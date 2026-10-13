@@ -1,6 +1,6 @@
-# Space Tower Defense — Navigation & Performance Plan (Godot 2D)
+# Space Tower Defense — Navigation & Performance Plan (Godot 2D / C#)
 
-> Planning notes only; **not yet implemented**. Gameplay inspired by *Helix Defense 2*. Condensed from older GameMaker TD code and its optimization experiments. Read [CodePreferences.md](CodePreferences.md) before implementing; refer to the user's Isometric 2D/3D repositories for organization patterns where helpful.
+> Planning notes only; **not yet implemented**. Gameplay inspired by *Helix Defense 2*. Condensed from older GameMaker TD code and its optimization experiments. **Implementation language: C# (.NET), not GDScript.** Read [CodePreferences.md](CodePreferences.md) before implementing; refer to the user's Isometric 2D/3D repositories for organization patterns where helpful.
 
 ## Core game
 - **Fully 2D, top-down** sci-fi tower defense. Alien ships attack objectives; no fixed road required.
@@ -28,9 +28,9 @@
 - Check that tower placement **preserves required paths** from currently relevant portal/edge entries to their assigned goals.
 - Path variation and diagonals must obey collision clearance and avoid corner cutting.
 
-## Initial Godot implementation: budgeted AStarGrid2D
-1. **NavigationGrid:** compact cell state (walkable, blocked, buildable, occupied), spawn entries and goals; align it to the placement grid.
-2. **PathRequestManager:** central queue with configurable **maximum path calculations per frame**; prioritize urgent requests. New ships request a path; moving ships **reuse** theirs until needed.
+## Initial Godot C# implementation: budgeted AStarGrid2D
+1. **NavigationGrid (C#):** compact cell state (walkable, blocked, buildable, occupied), spawn entries and goals; align it to the placement grid. Use typed arrays/enums for hot-path data where appropriate.
+2. **PathRequestManager (C#):** central queue with configurable **maximum path calculations per frame**; prioritize urgent requests. New ships request a path; moving ships **reuse** theirs until needed. Avoid unnecessary allocations in frequent updates.
 3. **Grid revision:** change navigation revision on tower placement/removal or obstacle destruction. Refresh affected routes; while waiting, ships must **stop safely** before newly blocked segments.
 4. **Path caching:** reuse routes for compatible start/goal regions when beneficial; do not allocate one new route every frame.
 5. **Movement:** follow waypoints with smooth facing, velocity and safe slight variation. Optional simple separation between ships.
@@ -40,7 +40,7 @@
 **Alternative to benchmark:** reverse Dijkstra/BFS **distance/flow fields** shared by ships headed to the same goal. Reading field directions is very cheap for swarms; rebuilding fields after layout changes has a cost. Compare actual CPU timings against cached/budgeted A*, especially for hundreds of ships and multiple destinations.
 
 ## Performance principles
-- Start with lightweight **Node2D** ships; separate logical simulation data from visuals so rendering can be optimized later.
+- Start with lightweight **Node2D** ships implemented as Godot **C# partial classes**; separate logical simulation data from visuals so rendering can be optimized later.
 - Spread targeting and other noncritical checks over frames with a **reusable staggered-check helper**.
 - Use spatial buckets for nearby target queries **if** broad scans become a bottleneck.
 - Avoid hundreds of active `RigidBody2D` objects, all-vs-all collision checks and unnecessary per-frame allocations.
@@ -54,4 +54,4 @@
 3. **Profile & improve:** raise to 500 ships, measure spikes, test flow fields *only if needed*. Then polish artwork, particles and more maps.
 
 ## Project/code conventions
-Follow `NOTES/CodePreferences.md`: clearly described scripts, `# =====` dividers and comments **above** functions, sensible regions, compact readable code, helper nodes instead of cluttered scene trees, grouped exports/settings, and a **MasterConfig** in major uppercase feature folders where appropriate. Prefer cohesive, simple systems; avoid overengineering. Keep existing notes authoritative when they provide specific feature context. **Do not modify game code as part of this documentation-only step.**
+**C# (.NET) is the project language, not GDScript.** Follow `NOTES/CodePreferences.md`: a short header comment per `.cs` file, `// =====` dividers and comments **above** methods, `#region` where helpful, compact readable C#, helper nodes instead of cluttered scene trees, `[Export]` and `[ExportGroup]` for Inspector settings, and a **MasterConfig** C# class/resource in major uppercase feature folders where appropriate. Use strongly typed enums/data structures and reusable stagger helpers; avoid allocations in hot loops. Prefer cohesive, simple systems; avoid overengineering. Keep existing notes authoritative when they provide specific feature context. **Do not modify game code as part of this documentation-only step.**
