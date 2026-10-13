@@ -1,5 +1,5 @@
 // Permanent top HUD, Ctrl-toggle tower tray, and independent bottom-right inspector.
-// Tower buttons currently show prototype details; placement/combat/economy are NOT wired in.
+// The Battle Tower button now enters placement mode; other options stay informational.
 using Godot;
 
 public partial class GameplayHUD : Control
@@ -8,7 +8,7 @@ public partial class GameplayHUD : Control
     [Export] public UIMasterConfig Config { get; set; }
 
     // =========================================================
-    // Future tower placement system can subscribe to this UI-only selection event.
+    // Placement subscribes to Battle Tower selections; other IDs are prototypes.
     [Signal] public delegate void TowerChoiceRequestedEventHandler(string towerId);
     #endregion
 
@@ -27,7 +27,7 @@ public partial class GameplayHUD : Control
     // These entries are just HUD samples. No towers are placed or instantiated by this class.
     private static readonly PrototypeTower[] SampleTowers =
     {
-        new("gun", "Gun Tower", "Offensive", "Footprint: 1 x 1\nCost: TBD\nDamage: TBD\nRange: TBD", "Basic kinetic defense."),
+        new("battle", "Battle Tower", "Offensive", "Footprint: 1 x 1\nBarrels: 1\nRange: 4 cells", "Balanced starter tower. Click to place on the grid."),
         new("laser", "Laser Tower", "Offensive", "Footprint: 1 x 1\nCost: TBD\nDamage: TBD\nRange: TBD", "Planned energy weapon."),
         new("missile", "Missile Tower", "Offensive", "Footprint: 1 x 1\nCost: TBD\nSplash: TBD", "Planned explosive defense."),
         new("repair", "Repair Tower", "Support", "Footprint: 1 x 1\nCost: TBD\nRepair rate: TBD", "Repairs nearby friendly towers."),
@@ -105,7 +105,7 @@ public partial class GameplayHUD : Control
     // Populate the prototype bar. Names and IDs are temporary until tower definitions exist.
     private void BindTowerButtons()
     {
-        string[] buttonNames = { "GunButton", "LaserButton", "MissileButton",
+        string[] buttonNames = { "BattleButton", "LaserButton", "MissileButton",
             "RepairButton", "SolarButton", "ResourceButton" };
         for (int i = 0; i < buttonNames.Length; i++)
         {
@@ -180,7 +180,7 @@ public partial class GameplayHUD : Control
         _towerBar.AddThemeStyleboxOverride("panel", MakePanel(Config.PanelColor, Config.AccentColor));
         _inspector.AddThemeStyleboxOverride("panel", MakePanel(Config.PanelColor, Config.AccentColor));
 
-        string[] buttons = { "GunButton", "LaserButton", "MissileButton",
+        string[] buttons = { "BattleButton", "LaserButton", "MissileButton",
             "RepairButton", "SolarButton", "ResourceButton" };
         foreach (string name in buttons)
         {

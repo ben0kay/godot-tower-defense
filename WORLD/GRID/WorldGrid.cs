@@ -24,6 +24,14 @@ public partial class WorldGrid : Node2D
     }
 
     // =========================================================
+    // Convert a cell coordinate into its visual center, respecting the grid transform.
+    public Vector2 CellToWorldCenter(Vector2I cell)
+    {
+        float s = Config.CellSize;
+        return ToGlobal(new Vector2((cell.X + 0.5f) * s, (cell.Y + 0.5f) * s));
+    }
+
+    // =========================================================
     // Shared bounds check for placement previews and cursor diagnostics.
     public bool IsInsideMap(Vector2I cell) =>
         cell.X >= 0 && cell.Y >= 0 && cell.X < Config.WidthCells && cell.Y < Config.HeightCells;

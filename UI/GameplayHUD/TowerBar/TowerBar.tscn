@@ -36,11 +36,11 @@ theme_override_font_sizes/font_size = 11
 layout_mode = 2
 theme_override_constants/separation = 7
 
-[node name="GunButton" type="Button" parent="Insets/Tray/Buttons"]
+[node name="BattleButton" type="Button" parent="Insets/Tray/Buttons"]
 custom_minimum_size = Vector2(112, 65)
 layout_mode = 2
 size_flags_horizontal = 3
-text = "GUN\nOffensive"
+text = "BATTLE\nOffensive"
 
 [node name="LaserButton" type="Button" parent="Insets/Tray/Buttons"]
 custom_minimum_size = Vector2(112, 65)

@@ -8,3 +8,5 @@
 [node name="Grid" type="Node2D" parent="."]
 script = ExtResource("1_script")
 Config = ExtResource("2_config")
+
+[node name="Towers" type="Node2D" parent="."]
