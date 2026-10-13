@@ -1,7 +1,5 @@
 # TileSets
 
-Reserved for reusable Godot 4 `TileSet` resources and atlas definitions. Codex should create the first 64 × 64-pixel tile atlas and assign it to level `TileMapLayer` nodes.
+`WorldTerrain.tres` is the paint-ready shared 64 px atlas. Source 0 uses `../Tiles/Metal/prototype_atlas.svg` with six tiles. Boolean custom-data layers are `can_build` and `blocks_enemies`.
 
-Define TileSet custom-data Boolean layers **`can_build`** and **`blocks_enemies`**. Paint different metal/dirt/decor variants with intentional rules; avoid deriving logic from visual texture ID alone.
-
-Use source artwork in `../Tiles/`. No TileSet assets are created in this documentation-only pass: the starter scenes cannot paint tiles until a resource is assigned.
+All levels can reuse this resource. Paint Ground/Walls for gameplay and Decorations for cosmetic detail. Changing a tile's metadata affects all maps that use it. The palette and initial behavior table are documented in `WORLD/LEVELS/Level001/README.md`. No physics/navigation polygons are needed: the logical grid caches tile data for future navigation.

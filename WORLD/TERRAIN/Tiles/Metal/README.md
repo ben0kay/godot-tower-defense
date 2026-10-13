@@ -1,7 +1,5 @@
 # Metal Tiles
 
-Planned 64×64 metal atlas examples: unbuildable solid wall, buildable solid wall/platform, buildable enemy-passable floor, and purely decorative plating.
+`prototype_atlas.svg` is a replaceable 384×64 vector atlas with six 64px cells: unbuildable metal wall, buildable solid platform, open metal floor, rocky obstacle, open dirt and transparent decal. The temporary atlas mixes materials; final artwork can move into separate Metal/Dirt/Decorative sources.
 
-Do not assume that metal means solid: `can_build` and `blocks_enemies` can vary per TileSet tile even with similar art.
-
-No images or actual tile definitions yet; Codex or later artwork passes will supply them.
+Gameplay metadata belongs to `WORLD/TERRAIN/TileSets/WorldTerrain.tres`, independent of artwork. See `WORLD/LEVELS/Level001/README.md` for the palette. Keep tile regions at 64px when replacing artwork.

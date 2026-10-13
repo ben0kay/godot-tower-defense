@@ -17,6 +17,6 @@ Use Godot `TileSet` custom-data **Boolean layers** named exactly:
 
 A tower being placed on a passable buildable tile sets a **runtime navigation blocker** until removed; a tower on an already-solid tile doesn't add new blockage. Dynamic occupancy is not equivalent to a painted wall.
 
-Future C# implementation should read TileMapLayer cell data **on scene load or when tiles change**, cache results into an array indexed by grid coordinates, and let placement/pathing query that array. Do not scan TileMapLayer/scene-tree state every frame or for each enemy. Before allowing new blockers, check that required spawn-to-goal routes remain connected.
+`WORLD/GRID/WorldGrid.cs` reads TileMapLayer cell data **on scene load or explicit `RebuildTerrain()` calls**, caches results in Boolean arrays indexed by grid coordinates, and exposes shared build/block/occupancy queries. Do not scan TileMapLayer/scene-tree state every frame or for each enemy. Route connectivity must be added with enemy navigation before allowing gameplay blockers in a combat level.
 
-The folder contains documentation only. The current `TowerPlacementController.cs` still checks only in-bounds/unoccupied cells; it does not enforce these rules until Codex integrates them.
+`TowerPlacementController.cs` now enforces these terrain/bounds/occupancy rules. Object footprints reserve Portal/Citadel cells. Navigation revision changes when a tower newly blocks an open cell; no actual pathfinding or route checking exists yet. Tiles on Walls replace Ground rules even when their Boolean values are false.

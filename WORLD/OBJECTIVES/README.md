@@ -2,9 +2,9 @@
 
 World objects that enemies seek, rather than enemy AI/logic or terrain tiles. The first primary objective is **The Citadel**.
 
-- `Citadel/Citadel.tscn` — minimal editable scene shell for the destination.
+- `Citadel/Citadel.tscn` — editable destination with placeholder visuals, a reserved solid 3×3 footprint and four approach markers.
 - `Citadel/README.md` — design intent and future integration.
 
-The Citadel will eventually have a visual footprint, health/armor, possible damage/destruction VFX and level-loss consequences. It may be solid to enemies, so **enemy paths should target reachable approach points around it**, not force ships into its blocked center.
+The Citadel now has a logical solid footprint. Health/armor, damage/destruction VFX and level-loss consequences remain future work, so **enemy paths should target reachable approach points around it**, not force ships into its blocked center.
 
 The spawning/movement systems live under `ENEMIES/`; place the Citadel under a level's `Objectives` container. No gameplay logic or ObjectiveMasterConfig exists yet.

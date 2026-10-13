@@ -13,7 +13,6 @@ public partial class WorldMasterConfig : Resource
     [ExportGroup("Grid Visuals")]
     [Export] public bool ShowGrid { get; set; } = true;
     [Export] public bool ShowHoverCell { get; set; } = true;
-    [Export] public Color MapColor { get; set; } = new Color(0.035f, 0.058f, 0.092f);
     [Export] public Color GridColor { get; set; } = new Color(0.17f, 0.34f, 0.43f, 0.36f);
     [Export] public Color BorderColor { get; set; } = new Color(0.34f, 0.79f, 0.89f, 0.72f);
     [Export] public Color HoverColor { get; set; } = new Color(0.22f, 0.70f, 0.85f, 0.16f);

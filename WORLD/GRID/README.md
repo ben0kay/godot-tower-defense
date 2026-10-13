@@ -1,9 +1,9 @@
 # WORLD / GRID
 
-A lightweight top-down **visual grid**. Initial defaults: **64-pixel cells**, **100 x 80** cells (6,400 x 5,120 world units).
+`WorldGrid.cs` is the single cached gameplay grid plus a transparent, viewport-limited debug overlay. Default dimensions remain 100×80 cells at 64 px, configured in `WORLD/DefaultWorldConfig.tres`.
 
-`WorldGrid.cs` converts positions to cell indices, shares map bounds, and draws only visible lines with one Node2D. `GridDebugOverlay.cs` reports the hovered cell and camera metrics.
+It reads the live `World/Level` Ground and Walls layers on startup, applies object footprints, and stores build permission, static blockage, reservations and runtime tower occupancy in compact arrays. `CanBuild`, `BlocksEnemies`, `IsOccupied`, `PlacementFailure`, `TryOccupy` and `ReleaseOccupancy` expose shared queries/mutations. `RebuildTerrain` refreshes static rules while retaining occupancy. Future selling/destruction must release occupancy and remove the corresponding placement-controller tower reference.
 
-**Important:** No cells are currently marked buildable/blocked and no navigation is implemented. The later placement/navigation systems must store actual buildability and occupancy; this visual overlay is not pathfinding data.
+`WorldObjectFootprint.cs` reserves authored Portal/Citadel cells. Its root is the upper-left footprint cell center; SizeCells and BlocksEnemies are Inspector-editable.
 
-Tweak all initial map and grid settings in `WORLD/DefaultWorldConfig.tres`. Navigation details: `NOTES/NAVIGATION_PERFORMANCE_PLAN.md`.
+`GridDebugOverlay.cs` reports cell rules, occupancy, camera metrics and navigation revision. `NavigationRevision` is an invalidation counter for future pathing, not a navigation implementation. Background rendering belongs to the level, keeping grid lines/hover overlays transparent.

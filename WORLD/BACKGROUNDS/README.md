@@ -8,6 +8,4 @@ Purely visual **non-tilemap** art intended to appear behind a level's physical t
 
 A nebula is **not a wall tile, an occupancy cell or a gameplay obstacle**. Leaving terrain cells empty allows it to show through. No collision, buildability, pathfinding or save-state requirements.
 
-The current `WorldGrid._Draw()` paints an opaque `MapColor` rectangle. When Codex integrates backgrounds, change the draw/ordering appropriately so the nebula is visible. Preserve camera/grid overlay and do not blend collision properties into cosmetics.
-
-This pass provides folder structure and documentation only, no background artwork/shaders or live scene integration.
+The live Level001 includes a world-anchored SVG placeholder starfield/nebula under SpaceBackground/Stars. WorldGrid now draws transparent lines/diagnostics rather than an opaque fill. Add or replace sprites without changing gameplay rules. Keep SpaceBackground at z=-20, behind terrain.

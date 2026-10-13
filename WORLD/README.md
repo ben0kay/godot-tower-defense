@@ -2,26 +2,26 @@
 
 This folder owns the playable **top-down 2D world** of the space tower-defense game. The long-term direction is **hand-authored maps** painted directly in the Godot 4 editor, with large areas of open space, detailed metal base corridors, disconnected wall/platform islands, dirt/rock formations and independent nebula/star backgrounds.
 
-**Important status (October 2026):** The existing `World.tscn`, `GRID/WorldGrid.cs` and Battle Tower placement prototype still run as before. The terrain/level folders and new Portal/Citadel scene shells are **authoring scaffolding only**. No actual 64×64 TileSet atlas, custom tile data, tilemap loading, navigation integration, or level switching is implemented. `Main.tscn` is deliberately unchanged.
+**Current status (October 2026):** Level001 is now mounted in the live world. Shared 64×64 TileSet, saved editable terrain, cached tile rules, tower build restrictions, space backdrop and visible Portal/Citadel placeholders are implemented. LevelConfig declares portal/edge/both source permissions. This is a terrain/placement playtest: enemy spawning, waves, navigation/route-preservation checks, firing, economy and Citadel health are not implemented. See `LEVELS/Level001/README.md` for exact testing and painting steps.
 
 ## Folders and responsibilities
 
 | Location | Responsibility |
 | --- | --- |
-| `World.tscn` | Current live world scene, holding the visual `Grid` and placed `Towers` container. |
+| `World.tscn` | Live world scene, mounting `Level001` as `Level`, the cached `Grid`, and placed `Towers` container. |
 | `WorldMasterConfig.cs` + `DefaultWorldConfig.tres` | Current Inspector-editable world/grid size (default 100 × 80 cells, 64 px each) and debug colors. |
-| `GRID/` | Logical grid coordinates and the current lightweight, visible-line editor/gameplay overlay. |
-| `TERRAIN/` | Reusable metal, dirt and decorative tiles; future Godot `TileSet` assets and tile gameplay rules. |
+| `GRID/` | Cached terrain rules/object reservations/tower occupancy, grid coordinates and transparent debug overlay. |
+| `TERRAIN/` | Shared 64px TileSet, replaceable prototype atlas and tile gameplay rules. |
 | `LEVELS/` | **Maps hand-painted by the designer**, including a reusable scene template and the starter `Level001` scene. |
 | `BACKGROUNDS/` | Non-colliding space art: nebulae, stars and distant planets independent of TileMapLayers. |
 | `PORTALS/` | **Physical, reusable Portal scene**, manually placed on maps where enemies emerge through portals. No spawning logic here. |
-| `OBJECTIVES/Citadel/` | **Physical Citadel scene**, the defended destination with future health/footprint and reachable approach points. |
+| `OBJECTIVES/Citadel/` | **Physical Citadel scene**, the defended destination with reserved solid 3×3 footprint and approach markers; health remains future work. |
 
 Avoid naming this system `SOLIDS/`: some buildable tiles are passable until built on, while purely visual tiles have no collision at all.
 
 ## Tile behavior — separate gameplay from artwork
 
-Every effective terrain cell should provide **two independent Boolean rules** (planned Godot TileSet custom-data names: `can_build` and `blocks_enemies`):
+Every effective terrain cell should provide **two independent Boolean rules** (Godot TileSet custom-data names: `can_build` and `blocks_enemies`):
 
 | Painted terrain | `can_build` | `blocks_enemies` | Game behavior |
 | --- | --- | --- | --- |
@@ -35,7 +35,7 @@ Every effective terrain cell should provide **two independent Boolean rules** (p
 
 For cells where multiple terrain layers overlap, choose **one authoritative gameplay tile**: `Walls` should take precedence over `Ground`; `Decorations` should never override navigation/build permissions. Keep a single, cached logical grid that merges authored tile data and runtime tower occupancy, rather than querying TileMapLayer nodes once per enemy every frame.
 
-Tower placement must check, in order: cell inside map, terrain `can_build`, currently unoccupied, sufficient funds when economy exists, and **active spawn-source-to-Citadel route validity** (Portal or map-edge sources) if construction would newly block an enemy-passable cell. A tower on a pre-blocked solid platform does not create additional navigation blockage. See `NOTES/NAVIGATION_PERFORMANCE_PLAN.md` for pathfinding and caching plans.
+With enemy navigation/economy implemented later, tower placement must check, in order: cell inside map, terrain `can_build`, currently unoccupied, sufficient funds when economy exists, and **active spawn-source-to-Citadel route validity** (Portal or map-edge sources) if construction would newly block an enemy-passable cell. Current placement enforces bounds, terrain permission, object reservations and occupancy; route validation/funds remain future work. A tower on a pre-blocked solid platform does not create additional navigation blockage. See `NOTES/NAVIGATION_PERFORMANCE_PLAN.md` for pathfinding and caching plans.
 
 ## Enemy entry and destination — world objects vs enemy mechanics
 
@@ -49,7 +49,7 @@ Enemy spawning can come from **Portals**, **map edges**, or **both**, chosen **p
 - `ENEMIES/Movement/`: later centralized enemy movement/nav.
 - `WORLD/LEVELS/`: per-level authored Portal/Citadel positions and future **level spawn parameters** (`Portals`, `MapEdges`, `Both`, allowed edge directions and optionally active Portal references).
 
-**For Codex:** The `Level001.tscn` scene currently contains legacy **marker-only placeholders** `GameplayMarkers/SpawnPoints/EnemySpawn` and `GameplayMarkers/Objectives/EnemyGoal`. When wiring the real level, replace them with instances of reusable `EnemyPortal.tscn` and `Citadel.tscn` as appropriate. Do not accidentally require Portal instances for edge-only maps; and do not make every map use Portals. The new Portal/Citadel files are **not yet instanced into the live game**.
+`Level001.tscn` now instances reusable EnemyPortal/Citadel objects under Portals/Objectives; legacy GameplayMarkers have been removed. Physical objects use `WorldObjectFootprint.cs` to reserve cells. Edge-only maps need no Portal instance. The empty LevelTemplate defaults to edge sources; Level001 defaults to its single Portal. All NodePaths in LevelConfig are relative to the level root.
 
 ## Author levels by painting in Godot, not by writing coordinates
 
@@ -69,9 +69,9 @@ Level001 (Node2D)
 └── Objectives (Node2D)            # Citadel scene instance(s)
 ```
 
-The scene above is the **target arrangement**, not the exact current `Level001.tscn` tree (which still uses `GameplayMarkers`). Existing `LEVELS/LevelTemplate.tscn` and `LEVELS/Level001/Level001.tscn` contain empty TileMapLayer nodes with **no assigned TileSet**; they are not yet paintable. After Codex assigns a shared 64px TileSet, select `Ground` or `Walls` in Godot's 2D editor to paint your base/corridors/isolated walls, leaving large regions unpainted to show nebulae. Use `Decorations` for scratches/decals, not physical blocking logic.
+This is now the actual Level001 arrangement. Ground, Walls and Decorations share `TERRAIN/TileSets/WorldTerrain.tres`. Select a layer in Godot's 2D editor and paint the map; save and press F5 to test with camera/HUD/placement. F6 runs only the level scene. Empty unpainted regions reveal space scenery.
 
-**Recommended level-config fields to implement later:** `SpawnMode` = `Portals` / `MapEdges` / `Both`, `AllowedEdges` = top/bottom/left/right flags, Portal references/IDs as appropriate, and a destination Citadel reference. Codex should define a single Inspector-editable per-level Resource when implementing those parameters; no placeholder config class is needed before then.
+`LEVELS/LevelConfig.cs` is the single Inspector-editable per-level spawn Resource: SpawnMode, AllowedEdges, ActivePortals and CitadelPath. These are metadata for future ENEMIES systems. Keep each new level's resource separate; keep WorldMasterConfig as the single source for grid/map dimensions.
 
 ## Nebulae and space backgrounds — NOT required to be tiles
 
@@ -82,22 +82,17 @@ Large nebula textures, stars and planets can be ordinary `Sprite2D` nodes, optio
 - **Cosmetic lighting/dust** can be added later, without modifying terrain/gameplay data.
 - A painted `Decorations` TileMapLayer is for repeated *grid-aligned surface detail*, not giant celestial scenery.
 
-**Rendering integration warning:** the current `GRID/WorldGrid.cs` draws an opaque map rectangle via `DrawRect(map, Config.MapColor)`. Codex must adjust that when wiring the space background, otherwise the dark fill or node draw order may conceal nebula art. Keep the optional visible grid lines/cell diagnostics, but draw the nebula **behind** terrain and choose a transparent grid background or a dedicated space-colored background layer.
+**Rendering:** WorldGrid no longer draws an opaque map fill. SpaceBackground renders at z=-20; terrain at z=0; transparent grid diagnostics at z=1; Portal/Citadel at z=3; towers at z=5; placement ghost at z=10.
 
-## Suggested Codex implementation order
+## Implemented terrain pass and next work
 
-1. Create a shared **64 × 64-pixel Godot TileSet atlas** in `TERRAIN/TileSets/`, using initial placeholder metal/ground tiles. Keep final artwork replaceable.
-2. Add TileSet **custom data layers** `can_build: bool` and `blocks_enemies: bool` and configure the five tile behaviors above; document which layers supply gameplay rules.
-3. Assign TileSet resources to `Ground`, `Walls` and `Decorations` in the starter level, then confirm the tiles can be painted using the **Godot editor**.
-4. Mount the selected level scene inside the existing live world without breaking `Main.tscn`, camera controls, HUD, the world-size config or the Battle Tower prototype.
-5. Populate one compact authoritative grid from authored tile properties. Empty cells should be open to enemies but not buildable. Respect Walls-over-Ground and ignore decorations for gameplay.
-6. Update `TOWERS/Placement/TowerPlacementController.cs` to check `can_build`, bounds and occupancy, and later route connectivity for towers that block travel. Keep tower art and scene ownership in `TOWERS/`.
-7. Allow large world-anchored nebula `Sprite2D` assets and (optionally) `Parallax2D` stars to show behind the painted tilemap. Preserve rendering order, mouse-to-cell snapping and camera bounds.
-8. Smoke-test: an unbuildable solid wall rejects tower placement; a solid buildable platform allows it but blocks ships; an open buildable tile permits ships until occupied; empty space/decoration rejects building but allows ships. Later verify paths from **both portal exits and enabled map edges** to the Citadel approach areas.
+The shared six-tile atlas includes unbuildable metal walls, buildable solid platforms, buildable open floors, rocky obstacles, open dirt and transparent decals. Ground/Walls custom data is cached once at startup; Walls override Ground and Decorations are ignored. Tower occupancy is committed through WorldGrid, with navigation revision updated only when occupancy creates a new blocker. Portal/Citadel footprints are reserved against construction.
 
-**Scope separation for Codex:** implement manual tile painting, tile rules, logical grid integration and Battle Tower build restrictions **first**. Preserve Portal/Citadel scene shells and document spawn settings, but **do not implement SpawnManager, waves, enemy AI, combat or Citadel health in this terrain task**.
+The starter map is saved as editable TileMapLayer data. No map generator runs in gameplay. To switch the live level, replace World.tscn's Level scene instance, keeping its node name. For runtime terrain edits, call RebuildTerrain explicitly; editor changes take effect on the next game run.
 
-**Avoid premature complexity:** no custom editor/plugin, procedural tile/world generation, per-cell Godot nodes, physics bodies per tile or always-running path checks. Revisit more advanced tile auto-joining and enemy radius/clearance when the base game is functioning.
+Next gameplay pass: active-source route validation, budgeted navigation, SpawnManager/WaveManager, enemy movement/health, Battle Tower firing, economy and Citadel defeat/victory. Spawning belongs under ENEMIES, tower mechanics under TOWERS. Do not infer nav clearance or route validity merely from a visible approach marker.
+
+**Avoid premature complexity:** no custom editor/plugin, procedural world generation, per-cell Godot nodes, physics bodies per tile or always-running path checks. Revisit tile auto-joining and enemy radius/clearance when the base game is functioning.
 
 ## Future master configurations
 

@@ -1,25 +1,45 @@
-[gd_scene format=3]
+[gd_scene format=4]
 
-[node name="LevelTemplate" type="Node2D"]
+[ext_resource type="Texture2D" path="res://WORLD/BACKGROUNDS/Stars/level001_space.svg" id="1_p5ed7"]
+[ext_resource type="TileSet" path="res://WORLD/TERRAIN/TileSets/WorldTerrain.tres" id="2_8pvwx"]
 
-[node name="SpaceBackground" type="Node2D" parent="."]
+[ext_resource type="Script" path="res://WORLD/LEVELS/WorldLevel.cs" id="3_root"]
+[ext_resource type="Resource" path="res://WORLD/LEVELS/DefaultLevelConfig.tres" id="4_config"]
+[ext_resource type="PackedScene" path="res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn" id="5_portal"]
+[ext_resource type="PackedScene" path="res://WORLD/OBJECTIVES/Citadel/Citadel.tscn" id="6_citadel"]
 
-[node name="Nebulae" type="Node2D" parent="SpaceBackground"]
+[node name="LevelTemplate" type="Node2D" unique_id=864740696]
+script = ExtResource("3_root")
+Settings = ExtResource("4_config")
 
-[node name="Stars" type="Node2D" parent="SpaceBackground"]
+[node name="SpaceBackground" type="Node2D" parent="." unique_id=1825087959]
+z_index = -20
 
-[node name="Planets" type="Node2D" parent="SpaceBackground"]
+[node name="Nebulae" type="Node2D" parent="SpaceBackground" unique_id=87135791]
 
-[node name="Terrain" type="Node2D" parent="."]
+[node name="Stars" type="Node2D" parent="SpaceBackground" unique_id=2028579996]
 
-[node name="Ground" type="TileMapLayer" parent="Terrain"]
+[node name="Space" type="Sprite2D" parent="SpaceBackground/Stars" unique_id=1191861450]
+texture = ExtResource("1_p5ed7")
+centered = false
+scale = Vector2(4, 4)
 
-[node name="Walls" type="TileMapLayer" parent="Terrain"]
+[node name="Planets" type="Node2D" parent="SpaceBackground" unique_id=1684856347]
 
-[node name="Decorations" type="TileMapLayer" parent="Terrain"]
+[node name="Terrain" type="Node2D" parent="." unique_id=833107286]
 
-[node name="GameplayMarkers" type="Node2D" parent="."]
+[node name="Ground" type="TileMapLayer" parent="Terrain" unique_id=1382848671]
+tile_set = ExtResource("2_8pvwx")
 
-[node name="SpawnPoints" type="Node2D" parent="GameplayMarkers"]
+[node name="Walls" type="TileMapLayer" parent="Terrain" unique_id=1176658847]
+tile_set = ExtResource("2_8pvwx")
 
-[node name="Objectives" type="Node2D" parent="GameplayMarkers"]
+[node name="Decorations" type="TileMapLayer" parent="Terrain" unique_id=1034975239]
+tile_set = ExtResource("2_8pvwx")
+
+[node name="Portals" type="Node2D" parent="." unique_id=219222935]
+
+[node name="Objectives" type="Node2D" parent="." unique_id=1539156350]
+
+[node name="Citadel" parent="Objectives" instance=ExtResource("6_citadel")]
+position = Vector2(3872, 2528)

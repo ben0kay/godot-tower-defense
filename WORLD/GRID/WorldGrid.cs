@@ -1,6 +1,7 @@
-// Single-canvas grid renderer: draw only visible grid lines instead of per-tile nodes.
-// Expose map bounds and grid-to-world conversion for future placement/pathing systems.
+// Cached terrain, object reservations and tower occupancy for the live hand-painted level.
+// One transparent canvas draws only visible grid lines; no per-cell nodes or physics.
 using Godot;
+using System;
 
 public partial class WorldGrid : Node2D
 {
@@ -37,6 +38,107 @@ public partial class WorldGrid : Node2D
         cell.X >= 0 && cell.Y >= 0 && cell.X < Config.WidthCells && cell.Y < Config.HeightCells;
     #endregion
 
+    #region Terrain and Occupancy
+    private bool[] _buildable, _terrainBlocked, _occupied, _reserved;
+    public int NavigationRevision { get; private set; }
+    public WorldLevel Level { get; private set; }
+
+    // =========================================================
+    // Read authored terrain once, after the preceding Level scene has entered the tree.
+    public override void _Ready()
+    {
+        Level = GetNode<WorldLevel>("../Level");
+        int count = Config.WidthCells * Config.HeightCells;
+        _buildable = new bool[count]; _terrainBlocked = new bool[count];
+        _occupied = new bool[count]; _reserved = new bool[count];
+        RebuildTerrain();
+    }
+
+    // =========================================================
+    // Rebuild static rules on an explicit map edit/load; retain runtime tower occupancy.
+    public void RebuildTerrain()
+    {
+        Array.Clear(_buildable); Array.Clear(_terrainBlocked); Array.Clear(_reserved);
+        ReadLayer(Level.Ground);
+        ReadLayer(Level.Walls); // Walls replace Ground rules, including false values.
+        ReadFootprints(Level);
+        NavigationRevision++;
+        QueueRedraw();
+    }
+
+    // =========================================================
+    // Custom data defines behavior; Decorations deliberately never enter this cache.
+    private void ReadLayer(TileMapLayer layer)
+    {
+        if (layer.TileSet == null || layer.TileSet.TileSize != Vector2I.One * Config.CellSize)
+            throw new InvalidOperationException($"{layer.GetPath()}: TileSet tile size must match WorldMasterConfig.CellSize.");
+        foreach (Vector2I painted in layer.GetUsedCells())
+        {
+            TileData tile = layer.GetCellTileData(painted);
+            if (tile == null) continue;
+            Vector2I cell = WorldToCell(layer.ToGlobal(layer.MapToLocal(painted)));
+            if (!IsInsideMap(cell)) { GD.PushWarning($"Ignoring terrain outside map: {cell}"); continue; }
+            int index = Index(cell);
+            _buildable[index] = tile.GetCustomData("can_build").AsBool();
+            _terrainBlocked[index] = tile.GetCustomData("blocks_enemies").AsBool();
+        }
+    }
+
+    // =========================================================
+    // Portal and objective cells reject towers, independent of painted terrain.
+    private void ReadFootprints(Node parent)
+    {
+        if (parent is WorldObjectFootprint footprint)
+        {
+            Vector2I start = WorldToCell(footprint.GlobalPosition);
+            for (int y = 0; y < footprint.SizeCells.Y; y++)
+                for (int x = 0; x < footprint.SizeCells.X; x++)
+                {
+                    Vector2I cell = start + new Vector2I(x, y);
+                    if (!IsInsideMap(cell)) continue;
+                    int index = Index(cell);
+                    _reserved[index] = true;
+                    _terrainBlocked[index] |= footprint.BlocksEnemies;
+                }
+        }
+        foreach (Node child in parent.GetChildren()) ReadFootprints(child);
+    }
+
+    // =========================================================
+    // Constant-time shared queries; outside-map cells cannot be traversed or built on.
+    private int Index(Vector2I cell) => cell.Y * Config.WidthCells + cell.X;
+    public bool CanBuild(Vector2I cell) => IsInsideMap(cell) && _buildable[Index(cell)] && !_reserved[Index(cell)];
+    public bool IsOccupied(Vector2I cell) => IsInsideMap(cell) && _occupied[Index(cell)];
+    public bool BlocksEnemies(Vector2I cell) => !IsInsideMap(cell) || _terrainBlocked[Index(cell)] || _occupied[Index(cell)];
+    public string PlacementFailure(Vector2I cell)
+    {
+        if (!IsInsideMap(cell)) return "Outside the map.";
+        if (_reserved[Index(cell)]) return "Reserved for a Portal or the Citadel.";
+        if (!_buildable[Index(cell)]) return "This terrain does not allow towers.";
+        if (_occupied[Index(cell)]) return "A tower already occupies this cell.";
+        return "";
+    }
+
+    // =========================================================
+    // Commit occupancy once; navigation revision changes only for new obstacles.
+    public bool TryOccupy(Vector2I cell)
+    {
+        if (PlacementFailure(cell).Length != 0) return false;
+        _occupied[Index(cell)] = true;
+        if (!_terrainBlocked[Index(cell)]) NavigationRevision++;
+        return true;
+    }
+
+    // =========================================================
+    // Removal is ready for future selling/destruction mechanics.
+    public void ReleaseOccupancy(Vector2I cell)
+    {
+        if (!IsOccupied(cell)) return;
+        _occupied[Index(cell)] = false;
+        if (!_terrainBlocked[Index(cell)]) NavigationRevision++;
+    }
+    #endregion
+
     #region Redraw
     // =========================================================
     // Queue new drawing only if the visible area or hovered square has changed.
@@ -59,7 +161,7 @@ public partial class WorldGrid : Node2D
     public override void _Draw()
     {
         Rect2 map = WorldBounds;
-        DrawRect(map, Config.MapColor);
+        // The level owns its background; keep this overlay transparent.
 
         Transform2D localFromViewport = GetGlobalTransformWithCanvas().AffineInverse();
         Vector2 a = localFromViewport * Vector2.Zero;

@@ -10,8 +10,8 @@ Planned `SpawnManager` reads per-level spawn settings in `WORLD/LEVELS/`, choose
 - **Map Edges:** select valid locations from the configured **Top, Bottom, Left and/or Right** map boundaries. This does not require physical Portal objects.
 - **Both:** allow an explicit mixture of the above. Later, a wave may override the source selection.
 
-Suggested future per-level fields (names may be refined by Codex):
-`spawn_mode` (Portals / MapEdges / Both), `allowed_edges`, `active_portals` (scene references or IDs), optional weights / spawn clearance, and destination Citadel reference. Map edges are derived from map bounds, not extra tile types or hand-authored wall cells.
+Implemented per-level metadata in `WORLD/LEVELS/LevelConfig.cs`:
+`SpawnMode` (Portals / MapEdges / Both), `AllowedEdges`, `ActivePortals` (root-relative NodePaths), and `CitadelPath`. Weights and spawn clearance remain future work. Map edges are derived from map bounds, not extra tile types or hand-authored wall cells.
 
 ### Responsibilities and rules
 

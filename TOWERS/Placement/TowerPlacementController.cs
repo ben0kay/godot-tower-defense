@@ -1,5 +1,5 @@
 // Build mode for the first Battle Tower: ghost, grid validation and selection.
-// The occupancy dictionary is shared by all placements; no per-cell nodes or ticked towers.
+// WorldGrid owns occupancy; the local dictionary only finds/selects tower instances.
 using Godot;
 using System.Collections.Generic;
 
@@ -20,7 +20,7 @@ public partial class TowerPlacementController : Node2D
     private GameplayHUD _hud;
     private Node2D _towers;
     private Sprite2D _ghost;
-    private readonly Dictionary<Vector2I, BattleTower> _occupied = new();
+    private readonly Dictionary<Vector2I, BattleTower> _placedTowers = new();
     private Vector2I _hoverCell = new(int.MinValue, int.MinValue);
     private bool _placing, _previewVisible, _previewValid;
     private BattleTower _selected;
@@ -62,7 +62,7 @@ public partial class TowerPlacementController : Node2D
         _placing = true;
         SetProcess(true);
         _hud.ShowTowerDetails(BattleConfig.DisplayName, "Offensive / Build Preview",
-            DescribeTower(), "Left-click a free square to build. Right-click / Esc cancels.");
+            DescribeTower(), "Left-click a buildable terrain square to build. Right-click / Esc cancels.");
         UpdatePreview();
     }
 
@@ -71,12 +71,12 @@ public partial class TowerPlacementController : Node2D
     public override void _Process(double delta) => UpdatePreview();
 
     // =========================================================
-    // One cell-based preview, green on free cells and red on occupied ones.
+    // One cell-based preview, green on buildable free cells and red on invalid terrain.
     private void UpdatePreview()
     {
         Vector2I cell = _grid.WorldToCell(GetGlobalMousePosition());
         bool visible = _placing && !IsOverUi() && _grid.IsInsideMap(cell);
-        bool valid = visible && !_occupied.ContainsKey(cell);
+        bool valid = visible && _grid.PlacementFailure(cell).Length == 0;
         if (_previewVisible == visible && _previewValid == valid && (!visible || cell == _hoverCell))
             return;
 
@@ -86,6 +86,10 @@ public partial class TowerPlacementController : Node2D
         _ghost.Visible = visible && Settings.ShowPlacementPreview;
         if (visible)
         {
+            if (_selected == null)
+                _hud.ShowTowerDetails(BattleConfig.DisplayName, "Offensive / Build Preview", DescribeTower(),
+                    valid ? "Left-click to build. Right-click / Esc cancels."
+                        : _grid.PlacementFailure(cell));
             _ghost.GlobalPosition = _grid.CellToWorldCenter(cell);
             _ghost.Modulate = valid ? new Color(0.45f, 1f, 0.73f, 0.66f)
                 : new Color(1f, 0.35f, 0.31f, 0.56f);
@@ -129,7 +133,7 @@ public partial class TowerPlacementController : Node2D
 
         Vector2I cell = _grid.WorldToCell(GetGlobalMousePosition());
         if (_placing) TryPlace(cell);
-        else if (_occupied.TryGetValue(cell, out BattleTower tower)) SelectTower(tower);
+        else if (_placedTowers.TryGetValue(cell, out BattleTower tower)) SelectTower(tower);
         else { SelectTower(null); _hud.ClearInspection(); }
         GetViewport().SetInputAsHandled();
     }
@@ -138,11 +142,12 @@ public partial class TowerPlacementController : Node2D
     // Spawn an idle tower centered on a valid, unoccupied grid cell.
     private void TryPlace(Vector2I cell)
     {
-        if (!_grid.IsInsideMap(cell) || _occupied.ContainsKey(cell)) return;
+        if (_grid.PlacementFailure(cell).Length != 0) return;
         BattleTower tower = BattleTowerScene.Instantiate<BattleTower>();
+        if (!_grid.TryOccupy(cell)) { tower.Free(); return; }
         _towers.AddChild(tower);
         tower.SetPlacement(cell, _grid.CellToWorldCenter(cell));
-        _occupied.Add(cell, tower);
+        _placedTowers.Add(cell, tower);
         SelectTower(tower);
         UpdatePreview();
     }
