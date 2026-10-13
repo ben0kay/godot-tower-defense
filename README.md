@@ -11,6 +11,7 @@ Camera controls: **WASD/Arrows** pan, **middle mouse drag** to pan freely, **mou
 ## Customize
 - `CAMERA/DefaultCameraConfig.tres`: speed, smoothing, zoom and camera boundary limits.
 - `WORLD/DefaultWorldConfig.tres`: map cell dimensions (100 x 80 by default), 64-pixel grid, colors and visibility.
+- `TOWERS/`: future player-placeable offensive, support, economy and utility towers (structure only).
 - `FEEDBACK/`: placeholders for defense bars, damage numbers and camera effects.
 
 Debug overlay shows hovered cell, zoom, camera coordinates, FPS. World grid is drawn using one Node2D rather than thousands of scene nodes.
