@@ -1,0 +1,31 @@
+[gd_scene format=3]
+
+[node name="Level001" type="Node2D"]
+
+[node name="SpaceBackground" type="Node2D" parent="."]
+
+[node name="Nebulae" type="Node2D" parent="SpaceBackground"]
+
+[node name="Stars" type="Node2D" parent="SpaceBackground"]
+
+[node name="Planets" type="Node2D" parent="SpaceBackground"]
+
+[node name="Terrain" type="Node2D" parent="."]
+
+[node name="Ground" type="TileMapLayer" parent="Terrain"]
+
+[node name="Walls" type="TileMapLayer" parent="Terrain"]
+
+[node name="Decorations" type="TileMapLayer" parent="Terrain"]
+
+[node name="GameplayMarkers" type="Node2D" parent="."]
+
+[node name="SpawnPoints" type="Node2D" parent="GameplayMarkers"]
+
+[node name="EnemySpawn" type="Marker2D" parent="GameplayMarkers/SpawnPoints"]
+position = Vector2(320, 320)
+
+[node name="Objectives" type="Node2D" parent="GameplayMarkers"]
+
+[node name="EnemyGoal" type="Marker2D" parent="GameplayMarkers/Objectives"]
+position = Vector2(3200, 2560)
