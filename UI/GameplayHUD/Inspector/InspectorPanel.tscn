@@ -1,0 +1,57 @@
+[gd_scene format=3]
+
+[node name="Inspector" type="PanelContainer"]
+custom_minimum_size = Vector2(292, 0)
+mouse_filter = 0
+
+[node name="Insets" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="Body" type="VBoxContainer" parent="Insets"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Heading" type="HBoxContainer" parent="Insets/Body"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Insets/Body/Heading"]
+layout_mode = 2
+text = "INSPECTOR"
+theme_override_font_sizes/font_size = 14
+
+[node name="Spacer" type="Control" parent="Insets/Body/Heading"]
+layout_mode = 2
+mouse_filter = 2
+size_flags_horizontal = 3
+
+[node name="CloseButton" type="Button" parent="Insets/Body/Heading"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+text = "X"
+flat = true
+tooltip_text = "Close inspector"
+
+[node name="TowerName" type="Label" parent="Insets/Body"]
+layout_mode = 2
+text = "No tower selected"
+theme_override_font_sizes/font_size = 17
+
+[node name="TowerCategory" type="Label" parent="Insets/Body"]
+layout_mode = 2
+text = "CATEGORY"
+theme_override_font_sizes/font_size = 12
+
+[node name="TowerStats" type="Label" parent="Insets/Body"]
+layout_mode = 2
+text = "Prototype stats"
+theme_override_font_sizes/font_size = 13
+
+[node name="Notes" type="Label" parent="Insets/Body"]
+layout_mode = 2
+text = "Select a tower to preview."
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 11

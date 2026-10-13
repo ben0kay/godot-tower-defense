@@ -1,0 +1,58 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://UI/GameplayHUD/GameplayHUD.cs" id="1_hud"]
+[ext_resource type="Resource" path="res://UI/DefaultUIConfig.tres" id="2_config"]
+[ext_resource type="PackedScene" path="res://UI/GameplayHUD/TopBar/TopBar.tscn" id="3_top"]
+[ext_resource type="PackedScene" path="res://UI/GameplayHUD/TowerBar/TowerBar.tscn" id="4_tray"]
+[ext_resource type="PackedScene" path="res://UI/GameplayHUD/Inspector/InspectorPanel.tscn" id="5_inspector"]
+
+[node name="GameplayHUD" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_hud")
+Config = ExtResource("2_config")
+
+[node name="TopBar" parent="." instance=ExtResource("3_top")]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 46.0
+grow_horizontal = 2
+
+[node name="BottomArea" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = -166.0
+offset_right = -12.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="TraySlot" type="Control" parent="BottomArea"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="TowerBar" parent="BottomArea/TraySlot" instance=ExtResource("4_tray")]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Inspector" parent="BottomArea" instance=ExtResource("5_inspector")]
+visible = false
+layout_mode = 2

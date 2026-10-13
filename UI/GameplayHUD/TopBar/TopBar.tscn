@@ -1,0 +1,40 @@
+[gd_scene format=3]
+
+[node name="TopBar" type="PanelContainer"]
+mouse_filter = 0
+
+[node name="Insets" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 6
+
+[node name="Status" type="HBoxContainer" parent="Insets"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Wave" type="Label" parent="Insets/Status"]
+layout_mode = 2
+text = "WAVE --"
+theme_override_font_sizes/font_size = 16
+
+[node name="Credits" type="Label" parent="Insets/Status"]
+layout_mode = 2
+text = "CREDITS --"
+theme_override_font_sizes/font_size = 16
+
+[node name="Spacer" type="Control" parent="Insets/Status"]
+layout_mode = 2
+mouse_filter = 2
+size_flags_horizontal = 3
+
+[node name="Core" type="Label" parent="Insets/Status"]
+layout_mode = 2
+text = "CORE --"
+theme_override_font_sizes/font_size = 16
+
+[node name="Shortcut" type="Label" parent="Insets/Status"]
+layout_mode = 2
+text = "CTRL  /  TOWERS"
+theme_override_font_sizes/font_size = 13

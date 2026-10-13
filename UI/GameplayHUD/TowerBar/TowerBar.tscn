@@ -1,0 +1,73 @@
+[gd_scene format=3]
+
+[node name="TowerBar" type="PanelContainer"]
+mouse_filter = 0
+
+[node name="Insets" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="Tray" type="VBoxContainer" parent="Insets"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Header" type="HBoxContainer" parent="Insets/Tray"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Insets/Tray/Header"]
+layout_mode = 2
+text = "BUILD TOWERS"
+theme_override_font_sizes/font_size = 14
+
+[node name="Spacer" type="Control" parent="Insets/Tray/Header"]
+layout_mode = 2
+mouse_filter = 2
+size_flags_horizontal = 3
+
+[node name="Hint" type="Label" parent="Insets/Tray/Header"]
+layout_mode = 2
+text = "CTRL TO CLOSE"
+theme_override_font_sizes/font_size = 11
+
+[node name="Buttons" type="HBoxContainer" parent="Insets/Tray"]
+layout_mode = 2
+theme_override_constants/separation = 7
+
+[node name="GunButton" type="Button" parent="Insets/Tray/Buttons"]
+custom_minimum_size = Vector2(112, 65)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "GUN\nOffensive"
+
+[node name="LaserButton" type="Button" parent="Insets/Tray/Buttons"]
+custom_minimum_size = Vector2(112, 65)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "LASER\nOffensive"
+
+[node name="MissileButton" type="Button" parent="Insets/Tray/Buttons"]
+custom_minimum_size = Vector2(112, 65)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "MISSILE\nOffensive"
+
+[node name="RepairButton" type="Button" parent="Insets/Tray/Buttons"]
+custom_minimum_size = Vector2(112, 65)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "REPAIR\nSupport"
+
+[node name="SolarButton" type="Button" parent="Insets/Tray/Buttons"]
+custom_minimum_size = Vector2(112, 65)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "SOLAR\nEconomy"
+
+[node name="ResourceButton" type="Button" parent="Insets/Tray/Buttons"]
+custom_minimum_size = Vector2(112, 65)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "RESOURCE\nEconomy"

@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="PackedScene" path="res://WORLD/World.tscn" id="1_world"]
 [ext_resource type="PackedScene" path="res://CAMERA/CameraRig.tscn" id="2_camera"]
 [ext_resource type="Script" path="res://WORLD/GRID/GridDebugOverlay.cs" id="3_debug"]
+[ext_resource type="PackedScene" path="res://UI/GameplayHUD/GameplayHUD.tscn" id="4_hud"]
 
 [node name="Battlefield" type="Node2D"]
 
@@ -14,10 +15,12 @@
 
 [node name="DebugInfo" type="Label" parent="UI"]
 offset_left = 16.0
-offset_top = 12.0
+offset_top = 62.0
 offset_right = 1150.0
-offset_bottom = 115.0
+offset_bottom = 165.0
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.68, 0.91, 0.96, 1)
-theme_override_font_sizes/font_size = 17
+theme_override_colors/font_color = Color(0.68, 0.91, 0.96, 0.86)
+theme_override_font_sizes/font_size = 14
 script = ExtResource("3_debug")
+
+[node name="GameplayHUD" parent="UI" instance=ExtResource("4_hud")]
