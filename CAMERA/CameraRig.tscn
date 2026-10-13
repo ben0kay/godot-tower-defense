@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://CAMERA/CameraController.cs" id="1_script"]
+[ext_resource type="Resource" path="res://CAMERA/DefaultCameraConfig.tres" id="2_config"]
+
+[node name="CameraRig" type="Node2D"]
+script = ExtResource("1_script")
+Config = ExtResource("2_config")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+enabled = true
