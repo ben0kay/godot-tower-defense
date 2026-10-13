@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[node name="Citadel" type="Node2D"]
+
+[node name="ApproachPoints" type="Node2D" parent="."]
+
+[node name="Approach01" type="Marker2D" parent="ApproachPoints"]
