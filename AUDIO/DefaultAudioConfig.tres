@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="AudioMasterConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://AUDIO/AudioMasterConfig.cs" id="1_config"]
+
+[resource]
+script = ExtResource("1_config")
+MasterDb = 0.0
+MusicDb = 0.0
+AmbienceDb = 0.0
+WorldSfxDb = 0.0
+UiDb = 0.0
+VoiceDb = 0.0
+MaxWorldOneShots = 24
+MaxUiOneShots = 6
+MaxVoiceOneShots = 1
+MaxWorldLoops = 12
+MaxAmbienceLoops = 6
+MaxRegisteredEmitters = 256
+EmitterCheckSeconds = 0.25
+DistanceCulling = true
+ScreenCulling = true
+ScreenMarginPixels = 120.0
+LoopResumeMarginPixels = 80.0
+PauseWorldAudioWithGame = true
+VoiceQueueLimit = 4
+DuckMusicDuringVoice = true
+VoiceMusicDuckDb = -8.0

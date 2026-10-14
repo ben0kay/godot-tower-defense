@@ -1,0 +1,19 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://AUDIO/AudioManager.cs" id="1_manager"]
+[ext_resource type="Resource" path="res://AUDIO/DefaultAudioConfig.tres" id="2_config"]
+[ext_resource type="Resource" path="res://AUDIO/DefaultAudioCatalog.tres" id="3_catalog"]
+[ext_resource type="Script" path="res://AUDIO/VoiceAssistant/VoiceAssistant.cs" id="4_voice"]
+[ext_resource type="Script" path="res://AUDIO/Debug/AudioTester.cs" id="5_debug"]
+
+[node name="AudioManager" type="Node2D"]
+process_mode = 3
+script = ExtResource("1_manager")
+Config = ExtResource("2_config")
+Catalog = ExtResource("3_catalog")
+
+[node name="VoiceAssistant" type="Node" parent="."]
+script = ExtResource("4_voice")
+
+[node name="AudioTester" type="Node" parent="."]
+script = ExtResource("5_debug")
