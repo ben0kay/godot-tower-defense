@@ -13,7 +13,7 @@ public static class EconomyChecks
         GameplayHUD hud = battle.GetNode<GameplayHUD>("UI/GameplayHUD");
         Label label = hud.GetNode<Label>("TopBar/Status/Credits");
         Require(wallet.GetBalance(credits) == grid.Level.Settings.StartingCredits, "Live level seeds its wallet");
-        Require(label.Text == $"CREDITS {wallet.GetBalance(credits):N0}", "HUD starts with the actual credit balance");
+        Require(label.Text == $"Credits: {wallet.GetBalance(credits):N0}", "HUD starts with the actual credit balance");
         wallet.Initialize(new LevelConfig { StartingCredits = 700 });
         Require(wallet.GetBalance(credits) == 700, "First level uses its starting amount");
         ResourceDefinition alloy = new() { ResourceId = "alloy", DisplayName = "Alloy" };
@@ -39,7 +39,7 @@ public static class EconomyChecks
         wallet.BalanceChanged += Changed;
         Require(wallet.TrySpend(Costs((credits, 50), (alloy, 2))) && allCommittedAtEvent, "Events observe the fully committed multi-resource payment");
         wallet.BalanceChanged -= Changed;
-        Require(label.Text == "CREDITS 100", "Credit changes push the HUD without polling");
+        Require(hud.TargetCredits == 100 && label.Text.StartsWith("Credits: "), "Credit target updates without polling while the visual number counts");
         Require(!wallet.TryPurchase(Costs((credits, 50)), () => false) && wallet.GetBalance(credits) == 100,
             "Failed build callback leaves funds untouched");
         try { wallet.TryPurchase(Costs((credits, 50)), () => throw new InvalidOperationException("Test creation failure")); }

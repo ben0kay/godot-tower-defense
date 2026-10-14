@@ -24,12 +24,27 @@ public partial class UIMasterConfig : Resource
     [Export(PropertyHint.Range, "0,1,0.05")] public float HealthWarningThreshold { get; set; } = 0.5f;
     [Export(PropertyHint.Range, "0,1,0.05")] public float HealthCriticalThreshold { get; set; } = 0.25f;
 
+    [ExportGroup("Credit Balance Animation")]
+    [Export] public bool AnimateCreditBalance { get; set; } = true;
+    [Export(PropertyHint.Range, "0.05,1,0.05")] public float CreditCountSeconds { get; set; } = 0.3f;
+
     [ExportGroup("Credit Reward Feedback")]
     [Export] public bool ShowCreditRewards { get; set; } = true;
     [Export(PropertyHint.Range, "0.1,3,0.05")] public float CreditRewardStackSeconds { get; set; } = 0.8f;
     [Export(PropertyHint.Range, "0.1,2,0.05")] public float CreditRewardFadeSeconds { get; set; } = 0.5f;
-    [Export(PropertyHint.Range, "0,40,1")] public float CreditRewardRisePixels { get; set; } = 12f;
+    [Export(PropertyHint.Range, "0,12,1")] public float CreditRewardRisePixels { get; set; } = 4f;
+    [Export(PropertyHint.Range, "1,1.5,0.05")] public float CreditRewardPulseScale { get; set; } = 1.25f;
+    [Export(PropertyHint.Range, "0.05,0.5,0.05")] public float CreditRewardPulseSeconds { get; set; } = 0.22f;
     [Export] public Color CreditRewardColor { get; set; } = new Color("#69e4a3");
+    [Export] public bool ShowCreditExpenses { get; set; } = true;
+    [Export] public Color CreditSpendColor { get; set; } = new Color("#efbc62");
+
+    [ExportGroup("Top Bar Reactions")]
+    [Export(PropertyHint.Range, "0,1,0.05")] public float CitadelBarTweenSeconds { get; set; } = 0.25f;
+    [Export(PropertyHint.Range, "0,1,0.05")] public float CitadelDamageFlashSeconds { get; set; } = 0.3f;
+    [Export] public Color CitadelDamageFlashColor { get; set; } = new Color("#ed6666");
+    [Export(PropertyHint.Range, "0,1,0.05")] public float WavePulseSeconds { get; set; } = 0.28f;
+    [Export(PropertyHint.Range, "1,1.25,0.01")] public float WavePulseScale { get; set; } = 1.10f;
 
     [ExportGroup("Interaction")]
     [Export] public bool StartWithTowerBarOpen { get; set; } = false;

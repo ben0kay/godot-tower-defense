@@ -1,6 +1,7 @@
 // Permanent top HUD, Ctrl-toggle tower tray, and independent bottom-right inspector.
 // Build entries come from the validated tower catalog; gameplay belongs to its controllers.
 using Godot;
+using System;
 using System.Collections.Generic;
 
 public partial class GameplayHUD : Control
@@ -31,6 +32,10 @@ public partial class GameplayHUD : Control
     private Label _upgradeInfo;
     private CreditGainIndicator _creditGain;
     private ProgressBar _healthBar;
+    private Tween _citadelBarTween, _citadelFlashTween, _wavePulseTween;
+    private int _targetCredits, _previousCitadelHealth = -1, _previousCitadelMax, _previousWave;
+    private double _displayCredits, _creditStart, _creditElapsed;
+    private bool _creditsInitialized, _creditCounting, _snapNextCredits;
     private StyleBoxFlat _healthFill;
     private Tween _trayTween;
     private bool _trayOpen;
@@ -53,6 +58,7 @@ public partial class GameplayHUD : Control
 
         _wave = GetNode<Label>("TopBar/Status/Wave");
         _credits = GetNode<Label>("TopBar/Status/Credits");
+        SetProcess(false);
         _creditGain = GetNode<CreditGainIndicator>("TopBar/Status/CreditGain");
         _creditGain.Configure(Config);
         _core = GetNode<Label>("TopBar/Status/Citadel/Health");
@@ -179,14 +185,19 @@ public partial class GameplayHUD : Control
     #region Future Gameplay Status API
     // =========================================================
     // Bind the actual wave system here when waves are implemented.
-    public void SetWave(int current, int total = 0) =>
+    public void SetWave(int current, int total = 0)
+    {
         _wave.Text = total > 0 ? $"WAVE {current:00} / {total:00}" : $"WAVE {current:00}";
+        if (current > 0 && current > _previousWave) PulseWave();
+        _previousWave = current;
+    }
 
     // =========================================================
     // Event-driven wave state presentation; no countdown or wave ownership lives in the HUD.
     public void SetWaveControls(int current, int total, string button, bool canStart, string message)
     {
-        if (total > 0) SetWave(current, total); else _wave.Text = "WAVE --";
+        if (total > 0) SetWave(current, total);
+        else { _wave.Text = "WAVE --"; _previousWave = 0; }
         _startWave.Text = button; _startWave.Disabled = !canStart;
         _startWave.TooltipText = message; _wave.TooltipText = message;
         _startWave.Visible = total > 0 || button == "SETUP ERROR";
@@ -194,18 +205,92 @@ public partial class GameplayHUD : Control
 
     // =========================================================
     // Bind the actual economy here when the resource system exists.
-    public void SetCredits(int amount) => _credits.Text = $"CREDITS {amount:N0}";
+    public int TargetCredits => _targetCredits;
 
     // =========================================================
-    // Cosmetic only: the wallet remains authoritative; reward bursts combine in the top bar.
-    public void ShowCreditReward(int amount)
+    // The wallet supplies the true amount immediately; only the displayed counter eases toward it.
+    public void SetCredits(int amount, bool immediate = false)
     {
-        if (Config.ShowCreditRewards) _creditGain.AddReward(amount);
+        _targetCredits = amount;
+        if (immediate || !_creditsInitialized || _snapNextCredits ||
+            !Config.AnimateCreditBalance || Config.CreditCountSeconds <= 0f)
+        {
+            _displayCredits = amount;
+            _creditCounting = false;
+            SetProcess(false);
+        }
+        else if (Math.Abs(_displayCredits - amount) > 0.1d)
+        {
+            _creditStart = _displayCredits;
+            _creditElapsed = 0d;
+            _creditCounting = true;
+            SetProcess(true);
+        }
+        _creditsInitialized = true;
+        _snapNextCredits = false;
+        UpdateCreditsText();
     }
 
     // =========================================================
-    // Explicit reset when a new level initializes its session wallet.
-    public void ResetCreditReward() => _creditGain.ResetRewards();
+    // Show green earned credits, separate from the permanent wallet total.
+    public void ShowCreditReward(int amount)
+    {
+        if (Config.ShowCreditRewards) _creditGain.AddReward(amount);
+        LayoutCreditFeedback();
+    }
+
+    // =========================================================
+    // Show amber spending only for transactions that actually committed.
+    public void ShowCreditExpense(int amount)
+    {
+        if (Config.ShowCreditExpenses) _creditGain.AddExpense(amount);
+        LayoutCreditFeedback();
+    }
+
+    // =========================================================
+    // Initial balances and new sessions snap to their starting value without reward animations.
+    public void ResetCreditReward()
+    {
+        _creditGain.ResetRewards();
+        _snapNextCredits = true;
+    }
+
+    // =========================================================
+    // Credit counting runs only during transitions; never on every idle HUD frame.
+    public override void _Process(double delta)
+    {
+        if (!_creditCounting) { SetProcess(false); return; }
+        _creditElapsed += Math.Max(0d, delta);
+        float t = Mathf.Clamp((float)(_creditElapsed / Math.Max(0.01f, Config.CreditCountSeconds)), 0f, 1f);
+        float eased = 1f - (1f - t) * (1f - t) * (1f - t);
+        _displayCredits = t >= 1f ? _targetCredits : _creditStart + (_targetCredits - _creditStart) * eased;
+        if (t >= 1f) { _creditCounting = false; SetProcess(false); }
+        UpdateCreditsText();
+    }
+
+    // =========================================================
+    // Keep currency formatting in one place for initialization and animated changes.
+    private void UpdateCreditsText()
+    {
+        _credits.Text = $"Credits: {Math.Round(_displayCredits):N0}";
+        LayoutCreditFeedback();
+    }
+
+    // =========================================================
+    // Measure the displayed balance so (+N)/(-N) sits immediately to its right.
+    private void LayoutCreditFeedback()
+    {
+        if (_credits == null || _creditGain == null || Config == null) return;
+        Font font = _credits.GetThemeFont("font");
+        float textWidth = font.GetStringSize(_credits.Text, HorizontalAlignment.Left, -1,
+            _credits.GetThemeFontSize("font_size")).X;
+        float maxX = _credits.Position.X + _credits.Size.X;
+        float x = _credits.Position.X + textWidth + 9f;
+        float available = Mathf.Max(0f, maxX - x);
+        _creditGain.SetOrigin(new Vector2(x, _credits.Position.Y + (_credits.Size.Y - _creditGain.GetCombinedMinimumSize().Y) * 0.5f));
+        _creditGain.Size = new Vector2(available, _credits.Size.Y);
+        if (available < 34f && _creditGain.Visible) _creditGain.Hide();
+    }
 
     // =========================================================
     // Preserve existing callers while naming the physical objective correctly.
@@ -213,16 +298,57 @@ public partial class GameplayHUD : Control
 
     // =========================================================
     // Display authoritative health only; absent maximum leaves the status unknown.
-    public void SetCitadelHealth(int current, int maximum)
+    public void SetCitadelHealth(int current, int maximum, bool animate = true)
     {
+        bool wasVisible = _healthBar.Visible;
         _healthBar.Visible = maximum > 0;
-        if (maximum <= 0) { _core.Text = "CITADEL --"; _healthBar.Value = 0; return; }
+        _citadelBarTween?.Kill();
+        if (maximum <= 0)
+        {
+            _core.Text = "CITADEL --"; _healthBar.Value = 0;
+            _previousCitadelHealth = -1; _previousCitadelMax = 0;
+            return;
+        }
         int health = Mathf.Clamp(current, 0, maximum);
         float fraction = (float)health / maximum;
         _core.Text = $"CITADEL {health:N0} / {maximum:N0}";
-        _healthBar.Value = fraction * 100f;
+        bool damage = wasVisible && _previousCitadelHealth >= 0 &&
+            maximum == _previousCitadelMax && health < _previousCitadelHealth;
+        _previousCitadelHealth = health; _previousCitadelMax = maximum;
+        if (damage && animate && Config.CitadelBarTweenSeconds > 0f)
+        {
+            _citadelBarTween = CreateTween();
+            _citadelBarTween.TweenProperty(_healthBar, "value", (double)(fraction * 100f),
+                Config.CitadelBarTweenSeconds).SetTrans(Tween.TransitionType.Cubic).SetEase(Tween.EaseType.Out);
+        }
+        else _healthBar.Value = fraction * 100f;
+
+        _citadelFlashTween?.Kill();
+        _core.Modulate = damage && animate ? Config.CitadelDamageFlashColor : Colors.White;
+        if (damage && animate && Config.CitadelDamageFlashSeconds > 0f)
+        {
+            _citadelFlashTween = CreateTween();
+            _citadelFlashTween.TweenProperty(_core, "modulate", Colors.White, Config.CitadelDamageFlashSeconds)
+                .SetTrans(Tween.TransitionType.Cubic).SetEase(Tween.EaseType.Out);
+        }
+        else _core.Modulate = Colors.White;
         _healthFill.BgColor = fraction <= Config.HealthCriticalThreshold ? Config.HealthCriticalColor
             : fraction <= Config.HealthWarningThreshold ? Config.HealthWarningColor : Config.HealthHealthyColor;
+    }
+
+    // =========================================================
+    // A new wave brightens and grows briefly, but repeated status updates do not restart it.
+    private void PulseWave()
+    {
+        _wavePulseTween?.Kill();
+        _wave.PivotOffset = new Vector2(_wave.Size.X, _wave.Size.Y * 0.5f);
+        _wave.Scale = Vector2.One * Mathf.Max(1f, Config.WavePulseScale);
+        _wave.Modulate = new Color(1.25f, 1.25f, 1.25f, 1f);
+        if (Config.WavePulseSeconds <= 0f) { _wave.Scale = Vector2.One; _wave.Modulate = Colors.White; return; }
+        _wavePulseTween = CreateTween().SetParallel(true);
+        _wavePulseTween.TweenProperty(_wave, "scale", Vector2.One, Config.WavePulseSeconds)
+            .SetTrans(Tween.TransitionType.Cubic).SetEase(Tween.EaseType.Out);
+        _wavePulseTween.TweenProperty(_wave, "modulate", Colors.White, Config.WavePulseSeconds);
     }
     #endregion
 
@@ -259,13 +385,14 @@ public partial class GameplayHUD : Control
         float sideWidth = Mathf.Max(0f, (width - centerWidth) * 0.5f - margin - Config.StatusGapPixels);
         _credits.Position = new Vector2(margin, 0); _credits.Size = new Vector2(sideWidth, height);
         _wave.Position = new Vector2(width - margin - sideWidth, 0); _wave.Size = new Vector2(sideWidth, height);
-        _creditGain.SetOrigin(new Vector2(_credits.Position.X, height + 4f));
+        LayoutCreditFeedback();
         Control center = status.GetNode<Control>("Citadel");
         center.Position = new Vector2((width - centerWidth) * 0.5f, 0);
         center.Size = new Vector2(centerWidth, height);
         int fontSize = Mathf.Clamp((int)(Config.StatusFontSize * Mathf.Min(1f, width / 900f)), 10, Config.StatusFontSize);
         foreach (Label label in new[] { _credits, _core, _wave }) label.AddThemeFontSizeOverride("font_size", fontSize);
         _creditGain.AddThemeFontSizeOverride("font_size", Mathf.Max(10, fontSize - 2));
+        LayoutCreditFeedback();
         float buttonWidth = Mathf.Min(140f, sideWidth);
         _startWave.Position = new Vector2(width - margin - buttonWidth, height + 6);
         _startWave.Size = new Vector2(buttonWidth, 26);

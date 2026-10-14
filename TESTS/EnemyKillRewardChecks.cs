@@ -28,8 +28,8 @@ public static class EnemyKillRewardChecks
             Require(killed != null && killed.Definition.KillRewardCredits == 3,
                 "Saved Enemy001 definition grants 3 kill credits");
             killed.Movement.SetPhysicsProcess(false); killed.TakeDamage(10000);
-            Require(wallet.GetBalance(wallet.CreditsResource) == 103 && label.Text == "CREDITS 103" &&
-                updates == 1 && popup.Visible && popup.AccumulatedReward == 3 && popup.Text == "+3",
+            Require(wallet.GetBalance(wallet.CreditsResource) == 103 && hud.TargetCredits == 103 &&
+                updates == 1 && popup.Visible && popup.AccumulatedReward == 3 && popup.Text == "(+3)",
                 "A kill pays 3 Credits, updates the wallet and shows +3 exactly once");
             killed.TakeDamage(10000); killed.Arrive();
             Require(wallet.GetBalance(wallet.CreditsResource) == 103 && updates == 1,
@@ -60,7 +60,7 @@ public static class EnemyKillRewardChecks
             Require(wallet.GetBalance(wallet.CreditsResource) == 106 && updates == 2 &&
                 waves.State == WaveManager.WaveState.AllWavesComplete,
                 "Wave kills pay the same reward and resolve normally");
-            Require(popup.AccumulatedReward == 6 && popup.Text == "+6",
+            Require(popup.AccumulatedReward == 6 && popup.Text == "(+6)",
                 "Rapid kills from debug or waves share one accumulated HUD reward popup");
 
             GD.Print("PASS: Enemy001 kill rewards, HUD events, arrival/duplicate exclusions and wave payout");
