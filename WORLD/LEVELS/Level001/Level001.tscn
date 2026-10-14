@@ -45,7 +45,10 @@ tile_set = ExtResource("2_8pvwx")
 [node name="Portals" type="Node2D" parent="." unique_id=219222935]
 
 [node name="EnemyPortal" parent="Portals" unique_id=345948730 instance=ExtResource("5_portal")]
-position = Vector2(2336, 2528)
+position = Vector2(2022, 2528)
+
+[node name="EnemyPortal2" parent="Portals" unique_id=1308718269 instance=ExtResource("5_portal")]
+position = Vector2(3082, 1823)
 
 [node name="Objectives" type="Node2D" parent="." unique_id=1539156350]
 

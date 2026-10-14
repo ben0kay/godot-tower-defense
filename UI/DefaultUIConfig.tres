@@ -1,13 +1,6 @@
-[gd_resource type="Resource" script_class="UIMasterConfig" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="UIMasterConfig" format=3 uid="uid://bo2uiw3ikd8wi"]
 
-[ext_resource type="Script" path="res://UI/UIMasterConfig.cs" id="1_ui"]
+[ext_resource type="Script" uid="uid://cjshaij5nowc4" path="res://UI/UIMasterConfig.cs" id="1_ui"]
 
 [resource]
 script = ExtResource("1_ui")
-StatusFontSize = 16
-StatusGapPixels = 16
-CitadelBlockWidth = 280
-CitadelBarWidth = 220
-CitadelBarHeight = 5
-HealthWarningThreshold = 0.5
-HealthCriticalThreshold = 0.25

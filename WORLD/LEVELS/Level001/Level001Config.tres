@@ -1,10 +1,7 @@
-[gd_resource type="Resource" script_class="LevelConfig" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="LevelConfig" format=3 uid="uid://vxivrh6h6iwx"]
 
-[ext_resource type="Script" path="res://WORLD/LEVELS/LevelConfig.cs" id="1"]
+[ext_resource type="Script" uid="uid://d3rj1iimghlhl" path="res://WORLD/LEVELS/LevelConfig.cs" id="1"]
 
 [resource]
 script = ExtResource("1")
-SpawnMode = 0
-AllowedEdges = 4
-ActivePortals = Array[NodePath]([NodePath("Portals/EnemyPortal")])
-CitadelPath = NodePath("Objectives/Citadel")
+ActivePortals = Array[NodePath]([NodePath("Portals/EnemyPortal"), NodePath("Portals/EnemyPortal2")])

@@ -1,9 +1,6 @@
-[gd_resource type="Resource" script_class="BattleTowerConfig" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="BattleTowerConfig" format=3 uid="uid://dwkunf5wywb8t"]
 
-[ext_resource type="Script" path="res://TOWERS/Offensive/BattleTower/BattleTowerConfig.cs" id="1_config"]
+[ext_resource type="Script" uid="uid://cin5m60oapsu1" path="res://TOWERS/Offensive/BattleTower/BattleTowerConfig.cs" id="1_config"]
 
 [resource]
 script = ExtResource("1_config")
-RotationSpeedDegrees = 180.0
-AimToleranceDegrees = 12.0
-RotateWhileTracking = true
