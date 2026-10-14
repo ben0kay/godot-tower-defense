@@ -1,9 +1,7 @@
-# Shared tower helpers
+# Shared tower foundation
 
-Targeting/TowerTargeting.cs supports First (shortest remaining valid route to the Citadel) and Closest (nearest to the tower), filtering living enemies within weapon range. Projectiles/BasicProjectile.cs provides a lightweight visible guided test bullet calling Enemy.TakeDamage. Both can be reused by future offensive towers without forcing utility/economy towers to inherit weapon behavior.
+Phase 4A adds TowerConfig (canonical identity, construction recipe, optional tiers), TowerDefinition (stable ID, category, scene, config reference, icon and 1×1 footprint) and TowerCatalog (validated ID lookup). Name/description/prices are read from Config rather than duplicated in definition or HUD. The default catalog registers only Battle Tower. Unavailable types remain registered but cannot be built. Rebuild validates blank/duplicate IDs, costs, category, footprint, scene root, config compatibility and type-specific scene prerequisites; call Rebuild after editing registration data.
 
-Weapons/TurretAiming.cs provides shortest-angle, speed-capped aiming and tolerance checks for an up-facing visual pivot. Only offensive towers opt in; utility towers need no aiming component.
+TowerBase owns type/definition, fixed grid anchor, footprint, placement/selection hooks, optional range capability, purchased UpgradeLevel, FinalStats and StatsChanged. Types supply config compatibility/application and resolution; it has no mandatory weapon nodes or processing. TowerConfig explicitly copies external tier/cost resources per instance. Passive types can have no combat snapshot, range or upgrades.
 
-Stats/ now provides typed read-only values/context, immutable final snapshots, opt-in traces and the single eight-stage numbered pipeline. Only base input, safety validation and final publication are active in Phase 3A; future progression/effect stages remain neutral. No upgrade purchases or managers are added.
-
-TowerBase and Upgrades/ implement lightweight per-instance level progression and generic typed tier/modifier data, paid atomically through ECONOMY. Stat Stage 02 applies the purchased tiers; weapon loops stay optional. See Upgrades/README.md.
+Targeting/, Weapons/TurretAiming and Projectiles/ are optional existing weapon helpers. Battle Tower's weapon loop remains local until Phase 4C has a second real offensive consumer. Stats/ preserves the eight-stage resolver; purchased upgrades are active and ranks/research/conditions/effects remain neutral. Upgrades/ uses the sole ECONOMY wallet.

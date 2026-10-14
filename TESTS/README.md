@@ -62,3 +62,9 @@ TowerUpgradeChecks drives actual HUD upgrade actions and validates levels 1→2�
 ## Menu / profile foundation
 
 `MenuFoundationChecks.cs` is included in the existing Main-scene headless suite. It checks loadable Boot, Main and Campaign scene resources, the unchanged gameplay destination, factory-created button callbacks, styled existing HUD buttons and profile name validation. The automated check **does not touch the user's real profiles**. Manual Boot smoke test: create/select a profile, enter Campaign → Play Level001, exit/restart and confirm the same profile remains selectable; try multiple profiles, invalid names and returning to Boot with Change Profile. Test the normal F5 startup and direct gameplay `Main.tscn` F6 separately. This does not test campaign persistence because that system is still planned.
+
+## Phase 4A/4B tower regression coverage
+
+EnemyIntegrationChecks now runs TowerCatalogChecks (validation, mixed paid placement/selection, passive capability absence, config isolation and independent Battle progression) and TowerBuildBarChecks (40 registrations, availability, canonical prices/icons, generated actions, focus, scrolling, empty/rebound catalogs and independent panels). TESTS/Towers/PassiveTestTower is a test-only nonweapon scene, excluded from the default catalog. Existing economy failure-after-occupancy rollback, route sealing, combat, stat/upgrades and 500-ship checks are retained.
+
+Run `Godot --headless --path . TESTS/MenuTowerFlowChecks.tscn` separately to exercise real Boot profile selection → Main → Campaign → Level001 buttons, dynamic Battle entry, construction and paid upgrade. The fixture injects a memory-only ProfileStore list in that standalone process; it does not read or write user profiles. Existing EnemyIntegrationChecks loads Main.tscn directly without a save/profile dependency. Headless tests validate behavior and bounds, not rendered appearance or hardware FPS.

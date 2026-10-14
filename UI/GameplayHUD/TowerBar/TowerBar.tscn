@@ -32,42 +32,14 @@ layout_mode = 2
 text = "CTRL TO CLOSE"
 theme_override_font_sizes/font_size = 11
 
-[node name="Buttons" type="HBoxContainer" parent="Insets/Tray"]
+[node name="Scroll" type="ScrollContainer" parent="Insets/Tray"]
+custom_minimum_size = Vector2(0, 82)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 1
+vertical_scroll_mode = 0
+
+[node name="Buttons" type="HBoxContainer" parent="Insets/Tray/Scroll"]
 layout_mode = 2
 theme_override_constants/separation = 7
-
-[node name="BattleButton" type="Button" parent="Insets/Tray/Buttons"]
-custom_minimum_size = Vector2(112, 65)
-layout_mode = 2
-size_flags_horizontal = 3
-text = "BATTLE\nOffensive"
-
-[node name="LaserButton" type="Button" parent="Insets/Tray/Buttons"]
-custom_minimum_size = Vector2(112, 65)
-layout_mode = 2
-size_flags_horizontal = 3
-text = "LASER\nOffensive"
-
-[node name="MissileButton" type="Button" parent="Insets/Tray/Buttons"]
-custom_minimum_size = Vector2(112, 65)
-layout_mode = 2
-size_flags_horizontal = 3
-text = "MISSILE\nOffensive"
-
-[node name="RepairButton" type="Button" parent="Insets/Tray/Buttons"]
-custom_minimum_size = Vector2(112, 65)
-layout_mode = 2
-size_flags_horizontal = 3
-text = "REPAIR\nSupport"
-
-[node name="SolarButton" type="Button" parent="Insets/Tray/Buttons"]
-custom_minimum_size = Vector2(112, 65)
-layout_mode = 2
-size_flags_horizontal = 3
-text = "SOLAR\nEconomy"
-
-[node name="ResourceButton" type="Button" parent="Insets/Tray/Buttons"]
-custom_minimum_size = Vector2(112, 65)
-layout_mode = 2
-size_flags_horizontal = 3
-text = "RESOURCE\nEconomy"

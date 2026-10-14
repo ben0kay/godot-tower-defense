@@ -26,7 +26,7 @@ public static class MenuFoundationChecks
 
         GameplayHUD hud = main.GetNode<GameplayHUD>("UI/GameplayHUD");
         Button wave = hud.GetNode<Button>("TopBar/Status/StartWave");
-        Button tower = hud.GetNode<Button>("BottomArea/TraySlot/TowerBar/Insets/Tray/Buttons/BattleButton");
+        Button tower = hud.GetBuildButton("battle");
         Button close = hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/Heading/CloseButton");
         Require(wave.GetThemeFontSize("font_size") >= 10 &&
                 tower.GetThemeFontSize("font_size") == 13 &&

@@ -6,11 +6,11 @@ Umbrella folder for **every player-buildable tower**, not just weapons: offensiv
 
 **Implemented today:** 1×1 Battle Tower placement/selection; terrain and connectivity validation; First/Closest target search, turret rotation, guided projectiles and enemy damage; atomic 200-Credit construction; per-instance Config copies; eight-stage cached stats (Phase 3A); and **Phase 3B paid upgrades**. Battle Tower upgrades level 1→2 (150 Credits) and 2→3 (250 Credits), with the selected Inspector showing real next-tier stat differences, cost and an Upgrade button. `TowerBase`, `Shared/Upgrades/`, `Shared/Stats/` and `TowerUpgradeChecks` exist.
 
-**Existing shared helpers:** `Shared/TowerBase.cs` currently owns the per-instance `UpgradeLevel`, `FinalStats`, `NextUpgrade`, `StatsChanged`, `ResolveLevel` and guarded upgrade-commit contract. It does **not** yet own universal type identity or selection/placement. `Shared/Targeting/TowerTargeting.cs` owns First/Closest lookup; `Shared/Weapons/TurretAiming.cs` owns rotation; `Shared/Projectiles/BasicProjectile.cs` handles guided test shots. `TowerStatPipeline.Resolve(TowerStatContext)` is generic math, but `Resolve(BattleTowerConfig, level)` is Battle-specific input adaptation. Stage 02 upgrades is **ACTIVE**; stages 03–06 (ranks/research/level rules/active effects) remain neutral.
+**Phase 4A/4B implemented:** `TowerConfig`, `TowerDefinition`, `TowerCatalog` and `TowerPresentation` are the shared foundation. `TowerBase` additionally owns stable type identity, definition, grid anchor/footprint, config compatibility/application, placement/selection hooks and optional range inspection. Placement indexes `TowerBase` and resolves catalog IDs without Battle-specific branches or scene-node assumptions. The HUD creates available catalog entries in a horizontal scrolling tray, using `UIButtonFactory`. Construction identity/prices stay on the canonical Config, referenced by definitions; no second price or stat list exists.
 
-**Current scaling bottleneck:** `BattleTower.cs` still owns its search/cooldown/shooting implementation. `Placement/TowerPlacementController.cs` still uses `BattleTower` in its selected instance/dictionary, explicitly exports Battle scene/config/art, and validates a Battle-specific turret node. `UI/GameplayHUD/GameplayHUD.cs` still owns a hardcoded six-button, prototype `SampleTowers` list. Laser/Missile/Repair/etc. are **not actually placeable**. `TowerDefinition`, `TowerCatalog`, multi-type placement and a dynamic catalog-driven build tray are not implemented.
+**Default playable roster:** Battle Tower only. The passive scene under `TESTS/Towers/` is a regression fixture, not a promised Repair/Solar tower or a default menu entry. Registering a valid additional definition creates its build choice without editing placement or HUD. Only 1×1 footprints are supported; other footprints fail registration.
 
-**NEXT:** Phase 4 below. Scale to **30+ offensive types** without copying placement and HUD logic 30 times. Non-weapon support, economy and utility towers must remain optional/lightweight. [tower_ideas.md](tower_ideas.md) records the proposed weapon families, but its pre-3B current-state snapshot is historical; **this README and the latest working code are authoritative**.
+**Still local/future:** Battle Tower keeps its existing targeting/cooldown/guided-projectile loop. **Phase 4C weapon-family extraction is not implemented.** Stage 02 upgrades remains active; ranks/research/level modifiers/effects remain neutral. New weapon families, selling, tower health and multi-cell placement are later work.
 
 **Codex:** read `NOTES/CodePreferences.md`, this README, `tower_ideas.md`, `Shared/README.md`, `Shared/Stats/README.md`, `Shared/Upgrades/README.md`, `Placement/README.md` and `Offensive/BattleTower/README.md` before editing. Work against latest HEAD, preserve the newly implemented upgrade work, and run existing tests.
 
@@ -22,12 +22,12 @@ Umbrella folder for **every player-buildable tower**, not just weapons: offensiv
 | `Shared/Stats/` and `Shared/Stats/Pipeline/` | EXISTS | Eight ordered stages; Base, Upgrades, Safety and Final active |
 | `Shared/Upgrades/` | EXISTS | Paid tiers, stat operations, validation, atomic wallet purchase |
 | `Shared/Targeting/`, `Shared/Weapons/`, `Shared/Projectiles/` | EXISTS | Common target query, turret aiming and guided projectile |
-| `Shared/TowerDefinition.cs` and `Shared/TowerCatalog.cs` | **PROPOSED Phase 4** | Type metadata, scene/config registry, dynamic build choices |
-| `Placement/TowerPlacementController.cs` | EXISTS (Battle-only) | Generalize placement/selection/ghost, keep grid/economy ownership |
+| `Shared/TowerDefinition.cs` and `Shared/TowerCatalog.cs` | EXISTS (Phase 4A) | Type metadata, scene/config registry, dynamic build choices |
+| `Placement/TowerPlacementController.cs` | EXISTS (generic TowerBase) | Generalize placement/selection/ghost, keep grid/economy ownership |
 | `Offensive/BattleTower/` and `Offensive/BattleTower/Upgrades/` | EXISTS | First working offensive type; Level2/Level3 assets |
 | `Offensive/LaserTower/`, `Offensive/MissileTower/` | PLANNED | Future beam/explosive example towers, not active |
 | `Support/`, `Economy/`, `Utility/` | PLANNED | Passive and hybrid tower categories, never mandatory weapon logic |
-| `UI/GameplayHUD/` | EXISTS (hardcoded prototype buttons) | Replace build choice inputs with catalog data |
+| `UI/GameplayHUD/` | EXISTS (dynamic catalog entries) | Replace build choice inputs with catalog data |
 | `ECONOMY/` | EXISTS | The **only** wallet, ResourceCost and purchase authority |
 
 The current `BattleTowerConfig.ConstructionCosts` and `DefaultBattleTowerConfig.tres` own construction price/base stats, with external `Level2.tres`/`Level3.tres` for per-type upgrades. Phase 4 must not create a second conflicting catalog price. Keep source data Inspector-editable. No other gameplay service belongs under `TOWERS/`.
@@ -255,11 +255,11 @@ These are editable **playtest values**, defined in `Offensive/BattleTower/Upgrad
 
 Do not redo Phase 3A/3B in Phase 4. Maintain stable Source Config values, `TowerUpgradeController`, per-instance `UpgradeLevel`, active Stage 02, `TowerFinalStats`, combat/invalidation caches, wallet events and existing test coverage. Phase 3C+ (ranks, research, level rules, buffs/debuffs) stays separate future work.
 
-## Phase 4 — Scalable tower catalog and shared placement (NEXT FOR CODEX)
+## Phase 4 — Scalable tower catalog and shared placement (4A/4B implemented)
 
-**Objective:** Support **30+ different offensive tower types** alongside optional Support/Economy/Utility towers without creating 30 copies of `BattleTower`, the same placement logic or the same hardcoded build-bar UI. **Implement Phase 4A then 4B as the next architecture refactor; Phase 4C is a later distinct weapon pass.** First migrate and verify the existing single working Battle Tower. Add a lightweight second *test* tower to prove extensibility; do not build 30 gameplay towers.
+**Objective:** Support **30+ different offensive tower types** alongside optional Support/Economy/Utility towers without creating 30 copies of `BattleTower`, the same placement logic or the same hardcoded build-bar UI. **Phase 4A was implemented and verified before Phase 4B; Phase 4C remains a later distinct weapon pass.** The numbered requirements below record the accepted design. First migrate and verify the existing single working Battle Tower. Add a lightweight second *test* tower to prove extensibility; do not build 30 gameplay towers.
 
-### 4A — Tower definitions, minimal common contract, generic placement
+### 4A — Tower definitions, minimal common contract, generic placement (implemented)
 
 1. **Extend current `TOWERS/Shared/TowerBase.cs` minimally**, preserving `UpgradeLevel`, `NextUpgrade`, `FinalStats`, `StatsChanged`, `ResolveLevel` and the paid-upgrade contract. Add only reusable placed-tower needs: stable **tower-type ID**, grid anchor/footprint (currently 1×1), selection/inspection entry point and an optional type/config accessor. Instance identity can come when saving needs it. **No mandatory `_PhysicsProcess`, weapon, aiming pivot, damage, recoil, projectile node or combat stats for passive towers.**
 2. **Introduce `TOWERS/Shared/TowerDefinition.cs`** as an Inspector-editable typed Resource for stable ID, display name, description, category, preview/build icon, `PackedScene`, type-appropriate default Config and declared footprint. **Introduce `TowerCatalog.cs`** as the one authoritative registry for registered/available types, with ID lookup and validation; use authored Resources/a small exported list, not 30 hardcoded switches. Reject blank/duplicate IDs, invalid scene/config references and unsupported footprints early.
@@ -270,7 +270,7 @@ Do not redo Phase 3A/3B in Phase 4. Maintain stable Source Config values, `Tower
 
 **Phase 4A acceptance:** the existing Battle Tower places, selects, targets, fires, damages enemies, buys levels 2/3 at the same prices and uses the same stat pipeline. A minimal **second test tower definition and scene** (even a non-firing/passive one) can be registered, paid for, placed and selected **without editing controller per-type logic**. No forced turret scene nodes, weapon ticks or nonsensical weapon stats. Test invalid catalog entries, rollback, different costs, independent upgrade state and navigation route sealing.
 
-### 4B — Dynamic build bar and generic Inspector
+### 4B — Dynamic build bar and generic Inspector (implemented)
 
 - **Replace `GameplayHUD.SampleTowers`**, six hardcoded prototype button IDs, and duplicated stat descriptions with catalog-backed buttons. The catalog determines visible playable entries, name, art, category, build costs and authorable default config. Don't display nonfunctional Laser/Missile/Repair/etc. as though usable.
 - **Design for arbitrary registered tower count** with scrollable/wrapping/grouped build entries (future category filters: Offensive / Support / Economy / Utility). Read metadata to populate UI, not by instantiating all tower scenes. Keep the current Ctrl toggle, close/selection behavior, keyboard focus and Inspector positioning.
@@ -302,7 +302,7 @@ Model weapon behavior as optional acquisition, aiming, cadence, delivery, impact
 
 ## Next implementation pass
 
-**Codex priority:** implement Phase 4A+4B above, using the existing Phase 3A/3B code as the base. The entire game should remain playable with only Battle Tower registered until a second real tower is ready. Ranks, profile research, level modifiers, active effects, selling and tower HP remain future phases.
+**Phase 4A+4B are complete.** Next, author a second actual offensive type before extracting shared weapon-family behavior in Phase 4C. The entire game should remain playable with only Battle Tower registered until a second real tower is ready. Ranks, profile research, level modifiers, active effects, selling and tower HP remain future phases.
 
 ## Current live Inspector files
 
@@ -310,7 +310,7 @@ Model weapon behavior as optional acquisition, aiming, cadence, delivery, impact
 - `DefaultTowerConfig.tres`: shared placement/selection preview flags; `AllowUpgrades` is **active**, while selling/refund settings remain future work.
 - `FEEDBACK/DefenseBars/DefaultDefenseBarConfig.tres`: reusable health bar appearance when towers become damageable.
 
-**Current status:** rotation (Phase 1), paid construction (Phase 2) and stat foundation (3A) and paid upgrades (3B) work. Ranks, research, level conditions and timed effects remain planned.
+**Current status:** rotation (Phase 1), paid construction (Phase 2), stat foundation (3A), paid upgrades (3B), generic catalog/placement (4A) and dynamic build UI (4B) work. Ranks, research, level conditions and timed effects remain planned.
 
 
 ## Implemented Phase 3A verification
@@ -323,3 +323,11 @@ BattleTower uses shared TowerBase UpgradeLevel (starting at 1) and the existing 
 The selected Inspector displays current level, actual next-tier stat differences, price, affordability and max-tier status. Purchases use EconomyManager.TryPurchase, do not change navigation/occupancy or reset cooldown/aim, and notify UI after payment commits. Build previews/prototype towers have no upgrade action. The larger Inspector grows upward while the Ctrl tray retains its configured height.
 
 TowerUpgradeChecks covers paid HUD actions, stale/same-frame duplicate protection, global AllowUpgrades, insufficient/secondary-resource costs, max tier, source isolation, preview parity, deterministic stage arithmetic, no compounding and layout/independent panels. No rank, research, level/effect gameplay, selling or visual tower upgrade artwork was added.
+
+## Implemented Phase 4A/4B verification and authoring
+
+`DefaultTowerCatalog.tres` references `Offensive/BattleTower/BattleTowerDefinition.tres`. Add a tower by authoring a compatible `TowerBase` scene/script, typed `TowerConfig`, icon and `TowerDefinition` (ID/category/scene/config/icon/1×1 footprint), then adding the definition to the catalog's Definitions array. Expand DefaultConfig to edit its name, description, construction costs and tiers. Definitions do not independently override prices or names. Rebuild the catalog and rebind the HUD after runtime registration/availability edits; ordinary frames do neither. Available=false hides the build entry and rejects placement; asset/config validation still applies to registered entries. Empty catalogs display a safe message.
+
+Passive scenes need no pivot, projectile node, weapon stats, range ring or processing. `TowerConfig.ResolveStats`/`DescribeStats`/`DescribeChanges` are type-aware adapters; Battle keeps the unchanged eight numerical stages and real upgrade preview. Future passive progression with actual capability stats can supply its own typed data when that consumer exists; the passive fixture deliberately has no upgrades or combat snapshot.
+
+At the 4A checkpoint the real Godot headless integration scene passed catalog/mixed-type tests and all existing combat, stat, upgrade, economy, terrain, wave, feedback and navigation checks. After 4B it passed again, with 40 registered variants testing availability, canonical prices/icons, generated ID actions, focus, scrolling, rebinding and independent panels. `MenuTowerFlowChecks.tscn` separately exercises actual Boot profile-button → Main → Campaign → Level001 buttons, then paid Battle placement/upgrade using an injected memory-only profile (no save writes). The suite includes the existing 500-ship fixture; headless timings are not a rendered-FPS or visual-layout guarantee.

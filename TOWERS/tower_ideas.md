@@ -1,6 +1,6 @@
 # Tower Ideas — Architecture and Weapon Families
 
-> **Proposal only — NOT implemented.** This document records a scalable direction for approximately 30 offensive towers, with room for many more, while also supporting passive, support, economy and hybrid towers. Do not treat planned files, features or tower names here as existing code.
+> **Weapon-family proposal; foundation 4A/4B is now implemented.** This document records a scalable direction for approximately 30 offensive towers, with room for many more, while also supporting passive, support, economy and hybrid towers. Do not treat planned files, features or tower names here as existing code.
 >
 > Before implementing: read `NOTES/CodePreferences.md`, `TOWERS/README.md`, `TOWERS/Shared/README.md`, `TOWERS/Shared/Stats/README.md`, `TOWERS/Placement/README.md`, and the relevant tower-specific README. Prefer lightweight, reusable, Inspector-editable C# systems and compact scene trees.
 
@@ -22,13 +22,13 @@
 - `BattleTowerConfig.cs` and `DefaultBattleTowerConfig.tres` define its Inspector-editable authored stats and costs. Placed instances receive a deep-duplicated config.
 - `Shared/Targeting/TowerTargeting.cs` provides First (shortest remaining route to the Citadel) and Closest (world distance to tower).
 - `Shared/Weapons/TurretAiming.cs` provides reusable tracking/alignment; `Shared/Projectiles/BasicProjectile.cs` provides a guided test projectile.
-- `Shared/Stats/Pipeline/` already has eight ordered stages and immutable effective stat snapshots. Base, safety clamps and final publication are active; upgrades, ranks, research, level modifiers and active effects are currently neutral.
-- `Placement/TowerPlacementController.cs` owns the Battle Tower build preview, scene instantiation, occupancy, selection and economy purchase integration.
-- `UI/GameplayHUD/GameplayHUD.cs` uses a prototype list with hardcoded tower buttons; non-Battle entries are only samples.
+- `Shared/Stats/Pipeline/` has eight ordered stages; Base, purchased Upgrades, Safety and Final are active. Ranks/research/level/effects remain neutral.
+- `Placement/TowerPlacementController.cs` resolves catalog IDs and owns generic TowerBase preview/placement/selection, occupancy integration and atomic wallet callbacks.
+- `UI/GameplayHUD/GameplayHUD.cs` generates scrollable available catalog buttons. Default roster is only Battle Tower; no placeholder gameplay entries.
 
-**Not implemented yet:** a common `TowerBase`, tower definition/catalog, generic multi-type placement, dynamic build menu, shared weapon-family implementations, tower upgrades and selling. The existing `TowerMasterConfig` includes future switches; those switches alone do not implement features.
+**Implemented foundation:** minimal TowerBase, TowerConfig, TowerDefinition, TowerCatalog, generic multi-type placement and catalog-driven HUD/Inspector, plus the existing paid upgrades. Per-type compatibility/formatting stays outside placement/HUD. Name/description/recipe live once on Config; definition references it. TESTS/Towers/PassiveTestTower verifies nonweapon registration/placement.
 
-**Main scaling issue:** placement, selection, HUD choices and part of stat input are still coupled to `BattleTower`/`BattleTowerConfig`. Adding 30 towers by copying this setup 30 times would create unnecessary maintenance work.
+**Not implemented:** second real weapon family, weapon-family extraction (4C), selling, tower health, ranks/research/effects and multi-cell placement. The proposals below describe extension direction; TOWERS/README.md and feature READMEs describe current contracts.
 
 ## Proposed ownership
 
@@ -102,7 +102,7 @@ Rather than hardcode a unique system for every tower, consider reusing a small n
 
 The first implementation should remain small: extract only code already shared by at least two working towers. Do not build every listed delivery/effect type up front.
 
-## Proposed folder layout (future; not a claim these files exist)
+## Folder direction (foundation exists; weapon families remain future)
 
 ```text
 TOWERS/
@@ -110,14 +110,14 @@ TOWERS/
 ├── tower_ideas.md                    # This proposal
 ├── TowerMasterConfig.cs             # Existing
 ├── Shared/
-│   ├── TowerBase.cs                 # Proposed shared placed-tower API
-│   ├── TowerDefinition.cs           # Proposed Inspector-editable type metadata
-│   ├── TowerCatalog.cs              # Proposed tower type lookup
+│   ├── TowerBase.cs                 # Existing shared placed-tower API
+│   ├── TowerDefinition.cs           # Existing Inspector-editable type metadata
+│   ├── TowerCatalog.cs              # Existing validated tower type lookup
 │   ├── Stats/                       # Existing eight-stage pipeline
 │   ├── Targeting/                   # Existing, extend only as needed
 │   ├── Weapons/                     # Existing aiming; future optional attack behaviors
 │   ├── Projectiles/                 # Existing BasicProjectile, future delivery types
-│   └── Upgrades/                    # Future typed upgrade data/operations
+│   └── Upgrades/                    # Existing paid tier data/operations
 ├── Placement/
 │   └── TowerPlacementController.cs  # Existing; generalize, do not duplicate
 ├── Offensive/
@@ -172,7 +172,7 @@ Thirty authored types are not inherently a performance problem. The relevant loa
 
 ## Suggested implementation order
 
-All phases below are **future work**; this file makes no code changes.
+Items 1–3 are complete through Phase 4A/4B (and paid upgrades are already implemented). Items 4–6 remain future direction; weapon-family extraction is explicitly deferred to Phase 4C.
 
 1. **Common identity:** add the minimal `TowerBase` (and scene inheritance only if it helps). Migrate the existing Battle Tower without changing its combat or appearance. Preserve current tests.
 2. **Type/catalog + generic placement:** register Battle Tower, replace Battle-only creation/dictionary/UI coupling, retain the same world occupancy, route safety, selection, wallet transaction and refund-on-failure behavior.

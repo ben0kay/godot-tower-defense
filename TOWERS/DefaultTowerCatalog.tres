@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="TowerCatalog" load_steps=3 format=3]
+[ext_resource type="Script" path="res://TOWERS/Shared/TowerCatalog.cs" id="1"]
+[ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/BattleTowerDefinition.tres" id="2"]
+[resource]
+script = ExtResource("1")
+Definitions = [ExtResource("2")]

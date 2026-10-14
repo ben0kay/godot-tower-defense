@@ -4,17 +4,15 @@ using Godot;
 using System.Collections.Generic;
 
 [GlobalClass]
-public partial class BattleTowerConfig : Resource
+public partial class BattleTowerConfig : TowerConfig
 {
-    [ExportGroup("Identity")]
-    [Export] public string DisplayName { get; set; } = "Battle Tower";
-    [Export] public string Description { get; set; } = "Versatile baseline turret: one barrel and balanced range/fire rate.";
-
-    [ExportGroup("Construction")]
-    [Export] public Godot.Collections.Array<ResourceCost> ConstructionCosts { get; set; } = new();
-
-    [ExportGroup("Upgrades")]
-    [Export] public Godot.Collections.Array<TowerUpgradeTier> UpgradeTiers { get; set; } = new();
+    // =========================================================
+    // Preserve the existing Battle identity when authored resources omit default-valued fields.
+    public BattleTowerConfig()
+    {
+        DisplayName = "Battle Tower";
+        Description = "Versatile baseline turret: one barrel and balanced range/fire rate.";
+    }
 
     [ExportGroup("Combat")]
     [Export(PropertyHint.Range, "32,1024,16")] public float RangePixels { get => _rangePixels; set => SetStat(ref _rangePixels, value); }
@@ -50,17 +48,29 @@ public partial class BattleTowerConfig : Resource
 
     // =========================================================
     // Copy external tier assets explicitly; Duplicate(true) alone retains these array references.
-    public BattleTowerConfig CreateInstanceCopy()
+    public override BattleTowerConfig CreateInstanceCopy() => (BattleTowerConfig)base.CreateInstanceCopy();
+
+    // =========================================================
+    // Keep the existing eight-stage Battle adapter and exact tier arithmetic.
+    public override TowerFinalStats ResolveStats(int level) => TowerStatPipeline.Resolve(this, level);
+
+    // =========================================================
+    // Weapon-specific detail belongs to the weapon config, not generic placement or HUD.
+    public override string DescribeStats(TowerFinalStats final) =>
+        $"Barrels: 1\nRange: {final.RangePixels:0} px\nRate: {final.ShotsPerSecond:0.##} shots/s\nDamage: {final.DamagePerShot}\nTargeting: {TargetPriority}";
+
+    // =========================================================
+    // Describe the same resolved snapshot used by upgrade application.
+    public override string DescribeChanges(TowerFinalStats now, TowerFinalStats future)
     {
-        BattleTowerConfig copy = (BattleTowerConfig)Duplicate(true);
-        copy.ConstructionCosts = TowerUpgradeTier.CopyCosts(ConstructionCosts);
-        if (UpgradeTiers == null) copy.UpgradeTiers = null;
-        else
-        {
-            copy.UpgradeTiers = new();
-            foreach (TowerUpgradeTier tier in UpgradeTiers)
-                copy.UpgradeTiers.Add(tier?.CreateInstanceCopy());
-        }
-        return copy;
+        string changes = "";
+        if (now.DamagePerShot != future.DamagePerShot) changes += $"Damage: {now.DamagePerShot} → {future.DamagePerShot}\n";
+        if (now.ShotsPerSecond != future.ShotsPerSecond) changes += $"Rate: {now.ShotsPerSecond:0.##} → {future.ShotsPerSecond:0.##} shots/s\n";
+        if (now.RangePixels != future.RangePixels) changes += $"Range: {now.RangePixels:0} → {future.RangePixels:0} px\n";
+        if (now.ProjectileSpeed != future.ProjectileSpeed) changes += $"Projectile: {now.ProjectileSpeed:0} → {future.ProjectileSpeed:0} px/s\n";
+        if (now.RotationSpeedDegrees != future.RotationSpeedDegrees) changes += $"Turn: {now.RotationSpeedDegrees:0} → {future.RotationSpeedDegrees:0}°/s\n";
+        if (now.AimToleranceDegrees != future.AimToleranceDegrees) changes += $"Aim tolerance: {now.AimToleranceDegrees:0} → {future.AimToleranceDegrees:0}°\n";
+        if (now.TargetSearchInterval != future.TargetSearchInterval) changes += $"Target search: {now.TargetSearchInterval:0.##} → {future.TargetSearchInterval:0.##}s\n";
+        return changes;
     }
 }

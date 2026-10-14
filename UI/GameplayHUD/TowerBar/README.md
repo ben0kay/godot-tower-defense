@@ -1,9 +1,5 @@
-# Tower Build Tray
+# Catalog build tray — Phase 4B
 
-`TowerBar.tscn` is the row of selectable tower tiles, toggled with Ctrl by `GameplayHUD.cs`. The tray starts hidden and can open/close without altering the bottom-right Inspector.
+TowerBar.tscn contains a header and horizontal ScrollContainer/Buttons row. GameplayHUD.BindCatalog creates UIButtonFactory TowerTile buttons from validated available definitions; no hardcoded IDs, names, costs, stats or prototype controls live in this scene. DefaultTowerCatalog currently exposes Battle Tower only.
 
-Six buttons demonstrate categories under `TOWERS/`: **Battle** (placeable), Laser, Missile, Repair, Solar and Resource (Inspector-only placeholders). The Solar example intentionally supports a future economy + defensive laser hybrid.
-
-Clicking a tile displays its planned information and emits `TowerChoiceRequested(id)`. The placement system subscribes to `"battle"`, previews a grid-snapped ghost, rejects occupied cells, and builds a tower on left-click. Other buttons remain informational.
-
-All six existing `Button` nodes now use `UIButtonFactory.Apply(button, UIButtonStyle.TowerTile, Config)` for visual consistency. Their scene hierarchy, prototype data, signals and tower placement behavior are unchanged.
+Ctrl toggles the existing slide/fade independently from the Inspector. The scroll container clips large rosters inside the configured tray width; buttons keep focus/navigation support. Available=false entries are hidden and rejected by placement. An empty catalog displays a safe message. Registration edits require Catalog.Rebuild followed by BindCatalog, rather than polling/rebuilding every frame. GetBuildButton(typeId) is the stable action lookup.

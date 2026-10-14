@@ -49,23 +49,24 @@ public static class EconomyChecks
             !wallet.TrySpend(Costs((credits, 1))) && !wallet.Grant(credits, 1)), "Reentrant wallet mutation is blocked during build commit");
 
         TowerPlacementController placement = battle.GetNode<TowerPlacementController>("TowerPlacement");
+        TowerDefinition definition = placement.Catalog.Find("battle");
         Node2D towers = battle.GetNode<Node2D>("World/Towers");
         Vector2I cell = FindBuildCell(grid, battle.GetNode<SpawnManager>("World/EnemySystems/Spawning"));
         wallet.Initialize(new LevelConfig { StartingCredits = 400 });
-        Require(placement.BattleConfig.ConstructionCosts.Count == 1 &&
-            placement.BattleConfig.ConstructionCosts[0].Amount == 200, "Saved Battle Tower recipe is 200 Credits");
-        PackedScene original = placement.BattleTowerScene;
+        Require(definition.DefaultConfig.ConstructionCosts.Count == 1 &&
+            definition.DefaultConfig.ConstructionCosts[0].Amount == 200, "Saved Battle Tower recipe is 200 Credits");
+        PackedScene original = definition.Scene;
         PackedScene broken = new(); Node2D wrongRoot = new(); broken.Pack(wrongRoot); wrongRoot.Free();
-        placement.BattleTowerScene = broken;
+        definition.Scene = broken;
         placement.Call("TryPlace", cell);
         Require(wallet.GetBalance(credits) == 400 && !grid.IsOccupied(cell) && towers.GetChildCount() == 0,
             "Invalid tower scene creates no tower, occupancy or charge");
-        placement.BattleTowerScene = original;
+        definition.Scene = original;
         placement.Call("TryPlace", cell);
         Require(wallet.GetBalance(credits) == 200 && grid.IsOccupied(cell) && towers.GetChildCount() == 1,
             "Actual placement charges exactly 200 and commits occupancy");
         BattleTower tower = towers.GetChild<BattleTower>(0); tower.SetPhysicsProcess(false);
-        Require(tower.Config != placement.BattleConfig && tower.Config.ConstructionCosts[0] != placement.BattleConfig.ConstructionCosts[0],
+        Require(tower.Config != definition.DefaultConfig && tower.Config.ConstructionCosts[0] != definition.DefaultConfig.ConstructionCosts[0],
             "Placed tower has isolated nested cost/config resources");
         placement.Call("TryPlace", cell);
         Require(wallet.GetBalance(credits) == 200 && towers.GetChildCount() == 1, "Repeat click on occupied cell never charges twice");
@@ -80,9 +81,9 @@ public static class EconomyChecks
         placement.Call("TryPlace", cell);
         Require(wallet.GetBalance(credits) == 400 && !grid.IsOccupied(cell) && towers.GetChildCount() == 0,
             "Failure after occupancy rolls back world state and keeps the entire payment");
-        BattleTowerConfig savedConfig = placement.BattleConfig;
-        placement.BattleConfig = (BattleTowerConfig)savedConfig.Duplicate(true);
-        placement.BattleConfig.ConstructionCosts.Add(new ResourceCost { Resource = alloy, Amount = 2 });
+        TowerConfig savedConfig = definition.DefaultConfig;
+        definition.DefaultConfig = (BattleTowerConfig)savedConfig.Duplicate(true);
+        definition.DefaultConfig.ConstructionCosts.Add(new ResourceCost { Resource = alloy, Amount = 2 });
         wallet.Grant(alloy, 1);
         placement.Call("TryPlace", other);
         Require(wallet.GetBalance(credits) == 400 && wallet.GetBalance(alloy) == 1 && !grid.IsOccupied(other),
@@ -92,7 +93,7 @@ public static class EconomyChecks
         Require(wallet.GetBalance(credits) == 200 && wallet.GetBalance(alloy) == 0 && grid.IsOccupied(other),
             "Actual multi-resource construction commits all costs together");
         towers.GetChild<BattleTower>(0).Free(); grid.ReleaseOccupancy(other);
-        placement.BattleConfig = savedConfig;
+        definition.DefaultConfig = savedConfig;
         wallet.Initialize(grid.Level.Settings);
         GD.Print("PASS: economy initialization, atomic transactions, HUD updates and paid placement checks");
     }

@@ -1,6 +1,7 @@
 // Permanent top HUD, Ctrl-toggle tower tray, and independent bottom-right inspector.
-// The Battle Tower button now enters placement mode; other options stay informational.
+// Build entries come from the validated tower catalog; gameplay belongs to its controllers.
 using Godot;
+using System.Collections.Generic;
 
 public partial class GameplayHUD : Control
 {
@@ -8,7 +9,7 @@ public partial class GameplayHUD : Control
     [Export] public UIMasterConfig Config { get; set; }
 
     // =========================================================
-    // Placement subscribes to Battle Tower selections; other IDs are prototypes.
+    // Placement owns validation and building; the HUD emits only a registered tower ID.
     [Signal] public delegate void TowerChoiceRequestedEventHandler(string towerId);
     // =========================================================
     // The wave service owns scheduling; this button only requests a manual start.
@@ -34,21 +35,7 @@ public partial class GameplayHUD : Control
     private bool _trayOpen;
     #endregion
 
-    #region Prototype Tower List
-    private readonly record struct PrototypeTower(string Id, string Name, string Category,
-        string Stats, string Notes);
-
-    // These entries are just HUD samples. No towers are placed or instantiated by this class.
-    private static readonly PrototypeTower[] SampleTowers =
-    {
-        new("battle", "Battle Tower", "Offensive", "Footprint: 1 x 1\nBarrels: 1\nRange: 4 cells", "Balanced starter tower. Click to place on the grid."),
-        new("laser", "Laser Tower", "Offensive", "Footprint: 1 x 1\nCost: TBD\nDamage: TBD\nRange: TBD", "Planned energy weapon."),
-        new("missile", "Missile Tower", "Offensive", "Footprint: 1 x 1\nCost: TBD\nSplash: TBD", "Planned explosive defense."),
-        new("repair", "Repair Tower", "Support", "Footprint: 1 x 1\nCost: TBD\nRepair rate: TBD", "Repairs nearby friendly towers."),
-        new("solar", "Solar Tower", "Economy / Hybrid", "Footprint: 1 x 1\nEnergy: TBD\nLaser upgrade: Future", "Energy production; can gain a defensive laser later."),
-        new("resource", "Resource Tower", "Economy", "Footprint: 2 x 2\nCredits: TBD\nPayout: TBD", "Generates income over time.")
-    };
-    #endregion
+    private readonly Dictionary<string, Button> _buildButtons = new();
 
     #region Lifecycle
     // =========================================================
@@ -80,7 +67,6 @@ public partial class GameplayHUD : Control
         _upgradeButton.Pressed += () => EmitSignal(SignalName.TowerUpgradeRequested);
         ApplyLayout();
         ApplyAppearance();
-        BindTowerButtons();
         GetNode<Button>("BottomArea/Inspector/Insets/Body/Heading/CloseButton").Pressed += ClearInspection;
         _inspector.Hide();
         SetTowerBarOpen(Config.StartWithTowerBarOpen, true);
@@ -125,30 +111,39 @@ public partial class GameplayHUD : Control
 
     #region Tower Selection and Inspector
     // =========================================================
-    // Populate the prototype bar. Names and IDs are temporary until tower definitions exist.
-    private void BindTowerButtons()
+    // Render registered available metadata only; no tower scenes or combat loops are instantiated.
+    // Call after Catalog.Rebuild when registration/availability changes, never each physics frame.
+    public void BindCatalog(TowerCatalog catalog)
     {
-        string[] buttonNames = { "BattleButton", "LaserButton", "MissileButton",
-            "RepairButton", "SolarButton", "ResourceButton" };
-        for (int i = 0; i < buttonNames.Length; i++)
+        HBoxContainer entries = GetNode<HBoxContainer>("BottomArea/TraySlot/TowerBar/Insets/Tray/Scroll/Buttons");
+        foreach (Node child in entries.GetChildren()) { entries.RemoveChild(child); child.QueueFree(); }
+        _buildButtons.Clear();
+        foreach (TowerDefinition definition in catalog.Definitions)
         {
-            PrototypeTower tower = SampleTowers[i];
-            Button button = GetNode<Button>($"BottomArea/TraySlot/TowerBar/Insets/Tray/Buttons/{buttonNames[i]}");
-            button.Pressed += () => SelectPrototypeTower(tower);
+            if (!definition.Available) continue;
+            string id = definition.TowerId;
+            Button button = UIButtonFactory.Create(definition.DisplayName + "\n" + definition.Category + " · " +
+                TowerPresentation.DescribeResourceCosts(definition.DefaultConfig.ConstructionCosts),
+                () => EmitSignal(SignalName.TowerChoiceRequested, id), UIButtonStyle.TowerTile, height: 65f, config: Config);
+            button.Name = "Tower_" + entries.GetChildCount();
+            button.CustomMinimumSize = new Vector2(Config.TowerButtonWidth, 65f);
+            button.TooltipText = definition.Description;
+            button.Icon = definition.Icon;
+            button.ExpandIcon = true;
+            button.AddThemeConstantOverride("icon_max_width", 32);
+            entries.AddChild(button);
+            _buildButtons.Add(id, button);
         }
+        if (_buildButtons.Count == 0)
+            entries.AddChild(new Label { Text = "No towers available.", MouseFilter = MouseFilterEnum.Ignore });
     }
 
     // =========================================================
-    // Selecting a build-menu button previews stats and emits an integration signal.
-    // Nothing is instantiated in the world until the next placement implementation.
-    private void SelectPrototypeTower(PrototypeTower tower)
-    {
-        ShowTowerDetails(tower.Name, tower.Category, tower.Stats, tower.Notes);
-        EmitSignal(SignalName.TowerChoiceRequested, tower.Id);
-    }
+    // Stable ID lookup for keyboard/tool integration independent of generated scene-node names.
+    public Button GetBuildButton(string towerId) => _buildButtons.GetValueOrDefault(towerId);
 
     // =========================================================
-    // This public entry point will also display clicked world towers in later passes.
+    // Placement supplies actual instance details and build previews to the independent Inspector.
     public void ShowTowerDetails(string name, string category, string stats, string notes = "")
     {
         SetUpgradeDetails("", "", false);
@@ -276,15 +271,6 @@ public partial class GameplayHUD : Control
         _healthFill = new StyleBoxFlat { BgColor = Config.HealthHealthyColor };
         _healthBar.AddThemeStyleboxOverride("fill", _healthFill);
         _healthBar.AddThemeStyleboxOverride("background", new StyleBoxFlat { BgColor = Config.ButtonColor });
-
-        string[] buttons = { "BattleButton", "LaserButton", "MissileButton",
-            "RepairButton", "SolarButton", "ResourceButton" };
-        foreach (string name in buttons)
-        {
-            Button button = GetNode<Button>($"BottomArea/TraySlot/TowerBar/Insets/Tray/Buttons/{name}");
-            button.CustomMinimumSize = new Vector2(Config.TowerButtonWidth, 65f);
-            UIButtonFactory.Apply(button, UIButtonStyle.TowerTile, Config);
-        }
 
         Label[] primary = { _wave, _credits, _core, _towerName };
         foreach (Label label in primary) label.AddThemeColorOverride("font_color", Config.TextColor);

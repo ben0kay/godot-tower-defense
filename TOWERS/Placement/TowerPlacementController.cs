@@ -1,9 +1,8 @@
-// Build mode for the first Battle Tower: ghost, grid validation and selection.
+// Catalog-driven tower build mode: ghost, grid validation and selection.
 // WorldGrid owns occupancy; the local dictionary only finds/selects tower instances.
 using Godot;
 using System.Collections.Generic;
 using System;
-using System.Text;
 
 public partial class TowerPlacementController : Node2D
 {
@@ -11,13 +10,12 @@ public partial class TowerPlacementController : Node2D
     [ExportGroup("Global Placement")]
     [Export] public TowerMasterConfig Settings { get; set; }
 
-    [ExportGroup("Battle Tower")]
-    [Export] public PackedScene BattleTowerScene { get; set; }
-    [Export] public BattleTowerConfig BattleConfig { get; set; }
-    [Export] public Texture2D BattleArtwork { get; set; }
+    [ExportGroup("Buildable Types")]
+    [Export] public TowerCatalog Catalog { get; set; }
     #endregion
 
     #region State
+    private TowerDefinition _buildDefinition;
     private EconomyManager _economy;
     private bool _affordable, _previewDirty;
     private WorldGrid _grid;
@@ -25,10 +23,10 @@ public partial class TowerPlacementController : Node2D
     private SpawnManager _spawns;
     private Node2D _towers;
     private Sprite2D _ghost;
-    private readonly Dictionary<Vector2I, BattleTower> _placedTowers = new();
+    private readonly Dictionary<Vector2I, TowerBase> _placedTowers = new();
     private Vector2I _hoverCell = new(int.MinValue, int.MinValue);
     private bool _placing, _previewVisible, _previewValid;
-    private BattleTower _selected;
+    private TowerBase _selected;
     private int _displayedUpgradeLevel;
     private ulong _lastUpgradeFrame = ulong.MaxValue;
     #endregion
@@ -46,10 +44,14 @@ public partial class TowerPlacementController : Node2D
         _hud = GetNode<GameplayHUD>("../UI/GameplayHUD");
         _hud.TowerChoiceRequested += OnTowerChoiceRequested;
         _hud.TowerUpgradeRequested += OnUpgradeRequested;
-        BattleConfig.Changed += OnPreviewConfigChanged;
+        Catalog.Rebuild();
+        _hud.BindCatalog(Catalog);
+        foreach (TowerDefinition definition in Catalog.Definitions)
+            if (definition.Available) { _buildDefinition = definition; break; }
+        if (_buildDefinition?.DefaultConfig != null) _buildDefinition.DefaultConfig.Changed += OnPreviewConfigChanged;
         _ghost = new Sprite2D
         {
-            Name = "PlacementGhost", Texture = BattleArtwork, Visible = false, ZIndex = 10,
+            Name = "PlacementGhost", Texture = _buildDefinition?.Icon, Visible = false, ZIndex = 10,
             Modulate = new Color(0.45f, 1f, 0.73f, 0.66f)
         };
         AddChild(_ghost);
@@ -63,23 +65,33 @@ public partial class TowerPlacementController : Node2D
         if (GodotObject.IsInstanceValid(_hud))
         { _hud.TowerChoiceRequested -= OnTowerChoiceRequested; _hud.TowerUpgradeRequested -= OnUpgradeRequested; }
         if (GodotObject.IsInstanceValid(_economy)) _economy.BalanceChanged -= OnBalanceChanged;
-        if (GodotObject.IsInstanceValid(BattleConfig)) BattleConfig.Changed -= OnPreviewConfigChanged;
+        if (GodotObject.IsInstanceValid(_buildDefinition?.DefaultConfig)) _buildDefinition.DefaultConfig.Changed -= OnPreviewConfigChanged;
         if (GodotObject.IsInstanceValid(_selected)) _selected.StatsChanged -= OnSelectedStatsChanged;
     }
     #endregion
 
     #region Build Mode
     // =========================================================
-    // Battle is the only implemented tower. Other HUD options remain informational.
+    // Resolve an available registered type without per-type branches.
     private void OnTowerChoiceRequested(string id)
     {
-        if (id != "battle") { CancelPlacement(); SelectTower(null); return; }
+        TowerDefinition choice = Catalog.Find(id);
+        if (choice == null || !choice.Available)
+        {
+            CancelPlacement(); SelectTower(null);
+            if (GodotObject.IsInstanceValid(_buildDefinition?.DefaultConfig)) _buildDefinition.DefaultConfig.Changed -= OnPreviewConfigChanged;
+            _buildDefinition = null; return;
+        }
+        if (GodotObject.IsInstanceValid(_buildDefinition?.DefaultConfig)) _buildDefinition.DefaultConfig.Changed -= OnPreviewConfigChanged;
+        _buildDefinition = choice;
+        choice.DefaultConfig.Changed += OnPreviewConfigChanged;
+        _ghost.Texture = choice.Icon;
         SelectTower(null);
-        _affordable = _economy.CanAfford(BattleConfig.ConstructionCosts);
+        _affordable = _buildDefinition != null && _economy.CanAfford(_buildDefinition.DefaultConfig.ConstructionCosts);
         _previewDirty = true;
         _placing = true;
         SetProcess(true);
-        _hud.ShowTowerDetails(BattleConfig.DisplayName, "Offensive / Build Preview",
+        _hud.ShowTowerDetails(_buildDefinition.DisplayName, _buildDefinition.Category + " / Build Preview",
             DescribeTower(), "Left-click a buildable terrain square to build. Right-click / Esc cancels.");
         UpdatePreview();
     }
@@ -106,7 +118,7 @@ public partial class TowerPlacementController : Node2D
         if (visible)
         {
             if (_selected == null)
-                _hud.ShowTowerDetails(BattleConfig.DisplayName, "Offensive / Build Preview", DescribeTower(),
+                _hud.ShowTowerDetails(_buildDefinition.DisplayName, _buildDefinition.Category + " / Build Preview", DescribeTower(),
                     valid ? "Left-click to build. Right-click / Esc cancels."
                         : _grid.PlacementFailure(cell).Length > 0 ? _grid.PlacementFailure(cell) : "Insufficient resources.");
             _ghost.GlobalPosition = _grid.CellToWorldCenter(cell);
@@ -152,7 +164,7 @@ public partial class TowerPlacementController : Node2D
 
         Vector2I cell = _grid.WorldToCell(GetGlobalMousePosition());
         if (_placing) TryPlace(cell);
-        else if (_placedTowers.TryGetValue(cell, out BattleTower tower)) SelectTower(tower);
+        else if (_placedTowers.TryGetValue(cell, out TowerBase tower)) SelectTower(tower);
         else { SelectTower(null); _hud.ClearInspection(); }
         GetViewport().SetInputAsHandled();
     }
@@ -161,18 +173,18 @@ public partial class TowerPlacementController : Node2D
     // Spawn a configured firing tower centered on a valid, unoccupied grid cell.
     private void TryPlace(Vector2I cell)
     {
-        if (_grid.PlacementFailure(cell).Length != 0) return;
+        if (_buildDefinition == null || !_buildDefinition.Available || _buildDefinition.Footprint != Vector2I.One || _grid.PlacementFailure(cell).Length != 0) return;
         string failure = _spawns.PlacementFailure(cell);
         if (failure.Length != 0)
         {
-            _hud.ShowTowerDetails(BattleConfig.DisplayName, "Placement rejected", DescribeTower(), failure);
+            _hud.ShowTowerDetails(_buildDefinition.DisplayName, "Placement rejected", DescribeTower(), failure);
             return;
         }
-        BattleTower tower = null;
-        if (!_economy.TryPurchase(BattleConfig.ConstructionCosts, () => CommitTower(cell, out tower)))
+        TowerBase tower = null;
+        if (!_economy.TryPurchase(_buildDefinition.DefaultConfig.ConstructionCosts, () => CommitTower(cell, out tower)))
         {
-            _hud.ShowTowerDetails(BattleConfig.DisplayName, "Placement rejected", DescribeTower(),
-                _economy.CanAfford(BattleConfig.ConstructionCosts) ? "Tower creation failed; no resources charged."
+            _hud.ShowTowerDetails(_buildDefinition.DisplayName, "Placement rejected", DescribeTower(),
+                _economy.CanAfford(_buildDefinition.DefaultConfig.ConstructionCosts) ? "Tower creation failed; no resources charged."
                     : "Insufficient resources.");
             return;
         }
@@ -182,20 +194,19 @@ public partial class TowerPlacementController : Node2D
 
     // =========================================================
     // Roll back occupancy and the scene on creation failure, before the wallet deducts payment.
-    private bool CommitTower(Vector2I cell, out BattleTower tower)
+    private bool CommitTower(Vector2I cell, out TowerBase tower)
     {
         tower = null;
         bool occupied = false;
         try
         {
-            if (BattleTowerScene == null) return false;
-            Node instance = BattleTowerScene.Instantiate();
-            if (instance is not BattleTower created) { instance.Free(); return false; }
-            if (created.GetNodeOrNull<Node2D>("TurretPivot") == null
-                || created.GetNodeOrNull<Sprite2D>("TurretPivot/Sprite") == null)
+            if (_buildDefinition.Scene == null) return false;
+            Node instance = _buildDefinition.Scene.Instantiate();
+            if (instance is not TowerBase created) { instance.Free(); return false; }
+            if (!created.AcceptsConfig(_buildDefinition.DefaultConfig) || !created.ValidateScene())
             { created.Free(); return false; }
             tower = created;
-            tower.Config = BattleConfig.CreateInstanceCopy();
+            tower.InitializeDefinition(_buildDefinition);
             if (!_grid.TryOccupy(cell)) { tower.Free(); tower = null; return false; }
             occupied = true;
             _towers.AddChild(tower);
@@ -219,14 +230,14 @@ public partial class TowerPlacementController : Node2D
     // Refresh affordability only when wallet state changes, not on every preview frame.
     private void OnBalanceChanged(string resourceId, int amount)
     {
-        _affordable = _economy.CanAfford(BattleConfig.ConstructionCosts);
+        _affordable = _buildDefinition != null && _economy.CanAfford(_buildDefinition.DefaultConfig.ConstructionCosts);
         _previewDirty = true;
         if (_hud.IsInspectionVisible) RefreshUpgradePreview();
     }
 
     // =========================================================
     // A selected placed tower shares the existing HUD Inspector with build previews.
-    private void SelectTower(BattleTower tower)
+    private void SelectTower(TowerBase tower)
     {
         if (_selected == tower) return;
         if (GodotObject.IsInstanceValid(_selected))
@@ -236,9 +247,9 @@ public partial class TowerPlacementController : Node2D
         {
             _selected.StatsChanged += OnSelectedStatsChanged;
             _selected.SetSelected(true);
-            _hud.ShowTowerDetails(BattleConfig.DisplayName, "Offensive / Placed",
+            _hud.ShowTowerDetails(_selected.AuthoredConfig.DisplayName, (_selected.Definition?.Category.ToString() ?? "Tower") + " / Placed",
                 DescribeTower($"Grid cell: {_selected.GridCell.X}, {_selected.GridCell.Y}"),
-                _selected.Config.Description + "\nConstruction paid; automatic firing active.");
+                _selected.AuthoredConfig.Description + "\nConstruction paid.");
         }
         RefreshUpgradePreview();
         QueueRedraw();
@@ -248,10 +259,10 @@ public partial class TowerPlacementController : Node2D
     // Refresh the selected tower's displayed effective values/range when its inputs change.
     private void OnSelectedStatsChanged()
     {
-        if (!GodotObject.IsInstanceValid(_selected) || _selected.FinalStats == null) return;
-        if (_hud.IsInspectionVisible) _hud.ShowTowerDetails(_selected.Config.DisplayName, "Offensive / Placed",
+        if (!GodotObject.IsInstanceValid(_selected)) return;
+        if (_hud.IsInspectionVisible) _hud.ShowTowerDetails(_selected.AuthoredConfig.DisplayName, (_selected.Definition?.Category.ToString() ?? "Tower") + " / Placed",
             DescribeTower($"Grid cell: {_selected.GridCell.X}, {_selected.GridCell.Y}"),
-            _selected.Config.Description + "\nConstruction paid; automatic firing active.");
+            _selected.AuthoredConfig.Description + "\nConstruction paid.");
         if (_hud.IsInspectionVisible) RefreshUpgradePreview();
         QueueRedraw();
     }
@@ -261,7 +272,7 @@ public partial class TowerPlacementController : Node2D
     private void OnPreviewConfigChanged()
     {
         _previewDirty = true;
-        _affordable = _economy.CanAfford(BattleConfig.ConstructionCosts);
+        _affordable = _buildDefinition != null && _economy.CanAfford(_buildDefinition.DefaultConfig.ConstructionCosts);
         if (_placing && _selected == null) UpdatePreview();
     }
 
@@ -276,18 +287,12 @@ public partial class TowerPlacementController : Node2D
         {
             TowerUpgradeController.Validate(_selected.UpgradeTiers);
             TowerUpgradeTier next = _selected.NextUpgrade;
-            if (next == null) { _hud.SetUpgradeDetails("Maximum level reached.", "", false); return; }
+            if (next == null) { _hud.SetUpgradeDetails(_selected.UpgradeTiers.Count == 0 ? "No upgrades available." : "Maximum level reached.", "", false); return; }
             TowerFinalStats now = _selected.FinalStats, future = _selected.ResolveLevel(_selected.UpgradeLevel + 1);
             string changes = $"NEXT: LEVEL {next.Level} — {next.DisplayName}\n";
-            if (now.DamagePerShot != future.DamagePerShot) changes += $"Damage: {now.DamagePerShot} → {future.DamagePerShot}\n";
-            if (now.ShotsPerSecond != future.ShotsPerSecond) changes += $"Rate: {now.ShotsPerSecond:0.##} → {future.ShotsPerSecond:0.##} shots/s\n";
-            if (now.RangePixels != future.RangePixels) changes += $"Range: {now.RangePixels:0} → {future.RangePixels:0} px\n";
-            if (now.ProjectileSpeed != future.ProjectileSpeed) changes += $"Projectile: {now.ProjectileSpeed:0} → {future.ProjectileSpeed:0} px/s\n";
-            if (now.RotationSpeedDegrees != future.RotationSpeedDegrees) changes += $"Turn: {now.RotationSpeedDegrees:0} → {future.RotationSpeedDegrees:0}°/s\n";
-            if (now.AimToleranceDegrees != future.AimToleranceDegrees) changes += $"Aim tolerance: {now.AimToleranceDegrees:0} → {future.AimToleranceDegrees:0}°\n";
-            if (now.TargetSearchInterval != future.TargetSearchInterval) changes += $"Target search: {now.TargetSearchInterval:0.##} → {future.TargetSearchInterval:0.##}s\n";
+            changes += _selected.AuthoredConfig.DescribeChanges(now, future);
             bool enabled = Settings.AllowUpgrades && _economy.CanAfford(next.Costs);
-            changes += "Price: " + DescribeResourceCosts(next.Costs);
+            changes += "Price: " + TowerPresentation.DescribeResourceCosts(next.Costs);
             if (!Settings.AllowUpgrades) changes += "\nUpgrades disabled.";
             else if (!enabled) changes += "\nInsufficient resources.";
             _hud.SetUpgradeDetails(changes, $"UPGRADE TO LEVEL {next.Level}", enabled);
@@ -324,46 +329,20 @@ public partial class TowerPlacementController : Node2D
     // Show active weapon stats and the one authoritative shared construction recipe.
     private string DescribeTower(string extra = "")
     {
-        BattleTowerConfig config = _selected?.Config ?? BattleConfig;
-        TowerFinalStats final = _selected?.FinalStats ?? TowerStatPipeline.Resolve(BattleConfig);
-        string stats = $"Footprint: 1 x 1 | Barrels: 1\n" +
+        TowerConfig config = _selected?.AuthoredConfig ?? _buildDefinition.DefaultConfig;
+        TowerFinalStats final = _selected == null ? config.ResolveStats(1) : _selected.FinalStats;
+        string stats = "Footprint: 1 x 1\n" +
             (_selected == null ? "" : $"Tower level: {_selected.UpgradeLevel}\n") +
-            $"Cost: {DescribeCosts(config)}\n" +
-            $"Range: {final.RangePixels:0} px\n" +
-            $"Rate: {final.ShotsPerSecond:0.##} shots/s\n" +
-            $"Damage: {final.DamagePerShot}\nTargeting: {config.TargetPriority}";
+            $"Cost: {TowerPresentation.DescribeResourceCosts(config.ConstructionCosts)}\n" + config.DescribeStats(final);
         return extra.Length == 0 ? stats : stats + "\n" + extra;
-    }
-
-    // =========================================================
-    // The Inspector displays every required resource, including future optional materials.
-    private static string DescribeCosts(BattleTowerConfig config)
-    {
-        return DescribeResourceCosts(config.ConstructionCosts);
-    }
-
-    // =========================================================
-    // The same display format is used for shared build and upgrade recipes.
-    private static string DescribeResourceCosts(Godot.Collections.Array<ResourceCost> costs)
-    {
-        if (costs == null) return "Invalid cost configuration";
-        StringBuilder text = new();
-        foreach (ResourceCost cost in costs)
-        {
-            if (cost?.Resource == null || string.IsNullOrWhiteSpace(cost.Resource.ResourceId) || cost.Amount < 0) return "Invalid cost configuration";
-            if (cost.Amount == 0) continue;
-            if (text.Length > 0) text.Append(", ");
-            text.Append($"{cost.Amount:N0} {cost.Resource.DisplayName}");
-        }
-        return text.Length == 0 ? "Free" : text.ToString();
     }
 
     // =========================================================
     // Draw only the active preview cell and selected tower's weapon range.
     public override void _Draw()
     {
-        if (GodotObject.IsInstanceValid(_selected) && _selected.FinalStats != null && Settings.ShowSelectionRange)
-            DrawArc(ToLocal(_selected.GlobalPosition), _selected.FinalStats.RangePixels, 0f,
+        if (GodotObject.IsInstanceValid(_selected) && _selected.InspectionRange.HasValue && Settings.ShowSelectionRange)
+            DrawArc(ToLocal(_selected.GlobalPosition), _selected.InspectionRange.Value, 0f,
                 Mathf.Tau, 96, new Color(0.37f, 0.82f, 0.95f, 0.55f), 2f);
 
         if (!_previewVisible || !Settings.ShowPlacementPreview) return;

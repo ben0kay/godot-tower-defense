@@ -4,12 +4,12 @@ F5 -> Ctrl -> BATTLE -> place on buildable terrain. Press F2 repeatedly to spawn
 
 ## Inspector tuning
 
-- Select `DefaultBattleTowerConfig.tres` to change defaults for newly built towers, or select TowerPlacement in Main.tscn and expand BattleConfig.
+- Select `DefaultBattleTowerConfig.tres` to change defaults for newly built towers, or select DefaultTowerCatalog.tres, expand its Battle definition and DefaultConfig.
 - Open BattleTower.tscn, select its root and expand Config to view the same defaults.
 - Each placed tower receives a separate Config copy. During play, switch Scene to Remote, expand Battlefield/World/Towers, select a BattleTower and expand Config to tune only that tower's range, fire rate, damage, projectile speed and targeting. Runtime edits are temporary; edit the saved resource for permanent defaults.
 - Fire rate zero disables shooting. ConstructionCosts is the authoritative shared resource recipe; the default costs 200 Credits. Successful placement pays through Main/Economy.
 
-The one-piece SVG is unchanged; bullets fire from its center. The child TurretPivot rotates the one-piece art, leaving placement and selection fixed. No line-of-sight/terrain-blocked bullets, upgrades, rewards, saving or objective-health/waves yet. Tower placement prevents sealing currently usable entries or trapping existing ships. Click a tower to inspect active stats and its range ring.
+The one-piece SVG is unchanged; bullets fire from its center. The child TurretPivot rotates the one-piece art, leaving placement and selection fixed. No line-of-sight/terrain-blocked bullets or saving yet. Tower placement prevents sealing currently usable entries or trapping existing ships. Click a tower to inspect active stats and its range ring.
 
 
 ## Phase 1 aiming
@@ -21,7 +21,10 @@ Tune **Aiming** in DefaultBattleTowerConfig.tres: RotationSpeedDegrees (180), Ai
 Set Construction / Construction Costs in DefaultBattleTowerConfig.tres. Each entry expands to Resource and Amount; the default is 200 Credits. Starting funds live in each level config (Level001 starts with 1,000). Terrain/connectivity and affordability failures charge nothing. The preview shows required costs and insufficient-resource feedback. Paid upgrades are implemented; selling is still future work.
 
 ## Effective stat pipeline (Phase 3A)
-BattleTower now reads cached FinalStats from the shared eight-stage resolver. Existing numeric Config fields are still editable: Remote Inspector or C# property changes emit Changed and rebuild immediately. Config replacement also rebuilds; RebuildStats() supports future explicit invalidation. The selected Inspector/range ring uses the same final values. Upgrades, ranks, research, level conditions and effects are currently neutral, so valid base balance stays unchanged. Prices, priority and tracking policy remain outside the numeric pipeline. See TOWERS/Shared/Stats/README.md.
+BattleTower now reads cached FinalStats from the shared eight-stage resolver. Existing numeric Config fields are still editable: Remote Inspector or C# property changes emit Changed and rebuild immediately. Config replacement also rebuilds; RebuildStats() supports future explicit invalidation. The selected Inspector/range ring uses the same final values. Purchased upgrades are active; ranks, research, level conditions and effects remain neutral, so valid base balance stays unchanged. Prices, priority and tracking policy remain outside the numeric pipeline. See TOWERS/Shared/Stats/README.md.
 
 ## Phase 3B upgrades
 Select a placed tower after exiting build mode to see its current level and next-tier differences/price. Upgrade to level 2 for 150 Credits, then level 3 for 250; defaults become 16/22 damage, 1.2/1.5 shots/sec and 288/320px range. Edit Upgrades/Level2.tres and Level3.tres for permanent balance changes. The resolver applies cumulative operations without altering base Config, other towers, aim/cooldown or navigation. External tier Resources are explicitly copied per instance; nested runtime edits require RebuildStats().
+
+## Phase 4A catalog migration
+BattleTowerDefinition.tres references the existing scene/art and canonical config; DefaultTowerCatalog.tres registers it. BattleTower implements shared config/selection/placement contracts while retaining its existing local targeting, cooldown, rotation and guided projectile loop. TowerConfig supplies identity/cost/tiers, BattleTowerConfig retains all weapon fields, change notifications and the same eight-stage input adapter. Level2/Level3 costs and calculations are unchanged. No weapon-family extraction was performed.

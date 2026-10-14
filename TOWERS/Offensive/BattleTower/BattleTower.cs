@@ -20,7 +20,17 @@ public partial class BattleTower : TowerBase
             RebuildStats();
         }
     }
-    public Vector2I GridCell { get; private set; }
+    public override TowerConfig AuthoredConfig => Config;
+    public override float? InspectionRange => FinalStats?.RangePixels;
+    // =========================================================
+    // Battle alone opts into the weapon config and pivot layout.
+    public override bool AcceptsConfig(TowerConfig config) => config is BattleTowerConfig;
+    // =========================================================
+    // Reject malformed Battle scenes before occupancy/payment, without imposing this on passive types.
+    public override bool ValidateScene() => GetNodeOrNull<Node2D>("TurretPivot") != null && GetNodeOrNull<Sprite2D>("TurretPivot/Sprite") != null;
+    // =========================================================
+    // Per-instance initialization preserves the exported Battle Config and its change subscriptions.
+    protected override void ApplyConfig(TowerConfig config) => Config = (BattleTowerConfig)config;
     private Sprite2D _sprite;
     private Node2D _turret;
     private EnemyRegistry _registry;
@@ -91,16 +101,8 @@ public partial class BattleTower : TowerBase
 
     #region Placement and Selection
     // =========================================================
-    // Initialize a placed tower's logical cell and world position.
-    public void SetPlacement(Vector2I cell, Vector2 center)
-    {
-        GridCell = cell;
-        GlobalPosition = center;
-    }
-
-    // =========================================================
     // Modulate the existing sprite instead of instantiating selection effects.
-    public void SetSelected(bool selected) =>
+    public override void SetSelected(bool selected) =>
         _sprite.Modulate = selected ? new Color(1f, 0.9f, 0.68f) : Colors.White;
     #endregion
 }
