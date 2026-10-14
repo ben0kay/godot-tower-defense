@@ -55,3 +55,15 @@ layout_mode = 2
 text = "Select a tower to preview."
 autowrap_mode = 2
 theme_override_font_sizes/font_size = 11
+
+[node name="UpgradeInfo" type="Label" parent="Insets/Body"]
+visible = false
+layout_mode = 2
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 12
+
+[node name="UpgradeButton" type="Button" parent="Insets/Body"]
+visible = false
+layout_mode = 2
+custom_minimum_size = Vector2(0, 30)
+text = "UPGRADE"

@@ -5,7 +5,7 @@ TowerStatPipeline.cs is the single coordinator. Each stage is an ordinary static
 | File | Current behavior |
 | --- | --- |
 | 01_BaseStats.cs | Copy the resolution context's authored snapshot |
-| 02_TowerUpgrades.cs | Neutral; paid tiers are Phase 3B |
+| 02_TowerUpgrades.cs | Active; cumulative purchased tier operations |
 | 03_TowerRanks.cs | Neutral; kill milestones later |
 | 04_PermanentResearch.cs | Neutral; persistent player research later |
 | 05_LevelModifiers.cs | Neutral; current-map conditions later |

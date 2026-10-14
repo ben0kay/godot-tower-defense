@@ -29,6 +29,8 @@ public partial class TowerPlacementController : Node2D
     private Vector2I _hoverCell = new(int.MinValue, int.MinValue);
     private bool _placing, _previewVisible, _previewValid;
     private BattleTower _selected;
+    private int _displayedUpgradeLevel;
+    private ulong _lastUpgradeFrame = ulong.MaxValue;
     #endregion
 
     #region Lifecycle
@@ -43,6 +45,7 @@ public partial class TowerPlacementController : Node2D
         _towers = GetNode<Node2D>("../World/Towers");
         _hud = GetNode<GameplayHUD>("../UI/GameplayHUD");
         _hud.TowerChoiceRequested += OnTowerChoiceRequested;
+        _hud.TowerUpgradeRequested += OnUpgradeRequested;
         BattleConfig.Changed += OnPreviewConfigChanged;
         _ghost = new Sprite2D
         {
@@ -57,7 +60,8 @@ public partial class TowerPlacementController : Node2D
     // Avoid subscriptions retaining scenes that are no longer alive.
     public override void _ExitTree()
     {
-        if (GodotObject.IsInstanceValid(_hud)) _hud.TowerChoiceRequested -= OnTowerChoiceRequested;
+        if (GodotObject.IsInstanceValid(_hud))
+        { _hud.TowerChoiceRequested -= OnTowerChoiceRequested; _hud.TowerUpgradeRequested -= OnUpgradeRequested; }
         if (GodotObject.IsInstanceValid(_economy)) _economy.BalanceChanged -= OnBalanceChanged;
         if (GodotObject.IsInstanceValid(BattleConfig)) BattleConfig.Changed -= OnPreviewConfigChanged;
         if (GodotObject.IsInstanceValid(_selected)) _selected.StatsChanged -= OnSelectedStatsChanged;
@@ -69,7 +73,7 @@ public partial class TowerPlacementController : Node2D
     // Battle is the only implemented tower. Other HUD options remain informational.
     private void OnTowerChoiceRequested(string id)
     {
-        if (id != "battle") { CancelPlacement(); return; }
+        if (id != "battle") { CancelPlacement(); SelectTower(null); return; }
         SelectTower(null);
         _affordable = _economy.CanAfford(BattleConfig.ConstructionCosts);
         _previewDirty = true;
@@ -191,7 +195,7 @@ public partial class TowerPlacementController : Node2D
                 || created.GetNodeOrNull<Sprite2D>("TurretPivot/Sprite") == null)
             { created.Free(); return false; }
             tower = created;
-            tower.Config = (BattleTowerConfig)BattleConfig.Duplicate(true);
+            tower.Config = BattleConfig.CreateInstanceCopy();
             if (!_grid.TryOccupy(cell)) { tower.Free(); tower = null; return false; }
             occupied = true;
             _towers.AddChild(tower);
@@ -217,6 +221,7 @@ public partial class TowerPlacementController : Node2D
     {
         _affordable = _economy.CanAfford(BattleConfig.ConstructionCosts);
         _previewDirty = true;
+        if (_hud.IsInspectionVisible) RefreshUpgradePreview();
     }
 
     // =========================================================
@@ -235,6 +240,7 @@ public partial class TowerPlacementController : Node2D
                 DescribeTower($"Grid cell: {_selected.GridCell.X}, {_selected.GridCell.Y}"),
                 _selected.Config.Description + "\nConstruction paid; automatic firing active.");
         }
+        RefreshUpgradePreview();
         QueueRedraw();
     }
 
@@ -246,6 +252,7 @@ public partial class TowerPlacementController : Node2D
         if (_hud.IsInspectionVisible) _hud.ShowTowerDetails(_selected.Config.DisplayName, "Offensive / Placed",
             DescribeTower($"Grid cell: {_selected.GridCell.X}, {_selected.GridCell.Y}"),
             _selected.Config.Description + "\nConstruction paid; automatic firing active.");
+        if (_hud.IsInspectionVisible) RefreshUpgradePreview();
         QueueRedraw();
     }
 
@@ -256,6 +263,51 @@ public partial class TowerPlacementController : Node2D
         _previewDirty = true;
         _affordable = _economy.CanAfford(BattleConfig.ConstructionCosts);
         if (_placing && _selected == null) UpdatePreview();
+    }
+
+    // =========================================================
+    // Preview uses the same pipeline as a real upgrade and cannot mutate/spend.
+    private void RefreshUpgradePreview()
+    {
+        if (!GodotObject.IsInstanceValid(_selected))
+        { _hud.SetUpgradeDetails("", "", false); return; }
+        _displayedUpgradeLevel = _selected.UpgradeLevel;
+        try
+        {
+            TowerUpgradeController.Validate(_selected.UpgradeTiers);
+            TowerUpgradeTier next = _selected.NextUpgrade;
+            if (next == null) { _hud.SetUpgradeDetails("Maximum level reached.", "", false); return; }
+            TowerFinalStats now = _selected.FinalStats, future = _selected.ResolveLevel(_selected.UpgradeLevel + 1);
+            string changes = $"NEXT: LEVEL {next.Level} — {next.DisplayName}\n";
+            if (now.DamagePerShot != future.DamagePerShot) changes += $"Damage: {now.DamagePerShot} → {future.DamagePerShot}\n";
+            if (now.ShotsPerSecond != future.ShotsPerSecond) changes += $"Rate: {now.ShotsPerSecond:0.##} → {future.ShotsPerSecond:0.##} shots/s\n";
+            if (now.RangePixels != future.RangePixels) changes += $"Range: {now.RangePixels:0} → {future.RangePixels:0} px\n";
+            if (now.ProjectileSpeed != future.ProjectileSpeed) changes += $"Projectile: {now.ProjectileSpeed:0} → {future.ProjectileSpeed:0} px/s\n";
+            if (now.RotationSpeedDegrees != future.RotationSpeedDegrees) changes += $"Turn: {now.RotationSpeedDegrees:0} → {future.RotationSpeedDegrees:0}°/s\n";
+            if (now.AimToleranceDegrees != future.AimToleranceDegrees) changes += $"Aim tolerance: {now.AimToleranceDegrees:0} → {future.AimToleranceDegrees:0}°\n";
+            if (now.TargetSearchInterval != future.TargetSearchInterval) changes += $"Target search: {now.TargetSearchInterval:0.##} → {future.TargetSearchInterval:0.##}s\n";
+            bool enabled = Settings.AllowUpgrades && _economy.CanAfford(next.Costs);
+            changes += "Price: " + DescribeResourceCosts(next.Costs);
+            if (!Settings.AllowUpgrades) changes += "\nUpgrades disabled.";
+            else if (!enabled) changes += "\nInsufficient resources.";
+            _hud.SetUpgradeDetails(changes, $"UPGRADE TO LEVEL {next.Level}", enabled);
+        }
+        catch (Exception exception) { _hud.SetUpgradeDetails("Invalid upgrade data: " + exception.Message, "", false); }
+    }
+
+    // =========================================================
+    // Reject stale selection/level requests; world occupancy and aim/cooldown are not rebuilt.
+    private void OnUpgradeRequested()
+    {
+        if (!_hud.IsInspectionVisible || !GodotObject.IsInstanceValid(_selected)) return;
+        ulong frame = Engine.GetProcessFrames();
+        if (_lastUpgradeFrame == frame) return;
+        _lastUpgradeFrame = frame;
+        if (!TowerUpgradeController.TryUpgrade(_selected, _economy, Settings, _displayedUpgradeLevel, out string failure))
+        {
+            RefreshUpgradePreview();
+            _hud.SetUpgradeError(failure);
+        }
     }
 
     // =========================================================
@@ -275,6 +327,7 @@ public partial class TowerPlacementController : Node2D
         BattleTowerConfig config = _selected?.Config ?? BattleConfig;
         TowerFinalStats final = _selected?.FinalStats ?? TowerStatPipeline.Resolve(BattleConfig);
         string stats = $"Footprint: 1 x 1 | Barrels: 1\n" +
+            (_selected == null ? "" : $"Tower level: {_selected.UpgradeLevel}\n") +
             $"Cost: {DescribeCosts(config)}\n" +
             $"Range: {final.RangePixels:0} px\n" +
             $"Rate: {final.ShotsPerSecond:0.##} shots/s\n" +
@@ -286,9 +339,16 @@ public partial class TowerPlacementController : Node2D
     // The Inspector displays every required resource, including future optional materials.
     private static string DescribeCosts(BattleTowerConfig config)
     {
-        if (config.ConstructionCosts == null) return "Invalid cost configuration";
+        return DescribeResourceCosts(config.ConstructionCosts);
+    }
+
+    // =========================================================
+    // The same display format is used for shared build and upgrade recipes.
+    private static string DescribeResourceCosts(Godot.Collections.Array<ResourceCost> costs)
+    {
+        if (costs == null) return "Invalid cost configuration";
         StringBuilder text = new();
-        foreach (ResourceCost cost in config.ConstructionCosts)
+        foreach (ResourceCost cost in costs)
         {
             if (cost?.Resource == null || string.IsNullOrWhiteSpace(cost.Resource.ResourceId) || cost.Amount < 0) return "Invalid cost configuration";
             if (cost.Amount == 0) continue;

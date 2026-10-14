@@ -56,6 +56,9 @@ TowerStatChecks verifies all eight stage calls/order, neutral baseline parity, d
 
 `TESTS/CitadelHealthChecks.cs` runs in the existing Main-scene integration suite. It checks the level-specific initial maximum, real Enemy001 arrivals and configured CitadelDamage, instantaneous health HUD/bar updates, duplicate-arrival prevention, killed-enemy exclusion, zero clamping, once-per-destruction event, and reset without modifying any saved level Resource. `HudTowerChecks` now expects a live objective on startup and restores the authoritative display after synthetic status setter tests. Defeat/menu flow is intentionally not part of this pass.
 
+## Purchased tier regressions
+TowerUpgradeChecks drives actual HUD upgrade actions and validates levels 1→2→3, preview/apply parity, shared/base/other-instance isolation, atomic credit/material prices, insufficient funds, disabled rules, stale and same-frame repeat requests, max tier, invalid tier/operation data, arithmetic, unchanged navigation and no repeated compounding. It waits for GUI layout to verify Inspector screen bounds and tray height/independence.
+
 ## Menu / profile foundation
 
 `MenuFoundationChecks.cs` is included in the existing Main-scene headless suite. It checks loadable Boot, Main and Campaign scene resources, the unchanged gameplay destination, factory-created button callbacks, styled existing HUD buttons and profile name validation. The automated check **does not touch the user's real profiles**. Manual Boot smoke test: create/select a profile, enter Campaign → Play Level001, exit/restart and confirm the same profile remains selectable; try multiple profiles, invalid names and returning to Boot with Change Profile. Test the normal F5 startup and direct gameplay `Main.tscn` F6 separately. This does not test campaign persistence because that system is still planned.

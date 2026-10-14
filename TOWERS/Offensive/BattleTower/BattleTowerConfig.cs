@@ -13,6 +13,9 @@ public partial class BattleTowerConfig : Resource
     [ExportGroup("Construction")]
     [Export] public Godot.Collections.Array<ResourceCost> ConstructionCosts { get; set; } = new();
 
+    [ExportGroup("Upgrades")]
+    [Export] public Godot.Collections.Array<TowerUpgradeTier> UpgradeTiers { get; set; } = new();
+
     [ExportGroup("Combat")]
     [Export(PropertyHint.Range, "32,1024,16")] public float RangePixels { get => _rangePixels; set => SetStat(ref _rangePixels, value); }
     [Export(PropertyHint.Range, "0,10,0.1")] public float ShotsPerSecond { get => _shotsPerSecond; set => SetStat(ref _shotsPerSecond, value); }
@@ -44,4 +47,20 @@ public partial class BattleTowerConfig : Resource
         field = value; EmitChanged();
     }
     #endregion
+
+    // =========================================================
+    // Copy external tier assets explicitly; Duplicate(true) alone retains these array references.
+    public BattleTowerConfig CreateInstanceCopy()
+    {
+        BattleTowerConfig copy = (BattleTowerConfig)Duplicate(true);
+        copy.ConstructionCosts = TowerUpgradeTier.CopyCosts(ConstructionCosts);
+        if (UpgradeTiers == null) copy.UpgradeTiers = null;
+        else
+        {
+            copy.UpgradeTiers = new();
+            foreach (TowerUpgradeTier tier in UpgradeTiers)
+                copy.UpgradeTiers.Add(tier?.CreateInstanceCopy());
+        }
+        return copy;
+    }
 }

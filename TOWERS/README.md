@@ -95,7 +95,7 @@ Terrain/occupancy and route connectivity validation run before purchase. TryPurc
 
 Prices are deeply duplicated with each placed tower's config. The build preview shows costs and affordability; the placed Inspector describes paid construction. Weapon rotation, targeting, navigation and combat remain unchanged.
 
-## Phase 3 — Tower upgrades and a layered stat pipeline (planned)
+## Phase 3 — Tower upgrades and a layered stat pipeline (3A/3B implemented)
 
 Every tower type should **be able to upgrade**, including support/economy towers; an individual design may have fewer upgrade tiers or temporarily disable upgrades.
 
@@ -336,7 +336,9 @@ Keep actual progression per tower editable in Resources, not in a global switch 
 
 Phase 1 rotation, Phase 2 paid construction and **Phase 3A stat foundation are implemented**. Battle Tower combat, selected stats and range displays use immutable cached FinalStats; numeric Config changes emit invalidation events. The eight numbered stages are in TOWERS/Shared/Stats/Pipeline, with 02–06 neutral. See Shared/Stats/README.md for the supported tuning workflow and safety rules.
 
-**Next is Phase 3B:** purchased tier data, atomic ECONOMY payments and an upgrade preview/button, activating only 02_TowerUpgrades. Ranks, persistent research, level conditions and timed effects remain later passes. Do not rebuild the pipeline, add a competing wallet or fabricate future managers.
+**Phase 3B is implemented:** shared TowerBase progression, typed upgrade-tier/modifier Resources, atomic wallet payments and the Inspector preview/button. Battle Tower has editable level 2/3 playtest tiers in Offensive/BattleTower/Upgrades/. Stage 02 now applies cumulative tier operations; stages 03–06 remain neutral. See Shared/Upgrades/README.md for rules and instance-copy ownership.
+
+**Next:** ranks, persistent research, level conditions and timed effects in separate focused passes. Do not rebuild the pipeline or add a competing wallet. Selling and tower damage are still future systems.
 
 Tests currently cover rotation/cooldown, atomic payments, paid placement and nested config isolation. Add tier progression and upgrade effects/payment checks when upgrades are implemented.
 
@@ -348,8 +350,16 @@ Tests currently cover rotation/cooldown, atomic payments, paid placement and nes
 - `DefaultTowerConfig.tres`: shared placement preview/selection range toggles and future upgrade/sell switches.
 - `FEEDBACK/DefenseBars/DefaultDefenseBarConfig.tres`: reusable health bar appearance when towers become damageable.
 
-**Current status:** rotation (Phase 1), paid construction (Phase 2) and neutral stat pipeline (Phase 3A) work. Purchased upgrades (3B), ranks, research, level conditions and timed effects remain planned.
+**Current status:** rotation (Phase 1), paid construction (Phase 2) and stat foundation (3A) and paid upgrades (3B) work. Ranks, research, level conditions and timed effects remain planned.
 
 
 ## Implemented Phase 3A verification
 All eight stage files and the single coordinator exist. TowerFinalStats is a separate immutable instance snapshot; source Config remains Inspector-editable and numeric changes automatically rebuild. Resource replacement/exit remove old subscriptions. StatsChanged refreshes selected Inspector values/range rings; combat ticks consume cached results. Safety bounds and optional traces are documented in Shared/Stats/README.md. TowerStatChecks validates stage order, baseline parity, clamps, cache/input isolation, per-tower independence, live tuning and disabled/re-enabled firing. No tier purchasing, rank/research/condition/effect gameplay or Upgrade button was added.
+
+
+## Implemented Phase 3B verification
+BattleTower uses shared TowerBase UpgradeLevel (starting at 1) and the existing eight-stage resolver. Editable Level2/Level3 tiers cost 150/250 Credits and produce 16/22 damage, 1.2/1.5 shots/sec and 288/320px range at current base balance. These are playtest values, not finalized balance. Tier/modifier/cost Resources are explicitly copied per instance; base Config remains unchanged.
+
+The selected Inspector displays current level, actual next-tier stat differences, price, affordability and max-tier status. Purchases use EconomyManager.TryPurchase, do not change navigation/occupancy or reset cooldown/aim, and notify UI after payment commits. Build previews/prototype towers have no upgrade action. The larger Inspector grows upward while the Ctrl tray retains its configured height.
+
+TowerUpgradeChecks covers paid HUD actions, stale/same-frame duplicate protection, global AllowUpgrades, insufficient/secondary-resource costs, max tier, source isolation, preview parity, deterministic stage arithmetic, no compounding and layout/independent panels. No rank, research, level/effect gameplay, selling or visual tower upgrade artwork was added.

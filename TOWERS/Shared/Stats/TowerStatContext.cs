@@ -1,2 +1,4 @@
-// Read-only resolution inputs. Future feature inputs are added here when their systems exist.
-public readonly record struct TowerStatContext(TowerStatBlock BaseStats);
+// Immutable resolution inputs; future stage sources remain empty until their systems exist.
+using System.Collections.Immutable;
+public readonly record struct TowerStatContext(TowerStatBlock BaseStats,
+    ImmutableArray<TowerStatModifier> UpgradeModifiers = default);

@@ -1,13 +1,12 @@
 // Placed Battle Tower with staggered reusable targeting and lightweight guided test bullets.
 using Godot;
 
-public partial class BattleTower : Node2D
+public partial class BattleTower : TowerBase
 {
     #region Settings and State
     private BattleTowerConfig _config;
     private bool _initialized;
-    public TowerFinalStats FinalStats { get; private set; }
-    public event System.Action StatsChanged;
+    public override Godot.Collections.Array<TowerUpgradeTier> UpgradeTiers => Config?.UpgradeTiers;
     [Export] public BattleTowerConfig Config
     {
         get => _config;
@@ -70,11 +69,15 @@ public partial class BattleTower : Node2D
 
     #region Stat Resolution
     // =========================================================
+    // Both paid application and preview resolve the same source/context with a different tier.
+    public override TowerFinalStats ResolveLevel(int level) => TowerStatPipeline.Resolve(Config, level);
+
+    // =========================================================
     // Explicit rebuild is also available for future input changes that do not emit Resource.Changed.
     public void RebuildStats()
     {
-        FinalStats = Config == null ? null : TowerStatPipeline.Resolve(Config);
-        StatsChanged?.Invoke();
+        FinalStats = Config == null ? null : ResolveLevel(UpgradeLevel);
+        NotifyStatsChanged();
     }
 
     // =========================================================

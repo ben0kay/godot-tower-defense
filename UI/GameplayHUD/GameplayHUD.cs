@@ -13,6 +13,10 @@ public partial class GameplayHUD : Control
     // =========================================================
     // The wave service owns scheduling; this button only requests a manual start.
     [Signal] public delegate void WaveStartRequestedEventHandler();
+
+    // =========================================================
+    // The placement/upgrade controller validates the selected tower and payment.
+    [Signal] public delegate void TowerUpgradeRequestedEventHandler();
     #endregion
 
     public bool IsInspectionVisible => _inspector?.Visible == true;
@@ -20,8 +24,10 @@ public partial class GameplayHUD : Control
     #region Cached Nodes
     private PanelContainer _topBar, _towerBar, _inspector;
     private HBoxContainer _bottomArea;
+    private Control _traySlot;
     private Label _wave, _credits, _core, _towerName, _towerCategory, _towerStats, _towerNotes;
-    private Button _startWave;
+    private Button _startWave, _upgradeButton;
+    private Label _upgradeInfo;
     private ProgressBar _healthBar;
     private StyleBoxFlat _healthFill;
     private Tween _trayTween;
@@ -53,6 +59,8 @@ public partial class GameplayHUD : Control
         _topBar = GetNode<PanelContainer>("TopBar");
         _bottomArea = GetNode<HBoxContainer>("BottomArea");
         _towerBar = GetNode<PanelContainer>("BottomArea/TraySlot/TowerBar");
+        _traySlot = GetNode<Control>("BottomArea/TraySlot");
+        _traySlot.Resized += FitTrayToSlot;
         _inspector = GetNode<PanelContainer>("BottomArea/Inspector");
 
         _wave = GetNode<Label>("TopBar/Status/Wave");
@@ -67,6 +75,9 @@ public partial class GameplayHUD : Control
         _startWave.Pressed += () => EmitSignal(SignalName.WaveStartRequested);
         _healthBar = GetNode<ProgressBar>("TopBar/Status/Citadel/Bar");
         _topBar.GetNode<Control>("Status").Resized += LayoutStatus;
+        _upgradeInfo = GetNode<Label>("BottomArea/Inspector/Insets/Body/UpgradeInfo");
+        _upgradeButton = GetNode<Button>("BottomArea/Inspector/Insets/Body/UpgradeButton");
+        _upgradeButton.Pressed += () => EmitSignal(SignalName.TowerUpgradeRequested);
         ApplyLayout();
         ApplyAppearance();
         BindTowerButtons();
@@ -140,12 +151,27 @@ public partial class GameplayHUD : Control
     // This public entry point will also display clicked world towers in later passes.
     public void ShowTowerDetails(string name, string category, string stats, string notes = "")
     {
+        SetUpgradeDetails("", "", false);
         _towerName.Text = name;
         _towerCategory.Text = category;
         _towerStats.Text = stats;
         _towerNotes.Text = notes;
         _inspector.Show();
     }
+
+    // =========================================================
+    // Display an authoritative controller preview; buttons carry no payment or stat logic.
+    public void SetUpgradeDetails(string preview, string button, bool affordable)
+    {
+        _upgradeButton.TooltipText = "";
+        _upgradeInfo.Text = preview; _upgradeInfo.Visible = preview.Length > 0;
+        _upgradeButton.Text = button; _upgradeButton.Visible = button.Length > 0;
+        _upgradeButton.Disabled = !affordable;
+    }
+
+    // =========================================================
+    // Keep a refreshed retry button available while reporting rejected upgrade attempts.
+    public void SetUpgradeError(string message) => _upgradeInfo.Text = message + "\n" + _upgradeInfo.Text;
 
     // =========================================================
     // Hide the inspector independently from the build tray.
@@ -202,8 +228,15 @@ public partial class GameplayHUD : Control
         _bottomArea.OffsetRight = -Config.EdgeMargin;
         _bottomArea.OffsetTop = -(Config.BottomBarHeight + Config.EdgeMargin);
         _bottomArea.OffsetBottom = -Config.EdgeMargin;
+        Control slot = GetNode<Control>("BottomArea/TraySlot");
+        slot.CustomMinimumSize = new Vector2(0, Config.BottomBarHeight);
+        slot.SizeFlagsVertical = SizeFlags.ShrinkEnd;
         _inspector.CustomMinimumSize = new Vector2(Config.InspectorWidth, 0f);
     }
+
+    // =========================================================
+    // Remove startup minimum-size offsets after the parent container assigns the tray's bounds.
+    private void FitTrayToSlot() => _towerBar.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
 
     // =========================================================
     // Reserve non-overlapping side zones around an exactly viewport-centered objective.
@@ -237,7 +270,8 @@ public partial class GameplayHUD : Control
         _towerBar.AddThemeStyleboxOverride("panel", MakePanel(Config.PanelColor, Config.AccentColor));
         _inspector.AddThemeStyleboxOverride("panel", MakePanel(Config.PanelColor, Config.AccentColor));
 
-        // Existing buttons keep their scene paths and signals; only appearance is shared.
+        _upgradeInfo.AddThemeColorOverride("font_color", Config.AccentColor);
+        UIButtonFactory.Apply(_upgradeButton, UIButtonStyle.Action, Config);
         UIButtonFactory.Apply(_startWave, UIButtonStyle.Action, Config);
         _healthFill = new StyleBoxFlat { BgColor = Config.HealthHealthyColor };
         _healthBar.AddThemeStyleboxOverride("fill", _healthFill);

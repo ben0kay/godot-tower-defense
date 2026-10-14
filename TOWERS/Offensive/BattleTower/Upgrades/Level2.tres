@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="TowerUpgradeTier" load_steps=9 format=3]
+[ext_resource type="Script" path="res://TOWERS/Shared/Upgrades/TowerUpgradeTier.cs" id="1"]
+[ext_resource type="Script" path="res://ECONOMY/Transactions/ResourceCost.cs" id="2"]
+[ext_resource type="Resource" path="res://ECONOMY/Resources/Credits.tres" id="3"]
+[ext_resource type="Script" path="res://TOWERS/Shared/Upgrades/TowerUpgradeModifier.cs" id="4"]
+[sub_resource type="Resource" id="Cost"]
+script = ExtResource("2")
+Resource = ExtResource("3")
+Amount = 150
+[sub_resource type="Resource" id="Damage"]
+script = ExtResource("4")
+Stat = 2
+Amount = 4.0
+[sub_resource type="Resource" id="Rate"]
+script = ExtResource("4")
+Stat = 1
+Amount = 0.2
+[sub_resource type="Resource" id="Range"]
+script = ExtResource("4")
+Stat = 0
+Amount = 32.0
+[resource]
+script = ExtResource("1")
+Level = 2
+DisplayName = "Battle Tower Mk 2"
+Costs = Array[ExtResource("2")]([SubResource("Cost")])
+Modifiers = Array[ExtResource("4")]([SubResource("Damage"), SubResource("Rate"), SubResource("Range")])

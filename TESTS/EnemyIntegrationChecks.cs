@@ -31,6 +31,7 @@ public partial class EnemyIntegrationChecks : Node
             feedback.DeathExplosionsEnabled = false;
             MenuFoundationChecks.Run(_battle);
             TowerStatChecks.Run(_battle);
+            await TowerUpgradeChecks.Run(_battle);
             TerrainCategoryChecks.Run(_grid);
             PortalSpawnChecks.Run(_grid, _spawns);
             _battle.GetNode<EconomyManager>("Economy").Initialize(_grid.Level.Settings);
