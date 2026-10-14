@@ -22,6 +22,7 @@ z_index = -20
 [node name="Stars" type="Node2D" parent="SpaceBackground" unique_id=2028579996]
 
 [node name="Space" type="Sprite2D" parent="SpaceBackground/Stars" unique_id=1191861450]
+position = Vector2(1, 1)
 scale = Vector2(4, 4)
 texture = ExtResource("1_p5ed7")
 centered = false

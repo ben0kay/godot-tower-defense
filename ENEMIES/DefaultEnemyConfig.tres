@@ -4,6 +4,4 @@
 
 [resource]
 script = ExtResource("1")
-MaxWaveSpawnAttemptsPerFrame = 2
-WaveSpawnRetrySeconds = 0.5
-WaveRandomSeed = 12345
+PathDiversityStrength = 2.0
