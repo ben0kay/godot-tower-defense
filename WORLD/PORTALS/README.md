@@ -10,3 +10,6 @@ A level designer can instance one or many Portals under `LevelXXX/Portals`. Some
 **Responsibilities:** expose exit position, optional unique ID, active state and visuals. **Do not put SpawnManager, wave timing, ship selection or navigation algorithms here.** Those belong in `ENEMIES/Spawning/`, `LEVELS/Waves/` and `ENEMIES/Movement/`.
 
 The current Portal scene includes placeholder polygons, a SpawnExit and Inspector-editable WorldObjectFootprint properties. It reserves its cell against towers and is instanced in Level001. It has no spawning code or physics collision. Add a PortalMasterConfig only when actual per-Portal settings are defined, rather than an empty Resource.
+
+
+Per-level/per-instance size overrides now live directly on EnemyPortal.SizeMultiplier, while source selection/timing remain in SpawnManager/WaveManager. Only Visuals and spawn spread scale; marker center/grid reservations are unchanged. Select a portal instance in the level Inspector to override the default1 multiplier.

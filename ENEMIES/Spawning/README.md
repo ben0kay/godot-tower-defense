@@ -19,3 +19,6 @@ E2A: optional exported Catalog defaults to DefaultEnemyCatalog; string-ID Spawn/
 
 
 Default catalog now also registers shieldgenerator. Abilities initialize only after a safe physical source, registry and movement are ready. SpawnManager does not own pulse timers or shield-restoration logic; wave starting-shield policy remains unchanged.
+
+
+Portal offsets now scale by each EnemyPortal.SizeMultiplier and its authored transform. Portal references are cached alongside source metadata; current size is read on each spawn, so changing it needs no A* or navigation rebuild. The base config offset remains the shared tuning control, and all8 bounded safety attempts/center fallback still apply. Map-edge sources are unaffected.

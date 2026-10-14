@@ -84,3 +84,6 @@ EnemyCatalogChecks validates canonical scene registration, invalid assets/IDs/ba
 
 
 ShieldEmitterChecks adds real registered support scenes to test staggered per-instance cooldowns, capped restoration, hull-bar neutrality, self/eligibility/range, bounded candidate/recipient work, no catch-up bursts, private configs, disabled/null/invalid components and kill/arrival/unload/queued cleanup. Ordinary Enemy001/Enemy002 remain ability-free. All original tower/combat/navigation/wave/shield tests stay active. MenuTowerFlowChecks still independently verifies startup-to-Level001 flow without save writes.
+
+
+PortalSpawnChecks now verifies independent0.5/3 portal sizes, visual scale/center/footprint/revision preservation, scaled wave and debug offsets, actual expanded spread, clearance/segments, zero-offset mode and invalid-size fallback. Existing baseline8px checks remain.

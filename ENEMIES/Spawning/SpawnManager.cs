@@ -14,6 +14,7 @@ public partial class SpawnManager : Node
     private bool[] _reachable;
     private int _portalCount;
     private readonly List<string> _portalPaths = new();
+    private readonly List<Node2D> _portalObjects = new();
     private readonly List<Vector2> _entries = new();
 
     // =========================================================
@@ -60,17 +61,18 @@ public partial class SpawnManager : Node
     {
         NavigationGrid nav = Paths.Navigation;
         if (_cachedRevision == nav.Revision) return;
-        _entries.Clear(); _portalPaths.Clear(); bool[] reachable = nav.ReachableWithout();
+        _entries.Clear(); _portalPaths.Clear(); _portalObjects.Clear(); bool[] reachable = nav.ReachableWithout();
         if (_reachable == null || _reachable.Length != reachable.Length) _reachable = new bool[reachable.Length];
         System.Array.Copy(reachable, _reachable, reachable.Length);
         WorldGrid grid = nav.Grid; LevelConfig settings = grid.Level.Settings;
         if (settings.SpawnMode != LevelConfig.SpawnSourceMode.MapEdges)
             foreach (NodePath path in settings.ActivePortals)
             {
-                Marker2D exit = grid.Level.GetNodeOrNull<Node2D>(path)?.GetNodeOrNull<Marker2D>("SpawnExit");
+                Node2D portal = grid.Level.GetNodeOrNull<Node2D>(path);
+                Marker2D exit = portal?.GetNodeOrNull<Marker2D>("SpawnExit");
                 if (exit == null) GD.PushWarning("Registered Portal has no SpawnExit: " + path);
                 if (exit != null && !_portalPaths.Contains(path.ToString()))
-                { _entries.Add(exit.GlobalPosition); _portalPaths.Add(path.ToString()); }
+                { _entries.Add(exit.GlobalPosition); _portalPaths.Add(path.ToString()); _portalObjects.Add(portal); }
             }
         _portalCount = _entries.Count;
         if (settings.SpawnMode != LevelConfig.SpawnSourceMode.Portals)
@@ -106,14 +108,16 @@ public partial class SpawnManager : Node
         Enemy ship = scene.Instantiate<Enemy>();
         if (!FitsNavigation(ship)) { ship.Free(); return null; }
         List<Vector2> sources = _entries;
+        List<Node2D> portals = _portalObjects;
         if (portalOnly)
         {
-            sources = new();
+            sources = new(); portals = new();
             if (grid.Level.Settings.SpawnMode != LevelConfig.SpawnSourceMode.MapEdges)
                 foreach (NodePath path in grid.Level.Settings.ActivePortals)
                 {
-                    Marker2D exit = grid.Level.GetNodeOrNull<Node2D>(path)?.GetNodeOrNull<Marker2D>("SpawnExit");
-                    if (exit != null) sources.Add(exit.GlobalPosition);
+                    Node2D portal = grid.Level.GetNodeOrNull<Node2D>(path);
+                    Marker2D exit = portal?.GetNodeOrNull<Marker2D>("SpawnExit");
+                    if (exit != null) { sources.Add(exit.GlobalPosition); portals.Add(portal); }
                 }
         }
         for (int i = 0; i < sources.Count; i++)
@@ -122,7 +126,7 @@ public partial class SpawnManager : Node
             if (!nav.IsReachable(_reachable, grid.WorldToCell(position))
                 || !nav.HasClearance(position, ship.Definition.RadiusPixels)) continue;
             int source = (_sourceIndex + i) % sources.Count;
-            if (portalOnly || source < _portalCount) position = OffsetPortal(position, ship.Definition.RadiusPixels, _spawnRandom);
+            if (portalOnly || source < _portalCount) position = OffsetPortal(position, ship.Definition.RadiusPixels, _spawnRandom, portals[source]);
             _sourceIndex = (_sourceIndex + i + 1) % sources.Count;
             _ships.AddChild(ship); ship.GlobalPosition = position;
             ship.Initialize(Registry, Paths); LastMessage = "Spawned " + ship.Definition.DisplayName;
@@ -165,7 +169,7 @@ public partial class SpawnManager : Node
             return null;
         }
         Vector2 spawn = _entries[chosen];
-        if (chosen < _portalCount) spawn = OffsetPortal(spawn, ship.Definition.RadiusPixels, random);
+        if (chosen < _portalCount) spawn = OffsetPortal(spawn, ship.Definition.RadiusPixels, random, _portalObjects[chosen]);
         _ships.AddChild(ship); ship.GlobalPosition = spawn;
         ship.Initialize(Registry, Paths, spawnWithShield); LastMessage = "Wave spawned " + ship.Definition.DisplayName;
         return ship;
@@ -174,14 +178,16 @@ public partial class SpawnManager : Node
     // =========================================================
     // Small portal-only variation; validate radius, connectivity and the segment back to center.
     // Bounded attempts fall back to the already validated center, without extra A* requests.
-    private Vector2 OffsetPortal(Vector2 center, float radius, RandomNumberGenerator random)
+    private Vector2 OffsetPortal(Vector2 center, float radius, RandomNumberGenerator random, Node2D portal)
     {
-        float offset = Mathf.Clamp(Paths.Config.PortalSpawnOffsetPixels, 0f, 24f);
+        float offset = Mathf.Clamp(Paths.Config.PortalSpawnOffsetPixels, 0f, 24f) *
+            (portal is EnemyPortal enemyPortal ? enemyPortal.SizeMultiplier : 1f);
         if (offset <= 0f) return center;
         NavigationGrid nav = Paths.Navigation;
         for (int attempt = 0; attempt < 8; attempt++)
         {
-            Vector2 point = center + new Vector2(random.RandfRange(-offset, offset), random.RandfRange(-offset, offset));
+            Vector2 localOffset = new(random.RandfRange(-offset, offset), random.RandfRange(-offset, offset));
+            Vector2 point = center + (GodotObject.IsInstanceValid(portal) ? portal.GlobalTransform.BasisXform(localOffset) : localOffset);
             if (nav.IsReachable(_reachable, nav.Grid.WorldToCell(point))
                 && nav.HasClearance(point, radius) && nav.SegmentClear(center, point, radius)) return point;
         }

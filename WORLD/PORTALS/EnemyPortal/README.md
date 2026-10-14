@@ -5,3 +5,8 @@
 Snap the root to a 64px cell center (32 + 64*n), keep the centered exit in reachable passable space, and list the root-relative Portal path in the level's Settings/ActivePortals. Placeholder polygons and label can be replaced with art/VFX.
 
 This object creates no enemies and owns no wave timers. `ENEMIES/Spawning` will consume approved sources from LevelConfig; edge-only levels need no Portal.
+
+
+Portal root now uses EnemyPortal.cs, a tool script derived from WorldObjectFootprint. In each level select Portals/EnemyPortal (or another instance) → Portal Size → Size Multiplier. Default1 preserves appearance;2 doubles Visuals and spawn spread. Values clamp0.1–16; nonfinite inputs reset1. The visual-only child scales immediately in editor/game, with no processing or navigation rebuild. SpawnExit stays centered; SizeCells remains separately authored rather than automatically expanding reservations.
+
+SpawnManager uses base PortalSpawnOffsetPixels × that portal SizeMultiplier, transformed by the portal's authored rotation/scale. At the default8px, multipliers0.5/2/3 produce ±4/16/24px local-axis spread. Debug and waves use the same helper; bounded clearance/connectivity/segment checks and valid-center fallback remain. Setting base offset0 stays exactly centered. Runtime size edits affect subsequent spawns without rebuilding terrain; moving a portal still requires the existing source/navigation refresh.
