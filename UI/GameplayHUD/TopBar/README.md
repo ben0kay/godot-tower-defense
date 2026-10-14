@@ -17,3 +17,7 @@ Main/Economy seeds and pushes live Credits through SetCredits; SetWave updates t
 See **`UI/GameplayHUD/README.md`** for the complete layout, semantics, proposed colors/thresholds, future cost/resource considerations and Codex acceptance tests.
 
 Main/Waves now supplies wave status through SetWaveControls and owns manual progression. The StartWave button is below the right zone (not within the center block); active waves show a disabled remaining count and blocked/setup states have explanatory tooltips. Credits still come from Main/Economy and Citadel remains unknown.
+
+## Live Citadel durability
+
+The central health number/bar now reflects **actual Citadel HP**. The active level's `LevelConfig.CitadelMaxHealth` initializes the reusable `WORLD/OBJECTIVES/Citadel/CitadelHealth`; `Main/CitadelSession` listens to `HealthChanged` and calls the already-existing `GameplayHUD.SetCitadelHealth(current, maximum)`. Arriving ships subtract their configured `CitadelDamage`; killed ships do not. The HUD remains display-only and never owns health or defeat rules. Zero HP emits the model's `Destroyed` event but does not yet show game over.

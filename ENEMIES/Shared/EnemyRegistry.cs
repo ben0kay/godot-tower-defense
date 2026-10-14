@@ -10,6 +10,7 @@ public partial class EnemyRegistry : Node
     public int KilledCount { get; private set; }
     public int ArrivedCount { get; private set; }
     public event Action<Enemy> EnemyKilled;
+    public event Action<Enemy> EnemyArrived;
 
     // =========================================================
     // Register once; enemies unregister immediately on death or arrival.
@@ -24,7 +25,7 @@ public partial class EnemyRegistry : Node
     // Enemy.Finish is guarded against repeated damage, so each ship pays at most once.
     public void RecordOutcome(bool arrived, Enemy enemy)
     {
-        if (arrived) { ArrivedCount++; return; }
+        if (arrived) { ArrivedCount++; EnemyArrived?.Invoke(enemy); return; }
         KilledCount++;
         EnemyKilled?.Invoke(enemy);
     }

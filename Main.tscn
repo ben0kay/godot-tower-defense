@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="PackedScene" path="res://WORLD/World.tscn" id="1_world"]
 [ext_resource type="PackedScene" path="res://CAMERA/CameraRig.tscn" id="2_camera"]
@@ -15,6 +15,7 @@
 [ext_resource type="Resource" path="res://ECONOMY/Resources/Credits.tres" id="12_credits"]
 
 [ext_resource type="Script" path="res://LEVELS/Waves/WaveManager.cs" id="13_waves"]
+[ext_resource type="Script" path="res://WORLD/OBJECTIVES/Citadel/CitadelSession.cs" id="14_citadel"]
 
 [node name="Battlefield" type="Node2D"]
 
@@ -38,6 +39,9 @@ BattleArtwork = ExtResource("8_battleart")
 script = ExtResource("10_economy")
 Config = ExtResource("11_economyconfig")
 CreditsResource = ExtResource("12_credits")
+
+[node name="CitadelSession" type="Node" parent="."]
+script = ExtResource("14_citadel")
 
 [node name="Waves" type="Node" parent="."]
 script = ExtResource("13_waves")

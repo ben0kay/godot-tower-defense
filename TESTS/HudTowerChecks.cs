@@ -13,8 +13,10 @@ public static class HudTowerChecks
         Label wave = hud.GetNode<Label>("TopBar/Status/Wave");
         Label health = hud.GetNode<Label>("TopBar/Status/Citadel/Health");
         ProgressBar bar = hud.GetNode<ProgressBar>("TopBar/Status/Citadel/Bar");
-        Require(credits.Text == $"CREDITS {battle.GetNode<EconomyManager>("Economy").GetBalance(battle.GetNode<EconomyManager>("Economy").CreditsResource):N0}" && wave.Text == "WAVE 00 / 03" && health.Text == "CITADEL --" && !bar.Visible,
-            "HUD starts with live credits and unknown objective and prepared wave state");
+        CitadelHealth citadel = battle.GetNode<CitadelSession>("CitadelSession").Health;
+        Require(credits.Text == $"CREDITS {battle.GetNode<EconomyManager>("Economy").GetBalance(battle.GetNode<EconomyManager>("Economy").CreditsResource):N0}" && wave.Text == "WAVE 00 / 03" &&
+            health.Text == $"CITADEL {citadel.CurrentHealth:N0} / {citadel.MaxHealth:N0}" && bar.Visible,
+            "HUD shows authoritative live credits and Citadel HP with prepared wave state");
         hud.SetCredits(12345678); hud.SetWave(100); hud.SetCitadelHealth(800, 1000);
         Require(credits.Text.Contains("12") && wave.Text == "WAVE 100" && bar.Value == 80,
             "Status setters update their respective zones");
@@ -35,6 +37,7 @@ public static class HudTowerChecks
         Require(((StyleBoxFlat)bar.GetThemeStylebox("fill")).BgColor == hud.Config.HealthWarningColor, "Warning threshold is inclusive");
         hud.SetCitadelHealth(200, 100); Require(bar.Value == 100, "Over-healing clamps fill");
         hud.SetCitadelHealth(0, 0); Require(!bar.Visible && health.Text == "CITADEL --", "Missing maximum is safe");
+        hud.SetCitadelHealth(citadel.CurrentHealth, citadel.MaxHealth); // Restore live display after synthetic setter tests.
         hud.ShowTowerDetails("Test", "Offensive", "Test");
         hud.SetTowerBarOpen(true, true); hud.SetTowerBarOpen(false, true);
         Require(hud.GetNode<Control>("BottomArea/Inspector").Visible, "Tray close preserves Inspector");

@@ -39,6 +39,7 @@ public partial class EnemyIntegrationChecks : Node
             WaveChecks.Run(_battle, _grid, _spawns);
             EnemyKillRewardChecks.Run(_battle, _spawns);
             DeathExplosionChecks.Run(_battle, _spawns, feedback);
+            CitadelHealthChecks.Run(_battle, _spawns);
             int arrivedBefore = _spawns.Registry.ArrivedCount;
             LevelDebugController debug = _grid.Level.GetNode<LevelDebugController>("Debug");
             debug._UnhandledKeyInput(new InputEventKey { Keycode = Key.F2, Pressed = true });

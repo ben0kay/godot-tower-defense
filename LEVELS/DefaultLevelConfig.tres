@@ -8,3 +8,4 @@ SpawnMode = 1
 AllowedEdges = 4
 CitadelPath = NodePath("Objectives/Citadel")
 StartingCredits = 0
+CitadelMaxHealth = 1000

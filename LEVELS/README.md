@@ -64,3 +64,7 @@ SpawnManager reports missing registered exits, blocked/unreachable Portal SpawnE
 TESTS/TerrainCategoryChecks.cs covers category-filtered palettes, all four movement/build combinations, empty space, decals over empty/floor/solid cells, overlap precedence, tower occupancy and Portal/Citadel reservations. Existing F2, random waves, paid placement, combat and navigation fixtures use the new layer API and continue checking blocked routes safely. TESTS/TerrainMigration.md records the map-preservation verification.
 
 This was one cleanup pass; no procedural generation, art overhaul, new pathfinding algorithm or economy changes were introduced.
+
+## Per-level Citadel starting health (implemented)
+
+Each level's `LevelConfig` now provides **Destination / Citadel Max Health**. Set `CitadelMaxHealth` in `LEVELS/Level001/Level001Config.tres` (currently **1,000**) or in another LevelXXX config independently. `DefaultLevelConfig.tres` starts at 1,000. The `Main/CitadelSession` integration initializes the matching level `Objectives/Citadel/Health` at full health and uses enemy arrivals to subtract `EnemyDefinition.CitadelDamage`. `HealthChanged` updates the center HUD automatically; `Destroyed` emits once at zero. The defeat UI/level-loss consequences remain future work. There is **no separate per-level Citadel script or duplicate health config**; keep reusable logic under `WORLD/OBJECTIVES/Citadel/`.

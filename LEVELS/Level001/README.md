@@ -57,3 +57,7 @@ F5 prepares Wave 00 / 03; START WAVE appears just below the top-right status. Th
 
 ## Terrain categories
 Passable offers metal/dirt floors; Impassable offers walls, raised platforms and rocks; Decorations offers only decals. Build permission is independent of movement: raised platforms are solid but buildable. Erase the old gameplay-layer cell before changing a cell from solid to passable or vice versa. Empty space stays passable/unbuildable. All 176 previously authored cells were preserved during the palette migration.
+
+## Citadel durability
+
+Open `Level001Config.tres` → **Destination / Citadel Max Health** to choose this level's starting maximum (**1,000 HP** by default). The Citadel is initialized at full health for each new level session. Enemy001 arrivals deal `EnemyDefinition.CitadelDamage = 1` each; the center HUD health number/bar updates through events. Killed ships deal no objective damage and still award their kill credits. A one-time `CitadelHealth.Destroyed` event is available at 0 HP, but an actual defeat screen and level end are a separate future pass.

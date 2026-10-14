@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://WORLD/GRID/WorldObjectFootprint.cs" id="1"]
+[ext_resource type="Script" path="res://WORLD/OBJECTIVES/Citadel/CitadelHealth.cs" id="2_health"]
 
 [node name="Citadel" type="Node2D"]
 z_index = 3
@@ -36,3 +37,6 @@ position = Vector2(192, 64)
 
 [node name="Approach04" type="Marker2D" parent="ApproachPoints"]
 position = Vector2(64, 192)
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("2_health")
