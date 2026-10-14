@@ -1,16 +1,14 @@
-[gd_scene format=4]
+[gd_scene format=4 uid="uid://dy7onq4sx05eu"]
 
-[ext_resource type="Texture2D" path="res://WORLD/BACKGROUNDS/Stars/level001_space.svg" id="1_p5ed7"]
-[ext_resource type="TileSet" path="res://WORLD/TERRAIN/TileSets/WorldTerrain.tres" id="2_8pvwx"]
-
-[ext_resource type="Script" path="res://WORLD/LEVELS/WorldLevel.cs" id="3_root"]
+[ext_resource type="Texture2D" uid="uid://dtgxtqxxwsmoc" path="res://WORLD/BACKGROUNDS/Stars/level001_space.svg" id="1_p5ed7"]
+[ext_resource type="TileSet" uid="uid://dqaq6mgtdq8h2" path="res://WORLD/TERRAIN/TileSets/WorldTerrain.tres" id="2_8pvwx"]
+[ext_resource type="Script" uid="uid://cxu0tg3s3btvh" path="res://WORLD/LEVELS/WorldLevel.cs" id="3_root"]
 [ext_resource type="Resource" path="res://WORLD/LEVELS/Level001/Level001Config.tres" id="4_config"]
 [ext_resource type="PackedScene" path="res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn" id="5_portal"]
 [ext_resource type="PackedScene" path="res://WORLD/OBJECTIVES/Citadel/Citadel.tscn" id="6_citadel"]
-
-[ext_resource type="Script" path="res://WORLD/LEVELS/Debug/LevelDebugController.cs" id="7_debug"]
+[ext_resource type="Script" uid="uid://x78ylg3dne5d" path="res://WORLD/LEVELS/Debug/LevelDebugController.cs" id="7_debug"]
 [ext_resource type="PackedScene" path="res://ENEMIES/Types/Enemy001/Enemy001.tscn" id="8_enemy"]
-[ext_resource type="Script" path="res://WORLD/GRID/GridDebugOverlay.cs" id="9_info"]
+[ext_resource type="Script" uid="uid://cvogctvds5c0a" path="res://WORLD/GRID/GridDebugOverlay.cs" id="9_info"]
 
 [node name="Level001" type="Node2D" unique_id=864740696]
 script = ExtResource("3_root")
@@ -24,9 +22,9 @@ z_index = -20
 [node name="Stars" type="Node2D" parent="SpaceBackground" unique_id=2028579996]
 
 [node name="Space" type="Sprite2D" parent="SpaceBackground/Stars" unique_id=1191861450]
+scale = Vector2(4, 4)
 texture = ExtResource("1_p5ed7")
 centered = false
-scale = Vector2(4, 4)
 
 [node name="Planets" type="Node2D" parent="SpaceBackground" unique_id=1684856347]
 
@@ -46,26 +44,25 @@ tile_set = ExtResource("2_8pvwx")
 
 [node name="Portals" type="Node2D" parent="." unique_id=219222935]
 
-[node name="Objectives" type="Node2D" parent="." unique_id=1539156350]
-
-[node name="EnemyPortal" parent="Portals" instance=ExtResource("5_portal")]
+[node name="EnemyPortal" parent="Portals" unique_id=345948730 instance=ExtResource("5_portal")]
 position = Vector2(2336, 2528)
 
-[node name="Citadel" parent="Objectives" instance=ExtResource("6_citadel")]
+[node name="Objectives" type="Node2D" parent="." unique_id=1539156350]
+
+[node name="Citadel" parent="Objectives" unique_id=535378229 instance=ExtResource("6_citadel")]
 position = Vector2(3872, 2528)
 
-[node name="Debug" type="Node" parent="."]
+[node name="Debug" type="Node" parent="." unique_id=1405070056]
 script = ExtResource("7_debug")
 EnemyScene = ExtResource("8_enemy")
 
-[node name="HUD" type="CanvasLayer" parent="Debug"]
+[node name="HUD" type="CanvasLayer" parent="Debug" unique_id=1519549444]
 
-[node name="Info" type="Label" parent="Debug/HUD"]
+[node name="Info" type="Label" parent="Debug/HUD" unique_id=1434904208]
 offset_left = 16.0
 offset_top = 62.0
 offset_right = 1250.0
 offset_bottom = 185.0
-mouse_filter = 2
 theme_override_colors/font_color = Color(0.68, 0.91, 0.96, 0.86)
 theme_override_font_sizes/font_size = 14
 script = ExtResource("9_info")

@@ -1,9 +1,6 @@
-[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=2 format=3]
-[ext_resource type="Script" path="res://ENEMIES/Shared/EnemyDefinition.cs" id="1"]
+[gd_resource type="Resource" script_class="EnemyDefinition" format=3 uid="uid://cx54px4ngllx4"]
+
+[ext_resource type="Script" uid="uid://d4cax7p5ep4fd" path="res://ENEMIES/Shared/EnemyDefinition.cs" id="1"]
+
 [resource]
 script = ExtResource("1")
-EnemyId = "enemy001"
-DisplayName = "Enemy 001"
-MaxHealth = 60.0
-MoveSpeed = 100.0
-RadiusPixels = 12.0
