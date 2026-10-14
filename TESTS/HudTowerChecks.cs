@@ -10,6 +10,7 @@ public static class HudTowerChecks
     {
         GameplayHUD hud = FindHud(battle);
         Label credits = hud.GetNode<Label>("TopBar/Status/Credits");
+        CreditGainIndicator reward = hud.GetNode<CreditGainIndicator>("TopBar/Status/CreditGain");
         Label wave = hud.GetNode<Label>("TopBar/Status/Wave");
         Label health = hud.GetNode<Label>("TopBar/Status/Citadel/Health");
         ProgressBar bar = hud.GetNode<ProgressBar>("TopBar/Status/Citadel/Bar");
@@ -30,6 +31,20 @@ public static class HudTowerChecks
             Require(credits.Position.X + credits.Size.X <= center.Position.X &&
                 wave.Position.X >= center.Position.X + center.Size.X, "Status zones cannot overlap");
         }
+        // Cosmetic feedback does not alter the authoritative credit balance.
+        hud.ResetCreditReward();
+        hud.ShowCreditReward(5); hud.ShowCreditReward(5);
+        Require(reward.Visible && reward.AccumulatedReward == 10 && reward.Text == "+10",
+            "Back-to-back gains stack into one top-left popup");
+        reward._Process(hud.Config.CreditRewardStackSeconds + 0.01);
+        hud.ShowCreditReward(5);
+        Require(reward.AccumulatedReward == 5 && reward.Text == "+5",
+            "A quiet interval starts a fresh credit gain stack");
+        reward._Process(hud.Config.CreditRewardStackSeconds + hud.Config.CreditRewardFadeSeconds + 0.01);
+        Require(!reward.Visible && reward.AccumulatedReward == 0,
+            "Credit gain popup fades, hides and stops retaining an expired stack");
+        hud.ResetCreditReward();
+
         hud.SetCoreHealth(-10, 100);
         Require(bar.Value == 0 && ((StyleBoxFlat)bar.GetThemeStylebox("fill")).BgColor == hud.Config.HealthCriticalColor,
             "Compatibility API clamps health and applies critical color");

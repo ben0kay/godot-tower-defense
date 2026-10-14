@@ -24,6 +24,13 @@ public partial class UIMasterConfig : Resource
     [Export(PropertyHint.Range, "0,1,0.05")] public float HealthWarningThreshold { get; set; } = 0.5f;
     [Export(PropertyHint.Range, "0,1,0.05")] public float HealthCriticalThreshold { get; set; } = 0.25f;
 
+    [ExportGroup("Credit Reward Feedback")]
+    [Export] public bool ShowCreditRewards { get; set; } = true;
+    [Export(PropertyHint.Range, "0.1,3,0.05")] public float CreditRewardStackSeconds { get; set; } = 0.8f;
+    [Export(PropertyHint.Range, "0.1,2,0.05")] public float CreditRewardFadeSeconds { get; set; } = 0.5f;
+    [Export(PropertyHint.Range, "0,40,1")] public float CreditRewardRisePixels { get; set; } = 12f;
+    [Export] public Color CreditRewardColor { get; set; } = new Color("#69e4a3");
+
     [ExportGroup("Interaction")]
     [Export] public bool StartWithTowerBarOpen { get; set; } = false;
     [Export(PropertyHint.Range, "0,0.5,0.01")] public float TowerBarTransitionSeconds { get; set; } = 0.17f;

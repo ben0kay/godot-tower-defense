@@ -13,9 +13,12 @@ public static class EnemyKillRewardChecks
         GameplayHUD hud = battle.GetNode<GameplayHUD>("UI/GameplayHUD");
         WaveManager waves = battle.GetNode<WaveManager>("Waves");
         Label label = hud.GetNode<Label>("TopBar/Status/Credits");
+        CreditGainIndicator popup = hud.GetNode<CreditGainIndicator>("TopBar/Status/CreditGain");
         PackedScene scene = GD.Load<PackedScene>("res://ENEMIES/Types/Enemy001/Enemy001.tscn");
 
         wallet.Initialize(new LevelConfig { StartingCredits = 100 });
+        Require(!popup.Visible && popup.AccumulatedReward == 0,
+            "Starting credit balance never displays as a gain");
         int updates = 0;
         void Changed(string id, int amount) { if (id == wallet.CreditsResource.ResourceId) updates++; }
         wallet.BalanceChanged += Changed;
@@ -26,10 +29,12 @@ public static class EnemyKillRewardChecks
                 "Saved Enemy001 definition grants 3 kill credits");
             killed.Movement.SetPhysicsProcess(false); killed.TakeDamage(10000);
             Require(wallet.GetBalance(wallet.CreditsResource) == 103 && label.Text == "CREDITS 103" &&
-                updates == 1, "A kill pays 3 Credits and updates the HUD exactly once");
+                updates == 1 && popup.Visible && popup.AccumulatedReward == 3 && popup.Text == "+3",
+                "A kill pays 3 Credits, updates the wallet and shows +3 exactly once");
             killed.TakeDamage(10000); killed.Arrive();
             Require(wallet.GetBalance(wallet.CreditsResource) == 103 && updates == 1,
                 "Dead ships cannot pay a second time");
+            Require(popup.AccumulatedReward == 3, "Duplicate deaths do not increment the reward popup");
 
             Enemy arrived = spawns.Spawn(scene, true);
             Require(arrived != null, "Spawn arrival test enemy");
@@ -45,6 +50,7 @@ public static class EnemyKillRewardChecks
             zeroReward.TakeDamage(10000);
             Require(wallet.GetBalance(wallet.CreditsResource) == 103 && updates == 1,
                 "A zero-credit override pays nothing and leaves the shared type resource unchanged");
+            Require(popup.AccumulatedReward == 3, "Zero rewards and arrivals do not change reward feedback");
 
             waves.Configure(new[] { Wave(1, Batch(1, 0, 0, Enemy("enemy001"))) },
                 WaveCatalog.LoadScenes());
@@ -54,6 +60,8 @@ public static class EnemyKillRewardChecks
             Require(wallet.GetBalance(wallet.CreditsResource) == 106 && updates == 2 &&
                 waves.State == WaveManager.WaveState.AllWavesComplete,
                 "Wave kills pay the same reward and resolve normally");
+            Require(popup.AccumulatedReward == 6 && popup.Text == "+6",
+                "Rapid kills from debug or waves share one accumulated HUD reward popup");
 
             GD.Print("PASS: Enemy001 kill rewards, HUD events, arrival/duplicate exclusions and wave payout");
         }

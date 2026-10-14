@@ -40,6 +40,7 @@ public partial class EconomyManager : Node
             throw new InvalidOperationException("Economy requires level settings and a valid Credits resource.");
         string[] previous = new string[_balances.Count]; _balances.Keys.CopyTo(previous, 0);
         _balances.Clear();
+        if (GodotObject.IsInstanceValid(_hud)) _hud.ResetCreditReward();
         _balances[CreditsResource.ResourceId] = Mathf.Clamp(level.StartingCredits, 0, MaximumBalance);
         foreach (string id in previous)
             if (id != CreditsResource.ResourceId) EmitSignal(SignalName.BalanceChanged, id, 0);
@@ -159,6 +160,8 @@ public partial class EconomyManager : Node
         if (amount == 0) return true;
         _balances[resource.ResourceId] = (int)after;
         EmitSignal(SignalName.BalanceChanged, resource.ResourceId, (int)after);
+        if (resource.ResourceId == CreditsResource?.ResourceId && GodotObject.IsInstanceValid(_hud))
+            _hud.ShowCreditReward(amount);
         return true;
     }
     #endregion

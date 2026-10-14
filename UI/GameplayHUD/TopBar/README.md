@@ -23,3 +23,11 @@ Main/Waves now supplies wave status through SetWaveControls and owns manual prog
 The central health number/bar now reflects **actual Citadel HP**. The active level's `LevelConfig.CitadelMaxHealth` initializes the reusable `WORLD/OBJECTIVES/Citadel/CitadelHealth`; `Main/CitadelSession` listens to `HealthChanged` and calls the already-existing `GameplayHUD.SetCitadelHealth(current, maximum)`. Arriving ships subtract their configured `CitadelDamage`; killed ships do not. The HUD remains display-only and never owns health or defeat rules. Zero HP emits the model's `Destroyed` event but does not yet show game over.
 
 The Start/Next Wave `Button` now receives `UIButtonFactory.Apply(..., UIButtonStyle.Action)`. The wave scheduler still owns whether it is enabled and the existing HUD still owns its responsive position and click signal. This is styling only.
+
+## Stacking credit reward indicator (implemented)
+
+`CreditGainIndicator.cs` and the `CreditGain` Label under `TopBar/Status` display a cosmetic green `+N` just beneath the top-left balance when a **successful** Credits grant occurs. Quick grants stack in the same indicator; after the configured quiet period it rises slightly, fades out and resets. No spawning of dozens of popup nodes, no reward physics tick, and no change to the wallet amount. The indicator processes only while active and cannot intercept mouse input.
+
+The existing `ECONOMY/Wallet/EconomyManager.Grant` remains the only grant authority; after a successful Credits transaction it calls `GameplayHUD.ShowCreditReward(amount)`. Zero rewards, rejected/overflow grants, purchases and starting credits never add a popup. `Initialize` clears old reward feedback. Enemy kills already grant through this path, so debug and wave enemies share the same behavior.
+
+Tune `UI/DefaultUIConfig.tres` → **Credit Reward Feedback**: `ShowCreditRewards`, `CreditRewardStackSeconds` (default 0.8), `CreditRewardFadeSeconds` (0.5), `CreditRewardRisePixels` (12) and `CreditRewardColor`. The indicator follows the credits layout when window width changes. Enemy001 currently awards **3 Credits**, so rapid kills display +3, +6, +9, etc. `TESTS/HudTowerChecks.cs` and `TESTS/EnemyKillRewardChecks.cs` include checks for stacking, quiet reset, fade and real kill-only grants.

@@ -29,6 +29,7 @@ public partial class GameplayHUD : Control
     private Label _wave, _credits, _core, _towerName, _towerCategory, _towerStats, _towerNotes;
     private Button _startWave, _upgradeButton;
     private Label _upgradeInfo;
+    private CreditGainIndicator _creditGain;
     private ProgressBar _healthBar;
     private StyleBoxFlat _healthFill;
     private Tween _trayTween;
@@ -52,6 +53,8 @@ public partial class GameplayHUD : Control
 
         _wave = GetNode<Label>("TopBar/Status/Wave");
         _credits = GetNode<Label>("TopBar/Status/Credits");
+        _creditGain = GetNode<CreditGainIndicator>("TopBar/Status/CreditGain");
+        _creditGain.Configure(Config);
         _core = GetNode<Label>("TopBar/Status/Citadel/Health");
         _towerName = GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerName");
         _towerCategory = GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerCategory");
@@ -194,6 +197,17 @@ public partial class GameplayHUD : Control
     public void SetCredits(int amount) => _credits.Text = $"CREDITS {amount:N0}";
 
     // =========================================================
+    // Cosmetic only: the wallet remains authoritative; reward bursts combine in the top bar.
+    public void ShowCreditReward(int amount)
+    {
+        if (Config.ShowCreditRewards) _creditGain.AddReward(amount);
+    }
+
+    // =========================================================
+    // Explicit reset when a new level initializes its session wallet.
+    public void ResetCreditReward() => _creditGain.ResetRewards();
+
+    // =========================================================
     // Preserve existing callers while naming the physical objective correctly.
     public void SetCoreHealth(int current, int maximum) => SetCitadelHealth(current, maximum);
 
@@ -245,11 +259,13 @@ public partial class GameplayHUD : Control
         float sideWidth = Mathf.Max(0f, (width - centerWidth) * 0.5f - margin - Config.StatusGapPixels);
         _credits.Position = new Vector2(margin, 0); _credits.Size = new Vector2(sideWidth, height);
         _wave.Position = new Vector2(width - margin - sideWidth, 0); _wave.Size = new Vector2(sideWidth, height);
+        _creditGain.SetOrigin(new Vector2(_credits.Position.X, height + 4f));
         Control center = status.GetNode<Control>("Citadel");
         center.Position = new Vector2((width - centerWidth) * 0.5f, 0);
         center.Size = new Vector2(centerWidth, height);
         int fontSize = Mathf.Clamp((int)(Config.StatusFontSize * Mathf.Min(1f, width / 900f)), 10, Config.StatusFontSize);
         foreach (Label label in new[] { _credits, _core, _wave }) label.AddThemeFontSizeOverride("font_size", fontSize);
+        _creditGain.AddThemeFontSizeOverride("font_size", Mathf.Max(10, fontSize - 2));
         float buttonWidth = Mathf.Min(140f, sideWidth);
         _startWave.Position = new Vector2(width - margin - buttonWidth, height + 6);
         _startWave.Size = new Vector2(buttonWidth, 26);

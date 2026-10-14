@@ -24,3 +24,7 @@ Category filtering, extra inventories, selling, tower health and new weapon type
 
 
 Phase 4C-2 registers real Laser Tower beside Battle Tower; its generated entry/Inspector/upgrade action require no generic HUD or placement branches. Laser displays effective DPS/range and Energy type rather than projectile rate/damage.
+
+## Credit reward popup
+
+`TopBar/CreditGainIndicator.cs` shows a temporary green `+credits` below the balance. It combines grants made within the UI-configured 0.8-second quiet window, then floats upward and fades. The authoritative Credits label still updates immediately. See `TopBar/README.md` for configuration, wallet integration and regression coverage.
