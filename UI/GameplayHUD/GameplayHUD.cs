@@ -15,6 +15,8 @@ public partial class GameplayHUD : Control
     [Signal] public delegate void WaveStartRequestedEventHandler();
     #endregion
 
+    public bool IsInspectionVisible => _inspector?.Visible == true;
+
     #region Cached Nodes
     private PanelContainer _topBar, _towerBar, _inspector;
     private HBoxContainer _bottomArea;

@@ -19,3 +19,6 @@ Tune **Aiming** in DefaultBattleTowerConfig.tres: RotationSpeedDegrees (180), Ai
 
 ## Construction economy
 Set Construction / Construction Costs in DefaultBattleTowerConfig.tres. Each entry expands to Resource and Amount; the default is 200 Credits. Starting funds live in each level config (Level001 starts with 1,000). Terrain/connectivity and affordability failures charge nothing. The preview shows required costs and insufficient-resource feedback. Upgrades and selling are still future work.
+
+## Effective stat pipeline (Phase 3A)
+BattleTower now reads cached FinalStats from the shared eight-stage resolver. Existing numeric Config fields are still editable: Remote Inspector or C# property changes emit Changed and rebuild immediately. Config replacement also rebuilds; RebuildStats() supports future explicit invalidation. The selected Inspector/range ring uses the same final values. Upgrades, ranks, research, level conditions and effects are currently neutral, so valid base balance stays unchanged. Prices, priority and tracking policy remain outside the numeric pipeline. See TOWERS/Shared/Stats/README.md.

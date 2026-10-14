@@ -145,7 +145,7 @@ Examples (illustrative, not balance): a permanent range-research bonus applies o
 
 ### Required code layout — readable, numbered stat pipeline (planned)
 
-**Codex implementation target:** keep every stat stage clearly visible under **`TOWERS/Shared/Stats/Pipeline/`**, with **one small C# file per stage in the exact order below**. These filenames and types are a proposed architecture, **not files already in the repository**. The leading numbers sort them in VS Code/Godot's FileSystem; ordinary C# class names do **not** start with digits.
+**Codex implementation target:** keep every stat stage clearly visible under **`TOWERS/Shared/Stats/Pipeline/`**, with **one small C# file per stage in the exact order below**. The Stats/Pipeline files are implemented in Phase 3A; the upgrade/rank/research/effect gameplay files shown below remain future work. The leading numbers sort them in VS Code/Godot's FileSystem; ordinary C# class names do **not** start with digits.
 
 ```text
 TOWERS/
@@ -275,9 +275,9 @@ A `TowerStatTrace` can store a **stage-name + copied stat snapshot** after each 
 
 **Acceptance for this architecture:** a developer can open **`TOWERS/Shared/Stats/Pipeline/TowerStatPipeline.cs` and see the entire actual execution sequence at a glance**, open any numbered file to find that step's implementation, inspect optional stage-by-stage values, and follow each source back to its natural owning feature folder. No other class should contain a competing full copy of the pipeline.
 
-### Phase 3A — Pipeline foundation ONLY (implement this first)
+### Phase 3A — Pipeline foundation ONLY (implemented)
 
-**Explicit decision: it is NOT necessary to build purchased upgrades, kill-based ranks, permanent research, level conditions or active buff/debuff systems before the pipeline.** Codex should first implement the **entire numbered pipeline structure** with the currently available **Base Stats → neutral future stages → Safety Clamps → Final Stats**. This is the next standalone deliverable, and must compile and run with *zero research, rank, upgrade or modifier data present*.
+**Explicit decision: it is NOT necessary to build purchased upgrades, kill-based ranks, permanent research, level conditions or active buff/debuff systems before the pipeline.** Codex should first implement the **entire numbered pipeline structure** with the currently available **Base Stats → neutral future stages → Safety Clamps → Final Stats**. This is the completed standalone foundation, and must compile and run with *zero research, rank, upgrade or modifier data present*.
 
 | Pipeline file | Phase 3A behavior | When real logic is added |
 | --- | --- | --- |
@@ -334,7 +334,9 @@ Keep actual progression per tower editable in Resources, not in a global switch 
 
 ## Next implementation pass
 
-Phase 1 rotation and Phase 2 wallet/paid construction are implemented. **Next is Phase 3A — foundation ONLY:** create the full eight-stage numbered stat pipeline with neutral placeholders for upgrades, ranks, persistent research, level modifiers and buffs/debuffs; implement real base stats, safety clamps and final effective stats, then wire the Battle Tower to the resolver without changing gameplay. **No purchased upgrades, research systems, rank tracking, modifier managers or upgrade UI in 3A.** Phase 3B adds paid upgrades afterward; ranks, research, level conditions and active-effect gameplay follow in separate passes. Do not create another wallet, rebuild aiming or reintroduce BuildCost.
+Phase 1 rotation, Phase 2 paid construction and **Phase 3A stat foundation are implemented**. Battle Tower combat, selected stats and range displays use immutable cached FinalStats; numeric Config changes emit invalidation events. The eight numbered stages are in TOWERS/Shared/Stats/Pipeline, with 02–06 neutral. See Shared/Stats/README.md for the supported tuning workflow and safety rules.
+
+**Next is Phase 3B:** purchased tier data, atomic ECONOMY payments and an upgrade preview/button, activating only 02_TowerUpgrades. Ranks, persistent research, level conditions and timed effects remain later passes. Do not rebuild the pipeline, add a competing wallet or fabricate future managers.
 
 Tests currently cover rotation/cooldown, atomic payments, paid placement and nested config isolation. Add tier progression and upgrade effects/payment checks when upgrades are implemented.
 
@@ -346,5 +348,8 @@ Tests currently cover rotation/cooldown, atomic payments, paid placement and nes
 - `DefaultTowerConfig.tres`: shared placement preview/selection range toggles and future upgrade/sell switches.
 - `FEEDBACK/DefenseBars/DefaultDefenseBarConfig.tres`: reusable health bar appearance when towers become damageable.
 
-**Current status:** rotation (Phase 1) and paid construction/economy (Phase 2) work. Upgrades (Phase 3) remain planned.
+**Current status:** rotation (Phase 1), paid construction (Phase 2) and neutral stat pipeline (Phase 3A) work. Purchased upgrades (3B), ranks, research, level conditions and timed effects remain planned.
 
+
+## Implemented Phase 3A verification
+All eight stage files and the single coordinator exist. TowerFinalStats is a separate immutable instance snapshot; source Config remains Inspector-editable and numeric changes automatically rebuild. Resource replacement/exit remove old subscriptions. StatsChanged refreshes selected Inspector values/range rings; combat ticks consume cached results. Safety bounds and optional traces are documented in Shared/Stats/README.md. TowerStatChecks validates stage order, baseline parity, clamps, cache/input isolation, per-tower independence, live tuning and disabled/re-enabled firing. No tier purchasing, rank/research/condition/effect gameplay or Upgrade button was added.

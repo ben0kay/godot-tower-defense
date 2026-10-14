@@ -43,6 +43,7 @@ public partial class TowerPlacementController : Node2D
         _towers = GetNode<Node2D>("../World/Towers");
         _hud = GetNode<GameplayHUD>("../UI/GameplayHUD");
         _hud.TowerChoiceRequested += OnTowerChoiceRequested;
+        BattleConfig.Changed += OnPreviewConfigChanged;
         _ghost = new Sprite2D
         {
             Name = "PlacementGhost", Texture = BattleArtwork, Visible = false, ZIndex = 10,
@@ -58,6 +59,8 @@ public partial class TowerPlacementController : Node2D
     {
         if (GodotObject.IsInstanceValid(_hud)) _hud.TowerChoiceRequested -= OnTowerChoiceRequested;
         if (GodotObject.IsInstanceValid(_economy)) _economy.BalanceChanged -= OnBalanceChanged;
+        if (GodotObject.IsInstanceValid(BattleConfig)) BattleConfig.Changed -= OnPreviewConfigChanged;
+        if (GodotObject.IsInstanceValid(_selected)) _selected.StatsChanged -= OnSelectedStatsChanged;
     }
     #endregion
 
@@ -221,16 +224,38 @@ public partial class TowerPlacementController : Node2D
     private void SelectTower(BattleTower tower)
     {
         if (_selected == tower) return;
-        if (GodotObject.IsInstanceValid(_selected)) _selected.SetSelected(false);
+        if (GodotObject.IsInstanceValid(_selected))
+        { _selected.StatsChanged -= OnSelectedStatsChanged; _selected.SetSelected(false); }
         _selected = tower;
         if (GodotObject.IsInstanceValid(_selected))
         {
+            _selected.StatsChanged += OnSelectedStatsChanged;
             _selected.SetSelected(true);
             _hud.ShowTowerDetails(BattleConfig.DisplayName, "Offensive / Placed",
                 DescribeTower($"Grid cell: {_selected.GridCell.X}, {_selected.GridCell.Y}"),
                 _selected.Config.Description + "\nConstruction paid; automatic firing active.");
         }
         QueueRedraw();
+    }
+
+    // =========================================================
+    // Refresh the selected tower's displayed effective values/range when its inputs change.
+    private void OnSelectedStatsChanged()
+    {
+        if (!GodotObject.IsInstanceValid(_selected) || _selected.FinalStats == null) return;
+        if (_hud.IsInspectionVisible) _hud.ShowTowerDetails(_selected.Config.DisplayName, "Offensive / Placed",
+            DescribeTower($"Grid cell: {_selected.GridCell.X}, {_selected.GridCell.Y}"),
+            _selected.Config.Description + "\nConstruction paid; automatic firing active.");
+        QueueRedraw();
+    }
+
+    // =========================================================
+    // Preview resolution happens on changed inputs/cells, not as a full pipeline every frame.
+    private void OnPreviewConfigChanged()
+    {
+        _previewDirty = true;
+        _affordable = _economy.CanAfford(BattleConfig.ConstructionCosts);
+        if (_placing && _selected == null) UpdatePreview();
     }
 
     // =========================================================
@@ -248,11 +273,12 @@ public partial class TowerPlacementController : Node2D
     private string DescribeTower(string extra = "")
     {
         BattleTowerConfig config = _selected?.Config ?? BattleConfig;
+        TowerFinalStats final = _selected?.FinalStats ?? TowerStatPipeline.Resolve(BattleConfig);
         string stats = $"Footprint: 1 x 1 | Barrels: 1\n" +
             $"Cost: {DescribeCosts(config)}\n" +
-            $"Range: {config.RangePixels:0} px\n" +
-            $"Rate: {config.ShotsPerSecond:0.##} shots/s\n" +
-            $"Damage: {config.DamagePerShot}\nTargeting: {config.TargetPriority}";
+            $"Range: {final.RangePixels:0} px\n" +
+            $"Rate: {final.ShotsPerSecond:0.##} shots/s\n" +
+            $"Damage: {final.DamagePerShot}\nTargeting: {config.TargetPriority}";
         return extra.Length == 0 ? stats : stats + "\n" + extra;
     }
 
@@ -276,8 +302,8 @@ public partial class TowerPlacementController : Node2D
     // Draw only the active preview cell and selected tower's weapon range.
     public override void _Draw()
     {
-        if (GodotObject.IsInstanceValid(_selected) && Settings.ShowSelectionRange)
-            DrawArc(ToLocal(_selected.GlobalPosition), _selected.Config.RangePixels, 0f,
+        if (GodotObject.IsInstanceValid(_selected) && _selected.FinalStats != null && Settings.ShowSelectionRange)
+            DrawArc(ToLocal(_selected.GlobalPosition), _selected.FinalStats.RangePixels, 0f,
                 Mathf.Tau, 96, new Color(0.37f, 0.82f, 0.95f, 0.55f), 2f);
 
         if (!_previewVisible || !Settings.ShowPlacementPreview) return;
