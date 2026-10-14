@@ -8,6 +8,10 @@ This top-level folder owns **enemy gameplay mechanics** in the Godot 4 C#/.NET s
 
 **Current limitations:** no death-spawning (E3A), enemy weapons/electrical tower attacks or tower durability (E3B), armor mitigation, linked shields, shield UI, timed effects or universal ability manager. TOWERS Phase 4C typed combat and continuous Laser are already implemented and preserved. F2 still spawns Enemy001 unshielded; existing Level001 authored wave contents are unchanged. New registered IDs can be authored in waves or explicitly assigned to Debug/EnemyScene for playtesting.
 
+## Corridor-aware enemy path variation (PLANNED — Codex navigation pass N4)
+
+See **[enemypathing.md](enemypathing.md)** for the standalone Phase N4 implementation plan: Inspector master toggle, percentage of individual enemies assigned the new corridor-aware refinement, safe randomized routes within walkable boundaries, stable repathing, 0%/100% behavior and performance/regression requirements. This is **not implemented yet** and is independent of the completed E2A/E2B enemy catalog/ShieldEmitter and existing shared path diversity.
+
 ## Enemy architecture — multi-type roster and modular abilities (E2A/E2B implemented; E3 later)
 
 **Design goal:** Support many enemy types—fast scouts, heavy tanks, generators, carriers, electrical ships, attackers, healers, stealth units, bosses and hybrids—without growing `Enemy.cs` into a giant switch on IDs or writing a full replacement AI/spawn/health script for each one. An enemy may have **zero, one or several independent optional abilities**. Keep ordinary enemies lightweight: speed, HP, shield *capacity*, Citadel damage, reward and navigation radius are already `EnemyDefinition` data.
