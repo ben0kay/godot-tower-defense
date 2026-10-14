@@ -289,7 +289,8 @@ public partial class GameplayHUD : Control
         float available = Mathf.Max(0f, maxX - x);
         _creditGain.SetOrigin(new Vector2(x, _credits.Position.Y + (_credits.Size.Y - _creditGain.GetCombinedMinimumSize().Y) * 0.5f));
         _creditGain.Size = new Vector2(available, _credits.Size.Y);
-        if (available < 34f && _creditGain.Visible) _creditGain.Hide();
+        if (available < 34f) _creditGain.Hide();
+        else if (_creditGain.IsDisplaying) _creditGain.Show();
     }
 
     // =========================================================
