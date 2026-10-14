@@ -22,4 +22,4 @@ text = "PORTAL"
 mouse_filter = 2
 
 [node name="SpawnExit" type="Marker2D" parent="."]
-position = Vector2(64, 0)
+position = Vector2(0, 0)

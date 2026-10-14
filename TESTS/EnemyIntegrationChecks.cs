@@ -29,6 +29,10 @@ public partial class EnemyIntegrationChecks : Node
             // Disable cosmetic particles during mass-kill fixtures; test them separately below.
             FeedbackMasterConfig feedback = GD.Load<FeedbackMasterConfig>("res://FEEDBACK/DefaultFeedbackConfig.tres");
             feedback.DeathExplosionsEnabled = false;
+            PortalSpawnChecks.Run(_grid, _spawns);
+            _battle.GetNode<EconomyManager>("Economy").Initialize(_grid.Level.Settings);
+            // Legacy route/source fixtures use exact centers; the focused check covers variation.
+            _paths.Config.PortalSpawnOffsetPixels = 0;
             EconomyChecks.Run(_battle, _grid);
             WaveChecks.Run(_battle, _grid, _spawns);
             EnemyKillRewardChecks.Run(_battle, _spawns);

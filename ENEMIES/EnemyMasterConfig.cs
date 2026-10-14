@@ -27,6 +27,8 @@ public partial class EnemyMasterConfig : Resource
     [ExportGroup("Separation (Reserved, Not Active)")]
     [Export(PropertyHint.Range, "0,10,0.1")] public float SeparationStrength { get; set; } = 0f;
     [Export(PropertyHint.Range, "0,128,1")] public float SeparationRadius { get; set; } = 48f;
+    [ExportGroup("Portal Spawning")]
+    [Export(PropertyHint.Range, "0,24,1")] public float PortalSpawnOffsetPixels { get; set; } = 8f;
     [ExportGroup("Wave Scheduling")]
     [Export(PropertyHint.Range, "1,16,1")] public int MaxWaveSpawnAttemptsPerFrame { get; set; } = 2;
     [Export(PropertyHint.Range, "0.1,5,0.1")] public float WaveSpawnRetrySeconds { get; set; } = 0.5f;

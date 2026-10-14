@@ -7,6 +7,7 @@ public partial class SpawnManager : Node
     public EnemyRegistry Registry { get; private set; }
     public PathRequestManager Paths { get; private set; }
     public string LastMessage { get; private set; } = "F2: spawn Enemy001 at a permitted Portal.";
+    private readonly RandomNumberGenerator _spawnRandom = new();
     private Node2D _ships;
     private int _sourceIndex, _cachedRevision = -1;
     private bool[] _reachable;
@@ -18,6 +19,7 @@ public partial class SpawnManager : Node
     // All runtime mechanics remain outside the physical Portal and level Debug nodes.
     public override void _Ready()
     {
+        _spawnRandom.Randomize();
         Registry = GetNode<EnemyRegistry>("../Registry");
         Paths = GetNode<PathRequestManager>("../Paths");
         _ships = GetNode<Node2D>("../../Enemies");
@@ -83,6 +85,8 @@ public partial class SpawnManager : Node
             Vector2 position = sources[(_sourceIndex + i) % sources.Count];
             if (!nav.IsReachable(_reachable, grid.WorldToCell(position))
                 || !nav.HasClearance(position, ship.Definition.RadiusPixels)) continue;
+            int source = (_sourceIndex + i) % sources.Count;
+            if (portalOnly || source < _portalCount) position = OffsetPortal(position, ship.Definition.RadiusPixels, _spawnRandom);
             _sourceIndex = (_sourceIndex + i + 1) % sources.Count;
             _ships.AddChild(ship); ship.GlobalPosition = position;
             ship.Initialize(Registry, Paths); LastMessage = "Spawned " + ship.Definition.DisplayName;
@@ -123,9 +127,28 @@ public partial class SpawnManager : Node
                 : "No permitted reachable source with enemy clearance; wave spawn will retry.";
             return null;
         }
-        _ships.AddChild(ship); ship.GlobalPosition = _entries[chosen];
+        Vector2 spawn = _entries[chosen];
+        if (chosen < _portalCount) spawn = OffsetPortal(spawn, ship.Definition.RadiusPixels, random);
+        _ships.AddChild(ship); ship.GlobalPosition = spawn;
         ship.Initialize(Registry, Paths); LastMessage = "Wave spawned " + ship.Definition.DisplayName;
         return ship;
+    }
+
+    // =========================================================
+    // Small portal-only variation; validate radius, connectivity and the segment back to center.
+    // Bounded attempts fall back to the already validated center, without extra A* requests.
+    private Vector2 OffsetPortal(Vector2 center, float radius, RandomNumberGenerator random)
+    {
+        float offset = Mathf.Clamp(Paths.Config.PortalSpawnOffsetPixels, 0f, 24f);
+        if (offset <= 0f) return center;
+        NavigationGrid nav = Paths.Navigation;
+        for (int attempt = 0; attempt < 8; attempt++)
+        {
+            Vector2 point = center + new Vector2(random.RandfRange(-offset, offset), random.RandfRange(-offset, offset));
+            if (nav.IsReachable(_reachable, nav.Grid.WorldToCell(point))
+                && nav.HasClearance(point, radius) && nav.SegmentClear(center, point, radius)) return point;
+        }
+        return center;
     }
 
     // =========================================================

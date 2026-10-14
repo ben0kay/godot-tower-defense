@@ -5,3 +5,4 @@
 [resource]
 script = ExtResource("1")
 PathDiversityStrength = 2.0
+PortalSpawnOffsetPixels = 8.0

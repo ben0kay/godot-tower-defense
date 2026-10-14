@@ -14,7 +14,7 @@ public static class RepathMovementChecks
         for (int y = 0; y < grid.Config.HeightCells; y++)
             for (int x = 0; x < grid.Config.WidthCells; x++) grid.Level.Ground.SetCell(new(x, y), 0, new(2, 0));
         Vector2I start = new(5, 10), goal = new(25, 10);
-        grid.Level.GetNode<Node2D>("Portals/EnemyPortal").GlobalPosition = grid.CellToWorldCenter(start - Vector2I.Right);
+        grid.Level.GetNode<Node2D>("Portals/EnemyPortal").GlobalPosition = grid.CellToWorldCenter(start);
         foreach (Node node in grid.Level.Citadel.GetNode("ApproachPoints").GetChildren())
             ((Node2D)node).GlobalPosition = grid.CellToWorldCenter(goal);
         grid.RebuildTerrain(); paths.Navigation.Refresh();

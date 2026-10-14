@@ -26,7 +26,7 @@ public static class SwarmNavigationChecks
                 grid.Level.Walls.EraseCell(new(x, y)); grid.Level.Ground.SetCell(new(x, y), 0, new(2, 0));
             }
         Vector2 start = grid.CellToWorldCenter(new(5, 15)); Vector2I goal = new(35, 15);
-        grid.Level.GetNode<Node2D>("Portals/EnemyPortal").GlobalPosition = grid.CellToWorldCenter(new(4, 15));
+        grid.Level.GetNode<Node2D>("Portals/EnemyPortal").GlobalPosition = grid.CellToWorldCenter(new(5, 15));
         foreach (Node child in grid.Level.Citadel.GetNode("ApproachPoints").GetChildren())
             ((Node2D)child).GlobalPosition = grid.CellToWorldCenter(goal);
         grid.Level.Settings.SpawnMode = LevelConfig.SpawnSourceMode.Portals;
