@@ -1,4 +1,4 @@
-// Editable per-type identity, health and movement settings; filenames stay Enemy001.
+// Editable per-type identity, health and movement settings; plain types reuse shared gameplay scripts.
 using Godot;
 
 [GlobalClass]

@@ -11,6 +11,8 @@ public partial class Enemy : Node2D
     public EnemyMovement Movement { get; private set; }
     public float RemainingPathDistance => Movement?.RemainingPathDistance ?? float.PositiveInfinity;
     public event Action<Enemy> Removed;
+    public event Action<Enemy> Initialized;
+    public EnemyRegistry Registry => _registry;
     private EnemyRegistry _registry;
     private DefenseBar _defenseBar;
 
@@ -26,6 +28,7 @@ public partial class Enemy : Node2D
         Movement = GetNode<EnemyMovement>("Movement");
         _registry.Register(this);
         Movement.Initialize(this, paths);
+        Initialized?.Invoke(this);
     }
 
     // =========================================================
@@ -53,6 +56,17 @@ public partial class Enemy : Node2D
         if (Health == oldHealth) return;
         _defenseBar?.SetHealth(Health, Definition.MaxHealth);
         if (Health <= 0f) Finish(false);
+    }
+
+    // =========================================================
+    // Optional support restores instance shield points only; capacity/health/kill state never change.
+    public float RestoreShield(float amount)
+    {
+        if (!IsAlive || !float.IsFinite(amount) || amount <= 0 || Definition == null ||
+            !float.IsFinite(Definition.MaxShield) || Definition.MaxShield <= CurrentShield) return 0;
+        float before = CurrentShield;
+        CurrentShield = (float)Math.Min(Definition.MaxShield, (double)CurrentShield + amount);
+        return CurrentShield - before;
     }
 
     // =========================================================

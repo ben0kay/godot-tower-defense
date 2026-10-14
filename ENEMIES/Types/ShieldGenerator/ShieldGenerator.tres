@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://ENEMIES/Shared/EnemyDefinition.cs" id="1"]
+[resource]
+script = ExtResource("1")
+EnemyId = "shieldgenerator"
+DisplayName = "Shield Generator"
+MaxHealth = 100.0
+MaxShield = 80.0
+MoveSpeed = 70.0
+RadiusPixels = 16.0
+CitadelDamage = 2
+KillRewardCredits = 5

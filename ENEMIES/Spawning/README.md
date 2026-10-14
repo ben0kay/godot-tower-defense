@@ -13,3 +13,9 @@ Connectivity storage now reuses buffers: NavigationGrid returns borrowed flood s
 Portal spawning now uses the centered SpawnExit plus a random offset up to PortalSpawnOffsetPixels on each world axis (default 8). Both F2 and waves use the same safety helper; source selection remains round-robin for F2 and random for waves. Up to eight clearance/connectivity/segment-checked samples are tried, falling back to the valid center. Edge positions remain exact. Set the offset to 0 for exact portal-center spawning.
 
 `SpawnWave(scene, random, requiredPortal: "", spawnWithShield: false)` now accepts the wave's optional full-shield flag and passes it to `Enemy.Initialize` only after a valid spawn is found. This does not affect portal selection, retry logic, navigation or costs. `Spawn(scene, portalOnly)` (F2/debug) continues to initialize without shields by default; the per-type `EnemyDefinition.MaxShield` is capacity, not a spawning directive.
+
+
+E2A: optional exported Catalog defaults to DefaultEnemyCatalog; string-ID Spawn/SpawnWave adapters resolve types while legacy scene APIs/F2 remain intact. WaveManager uses this actual world catalog. Current guaranteed single-cell route support requires radius smaller than half CellSize; oversized types are held/retried with a diagnostic, not squeezed through obstacles. No new A* work or radius grid is created.
+
+
+Default catalog now also registers shieldgenerator. Abilities initialize only after a safe physical source, registry and movement are ready. SpawnManager does not own pulse timers or shield-restoration logic; wave starting-shield policy remains unchanged.

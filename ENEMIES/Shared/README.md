@@ -20,3 +20,9 @@ A killed enemy (only `Finish(false)`) calls the shared `FEEDBACK/DeathExplosion/
 
 
 Typed ApplyDamage(DamageInfo) now delegates base hits to COMBAT/Damage. TakeDamage(float) keeps 1:1 shield-first behavior. One internal helper commits state; only hull changes update DefenseBar, only hull death pays a kill. Capacity/opt-in spawning remain unchanged.
+
+
+E2A: EnemyCatalog validates an Inspector scene list once, derives canonical IDs from each scene Definition and provides stable lookup. DefaultEnemyCatalog registers Enemy001/Enemy002; WaveCatalog.LoadScenes is now an adapter. Unknown/duplicate IDs, invalid balance and missing root/Movement fail setup.
+
+
+E2B adds only optional Initialized notification after registry/movement setup, a read-only Registry accessor and RestoreShield(amount). The latter rejects invalid/nonpositive amounts/dead recipients/zero capacity and clamps finite additions at MaxShield without touching hull feedback or definitions. ShieldEmitter owns pulse behavior; ordinary Enemy001/Enemy002 have no ability node/manager. Kill/arrival/unload behavior and typed COMBAT damage remain unchanged.

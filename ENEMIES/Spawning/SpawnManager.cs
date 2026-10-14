@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public partial class SpawnManager : Node
 {
+    [Export] public EnemyCatalog Catalog { get; set; }
     public EnemyRegistry Registry { get; private set; }
     public PathRequestManager Paths { get; private set; }
     public string LastMessage { get; private set; } = "F2: spawn Enemy001 at a permitted Portal.";
@@ -19,11 +20,38 @@ public partial class SpawnManager : Node
     // All runtime mechanics remain outside the physical Portal and level Debug nodes.
     public override void _Ready()
     {
+        if (Catalog == null) Catalog = EnemyCatalog.Default; else Catalog.Rebuild();
         _spawnRandom.Randomize();
         Registry = GetNode<EnemyRegistry>("../Registry");
         Paths = GetNode<PathRequestManager>("../Paths");
         _ships = GetNode<Node2D>("../../Enemies");
         RefreshSources();
+    }
+
+    // =========================================================
+    // Catalog IDs provide generic spawn requests while preserving debug's original scene overload.
+    public Enemy Spawn(string enemyId, bool portalOnly = false)
+    {
+        PackedScene scene = Catalog.Find(enemyId);
+        if (scene == null) { LastMessage = "Unknown EnemyId: " + enemyId; return null; }
+        return Spawn(scene, portalOnly);
+    }
+    // =========================================================
+    // Wave callers retain portal/shield policy; this adapter only resolves the registered type.
+    public Enemy SpawnWave(string enemyId, RandomNumberGenerator random, string requiredPortal = "", bool spawnWithShield = false)
+    {
+        PackedScene scene = Catalog.Find(enemyId);
+        if (scene == null) { LastMessage = "Unknown EnemyId: " + enemyId; return null; }
+        return SpawnWave(scene, random, requiredPortal, spawnWithShield);
+    }
+    // =========================================================
+    // Current single-cell routing guarantees clearance only below half a navigation cell.
+    // Oversized types wait safely rather than spawning into a corridor the shared path model cannot fit.
+    private bool FitsNavigation(Enemy ship)
+    {
+        if (ship.Definition.RadiusPixels < Paths.Navigation.Grid.Config.CellSize * 0.5f) return true;
+        LastMessage = "Enemy radius must be smaller than half a navigation cell; spawn will retry.";
+        return false;
     }
 
     // =========================================================
@@ -76,6 +104,7 @@ public partial class SpawnManager : Node
         if (Registry.Living.Count >= Paths.Config.MaxActiveEnemies)
         { LastMessage = "Active enemy safety limit reached."; return null; }
         Enemy ship = scene.Instantiate<Enemy>();
+        if (!FitsNavigation(ship)) { ship.Free(); return null; }
         List<Vector2> sources = _entries;
         if (portalOnly)
         {
@@ -113,6 +142,7 @@ public partial class SpawnManager : Node
         if (Registry.Living.Count >= Paths.Config.MaxActiveEnemies)
         { LastMessage = "Active enemy safety limit reached; wave spawn will retry."; return null; }
         Enemy ship = scene.Instantiate<Enemy>();
+        if (!FitsNavigation(ship)) { ship.Free(); return null; }
         NavigationGrid nav = Paths.Navigation;
         int chosen = -1, eligible = 0;
         for (int i = 0; i < _entries.Count; i++)

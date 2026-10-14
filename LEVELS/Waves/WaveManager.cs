@@ -39,7 +39,7 @@ public partial class WaveManager : Node
         try
         {
             string set = _spawns.Paths.Navigation.Grid.Level.Settings.WaveSetId;
-            Configure(WaveCatalog.GetWaves(set), WaveCatalog.LoadScenes());
+            Configure(WaveCatalog.GetWaves(set), _spawns.Catalog.ToSceneMap());
         }
         catch (Exception exception) { SetError(exception.Message); }
     }

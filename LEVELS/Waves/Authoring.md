@@ -29,3 +29,9 @@ Batch(count: 5, interval: 0.2, after: 0,
 ```
 
 `MaxShield` is configured once on `ENEMIES/Types/Enemy001/Enemy001.tres` (**100 SP** for Enemy001). Shielded spawns begin full; unshielded spawns begin at zero, including F2. Exact weighted quotas/shuffle remain unchanged; two entries can share the same EnemyId with different shield flags. Existing Level001 authored waves have **not** been changed, so nothing spawns shielded until you explicitly edit an entry. Shield regeneration/visuals/stealth/boss abilities are future work.
+
+
+E2A: register new Enemy scenes in ENEMIES/DefaultEnemyCatalog.tres, then use their canonical EnemyDefinition.EnemyId. Enemy002 is now available with30 hull/160px/s; the authored Level001 encounters remain unchanged. Wave timing/weights/portal/shield ownership are unchanged.
+
+
+E2B: Enemy("shieldgenerator") spawns the registered support scene with a ShieldEmitter child. Its default pulses replenish nearby positive-capacity allies, including unshielded starts, while shield:true separately controls full starting capacity. E3 death-spawn/attack behavior is not implemented. Runtime catalog changes require Rebuild and wave reconfiguration.

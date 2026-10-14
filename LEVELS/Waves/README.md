@@ -248,8 +248,13 @@ Suggested future separation: a compact `[Flags] EnemySpawnFlags` for toggles **a
 - Changing/restarting levels uses that level's wave set and releases old event subscriptions.
 - Existing navigation, tower placement, Battle Tower combat, Credits/HUD and headless tests still work.
 
-**Current scope:** Phase 1 is implemented with Enemy001-only encounters. Future types, modifiers, rewards, advanced progression and saving remain separate passes.
+**Current encounters:** Level001 remains Enemy001-only. E2A additionally registers Enemy002/ShieldGenerator for authoring; opt-in shields and E2B restoration are active. Additional modifiers, wave-completion rewards, advanced progression and saving remain later passes.
 
 ## Optional full spawn shields (implemented)
 
 Each `WaveEnemyEntry` now includes `SpawnWithShield` (default `false`) and `WaveBuilder.Enemy(..., shield: true)` can request full shields on that entry. `WaveManager` forwards it to `SpawnManager.SpawnWave`; `Enemy.Initialize` sets the **individual** ship's `CurrentShield` to its type's `MaxShield` only when requested. Default wave/F2 spawns are still unshielded. Mixed entries sharing the same `EnemyId` remain distinct through the exact-quota shuffle; `TESTS/EnemyShieldChecks.cs` covers this, shield-first hits, damage overflow and no shared-definition mutation. Level001 wave contents are unchanged. No shield visuals, regeneration or other generic spawn-modifier engine is implemented.
+
+
+## E2A/E2B enemy registration
+
+WaveCatalog.LoadScenes now adapts EnemyCatalog.Default; WaveManager setup uses its SpawnManager's actual Catalog. Register scenes in ENEMIES/DefaultEnemyCatalog.tres rather than adding a dictionary branch. IDs enemy001, enemy002 and shieldgenerator are available; default Level001 encounter data remains unchanged. Exact quotas, RNG, portal requirements, retry/backoff, opt-in starting shields and owned completion remain unchanged. ShieldEmitter raises current shields later through Enemy.RestoreShield; it does not alter wave data/ownership. Death-spawn children and enemy attacks remain future E3 passes.

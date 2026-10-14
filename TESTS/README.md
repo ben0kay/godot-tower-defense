@@ -78,3 +78,9 @@ DamageTypeChecks covers typed coefficients, exact shield break,20/30/4.25 base s
 
 
 LaserTowerChecks runs after the independent 4C-1 damage/shield fixture: real catalog placement/recipe/upgrade actions, private source data, shared DPS operations/clamps,30/60/120 Hz parity, typed hull/shield spillover, First/Closest/retargeting, range/alignment/disable/zero-DPS/arrival/death/unload gates, endpoints/visual independence and no per-tick node creation. TowerBuildBarChecks now expects both playable default entries. Full regression and standalone menu flow are exercised with the Godot assembly compiled via Roslyn/source generators; standard editor SDK/MSBuild is unavailable here and no live rendered visual-quality check is claimed.
+
+
+EnemyCatalogChecks validates canonical scene registration, invalid assets/IDs/balance, two-type exact weighted waves/required portals, weaker/faster Enemy002 navigation/targeting/shield isolation, distinct kill rewards/Citadel arrivals and safe oversized rejection. E2A is compiled/headless-verified separately before ability work.
+
+
+ShieldEmitterChecks adds real registered support scenes to test staggered per-instance cooldowns, capped restoration, hull-bar neutrality, self/eligibility/range, bounded candidate/recipient work, no catch-up bursts, private configs, disabled/null/invalid components and kill/arrival/unload/queued cleanup. Ordinary Enemy001/Enemy002 remain ability-free. All original tower/combat/navigation/wave/shield tests stay active. MenuTowerFlowChecks still independently verifies startup-to-Level001 flow without save writes.

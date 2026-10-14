@@ -42,6 +42,8 @@ public partial class EnemyIntegrationChecks : Node
             EconomyChecks.Run(_battle, _grid);
             WaveChecks.Run(_battle, _grid, _spawns);
             EnemyShieldChecks.Run(_battle, _spawns);
+            EnemyCatalogChecks.Run(_battle, _spawns);
+            ShieldEmitterChecks.Run(_battle, _spawns);
             DamageTypeChecks.Run(_battle, _spawns);
             await LaserTowerChecks.Run(_battle, _spawns);
             EnemyKillRewardChecks.Run(_battle, _spawns);

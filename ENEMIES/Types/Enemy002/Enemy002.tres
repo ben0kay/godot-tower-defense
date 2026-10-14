@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://ENEMIES/Shared/EnemyDefinition.cs" id="1"]
+[resource]
+script = ExtResource("1")
+EnemyId = "enemy002"
+DisplayName = "Enemy 002"
+MaxHealth = 30.0
+MaxShield = 40.0
+MoveSpeed = 160.0
+RadiusPixels = 8.0
+KillRewardCredits = 2
+CitadelDamage = 1

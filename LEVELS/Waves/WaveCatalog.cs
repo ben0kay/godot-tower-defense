@@ -17,10 +17,7 @@ public static class WaveCatalog
 
     // =========================================================
     // Load once during setup, never once per spawn.
-    public static Dictionary<string, PackedScene> LoadScenes() => new()
-    {
-        ["enemy001"] = GD.Load<PackedScene>("res://ENEMIES/Types/Enemy001/Enemy001.tscn")
-    };
+    public static Dictionary<string, PackedScene> LoadScenes() => EnemyCatalog.Default.ToSceneMap();
 
     // =========================================================
     // Validate the full set before any wave runs, reporting exact wave/batch context.
@@ -56,7 +53,8 @@ public static class WaveCatalog
         {
             Node node = scenes[id].Instantiate();
             bool valid = node is Enemy enemy && enemy.Definition?.EnemyId == id && enemy.GetNodeOrNull<EnemyMovement>("Movement") != null;
-            node.Free();
+            try { if (valid) EnemyCatalog.ValidateDefinition(((Enemy)node).Definition); }
+            finally { node.Free(); }
             if (!valid) throw new ArgumentException("Enemy scene/catalog identity mismatch: " + id);
         }
     }
