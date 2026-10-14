@@ -1,4 +1,4 @@
-# Enemy Pathing — Corridor-Aware Individual Route Variation (Phase N4, PLANNED)
+# Enemy Pathing — Corridor-Aware Individual Route Variation (Phase N4, IMPLEMENTED — visual playtest pending)
 
 > **Codex implementation specification — NOT IMPLEMENTED.** This document lives in `ENEMIES/` and is linked from `ENEMIES/README.md`. It is a focused optional navigation feature, separate from Enemy E2A/E2B abilities and tower work. First read `NOTES/CodePreferences.md`, `ENEMIES/Movement/README.md`, `WORLD/NAVIGATION/README.md` and the existing C# scripts before changing code.
 
@@ -113,3 +113,9 @@ Don't maintain a separate long-lived `AStarGrid2D` for every enemy. Avoid a glob
 **Codex order:** First implement the master switch and deterministic per-instance percentage assignment (test 0/50/100%). Second, implement route refinement for selected ships and safety fallback (test width, obstacles and repaths). Third, run regression/performance checks and manually inspect moving ships. Commit/push only after verifying and report anything that cannot be tested.
 
 **Done means:** With `EnableCorridorVariation = true` and `CorridorVariationPercent = 50`, approximately half of each large group of otherwise identical enemies uses safe, individually varied routes across available corridor width while the others retain the existing pathing. With the master toggle off, the game follows the current routing system without this feature. 
+
+## Implementation status
+
+N4 master/percentage assignment was implemented and verified independently before corridor refinement. Automated geometry, safety, stable preferences, disabled parity and 100/500-ship performance checks now pass; existing navigation/combat/tower regression suites are preserved. Implementation details are in Movement/README.md, configuration in EnemyMasterConfig/DefaultEnemyConfig, and measured results in TESTS/CorridorPerformance.md.
+
+A moving-window visual playtest could not be performed in the headless execution environment. Visual acceptance remains pending: enable the feature, compare 0/50/100% in straight/winding three-cell corridors, inspect turns/spread and place towers while ships move. Do not interpret CPU-only timings as a rendered 60FPS guarantee.

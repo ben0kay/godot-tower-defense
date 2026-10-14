@@ -15,6 +15,16 @@ public partial class EnemyMasterConfig : Resource
     [Export] public bool EnablePathOffsets { get; set; } = true;
     [Export(PropertyHint.Range, "0,24,1")] public float PathOffsetMaxPixels { get; set; } = 8f;
     [Export(PropertyHint.Range, "0,30,0.1")] public float RouteAuditIntervalSeconds { get; set; } = 3f;
+    [ExportGroup("Corridor Path Variation")]
+    [Export] public bool EnableCorridorVariation { get; set; } = false;
+    private float _corridorPercent = 50, _corridorStrength = 0.65f;
+    private int _corridorSpacing = 3;
+    [Export(PropertyHint.Range, "0,100,1")] public float CorridorVariationPercent
+    { get => _corridorPercent; set => _corridorPercent = float.IsFinite(value) ? Mathf.Clamp(value, 0, 100) : 0; }
+    [Export(PropertyHint.Range, "0,1,0.05")] public float CorridorVariationStrength
+    { get => _corridorStrength; set => _corridorStrength = float.IsFinite(value) ? Mathf.Clamp(value, 0, 1) : 0; }
+    [Export(PropertyHint.Range, "2,12,1")] public int CorridorVariationSpacingCells
+    { get => _corridorSpacing; set => _corridorSpacing = Mathf.Clamp(value, 2, 12); }
     [ExportGroup("Path Diversity")]
     [Export] public bool EnablePathDiversity { get; set; } = true;
     [Export(PropertyHint.Range, "0,3,0.05")] public float PathDiversityStrength { get; set; } = 0.6f;

@@ -5,6 +5,10 @@ using System.Collections.Generic;
 public partial class EnemyMovement : Node
 {
     #region State
+    public bool UsesCorridorVariation { get; private set; }
+    public int CorridorSamplingChecks => _route.CorridorSamples;
+    public bool CorridorVariationApplied => _route.CorridorVariationApplied;
+    public uint CorridorSeed { get; private set; }
     public int RouteProfile { get; private set; }
     public Enemy Enemy { get; private set; }
     public float RemainingPathDistance => _replacementNeeded ? float.PositiveInfinity : _remainingDistance;
@@ -36,6 +40,8 @@ public partial class EnemyMovement : Node
     public void Initialize(Enemy enemy, PathRequestManager paths)
     {
         Enemy = enemy; _paths = paths; RouteProfile = paths.AssignProfile();
+        CorridorSeed = paths.AssignCorridorSeed();
+        UsesCorridorVariation = CorridorPreference.Selected(CorridorSeed, paths.Config);
         uint seed = unchecked((uint)GetInstanceId() * 2654435761u); seed ^= seed >> 16;
         LateralOffsetPixels = ((seed & 65535u) / 65535f * 2f - 1f) * Mathf.Max(0f, paths.Config.PathOffsetMaxPixels);
         _auditTimer = (seed % 997) / 997f * Mathf.Max(0f, paths.Config.RouteAuditIntervalSeconds);
@@ -75,7 +81,10 @@ public partial class EnemyMovement : Node
         _stopped = false; _replacementNeeded = false;
         float offset = _paths.Config.EnablePathOffsets ? Mathf.Clamp(LateralOffsetPixels,
             -Mathf.Max(0f, _paths.Config.PathOffsetMaxPixels), Mathf.Max(0f, _paths.Config.PathOffsetMaxPixels)) : 0f;
-        _route.Build(connected, Enemy.GlobalPosition, _paths.Navigation, Enemy.Definition.RadiusPixels, offset, _travelDirection);
+        if (UsesCorridorVariation && _paths.Config.EnableCorridorVariation && _paths.Config.CorridorVariationStrength > 0)
+            _route.BuildCorridor(connected, Enemy.GlobalPosition, _paths.Navigation, Enemy.Definition.RadiusPixels,
+                offset, CorridorSeed, _paths.Config, _travelDirection);
+        else _route.Build(connected, Enemy.GlobalPosition, _paths.Navigation, Enemy.Definition.RadiusPixels, offset, _travelDirection);
         _paths.RegisterRoute(this); UpdateDistance();
     }
 
@@ -97,7 +106,7 @@ public partial class EnemyMovement : Node
             {
                 Vector2 direction = route[i] - position;
                 if (pass == 0 && _travelDirection != Vector2.Zero && direction.Dot(_travelDirection) < -0.01f) continue;
-                if (_paths.Navigation.ConnectionClear(position, route[i], Enemy.Definition.RadiusPixels))
+                if (RouteConnectionClear(position, route[i], Enemy.Definition.RadiusPixels))
                 { join = i; break; }
                 // A clearance-tested elbow can turn around a nearby wall without retreating
                 // to the cell center. Try keeping either current coordinate for the first leg.
@@ -106,8 +115,8 @@ public partial class EnemyMovement : Node
                     Vector2 corner = axis == 0 ? new Vector2(position.X, route[i].Y) : new Vector2(route[i].X, position.Y);
                     if (corner.DistanceSquaredTo(position) < 0.0001f || corner.DistanceSquaredTo(route[i]) < 0.0001f) continue;
                     if (pass == 0 && _travelDirection != Vector2.Zero && (corner - position).Dot(_travelDirection) < -0.01f) continue;
-                    if (!_paths.Navigation.ConnectionClear(position, corner, Enemy.Definition.RadiusPixels)
-                        || !_paths.Navigation.ConnectionClear(corner, route[i], Enemy.Definition.RadiusPixels)) continue;
+                    if (!RouteConnectionClear(position, corner, Enemy.Definition.RadiusPixels)
+                        || !RouteConnectionClear(corner, route[i], Enemy.Definition.RadiusPixels)) continue;
                     bend = corner; join = i; break;
                 }
                 if (join >= 0) break;
@@ -122,6 +131,13 @@ public partial class EnemyMovement : Node
         System.Array.Copy(route, join, connected, offset, route.Length - join);
         return connected;
     }
+
+    // =========================================================
+    // Only active selected N4 routes need the analytic grazing-corner supplement; old behavior is unchanged.
+    private bool RouteConnectionClear(Vector2 from, Vector2 to, float radius) => UsesCorridorVariation &&
+        _paths.Config.EnableCorridorVariation && _paths.Config.CorridorVariationStrength > 0
+        ? CorridorClearance.ConnectionClear(_paths.Navigation, from, to, radius)
+        : _paths.Navigation.ConnectionClear(from, to, radius);
 
     // =========================================================
     // Remove dependency references when enemies die, arrive or the level unloads.

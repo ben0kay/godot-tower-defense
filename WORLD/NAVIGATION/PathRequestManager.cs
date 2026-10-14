@@ -18,6 +18,7 @@ public partial class PathRequestManager : Node
     public double LastValidationMilliseconds { get; private set; }
     public long TotalCalculations { get; private set; }
     private int _nextProfile;
+    private uint _corridorSpawnOrdinal;
     private long _serviceOrder;
     private readonly List<Request> _requests = new();
     private readonly Dictionary<EnemyMovement, Request> _pending = new();
@@ -52,6 +53,10 @@ public partial class PathRequestManager : Node
     // =========================================================
     // Profiles are balanced independently from offset randomization.
     public int AssignProfile() => _nextProfile++ % Mathf.Clamp(Config.RouteProfileCount, 1, 8);
+
+    // =========================================================
+    // One independent ordinal per initialized ship; does not change profile/wave/portal random streams.
+    public uint AssignCorridorSeed() => CorridorPreference.Seed(_corridorSpawnOrdinal++, Config.RoutePreferenceSeed);
 
     // =========================================================
     // Cache conservative swept segment cells when assigning a path, never every physics frame.

@@ -5,3 +5,8 @@
 [resource]
 script = ExtResource("1")
 PathDiversityStrength = 2.0
+
+EnableCorridorVariation = false
+CorridorVariationPercent = 50.0
+CorridorVariationStrength = 0.65
+CorridorVariationSpacingCells = 3

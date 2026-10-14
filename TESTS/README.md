@@ -86,4 +86,10 @@ EnemyCatalogChecks validates canonical scene registration, invalid assets/IDs/ba
 ShieldEmitterChecks adds real registered support scenes to test staggered per-instance cooldowns, capped restoration, hull-bar neutrality, self/eligibility/range, bounded candidate/recipient work, no catch-up bursts, private configs, disabled/null/invalid components and kill/arrival/unload/queued cleanup. Ordinary Enemy001/Enemy002 remain ability-free. All original tower/combat/navigation/wave/shield tests stay active. MenuTowerFlowChecks still independently verifies startup-to-Level001 flow without save writes.
 
 
-PortalSpawnChecks now verifies independent0.5/3 portal sizes, visual scale/center/footprint/revision preservation, scaled wave and debug offsets, actual expanded spread, clearance/segments, zero-offset mode and invalid-size fallback. Existing baseline8px checks remain.
+PortalSpawnChecks now verifies independent0.5/3 portal sizes, visual scale/center/footprint/revision preservation, scaled wave and debug offsets, actual expanded spread, clearance/segments, zero-offset mode and invalid-size fallback. Existing baseline 8px checks remain.
+
+## Phase N4 navigation regression
+
+`CorridorAssignmentChecks` runs inside EnemyIntegrationChecks: deterministic percentage boundaries/distribution, config clamping and unchanged seeded wave composition. Run `Godot --headless --path . TESTS/CorridorNavigationChecks.tscn` separately for stable forced-repath preferences, exact disabled/unselected waypoint parity with zero sampling, upper/lower/center spread in three-cell corridors, narrow/open/radius clearance, endpoint/detour/physical-distance checks, swept-corner regression and safe progress through dynamic tower blocks. Its runtime terrain/config copies never modify authored resources.
+
+The fixture exercises straight and winding corridors at 100/500 ships and 0/50/100% selection, records assignment and movement CPU timings, enforces the existing request-count budget, checks no unnecessary A* during unchanged movement, and waits for blocked-route repaths to settle safely. Existing EnemyIntegrationChecks (including SwarmNavigationChecks, RepathMovementChecks and SmoothRepathChecks) and standalone PlacementPerformanceChecks remain required. Results, commands and manual playtest limitations are recorded in CorridorPerformance.md.

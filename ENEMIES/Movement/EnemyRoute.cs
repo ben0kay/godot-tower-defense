@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 public sealed class EnemyRoute
 {
+    public int CorridorSamples { get; private set; }
+    public bool CorridorVariationApplied { get; private set; }
+    private Vector2I[][] _corridorCorners;
     public Vector2[] Points { get; private set; } = System.Array.Empty<Vector2>();
     public float[] Suffix { get; private set; } = System.Array.Empty<float>();
     private Vector2I[] _logicalCells = System.Array.Empty<Vector2I>();
@@ -13,6 +16,7 @@ public sealed class EnemyRoute
     // Apply one stable lateral bias, tapering safely at corners/walls and preserving endpoints.
     public void Build(Vector2[] logical, Vector2 start, NavigationGrid nav, float radius, float offset, Vector2 forward = default)
     {
+        CorridorSamples = 0; CorridorVariationApplied = false; _corridorCorners = null;
         _logicalCells = new Vector2I[logical.Length];
         for (int i = 0; i < logical.Length; i++) _logicalCells[i] = nav.Grid.WorldToCell(logical[i]);
         Points = (Vector2[])logical.Clone(); Dependencies.Clear(); Suffix = new float[Points.Length];
@@ -30,6 +34,36 @@ public sealed class EnemyRoute
                 Points[i] = candidate; break;
             }
         }
+        CacheGeometry(start, nav, radius);
+    }
+
+    // =========================================================
+    // Only selected ships call the optional sampler; ordinary Build remains the original offset path.
+    public void BuildCorridor(Vector2[] logical, Vector2 start, NavigationGrid nav, float radius, float offset,
+        uint seed, EnemyMasterConfig config, Vector2 forward = default)
+    {
+        Build(logical, start, nav, radius, offset, forward);
+        bool changed = CorridorRouteRefinement.TryBuild(logical, Points, start, nav, radius, seed,
+            config.CorridorVariationStrength, config.CorridorVariationSpacingCells, forward, out Vector2[] varied, out int samples);
+        CorridorSamples = samples;
+        if (changed)
+        { Points = varied; CorridorVariationApplied = true; CacheGeometry(start, nav, radius); }
+        else
+        {
+            // The legacy tiny-offset fallback also needs a strict check at a newly blocked grazing corner.
+            Vector2 from = start; bool safe = true;
+            foreach (Vector2 point in Points)
+            { CorridorSamples++; if (!CorridorClearance.ConnectionClear(nav, from, point, radius)) { safe = false; break; } from = point; }
+            if (!safe) { Build(logical, start, nav, radius, 0, forward); CorridorSamples = samples; }
+        }
+        CacheCorners(start, nav, radius);
+    }
+
+    // =========================================================
+    // Cache physical distance and swept dependencies from the actual traveled chain, not its old centerline.
+    private void CacheGeometry(Vector2 start, NavigationGrid nav, float radius)
+    {
+        Dependencies.Clear();
         for (int i = Points.Length - 2; i >= 0; i--) Suffix[i] = Suffix[i + 1] + Points[i].DistanceTo(Points[i + 1]);
         for (int i = 0; i < Points.Length; i++)
         {
@@ -64,9 +98,41 @@ public sealed class EnemyRoute
         return -1;
     }
     // =========================================================
+    // Cache actual grid-corner side cells once so immediate movement checks need no new geometric sampling.
+    private void CacheCorners(Vector2 start, NavigationGrid nav, float radius)
+    {
+        _corridorCorners = new Vector2I[Points.Length][];
+        Vector2 from = start;
+        for (int index = 0; index < Points.Length; index++)
+        {
+            Vector2 to = Points[index];
+            int steps = Mathf.Max(1, Mathf.CeilToInt(from.DistanceTo(to) / Mathf.Max(0.5f,
+                Mathf.Min(nav.Grid.Config.CellSize * 0.1f, radius * 0.5f))));
+            Vector2I previous = nav.Grid.WorldToCell(from); List<Vector2I> corners = null;
+            for (int i = 1; i <= steps; i++)
+            {
+                Vector2I cell = nav.Grid.WorldToCell(from.Lerp(to, (float)i / steps)), step = cell - previous;
+                if (step.X != 0 && step.Y != 0)
+                {
+                    corners ??= new();
+                    corners.Add(previous + new Vector2I(step.X, 0)); corners.Add(previous + new Vector2I(0, step.Y));
+                }
+                previous = cell;
+            }
+            _corridorCorners[index] = corners?.ToArray(); from = to;
+        }
+    }
+
+    // =========================================================
     // Cached logical corner links stay strict even for tiny-radius ships with lateral offsets.
     public bool CornerBlocked(int index, NavigationGrid nav)
     {
+        if (_corridorCorners != null)
+        {
+            if (index < 0 || index >= _corridorCorners.Length || _corridorCorners[index] == null) return false;
+            foreach (Vector2I cell in _corridorCorners[index]) if (nav.Grid.BlocksEnemies(cell)) return true;
+            return false;
+        }
         if (index <= 0 || index >= _logicalCells.Length) return false;
         Vector2I from = _logicalCells[index - 1], step = _logicalCells[index] - from;
         return Mathf.Abs(step.X) == 1 && Mathf.Abs(step.Y) == 1
