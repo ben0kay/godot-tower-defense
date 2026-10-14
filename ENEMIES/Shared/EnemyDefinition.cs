@@ -12,6 +12,8 @@ public partial class EnemyDefinition : Resource
     [Export(PropertyHint.Range, "1,1000,1")] public float MoveSpeed { get; set; } = 100f;
     [Export] public int CitadelDamage { get; set; } = 1;
     [Export] public int Armor { get; set; }
+    [ExportGroup("Rewards")]
+    [Export(PropertyHint.Range, "0,1000000,1")] public int KillRewardCredits { get; set; } = 0;
     [ExportGroup("Movement")]
     [Export(PropertyHint.Range, "1,24,1")] public float RadiusPixels { get; set; } = 12f;
     [Export(PropertyHint.Range, "0,30,0.1")] public float TurnSpeed { get; set; } = 8f;

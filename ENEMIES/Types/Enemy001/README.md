@@ -9,3 +9,7 @@ F5 -> tap F2 repeatedly. Each press spawns one ship at a permitted reachable Por
 ## Health display
 
 `Enemy001.tscn` now includes a reusable `FEEDBACK/DefenseBars/DefenseBar.tscn` child. It appears **only after Enemy001 takes damage**, remains above the rotating ship, and hides at full/zero health. `Enemy.TakeDamage()` drives it directly; the bar does not poll health every frame. Edit `FEEDBACK/DefenseBars/DefaultDefenseBarConfig.tres` to adjust its small height, colors, vertical offset, minimum width and capped logarithmic growth for high-HP enemies. No enemy-specific drawing code is needed.
+
+## Kill rewards
+
+`Enemy001.tres` -> **Rewards / Kill Reward Credits** is **3** by default. Every killed Enemy001, including F2 and wave spawns, grants 3 Credits to the current level's wallet. Other enemy types can set their own reward in their `EnemyDefinition.tres`; the shared default is 0. Ships reaching the Citadel or unloaded without a kill give no reward. An enemy can pay out only once. The wallet's `BalanceChanged` event updates the top-left HUD. Credit caps still apply. Wave-completion bonuses are a separate, future feature.

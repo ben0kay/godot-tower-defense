@@ -10,6 +10,7 @@ public partial class EconomyManager : Node
     [Export] public ResourceDefinition CreditsResource { get; set; }
     private readonly Dictionary<string, int> _balances = new();
     private GameplayHUD _hud;
+    private EnemyRegistry _enemyRegistry;
     private bool _transactionActive;
 
     // =========================================================
@@ -24,7 +25,9 @@ public partial class EconomyManager : Node
     {
         SetProcess(false); SetPhysicsProcess(false);
         _hud = GetNode<GameplayHUD>("../UI/GameplayHUD");
+        _enemyRegistry = GetNode<EnemyRegistry>("../World/EnemySystems/Registry");
         BalanceChanged += UpdateCreditsDisplay;
+        _enemyRegistry.EnemyKilled += GrantKillReward;
         Initialize(GetNode<WorldGrid>("../World/Grid").Level.Settings);
     }
 
@@ -45,13 +48,25 @@ public partial class EconomyManager : Node
 
     // =========================================================
     // Avoid retaining HUD subscriptions after this session exits.
-    public override void _ExitTree() => BalanceChanged -= UpdateCreditsDisplay;
+    public override void _ExitTree()
+    {
+        BalanceChanged -= UpdateCreditsDisplay;
+        if (GodotObject.IsInstanceValid(_enemyRegistry)) _enemyRegistry.EnemyKilled -= GrantKillReward;
+    }
 
     // =========================================================
     // Credits are pushed on changes only; the HUD never owns the balance.
     private void UpdateCreditsDisplay(string id, int amount)
     {
         if (id == CreditsResource.ResourceId && GodotObject.IsInstanceValid(_hud)) _hud.SetCredits(amount);
+    }
+    // =========================================================
+    // A killed ship grants its type's configured credits; Citadel arrivals do not emit kills.
+    // Reuse Grant for wallet caps and event-driven HUD updates.
+    private void GrantKillReward(Enemy enemy)
+    {
+        int reward = enemy?.Definition?.KillRewardCredits ?? 0;
+        if (reward > 0) Grant(CreditsResource, reward);
     }
     #endregion
 

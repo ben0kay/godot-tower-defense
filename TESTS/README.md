@@ -37,3 +37,7 @@ Synthetic swarm/repath fixtures explicitly select the one portal they reposition
 
 ## Wave regressions
 WaveChecks runs against Main's WaveManager/SpawnManager. It asserts immediate first spawns, exact 10/5/20 counts and 2s/5s pauses, overlapping batch ships, ignored final post-delay, owned-only completion and idempotent arrival/death, manual next/final state, quota rounding/shuffle seeds, setup validation, random approximately balanced portals, unchanged F2 round-robin, blocked and named exits, map-edge-only spawning, cap retry backoff, reset/unsubscription and bounded zero-interval/lag spawning. Pure composition checks use synthetic IDs without loading or introducing new enemy assets. Live waves remain Enemy001-only.
+
+## Kill rewards
+
+`EnemyKillRewardChecks` runs in the production-scene integration fixture after WaveChecks. It verifies 3 Credits from Enemy001 kills, event-driven HUD updates, one payout per kill, zero payouts on arrival, configurable zero-reward enemies, and identical payout for WaveManager-owned ships. Wallet and authored waves are restored afterward.

@@ -1,5 +1,6 @@
 // Per-world living enemy list, shared by targeting, spawning and placement checks.
 using Godot;
+using System;
 using System.Collections.Generic;
 
 public partial class EnemyRegistry : Node
@@ -8,6 +9,7 @@ public partial class EnemyRegistry : Node
     public IReadOnlyList<Enemy> Living => _living;
     public int KilledCount { get; private set; }
     public int ArrivedCount { get; private set; }
+    public event Action<Enemy> EnemyKilled;
 
     // =========================================================
     // Register once; enemies unregister immediately on death or arrival.
@@ -18,9 +20,12 @@ public partial class EnemyRegistry : Node
     public void Unregister(Enemy enemy) => _living.Remove(enemy);
 
     // =========================================================
-    // Keep simple debug totals without adding an economy or objective-health system.
-    public void RecordOutcome(bool arrived)
+    // Emit kill-only notifications after an enemy leaves the living registry.
+    // Enemy.Finish is guarded against repeated damage, so each ship pays at most once.
+    public void RecordOutcome(bool arrived, Enemy enemy)
     {
-        if (arrived) ArrivedCount++; else KilledCount++;
+        if (arrived) { ArrivedCount++; return; }
+        KilledCount++;
+        EnemyKilled?.Invoke(enemy);
     }
 }

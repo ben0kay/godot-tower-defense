@@ -49,7 +49,7 @@ public partial class Enemy : Node2D
     {
         if (!IsAlive) return;
         IsAlive = false; Movement.SetPhysicsProcess(false);
-        _registry.Unregister(this); _registry.RecordOutcome(arrived);
+        _registry.Unregister(this); _registry.RecordOutcome(arrived, this);
         Removed?.Invoke(this); QueueFree();
     }
 
