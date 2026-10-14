@@ -12,7 +12,7 @@ Keep the middle block *actually centered on the viewport* independently of the a
 
 Main/Economy seeds and pushes live Credits through SetCredits; SetWave updates text; SetCitadelHealth updates current/max, clamped fill and configured threshold colors. SetCoreHealth forwards for compatibility. Unknown Citadel/Wave state remains -- with no health fill. Layout and palette settings live in UIMasterConfig / DefaultUIConfig.tres.
 
-**Later integration:** `WORLD/LEVELS/LevelConfig.cs` will eventually specify starting credits per level; a central economy/session service owns the changing balance; Citadel durability is owned by `WORLD/OBJECTIVES/Citadel/`; future `ENEMIES/Waves/` owns wave state. Bind event-driven updates to the HUD. Don't simulate those mechanics here.
+**Later integration:** `LEVELS/LevelConfig.cs` will eventually specify starting credits per level; a central economy/session service owns the changing balance; Citadel durability is owned by `WORLD/OBJECTIVES/Citadel/`; future `LEVELS/Waves/` owns wave state. Bind event-driven updates to the HUD. Don't simulate those mechanics here.
 
 See **`UI/GameplayHUD/README.md`** for the complete layout, semantics, proposed colors/thresholds, future cost/resource considerations and Codex acceptance tests.
 

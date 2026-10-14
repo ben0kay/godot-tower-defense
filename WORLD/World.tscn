@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://WORLD/GRID/WorldGrid.cs" id="1_script"]
 [ext_resource type="Resource" path="res://WORLD/DefaultWorldConfig.tres" id="2_config"]
-[ext_resource type="PackedScene" path="res://WORLD/LEVELS/Level001/Level001.tscn" id="3_level"]
+[ext_resource type="PackedScene" path="res://LEVELS/Level001/Level001.tscn" id="3_level"]
 
 [ext_resource type="Script" path="res://WORLD/NAVIGATION/NavigationGrid.cs" id="4_nav"]
 [ext_resource type="Script" path="res://WORLD/NAVIGATION/PathRequestManager.cs" id="5_paths"]

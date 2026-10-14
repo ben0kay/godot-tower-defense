@@ -7,7 +7,7 @@ This top-level folder owns currency/resource identities, current balances and at
 - Resources/ResourceDefinition.cs and Credits.tres define the stable Credits resource type.
 - Transactions/ResourceCost.cs is the shared typed Inspector-editable cost entry for construction and future upgrades.
 - Wallet/EconomyManager.cs is one Main/Economy session node, seeded from the active level's StartingCredits.
-- WORLD/LEVELS/LevelConfig.cs exposes **Starting Resources / Starting Credits**. Level001Config.tres starts at **1,000**; the empty template/default starts at **0**. Duplicate the level settings resource for each map.
+- LEVELS/LevelConfig.cs exposes **Starting Resources / Starting Credits**. Level001Config.tres starts at **1,000**; the empty template/default starts at **0**. Duplicate the level settings resource for each map.
 - BattleTowerConfig.ConstructionCosts replaces BuildCost. DefaultBattleTowerConfig.tres requires **200 Credits**, as requested; optional extra resource entries use the same transaction.
 - TowerPlacementController retains terrain/occupancy and navigation connectivity checks. It creates the tower through TryPurchase; a failed build rolls back scene/occupancy and charges nothing. Repeated occupied-cell clicks cannot charge twice.
 - BalanceChanged pushes the real credit balance to GameplayHUD.SetCredits on initialization and changes. No polling or fake HUD balance.
@@ -22,7 +22,7 @@ EconomyMasterConfig owns shared caps and the explicit negative-balance policy (o
 
 ## Inspector workflow
 
-Open WORLD/LEVELS/Level001/Level001Config.tres and change Starting Resources / Starting Credits. Set Battle Tower prices in TOWERS/Offensive/BattleTower/DefaultBattleTowerConfig.tres / Construction / Construction Costs, expanding the ResourceCost entry and Amount. The active level and placement controller reference these saved resources.
+Open LEVELS/Level001/Level001Config.tres and change Starting Resources / Starting Credits. Set Battle Tower prices in TOWERS/Offensive/BattleTower/DefaultBattleTowerConfig.tres / Construction / Construction Costs, expanding the ResourceCost entry and Amount. The active level and placement controller reference these saved resources.
 
 F5 → Ctrl → Battle → place a valid tower: 200 credits are deducted, the top-left label updates, and combat stays active. Insufficient resources turn the preview red and display a rejection in the Inspector.
 

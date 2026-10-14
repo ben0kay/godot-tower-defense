@@ -4,4 +4,4 @@
 
 `WORLD/GRID/WorldGrid.cs` caches Ground, then Walls, on level load. Walls override Ground; Decorations are ignored. Empty cells default to unbuildable/passable. Runtime tower occupancy and object reservations are separate from painted terrain. `RebuildTerrain()` explicitly refreshes static rules after a future runtime terrain edit; ordinary editor edits take effect on the next run.
 
-See `Rules/README.md` for semantics and `WORLD/LEVELS/Level001/README.md` for the palette. No navigation engine or per-cell physics nodes are created by this terrain pass.
+See `Rules/README.md` for semantics and `LEVELS/Level001/README.md` for the palette. No navigation engine or per-cell physics nodes are created by this terrain pass.

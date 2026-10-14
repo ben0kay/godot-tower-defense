@@ -1,4 +1,4 @@
-# LEVELS — Maps Painted in Godot
+# LEVELS — Authored Maps, Settings and Waves
 
 - `Level001/Level001.tscn`: the live terrain/placement test map, mounted as `World/Level`.
 - `LevelTemplate.tscn`: empty paint-ready scene with a Citadel and shared TileSet; defaults to MapEdges and requires no Portal.
@@ -12,10 +12,19 @@ Open a level in the 2D editor and paint Ground/Walls/Decorations. Save and press
 
 Physical Portals belong under `Portals`; the Citadel belongs under `Objectives`. Position object roots at cell centers. A Citadel root identifies the upper-left cell center of its footprint, rather than the overall footprint center. Place `SpawnExit` and `ApproachPoints` in unblocked cells. Paths in LevelConfig are relative to the level root, not Main.
 
-Spawning and manual waves live in ENEMIES; level resources only declare permitted sources and WaveSetId. Background sprites are independent of the grid. Empty space is unbuildable and passable. See `Level001/README.md` for controls and the atlas palette.
+Spawning lives in ENEMIES; the shared wave scheduler/catalog live in LEVELS/Waves. Level resources declare permitted sources and WaveSetId. Background sprites are independent of the grid. Empty space is unbuildable and passable. See `Level001/README.md` for controls and the atlas palette.
 
 ## Starting resources
 Select the active level settings .tres and edit Starting Resources / Starting Credits. Level001Config.tres starts at 1,000; DefaultLevelConfig.tres starts at 0. Main/Economy loads this value into a fresh session wallet and pushes it to the HUD. Changing settings during play does not refill the wallet; restart the level to apply saved starting values. Credits are currently the only starting resource; optional tower material costs already use shared ResourceCost entries.
 
 ## Wave sets
-LevelConfig / Waves / WaveSetId references a C# wave set in ENEMIES/Waves/WaveCatalog.cs. Level001 uses level001; the empty default disables waves. Wave timing/counts are edited in ENEMIES/Waves/Definitions/Level001Waves.cs, not large Inspector arrays. Unknown set IDs show a setup error; there is no implicit fallback. ActivePortals remains the authoritative allowed-source list.
+LevelConfig / Waves / WaveSetId references a C# wave set in LEVELS/Waves/WaveCatalog.cs. Level001 uses level001; the empty default disables waves. Wave timing/counts are edited in LEVELS/Level001/Level001Waves.cs, not large Inspector arrays. Unknown set IDs show a setup error; there is no implicit fallback. ActivePortals remains the authoritative allowed-source list.
+
+
+## Folder ownership
+
+Each level folder is its authoring home: Level001/ contains Level001.tscn, Level001Config.tres and Level001Waves.cs, including matching script .uid files. Future levels follow the same pattern and register their wave set in Waves/WaveCatalog.cs.
+
+Waves/ holds the shared scheduler, immutable data/builder helpers and catalog; Waves/Authoring.md describes batch editing. Debug/ holds shared level debug helpers. WorldLevel.cs, LevelConfig.cs, default settings and LevelTemplate.tscn remain shared at this root.
+
+WORLD/ still owns reusable terrain, grid/navigation, portals, objectives and scenery. The runtime map is still mounted at World/Level by WORLD/World.tscn; moving files does not change scene-tree paths, level-relative portal references or gameplay behavior. Existing Godot .uid values are preserved.

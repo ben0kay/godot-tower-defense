@@ -1,4 +1,4 @@
-# WORLD — Terrain, Hand-Built Levels, Portals, The Citadel and Space Scenery
+# WORLD — Shared Terrain, Navigation, Portals, Citadel and Space Scenery
 
 This folder owns the playable **top-down 2D world** of the space tower-defense game. The long-term direction is **hand-authored maps** painted directly in the Godot 4 editor, with large areas of open space, detailed metal base corridors, disconnected wall/platform islands, dirt/rock formations and independent nebula/star backgrounds.
 
@@ -12,7 +12,7 @@ This folder owns the playable **top-down 2D world** of the space tower-defense g
 | `WorldMasterConfig.cs` + `DefaultWorldConfig.tres` | Current Inspector-editable world/grid size (default 100 × 80 cells, 64 px each) and debug colors. |
 | `GRID/` | Cached terrain rules/object reservations/tower occupancy, grid coordinates and transparent debug overlay. |
 | `TERRAIN/` | Shared 64px TileSet, replaceable prototype atlas and tile gameplay rules. |
-| `LEVELS/` | **Maps hand-painted by the designer**, including a reusable scene template and the starter `Level001` scene. |
+| Top-level `LEVELS/` | **Authored maps and per-level settings/waves**, stored outside WORLD; World.tscn mounts the selected map at World/Level. |
 | `BACKGROUNDS/` | Non-colliding space art: nebulae, stars and distant planets independent of TileMapLayers. |
 | `PORTALS/` | **Physical, reusable Portal scene**, manually placed on maps where enemies emerge through portals. No spawning logic here. |
 | `OBJECTIVES/Citadel/` | **Physical Citadel scene**, the defended destination with reserved solid 3×3 footprint and approach markers; health remains future work. |
@@ -45,9 +45,9 @@ Enemy spawning can come from **Portals**, **map edges**, or **both**, chosen **p
 - **Map-edge spawning:** no physical Portal or tile needed; the SpawnManager computes reachable, valid entry positions on whichever sides the level enables (Top / Bottom / Left / Right).
 - `WORLD/OBJECTIVES/Citadel/Citadel.tscn`: the destination object. Enemies should navigate toward **reachable approach locations**, not blindly into the Citadel's future solid footprint.
 - `ENEMIES/Spawning/`: **SpawnManager logic** that chooses where to spawn from level-approved sources.
-- `ENEMIES/Waves/`: **WaveManager logic** that controls what/when/how many ships to spawn.
+- `LEVELS/Waves/`: **WaveManager logic** that controls what/when/how many ships to spawn.
 - `ENEMIES/Movement/`: waypoint following using shared WORLD/NAVIGATION services.
-- `WORLD/LEVELS/`: per-level authored Portal/Citadel positions and future **level spawn parameters** (`Portals`, `MapEdges`, `Both`, allowed edge directions and optionally active Portal references).
+- `LEVELS/`: per-level authored Portal/Citadel positions and future **level spawn parameters** (`Portals`, `MapEdges`, `Both`, allowed edge directions and optionally active Portal references).
 
 `Level001.tscn` now instances reusable EnemyPortal/Citadel objects under Portals/Objectives; legacy GameplayMarkers have been removed. Physical objects use `WorldObjectFootprint.cs` to reserve cells. Edge-only maps need no Portal instance. The empty LevelTemplate defaults to edge sources; Level001 defaults to its single Portal. All NodePaths in LevelConfig are relative to the level root.
 

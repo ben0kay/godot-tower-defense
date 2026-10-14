@@ -2,7 +2,7 @@
 
 This top-level folder owns **enemy gameplay mechanics** in the Godot 4 C#/.NET space tower-defense project. The first enemy will be a deliberately simple **basic test ship** named **`Enemy001` internally** — **not** "ScoutShip". This is the baseline implementation that subsequent enemies can reuse.
 
-**Implemented baseline (October 2026):** Enemy001, shared enemy state/registry, budgeted AStarGrid2D, portal/edge spawning, debug F2 and Battle Tower targeting/projectiles are now present. Level001's Debug parent owns F2 and the debug HUD. Existing terrain, camera, HUD and placement remain intact. See Types/Enemy001/README.md and WORLD/LEVELS/Level001/README.md for playtesting.
+**Implemented baseline (October 2026):** Enemy001, shared enemy state/registry, budgeted AStarGrid2D, portal/edge spawning, debug F2 and Battle Tower targeting/projectiles are now present. Level001's Debug parent owns F2 and the debug HUD. Existing terrain, camera, HUD and placement remain intact. See Types/Enemy001/README.md and LEVELS/Level001/README.md for playtesting.
 
 The planning sections below describe the architecture and acceptance goals. Current targeting defaults to **First** (shortest remaining route), with **Closest** selectable in BattleTowerConfig. Manual finite waves and the credit wallet are active; armor mechanics and Citadel health remain future work.
 
@@ -38,9 +38,6 @@ ENEMIES/
 │   ├── README.md
 │   └── MapEdges/
 │       └── README.md
-│
-└── Waves/
-    └── README.md                       # Later WaveManager, not required for first test
 ```
 
 The folder names and filenames **`Enemy001/`, `Enemy001.tscn`, `Enemy001.tres` and `enemy001.svg` are intentional**. Additional variants will follow `Enemy002`, `Enemy003`, etc.; they should usually share `Enemy.cs` and `EnemyMovement.cs` rather than receiving a duplicate C# script for each type.
@@ -76,12 +73,12 @@ These are placeholders. Favor **Resource-driven data** over hardcoded stats insi
 | `Shared/EnemyRegistry.cs` | Registers/unregisters living enemies for nearby tower target selection | Per-frame global rescan of the scene tree |
 | `Movement/EnemyMovement.cs` | Follows a valid waypoint route, turns smoothly, stops safely if route unavailable/stale | Its own independent tile occupancy map |
 | `Spawning/SpawnManager.cs` | Uses level settings to select valid Portal/map-edge spawn positions and instantiate enemies | Wave composition/timing; Portal scene internals |
-| `Waves/` | Later waves decide which enemy type/how many/when and request a spawn | Choosing physical map entry positions |
+| `LEVELS/Waves/` | Shared wave scheduling requests spawns from per-level authored definitions | Choosing physical map entry positions |
 | `WORLD/PORTALS/` | Reusable physical Portal art and `SpawnExit` Marker2D | Enemy type selection or spawn schedule |
 | `WORLD/OBJECTIVES/Citadel/` | Placed goal, solid footprint and reachable `ApproachPoints` | Enemy navigation algorithms |
 | `TOWERS/` | Battle Tower targeting/projectile/damage logic | Enemy identity and path requests |
 
-**Level spawn configuration already exists:** `WORLD/LEVELS/LevelConfig.cs` exports `SpawnMode` = `Portals` / `MapEdges` / `Both`, `AllowedEdges`, root-relative `ActivePortals` NodePaths, and `CitadelPath`. Respect these settings rather than hardcoding Level001 or a single source type. Portal enemies emerge at a valid `SpawnExit`; edge-only levels do not require a Portal.
+**Level spawn configuration already exists:** `LEVELS/LevelConfig.cs` exports `SpawnMode` = `Portals` / `MapEdges` / `Both`, `AllowedEdges`, root-relative `ActivePortals` NodePaths, and `CitadelPath`. Respect these settings rather than hardcoding Level001 or a single source type. Portal enemies emerge at a valid `SpawnExit`; edge-only levels do not require a Portal.
 
 ## Navigation is a prerequisite: follow the existing performance plan
 
@@ -167,4 +164,4 @@ Each multi-goal request uses one position snapshot, so its candidate costs are c
 Safe offset refinement cannot turn the first new segment backward merely due to lateral bias. Existing speed/turning/offset settings, weighted profiles, congestion, auditing and count/time budgets are preserved. First targeting excludes routes known to need replacement until a valid handoff completes. No new pathfinding algorithm or per-frame A* is added.
 
 ## Manual waves (Phase 1)
-ENEMIES/Waves now contains immutable authored data, catalog, Level001Waves.cs and one Main/Waves scheduler. WaveSetId in LevelConfig chooses a finite set; the HUD Start/Next button controls progression. Wave spawns use random eligible sources, preserve F2 round-robin debugging, retain blocked pending ships and complete only after scheduled and wave-owned ships resolve. DefaultEnemyConfig exposes attempt cap/retry/seed. No rewards, new enemy types or modifiers yet. See Waves/README.md.
+LEVELS/Waves contains the shared immutable data, catalog and one Main/Waves scheduler; LEVELS/Level001/Level001Waves.cs contains this map's authored encounters. WaveSetId in LevelConfig chooses a finite set; the HUD Start/Next button controls progression. Wave spawns use random eligible sources, preserve F2 round-robin debugging, retain blocked pending ships and complete only after scheduled and wave-owned ships resolve. DefaultEnemyConfig exposes attempt cap/retry/seed. No rewards, new enemy types or modifiers yet. See LEVELS/Waves/README.md.

@@ -14,7 +14,7 @@
 [ext_resource type="Resource" path="res://ECONOMY/DefaultEconomyConfig.tres" id="11_economyconfig"]
 [ext_resource type="Resource" path="res://ECONOMY/Resources/Credits.tres" id="12_credits"]
 
-[ext_resource type="Script" path="res://ENEMIES/Waves/WaveManager.cs" id="13_waves"]
+[ext_resource type="Script" path="res://LEVELS/Waves/WaveManager.cs" id="13_waves"]
 
 [node name="Battlefield" type="Node2D"]
 

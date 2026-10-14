@@ -3,8 +3,8 @@
 [ext_resource type="Texture2D" path="res://WORLD/BACKGROUNDS/Stars/level001_space.svg" id="1_p5ed7"]
 [ext_resource type="TileSet" path="res://WORLD/TERRAIN/TileSets/WorldTerrain.tres" id="2_8pvwx"]
 
-[ext_resource type="Script" path="res://WORLD/LEVELS/WorldLevel.cs" id="3_root"]
-[ext_resource type="Resource" path="res://WORLD/LEVELS/DefaultLevelConfig.tres" id="4_config"]
+[ext_resource type="Script" path="res://LEVELS/WorldLevel.cs" id="3_root"]
+[ext_resource type="Resource" path="res://LEVELS/DefaultLevelConfig.tres" id="4_config"]
 [ext_resource type="PackedScene" path="res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn" id="5_portal"]
 [ext_resource type="PackedScene" path="res://WORLD/OBJECTIVES/Citadel/Citadel.tscn" id="6_citadel"]
 

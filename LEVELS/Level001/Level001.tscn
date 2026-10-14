@@ -2,11 +2,11 @@
 
 [ext_resource type="Texture2D" uid="uid://dtgxtqxxwsmoc" path="res://WORLD/BACKGROUNDS/Stars/level001_space.svg" id="1_p5ed7"]
 [ext_resource type="TileSet" uid="uid://dqaq6mgtdq8h2" path="res://WORLD/TERRAIN/TileSets/WorldTerrain.tres" id="2_8pvwx"]
-[ext_resource type="Script" uid="uid://cxu0tg3s3btvh" path="res://WORLD/LEVELS/WorldLevel.cs" id="3_root"]
-[ext_resource type="Resource" uid="uid://vxivrh6h6iwx" path="res://WORLD/LEVELS/Level001/Level001Config.tres" id="4_config"]
+[ext_resource type="Script" uid="uid://cxu0tg3s3btvh" path="res://LEVELS/WorldLevel.cs" id="3_root"]
+[ext_resource type="Resource" uid="uid://vxivrh6h6iwx" path="res://LEVELS/Level001/Level001Config.tres" id="4_config"]
 [ext_resource type="PackedScene" path="res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn" id="5_portal"]
 [ext_resource type="PackedScene" path="res://WORLD/OBJECTIVES/Citadel/Citadel.tscn" id="6_citadel"]
-[ext_resource type="Script" uid="uid://x78ylg3dne5d" path="res://WORLD/LEVELS/Debug/LevelDebugController.cs" id="7_debug"]
+[ext_resource type="Script" uid="uid://x78ylg3dne5d" path="res://LEVELS/Debug/LevelDebugController.cs" id="7_debug"]
 [ext_resource type="PackedScene" path="res://ENEMIES/Types/Enemy001/Enemy001.tscn" id="8_enemy"]
 [ext_resource type="Script" uid="uid://cvogctvds5c0a" path="res://WORLD/GRID/GridDebugOverlay.cs" id="9_info"]
 

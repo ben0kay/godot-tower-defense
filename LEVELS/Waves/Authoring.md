@@ -1,6 +1,6 @@
 # C# wave authoring
 
-Level001Waves.cs contains three finite Enemy001-only test waves. Edit counts, intervals and post-batch delays directly here. WaveCatalog maps LevelConfig.WaveSetId = "level001" to this file; empty disables waves, and unknown IDs report setup errors instead of using another level's encounters.
+LEVELS/Level001/Level001Waves.cs contains three finite Enemy001-only test waves. Edit counts, intervals and post-batch delays directly here. WaveCatalog maps LevelConfig.WaveSetId = "level001" to this file; empty disables waves, and unknown IDs report setup errors instead of using another level's encounters.
 
 Use static WaveBuilder helpers:
 

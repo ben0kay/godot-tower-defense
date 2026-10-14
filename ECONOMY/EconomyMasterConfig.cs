@@ -1,5 +1,5 @@
 // Shared economy limits used by the session wallet.
-// Per-level StartingCredits belongs in WORLD/LEVELS/LevelConfig.cs, not here.
+// Per-level StartingCredits belongs in LEVELS/LevelConfig.cs, not here.
 using Godot;
 
 [GlobalClass]

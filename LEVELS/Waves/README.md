@@ -6,7 +6,7 @@
 
 F5 loads **WAVE 00 / 03** without spawning. Press **START WAVE** below the top-right status. Wave 1 uses the requested 10 ships at 0.1s, 2s post-delay, 5 ships at 0.3s, 5s post-delay, then 20 ships at 0.2s; all are Enemy001 for now. The button shows remaining scheduled + alive ships while disabled. After every owned ship is killed or arrives, **NEXT WAVE** becomes available. F2 debug ships are unowned and cannot hold waves open. The final wave displays COMPLETE without auto-restarting.
 
-Edit Definitions/Level001Waves.cs for batches and WaveCatalog.cs for future wave sets/scenes. LevelConfig.Waves/WaveSetId chooses the set; empty disables waves and unknown IDs show SETUP ERROR. DefaultEnemyConfig.tres/Wave Scheduling exposes a two-attempt/frame limit, 0.5s retry and seed 12345. SpawnBlocked shows the reason in the button/status tooltip and retains planned ships.
+Edit LEVELS/Level001/Level001Waves.cs for batches and WaveCatalog.cs for future wave sets/scenes. LevelConfig.Waves/WaveSetId chooses the set; empty disables waves and unknown IDs show SETUP ERROR. DefaultEnemyConfig.tres/Wave Scheduling exposes a two-attempt/frame limit, 0.5s retry and seed 12345. SpawnBlocked shows the reason in the button/status tooltip and retains planned ships.
 
 SpawnManager.SpawnWave uses uniform random eligible portals for each ship, preserves level source permissions, prefers portals in Both mode and falls back to permitted edges only when no portal is eligible. An optional entry Portal field already supports a named registered entrance without fallback; advanced portal policies/modifiers remain future work. It uses existing revision-cached connectivity and per-enemy spawn clearance, with no extra synchronous A* requests.
 
@@ -51,7 +51,7 @@ Wave scheduling is independent of movement, portal visual nodes, navigation and 
 **Illustrative intended syntax — `Wave`, `Batch` and `Enemy` are helper functions to be built by Codex; not currently compiled source.** Exact helper signatures are flexible as long as the result is similarly concise and typed.
 
 ```csharp
-// ENEMIES/Waves/Definitions/Level001Waves.cs
+// LEVELS/Level001/Level001Waves.cs
 public static class Level001Waves
 {
     public static WaveDefinition[] Create() =>
@@ -93,7 +93,7 @@ Prefer **stable lowercase enemy IDs** matching `EnemyDefinition.EnemyId` and a s
 
 **Important updated requirement:** ordinary wave enemies should **pick a random valid portal for each spawn**, *NOT* take the F2 debug spawner's current round-robin rotation.
 
-- Existing `WORLD/LEVELS/LevelConfig.cs` owns `SpawnMode` (`Portals`, `MapEdges`, `Both`) and root-relative `ActivePortals` NodePaths. **These remain authoritative.** Adding an actual portal scene without registering its path in ActivePortals does not make it a wave source.
+- Existing `LEVELS/LevelConfig.cs` owns `SpawnMode` (`Portals`, `MapEdges`, `Both`) and root-relative `ActivePortals` NodePaths. **These remain authoritative.** Adding an actual portal scene without registering its path in ActivePortals does not make it a wave source.
 - **Default for portal-based waves: `RandomEligiblePortal`.** Pick uniformly from the enabled, reachable portal instances whose `SpawnExit` has sufficient radius clearance for the chosen enemy. Two equally eligible portals mean *approximately* 50/50 across many spawns, **not exact alternation or fixed quotas**. Pick for **each actual spawn**, not once per batch or wave. Use a repeatable RNG seed for tests if desired.
 - Never choose blocked, invalid, missing, unregistered or unreachable portal exits. Do not place an enemy through terrain. Reuse the current `SpawnManager` navigation/clearance checks; validate sources against **that enemy's radius**.
 - **MapEdges-only levels** must continue to work without portal nodes; choose among eligible configured edge entries. For `Both` levels, define/document a safe default that prefers random eligible portals when available but respects configured edge permissions; an explicit `RandomAllowedSource` policy can later include edges as well. Do not hardcode `Level001` or switch edge-only maps to portal spawning.
@@ -107,40 +107,16 @@ Prefer **stable lowercase enemy IDs** matching `EnemyDefinition.EnemyId` and a s
 
 ## 4. Proposed folder structure
 
-All wave logic belongs under existing **`ENEMIES/Waves/`**. These files are **proposed**, not present yet:
+Wave scheduling helpers live in **LEVELS/Waves/**; authored encounters live beside their map:
 
-```text
-ENEMIES/
-├── EnemyMasterConfig.cs                  # Exists: global enemy/path limits
-├── Shared/
-│   ├── Enemy.cs                          # Exists: state and Removed event
-│   ├── EnemyDefinition.cs                # Exists: per-type stats and EnemyId
-│   ├── EnemyRegistry.cs                  # Exists: world-level living enemies
-│   └── Modifiers/                        # Future shared spawn-instance effects
-│       ├── EnemySpawnFlags.cs            # Future, not implemented
-│       ├── EnemySpawnModifiers.cs        # Future parameterized modifiers
-│       └── README.md
-├── Spawning/
-│   └── SpawnManager.cs                   # Exists; extend with optional spawn request/policy
-├── Types/
-│   ├── Enemy001/                         # Exists
-│   ├── Enemy002/                         # Future
-│   └── Enemy003/                         # Future
-└── Waves/
-    ├── README.md                         # This specification
-    ├── WaveManager.cs                    # Runtime state machine/scheduler
-    ├── WaveDefinition.cs                 # One wave: number + batches + optional metadata
-    ├── WaveBatch.cs                      # Count, interval, post-delay, entries
-    ├── WaveEnemyEntry.cs                 # EnemyId, weight, optional modifiers/portal
-    ├── WaveCatalog.cs                    # Level's wave set / enemy-scene lookup integration
-    ├── WaveBuilder.cs                    # Optional tiny C# helper DSL: Wave/Batch/Enemy
-    └── Definitions/
-        ├── Level001Waves.cs              # One readable authored file for Level001
-        ├── Level002Waves.cs              # Future
-        └── README.md                     # C# authoring conventions
-```
+| Location | Contents |
+| --- | --- |
+| LEVELS/ | LevelConfig.cs, WorldLevel.cs, defaults, template and README |
+| LEVELS/Level001/ | Level001.tscn, Level001Config.tres, Level001Waves.cs and README |
+| LEVELS/Waves/ | WaveManager.cs, WaveDefinition.cs (including batch/entry/builder types), WaveCatalog.cs, Authoring.md and this README |
+| LEVELS/Debug/ | Shared level debug controller and README |
 
-Keep names uncomplicated. `WaveCatalog` and optional `WaveBuilder` can be combined if a smaller implementation is clearer. Avoid an excessive inheritance hierarchy or Inspector Resources for every batch. Add short README files as each actual subfolder is created.
+Future levels keep their own Level002Waves.cs beside Level002.tscn and settings, then register their WaveSetId in WaveCatalog. All maps reuse the shared scheduler/data helpers; enemy scenes, spawning and movement remain under ENEMIES.
 
 ### Ownership boundaries
 
@@ -151,11 +127,11 @@ Keep names uncomplicated. `WaveCatalog` and optional `WaveBuilder` can be combin
 | `WaveCatalog` | Maps a level's stable wave-set ID to its C# definition list and known enemy IDs/scenes | Editing level geometry or doing wave timing |
 | `SpawnManager` | Per-spawn validation, permitted portal/edge selection, scene instantiation | Batch schedules / auto-advance |
 | `EnemyRegistry`, `Enemy.Removed` | Live enemy membership and resolved-enemy notifications | Defining wave counts / reward schedules |
-| `WORLD/LEVELS/LevelConfig.cs` | Per-level `WaveSetId` reference plus existing portal/map-edge rules | Hundreds of individual wave Inspector fields |
+| `LEVELS/LevelConfig.cs` | Per-level `WaveSetId` reference plus existing portal/map-edge rules | Hundreds of individual wave Inspector fields |
 | `UI/GameplayHUD/` | Wave text, optional small remaining count, manual Start/Next button | Timing/enemy selection or current-wave truth |
 | `ECONOMY/` | Future wave-completion credits, if/when specified | Wave scheduling logic |
 
-A small new `[Export] string WaveSetId` (e.g. `"level001"`) in `LevelConfig` is reasonable. A `WaveCatalog` maps that ID to the respective `Definitions/Level001Waves.cs`. Missing sets or duplicate wave numbers must report a useful setup error, not silently run a default level's waves. Keep `StartingCredits`, `SpawnMode`, `ActivePortals` and `CitadelPath` untouched.
+A small new `[Export] string WaveSetId` (e.g. `"level001"`) in `LevelConfig` is reasonable. A `WaveCatalog` maps that ID to the respective `LEVELS/Level001/Level001Waves.cs`. Missing sets or duplicate wave numbers must report a useful setup error, not silently run a default level's waves. Keep `StartingCredits`, `SpawnMode`, `ActivePortals` and `CitadelPath` untouched.
 
 ## 5. State machine and manual progression
 
@@ -235,8 +211,8 @@ Suggested future separation: a compact `[Flags] EnemySpawnFlags` for toggles **a
 
 ### Phase 1 — Basic working waves (IMPLEMENT THIS FIRST)
 
-1. Read `NOTES/CodePreferences.md`, this README, `ENEMIES/Spawning/SpawnManager.cs`, `ENEMIES/Shared/Enemy.cs`, `ENEMIES/Shared/EnemyRegistry.cs`, `WORLD/LEVELS/LevelConfig.cs`, `WORLD/LEVELS/README.md` and `UI/GameplayHUD/README.md`.
-2. Create minimal wave data model and legible **`Definitions/Level001Waves.cs`**, with a typed enemy ID → PackedScene catalog. Use **only currently implemented Enemy001** in runnable Phase 1 definitions; keep the full Enemy002/003 mixture above documented as the target.
+1. Read `NOTES/CodePreferences.md`, this README, `ENEMIES/Spawning/SpawnManager.cs`, `ENEMIES/Shared/Enemy.cs`, `ENEMIES/Shared/EnemyRegistry.cs`, `LEVELS/LevelConfig.cs`, `LEVELS/README.md` and `UI/GameplayHUD/README.md`.
+2. Create minimal wave data model and legible **`LEVELS/Level001/Level001Waves.cs`**, with a typed enemy ID → PackedScene catalog. Use **only currently implemented Enemy001** in runnable Phase 1 definitions; keep the full Enemy002/003 mixture above documented as the target.
 3. Add a stable per-level wave-set reference (`WaveSetId` or equivalent) in `LevelConfig`. Connect only Level001 first, but support more levels without copying the WaveManager.
 4. Implement sequential `WaveManager` batch scheduler, exact proportions, delays, states and wave-owned completion tracking.
 5. Extend `SpawnManager` with **random valid portal selection for wave requests**, **without changing F2 round-robin debugging**. Keep map-edge support and level permissions. Build a small per-request optional specific-portal field or reserve its data shape for Phase 2; do not bury source choice in WaveManager.
