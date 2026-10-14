@@ -30,6 +30,15 @@ public partial class AudioTester : Node
     public override void _Ready()
     {
         if (!Enabled) return;
+        // A child receives _Ready before its AudioManager parent; defer until the autoload initializes.
+        Callable.From(InitializeDebugSounds).CallDeferred();
+    }
+
+    // =========================================================
+    // Register synthetic sound definitions after AudioManager has indexed its catalog.
+    private void InitializeDebugSounds()
+    {
+        if (!Enabled) return;
         _audio = AudioManager.Find(this);
         if (_audio == null) return;
         _source = new Node2D { Name = "AudioTestSource" };
