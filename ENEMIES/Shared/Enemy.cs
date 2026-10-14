@@ -11,12 +11,15 @@ public partial class Enemy : Node2D
     public float RemainingPathDistance => Movement?.RemainingPathDistance ?? float.PositiveInfinity;
     public event Action<Enemy> Removed;
     private EnemyRegistry _registry;
+    private DefenseBar _defenseBar;
 
     // =========================================================
     // Called by SpawnManager after adding the scene, using world-scoped services.
     public void Initialize(EnemyRegistry registry, PathRequestManager paths)
     {
         _registry = registry; Health = Mathf.Max(1f, Definition.MaxHealth); IsAlive = true;
+        _defenseBar = GetNodeOrNull<DefenseBar>("DefenseBar");
+        _defenseBar?.SetHealth(Health, Definition.MaxHealth);
         Movement = GetNode<EnemyMovement>("Movement");
         _registry.Register(this);
         Movement.Initialize(this, paths);
@@ -28,8 +31,13 @@ public partial class Enemy : Node2D
     {
         if (!IsAlive || amount <= 0f) return;
         Health = Mathf.Max(0f, Health - amount);
+        _defenseBar?.SetHealth(Health, Definition.MaxHealth);
         if (Health <= 0f) Finish(false);
     }
+
+    // =========================================================
+    // Only a damaged visible defense bar needs to counter-rotate as this ship turns.
+    public void UpdateDefenseBarTransform() => _defenseBar?.AlignWithOwner(Rotation);
 
     // =========================================================
     // Arrival is counted and removes the ship; Citadel health is intentionally future work.

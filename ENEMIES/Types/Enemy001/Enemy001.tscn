@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 [ext_resource type="Script" path="res://ENEMIES/Shared/Enemy.cs" id="1"]
 [ext_resource type="Resource" path="res://ENEMIES/Types/Enemy001/Enemy001.tres" id="2"]
 [ext_resource type="Texture2D" path="res://ENEMIES/Types/Enemy001/Artwork/enemy001.svg" id="3"]
 [ext_resource type="Script" path="res://ENEMIES/Movement/EnemyMovement.cs" id="4"]
+[ext_resource type="PackedScene" path="res://FEEDBACK/DefenseBars/DefenseBar.tscn" id="5_defense"]
 [node name="Enemy001" type="Node2D"]
 script = ExtResource("1")
 Definition = ExtResource("2")
@@ -10,3 +11,5 @@ Definition = ExtResource("2")
 texture = ExtResource("3")
 [node name="Movement" type="Node" parent="."]
 script = ExtResource("4")
+
+[node name="DefenseBar" parent="." instance=ExtResource("5_defense")]

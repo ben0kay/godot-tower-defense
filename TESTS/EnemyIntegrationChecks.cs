@@ -32,6 +32,24 @@ public partial class EnemyIntegrationChecks : Node
             Check(_spawns.Registry.Living.Count == 1, "F2 ignores OS key repeat");
             Enemy first = _spawns.Registry.Living[0]; first.Movement.SetPhysicsProcess(false);
             Check(first.Definition.EnemyId == "enemy001" && first.Health == 60, "Enemy001 resource identity and health");
+            DefenseBar bar = first.GetNode<DefenseBar>("DefenseBar");
+            Check(!bar.Visible, "Full-health Enemy001 starts with no health bar");
+            first.TakeDamage(12);
+            Check(bar.Visible && Mathf.IsEqualApprox(bar.HealthFraction, 0.8f),
+                "Damage reveals reusable health bar at correct fill");
+            first.Rotation = Mathf.Pi * 0.5f; first.UpdateDefenseBarTransform();
+            Check(Mathf.Abs(Mathf.AngleDifference(first.Rotation, -bar.Rotation)) < 0.001f,
+                "Health bar cancels ship rotation");
+            float normalWidth = bar.WidthPixels;
+            bar.SetHealth(5000f, 10000f);
+            Check(bar.WidthPixels > normalWidth
+                && bar.WidthPixels <= bar.Style.MaxWidthPixels,
+                "High-HP defense bar grows but respects configured width cap");
+            bar.SetHealth(10000f, 10000f);
+            Check(!bar.Visible, "Full health hides reusable defense bar");
+            bar.SetHealth(0f, 10000f);
+            Check(!bar.Visible, "Zero health hides reusable defense bar");
+            bar.SetHealth(first.Health, first.Definition.MaxHealth);
             int ticks = 0;
             while (first.IsAlive && ticks++ < 6000)
             {

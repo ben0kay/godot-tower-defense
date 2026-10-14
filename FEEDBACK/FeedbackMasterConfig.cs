@@ -1,10 +1,10 @@
-// Reserved shared effect toggles; these effects are not implemented in the first map test.
+// Master visibility toggles shared by feedback components; defense bars are now active.
 using Godot;
 
 [GlobalClass]
 public partial class FeedbackMasterConfig : Resource
 {
-    [ExportGroup("Future Feedback")]
+    [ExportGroup("Feedback Visibility")]
     [Export] public bool DefenseBarsEnabled { get; set; } = true;
     [Export] public bool DamageNumbersEnabled { get; set; } = true;
     [Export] public bool CameraEffectsEnabled { get; set; } = true;

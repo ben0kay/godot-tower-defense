@@ -5,3 +5,7 @@
 Select `Enemy001.tres` in Godot's FileSystem to edit DisplayName, EnemyId, MaxHealth (60), MoveSpeed (100 px/s), RadiusPixels (12) and TurnSpeed. CitadelDamage/Armor remain inactive. The current cell-center navigation supports small ships; keep radius below half a cell (32px with the default grid). Larger ship clearance/navigation will need a separate pass.
 
 F5 -> tap F2 repeatedly. Each press spawns one ship at a permitted reachable Portal exit. Ships choose the shortest calculated route to a reachable Citadel approach cell and are removed on arrival or death. No wave schedule runs.
+
+## Health display
+
+`Enemy001.tscn` now includes a reusable `FEEDBACK/DefenseBars/DefenseBar.tscn` child. It appears **only after Enemy001 takes damage**, remains above the rotating ship, and hides at full/zero health. `Enemy.TakeDamage()` drives it directly; the bar does not poll health every frame. Edit `FEEDBACK/DefenseBars/DefaultDefenseBarConfig.tres` to adjust its small height, colors, vertical offset, minimum width and capped logarithmic growth for high-HP enemies. No enemy-specific drawing code is needed.
