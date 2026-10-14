@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="BattleTowerConfig" load_steps=5 format=3 uid="uid://dwkunf5wywb8t"]
+[gd_resource type="Resource" script_class="BattleTowerConfig" format=3 uid="uid://dwkunf5wywb8t"]
 
 [ext_resource type="Script" uid="uid://cin5m60oapsu1" path="res://TOWERS/Offensive/BattleTower/BattleTowerConfig.cs" id="1_config"]
 [ext_resource type="Script" uid="uid://dijgxk6tq64p5" path="res://ECONOMY/Transactions/ResourceCost.cs" id="2_cost"]
