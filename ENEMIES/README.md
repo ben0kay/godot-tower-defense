@@ -1,12 +1,168 @@
 # ENEMIES — Enemy Ships, Navigation, Spawning, Waves and Targeting Integration
 
-This top-level folder owns **enemy gameplay mechanics** in the Godot 4 C#/.NET space tower-defense project. The first enemy will be a deliberately simple **basic test ship** named **`Enemy001` internally** — **not** "ScoutShip". This is the baseline implementation that subsequent enemies can reuse.
+This top-level folder owns **enemy gameplay mechanics** in the Godot 4 C#/.NET space tower-defense project. Enemy001 is the first working **basic test ship**, intentionally named `Enemy001` internally rather than `ScoutShip`. Its scene uses shared `Enemy.cs` and `EnemyMovement.cs` rather than a unique gameplay script. This is the baseline future types should reuse.
 
-**Implemented baseline (October 2026):** Enemy001, shared enemy state/registry, budgeted AStarGrid2D, portal/edge spawning, debug F2 and Battle Tower targeting/projectiles are now present. Level001's Debug parent owns F2 and the debug HUD. Existing terrain, camera, HUD and placement remain intact. See Types/Enemy001/README.md and LEVELS/Level001/README.md for playtesting.
+**Implemented baseline (October 2026):** Enemy001, shared hull HP and opt-in shield capacity, `EnemyRegistry` with killed/arrived events, kill rewards, death-puff feedback, Citadel arrival damage, budgeted AStarGrid2D navigation/repathing, portal/edge spawning, F2 debug spawns, immutable authored waves, and tower targeting/projectiles. `ENEMIES/Types/Enemy001/Enemy001.tres` has **60 MaxHealth, 100 MaxShield capacity, 100 px/s MoveSpeed and 3 Credits on kill**; its currently authored waves and F2 still spawn unshielded by default. See `Shared/README.md`, `Types/Enemy001/README.md` and `LEVELS/Waves/README.md`.
 
-The planning sections below describe the architecture and acceptance goals. Current targeting defaults to **First** (shortest remaining route), with **Closest** selectable in BattleTowerConfig. Manual finite waves and the credit wallet are active; armor mechanics and Citadel health remain future work.
+**Current limitations:** Only Enemy001 is registered for wave spawning; `LEVELS/Waves/WaveCatalog.LoadScenes()` hardcodes its scene. There is no generic `EnemyCatalog`, reusable ability/lifecycle system, ally shield emitter, death-spawn ability, enemy weapon, electrical tower-damage pulse or tower durability. `EnemyDefinition.Armor` is authored but unused. The separate `TOWERS/README.md` defines **Phase 4C-1 typed combat** (planned) and **4C-2 Laser Tower** (planned); avoid conflicts with Codex implementing those. The historical initial implementation plan further down is preserved as background, **not instructions to redo completed systems**.
 
-## Folder and file structure
+
+## Future enemy architecture — multi-type roster and modular abilities (PLANNED)
+
+**Design goal:** Support many enemy types—fast scouts, heavy tanks, generators, carriers, electrical ships, attackers, healers, stealth units, bosses and hybrids—without growing `Enemy.cs` into a giant switch on IDs or writing a full replacement AI/spawn/health script for each one. An enemy may have **zero, one or several independent optional abilities**. Keep ordinary enemies lightweight: speed, HP, shield *capacity*, Citadel damage, reward and navigation radius are already `EnemyDefinition` data.
+
+**Do not implement this entire proposal at once.** This section is a Codex-ready roadmap, not a claim these classes/folders currently exist. Preserve all previously implemented wave, shield, navigation, tower, audio and UI features. Prefer compact C#, `[GlobalClass]` Inspector-editable Resources, exported scene references when appropriate, method separators and feature READMEs as described in `NOTES/CodePreferences.md`.
+
+### Actual existing code versus future components
+
+| Responsibility | Source | Status |
+| --- | --- | --- |
+| Shared per-ship state: `Health`, `CurrentShield`, death/arrival, `Removed` | `Shared/Enemy.cs` | **EXISTS; only ~74 lines**, don't rewrite |
+| Per-type ID, health, shield capacity, speed, Citadel damage, armor field, rewards | `Shared/EnemyDefinition.cs` | **EXISTS**; armor remains inactive |
+| Navigation and route budgets, movement offsets, look-ahead clearance | `Movement/`, `WORLD/NAVIGATION/` | **EXISTS** |
+| Living ship registry, killed/arrived events | `Shared/EnemyRegistry.cs` | **EXISTS** |
+| Portal/edge spawning, F2, opt-in `SpawnWave(..., spawnWithShield)` | `Spawning/SpawnManager.cs` | **EXISTS** |
+| Immutable weighted wave authoring, manual owned completion | `LEVELS/Waves/` | **EXISTS**; enemy scene lookup hardcoded |
+| Enemy scene/catalog registration by stable `EnemyId` | `Shared/EnemyCatalog.cs` (suggested) | **NEW Phase E2A** |
+| Optional abilities + read-only authoring/instance-local state | `Abilities/` (suggested) | **NEW Phase E2B** |
+| Shield-emitting ally support | `Abilities/ShieldEmitter/` | **FIRST reference ability in E2B** |
+| Spawn several valid smaller enemies when killed | `Abilities/DeathSpawn/` | **LATER E3A** |
+| Tower durability and tower-targeting enemy weapons | `TOWERS/` + `Abilities/Weapons/` | **LATER E3B** |
+| Repeating electrical damage pulse against towers | `Abilities/ElectricalPulse/` | **LATER E3B**, after tower HP |
+| Typed damage/shield/hull math | `COMBAT/Damage/` | **TOWERS Phase 4C-1 planned**; reuse, don't duplicate |
+| Timed EMP/slow/repair/stun/stealth/buff effects | Future common effects ownership | **LATER**; no universal effect manager yet |
+
+**Proposed layout only; create an actual folder when the first real consumer is implemented:**
+
+```text
+ENEMIES/
+├── EnemyMasterConfig.cs                   # EXISTS: global budgets, scheduling/safety
+├── DefaultEnemyConfig.tres                 # EXISTS
+├── Shared/
+│   ├── Enemy.cs                           # EXISTS: lifecycle/HP/shield/registry, remains small
+│   ├── EnemyDefinition.cs                 # EXISTS: per-type authored balance/identity
+│   ├── EnemyRegistry.cs                   # EXISTS
+│   ├── EnemyCatalog.cs                    # NEW E2A: scene + definition registry
+│   └── README.md
+├── Movement/                               # EXISTS; keep common routes/pathfinding
+├── Spawning/                               # EXISTS; extend safe spawn APIs, no per-type switches
+├── Abilities/                              # NEW E2B, only for implemented abilities
+│   ├── README.md
+│   ├── ShieldEmitter/
+│   │   ├── ShieldEmitter.cs                # Optional child/component
+│   │   ├── ShieldEmitterConfig.cs          # Typed Inspector Resource
+│   │   └── README.md
+│   ├── DeathSpawn/                         # NEW LATER E3A
+│   ├── Weapons/                            # NEW LATER E3B
+│   └── ElectricalPulse/                    # NEW LATER E3B
+└── Types/
+    ├── Enemy001/                           # EXISTS: ordinary reference type, unchanged
+    ├── Enemy002/                           # Example future fast/slow type
+    ├── ShieldGeneratorShip/                # Example, can use normal Enemy + ability child
+    ├── CarrierShip/                        # Example, can use normal Enemy + ability child
+    └── ElectricalShip/                     # Example, can use normal Enemy + ability child
+
+COMBAT/Damage/                               # PLANNED in TOWERS Phase 4C-1; shared by combatants
+LEVELS/Waves/                                # EXISTS: wave scheduling/ownership, no ability logic
+TESTS/                                       # Add regression tests per implemented phase
+```
+
+**Example of composition, not a required fixed scene tree:**
+
+```text
+ShieldElectricalShip (Enemy.cs; EnemyDefinition.tres)
+├── Sprite
+├── Movement (EnemyMovement.cs)
+├── DefenseBar
+└── Abilities (optional organizer Node)
+    ├── ShieldEmitter (ShieldEmitter.cs + typed config Resource)
+    └── ElectricalPulse (ElectricalPulse.cs + typed config Resource)
+```
+
+An ordinary scout should not get empty ability controllers or per-frame AI nodes. A shield/electric ship should not need a new `Enemy007.cs` copied from `Enemy.cs`. Optional child components that explicitly reference the host Enemy are preferable to a deep inheritance tree or a mandatory always-running ability manager. A reusable, tiny `EnemyAbility` base/interface is acceptable **only when it removes repeated host wiring in two real abilities**; do not invent 15 no-op components first. Do not use runtime class discovery/reflection to decide ability order.
+
+### Phase E2A — Generic enemy catalog and safe multiple-type spawning (FIRST enemy pass)
+
+**Scope:** Replace the single hardcoded Enemy001 scene list with a validated, Inspector-editable `EnemyCatalog` of registered enemy types, while retaining immutable `WaveDefinition`/`WaveEnemyEntry` and their stable `EnemyId` strings.
+
+1. `EnemyDefinition` already has `EnemyId`, `DisplayName`, balance and rewards; **do not duplicate these fields** in a second enemy type definition without a real reason. A small catalog entry can reference a `PackedScene` whose root is `Enemy` and `Enemy.Definition` (or an explicit definition reference when validation demands it). Register by the existing stable ID, not by filenames/display names.
+2. Author one default `EnemyCatalog.tres` (location such as `ENEMIES/DefaultEnemyCatalog.tres`); validate missing/null scenes, blank/duplicate IDs, mismatched scene versus Resource ID, missing `EnemyMovement`, and invalid balance/clearance for new types. Validation happens at setup/registration, **not for every spawn or frame**. Keep unknown wave IDs as explicit setup errors; no fallback to Enemy001.
+3. `WaveCatalog` remains the **wave set** resolver (which levels/waves to run). The enemy catalog supplies scene lookup, so `WaveCatalog.LoadScenes()` can become an adapter to the new registry without moving actual wave timing, composition, RNG or ownership logic into `ENEMIES/`. Respect `WaveEnemyEntry.Portal`, `SpawnWithShield`, weights, retry backoff and the existing explicit `SpawnManager` placement rules.
+4. Validate the existing `Enemy001.tscn` unchanged. Prove a second plain test enemy with a different Inspector `EnemyDefinition` and artwork can be registered, spawned in a mixed weighted batch, move along valid routes, be targeted/killed, pay its own reward, damage the Citadel once on arrival and remain distinct from Enemy001 without a `switch (enemyId)`.
+5. **Larger ships:** `RadiusPixels` is not just presentation scale; clearance/swept movement/path corridors must accommodate it. A larger sprite does not automatically enlarge safe path radius. If current authored portals/corridors cannot accommodate a selected large enemy, reject/hold the spawn with a clear reason rather than squeezing through a blocker or allowing invalid movement. Don't rewrite shared navigation purely for the catalog.
+6. Leave `F2` as the existing Enemy001 debug path unless an explicit developer option is authored; normal debug spawns remain unshielded. Preserve credits, Citadel health, death puff, shield absorption/overflow, deterministic waves, the 500-enemy navigation fixtures, and all tower tests.
+
+**E2A acceptance:** new non-special enemy types can be added by **authoring scene/art/EnemyDefinition and registering them**, then referring to their stable `EnemyId` in waves; no new manual scene dictionary entry or special-case spawn code for each type. Add catalog ID/scene checks, two-type wave/quota/portal tests, health/shield isolation, different sizes/speeds/rewards and unchanged single Enemy001 gameplay.
+
+### Phase E2B — Optional ability plumbing and first ShieldEmitter (SECOND enemy pass)
+
+**Scope:** Introduce only the lifecycle hooks actually necessary for the **first reusable ability**, then implement one real ShieldEmitter. A ShieldEmitter is a **source ability**; the shield points it provides remain state on the **recipient `Enemy`**. Do not transform `Enemy.cs` into a list of shield/EMP/carrier-specific booleans and timers.
+
+1. An optional component can discover or be assigned its host `Enemy`, cache needed world services once and use a typed `Resource` with Inspector exports for **radius, shield points per pulse, pulse interval, target eligibility and whether the emitter can affect itself**. Each placed/spawned enemy owns its own *cooldowns/state*; shared `.tres` data is not modified. Null/disabled components do nothing.
+2. Use **the existing `EnemyRegistry.Living`** as the authoritative set of candidate friendly enemies; perform bounded, staggered queries **on the configured pulse interval**, not every physics tick and not through `GetTree().GetNodesInGroup()` rescans. Keep this first aura simple; add a spatial lookup only if 500+ actual ability instances prove profiling requires it.
+3. The recipient keeps the current `MaxShield` versus `CurrentShield` distinction. Emitter pulses may **replenish/raise** existing shield points but clamp each ally at its authored `MaxShield`; a type with `MaxShield = 0` remains ineligible for now. This preserves the semantics of `WaveBuilder.Enemy(..., shield: true)`: the wave controls **starting** shields, while an active generator may restore shields later. Giving capacity to previously zero-capacity units or granting a separate temporary shield pool is **future behavior**, not a hidden side effect.
+4. On the generator's death/arrival/level unload, stop pulses and clean subscriptions; **do not retroactively erase existing allies' shield points** by default. This avoids secretly coupling their HP to a deleted source. If a future aura is meant to provide a temporary shield pool that vanishes when the source leaves, design that as a **separate timed/linked effect**.
+5. Preserve shield-first damage, kill/arrival results, actual DefenseBar hull-only rendering and 4C-1 typed damage response once it lands. The shield emitter should restore shields through an explicit safe `Enemy` API (for example, `RestoreShield(amount)`), not by mutating `EnemyDefinition.MaxShield` or bypassing health invariants.
+6. Don't build a universal aura/status/effect stack to implement just one shield pulse. Define clean optional host-lifecycle callbacks only when necessary; guard against use after the enemy is removed/queued for deletion and against duplicate pulses after a scene restart.
+
+**E2B acceptance:** ordinary Enemy001 still runs unchanged with no ability node. A ShieldGenerator enemy with the component periodically replenishes only eligible allies within radius, obeys caps and intervals, can be combined with other optional children later, and stops affecting the world when removed. Add two-emitter/recipient-isolation, range, cap, no-ability-zero-cost and cleanup tests.
+
+### Phase E3A — DeathSpawn ability and children owned by their parent wave (LATER)
+
+**Scope:** A killed carrier can release several smaller enemies at its **death position**. This is not ordinary portal spawning and must not use `WaveManager` timing for each child.
+
+1. `DeathSpawnConfig` defines registered **child EnemyId**, finite **child count**, spawn/scatter radius, optional inheritance of starting shields and safe bounds/depth limits. Resolve child scenes through `EnemyCatalog`, not a hardcoded new script or scene path per carrier.
+2. Expose a **safe at-world-position spawn path** through `SpawnManager` (or a small subordinate spawner), reusing enemy-count caps, `Enemy.Initialize`, clearance, route connectivity, level ownership, bounded attempts and registry registration. Find positions within a validated region near the dead parent's location; never teleport children into blocked terrain, permanently trap them, silently overrun `MaxActiveEnemies`, or fall back to an unrelated Portal without an explicit rule.
+3. Trigger **only once on a true kill**, not arrival, scene unload, duplicate `TakeDamage` or repeated `QueueFree`. Preserve the mother's one-time reward/death feedback and each child's normal individual state/reward unless a future rule explicitly overrides it. Configurable positive child counts must be finite and capped; avoid uncontrolled recursive children-of-children chains or a huge synchronous creation spike.
+4. **Critical wave ownership contract:** If a wave-owned mother dies, successful spawned children become **owned by the same active wave before the parent is removed from that wave's `_owned` set**. Register children and their `Removed` handlers synchronously before `WaveManager.OnEnemyRemoved(parent)` can declare the wave complete. Children should contribute to `AliveCount`, but *not* mutate `PlannedRemaining` (which represents already-authored scheduled spawns). An F2/unowned parent spawns unowned children; they must not block unrelated wave completion. On wave cancellation/unload, subscriptions are safely released. This requires a deliberate, tested lifecycle hook or spawn notification—**not** a late deferred callback after wave completion.
+5. Define what happens on a partially successful spawn (some valid positions but cap or clearance rejects others): record only actually created children; skip remaining safely or adopt an explicitly documented bounded retry rule. Do not leave half-initialized nodes. A killed mother must always be removed even if no children can spawn.
+
+**E3A acceptance:** death produces registered, individually navigable children near the correct position; no duplicate generation; no path/limit violations; no premature wave completion; ordinary kill rewards and arrival/death events remain once-only. Add test cases for kill versus arrival, F2 versus wave ownership, empty spots, blocked terrain, spawn cap, cancellation, nested-spawn safeguards and simultaneous deaths.
+
+### Phase E3B — Enemies attack player towers (LATER; requires tower durability)
+
+**Prerequisites:** shared typed damage from `TOWERS/README.md` **Phase 4C-1**, plus a separately approved **optional tower health/durability** feature. `TowerBase` currently is not a destructible combatant; do not claim enemies can damage towers until that is implemented. A future `COMBAT/Damage/` should calculate defensive reductions for both kinds of target rather than duplicating damage-type math inside enemy abilities.
+
+**First prerequisite: damageable towers.** Design optional `TowerHealth` (or a damageable capability) for placed towers, with per-instance max/current HP and optional shield, default behavior chosen intentionally. Tower destruction must deselect/close or update the Inspector, remove that instance from generic `TowerPlacementController` ownership, release its `WorldGrid` cell/footprint, trigger existing navigation revision/repathing, stop any weapon/projectile subscriptions, and pay **no construction refund unless a real refund rule exists**. Never damage the passive test tower accidentally just because it derives from `TowerBase`. This tower-health feature should be implemented and verified **before** E3B attack code.
+
+**Then implement optional enemy attack components:**
+
+| Example ability | Behavior | Authoring fields |
+| --- | --- | --- |
+| `RangedWeapon` | Shoots at a valid damageable player tower (may keep moving or stop if intentionally configured) | Range, cadence, damage, `DamageType`, target preference, delivery/visual scene |
+| `ElectricalPulse` | Emits periodic **radial Energy damage** to eligible nearby towers; a distinct delivery style from bullets | Radius, pulse interval, base damage per pulse, target policy, VFX style |
+| Future `EMPDisruptor` | Temporarily disables nearby towers **without necessarily dealing HP damage** | Radius, effect duration, stacking/refresh policy—**not implemented in E3B** |
+
+- Reuse a focused tower-target lookup over the placement controller's placed-tower collection or a small maintained damageable-tower registry, **not** a scene-tree scan from every enemy on every physics tick. Validate range/alive/in-tree status; stagger attack searches/pulses; cache references; respect future target-eligibility rules.
+- A ship may **continue following its Citadel route while shooting** in version one; do not turn all enemies into stop-to-fire combatants or copy BattleTower's weapon loop into `Enemy.cs`. Optional component C# owns attack timing, target acquisition and delivery; weapon config owns damage type; the shared `DamageResolver` owns shield/hull multiplication. Electrical damage can start as **Energy** type from 4C-1 (an electric pulse is a delivery/ability, not necessarily a new damage type).
+- A hostile attack is not the same as reaching the Citadel: it must **not** call `Enemy.Arrive()` or award a tower kill payout. Tower destruction should not increment `EnemyRegistry.KilledCount` or change the owning wave's `PlannedRemaining`. Tower HP loss must not double-charge credits, alter already-purchased upgrades or cause a stale selection.
+- Ability VFX (electric arcs/ground pulse/projectiles), audio and attack math remain independent. Visuals should be restylable without changing damage, compatible with the Laser Tower beam separation in 4C-2.
+- A shield-emitting electric ship may carry **both** `ShieldEmitter` and `ElectricalPulse` as independent components; disabling one must not stop the other or change base movement/navigation.
+
+**E3B acceptance:** a damageable Battle Tower can be targeted/damaged/destroyed by an enemy's optional ranged weapon or area electrical pulse; ordinary enemies still just travel to the Citadel. Destroyed-tower occupancy/navigation/selection and upgrades remain consistent, overlapping pulses never double-apply one activation to the same target, and distant/passive/indestructible structures are ignored per rules. Tests cover tower removal while aimed at, wave-end cleanup, high enemy count, damage-type multipliers, visual independence and construction-payment isolation.
+
+### Later optional enemy mechanics (not a single giant next pass)
+
+- **Repair/support ship:** a timed heal source raising ally hull HP to `MaxHealth` through a validated, event-driven API; distinct from an HP/shield modifier.
+- **Commander/buff ship:** optional temporary movement, defense or attack buffs; requires clear recipients, source identities, lifetime and stacking; do not reuse `EnemyDefinition` as mutable per-instance buff state.
+- **Stealth/detection ship:** change which enemies `TowerTargeting` considers eligible, not the enemy's identity or nav rules; add detection-capable towers only when implemented.
+- **Boss/hybrid:** one larger scene with multiple real ability components; no separate boss base class or 30 feature flags unless a genuinely new lifecycle requires it.
+- **Speed variants:** per-type speed/turn stats already support fast and slow ships; large ships may require radius-aware layout and validated spawn clearance.
+- **Shield presentation:** separate optional bar/VFX from hull HealthBar and shared damage math; no polling every frame just to update visuals.
+- **Durations, stacking and status:** build a reusable `COMBAT/Effects/` owner **when** a first actual EMP/slow/buff requires it; not as an empty future manager now.
+
+### General rules and Codex checkpoints for enemy work
+
+- **Data-driven types, composable behaviors:** `EnemyDefinition` = authored type stats/capacities; `EnemyCatalog` = scene lookup; `Enemy` = instance lifecycle; `EnemyMovement` = route execution; optional components = abilities; `LEVELS/Waves/` = authored scheduling and ownership. No `if (EnemyId == "carrier")`/per-type branches in `Enemy.cs`, `SpawnManager` or `WaveManager`.
+- **Typed combat belongs outside both teams:** integrate with `COMBAT/Damage/` after tower Phase 4C-1, with weapon-specific source `DamageType`. Distinguish **delivery** (beam/bullet/radial pulse), **damage type** (Energy/Kinetic/Explosive), **effects** (shield refill/EMP/slow), and **enemy type** (a catalog ID). An enemy can combine several without becoming a special hardcoded subclass.
+- **Performance and lifecycle:** no unconditional per-frame ability managers on ordinary ships; use small interval timers, staggered/cached target queries, registry sets and the existing path budgets. Cache scene/service references in `_Ready`, avoid new nodes on every effect tick, cap child spawns and guarantee cleanup on death, arrival, reconfigure and world unload. 30 **types** are inexpensive; hundreds of **active ability instances** need profiling.
+- **Tests:** after **each** phase run the existing `TESTS/EnemyIntegrationChecks.tscn`, `WaveChecks`, `EnemyShieldChecks`, kill rewards, Citadel health, targeting, placement, navigational repath/500-ship, paid tower/upgrade, UI/menu and audio regressions. Add focused tests only for implemented features. Keep designer `.tres`/level art untouched; use in-memory fixtures and restore world/waves. Godot .NET compile + headless checks are required; don't claim passing tests unless actually run.
+- **Development sequence:** finish or coordinate with the approved `TOWERS/README.md` 4C damage/Laser work; then **E2A (enemy catalog) → E2B (small ability system + ShieldEmitter)**. Implement E3A death-spawn after ownership is deliberately designed; E3B weapons/electrical attacks **only after tower durability exists**. No requirement to implement every illustrative enemy type during the foundation pass. Update `ENEMIES/Shared/`, `ENEMIES/Abilities/`, `ENEMIES/Types/`, `ENEMIES/Spawning/` and wave/test READMEs **as each feature actually lands**.
+
+**Finished enemy foundation criteria:** register a different ordinary enemy or attach an implemented ShieldEmitter component to a ship **without editing the generic spawn/wave/health/movement source files for that particular type**. Advanced abilities should extend existing lifecycle/target/damage contracts rather than forcing a rewrite later.
+
+
+## Folder and file structure (current, implemented baseline)
 
 ```text
 ENEMIES/
@@ -51,16 +207,17 @@ The folder names and filenames **`Enemy001/`, `Enemy001.tscn`, `Enemy001.tres` a
 
 ## First Enemy001 settings (starting values, not final balance)
 
-Create an Inspector-editable `[GlobalClass] EnemyDefinition : Resource`; assign it via `Enemy001.tres`. Suggested grouped exports:
+`[GlobalClass] EnemyDefinition : Resource` is implemented and assigned through `Enemy001.tres`. The table below records the initial authoring defaults and current functionality:
 
 | Setting | Initial test value | Notes |
 | --- | --- | --- |
 | DisplayName | Enemy 001 | Temporary; editable |
 | Key / EnemyId | enemy001 | Separate from display name |
-| MaxHealth | 60 | Expose for tuning |
-| MoveSpeed | 100 world pixels/second | Simple continuous movement |
-| CitadelDamage | 1 | Applied only once arrival/health rules exist |
-| Armor | 0 | Can remain unused in the first test |
+| MaxHealth | 60 | Implemented; Inspector editable |
+| MaxShield | 100 for Enemy001 (shared default 0) | Capacity only; zero at spawn unless `shield: true` |
+| MoveSpeed | 100 world pixels/second | Implemented route-following movement |
+| CitadelDamage | 1 | **Implemented** through CitadelSession on arrival |
+| Armor | 0 | **Reserved**, not yet applied by damage code |
 | Visuals | 1 small SVG Sprite2D | Smaller than a 64px grid cell |
 
 These are placeholders. Favor **Resource-driven data** over hardcoded stats inside `Enemy.cs`. Per-type settings belong in `Enemy001.tres`; global limits/debug/timing settings belong in `EnemyMasterConfig.cs` and `DefaultEnemyConfig.tres`. Add only meaningful global exports, not duplicate per-enemy properties.
@@ -102,10 +259,10 @@ The active `TOWERS/Offensive/BattleTower/` baseline has editable stats: 256px ra
 - Put **reusable targeting** in `TOWERS/Shared/Targeting/`, and **reusable basic projectiles** in `TOWERS/Shared/Projectiles/`; do not embed projectile behavior in Enemy001.
 - Default to **First** (shortest remaining valid route) among living enemies within range; **Closest** remains selectable. Use `EnemyRegistry` and cache the chosen target; compare again on staggered intervals so overtaking can update First; validate cached range/alive state between queries.
 - First projectile can fire from the **center** of the current one-piece Battle Tower sprite (no rotating multi-part tower/art overhaul yet).
-- Projectile hits call `Enemy.TakeDamage(amount)`. Zero health marks the enemy dead, deregisters it and removes it cleanly. Avoid targeting or damaging already dead enemies.
-- Leave stronger/weaker/first/last targeting priorities, upgrades, credits/rewards, special damage types, VFX and armor mechanics for later; First and Closest are already available.
+- At the current pre-4C baseline, projectile hits call `Enemy.TakeDamage(amount)` and shields absorb damage before hull health. The planned 4C-1 typed damage pass will add a shared resolver. Zero hull health marks the enemy dead, deregisters it and removes it cleanly; already-dead enemies cannot be damaged again.
+- More targeting priorities and armor mitigation remain future work. **Credits/kill rewards, tower upgrades and death explosions already exist**. Typed damage and Laser Tower are planned under `TOWERS/README.md` Phase 4C-1/4C-2.
 
-## Suggested Codex implementation passes
+## Historical initial Codex implementation passes (completed; reference only)
 
 ### Pass 1 — Basic Enemy001 + correct movement
 
@@ -119,7 +276,7 @@ Implement reusable target selection, basic bullet/projectile and damage flow. Sp
 
 Test multiple ships, multiple buildable placements, navigation revision/repath behavior and valid spawn-source-to-goal connectivity. Add pathfinding/targeting budgeting according to the performance plan; confirm map-edge or mixed spawn modes use level settings. **Do not start full waves/economy/campaign logic yet.** Scale toward large swarms after measuring performance, not by prematurely overengineering.
 
-## Minimum acceptance tests
+## Historical baseline acceptance tests (already covered by regression suite)
 
 - `Enemy001` exists on disk by that name, uses the shared C# enemy code, and its display name/key/stats can be edited without renaming scene/art files.
 - In F5 play, the ship can emerge at Level001's Portal exit, navigate around **solid** painted tiles and reach a valid Citadel approach.
@@ -133,7 +290,7 @@ Test multiple ships, multiple buildable placements, navigation revision/repath b
 
 **C#/.NET only, not GDScript.** Follow `NOTES/CodePreferences.md`: short header comments explaining scripts, `// =========================================================` above methods, reasonable `#region` blocks, Inspector `[Export]` / `[ExportGroup]`, compact reusable code, and a README in each feature folder. Keep per-enemy nodes minimal; one central registry and a bounded navigation-request manager support future hundreds of ships. Refer to the user's existing `isometric-new-2d` project when appropriate.
 
-**Current status:** Basic Enemy001 and Battle Tower combat are implemented. TESTS/EnemyIntegrationChecks.tscn validates movement, budgets, targeting, damage and placement connectivity. Larger-ship routing, ship separation, flow fields, waves/economy/objective health and advanced target priorities remain future work.
+**Current status:** Enemy001, finite waves, kill rewards, Citadel HP/damage, shield-capacity opt-in, the economy wallet, 4A/4B generic tower catalog/UI and tested baseline navigation are implemented. `TESTS/EnemyIntegrationChecks.tscn` exercises the integrated systems. Larger-ship route edge cases, ship separation, flow fields, reusable enemy abilities, enemy attacks and advanced target priorities remain future work. The E2A/E2B/E3A/E3B roadmap above supersedes the historical initial implementation plan.
 
 ## Shared weighted route diversity
 
@@ -164,7 +321,7 @@ Each multi-goal request uses one position snapshot, so its candidate costs are c
 Safe offset refinement cannot turn the first new segment backward merely due to lateral bias. Existing speed/turning/offset settings, weighted profiles, congestion, auditing and count/time budgets are preserved. First targeting excludes routes known to need replacement until a valid handoff completes. No new pathfinding algorithm or per-frame A* is added.
 
 ## Manual waves (Phase 1)
-LEVELS/Waves contains the shared immutable data, catalog and one Main/Waves scheduler; LEVELS/Level001/Level001Waves.cs contains this map's authored encounters. WaveSetId in LevelConfig chooses a finite set; the HUD Start/Next button controls progression. Wave spawns use random eligible sources, preserve F2 round-robin debugging, retain blocked pending ships and complete only after scheduled and wave-owned ships resolve. DefaultEnemyConfig exposes attempt cap/retry/seed. No rewards, new enemy types or modifiers yet. See LEVELS/Waves/README.md.
+LEVELS/Waves contains the shared immutable data, catalog and one Main/Waves scheduler; LEVELS/Level001/Level001Waves.cs contains this map's authored encounters. WaveSetId in LevelConfig chooses a finite set; the HUD Start/Next button controls progression. Wave spawns use random eligible sources, preserve F2 round-robin debugging, retain blocked pending ships and complete only after scheduled and wave-owned ships resolve. DefaultEnemyConfig exposes attempt cap/retry/seed. Kill rewards and opt-in shield-spawn flags already work; only Enemy001 is currently registered. See LEVELS/Waves/README.md.
 
 ## Optional shield capacity and wave starting state
 
