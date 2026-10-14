@@ -42,3 +42,9 @@ Global active-enemy limit, failed-route retry and actual A* calls/frame live in 
 ## Swarm route preferences
 
 Select ENEMIES/DefaultEnemyConfig.tres and expand Path Diversity. Default four shared profiles use strength 0.6 and smooth eight-cell patches. Tap F2 repeatedly to compare routes where the painted map offers alternatives. Enable optional congestion with CongestionInfluence above zero; it affects new/repath requests at the snapshot interval. Turn EnablePathDiversity off for ordinary shortest paths. Separation settings are reserved and currently do nothing; single corridors can still look single-file.
+
+## Incremental updates and safe movement offsets
+
+EnemyMasterConfig now exposes path-work/validation millisecond budgets, validation count limit, audit interval and movement offsets. Defaults: up to eight A* calculations and 2ms path work per physics frame, sixteen route checks and 0.5ms validity work, staggered audits around every three seconds, offsets enabled with an 8px maximum. Zero milliseconds disables that time limit; zero audit interval disables periodic audits. Time limits are soft per work item.
+
+Placing one tower updates one cell in each shared A* profile. Ships with unaffected routes continue moving. Affected remaining routes are checked/recalculated across frames, with nearby blockages prioritized. The debug HUD distinguishes placement validation, grid synchronization, native A*, total path work and validity-check time. Spawn/arrival endpoints remain exact; interior offsets taper near obstacles. Local separation is still future work.

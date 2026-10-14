@@ -88,15 +88,17 @@ public static class SwarmNavigationChecks
             }
             movementMax = Math.Max(movementMax, clock.Elapsed.TotalMilliseconds);
         }
-        grid.TryOccupy(new(10, 15));
-        Vector2 before = ships[0].GlobalPosition; ships[0].Movement._PhysicsProcess(1.0 / 60);
-        Require(ships[0].GlobalPosition == before && float.IsPositiveInfinity(ships[0].RemainingPathDistance), "Tower revision did not stop stale weighted route");
-        while (paths.PendingCount > 0) paths._PhysicsProcess(1.0 / 60);
-        Require(float.IsFinite(ships[0].RemainingPathDistance), "Weighted tower repath failed");
+        int fullRebuilds = nav.FullRebuildCount;
+        grid.TryOccupy(new(10, 15)); nav.Refresh();
+        Require(nav.FullRebuildCount == fullRebuilds, "One tower caused a full navigation rebuild");
+        foreach (Enemy ship in ships) ship.Movement._PhysicsProcess(1.0 / 60);
+        for (int tick = 0; tick < 1000 && (paths.PendingCount > 0 || paths.PendingValidationCount > 0); tick++) paths._PhysicsProcess(1.0 / 60);
+        Require(paths.PendingCount == 0, "Selective weighted repaths did not drain");
         grid.ReleaseOccupancy(new(10, 15));
         foreach (Enemy ship in ships) ship.TakeDamage(10000);
         config.EnablePathDiversity = enabled; config.PathDiversityStrength = strength; config.CongestionInfluence = congestion;
         frameMs.Sort();
+        RepathMovementChecks.Run(grid, paths, spawns);
         GD.Print($"PASS: 500 assigned ships, budgeted weighted routing, safe movement and tower repath; spawn batch {spawnMs:0.0}ms; path-frame p95 {frameMs[(int)((frameMs.Count - 1) * 0.95)]:0.00}ms / max {frameMs.Max():0.00}ms; movement+clearance max {movementMax:0.00}ms (headless, not a rendered FPS guarantee)");
     }
 

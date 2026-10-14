@@ -1,21 +1,40 @@
-# Shared navigation — budgeted AStarGrid2D
+# Shared navigation — weighted, incremental and budgeted
 
-`NavigationGrid.cs` adapts cached WorldGrid.BlocksEnemies into one AStarGrid2D. Empty space is traversable; painted walls, Citadel footprints and towers block according to WorldGrid. Diagonals use OnlyIfNoObstacles. Citadel ApproachPoints supply goal cells outside its blocked footprint.
+WorldGrid is the sole authority for terrain, footprints and tower occupancy. NavigationGrid caches a small pool of shared AStarGrid2D profiles, not one grid per enemy. Weighted preferences, optional congestion, corner-safe diagonals and Citadel approach goals remain active. Jumping is disabled because it bypasses point weights; weights stay at least 1 for the octile heuristic.
 
-`PathRequestManager.cs` queues at most one request per ship, tests reachable approach candidates and selects the shortest calculated route. Every actual A* calculation counts against EnemyMasterConfig.MaxPathCalculationsPerFrame (default 8), including alternate goal tests. Work is round-robin across requests. Stale queued results restart after grid changes; living ships stop safely while waiting.
+## Updates and route invalidation
 
-Placement connectivity uses one temporary reverse flood fill per candidate build, preserving the same diagonal rules without running A* for every spawn source. Enemy movement checks swept radius clearance separately. Current navigation targets small ships and cell centers, not arbitrary large ship footprints.
+WorldGrid.NavigationChanged reports one changed cell on tower placement/removal, or a full invalidation after RebuildTerrain. A tower updates that one solid flag in every shared profile immediately. Full map scans are reserved for startup, terrain reloads and profile configuration changes. FullRebuildCount and IncrementalCellUpdates expose which work actually ran.
 
-Movement consumes waypoint arrays, so a later routing implementation can replace this adapter without rewriting enemy health or tower combat. No reverse Dijkstra/flow field is active yet. Inspect pending path count in the level Debug HUD; benchmark before changing algorithms or promising 500-ship performance.
+EnemyRoute caches swept segment cell dependencies when assigning a path. PathRequestManager indexes ships by those cells. A new block marks only potentially affected remaining routes; cells behind a ship are ignored. Marking is cheap, and exact checks run in a separate bounded queue. Unaffected ships continue moving. A confirmed affected ship stops and requests a new route; immediate per-tick swept clearance also stops a ship safely if validation has not reached it yet. Removing a block leaves valid routes alone. Failed routes retry on the existing timer.
 
-## Shared weighted route diversity
+Full terrain changes queue audits, rather than stopping/repathing all ships immediately. Existing routes do not compare the global revision each physics tick. Pending A* candidates still restart on navigation/cost revisions to prevent accepting stale results.
 
-EnemyMasterConfig / ENEMIES/DefaultEnemyConfig.tres now exposes EnablePathDiversity (true), PathDiversityStrength (0.6), RouteProfileCount (4, capped at 8), PreferencePatchCells (8), and RoutePreferenceSeed. Ships receive a stable round-robin profile on spawn. The navigation service caches a small pool of AStarGrid2D instances and smooth seeded weight arrays, shared by all ships; it never allocates a navigation grid per ship. WorldGrid remains the sole authority for solids and NavigationRevision.
+## Scheduling and Inspector settings
 
-Weights are at least 1, keeping the octile heuristic admissible. Jumping is explicitly disabled because it bypasses weighted cells. Approach selection compares weighted costs; First tower targeting still compares the physical remaining route distance, not preference/congestion cost. Broad cost patches encourage alternate corridors without per-tile random jitter. Movement speed, smooth facing and swept obstacle checks remain unchanged. A single navigable corridor still produces shared routes; separation/waypoint offsets are not implemented.
+Select ENEMIES/DefaultEnemyConfig.tres:
 
-CongestionInfluence defaults to 0 (off). When enabled, living-ship density is sampled every CongestionSnapshotSeconds (0.5), with capped costs in occupied/neighbor cells. Only sparse affected weights are refreshed per profile; old snapshots are restored before replacement. Profiles never borrow another profile's temporary state. New/repath requests consider snapshots; existing routes are not recalculated merely because crowds move. Earlier goal candidates are rescored against the current snapshot before comparison, without additional A*. Map changes invalidate solids and clear stale congestion. All actual A* searches remain within the configured frame budget.
+| Setting | Default | Meaning |
+| --- | --- | --- |
+| MaxPathCalculationsPerFrame | 8 | Maximum actual A* goal queries per physics frame |
+| MaxPathfindingMillisecondsPerFrame | 2 ms | Optional soft budget for the entire path-work stage; 0 disables |
+| MaxRouteValidationsPerFrame | 16 | Maximum cached-route validations per frame |
+| MaxRouteValidationMillisecondsPerFrame | 0.5 ms | Optional soft validity-work budget; 0 disables |
+| FairRequestEveryCalculations | 4 | Regular oldest-request service alongside distance-based urgency |
+| RouteAuditIntervalSeconds | 3 s | Staggered lightweight audits; 0 disables periodic audits |
+| EnablePathOffsets | true | Safe movement refinement without extra A* |
+| PathOffsetMaxPixels | 8 px | Maximum stable per-spawn lateral bias |
 
-SeparationStrength and SeparationRadius are reserved Inspector settings with no movement effect in this pass. A later separation implementation must use spatial buckets and swept obstacle clearance. Change configuration in the saved Resource before F5; runtime weight edits affect new/pending routes without forcibly repathing existing ships. Use terrain/occupancy revision changes to test repathing.
+Duplicate requests coalesce. Ships close to the blocking segment get higher path priority; regular oldest-request service prevents distant/spawn requests from starving. A native A* call and its path assignment cannot be interrupted, so time budgets may overrun by one work item. The count limit remains strict. Candidate approaches are compared by weighted cost; First targeting uses physical remaining refined-path distance.
 
-Tests include deterministic alternate corridors, swept clearance, ordinary paths with diversity disabled/zero strength, congestion/no weight leakage, 500 queued ships, budget limits and tower revision repathing. The headless timing output is a diagnostic, not a rendered 60 FPS guarantee; a synchronous 500-node spawn batch can still exceed a 16.7ms frame and future waves should spread spawn creation across frames.
+## Route preferences and congestion
+
+EnablePathDiversity, PathDiversityStrength (0.6), RouteProfileCount (4, capped at 8), PreferencePatchCells (8), and RoutePreferenceSeed configure smooth deterministic cost patterns. Ships receive a profile on spawn. Disable diversity for ordinary shortest paths. No algorithm can create another corridor where only one exists.
+
+CongestionInfluence defaults to 0/off. Throttled snapshots of living ship density affect new/repath queries; existing routes are not periodically recalculated for crowds. Per-profile sparse weight caches restore old snapshot costs before replacing them. A* candidates are rescored consistently against the current snapshot. Separation settings remain reserved and inactive.
+
+## Connectivity and diagnostics
+
+Build clicks still reject sealed usable entries and trapped active ships. Connectivity uses reusable flat flood-fill buffers and cardinal links: these have the same connected components as diagonals allowed only when both side cells are walkable. It remains a synchronous correctness check, but does not rebuild A* profiles or allocate a queue/result array per click. ReachableWithout returns borrowed scratch data: copy it if it must survive another flood call. SpawnManager keeps a separate reusable cache.
+
+Level001/Debug/HUD displays placement-validation, grid-update, native A*, total path-work and route-validation timings independently, plus work counts/queues. Tests and before/after measurements are in TESTS/README.md and TESTS/NavigationPerformance.md. These are headless CPU diagnostics, not a rendered 500-ship/60-FPS guarantee. Long individual searches/path assignments and synchronous mass spawning can still exceed a requested time budget.

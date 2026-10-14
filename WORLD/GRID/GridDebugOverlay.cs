@@ -55,6 +55,9 @@ public partial class GridDebugOverlay : Label
             $"Camera: {_camera.GlobalPosition.X:0}, {_camera.GlobalPosition.Y:0}     FPS: {Engine.GetFramesPerSecond()}\n" +
             $"{rules}     Navigation revision: {_grid.NavigationRevision}\n" +
             $"F2: Spawn Enemy001 | Alive: {_spawns.Registry.Living.Count} | Killed: {_spawns.Registry.KilledCount} | Arrived: {_spawns.Registry.ArrivedCount} | Paths queued: {_spawns.Paths.PendingCount}\n" +
+            $"Placement check: {_spawns.LastPlacementValidationMilliseconds:0.00}ms | Grid update: {_spawns.Paths.Navigation.LastGridUpdateMilliseconds:0.00}ms | " +
+            $"A*: {_spawns.Paths.LastFrameCalculations} / {_spawns.Paths.LastFrameAStarMilliseconds:0.00}ms | Path work: {_spawns.Paths.LastPathfindingMilliseconds:0.00}ms (peak {_spawns.Paths.PeakPathfindingMilliseconds:0.00}) | " +
+            $"Route checks: {_spawns.Paths.LastFrameValidations} / {_spawns.Paths.LastValidationMilliseconds:0.00}ms (peak {_spawns.Paths.PeakValidationMilliseconds:0.00}) | Queued checks: {_spawns.Paths.PendingValidationCount}\n" +
             _spawns.LastMessage;
     }
     #endregion

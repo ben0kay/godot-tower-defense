@@ -27,7 +27,9 @@ public partial class SpawnManager : Node
     {
         NavigationGrid nav = Paths.Navigation;
         if (_cachedRevision == nav.Revision) return;
-        _entries.Clear(); _reachable = nav.ReachableWithout();
+        _entries.Clear(); bool[] reachable = nav.ReachableWithout();
+        if (_reachable == null || _reachable.Length != reachable.Length) _reachable = new bool[reachable.Length];
+        System.Array.Copy(reachable, _reachable, reachable.Length);
         WorldGrid grid = nav.Grid; LevelConfig settings = grid.Level.Settings;
         if (settings.SpawnMode != LevelConfig.SpawnSourceMode.MapEdges)
             foreach (NodePath path in settings.ActivePortals)
@@ -88,7 +90,20 @@ public partial class SpawnManager : Node
 
     // =========================================================
     // Click-only route preservation: protect active ships and every currently usable source.
+    public double LastPlacementValidationMilliseconds { get; private set; }
+
+    // =========================================================
+    // Keep timing independent of early rejection paths.
     public string PlacementFailure(Vector2I cell)
+    {
+        long started = System.Diagnostics.Stopwatch.GetTimestamp();
+        try { return ValidatePlacement(cell); }
+        finally { LastPlacementValidationMilliseconds = System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds; }
+    }
+
+    // =========================================================
+    // Full connectivity is still checked before commit, using reusable flood-fill scratch space.
+    private string ValidatePlacement(Vector2I cell)
     {
         RefreshSources(); NavigationGrid nav = Paths.Navigation;
         foreach (Enemy enemy in Registry.Living)

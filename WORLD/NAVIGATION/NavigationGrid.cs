@@ -2,6 +2,7 @@
 // Placement connectivity uses one temporary flood fill, never one A* per spawn.
 using Godot;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 public partial class NavigationGrid : Node
 {
@@ -26,6 +27,12 @@ public partial class NavigationGrid : Node
         public float Influence = -1f;
     }
     private int _revision = -1;
+    public int FullRebuildCount { get; private set; }
+    public int IncrementalCellUpdates { get; private set; }
+    public double LastAStarMilliseconds { get; private set; }
+    public double LastGridUpdateMilliseconds { get; private set; }
+    private bool[] _floodVisited, _solid;
+    private int[] _floodQueue;
 
     // =========================================================
     // Initialize after Grid has cached the authored level and object footprints.
@@ -34,6 +41,7 @@ public partial class NavigationGrid : Node
         Grid = GetNode<WorldGrid>("../../Grid");
         _registry = GetNode<EnemyRegistry>("../Registry");
         Refresh();
+        Grid.NavigationChanged += OnGridChanged;
     }
 
     // =========================================================
@@ -42,11 +50,16 @@ public partial class NavigationGrid : Node
     {
         EnsureProfiles();
         if (_revision == Revision) return;
+        long started = Stopwatch.GetTimestamp(); FullRebuildCount++;
         _crowd.Clear(); _crowdRevision++; _crowdTimer = 0f;
+        _solid ??= new bool[Grid.Config.WidthCells * Grid.Config.HeightCells];
         for (int y = 0; y < Grid.Config.HeightCells; y++)
             for (int x = 0; x < Grid.Config.WidthCells; x++)
-                foreach (Profile profile in _profiles)
-                    profile.AStar.SetPointSolid(new Vector2I(x, y), Grid.BlocksEnemies(new Vector2I(x, y)));
+            {
+                Vector2I cell = new(x, y); bool solid = Grid.BlocksEnemies(cell);
+                _solid[y * Grid.Config.WidthCells + x] = solid;
+                foreach (Profile profile in _profiles) profile.AStar.SetPointSolid(cell, solid);
+            }
         Goals.Clear();
         Node approaches = Grid.Level.Citadel?.GetNodeOrNull<Node>("ApproachPoints");
         if (approaches != null)
@@ -57,6 +70,35 @@ public partial class NavigationGrid : Node
                     if (!Grid.BlocksEnemies(cell) && !Goals.Contains(cell)) Goals.Add(cell);
                 }
         _revision = Revision;
+        LastGridUpdateMilliseconds = Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+    }
+
+    // =========================================================
+    // One tower modifies one cell in each shared profile; terrain reloads defer a full refresh.
+    private void OnGridChanged(Vector2I? changed, bool blocked)
+    {
+        if (changed == null || _revision < 0) { _revision = -1; return; }
+        long started = Stopwatch.GetTimestamp();
+        foreach (Profile profile in _profiles) profile.AStar.SetPointSolid(changed.Value, blocked);
+        _solid[changed.Value.Y * Grid.Config.WidthCells + changed.Value.X] = blocked;
+        IncrementalCellUpdates++; _revision = Revision;
+        RefreshGoals();
+        LastGridUpdateMilliseconds = Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+    }
+
+    // =========================================================
+    // Goals are a few authored markers, so incremental changes never scan the whole map.
+    private void RefreshGoals()
+    {
+        Goals.Clear();
+        Node approaches = Grid.Level.Citadel?.GetNodeOrNull<Node>("ApproachPoints");
+        if (approaches == null) return;
+        foreach (Node child in approaches.GetChildren())
+            if (child is Marker2D marker)
+            {
+                Vector2I cell = Grid.WorldToCell(marker.GlobalPosition);
+                if (!Grid.BlocksEnemies(cell) && !Goals.Contains(cell)) Goals.Add(cell);
+            }
     }
 
     // =========================================================
@@ -67,12 +109,14 @@ public partial class NavigationGrid : Node
     // Each profile has its own shared cache; no temporary weights leak into another request.
     public Vector2[] FindPath(Vector2 position, Vector2I goal, int profileId, out float cost)
     {
-        Refresh(); cost = float.PositiveInfinity;
+        Refresh(); cost = float.PositiveInfinity; LastAStarMilliseconds = 0;
         Vector2I start = Grid.WorldToCell(position);
         if (Grid.BlocksEnemies(start) || Grid.BlocksEnemies(goal)) return System.Array.Empty<Vector2>();
         Profile profile = _profiles[((profileId % _profiles.Count) + _profiles.Count) % _profiles.Count];
         ApplyCrowd(profile);
+        long calculationStarted = Stopwatch.GetTimestamp();
         Godot.Collections.Array<Vector2I> cells = profile.AStar.GetIdPath(start, goal);
+        LastAStarMilliseconds = Stopwatch.GetElapsedTime(calculationStarted).TotalMilliseconds;
         Vector2[] points = new Vector2[cells.Count];
         if (cells.Count == 0) return points;
         cost = position.DistanceTo(Grid.CellToWorldCenter(cells[0])) / Grid.Config.CellSize;
@@ -231,29 +275,35 @@ public partial class NavigationGrid : Node
     public bool[] ReachableWithout(Vector2I? blocked = null)
     {
         Refresh();
-        int width = Grid.Config.WidthCells;
-        bool[] reached = new bool[width * Grid.Config.HeightCells];
-        Queue<Vector2I> queue = new();
+        int width = Grid.Config.WidthCells, count = width * Grid.Config.HeightCells;
+        if (_floodVisited == null || _floodVisited.Length != count)
+        { _floodVisited = new bool[count]; _floodQueue = new int[count]; }
+        System.Array.Clear(_floodVisited);
+        int head = 0, tail = 0;
         foreach (Vector2I goal in Goals)
-            if (goal != blocked) { reached[goal.Y * width + goal.X] = true; queue.Enqueue(goal); }
-        while (queue.Count > 0)
+            if (goal != blocked)
+            {
+                int index = goal.Y * width + goal.X;
+                if (_floodVisited[index]) continue;
+                _floodVisited[index] = true; _floodQueue[tail++] = index;
+            }
+        int blockedIndex = blocked.HasValue ? blocked.Value.Y * width + blocked.Value.X : -1;
+        while (head < tail)
         {
-            Vector2I cell = queue.Dequeue();
-            for (int y = -1; y <= 1; y++)
-                for (int x = -1; x <= 1; x++)
-                {
-                    if (x == 0 && y == 0) continue;
-                    Vector2I next = cell + new Vector2I(x, y);
-                    if (Grid.BlocksEnemies(next) || next == blocked) continue;
-                    if (x != 0 && y != 0 && (Grid.BlocksEnemies(cell + new Vector2I(x, 0))
-                        || Grid.BlocksEnemies(cell + new Vector2I(0, y))
-                        || cell + new Vector2I(x, 0) == blocked || cell + new Vector2I(0, y) == blocked)) continue;
-                    int index = next.Y * width + next.X;
-                    if (reached[index]) continue;
-                    reached[index] = true; queue.Enqueue(next);
-                }
+            int index = _floodQueue[head++], x = index % width;
+            if (x > 0) Visit(index - 1);
+            if (x + 1 < width) Visit(index + 1);
+            if (index >= width) Visit(index - width);
+            if (index + width < count) Visit(index + width);
         }
-        return reached;
+        // Four-way flood has identical connectivity to corner-safe diagonals: every allowed
+        // diagonal also has walkable cardinal links. This avoids redundant diagonal tests.
+        void Visit(int index)
+        {
+            if (_floodVisited[index] || _solid[index] || index == blockedIndex) return;
+            _floodVisited[index] = true; _floodQueue[tail++] = index;
+        }
+        return _floodVisited;
     }
 
     // =========================================================
@@ -263,5 +313,5 @@ public partial class NavigationGrid : Node
 
     // =========================================================
     // Release the native pathfinding resource with the world.
-    public override void _ExitTree() { foreach (Profile profile in _profiles) profile.AStar.Dispose(); }
+    public override void _ExitTree() { if (GodotObject.IsInstanceValid(Grid)) Grid.NavigationChanged -= OnGridChanged; foreach (Profile profile in _profiles) profile.AStar.Dispose(); }
 }

@@ -88,7 +88,8 @@ public partial class EnemyIntegrationChecks : Node
             while (_paths.PendingCount > 0) _paths._PhysicsProcess(1.0 / 60);
             Vector2 before = repath.GlobalPosition;
             _grid.RebuildTerrain(); repath.Movement._PhysicsProcess(1.0 / 60);
-            Check(repath.GlobalPosition == before && _paths.PendingCount == 1, "Revision change stops ship and queues repath");
+            _paths._PhysicsProcess(1.0 / 60);
+            Check(repath.GlobalPosition != before && _paths.PendingCount == 0, "Unchanged terrain audit preserves a valid moving route");
             repath.TakeDamage(10000);
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
             _grid.Level.Settings.SpawnMode = LevelConfig.SpawnSourceMode.MapEdges;

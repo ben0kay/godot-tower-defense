@@ -7,6 +7,14 @@ public partial class EnemyMasterConfig : Resource
     [ExportGroup("Navigation")]
     [Export(PropertyHint.Range, "1,64,1")] public int MaxPathCalculationsPerFrame { get; set; } = 8;
     [Export(PropertyHint.Range, "0.1,10,0.1")] public float FailedPathRetrySeconds { get; set; } = 1f;
+    [Export(PropertyHint.Range, "0,20,0.1")] public float MaxPathfindingMillisecondsPerFrame { get; set; } = 2f;
+    [Export(PropertyHint.Range, "1,128,1")] public int MaxRouteValidationsPerFrame { get; set; } = 16;
+    [Export(PropertyHint.Range, "0,5,0.1")] public float MaxRouteValidationMillisecondsPerFrame { get; set; } = 0.5f;
+    [Export(PropertyHint.Range, "1,16,1")] public int FairRequestEveryCalculations { get; set; } = 4;
+    [ExportGroup("Movement Refinement")]
+    [Export] public bool EnablePathOffsets { get; set; } = true;
+    [Export(PropertyHint.Range, "0,24,1")] public float PathOffsetMaxPixels { get; set; } = 8f;
+    [Export(PropertyHint.Range, "0,30,0.1")] public float RouteAuditIntervalSeconds { get; set; } = 3f;
     [ExportGroup("Path Diversity")]
     [Export] public bool EnablePathDiversity { get; set; } = true;
     [Export(PropertyHint.Range, "0,3,0.05")] public float PathDiversityStrength { get; set; } = 0.6f;

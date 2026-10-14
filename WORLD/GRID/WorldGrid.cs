@@ -41,6 +41,7 @@ public partial class WorldGrid : Node2D
     #region Terrain and Occupancy
     private bool[] _buildable, _terrainBlocked, _occupied, _reserved;
     public int NavigationRevision { get; private set; }
+    public event Action<Vector2I?, bool> NavigationChanged;
     public WorldLevel Level { get; private set; }
 
     // =========================================================
@@ -63,6 +64,7 @@ public partial class WorldGrid : Node2D
         ReadLayer(Level.Walls); // Walls replace Ground rules, including false values.
         ReadFootprints(Level);
         NavigationRevision++;
+        NavigationChanged?.Invoke(null, true);
         QueueRedraw();
     }
 
@@ -125,7 +127,8 @@ public partial class WorldGrid : Node2D
     {
         if (PlacementFailure(cell).Length != 0) return false;
         _occupied[Index(cell)] = true;
-        if (!_terrainBlocked[Index(cell)]) NavigationRevision++;
+        if (!_terrainBlocked[Index(cell)])
+        { NavigationRevision++; NavigationChanged?.Invoke(cell, _occupied[Index(cell)]); }
         return true;
     }
 
@@ -135,7 +138,8 @@ public partial class WorldGrid : Node2D
     {
         if (!IsOccupied(cell)) return;
         _occupied[Index(cell)] = false;
-        if (!_terrainBlocked[Index(cell)]) NavigationRevision++;
+        if (!_terrainBlocked[Index(cell)])
+        { NavigationRevision++; NavigationChanged?.Invoke(cell, _occupied[Index(cell)]); }
     }
     #endregion
 
