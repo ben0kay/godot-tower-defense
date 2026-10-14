@@ -41,3 +41,7 @@ WaveChecks runs against Main's WaveManager/SpawnManager. It asserts immediate fi
 ## Kill rewards
 
 `EnemyKillRewardChecks` runs in the production-scene integration fixture after WaveChecks. It verifies 3 Credits from Enemy001 kills, event-driven HUD updates, one payout per kill, zero payouts on arrival, configurable zero-reward enemies, and identical payout for WaveManager-owned ships. Wallet and authored waves are restored afterward.
+
+## Death explosion feedback
+
+`DeathExplosionChecks` runs once in the Main scene integration suite. It tests that a killed Enemy001 creates exactly one shared puff, actual Sprite2D scale changes explosion size, optional per-enemy multiplier overrides the result, and arriving ships or repeated damage never trigger explosions. It checks active-effect cleanup and turns GPU particles off for the mass-kill navigation/wave suites. The test validates spawn/sizing logic; the rendered orange/grey smoke still needs an F5 visual check in Godot .NET.

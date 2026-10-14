@@ -28,6 +28,9 @@ z_index = 4
 [node name="Projectiles" type="Node2D" parent="."]
 z_index = 6
 
+[node name="Effects" type="Node2D" parent="."]
+z_index = 7
+
 [node name="EnemySystems" type="Node" parent="."]
 
 [node name="Registry" type="Node" parent="EnemySystems"]

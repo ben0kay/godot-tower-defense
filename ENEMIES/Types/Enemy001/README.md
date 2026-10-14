@@ -13,3 +13,7 @@ F5 -> tap F2 repeatedly. Each press spawns one ship at a permitted reachable Por
 ## Kill rewards
 
 `Enemy001.tres` -> **Rewards / Kill Reward Credits** is **3** by default. Every killed Enemy001, including F2 and wave spawns, grants 3 Credits to the current level's wallet. Other enemy types can set their own reward in their `EnemyDefinition.tres`; the shared default is 0. Ships reaching the Citadel or unloaded without a kill give no reward. An enemy can pay out only once. The wallet's `BalanceChanged` event updates the top-left HUD. Credit caps still apply. Wave-completion bonuses are a separate, future feature.
+
+## Death explosion
+
+Killed Enemy001 ships now produce an automatically sized **orange flash followed by a grey/orange smoke puff**; arrival at the Citadel produces none. Size is measured from Enemy001's actual `Sprite2D` (32×24 px by default), including all scale transforms. `Enemy001.tres` inherits **Death Feedback / Death Explosion Multiplier = 1.0** from the shared enemy definition, so **nothing needs to be configured on new enemy types**. Override just that multiplier if a particular enemy should have a bigger or more subtle puff. Shared look, particle count and size limits are in `FEEDBACK/DeathExplosion/`.

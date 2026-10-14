@@ -1,0 +1,75 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://FEEDBACK/DeathExplosion/DeathExplosion.cs" id="1_effect"]
+[ext_resource type="Resource" path="res://FEEDBACK/DeathExplosion/DefaultDeathExplosionConfig.tres" id="2_config"]
+[ext_resource type="Texture2D" path="res://FEEDBACK/DeathExplosion/Artwork/smoke_puff.svg" id="3_smoke"]
+
+[sub_resource type="Gradient" id="Gradient_smoke"]
+offsets = PackedFloat32Array(0, 0.24, 0.65, 1)
+colors = PackedColorArray(0.96, 0.55, 0.25, 0.9, 0.64, 0.56, 0.46, 0.75, 0.4, 0.43, 0.44, 0.48, 0.27, 0.31, 0.34, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture_smoke"]
+gradient = SubResource("Gradient_smoke")
+
+[sub_resource type="ParticleProcessMaterial" id="Material_smoke"]
+particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 4.0
+direction = Vector3(0, -1, 0)
+spread = 180.0
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 22.0
+initial_velocity_max = 48.0
+damping_min = 16.0
+damping_max = 34.0
+scale_min = 0.25
+scale_max = 0.5
+color_ramp = SubResource("GradientTexture_smoke")
+
+[sub_resource type="Gradient" id="Gradient_flash"]
+offsets = PackedFloat32Array(0, 0.25, 1)
+colors = PackedColorArray(1, 0.93, 0.65, 0.97, 1, 0.46, 0.17, 0.65, 0.85, 0.24, 0.09, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture_flash"]
+gradient = SubResource("Gradient_flash")
+
+[sub_resource type="ParticleProcessMaterial" id="Material_flash"]
+particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 2.0
+direction = Vector3(0, -1, 0)
+spread = 180.0
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 40.0
+initial_velocity_max = 90.0
+damping_min = 12.0
+damping_max = 30.0
+scale_min = 0.1
+scale_max = 0.22
+color_ramp = SubResource("GradientTexture_flash")
+
+[node name="DeathExplosion" type="Node2D"]
+script = ExtResource("1_effect")
+Style = ExtResource("2_config")
+
+[node name="Smoke" type="GPUParticles2D" parent="."]
+emitting = false
+amount = 16
+one_shot = true
+explosiveness = 1.0
+lifetime = 0.7
+local_coords = true
+visibility_rect = Rect2(-256, -256, 512, 512)
+texture = ExtResource("3_smoke")
+process_material = SubResource("Material_smoke")
+
+[node name="Flash" type="GPUParticles2D" parent="."]
+emitting = false
+amount = 5
+one_shot = true
+explosiveness = 1.0
+lifetime = 0.18
+local_coords = true
+visibility_rect = Rect2(-256, -256, 512, 512)
+texture = ExtResource("3_smoke")
+process_material = SubResource("Material_flash")

@@ -25,9 +25,14 @@ public partial class EnemyIntegrationChecks : Node
             _grid = _battle.GetNode<WorldGrid>("World/Grid");
             _spawns = _battle.GetNode<SpawnManager>("World/EnemySystems/Spawning");
             _paths = _spawns.Paths;
+            // =========================================================
+            // Disable cosmetic particles during mass-kill fixtures; test them separately below.
+            FeedbackMasterConfig feedback = GD.Load<FeedbackMasterConfig>("res://FEEDBACK/DefaultFeedbackConfig.tres");
+            feedback.DeathExplosionsEnabled = false;
             EconomyChecks.Run(_battle, _grid);
             WaveChecks.Run(_battle, _grid, _spawns);
             EnemyKillRewardChecks.Run(_battle, _spawns);
+            DeathExplosionChecks.Run(_battle, _spawns, feedback);
             int arrivedBefore = _spawns.Registry.ArrivedCount;
             LevelDebugController debug = _grid.Level.GetNode<LevelDebugController>("Debug");
             debug._UnhandledKeyInput(new InputEventKey { Keycode = Key.F2, Pressed = true });

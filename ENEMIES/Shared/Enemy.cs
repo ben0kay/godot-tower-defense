@@ -49,6 +49,13 @@ public partial class Enemy : Node2D
     {
         if (!IsAlive) return;
         IsAlive = false; Movement.SetPhysicsProcess(false);
+        if (!arrived)
+        {
+            Sprite2D visual = GetNodeOrNull<Sprite2D>("Sprite");
+            float fallback = Mathf.Max(1f, Definition?.RadiusPixels * 2f ?? 32f);
+            DeathExplosion.Spawn(GetNodeOrNull<Node2D>("../../Effects"), GlobalPosition,
+                DeathExplosion.MeasureVisualSize(visual, fallback), Definition?.DeathExplosionMultiplier ?? 1f);
+        }
         _registry.Unregister(this); _registry.RecordOutcome(arrived, this);
         Removed?.Invoke(this); QueueFree();
     }
