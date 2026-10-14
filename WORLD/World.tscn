@@ -35,6 +35,7 @@ script = ExtResource("6_registry")
 
 [node name="Navigation" type="Node" parent="EnemySystems"]
 script = ExtResource("4_nav")
+Config = ExtResource("8_config")
 
 [node name="Paths" type="Node" parent="EnemySystems"]
 script = ExtResource("5_paths")

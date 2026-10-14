@@ -99,6 +99,7 @@ public partial class EnemyIntegrationChecks : Node
             edge.TakeDamage(10000);
             Check(_spawns.Spawn(scene, true) == null, "Portal-only debug does not override edge-only level permissions");
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            SwarmNavigationChecks.Run(_grid, _paths, _spawns);
             ConfigureCorridor();
             Check(_spawns.PlacementFailure(new Vector2I(5, 10)).Length > 0, "Tower cannot seal the only spawn route");
             _battle.GetNode<TowerPlacementController>("TowerPlacement").Call("TryPlace", new Vector2I(5, 10));

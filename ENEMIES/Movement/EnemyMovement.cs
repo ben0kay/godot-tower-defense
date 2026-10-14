@@ -3,6 +3,7 @@ using Godot;
 
 public partial class EnemyMovement : Node
 {
+    public int RouteProfile { get; private set; }
     public Enemy Enemy { get; private set; }
     public float RemainingPathDistance => _paths != null && !_waiting && _revision == _paths.Navigation.Revision
         ? _remainingDistance : float.PositiveInfinity;
@@ -22,7 +23,7 @@ public partial class EnemyMovement : Node
     // Request once on spawn, then reuse the assigned route.
     public void Initialize(Enemy enemy, PathRequestManager paths)
     {
-        Enemy = enemy; _paths = paths; SetPhysicsProcess(true); RequestRoute();
+        Enemy = enemy; _paths = paths; RouteProfile = paths.AssignProfile(); SetPhysicsProcess(true); RequestRoute();
     }
 
     // =========================================================

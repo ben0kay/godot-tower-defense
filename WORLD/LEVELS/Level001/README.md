@@ -38,3 +38,7 @@ Open Level001.tscn and select **Debug** to edit Enabled, SpawnKey, EnemyScene an
 Select **ENEMIES/Types/Enemy001/Enemy001.tres** for health/speed. Select **TOWERS/Offensive/BattleTower/DefaultBattleTowerConfig.tres** for weapon range, shots/second, damage, projectile speed, target priority and search interval. Default First prioritizes the shortest remaining route to the Citadel among enemies in range. Each built tower has an independent Config copy; edit that tower in Godot's Remote Inspector for temporary per-instance tuning.
 
 Global active-enemy limit, failed-route retry and actual A* calls/frame live in **ENEMIES/DefaultEnemyConfig.tres**. Ships can overlap each other. Small ships use corner-safe cell-center routes; no large-ship routing or flocking yet. Guided bullets currently pass through walls. Route checks run on placement click; a green terrain preview may still reject a route-blocking build and explain why.
+
+## Swarm route preferences
+
+Select ENEMIES/DefaultEnemyConfig.tres and expand Path Diversity. Default four shared profiles use strength 0.6 and smooth eight-cell patches. Tap F2 repeatedly to compare routes where the painted map offers alternatives. Enable optional congestion with CongestionInfluence above zero; it affects new/repath requests at the snapshot interval. Turn EnablePathDiversity off for ordinary shortest paths. Separation settings are reserved and currently do nothing; single corridors can still look single-file.

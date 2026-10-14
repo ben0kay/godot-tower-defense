@@ -8,7 +8,23 @@ public partial class NavigationGrid : Node
     public WorldGrid Grid { get; private set; }
     public int Revision => Grid.NavigationRevision;
     public readonly List<Vector2I> Goals = new();
-    private readonly AStarGrid2D _astar = new();
+    [Export] public EnemyMasterConfig Config { get; set; }
+    public int CostRevision { get; private set; }
+    public int SharedProfileCount => _profiles.Count;
+    private readonly List<Profile> _profiles = new();
+    private readonly Dictionary<Vector2I, float> _crowd = new();
+    private EnemyRegistry _registry;
+    private float _crowdTimer;
+    private int _crowdRevision;
+    private (bool, float, int, int, int) _settings;
+    private sealed class Profile
+    {
+        public AStarGrid2D AStar;
+        public float[] BaseWeights;
+        public readonly List<Vector2I> CrowdCells = new();
+        public int CrowdRevision = -1;
+        public float Influence = -1f;
+    }
     private int _revision = -1;
 
     // =========================================================
@@ -16,11 +32,7 @@ public partial class NavigationGrid : Node
     public override void _Ready()
     {
         Grid = GetNode<WorldGrid>("../../Grid");
-        _astar.Region = new Rect2I(0, 0, Grid.Config.WidthCells, Grid.Config.HeightCells);
-        _astar.DiagonalMode = AStarGrid2D.DiagonalModeEnum.OnlyIfNoObstacles;
-        _astar.DefaultComputeHeuristic = AStarGrid2D.Heuristic.Octile;
-        _astar.DefaultEstimateHeuristic = AStarGrid2D.Heuristic.Octile;
-        _astar.Update();
+        _registry = GetNode<EnemyRegistry>("../Registry");
         Refresh();
     }
 
@@ -28,10 +40,13 @@ public partial class NavigationGrid : Node
     // Synchronize only on an occupancy/terrain revision; update() would reset solid flags.
     public void Refresh()
     {
+        EnsureProfiles();
         if (_revision == Revision) return;
+        _crowd.Clear(); _crowdRevision++; _crowdTimer = 0f;
         for (int y = 0; y < Grid.Config.HeightCells; y++)
             for (int x = 0; x < Grid.Config.WidthCells; x++)
-                _astar.SetPointSolid(new Vector2I(x, y), Grid.BlocksEnemies(new Vector2I(x, y)));
+                foreach (Profile profile in _profiles)
+                    profile.AStar.SetPointSolid(new Vector2I(x, y), Grid.BlocksEnemies(new Vector2I(x, y)));
         Goals.Clear();
         Node approaches = Grid.Level.Citadel?.GetNodeOrNull<Node>("ApproachPoints");
         if (approaches != null)
@@ -46,15 +61,139 @@ public partial class NavigationGrid : Node
 
     // =========================================================
     // One actual A* calculation; PathRequestManager bounds calls per physics frame.
-    public Vector2[] FindPath(Vector2 position, Vector2I goal)
+    public Vector2[] FindPath(Vector2 position, Vector2I goal) => FindPath(position, goal, 0, out _);
+
+    // =========================================================
+    // Each profile has its own shared cache; no temporary weights leak into another request.
+    public Vector2[] FindPath(Vector2 position, Vector2I goal, int profileId, out float cost)
     {
-        Refresh();
+        Refresh(); cost = float.PositiveInfinity;
         Vector2I start = Grid.WorldToCell(position);
         if (Grid.BlocksEnemies(start) || Grid.BlocksEnemies(goal)) return System.Array.Empty<Vector2>();
-        Godot.Collections.Array<Vector2I> cells = _astar.GetIdPath(start, goal);
+        Profile profile = _profiles[((profileId % _profiles.Count) + _profiles.Count) % _profiles.Count];
+        ApplyCrowd(profile);
+        Godot.Collections.Array<Vector2I> cells = profile.AStar.GetIdPath(start, goal);
         Vector2[] points = new Vector2[cells.Count];
-        for (int i = 0; i < cells.Count; i++) points[i] = Grid.CellToWorldCenter(cells[i]);
+        if (cells.Count == 0) return points;
+        cost = position.DistanceTo(Grid.CellToWorldCenter(cells[0])) / Grid.Config.CellSize;
+        for (int i = 0; i < cells.Count; i++)
+        {
+            points[i] = Grid.CellToWorldCenter(cells[i]);
+            if (i > 0) cost += ((Vector2)(cells[i] - cells[i - 1])).Length()
+                * profile.AStar.GetPointWeightScale(cells[i]);
+        }
         return points;
+    }
+
+    // =========================================================
+    // Re-score an earlier candidate against today's snapshot without another A* calculation.
+    public float RouteCost(Vector2 position, Vector2[] route, int profileId)
+    {
+        if (route.Length == 0) return float.PositiveInfinity;
+        Profile profile = _profiles[((profileId % _profiles.Count) + _profiles.Count) % _profiles.Count];
+        float influence = Config.EnablePathDiversity ? Mathf.Max(0f, Config.CongestionInfluence) : 0f;
+        float cost = position.DistanceTo(route[0]) / Grid.Config.CellSize;
+        for (int i = 1; i < route.Length; i++)
+        {
+            Vector2I cell = Grid.WorldToCell(route[i]);
+            _crowd.TryGetValue(cell, out float density);
+            cost += route[i - 1].DistanceTo(route[i]) / Grid.Config.CellSize
+                * (profile.BaseWeights[cell.Y * Grid.Config.WidthCells + cell.X] + influence * density);
+        }
+        return cost;
+    }
+
+    // =========================================================
+    // Build a bounded pool only on configuration changes, never a full grid per enemy.
+    private void EnsureProfiles()
+    {
+        var settings = (Config.EnablePathDiversity, Mathf.Max(0f, Config.PathDiversityStrength),
+            Mathf.Clamp(Config.RouteProfileCount, 1, 8), Mathf.Max(2, Config.PreferencePatchCells), Config.RoutePreferenceSeed);
+        if (_profiles.Count > 0 && _settings == settings) return;
+        foreach (Profile profile in _profiles) profile.AStar.Dispose();
+        _profiles.Clear(); _settings = settings; CostRevision++; _revision = -1;
+        int count = settings.Item1 ? settings.Item3 : 1;
+        for (int id = 0; id < count; id++)
+        {
+            Profile profile = new() { AStar = new AStarGrid2D(),
+                BaseWeights = new float[Grid.Config.WidthCells * Grid.Config.HeightCells] };
+            profile.AStar.Region = new Rect2I(0, 0, Grid.Config.WidthCells, Grid.Config.HeightCells);
+            profile.AStar.DiagonalMode = AStarGrid2D.DiagonalModeEnum.OnlyIfNoObstacles;
+            profile.AStar.DefaultComputeHeuristic = AStarGrid2D.Heuristic.Octile;
+            profile.AStar.DefaultEstimateHeuristic = AStarGrid2D.Heuristic.Octile;
+            profile.AStar.JumpingEnabled = false; // Godot jumping bypasses point weights.
+            profile.AStar.Update();
+            for (int y = 0; y < Grid.Config.HeightCells; y++)
+                for (int x = 0; x < Grid.Config.WidthCells; x++)
+                {
+                    float weight = 1f + (settings.Item1 ? settings.Item2 * Preference(x, y, id) : 0f);
+                    profile.BaseWeights[y * Grid.Config.WidthCells + x] = weight;
+                    profile.AStar.SetPointWeightScale(new(x, y), weight);
+                }
+            _profiles.Add(profile);
+        }
+    }
+
+    // =========================================================
+    // Smooth seeded value noise creates broad preferences, not random tile-by-tile zigzags.
+    private float Preference(int x, int y, int profile)
+    {
+        float px = (float)x / _settings.Item4, py = (float)y / _settings.Item4;
+        int ix = Mathf.FloorToInt(px), iy = Mathf.FloorToInt(py);
+        float tx = Mathf.SmoothStep(0f, 1f, px - ix), ty = Mathf.SmoothStep(0f, 1f, py - iy);
+        return Mathf.Lerp(Mathf.Lerp(Noise(ix, iy, profile), Noise(ix + 1, iy, profile), tx),
+            Mathf.Lerp(Noise(ix, iy + 1, profile), Noise(ix + 1, iy + 1, profile), tx), ty);
+    }
+
+    // =========================================================
+    // Integer hashing is deterministic across game runs and does not mutate global RNG state.
+    private float Noise(int x, int y, int profile)
+    {
+        uint hash = unchecked((uint)_settings.Item5 ^ (uint)x * 374761393u ^ (uint)y * 668265263u ^ (uint)(profile + 1) * 2246822519u);
+        hash = unchecked((hash ^ (hash >> 13)) * 1274126177u); hash ^= hash >> 16;
+        return (hash & 0x00ffffffu) / 16777215f;
+    }
+
+    // =========================================================
+    // O(living ships) at a throttled interval, with bounded density and no route recalculations.
+    public void UpdateCongestion(double delta)
+    {
+        _crowdTimer -= (float)delta;
+        if (_crowdTimer > 0f) return;
+        _crowdTimer = Mathf.Max(0.1f, Config.CongestionSnapshotSeconds);
+        _crowd.Clear(); _crowdRevision++;
+        if (!Config.EnablePathDiversity || Config.CongestionInfluence <= 0f) return;
+        foreach (Enemy enemy in _registry.Living)
+        {
+            Vector2I center = Grid.WorldToCell(enemy.GlobalPosition);
+            for (int y = -1; y <= 1; y++)
+                for (int x = -1; x <= 1; x++)
+                {
+                    Vector2I cell = center + new Vector2I(x, y);
+                    if (!Grid.IsInsideMap(cell)) continue;
+                    _crowd.TryGetValue(cell, out float density);
+                    _crowd[cell] = Mathf.Min(8f, density + (x == 0 && y == 0 ? 1f : 0.25f));
+                }
+        }
+    }
+
+    // =========================================================
+    // Restore the previous sparse snapshot before applying a new one to this shared profile.
+    private void ApplyCrowd(Profile profile)
+    {
+        float influence = Config.EnablePathDiversity ? Mathf.Max(0f, Config.CongestionInfluence) : 0f;
+        if (profile.CrowdRevision == _crowdRevision && profile.Influence == influence) return;
+        foreach (Vector2I cell in profile.CrowdCells)
+            profile.AStar.SetPointWeightScale(cell, profile.BaseWeights[cell.Y * Grid.Config.WidthCells + cell.X]);
+        profile.CrowdCells.Clear();
+        if (influence > 0f)
+            foreach (var entry in _crowd)
+            {
+                profile.AStar.SetPointWeightScale(entry.Key,
+                    profile.BaseWeights[entry.Key.Y * Grid.Config.WidthCells + entry.Key.X] + influence * entry.Value);
+                profile.CrowdCells.Add(entry.Key);
+            }
+        profile.CrowdRevision = _crowdRevision; profile.Influence = influence;
     }
 
     // =========================================================
@@ -124,5 +263,5 @@ public partial class NavigationGrid : Node
 
     // =========================================================
     // Release the native pathfinding resource with the world.
-    public override void _ExitTree() => _astar.Dispose();
+    public override void _ExitTree() { foreach (Profile profile in _profiles) profile.AStar.Dispose(); }
 }
