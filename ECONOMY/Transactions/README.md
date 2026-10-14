@@ -1,9 +1,9 @@
-# Transactions — Planned Shared Resource Costs and Atomic Payments
+# Shared costs and atomic payments
 
-**No ResourceCost class or spend implementation exists yet.** Codex will add `ResourceCost.cs` here, containing a typed reference to `ECONOMY/Resources/ResourceDefinition` and a nonnegative integer amount.
+ResourceCost is a GlobalClass Resource with ResourceDefinition and integer Amount. BattleTowerConfig.ConstructionCosts is an Inspector-editable Array<ResourceCost>; future tower types and upgrades can reuse the exact same shape.
 
-The **same resource-cost entry type** must be reusable by Battle Tower construction, all other tower types, tower upgrade tiers and future purchases/crafting. Avoid creating a second competing TowerCostEntry struct unless needed for tower-specific rules.
+DefaultBattleTowerConfig.tres contains one 200-Credits entry. The legacy BuildCost integer is retired; it is never also charged. Optional materials can be added to the same array, with balances granted through the wallet. No material generation gameplay exists yet.
 
-The wallet/service owns payment: aggregate and validate the whole cost array, prevent overflow/negative balances, **pay all or nothing**, and publish signals only after success. A denied tower placement must not deduct anything; if placement fails after reservation/payment, restore it safely. Later refunds and selling must not create resources from invalid state.
+EconomyManager combines duplicate ResourceIds before affordability checks, rejects malformed/null/negative/overflowing recipes, and commits all deductions before emitting events. Empty recipes are intentionally free; zero entries still require a valid resource. Grant validates amounts and caps. TryPurchase charges only after the caller's synchronous build callback succeeds.
 
-See `ECONOMY/README.md` and `TOWERS/README.md` for the handoff.
+Placement validates terrain/occupancy and spawn-to-Citadel connectivity before the purchase callback. Failed scene creation or later placement exceptions release occupancy and remove/free partial tower state, with no payment committed. Occupied cells prevent a repeat click from purchasing twice. There is no sell/refund or upgrade mechanic yet.

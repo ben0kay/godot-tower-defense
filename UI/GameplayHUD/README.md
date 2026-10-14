@@ -10,7 +10,7 @@ The HUD runs in the existing **CanvasLayer** from `Main.tscn`, above the hand-pa
 - The **bottom-right Inspector** is separate from the Ctrl tray. Clicking a build-menu button or placed tower can display information; closing the tray must not close the Inspector.
 - The full-screen HUD root ignores mouse events in unused space; its visible controls consume clicks so map placement and camera interaction continue to work.
 
-`GameplayHUD.cs` already exposes **`SetCredits(int amount)`**, **`SetCoreHealth(int current, int maximum)`**, and **`SetWave(int current, int total = 0)`**. They update their corresponding status zones, including health fill and color; no real economy, Citadel health, or WaveManager is connected. Preserve these existing entry points while refactoring and provide a better-named `SetCitadelHealth` API if useful, with `SetCoreHealth` forwarding to it until all callers are updated.
+`GameplayHUD.cs` already exposes **`SetCredits(int amount)`**, **`SetCoreHealth(int current, int maximum)`**, and **`SetWave(int current, int total = 0)`**. They update their corresponding status zones, including health fill and color; the live session economy supplies Credits; Citadel health and WaveManager are still future work. Preserve these existing entry points while refactoring and provide a better-named `SetCitadelHealth` API if useful, with `SetCoreHealth` forwarding to it until all callers are updated.
 
 ## Target: thin, persistent top status bar
 
@@ -28,7 +28,7 @@ The HUD runs in the existing **CanvasLayer** from `Main.tscn`, above the hand-pa
 
 | Position | Display | Current/future source |
 | --- | --- | --- |
-| **Top left** | Credits icon/label and current balance, e.g. `CREDITS 2,500` | Future **level/session economy** initialized from each level's own starting credits |
+| **Top left** | Credits icon/label and current balance, e.g. `CREDITS 2,500` | Live **level/session economy** initialized from each level's own starting credits |
 | **Top center** | `CITADEL` + **current / maximum health**, and a narrow color-changing health fill | Future **Citadel durability component** on the level's actual `WORLD/OBJECTIVES/Citadel/` instance |
 | **Top right** | `WAVE --` until implemented; later `WAVE 03` or `WAVE 03 / 10` when total is known | Future **ENEMIES/Waves/** WaveManager |
 
@@ -43,7 +43,7 @@ The HUD runs in the existing **CanvasLayer** from `Main.tscn`, above the hand-pa
 
 ### Credits: per-level starting amount, changing during play
 
-- Each level should **eventually expose an Inspector-editable `StartingCredits`** (suggested future field in `WORLD/LEVELS/LevelConfig.cs` / its per-level `.tres`). Different maps can start with different amounts; **don't hardcode 1,000 or any other balance in the HUD**.
+- Each level exposes Inspector-editable `StartingCredits` in `WORLD/LEVELS/LevelConfig.cs` / its per-level `.tres`. Different maps can start with different amounts; **don't hardcode 1,000 or any other balance in the HUD**.
 - Once the economy exists, one **runtime balance** (owned by a central economy/session service, not the UI or a particular tower) starts from `StartingCredits` on level start/restart and changes as towers are constructed, upgraded, sold, or income is earned. Changing levels initializes the appropriate new starting amount.
 - The HUD **subscribes to a CreditsChanged event/signal**, or is pushed updated values, then calls `SetCredits`; it should never calculate costs, spend currency or poll the balance every frame.
 - Credits are the primary currency displayed in the thin top bar. Additional build resources (Alloy, Energy Cells etc.) will be part of shared construction/upgrade costs per `TOWERS/README.md`. When relevant, show them in the **build tray or tower Inspector**, with optional small/expandable resource indicators later, rather than crowding the top bar.
@@ -99,6 +99,9 @@ GameplayHUD (Control, CanvasLayer parent)
 
 **Acceptance checks:** the three zones are in the requested positions, the center does not shift as left/right numbers grow, and labels stay readable at multiple resolutions; no false gameplay numbers appear before systems exist; simulated calls to each setter update only the proper zone, including Citadel bar fill/thresholds; the Ctrl build menu, Battle Tower placement, Inspector, camera interactions and Enemy001 combat remain unaffected.
 
-**Status:** the HUD-only pass is implemented. SetCitadelHealth displays clamped current/max health and inclusive warning/critical thresholds; SetCoreHealth forwards to it. Missing maximum hides the bar and restores CITADEL --. No wave progression, economy or Citadel HP gameplay exists yet.
+**Status:** the HUD-only pass is implemented. SetCitadelHealth displays clamped current/max health and inclusive warning/critical thresholds; SetCoreHealth forwards to it. Missing maximum hides the bar and restores CITADEL --. Live Credits now come from Main/Economy; wave progression and Citadel HP gameplay remain future work.
 
 TopBar/Status uses independent side labels and a center block. Resize events reserve disjoint zones, scale fonts on narrow windows and truncate overflow without shifting the objective. UIMasterConfig exposes status font/gap, Citadel block/bar dimensions and health colors/thresholds. TESTS/HudTowerChecks exercises placeholders, setters, 1920/1366/640 widths, thresholds and independent tray/Inspector behavior.
+
+## Live Credits integration
+EconomyManager initializes from the active LevelConfig.StartingCredits and pushes SetCredits through BalanceChanged events. Level001 starts with an Inspector-editable 1,000 credits and successful Battle Tower construction charges 200 by default. UI owns neither funds nor prices. Citadel/Wave still show -- until authoritative systems exist.

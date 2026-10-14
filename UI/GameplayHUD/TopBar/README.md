@@ -10,7 +10,7 @@ Keep the middle block *actually centered on the viewport* independently of the a
 
 **Currently implemented:** TopBar/Status has independent Credits and Wave labels and a centered Citadel VBox containing Health and Bar. GameplayHUD updates the three reserved zones on resize, keeping the objective centered as numbers grow. Narrow screens scale text and truncate overflow. The Ctrl shortcut remains in the bottom build tray.
 
-SetCredits and SetWave update text; SetCitadelHealth updates current/max, clamped fill and configured threshold colors. SetCoreHealth forwards for compatibility. Unknown state remains -- with no health fill. Layout and palette settings live in UIMasterConfig / DefaultUIConfig.tres.
+Main/Economy seeds and pushes live Credits through SetCredits; SetWave updates text; SetCitadelHealth updates current/max, clamped fill and configured threshold colors. SetCoreHealth forwards for compatibility. Unknown Citadel/Wave state remains -- with no health fill. Layout and palette settings live in UIMasterConfig / DefaultUIConfig.tres.
 
 **Later integration:** `WORLD/LEVELS/LevelConfig.cs` will eventually specify starting credits per level; a central economy/session service owns the changing balance; Citadel durability is owned by `WORLD/OBJECTIVES/Citadel/`; future `ENEMIES/Waves/` owns wave state. Bind event-driven updates to the HUD. Don't simulate those mechanics here.
 

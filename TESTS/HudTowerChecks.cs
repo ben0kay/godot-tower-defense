@@ -13,8 +13,8 @@ public static class HudTowerChecks
         Label wave = hud.GetNode<Label>("TopBar/Status/Wave");
         Label health = hud.GetNode<Label>("TopBar/Status/Citadel/Health");
         ProgressBar bar = hud.GetNode<ProgressBar>("TopBar/Status/Citadel/Bar");
-        Require(credits.Text == "CREDITS --" && wave.Text == "WAVE --" && health.Text == "CITADEL --" && !bar.Visible,
-            "HUD starts with unknown authoritative values");
+        Require(credits.Text == $"CREDITS {battle.GetNode<EconomyManager>("Economy").GetBalance(battle.GetNode<EconomyManager>("Economy").CreditsResource):N0}" && wave.Text == "WAVE --" && health.Text == "CITADEL --" && !bar.Visible,
+            "HUD starts with live credits and unknown objective/wave state");
         hud.SetCredits(12345678); hud.SetWave(100); hud.SetCitadelHealth(800, 1000);
         Require(credits.Text.Contains("12") && wave.Text == "WAVE 100" && bar.Value == 80,
             "Status setters update their respective zones");

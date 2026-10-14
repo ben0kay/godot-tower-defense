@@ -27,7 +27,7 @@ The main base occupies roughly cells (34,31)–(65,49), with disconnected island
 
 Paint decals on Decorations. A decal alone never grants build permission. The atlas is shared by all three layers and other levels; changing tile metadata affects every level using it.
 
-Portal cells are reserved against towers but passable; Citadel cells are reserved and blocked. Enemy spawning, budgeted pathfinding, route-preserving placement and Battle Tower firing are active. Economy, Citadel health and win/lose remain future work.
+Portal cells are reserved against towers but passable; Citadel cells are reserved and blocked. Enemy spawning, budgeted pathfinding, route-preserving placement and Battle Tower firing are active. Paid tower construction is active; Citadel health and win/lose remain future work.
 
 ## F2 enemy test and Inspector settings
 
@@ -48,3 +48,6 @@ Select ENEMIES/DefaultEnemyConfig.tres and expand Path Diversity. Default four s
 EnemyMasterConfig now exposes path-work/validation millisecond budgets, validation count limit, audit interval and movement offsets. Defaults: up to eight A* calculations and 2ms path work per physics frame, sixteen route checks and 0.5ms validity work, staggered audits around every three seconds, offsets enabled with an 8px maximum. Zero milliseconds disables that time limit; zero audit interval disables periodic audits. Time limits are soft per work item.
 
 Placing one tower updates one cell in each shared A* profile. Ships with unaffected routes continue moving. Affected remaining routes are checked/recalculated across frames, with nearby blockages prioritized. The debug HUD distinguishes placement validation, grid synchronization, native A*, total path work and validity-check time. Spawn/arrival endpoints remain exact; interior offsets taper near obstacles. Local separation is still future work.
+
+## Starting credits and construction
+In Level001Config.tres (or the level root Settings), edit Starting Resources / Starting Credits. This map currently starts at 1,000. Battle Tower requires 200 Credits by default; set Construction Costs in DefaultBattleTowerConfig.tres. F5 initializes a fresh wallet and successful builds update the top-left credit display. Invalid terrain, insufficient funds and route-blocking builds do not spend. There is no income/kill reward yet.

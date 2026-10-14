@@ -1,6 +1,14 @@
-[gd_resource type="Resource" script_class="BattleTowerConfig" format=3 uid="uid://dwkunf5wywb8t"]
+[gd_resource type="Resource" script_class="BattleTowerConfig" load_steps=5 format=3 uid="uid://dwkunf5wywb8t"]
 
 [ext_resource type="Script" uid="uid://cin5m60oapsu1" path="res://TOWERS/Offensive/BattleTower/BattleTowerConfig.cs" id="1_config"]
+[ext_resource type="Script" path="res://ECONOMY/Transactions/ResourceCost.cs" id="2_cost"]
+[ext_resource type="Resource" path="res://ECONOMY/Resources/Credits.tres" id="3_credits"]
+
+[sub_resource type="Resource" id="Resource_credit_cost"]
+script = ExtResource("2_cost")
+Resource = ExtResource("3_credits")
+Amount = 200
 
 [resource]
 script = ExtResource("1_config")
+ConstructionCosts = Array[ExtResource("2_cost")]([SubResource("Resource_credit_cost")])

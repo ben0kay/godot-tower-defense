@@ -30,6 +30,8 @@ public static class SwarmNavigationChecks
         foreach (Node child in grid.Level.Citadel.GetNode("ApproachPoints").GetChildren())
             ((Node2D)child).GlobalPosition = grid.CellToWorldCenter(goal);
         grid.Level.Settings.SpawnMode = LevelConfig.SpawnSourceMode.Portals;
+        // Synthetic arena repositions one portal; exclude other authored exits from this fixture.
+        grid.Level.Settings.ActivePortals = new() { new NodePath("Portals/EnemyPortal") };
         grid.RebuildTerrain(); config.EnablePathDiversity = true; config.CongestionInfluence = 0;
         NavigationGrid nav = paths.Navigation;
         HashSet<int> corridors = new();

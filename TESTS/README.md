@@ -26,3 +26,11 @@ SmoothRepathChecks also runs in the integration scene. It deliberately delays re
 ## Defense bar regression checks
 
 The integration fixture now also asserts that Enemy001 has a hidden full-health bar, a damaging hit reveals the correct fractional fill, rotation stays counter-aligned, max-health scaling grows to but not beyond its width cap, and full/zero health hide the component. It doesn't replace visual inspection in F5 for pixel alignment and scale.
+
+## Construction economy and HUD checks
+
+EconomyChecks runs in the same Main-based fixture: per-level starting-credit/reset behavior, live HUD values/events, duplicate IDs and multi-resource costs, invalid/negative/overflow recipes and grants, recursive transaction rejection, creation failures before and after occupancy, successful 200-credit purchases, insufficient funds, repeated occupied-cell clicks and deep config/cost isolation. Actual secondary-material construction is exercised by temporary in-memory costs; no saved resource is changed. The route-sealing fixture asserts payment remains unchanged.
+
+HudTowerChecks now expects initialized live Credits, with Citadel/Wave still unknown. It checks the independent status APIs, true center/non-overlap at 1920/1366/640 widths, health thresholds/clamps, tray/Inspector independence and shortest-angle/speed-capped turret aiming. Weapon checks also verify no firing before alignment and a fixed placement root.
+
+Synthetic swarm/repath fixtures explicitly select the one portal they reposition, so additional authored portals do not alter controlled start positions or route lengths. The initial live-level checks retain all configured portals.

@@ -1,9 +1,9 @@
-# Wallet — Planned Runtime EconomyManager
+# Session wallet
 
-**No EconomyManager script exists yet.** Codex will implement `EconomyManager.cs` here.
+EconomyManager is the single Main/Economy node for the loaded battlefield. It initializes from World/Grid.Level.Settings.StartingCredits after the HUD is ready. A fresh Main scene starts a fresh wallet; Initialize(newLevelSettings) also clears all prior resource balances. It does not carry campaign balances or save state.
 
-Responsibilities: maintain one current balance per resource definition **for the loaded level/session**, initialize from each level's Inspector-editable `StartingCredits`, validate credits and other resources, award/grant, and publish balance-change signals to the HUD. Do not create a wallet for each tower; no per-frame polling.
+GetBalance, CanAfford, TrySpend, TryPurchase and Grant identify resources by their stable ResourceId, not display text or asset instance. BalanceChanged fires after all balances in a transaction are committed. Credits changes push GameplayHUD.SetCredits; there are no economy/HUD polling ticks.
 
-Expose a compact API such as `GetBalance(resource)`, `CanAfford(costs)`, `TrySpend(costs)`, `Grant(resource, amount)`, and a `BalanceChanged` signal/event. Route every construction/upgrade payment through this service, never directly edit an HUD label.
+EconomyMasterConfig sets maximum balance and the explicit AllowNegativeBalances policy (off by default). Starting values clamp to the valid nonnegative range. Invalid/negative entries and duplicate-cost overflow reject the complete transaction. Grants reject overflow instead of silently losing excess.
 
-Default policy: no negative balances. Full `ECONOMY/README.md` lists the tower integration and failure/rollback tests.
+TryPurchase validates the complete recipe, runs a synchronous world commit callback, then deducts once. While that callback runs, wallet mutation/reset and recursive purchases are prevented. A false result or exception does not deduct; the caller must undo any world changes it made. TowerPlacementController does this for its scene/occupancy/index.

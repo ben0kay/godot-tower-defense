@@ -2,6 +2,8 @@
 // WorldGrid owns occupancy; the local dictionary only finds/selects tower instances.
 using Godot;
 using System.Collections.Generic;
+using System;
+using System.Text;
 
 public partial class TowerPlacementController : Node2D
 {
@@ -16,6 +18,8 @@ public partial class TowerPlacementController : Node2D
     #endregion
 
     #region State
+    private EconomyManager _economy;
+    private bool _affordable, _previewDirty;
     private WorldGrid _grid;
     private GameplayHUD _hud;
     private SpawnManager _spawns;
@@ -32,6 +36,8 @@ public partial class TowerPlacementController : Node2D
     // One placement ghost; the world and HUD continue to own their separate responsibilities.
     public override void _Ready()
     {
+        _economy = GetNode<EconomyManager>("../Economy");
+        _economy.BalanceChanged += OnBalanceChanged;
         _grid = GetNode<WorldGrid>("../World/Grid");
         _spawns = GetNode<SpawnManager>("../World/EnemySystems/Spawning");
         _towers = GetNode<Node2D>("../World/Towers");
@@ -51,6 +57,7 @@ public partial class TowerPlacementController : Node2D
     public override void _ExitTree()
     {
         if (GodotObject.IsInstanceValid(_hud)) _hud.TowerChoiceRequested -= OnTowerChoiceRequested;
+        if (GodotObject.IsInstanceValid(_economy)) _economy.BalanceChanged -= OnBalanceChanged;
     }
     #endregion
 
@@ -61,6 +68,8 @@ public partial class TowerPlacementController : Node2D
     {
         if (id != "battle") { CancelPlacement(); return; }
         SelectTower(null);
+        _affordable = _economy.CanAfford(BattleConfig.ConstructionCosts);
+        _previewDirty = true;
         _placing = true;
         SetProcess(true);
         _hud.ShowTowerDetails(BattleConfig.DisplayName, "Offensive / Build Preview",
@@ -78,10 +87,11 @@ public partial class TowerPlacementController : Node2D
     {
         Vector2I cell = _grid.WorldToCell(GetGlobalMousePosition());
         bool visible = _placing && !IsOverUi() && _grid.IsInsideMap(cell);
-        bool valid = visible && _grid.PlacementFailure(cell).Length == 0;
-        if (_previewVisible == visible && _previewValid == valid && (!visible || cell == _hoverCell))
+        bool valid = visible && _affordable && _grid.PlacementFailure(cell).Length == 0;
+        if (!_previewDirty && _previewVisible == visible && _previewValid == valid && (!visible || cell == _hoverCell))
             return;
 
+        _previewDirty = false;
         _previewVisible = visible;
         _previewValid = valid;
         _hoverCell = cell;
@@ -91,7 +101,7 @@ public partial class TowerPlacementController : Node2D
             if (_selected == null)
                 _hud.ShowTowerDetails(BattleConfig.DisplayName, "Offensive / Build Preview", DescribeTower(),
                     valid ? "Left-click to build. Right-click / Esc cancels."
-                        : _grid.PlacementFailure(cell));
+                        : _grid.PlacementFailure(cell).Length > 0 ? _grid.PlacementFailure(cell) : "Insufficient resources.");
             _ghost.GlobalPosition = _grid.CellToWorldCenter(cell);
             _ghost.Modulate = valid ? new Color(0.45f, 1f, 0.73f, 0.66f)
                 : new Color(1f, 0.35f, 0.31f, 0.56f);
@@ -151,14 +161,59 @@ public partial class TowerPlacementController : Node2D
             _hud.ShowTowerDetails(BattleConfig.DisplayName, "Placement rejected", DescribeTower(), failure);
             return;
         }
-        BattleTower tower = BattleTowerScene.Instantiate<BattleTower>();
-        tower.Config = (BattleTowerConfig)BattleConfig.Duplicate();
-        if (!_grid.TryOccupy(cell)) { tower.Free(); return; }
-        _towers.AddChild(tower);
-        tower.SetPlacement(cell, _grid.CellToWorldCenter(cell));
-        _placedTowers.Add(cell, tower);
+        BattleTower tower = null;
+        if (!_economy.TryPurchase(BattleConfig.ConstructionCosts, () => CommitTower(cell, out tower)))
+        {
+            _hud.ShowTowerDetails(BattleConfig.DisplayName, "Placement rejected", DescribeTower(),
+                _economy.CanAfford(BattleConfig.ConstructionCosts) ? "Tower creation failed; no resources charged."
+                    : "Insufficient resources.");
+            return;
+        }
         SelectTower(tower);
         UpdatePreview();
+    }
+
+    // =========================================================
+    // Roll back occupancy and the scene on creation failure, before the wallet deducts payment.
+    private bool CommitTower(Vector2I cell, out BattleTower tower)
+    {
+        tower = null;
+        bool occupied = false;
+        try
+        {
+            if (BattleTowerScene == null) return false;
+            Node instance = BattleTowerScene.Instantiate();
+            if (instance is not BattleTower created) { instance.Free(); return false; }
+            if (created.GetNodeOrNull<Node2D>("TurretPivot") == null
+                || created.GetNodeOrNull<Sprite2D>("TurretPivot/Sprite") == null)
+            { created.Free(); return false; }
+            tower = created;
+            tower.Config = (BattleTowerConfig)BattleConfig.Duplicate(true);
+            if (!_grid.TryOccupy(cell)) { tower.Free(); tower = null; return false; }
+            occupied = true;
+            _towers.AddChild(tower);
+            tower.SetPlacement(cell, _grid.CellToWorldCenter(cell));
+            if (tower.GetParent() != _towers) throw new InvalidOperationException("Tower did not enter the world.");
+            _placedTowers.Add(cell, tower);
+            return true;
+        }
+        catch (Exception exception)
+        {
+            _placedTowers.Remove(cell);
+            if (GodotObject.IsInstanceValid(tower)) tower.Free();
+            if (occupied) _grid.ReleaseOccupancy(cell);
+            tower = null;
+            GD.PushWarning("Tower creation rolled back: " + exception.Message);
+            return false;
+        }
+    }
+
+    // =========================================================
+    // Refresh affordability only when wallet state changes, not on every preview frame.
+    private void OnBalanceChanged(string resourceId, int amount)
+    {
+        _affordable = _economy.CanAfford(BattleConfig.ConstructionCosts);
+        _previewDirty = true;
     }
 
     // =========================================================
@@ -173,7 +228,7 @@ public partial class TowerPlacementController : Node2D
             _selected.SetSelected(true);
             _hud.ShowTowerDetails(BattleConfig.DisplayName, "Offensive / Placed",
                 DescribeTower($"Grid cell: {_selected.GridCell.X}, {_selected.GridCell.Y}"),
-                _selected.Config.Description + "\nAutomatic firing active; credits are not charged.");
+                _selected.Config.Description + "\nConstruction paid; automatic firing active.");
         }
         QueueRedraw();
     }
@@ -189,16 +244,32 @@ public partial class TowerPlacementController : Node2D
 
     #region Feedback
     // =========================================================
-    // Show active weapon stats; only the future economy price remains planned.
+    // Show active weapon stats and the one authoritative shared construction recipe.
     private string DescribeTower(string extra = "")
     {
         BattleTowerConfig config = _selected?.Config ?? BattleConfig;
         string stats = $"Footprint: 1 x 1 | Barrels: 1\n" +
-            $"Cost (planned): {config.BuildCost}\n" +
+            $"Cost: {DescribeCosts(config)}\n" +
             $"Range: {config.RangePixels:0} px\n" +
             $"Rate: {config.ShotsPerSecond:0.##} shots/s\n" +
             $"Damage: {config.DamagePerShot}\nTargeting: {config.TargetPriority}";
         return extra.Length == 0 ? stats : stats + "\n" + extra;
+    }
+
+    // =========================================================
+    // The Inspector displays every required resource, including future optional materials.
+    private static string DescribeCosts(BattleTowerConfig config)
+    {
+        if (config.ConstructionCosts == null) return "Invalid cost configuration";
+        StringBuilder text = new();
+        foreach (ResourceCost cost in config.ConstructionCosts)
+        {
+            if (cost?.Resource == null || string.IsNullOrWhiteSpace(cost.Resource.ResourceId) || cost.Amount < 0) return "Invalid cost configuration";
+            if (cost.Amount == 0) continue;
+            if (text.Length > 0) text.Append(", ");
+            text.Append($"{cost.Amount:N0} {cost.Resource.DisplayName}");
+        }
+        return text.Length == 0 ? "Free" : text.ToString();
     }
 
     // =========================================================

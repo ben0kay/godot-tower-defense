@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="PackedScene" path="res://WORLD/World.tscn" id="1_world"]
 [ext_resource type="PackedScene" path="res://CAMERA/CameraRig.tscn" id="2_camera"]
@@ -9,6 +9,10 @@
 [ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/DefaultBattleTowerConfig.tres" id="7_battleconfig"]
 [ext_resource type="Texture2D" path="res://TOWERS/Offensive/BattleTower/Artwork/battle_tower.svg" id="8_battleart"]
 [ext_resource type="Resource" path="res://TOWERS/DefaultTowerConfig.tres" id="9_towermaster"]
+
+[ext_resource type="Script" path="res://ECONOMY/Wallet/EconomyManager.cs" id="10_economy"]
+[ext_resource type="Resource" path="res://ECONOMY/DefaultEconomyConfig.tres" id="11_economyconfig"]
+[ext_resource type="Resource" path="res://ECONOMY/Resources/Credits.tres" id="12_credits"]
 
 [node name="Battlefield" type="Node2D"]
 
@@ -26,3 +30,9 @@ BattleArtwork = ExtResource("8_battleart")
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="GameplayHUD" parent="UI" instance=ExtResource("4_hud")]
+
+
+[node name="Economy" type="Node" parent="."]
+script = ExtResource("10_economy")
+Config = ExtResource("11_economyconfig")
+CreditsResource = ExtResource("12_credits")

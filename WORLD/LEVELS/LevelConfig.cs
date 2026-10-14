@@ -7,6 +7,9 @@ public partial class LevelConfig : Resource
     public enum SpawnSourceMode { Portals, MapEdges, Both }
     [System.Flags] public enum MapEdge { None = 0, Top = 1, Bottom = 2, Left = 4, Right = 8 }
 
+    [ExportGroup("Starting Resources")]
+    [Export(PropertyHint.Range, "0,2000000000,100")] public int StartingCredits { get; set; } = 0;
+
     [ExportGroup("Enemy Entry")]
     [Export] public SpawnSourceMode SpawnMode { get; set; } = SpawnSourceMode.Portals;
     [Export(PropertyHint.Flags, "Top,Bottom,Left,Right")] public MapEdge AllowedEdges { get; set; } = MapEdge.Left;

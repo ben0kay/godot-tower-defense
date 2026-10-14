@@ -25,6 +25,7 @@ public partial class EnemyIntegrationChecks : Node
             _grid = _battle.GetNode<WorldGrid>("World/Grid");
             _spawns = _battle.GetNode<SpawnManager>("World/EnemySystems/Spawning");
             _paths = _spawns.Paths;
+            EconomyChecks.Run(_battle, _grid);
             LevelDebugController debug = _grid.Level.GetNode<LevelDebugController>("Debug");
             debug._UnhandledKeyInput(new InputEventKey { Keycode = Key.F2, Pressed = true });
             Check(_spawns.Registry.Living.Count == 1, "F2 creates one Enemy001");
@@ -129,7 +130,11 @@ public partial class EnemyIntegrationChecks : Node
             SwarmNavigationChecks.Run(_grid, _paths, _spawns);
             ConfigureCorridor();
             Check(_spawns.PlacementFailure(new Vector2I(5, 10)).Length > 0, "Tower cannot seal the only spawn route");
+            EconomyManager wallet = _battle.GetNode<EconomyManager>("Economy");
+            int beforeRejectedBuild = wallet.GetBalance(wallet.CreditsResource);
             _battle.GetNode<TowerPlacementController>("TowerPlacement").Call("TryPlace", new Vector2I(5, 10));
+            Check(wallet.GetBalance(wallet.CreditsResource) == beforeRejectedBuild,
+                "Route-sealing placement never charges credits");
             Check(!_grid.IsOccupied(new Vector2I(5, 10)), "Actual placement rejects a sealed route");
             Check(_paths.Navigation.FindPath(_grid.CellToWorldCenter(new(3, 10)), new(9, 10)).Length > 0, "Controlled corridor has a route");
             _grid.TryOccupy(new Vector2I(5, 10));

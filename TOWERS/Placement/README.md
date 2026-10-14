@@ -1,11 +1,9 @@
-# Tower Placement
+# Tower placement
 
-`TowerPlacementController.cs` wires the GameplayHUD `TowerChoiceRequested("battle")` event to grid-aligned creation and selection of `BattleTower.tscn` instances.
+TowerPlacementController connects the HUD Battle choice to grid-snapped placement and selection of BattleTower.tscn. Ctrl toggles the tray; Battle enters build mode; left-click builds repeatedly; right-click/Esc cancels. Clicking a placed tower outside build mode opens its independent Inspector and range ring.
 
-**Ctrl** opens/closes the tower menu. Click **BATTLE** to enter build mode; a green translucent SVG follows a free cell, red signals occupancy. Left-click to place, repeating as needed. **Right-click or Esc** cancels. Outside build mode, click an existing tower to inspect and highlight it (including a proposed range circle); click empty space to deselect. Tower bar and Inspector remain independent.
+WorldGrid owns bounds, tile rules and occupancy. SpawnManager checks required spawn-to-Citadel connectivity and existing ship routes. These validations precede the EconomyManager.TryPurchase transaction. The tower scene/config is created, occupancy claimed and the tower indexed before the wallet commits payment. Failure frees partial scene state and releases occupancy; no credits are lost. An occupied cell rejects repeated clicks before payment.
 
-The controller uses a `Dictionary<Vector2I, BattleTower>` for constant-time occupancy checks; instances are under `World/Towers`. No collider or per-tower `_Process` is created. World mouse input is handled only when not consumed by UI controls.
+Default Battle Tower costs 200 Credits, from BattleTowerConfig.ConstructionCosts. The preview and Inspector display the shared ResourceCost recipe. Wallet events refresh cached affordability, so preview movement does not aggregate costs every frame. Green indicates terrain/occupancy and affordability suitability; connectivity is checked on actual placement. Red shows invalid terrain or insufficient resources. No silent free-build bypass exists.
 
-**Not yet implemented:** cost checks/deduction, guns/projectiles, target acquisition, enemy navigation, build restrictions other than bounds/occupancy, saves and upgrades. Future tower placement must validate portal-to-goal connectivity when building can block ship paths (`NOTES/NAVIGATION_PERFORMANCE_PLAN.md`).
-
-Battle Tower config: `TOWERS/Offensive/BattleTower/DefaultBattleTowerConfig.tres`. Preview/range switches: `TOWERS/DefaultTowerConfig.tres`.
+Placed configs are deeply duplicated, including nested costs. Towers live under World/Towers; a local cell dictionary provides selection lookup. GameplayHUD only displays values; Main/Economy owns balances. Combat/rotation/navigation remain active. Saving, upgrades, tower damage and selling remain future work.
