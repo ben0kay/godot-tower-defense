@@ -275,12 +275,51 @@ A `TowerStatTrace` can store a **stage-name + copied stat snapshot** after each 
 
 **Acceptance for this architecture:** a developer can open **`TOWERS/Shared/Stats/Pipeline/TowerStatPipeline.cs` and see the entire actual execution sequence at a glance**, open any numbered file to find that step's implementation, inspect optional stage-by-stage values, and follow each source back to its natural owning feature folder. No other class should contain a competing full copy of the pipeline.
 
-### Implementation order within Phase 3
+### Phase 3A — Pipeline foundation ONLY (implement this first)
 
-1. Establish immutable base inputs, typed final-stat resolution and the ordered pipeline; initially unused rank/research/level/effect stages are neutral.
-2. Implement purchased tier state/data, atomically paid upgrades and Inspector preview/button using the shared resolver. Deliver a working Battle Tower upgrade first without requiring future research/rank/ability gameplay.
-3. Add earned ranks, permanent profile research, level conditions and active effects in separate focused passes through those existing stage boundaries. No competing stat mutation paths or second wallet.
-4. Add meaningful tests as stages become active: instance/base isolation; atomic upgrade payment/failure; tier preview matching applied final stats; rank kill attribution; deterministic stacking; repeated recalculation without drift; effect removal after other input changes; research retained across level restart/change/save/load; level-condition replacement; new towers inheriting applicable bonuses; safety bounds and unchanged navigation/combat.
+**Explicit decision: it is NOT necessary to build purchased upgrades, kill-based ranks, permanent research, level conditions or active buff/debuff systems before the pipeline.** Codex should first implement the **entire numbered pipeline structure** with the currently available **Base Stats → neutral future stages → Safety Clamps → Final Stats**. This is the next standalone deliverable, and must compile and run with *zero research, rank, upgrade or modifier data present*.
+
+| Pipeline file | Phase 3A behavior | When real logic is added |
+| --- | --- | --- |
+| `01_BaseStats.cs` | **ACTIVE:** copy actual authored Battle Tower values from its current Config/definition into typed working stat values. | Continue reading immutable base data for every future tower. |
+| `02_TowerUpgrades.cs` | **NEUTRAL PASS-THROUGH:** return the incoming values unchanged; no tier purchases/UI yet. | Phase 3B: purchased tower tiers. |
+| `03_TowerRanks.cs` | **NEUTRAL PASS-THROUGH:** no rank/kill attribution required. | Later: per-instance ranks and kill milestones. |
+| `04_PermanentResearch.cs` | **NEUTRAL PASS-THROUGH:** no ResearchManager or player-profile save required. | Later: persistent player research sourced outside levels. |
+| `05_LevelModifiers.cs` | **NEUTRAL PASS-THROUGH:** no per-level condition data/files required. | Later: authored `LEVELS/` modifiers supplied by the active level. |
+| `06_ActiveEffects.cs` | **NEUTRAL PASS-THROUGH:** no effect managers, stack logic or duration timers required. | Later: timed buffs/debuffs. |
+| `07_SafetyClamps.cs` | **ACTIVE:** enforce sensible bounds/finite values; allow intentional zero shots/sec to disable firing. | Extend for new capability-specific stats. |
+| `08_FinalStats.cs` | **ACTIVE:** publish a separate, immutable/read-only per-instance `TowerFinalStats`. | All gameplay systems continue reading effective values. |
+
+**Simple neutral-stage implementation (illustrative):**
+
+```csharp
+// 04_PermanentResearch.cs — no permanent-research system required yet.
+public static class PermanentResearchStage
+{
+    // =========================================================
+    // Neutral until a player/profile research system is implemented.
+    public static TowerStatBlock Apply(TowerStatBlock stats, TowerStatContext context)
+        => stats;
+}
+```
+
+**Requirements for Codex in 3A:**
+- Create `TOWERS/Shared/Stats/` and its `Pipeline/` folder with the proposed numbered stage files, coordinator, typed source/context and final stats. Use one small, explicitly ordered resolver; no duplicated stage logic in `BattleTower.cs`.
+- **Build only the dependencies that exist now.** `TowerStatContext` should accept neutral/empty future inputs without trying to resolve nonexistent managers, services, `.tres` assets, level modifier files or permanent research saves. A neutral stage does not need an empty Godot `Node` or manager; it is a simple C# function.
+- Keep initial Battle Tower base values from `BattleTowerConfig` unchanged: range, fire rate, damage, projectile speed, aiming/rotation, targeting intervals as appropriate. Keep IDs, priority, resource costs and other non-stat metadata in their existing owners. Do **not** invent new balance numbers or restructure wave/level folders.
+- Wire the **actual Battle Tower runtime** to cached `TowerFinalStats` where a value is a resolvable stat, rather than continuing to bypass the pipeline through `Config`. Build/rebuild on initialization and relevant future changes, never every physics tick. Preserve the existing in-editor/in-game Inspector tuning workflow: changes to an instance's Config need an explicit safe way to invalidate/rebuild stats, and tests should verify the supported workflow.
+- With the six neutral/active stages described above, **effective stats must equal the original base values**, except documented safety clamps/rounding. Existing fire rate, damage, projectile motion, turret rotation, targeting, placement, credits and HUD behavior must remain the same. Separate FinalStats instances must not mutate or alias shared `.tres` configuration.
+- Intermediate-stage debugging (optional `TowerStatTrace`) may show identical values throughout neutral stages; keep tracing opt-in and allocation-free in normal combat.
+- Test the real baseline Battle Tower and stat-resolution determinism, stage order, source-versus-final isolation, zero shots/sec, clamps and per-tower independence. Confirm F5 gameplay and headless regressions pass. Only update docs for features that actually work.
+
+**Acceptance:** Phase 3A is complete when a developer can open `TowerStatPipeline.cs`, visibly follow **all eight numbered steps**, and run the existing Battle Tower with unchanged gameplay—even though upgrade, rank, research, level-modifier and active-effect systems are **not implemented at all**.
+
+### Implementation order after the foundation
+
+1. **Phase 3A (NOW):** implement the ordered pipeline, immutable base/final separation, neutral future stages, runtime FinalStats wiring, safety validation and baseline regression tests only.
+2. **Phase 3B (NEXT):** implement purchased upgrade-tier data, atomic `ECONOMY/` payments and an upgrade preview/button; activate only the `02_TowerUpgrades.cs` stage. The later stages stay neutral.
+3. **Phase 3C+ (LATER):** implement ranks, player/profile research, authored level conditions and temporary buffs/debuffs in separate focused passes, activating **their existing stage files** without restructuring the resolver or changing prior stages.
+4. Add feature-specific tests **when those future systems actually exist**: per-tower kill attribution, research retained across level changes/save/load, level-rule replacement, deterministic effect stacking/removal, preview parity and drift-free recomputation. Do not fabricate placeholder gameplay or future managers to satisfy tests prematurely.
 
 Illustrative Battle Tower progression (**NOT approved final balance**):
 
@@ -295,7 +334,7 @@ Keep actual progression per tower editable in Resources, not in a global switch 
 
 ## Next implementation pass
 
-Phase 1 rotation and Phase 2 wallet/paid construction are implemented. Next is **Phase 3 upgrades with the layered stat foundation**: implement base/final separation and the ordered resolver, then instance/tier data, ResourceCost payments and the Inspector. Rank, permanent research, level conditions and active-effect gameplay follow in later focused passes. Do not create another wallet, rebuild aiming or reintroduce BuildCost.
+Phase 1 rotation and Phase 2 wallet/paid construction are implemented. **Next is Phase 3A — foundation ONLY:** create the full eight-stage numbered stat pipeline with neutral placeholders for upgrades, ranks, persistent research, level modifiers and buffs/debuffs; implement real base stats, safety clamps and final effective stats, then wire the Battle Tower to the resolver without changing gameplay. **No purchased upgrades, research systems, rank tracking, modifier managers or upgrade UI in 3A.** Phase 3B adds paid upgrades afterward; ranks, research, level conditions and active-effect gameplay follow in separate passes. Do not create another wallet, rebuild aiming or reintroduce BuildCost.
 
 Tests currently cover rotation/cooldown, atomic payments, paid placement and nested config isolation. Add tier progression and upgrade effects/payment checks when upgrades are implemented.
 
