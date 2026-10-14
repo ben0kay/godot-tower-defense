@@ -20,6 +20,7 @@ mouse_filter = 2
 visible = false
 layout_mode = 0
 mouse_filter = 2
+text_overrun_behavior = 3
 z_index = 2
 script = ExtResource("1_reward")
 
