@@ -306,6 +306,8 @@ public partial class GameplayHUD : Control
         _citadelBarTween?.Kill();
         if (maximum <= 0)
         {
+            _citadelFlashTween?.Kill();
+            _core.Modulate = Colors.White;
             _core.Text = "CITADEL --"; _healthBar.Value = 0;
             _previousCitadelHealth = -1; _previousCitadelMax = 0;
             return;
