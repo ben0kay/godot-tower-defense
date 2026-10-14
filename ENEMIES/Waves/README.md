@@ -1,6 +1,22 @@
-# WAVES — Hand-Authored Enemy Waves (Codex Implementation Plan)
+# WAVES — Hand-Authored Enemy Waves
 
-> **Status: planned; no WaveManager exists yet.** This README is the canonical handoff for implementing **finite, carefully authored waves** in Godot 4 C#/.NET. Preserve the existing ENEMIES/Spawning, navigation, EnemyRegistry, F2 debug spawn and HUD. The goal is to edit wave composition directly in **clear, compact C# files**, not large Godot Inspector arrays.
+> **Status: Phase 1 implemented.** Main/Waves is a single WaveManager; Level001 manually runs three Enemy001-only test waves. C# definitions, exact weighted composition, random eligible portals, owned completion, bounded retries and the HUD Start/Next button are active. The sections below retain the design specification for future passes; proposed Enemy002/003 and modifier mechanics are not implemented.
+
+## Implemented Phase 1 playtest
+
+F5 loads **WAVE 00 / 03** without spawning. Press **START WAVE** below the top-right status. Wave 1 uses the requested 10 ships at 0.1s, 2s post-delay, 5 ships at 0.3s, 5s post-delay, then 20 ships at 0.2s; all are Enemy001 for now. The button shows remaining scheduled + alive ships while disabled. After every owned ship is killed or arrives, **NEXT WAVE** becomes available. F2 debug ships are unowned and cannot hold waves open. The final wave displays COMPLETE without auto-restarting.
+
+Edit Definitions/Level001Waves.cs for batches and WaveCatalog.cs for future wave sets/scenes. LevelConfig.Waves/WaveSetId chooses the set; empty disables waves and unknown IDs show SETUP ERROR. DefaultEnemyConfig.tres/Wave Scheduling exposes a two-attempt/frame limit, 0.5s retry and seed 12345. SpawnBlocked shows the reason in the button/status tooltip and retains planned ships.
+
+SpawnManager.SpawnWave uses uniform random eligible portals for each ship, preserves level source permissions, prefers portals in Both mode and falls back to permitted edges only when no portal is eligible. An optional entry Portal field already supports a named registered entrance without fallback; advanced portal policies/modifiers remain future work. It uses existing revision-cached connectivity and per-enemy spawn clearance, with no extra synchronous A* requests.
+
+WaveManager uses one countdown and no per-ship timers. Composition is prepared once per batch using exact largest-remainder quotas and seeded shuffle. Positive intervals run from successful spawns; final post-delay is ignored. Overshot frame time is discarded rather than producing catch-up bursts; zero-interval batches remain attempt-bounded. Waiting/ready/completed states have no scheduler ticks. Cancellation/reconfiguration unsubscribes owned ships; unloading Main removes all services.
+
+TESTS/WaveChecks.cs exercises timing, 2s/5s pauses, exact 80/20 quotas as pure data, manual progression, ownership, once-only death/arrival completion, random two-portal traffic, F2 round-robin, blocked/required sources, map-edge levels, caps/retries and lag/zero-interval limits. Existing HUD, credits, tower and 500-enemy regression checks remain in place.
+
+## Design specification and future passes
+
+This README is the canonical design for **finite, carefully authored waves** in Godot 4 C#/.NET. Preserve the existing ENEMIES/Spawning, navigation, EnemyRegistry, F2 debug spawn and HUD. The goal is to edit wave composition directly in **clear, compact C# files**, not large Godot Inspector arrays.
 
 ## 1. Gameplay design and authoring goals
 
@@ -256,4 +272,4 @@ Suggested future separation: a compact `[Flags] EnemySpawnFlags` for toggles **a
 - Changing/restarting levels uses that level's wave set and releases old event subscriptions.
 - Existing navigation, tower placement, Battle Tower combat, Credits/HUD and headless tests still work.
 
-**Explicit scope:** this README is an implementation plan; no wave scripts/scenes have been added by this documentation update. Start with **Phase 1** only and don't add fictitious Enemy002/003 runtime assets or placeholder shield/stealth gameplay.
+**Current scope:** Phase 1 is implemented with Enemy001-only encounters. Future types, modifiers, rewards, advanced progression and saving remain separate passes.

@@ -26,6 +26,8 @@ public partial class EnemyIntegrationChecks : Node
             _spawns = _battle.GetNode<SpawnManager>("World/EnemySystems/Spawning");
             _paths = _spawns.Paths;
             EconomyChecks.Run(_battle, _grid);
+            WaveChecks.Run(_battle, _grid, _spawns);
+            int arrivedBefore = _spawns.Registry.ArrivedCount;
             LevelDebugController debug = _grid.Level.GetNode<LevelDebugController>("Debug");
             debug._UnhandledKeyInput(new InputEventKey { Keycode = Key.F2, Pressed = true });
             Check(_spawns.Registry.Living.Count == 1, "F2 creates one Enemy001");
@@ -58,7 +60,7 @@ public partial class EnemyIntegrationChecks : Node
                 first.Movement._PhysicsProcess(1.0 / 60);
                 if (first.IsAlive) CheckSilent(_paths.Navigation.HasClearance(first.GlobalPosition, first.Definition.RadiusPixels), "Ship crossed blocked terrain");
             }
-            Check(!first.IsAlive && _spawns.Registry.ArrivedCount == 1, "Authored Portal route reaches a Citadel approach");
+            Check(!first.IsAlive && _spawns.Registry.ArrivedCount == arrivedBefore + 1, "Authored Portal route reaches a Citadel approach");
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
             PackedScene scene = GD.Load<PackedScene>("res://ENEMIES/Types/Enemy001/Enemy001.tscn");
             for (int i = 0; i < 100; i++)

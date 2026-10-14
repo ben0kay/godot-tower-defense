@@ -10,12 +10,16 @@ public partial class GameplayHUD : Control
     // =========================================================
     // Placement subscribes to Battle Tower selections; other IDs are prototypes.
     [Signal] public delegate void TowerChoiceRequestedEventHandler(string towerId);
+    // =========================================================
+    // The wave service owns scheduling; this button only requests a manual start.
+    [Signal] public delegate void WaveStartRequestedEventHandler();
     #endregion
 
     #region Cached Nodes
     private PanelContainer _topBar, _towerBar, _inspector;
     private HBoxContainer _bottomArea;
     private Label _wave, _credits, _core, _towerName, _towerCategory, _towerStats, _towerNotes;
+    private Button _startWave;
     private ProgressBar _healthBar;
     private StyleBoxFlat _healthFill;
     private Tween _trayTween;
@@ -57,6 +61,8 @@ public partial class GameplayHUD : Control
         _towerStats = GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerStats");
         _towerNotes = GetNode<Label>("BottomArea/Inspector/Insets/Body/Notes");
 
+        _startWave = GetNode<Button>("TopBar/Status/StartWave");
+        _startWave.Pressed += () => EmitSignal(SignalName.WaveStartRequested);
         _healthBar = GetNode<ProgressBar>("TopBar/Status/Citadel/Bar");
         _topBar.GetNode<Control>("Status").Resized += LayoutStatus;
         ApplyLayout();
@@ -151,6 +157,16 @@ public partial class GameplayHUD : Control
         _wave.Text = total > 0 ? $"WAVE {current:00} / {total:00}" : $"WAVE {current:00}";
 
     // =========================================================
+    // Event-driven wave state presentation; no countdown or wave ownership lives in the HUD.
+    public void SetWaveControls(int current, int total, string button, bool canStart, string message)
+    {
+        if (total > 0) SetWave(current, total); else _wave.Text = "WAVE --";
+        _startWave.Text = button; _startWave.Disabled = !canStart;
+        _startWave.TooltipText = message; _wave.TooltipText = message;
+        _startWave.Visible = total > 0 || button == "SETUP ERROR";
+    }
+
+    // =========================================================
     // Bind the actual economy here when the resource system exists.
     public void SetCredits(int amount) => _credits.Text = $"CREDITS {amount:N0}";
 
@@ -204,6 +220,10 @@ public partial class GameplayHUD : Control
         center.Size = new Vector2(centerWidth, height);
         int fontSize = Mathf.Clamp((int)(Config.StatusFontSize * Mathf.Min(1f, width / 900f)), 10, Config.StatusFontSize);
         foreach (Label label in new[] { _credits, _core, _wave }) label.AddThemeFontSizeOverride("font_size", fontSize);
+        float buttonWidth = Mathf.Min(140f, sideWidth);
+        _startWave.Position = new Vector2(width - margin - buttonWidth, height + 6);
+        _startWave.Size = new Vector2(buttonWidth, 26);
+        _startWave.AddThemeFontSizeOverride("font_size", Mathf.Max(10, fontSize - 2));
         _healthBar.CustomMinimumSize = new Vector2(Mathf.Min(Config.CitadelBarWidth, centerWidth), Config.CitadelBarHeight);
     }
 
@@ -215,6 +235,12 @@ public partial class GameplayHUD : Control
         _towerBar.AddThemeStyleboxOverride("panel", MakePanel(Config.PanelColor, Config.AccentColor));
         _inspector.AddThemeStyleboxOverride("panel", MakePanel(Config.PanelColor, Config.AccentColor));
 
+        _startWave.AddThemeColorOverride("font_color", Config.TextColor);
+        _startWave.AddThemeColorOverride("font_disabled_color", Config.MutedTextColor);
+        _startWave.AddThemeStyleboxOverride("normal", MakePanel(Config.ButtonColor, Config.AccentColor));
+        _startWave.AddThemeStyleboxOverride("hover", MakePanel(Config.ButtonColor.Lightened(0.2f), Config.AccentColor));
+        _startWave.AddThemeStyleboxOverride("disabled", MakePanel(Config.TopBarColor, Config.MutedTextColor));
+        _startWave.AddThemeStyleboxOverride("focus", MakeFocusPanel(Config.AccentColor));
         _healthFill = new StyleBoxFlat { BgColor = Config.HealthHealthyColor };
         _healthBar.AddThemeStyleboxOverride("fill", _healthFill);
         _healthBar.AddThemeStyleboxOverride("background", new StyleBoxFlat { BgColor = Config.ButtonColor });

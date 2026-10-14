@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="PackedScene" path="res://WORLD/World.tscn" id="1_world"]
 [ext_resource type="PackedScene" path="res://CAMERA/CameraRig.tscn" id="2_camera"]
@@ -13,6 +13,8 @@
 [ext_resource type="Script" path="res://ECONOMY/Wallet/EconomyManager.cs" id="10_economy"]
 [ext_resource type="Resource" path="res://ECONOMY/DefaultEconomyConfig.tres" id="11_economyconfig"]
 [ext_resource type="Resource" path="res://ECONOMY/Resources/Credits.tres" id="12_credits"]
+
+[ext_resource type="Script" path="res://ENEMIES/Waves/WaveManager.cs" id="13_waves"]
 
 [node name="Battlefield" type="Node2D"]
 
@@ -36,3 +38,6 @@ BattleArtwork = ExtResource("8_battleart")
 script = ExtResource("10_economy")
 Config = ExtResource("11_economyconfig")
 CreditsResource = ExtResource("12_credits")
+
+[node name="Waves" type="Node" parent="."]
+script = ExtResource("13_waves")

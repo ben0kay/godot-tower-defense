@@ -10,7 +10,7 @@ The HUD runs in the existing **CanvasLayer** from `Main.tscn`, above the hand-pa
 - The **bottom-right Inspector** is separate from the Ctrl tray. Clicking a build-menu button or placed tower can display information; closing the tray must not close the Inspector.
 - The full-screen HUD root ignores mouse events in unused space; its visible controls consume clicks so map placement and camera interaction continue to work.
 
-`GameplayHUD.cs` already exposes **`SetCredits(int amount)`**, **`SetCoreHealth(int current, int maximum)`**, and **`SetWave(int current, int total = 0)`**. They update their corresponding status zones, including health fill and color; the live session economy supplies Credits; Citadel health and WaveManager are still future work. Preserve these existing entry points while refactoring and provide a better-named `SetCitadelHealth` API if useful, with `SetCoreHealth` forwarding to it until all callers are updated.
+`GameplayHUD.cs` already exposes **`SetCredits(int amount)`**, **`SetCoreHealth(int current, int maximum)`**, and **`SetWave(int current, int total = 0)`**. They update their corresponding status zones, including health fill and color; the live session economy supplies Credits; Citadel health is still future work; Main/Waves supplies wave state and manual progression. Preserve these existing entry points while refactoring and provide a better-named `SetCitadelHealth` API if useful, with `SetCoreHealth` forwarding to it until all callers are updated.
 
 ## Target: thin, persistent top status bar
 
@@ -30,7 +30,7 @@ The HUD runs in the existing **CanvasLayer** from `Main.tscn`, above the hand-pa
 | --- | --- | --- |
 | **Top left** | Credits icon/label and current balance, e.g. `CREDITS 2,500` | Live **level/session economy** initialized from each level's own starting credits |
 | **Top center** | `CITADEL` + **current / maximum health**, and a narrow color-changing health fill | Future **Citadel durability component** on the level's actual `WORLD/OBJECTIVES/Citadel/` instance |
-| **Top right** | `WAVE --` until implemented; later `WAVE 03` or `WAVE 03 / 10` when total is known | Future **ENEMIES/Waves/** WaveManager |
+| **Top right** | `WAVE --` until implemented; later `WAVE 03` or `WAVE 03 / 10` when total is known | Live **ENEMIES/Waves/** WaveManager |
 
 ### Layout rules
 
@@ -60,7 +60,7 @@ The HUD runs in the existing **CanvasLayer** from `Main.tscn`, above the hand-pa
 
 ### Wave number: top right, despite waves not existing yet
 
-- Keep `WAVE --` while no WaveManager is connected; **do not show Wave 1 merely because the level loaded**, and don't add automatic spawning just to populate the HUD.
+- With a wave set connected, show `WAVE 00 / total` before starting; without one, show `WAVE --`. Never imply Wave 1 started merely because the level loaded.
 - When implemented, show the current wave number; optionally show `current / total` if the scenario has a fixed total. If endless waves exist, omit total.
 - Future wave states may include `Preparing`, `In Progress`, `Intermission`, and `Completed` (subtle caption/tooltip, not necessary to implement now).
 - Use wave events/signals to update the HUD at state transitions, not every physics frame.
@@ -99,9 +99,12 @@ GameplayHUD (Control, CanvasLayer parent)
 
 **Acceptance checks:** the three zones are in the requested positions, the center does not shift as left/right numbers grow, and labels stay readable at multiple resolutions; no false gameplay numbers appear before systems exist; simulated calls to each setter update only the proper zone, including Citadel bar fill/thresholds; the Ctrl build menu, Battle Tower placement, Inspector, camera interactions and Enemy001 combat remain unaffected.
 
-**Status:** the HUD-only pass is implemented. SetCitadelHealth displays clamped current/max health and inclusive warning/critical thresholds; SetCoreHealth forwards to it. Missing maximum hides the bar and restores CITADEL --. Live Credits now come from Main/Economy; wave progression and Citadel HP gameplay remain future work.
+**Status:** the HUD-only pass is implemented. SetCitadelHealth displays clamped current/max health and inclusive warning/critical thresholds; SetCoreHealth forwards to it. Missing maximum hides the bar and restores CITADEL --. Live Credits now come from Main/Economy; manual finite wave progression is active; Citadel HP gameplay remains future work.
 
 TopBar/Status uses independent side labels and a center block. Resize events reserve disjoint zones, scale fonts on narrow windows and truncate overflow without shifting the objective. UIMasterConfig exposes status font/gap, Citadel block/bar dimensions and health colors/thresholds. TESTS/HudTowerChecks exercises placeholders, setters, 1920/1366/640 widths, thresholds and independent tray/Inspector behavior.
 
 ## Live Credits integration
 EconomyManager initializes from the active LevelConfig.StartingCredits and pushes SetCredits through BalanceChanged events. Level001 starts with an Inspector-editable 1,000 credits and successful Battle Tower construction charges 200 by default. UI owns neither funds nor prices. Citadel/Wave still show -- until authoritative systems exist.
+
+## Manual wave controls
+TopBar/Status/StartWave is a compact button below the right Wave zone, leaving the thin bar and true-centered Citadel unchanged. WaveManager calls SetWaveControls on state/count events; the button emits WaveStartRequested without owning timers or enemies. Before starting Level001 displays WAVE 00 / 03. Ready/Completed enable Start/Next; active waves disable it and show remaining planned + owned alive. Blocked/error reasons and detailed counts appear in the tooltip. Final completion disables the button; levels without wave sets hide it.

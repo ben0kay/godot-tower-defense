@@ -10,6 +10,8 @@ public partial class SpawnManager : Node
     private Node2D _ships;
     private int _sourceIndex, _cachedRevision = -1;
     private bool[] _reachable;
+    private int _portalCount;
+    private readonly List<string> _portalPaths = new();
     private readonly List<Vector2> _entries = new();
 
     // =========================================================
@@ -27,7 +29,7 @@ public partial class SpawnManager : Node
     {
         NavigationGrid nav = Paths.Navigation;
         if (_cachedRevision == nav.Revision) return;
-        _entries.Clear(); bool[] reachable = nav.ReachableWithout();
+        _entries.Clear(); _portalPaths.Clear(); bool[] reachable = nav.ReachableWithout();
         if (_reachable == null || _reachable.Length != reachable.Length) _reachable = new bool[reachable.Length];
         System.Array.Copy(reachable, _reachable, reachable.Length);
         WorldGrid grid = nav.Grid; LevelConfig settings = grid.Level.Settings;
@@ -35,8 +37,10 @@ public partial class SpawnManager : Node
             foreach (NodePath path in settings.ActivePortals)
             {
                 Marker2D exit = grid.Level.GetNodeOrNull<Node2D>(path)?.GetNodeOrNull<Marker2D>("SpawnExit");
-                if (exit != null) _entries.Add(exit.GlobalPosition);
+                if (exit != null && !_portalPaths.Contains(path.ToString()))
+                { _entries.Add(exit.GlobalPosition); _portalPaths.Add(path.ToString()); }
             }
+        _portalCount = _entries.Count;
         if (settings.SpawnMode != LevelConfig.SpawnSourceMode.Portals)
         {
             for (int x = 0; x < grid.Config.WidthCells; x++)
@@ -86,6 +90,42 @@ public partial class SpawnManager : Node
         }
         ship.Free(); LastMessage = "No permitted reachable spawn exit; check tiles and Citadel approach points.";
         return null;
+    }
+
+    // =========================================================
+    // Wave requests sample eligible portals uniformly, falling back to permitted edges in Both.
+    // Reservoir sampling avoids a per-spawn candidate allocation or any additional A* calls.
+    public Enemy SpawnWave(PackedScene scene, RandomNumberGenerator random, string requiredPortal = "")
+    {
+        RefreshSources();
+        if (scene == null || random == null) { LastMessage = "Wave enemy scene/RNG is missing."; return null; }
+        if (Registry.Living.Count >= Paths.Config.MaxActiveEnemies)
+        { LastMessage = "Active enemy safety limit reached; wave spawn will retry."; return null; }
+        Enemy ship = scene.Instantiate<Enemy>();
+        NavigationGrid nav = Paths.Navigation;
+        int chosen = -1, eligible = 0;
+        for (int i = 0; i < _entries.Count; i++)
+        {
+            bool portal = i < _portalCount;
+            if (requiredPortal.Length > 0 && (!portal || _portalPaths[i] != requiredPortal)) continue;
+            // If any eligible portal was found, Both mode ignores all map-edge candidates.
+            if (!portal && chosen >= 0 && chosen < _portalCount) break;
+            Vector2 position = _entries[i];
+            if (!nav.IsReachable(_reachable, nav.Grid.WorldToCell(position))
+                || !nav.HasClearance(position, ship.Definition.RadiusPixels)) continue;
+            eligible++;
+            if (random.RandiRange(1, eligible) == 1) chosen = i;
+        }
+        if (chosen < 0)
+        {
+            ship.Free();
+            LastMessage = requiredPortal.Length > 0 ? "Required portal unavailable: " + requiredPortal
+                : "No permitted reachable source with enemy clearance; wave spawn will retry.";
+            return null;
+        }
+        _ships.AddChild(ship); ship.GlobalPosition = _entries[chosen];
+        ship.Initialize(Registry, Paths); LastMessage = "Wave spawned " + ship.Definition.DisplayName;
+        return ship;
     }
 
     // =========================================================

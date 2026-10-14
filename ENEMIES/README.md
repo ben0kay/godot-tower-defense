@@ -4,7 +4,7 @@ This top-level folder owns **enemy gameplay mechanics** in the Godot 4 C#/.NET s
 
 **Implemented baseline (October 2026):** Enemy001, shared enemy state/registry, budgeted AStarGrid2D, portal/edge spawning, debug F2 and Battle Tower targeting/projectiles are now present. Level001's Debug parent owns F2 and the debug HUD. Existing terrain, camera, HUD and placement remain intact. See Types/Enemy001/README.md and WORLD/LEVELS/Level001/README.md for playtesting.
 
-The planning sections below describe the architecture and acceptance goals. Current targeting defaults to **First** (shortest remaining route), with **Closest** selectable in BattleTowerConfig. No waves, economy, armor mechanics or Citadel health yet.
+The planning sections below describe the architecture and acceptance goals. Current targeting defaults to **First** (shortest remaining route), with **Closest** selectable in BattleTowerConfig. Manual finite waves and the credit wallet are active; armor mechanics and Citadel health remain future work.
 
 ## Folder and file structure
 
@@ -165,3 +165,6 @@ Confirmed blockage now queues a replacement without stopping safe movement immed
 Each multi-goal request uses one position snapshot, so its candidate costs are comparable while the ship moves. When the result arrives, EnemyMovement joins it near the ship's current progress, preferring a forward clearance-tested waypoint. A safe two-leg elbow can turn around a nearby wall without returning to the cell center. Both legs obey swept clearance and corner-safe cell transitions. If reconnection fails, a fresh request uses the same centralized budgets. Backtracking remains possible when the actual map requires it.
 
 Safe offset refinement cannot turn the first new segment backward merely due to lateral bias. Existing speed/turning/offset settings, weighted profiles, congestion, auditing and count/time budgets are preserved. First targeting excludes routes known to need replacement until a valid handoff completes. No new pathfinding algorithm or per-frame A* is added.
+
+## Manual waves (Phase 1)
+ENEMIES/Waves now contains immutable authored data, catalog, Level001Waves.cs and one Main/Waves scheduler. WaveSetId in LevelConfig chooses a finite set; the HUD Start/Next button controls progression. Wave spawns use random eligible sources, preserve F2 round-robin debugging, retain blocked pending ships and complete only after scheduled and wave-owned ships resolve. DefaultEnemyConfig exposes attempt cap/retry/seed. No rewards, new enemy types or modifiers yet. See Waves/README.md.

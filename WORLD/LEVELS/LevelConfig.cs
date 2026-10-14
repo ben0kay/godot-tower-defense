@@ -15,6 +15,9 @@ public partial class LevelConfig : Resource
     [Export(PropertyHint.Flags, "Top,Bottom,Left,Right")] public MapEdge AllowedEdges { get; set; } = MapEdge.Left;
     [Export] public Godot.Collections.Array<NodePath> ActivePortals { get; set; } = new();
 
+    [ExportGroup("Waves")]
+    [Export] public string WaveSetId { get; set; } = "";
+
     [ExportGroup("Destination")]
     [Export] public NodePath CitadelPath { get; set; } = new("Objectives/Citadel");
 }
