@@ -7,18 +7,23 @@ public partial class EnemyMovement : Node
     #region State
     public int RouteProfile { get; private set; }
     public Enemy Enemy { get; private set; }
-    public float RemainingPathDistance => _waiting ? float.PositiveInfinity : _remainingDistance;
+    public float RemainingPathDistance => _replacementNeeded ? float.PositiveInfinity : _remainingDistance;
     public float LateralOffsetPixels { get; private set; }
     public IReadOnlyDictionary<Vector2I, List<int>> RouteDependencies => _route.Dependencies;
     public int NextWaypoint => _next;
     public Vector2[] Waypoints => _route.Points;
     public bool IsWaitingForPath => _waiting;
+    public float PendingObstacleDistance => _blockedFrom < _route.Points.Length
+        ? (_next <= _blockedFrom ? Mathf.Max(0f, _remainingDistance - _route.Suffix[_blockedFrom]) : 0f)
+        : float.PositiveInfinity;
     private float _remainingDistance = float.PositiveInfinity, _retry, _auditTimer;
     private PathRequestManager _paths;
     private readonly EnemyRoute _route = new();
     private readonly HashSet<Vector2I> _dirtyCells = new();
     private int _next;
-    private bool _waiting, _fullAudit;
+    private bool _waiting, _fullAudit, _stopped, _replacementNeeded;
+    private int _blockedFrom = int.MaxValue;
+    private Vector2 _travelDirection;
     #endregion
 
     #region Lifecycle and Routes
@@ -38,10 +43,11 @@ public partial class EnemyMovement : Node
     }
 
     // =========================================================
-    // Only confirmed unsafe routes stop. Other ships never react to a global revision alone.
-    private void RequestRoute(float distance)
+    // Queue a replacement while retaining safe old movement; stop only on immediate danger.
+    private void RequestRoute(float distance, bool stop = false)
     {
-        _waiting = true; _remainingDistance = float.PositiveInfinity;
+        _waiting = true; _replacementNeeded = true;
+        _stopped |= stop || _route.Points.Length == 0;
         _paths.RequestPath(this, distance);
     }
 
@@ -49,13 +55,72 @@ public partial class EnemyMovement : Node
     // A* assignment builds safe offset waypoints once and updates shared dependency indexing.
     public void AcceptPath(Vector2[] route, int revision)
     {
-        _paths.UnregisterRoute(this);
-        _waiting = false; _next = 0; _dirtyCells.Clear(); _fullAudit = false;
+        _waiting = false;
         _retry = Mathf.Max(0.1f, _paths.Config.FailedPathRetrySeconds);
+        if (route.Length == 0)
+        {
+            // A failed replacement does not discard a still-safe old prefix.
+            _replacementNeeded = true; _stopped |= _route.Points.Length == 0;
+            return;
+        }
+        Vector2[] connected = ConnectRoute(route);
+        if (connected == null)
+        {
+            if (!_paths.Navigation.HasClearance(Enemy.GlobalPosition, Enemy.Definition.RadiusPixels))
+            { _stopped = true; _replacementNeeded = true; return; }
+            RequestRoute(0f); return;
+        }
+        _paths.UnregisterRoute(this);
+        _next = 0; _dirtyCells.Clear(); _fullAudit = false; _blockedFrom = int.MaxValue;
+        _stopped = false; _replacementNeeded = false;
         float offset = _paths.Config.EnablePathOffsets ? Mathf.Clamp(LateralOffsetPixels,
             -Mathf.Max(0f, _paths.Config.PathOffsetMaxPixels), Mathf.Max(0f, _paths.Config.PathOffsetMaxPixels)) : 0f;
-        _route.Build(route, Enemy.GlobalPosition, _paths.Navigation, Enemy.Definition.RadiusPixels, offset);
+        _route.Build(connected, Enemy.GlobalPosition, _paths.Navigation, Enemy.Definition.RadiusPixels, offset, _travelDirection);
         _paths.RegisterRoute(this); UpdateDistance();
+    }
+
+    // =========================================================
+    // Join near current progress, preferring a forward visible waypoint over a cell-center U-turn.
+    private Vector2[] ConnectRoute(Vector2[] route)
+    {
+        Vector2 position = Enemy.GlobalPosition;
+        int nearest = 0; float distance = float.PositiveInfinity;
+        for (int i = 0; i < route.Length; i++)
+        {
+            float candidate = position.DistanceSquaredTo(route[i]);
+            if (candidate < distance) { nearest = i; distance = candidate; }
+        }
+        int end = Mathf.Min(route.Length - 1, nearest + 6), join = -1;
+        Vector2? bend = null;
+        for (int pass = 0; pass < 2 && join < 0; pass++)
+            for (int i = nearest; i <= end; i++)
+            {
+                Vector2 direction = route[i] - position;
+                if (pass == 0 && _travelDirection != Vector2.Zero && direction.Dot(_travelDirection) < -0.01f) continue;
+                if (_paths.Navigation.ConnectionClear(position, route[i], Enemy.Definition.RadiusPixels))
+                { join = i; break; }
+                // A clearance-tested elbow can turn around a nearby wall without retreating
+                // to the cell center. Try keeping either current coordinate for the first leg.
+                for (int axis = 0; axis < 2; axis++)
+                {
+                    Vector2 corner = axis == 0 ? new Vector2(position.X, route[i].Y) : new Vector2(route[i].X, position.Y);
+                    if (corner.DistanceSquaredTo(position) < 0.0001f || corner.DistanceSquaredTo(route[i]) < 0.0001f) continue;
+                    if (pass == 0 && _travelDirection != Vector2.Zero && (corner - position).Dot(_travelDirection) < -0.01f) continue;
+                    if (!_paths.Navigation.ConnectionClear(position, corner, Enemy.Definition.RadiusPixels)
+                        || !_paths.Navigation.ConnectionClear(corner, route[i], Enemy.Definition.RadiusPixels)) continue;
+                    bend = corner; join = i; break;
+                }
+                if (join >= 0) break;
+            }
+        if (join < 0) return null;
+        bool insertPosition = position.DistanceSquaredTo(route[join]) > 0.0001f;
+        int prefix = (insertPosition ? 1 : 0) + (bend.HasValue ? 1 : 0);
+        Vector2[] connected = new Vector2[route.Length - join + prefix];
+        int offset = prefix;
+        if (insertPosition) connected[0] = position;
+        if (bend.HasValue) connected[prefix - 1] = bend.Value;
+        System.Array.Copy(route, join, connected, offset, route.Length - join);
+        return connected;
     }
 
     // =========================================================
@@ -68,7 +133,7 @@ public partial class EnemyMovement : Node
     // Change notifications only mark relevant remaining segments; expensive checks are queued.
     public void MarkChangedCell(Vector2I? cell)
     {
-        if (_waiting || _route.Points.Length == 0) return;
+        if (_route.Points.Length == 0) return;
         if (cell == null) _fullAudit = true;
         else if (_route.UsesCell(cell.Value, _next)) _dirtyCells.Add(cell.Value);
         else return;
@@ -79,7 +144,7 @@ public partial class EnemyMovement : Node
     // Audits use cached cell dependencies, with swept geometry only near actual blockers.
     public void ValidateRoute()
     {
-        if (_waiting || !Enemy.IsAlive) { _dirtyCells.Clear(); _fullAudit = false; return; }
+        if (!Enemy.IsAlive) { _dirtyCells.Clear(); _fullAudit = false; return; }
         NavigationGrid nav = _paths.Navigation;
         int blocked = -1;
         if (_fullAudit)
@@ -101,6 +166,7 @@ public partial class EnemyMovement : Node
         {
             float distance = Enemy.GlobalPosition.DistanceTo(_route.Points[_next]);
             for (int i = _next; i < blocked; i++) distance += _route.Points[i].DistanceTo(_route.Points[i + 1]);
+            _blockedFrom = Mathf.Min(_blockedFrom, blocked);
             RequestRoute(distance);
         }
     }
@@ -118,7 +184,12 @@ public partial class EnemyMovement : Node
             _auditTimer -= (float)delta;
             if (_auditTimer <= 0f) { _auditTimer += interval; MarkChangedCell(null); }
         }
-        if (_waiting) return;
+        if (_replacementNeeded && !_waiting)
+        {
+            _retry -= (float)delta;
+            if (_retry <= 0f) RequestRoute(_stopped ? 0f : RemainingPathDistance);
+        }
+        if (_stopped) return;
         if (_route.Points.Length == 0)
         {
             _retry -= (float)delta;
@@ -128,14 +199,16 @@ public partial class EnemyMovement : Node
         float travel = Mathf.Max(0f, Enemy.Definition.MoveSpeed) * (float)delta;
         while (_next < _route.Points.Length)
         {
-            if (_route.CornerBlocked(_next, _paths.Navigation)) { RequestRoute(0f); return; }
+            if (_route.CornerBlocked(_next, _paths.Navigation))
+            { RequestRoute(0f, true); return; }
             Vector2 target = _route.Points[_next]; float distance = Enemy.GlobalPosition.DistanceTo(target);
             if (distance <= 0.01f) { _next++; continue; }
             if (travel <= 0f) break;
             Vector2 nextPosition = Enemy.GlobalPosition.MoveToward(target, travel);
             if (!_paths.Navigation.SegmentClear(Enemy.GlobalPosition, nextPosition, Enemy.Definition.RadiusPixels))
-            { RequestRoute(0f); return; }
+            { RequestRoute(0f, true); return; }
             Vector2 direction = target - Enemy.GlobalPosition;
+            _travelDirection = direction.Normalized();
             Enemy.Rotation = Mathf.LerpAngle(Enemy.Rotation, direction.Angle(),
                 1f - Mathf.Exp(-Mathf.Max(0f, Enemy.Definition.TurnSpeed) * (float)delta));
             Enemy.GlobalPosition = nextPosition; Enemy.UpdateDefenseBarTransform(); travel -= distance;

@@ -73,10 +73,10 @@ public partial class EnemyIntegrationChecks : Node
             }
             Check(_paths.PendingCount == 0 && _spawns.Registry.Living.Count == 100, "100 spammed enemies obey A* budget");
             Enemy a = _spawns.Registry.Living[0], b = _spawns.Registry.Living[1];
-            a.GlobalPosition = new Vector2(3000, 2400); b.GlobalPosition = new Vector2(3100, 2400);
+            a.GlobalPosition = new Vector2(640, 640); b.GlobalPosition = new Vector2(740, 640);
             a.Movement.AcceptPath(new[] { a.GlobalPosition, a.GlobalPosition + new Vector2(0, 700) }, _grid.NavigationRevision);
             b.Movement.AcceptPath(new[] { b.GlobalPosition, b.GlobalPosition + new Vector2(0, 100) }, _grid.NavigationRevision);
-            Vector2 towerPos = new(3000, 2400);
+            Vector2 towerPos = new(640, 640);
             Check(TowerTargeting.Find(_spawns.Registry, towerPos, 150, TowerTargeting.Priority.First) == b, "First uses route distance");
             Check(TowerTargeting.Find(_spawns.Registry, towerPos, 150, TowerTargeting.Priority.Closest) == a, "Closest uses tower distance");
             Check(TowerTargeting.Find(_spawns.Registry, towerPos, 50, TowerTargeting.Priority.First) == a, "Targeting respects weapon range");

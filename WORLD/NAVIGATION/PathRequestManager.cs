@@ -31,6 +31,8 @@ public partial class PathRequestManager : Node
         public long LastServed;
         public float Urgency, Length = float.PositiveInfinity;
         public Vector2[] Best = System.Array.Empty<Vector2>();
+        public Vector2 Origin;
+        public bool HasOrigin;
     }
 
     #region Services and Dependency Index
@@ -127,8 +129,10 @@ public partial class PathRequestManager : Node
         for (int i = 1; i < _requests.Count; i++)
         {
             Request candidate = _requests[i], chosen = _requests[best];
+            float candidateUrgency = Mathf.Min(candidate.Urgency, candidate.Movement.PendingObstacleDistance);
+            float chosenUrgency = Mathf.Min(chosen.Urgency, chosen.Movement.PendingObstacleDistance);
             if (fair ? candidate.LastServed < chosen.LastServed
-                : candidate.Urgency < chosen.Urgency || (candidate.Urgency == chosen.Urgency && candidate.LastServed < chosen.LastServed)) best = i;
+                : candidateUrgency < chosenUrgency || (candidateUrgency == chosenUrgency && candidate.LastServed < chosen.LastServed)) best = i;
         }
         return best;
     }
@@ -149,14 +153,15 @@ public partial class PathRequestManager : Node
             if (request.Revision != Navigation.Revision || request.CostRevision != Navigation.CostRevision)
             {
                 request.Revision = Navigation.Revision; request.CostRevision = Navigation.CostRevision;
-                request.GoalIndex = 0; request.Best = System.Array.Empty<Vector2>(); request.Length = float.PositiveInfinity;
+                request.GoalIndex = 0; request.HasOrigin = false; request.Best = System.Array.Empty<Vector2>(); request.Length = float.PositiveInfinity;
             }
             if (request.GoalIndex < Navigation.Goals.Count)
             {
-                Vector2[] route = Navigation.FindPath(movement.Enemy.GlobalPosition, Navigation.Goals[request.GoalIndex++], movement.RouteProfile, out float length);
+                if (!request.HasOrigin) { request.Origin = movement.Enemy.GlobalPosition; request.HasOrigin = true; }
+                Vector2[] route = Navigation.FindPath(request.Origin, Navigation.Goals[request.GoalIndex++], movement.RouteProfile, out float length);
                 LastFrameAStarMilliseconds += Navigation.LastAStarMilliseconds;
                 LastFrameCalculations++; TotalCalculations++; request.LastServed = _serviceOrder++;
-                request.Length = Navigation.RouteCost(movement.Enemy.GlobalPosition, request.Best, movement.RouteProfile);
+                request.Length = Navigation.RouteCost(request.Origin, request.Best, movement.RouteProfile);
                 if (length < request.Length) { request.Best = route; request.Length = length; }
             }
             if (request.GoalIndex >= Navigation.Goals.Count)

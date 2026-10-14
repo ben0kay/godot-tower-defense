@@ -11,7 +11,7 @@ public sealed class EnemyRoute
 
     // =========================================================
     // Apply one stable lateral bias, tapering safely at corners/walls and preserving endpoints.
-    public void Build(Vector2[] logical, Vector2 start, NavigationGrid nav, float radius, float offset)
+    public void Build(Vector2[] logical, Vector2 start, NavigationGrid nav, float radius, float offset, Vector2 forward = default)
     {
         _logicalCells = new Vector2I[logical.Length];
         for (int i = 0; i < logical.Length; i++) _logicalCells[i] = nav.Grid.WorldToCell(logical[i]);
@@ -24,6 +24,7 @@ public sealed class EnemyRoute
             for (float scale = 1f; scale >= 0.125f; scale *= 0.5f)
             {
                 Vector2 candidate = logical[i] + lateral * scale;
+                if (i == 1 && forward != Vector2.Zero && (candidate - start).Dot(forward) < -0.01f) continue;
                 if (!nav.HasClearance(candidate, radius) || !nav.SegmentClear(Points[i - 1], candidate, radius)
                     || !nav.SegmentClear(candidate, logical[i + 1], radius)) continue;
                 Points[i] = candidate; break;

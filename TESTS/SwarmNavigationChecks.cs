@@ -99,6 +99,7 @@ public static class SwarmNavigationChecks
         config.EnablePathDiversity = enabled; config.PathDiversityStrength = strength; config.CongestionInfluence = congestion;
         frameMs.Sort();
         RepathMovementChecks.Run(grid, paths, spawns);
+        SmoothRepathChecks.Run(grid, paths, spawns);
         GD.Print($"PASS: 500 assigned ships, budgeted weighted routing, safe movement and tower repath; spawn batch {spawnMs:0.0}ms; path-frame p95 {frameMs[(int)((frameMs.Count - 1) * 0.95)]:0.00}ms / max {frameMs.Max():0.00}ms; movement+clearance max {movementMax:0.00}ms (headless, not a rendered FPS guarantee)");
     }
 

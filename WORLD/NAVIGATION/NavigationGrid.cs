@@ -271,6 +271,24 @@ public partial class NavigationGrid : Node
     }
 
     // =========================================================
+    // Handoff visibility also respects corner-safe cell transitions for tiny-radius ships.
+    public bool ConnectionClear(Vector2 from, Vector2 to, float radius)
+    {
+        if (!SegmentClear(from, to, radius)) return false;
+        int steps = Mathf.Max(1, Mathf.CeilToInt(from.DistanceTo(to) / Mathf.Max(0.5f, Mathf.Min(Grid.Config.CellSize * 0.1f, radius * 0.5f))));
+        Vector2I previous = Grid.WorldToCell(from);
+        for (int i = 1; i <= steps; i++)
+        {
+            Vector2I cell = Grid.WorldToCell(from.Lerp(to, (float)i / steps));
+            Vector2I step = cell - previous;
+            if (step.X != 0 && step.Y != 0 && (Grid.BlocksEnemies(previous + new Vector2I(step.X, 0))
+                || Grid.BlocksEnemies(previous + new Vector2I(0, step.Y)))) return false;
+            previous = cell;
+        }
+        return true;
+    }
+
+    // =========================================================
     // Flood from all valid goals with a candidate tower cell temporarily excluded.
     public bool[] ReachableWithout(Vector2I? blocked = null)
     {

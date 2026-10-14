@@ -152,8 +152,16 @@ Tests include deterministic alternate corridors, swept clearance, ordinary paths
 
 ## Incremental navigation and selective repathing
 
-Tower placement/removal now emits a cell change: NavigationGrid updates that one cell across the shared weighted profiles. Full grid updates remain for startup, terrain reloads and profile changes. Route dependencies index potentially affected ships; exact remaining-route validations are bounded separately. Unaffected ships keep moving. Affected ships stop safely and request prioritized A*; per-tick immediate clearance prevents crossing newly blocked terrain while checks/repaths wait.
+Tower placement/removal now emits a cell change: NavigationGrid updates that one cell across the shared weighted profiles. Full grid updates remain for startup, terrain reloads and profile changes. Route dependencies index potentially affected ships; exact remaining-route validations are bounded separately. Unaffected ships keep moving. Affected ships request prioritized A* and keep moving along their safe old prefix; per-tick immediate clearance prevents crossing newly blocked terrain while checks/repaths wait.
 
 EnemyMasterConfig adds soft path-work/validation millisecond budgets, a validation count limit, fair oldest-request service, optional staggered three-second audits, and EnablePathOffsets/PathOffsetMaxPixels (default true/8px). Audits do not calculate A* for valid routes. One stable lateral bias per ship is applied to interior waypoints with corner bisectors and clearance-tested tapering; no extra A* or per-frame jitter. Local separation remains inactive.
 
 Placement connectivity is preserved using reusable flat flood-fill storage. Level Debug shows separate placement, grid, native A*, total path-work and validation timings. TESTS/RepathMovementChecks.cs covers 500 affected ships, unaffected movement, budgets, fairness, offsets, audits and safety. TESTS/PlacementPerformanceChecks.tscn measures identical 100/500-ship fixtures; TESTS/NavigationPerformance.md records before/after results. Time budgets are soft: a single native search/path assignment cannot be interrupted, and rendered 60 FPS still requires hardware testing.
+
+## Moving replacement-path handoffs
+
+Confirmed blockage now queues a replacement without stopping safe movement immediately. Ships retain old waypoints while waiting, with strict immediate swept/corner checks; they stop only when the next movement would be unsafe. Queue urgency follows the shrinking distance to the obstruction. Failed replacement searches retain any safe old prefix and use the existing retry interval.
+
+Each multi-goal request uses one position snapshot, so its candidate costs are comparable while the ship moves. When the result arrives, EnemyMovement joins it near the ship's current progress, preferring a forward clearance-tested waypoint. A safe two-leg elbow can turn around a nearby wall without returning to the cell center. Both legs obey swept clearance and corner-safe cell transitions. If reconnection fails, a fresh request uses the same centralized budgets. Backtracking remains possible when the actual map requires it.
+
+Safe offset refinement cannot turn the first new segment backward merely due to lateral bias. Existing speed/turning/offset settings, weighted profiles, congestion, auditing and count/time budgets are preserved. First targeting excludes routes known to need replacement until a valid handoff completes. No new pathfinding algorithm or per-frame A* is added.
