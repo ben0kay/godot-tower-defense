@@ -249,3 +249,7 @@ Suggested future separation: a compact `[Flags] EnemySpawnFlags` for toggles **a
 - Existing navigation, tower placement, Battle Tower combat, Credits/HUD and headless tests still work.
 
 **Current scope:** Phase 1 is implemented with Enemy001-only encounters. Future types, modifiers, rewards, advanced progression and saving remain separate passes.
+
+## Optional full spawn shields (implemented)
+
+Each `WaveEnemyEntry` now includes `SpawnWithShield` (default `false`) and `WaveBuilder.Enemy(..., shield: true)` can request full shields on that entry. `WaveManager` forwards it to `SpawnManager.SpawnWave`; `Enemy.Initialize` sets the **individual** ship's `CurrentShield` to its type's `MaxShield` only when requested. Default wave/F2 spawns are still unshielded. Mixed entries sharing the same `EnemyId` remain distinct through the exact-quota shuffle; `TESTS/EnemyShieldChecks.cs` covers this, shield-first hits, damage overflow and no shared-definition mutation. Level001 wave contents are unchanged. No shield visuals, regeneration or other generic spawn-modifier engine is implemented.

@@ -41,6 +41,7 @@ public partial class EnemyIntegrationChecks : Node
             _paths.Config.PortalSpawnOffsetPixels = 0;
             EconomyChecks.Run(_battle, _grid);
             WaveChecks.Run(_battle, _grid, _spawns);
+            EnemyShieldChecks.Run(_battle, _spawns);
             EnemyKillRewardChecks.Run(_battle, _spawns);
             DeathExplosionChecks.Run(_battle, _spawns, feedback);
             CitadelHealthChecks.Run(_battle, _spawns);

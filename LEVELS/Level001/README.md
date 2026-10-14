@@ -61,3 +61,7 @@ Passable offers metal/dirt floors; Impassable offers walls, raised platforms and
 ## Citadel durability
 
 Open `Level001Config.tres` → **Destination / Citadel Max Health** to choose this level's starting maximum (**1,000 HP** by default). The Citadel is initialized at full health for each new level session. Enemy001 arrivals deal `EnemyDefinition.CitadelDamage = 1` each; the center HUD health number/bar updates through events. Killed ships deal no objective damage and still award their kill credits. A one-time `CitadelHealth.Destroyed` event is available at 0 HP, but an actual defeat screen and level end are a separate future pass.
+
+## Wave-controlled enemy shields
+
+Enemy001 has **MaxShield = 100** in `ENEMIES/Types/Enemy001/Enemy001.tres`, but all existing Level001 wave entries remain unshielded. To opt in a specific weighted group, edit `Level001Waves.cs` and use `Enemy("enemy001", shield: true)`. Shields absorb incoming damage before hull HP. F2 defaults to zero shield, and no separate shield visual is implemented yet.

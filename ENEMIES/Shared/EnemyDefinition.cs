@@ -9,6 +9,7 @@ public partial class EnemyDefinition : Resource
     [Export] public string DisplayName { get; set; } = "Enemy 001";
     [ExportGroup("Balance")]
     [Export(PropertyHint.Range, "1,10000,1")] public float MaxHealth { get; set; } = 60f;
+    [Export(PropertyHint.Range, "0,10000,1")] public float MaxShield { get; set; } = 0f;
     [Export(PropertyHint.Range, "1,1000,1")] public float MoveSpeed { get; set; } = 100f;
     [Export] public int CitadelDamage { get; set; } = 1;
     [Export] public int Armor { get; set; }

@@ -165,3 +165,7 @@ Safe offset refinement cannot turn the first new segment backward merely due to 
 
 ## Manual waves (Phase 1)
 LEVELS/Waves contains the shared immutable data, catalog and one Main/Waves scheduler; LEVELS/Level001/Level001Waves.cs contains this map's authored encounters. WaveSetId in LevelConfig chooses a finite set; the HUD Start/Next button controls progression. Wave spawns use random eligible sources, preserve F2 round-robin debugging, retain blocked pending ships and complete only after scheduled and wave-owned ships resolve. DefaultEnemyConfig exposes attempt cap/retry/seed. No rewards, new enemy types or modifiers yet. See LEVELS/Waves/README.md.
+
+## Optional shield capacity and wave starting state
+
+Enemy types can define `MaxShield` in their own `EnemyDefinition.tres` (default 0; Enemy001 explicitly has 100). Runtime `CurrentShield` is **per ship** and starts at 0 unless an authored wave entry requests `Enemy("enemy001", shield: true)`. Shield hits absorb damage first, with spillover damaging hull HP; the current enemy health bar continues to represent hull health. F2 debug spawns and all currently authored Level001 waves remain unshielded. See `Shared/README.md` and `LEVELS/Waves/Authoring.md`; no regeneration or shield visuals are implemented.

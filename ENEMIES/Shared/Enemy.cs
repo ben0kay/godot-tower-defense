@@ -6,6 +6,7 @@ public partial class Enemy : Node2D
 {
     [Export] public EnemyDefinition Definition { get; set; }
     public float Health { get; private set; }
+    public float CurrentShield { get; private set; }
     public bool IsAlive { get; private set; }
     public EnemyMovement Movement { get; private set; }
     public float RemainingPathDistance => Movement?.RemainingPathDistance ?? float.PositiveInfinity;
@@ -15,9 +16,11 @@ public partial class Enemy : Node2D
 
     // =========================================================
     // Called by SpawnManager after adding the scene, using world-scoped services.
-    public void Initialize(EnemyRegistry registry, PathRequestManager paths)
+    public void Initialize(EnemyRegistry registry, PathRequestManager paths, bool spawnWithShield = false)
     {
         _registry = registry; Health = Mathf.Max(1f, Definition.MaxHealth); IsAlive = true;
+        CurrentShield = spawnWithShield && float.IsFinite(Definition.MaxShield)
+            ? Mathf.Max(0f, Definition.MaxShield) : 0f;
         _defenseBar = GetNodeOrNull<DefenseBar>("DefenseBar");
         _defenseBar?.SetHealth(Health, Definition.MaxHealth);
         Movement = GetNode<EnemyMovement>("Movement");
@@ -26,11 +29,15 @@ public partial class Enemy : Node2D
     }
 
     // =========================================================
-    // Armor is reserved for a later damage model; current bullets deal direct damage.
+    // Shields absorb hits first; any spillover damages hull. Armor remains future work.
     public void TakeDamage(float amount)
     {
-        if (!IsAlive || amount <= 0f) return;
-        Health = Mathf.Max(0f, Health - amount);
+        if (!IsAlive || !float.IsFinite(amount) || amount <= 0f) return;
+        float absorbed = Mathf.Min(CurrentShield, amount);
+        CurrentShield -= absorbed;
+        float hullDamage = amount - absorbed;
+        if (hullDamage <= 0f) return;
+        Health = Mathf.Max(0f, Health - hullDamage);
         _defenseBar?.SetHealth(Health, Definition.MaxHealth);
         if (Health <= 0f) Finish(false);
     }
@@ -40,7 +47,7 @@ public partial class Enemy : Node2D
     public void UpdateDefenseBarTransform() => _defenseBar?.AlignWithOwner(Rotation);
 
     // =========================================================
-    // Arrival is counted and removes the ship; Citadel health is intentionally future work.
+    // Arrival is counted once; CitadelSession applies its configured damage.
     public void Arrive() => Finish(true);
 
     // =========================================================

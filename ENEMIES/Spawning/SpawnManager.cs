@@ -106,7 +106,7 @@ public partial class SpawnManager : Node
     // =========================================================
     // Wave requests sample eligible portals uniformly, falling back to permitted edges in Both.
     // Reservoir sampling avoids a per-spawn candidate allocation or any additional A* calls.
-    public Enemy SpawnWave(PackedScene scene, RandomNumberGenerator random, string requiredPortal = "")
+    public Enemy SpawnWave(PackedScene scene, RandomNumberGenerator random, string requiredPortal = "", bool spawnWithShield = false)
     {
         RefreshSources();
         if (scene == null || random == null) { LastMessage = "Wave enemy scene/RNG is missing."; return null; }
@@ -137,7 +137,7 @@ public partial class SpawnManager : Node
         Vector2 spawn = _entries[chosen];
         if (chosen < _portalCount) spawn = OffsetPortal(spawn, ship.Definition.RadiusPixels, random);
         _ships.AddChild(ship); ship.GlobalPosition = spawn;
-        ship.Initialize(Registry, Paths); LastMessage = "Wave spawned " + ship.Definition.DisplayName;
+        ship.Initialize(Registry, Paths, spawnWithShield); LastMessage = "Wave spawned " + ship.Definition.DisplayName;
         return ship;
     }
 

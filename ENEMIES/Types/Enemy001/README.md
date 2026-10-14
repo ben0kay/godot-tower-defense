@@ -17,3 +17,7 @@ F5 -> tap F2 repeatedly. Each press spawns one ship at a permitted reachable Por
 ## Death explosion
 
 Killed Enemy001 ships now produce an automatically sized **orange flash followed by a grey/orange smoke puff**; arrival at the Citadel produces none. Size is measured from Enemy001's actual `Sprite2D` (32×24 px by default), including all scale transforms. `Enemy001.tres` inherits **Death Feedback / Death Explosion Multiplier = 1.0** from the shared enemy definition, so **nothing needs to be configured on new enemy types**. Override just that multiplier if a particular enemy should have a bigger or more subtle puff. Shared look, particle count and size limits are in `FEEDBACK/DeathExplosion/`.
+
+## Shield capacity (opt-in wave behavior)
+
+`Enemy001.tres` sets **Balance / Max Shield = 100** for testing. This is *capacity only*: standard Level001 wave entries and F2/debug enemies **still start at 0 shield**. To give this same enemy shields in a wave, author `Enemy("enemy001", shield: true)` in `LEVELS/Level001/Level001Waves.cs` (or mix weighted shielded/unshielded entries). A shielded ship absorbs damage before hull HP, with overflow passed to health; the current health bar still displays hull only. No passive recharge/blue shield bar yet.

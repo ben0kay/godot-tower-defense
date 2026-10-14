@@ -111,7 +111,7 @@ public partial class WaveManager : Node
                 _sequence = WaveCatalog.Compose(batch, _random);
             }
             WaveEnemyEntry entry = _sequence[_entryIndex];
-            Enemy ship = _spawns.SpawnWave(_scenes[entry.EnemyId], _random, entry.Portal);
+            Enemy ship = _spawns.SpawnWave(_scenes[entry.EnemyId], _random, entry.Portal, entry.SpawnWithShield);
             if (ship == null)
             {
                 State = WaveState.SpawnBlocked; StatusMessage = _spawns.LastMessage;
