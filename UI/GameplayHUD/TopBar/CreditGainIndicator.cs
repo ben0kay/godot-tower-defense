@@ -7,6 +7,7 @@ public partial class CreditGainIndicator : Label
     #region State
     public long AccumulatedReward { get; private set; }
     public bool IsExpense { get; private set; }
+    public bool IsDisplaying => _active;
     private Color _gainColor, _spendColor;
     private Vector2 _origin;
     private double _elapsed, _pulseElapsed;
