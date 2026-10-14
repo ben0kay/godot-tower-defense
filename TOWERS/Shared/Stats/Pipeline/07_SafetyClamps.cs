@@ -13,7 +13,8 @@ public static class SafetyClampsStage
         ProjectileSpeed = FiniteMinimum(stats.ProjectileSpeed, 1),
         RotationSpeedDegrees = FiniteMinimum(stats.RotationSpeedDegrees, 0),
         AimToleranceDegrees = Mathf.Min(180, FiniteMinimum(stats.AimToleranceDegrees, 0)),
-        TargetSearchInterval = FiniteMinimum(stats.TargetSearchInterval, 0.05f)
+        TargetSearchInterval = FiniteMinimum(stats.TargetSearchInterval, 0.05f),
+        Beam = stats.Beam.HasValue ? new BeamStats(FiniteMinimum(stats.Beam.Value.DamagePerSecond, 0)) : null
     };
 
     // =========================================================

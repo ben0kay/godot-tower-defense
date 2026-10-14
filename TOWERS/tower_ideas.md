@@ -1,6 +1,6 @@
 # Tower Ideas — Architecture and Weapon Families
 
-> **Weapon-family proposal; foundation 4A/4B is now implemented.** This document records a scalable direction for approximately 30 offensive towers, with room for many more, while also supporting passive, support, economy and hybrid towers. Do not treat planned files, features or tower names here as existing code.
+> **Weapon-family proposal; foundation4A/4B and typed damage/continuous Laser4C are now implemented.** This document records a scalable direction for approximately 30 offensive towers, with room for many more, while also supporting passive, support, economy and hybrid towers. Do not treat planned files, features or tower names here as existing code.
 >
 > Before implementing: read `NOTES/CodePreferences.md`, `TOWERS/README.md`, `TOWERS/Shared/README.md`, `TOWERS/Shared/Stats/README.md`, `TOWERS/Placement/README.md`, and the relevant tower-specific README. Prefer lightweight, reusable, Inspector-editable C# systems and compact scene trees.
 
@@ -18,17 +18,17 @@
 ## Actual repository state (October 2026)
 
 **Working:**
-- `Offensive/BattleTower/BattleTower.tscn` is the only working offensive tower scene. Its root is `Node2D` with `BattleTower.cs`; a `TurretPivot/Sprite` child provides rotating visuals.
+- `Offensive/BattleTower/BattleTower.tscn` is the working projectile-family scene. Its root is `Node2D` with `BattleTower.cs`; a `TurretPivot/Sprite` child provides rotating visuals.
 - `BattleTowerConfig.cs` and `DefaultBattleTowerConfig.tres` define its Inspector-editable authored stats and costs. Placed instances receive a deep-duplicated config.
 - `Shared/Targeting/TowerTargeting.cs` provides First (shortest remaining route to the Citadel) and Closest (world distance to tower).
 - `Shared/Weapons/TurretAiming.cs` provides reusable tracking/alignment; `Shared/Projectiles/BasicProjectile.cs` provides a guided test projectile.
 - `Shared/Stats/Pipeline/` has eight ordered stages; Base, purchased Upgrades, Safety and Final are active. Ranks/research/level/effects remain neutral.
 - `Placement/TowerPlacementController.cs` resolves catalog IDs and owns generic TowerBase preview/placement/selection, occupancy integration and atomic wallet callbacks.
-- `UI/GameplayHUD/GameplayHUD.cs` generates scrollable available catalog buttons. Default roster is only Battle Tower; no placeholder gameplay entries.
+- `UI/GameplayHUD/GameplayHUD.cs` generates scrollable available catalog buttons. Default roster is Battle and Laser Tower; no placeholder gameplay entries.
 
 **Implemented foundation:** minimal TowerBase, TowerConfig, TowerDefinition, TowerCatalog, generic multi-type placement and catalog-driven HUD/Inspector, plus the existing paid upgrades. Per-type compatibility/formatting stays outside placement/HUD. Name/description/recipe live once on Config; definition references it. TESTS/Towers/PassiveTestTower verifies nonweapon registration/placement.
 
-**Not implemented:** second real weapon family, weapon-family extraction (4C), selling, tower health, ranks/research/effects and multi-cell placement. The proposals below describe extension direction; TOWERS/README.md and feature READMEs describe current contracts.
+**Not implemented:** additional weapon families, broader weapon-module extraction, selling, tower health, ranks/research/effects and multi-cell placement. The proposals below describe extension direction; TOWERS/README.md and feature READMEs describe current contracts.
 
 ## Proposed ownership
 
@@ -176,7 +176,7 @@ Items 1–3 are complete through Phase 4A/4B (and paid upgrades are already impl
 
 1. **Common identity:** add the minimal `TowerBase` (and scene inheritance only if it helps). Migrate the existing Battle Tower without changing its combat or appearance. Preserve current tests.
 2. **Type/catalog + generic placement:** register Battle Tower, replace Battle-only creation/dictionary/UI coupling, retain the same world occupancy, route safety, selection, wallet transaction and refund-on-failure behavior.
-3. **Catalog-driven build tray/Inspector:** render build entries and previews from definitions instead of the HUD sample list. Still ship only Battle Tower until stable.
+3. **Catalog-driven build tray/Inspector:** render build entries and previews from definitions instead of the HUD sample list. This foundation now ships Battle and Laser Tower.
 4. **Second distinct weapon family:** implement **Laser Tower** as a contrasting beam/hitscan example. Extract genuinely shared weapon plumbing while keeping laser-specific behavior optional.
 5. **Third family and variation:** implement **Missile or Mortar** (explosive splash), then **Minigun** (projectile family using changed cadence/muzzles). Confirm new types do not require editing the placement system.
 6. **Progression and effects:** activate the existing stat-pipeline stages as their real owning features arrive; later add upgrades, tower health, sell behavior and more targeting/weapon modules.
@@ -193,3 +193,6 @@ Items 1–3 are complete through Phase 4A/4B (and paid upgrades are already impl
 ## Scope note
 
 This is an expandable design proposal, **not an instruction to refactor everything immediately**. Prefer migrating one working feature at a time, building on the current C#/.NET Godot architecture. Keep `TOWERS/README.md` and feature-specific READMEs authoritative for actual implemented behavior, and update them as phases are completed.
+
+## Phase4C completed
+COMBAT/Damage is the single typed shield/hull response authority. Battle guided projectiles deliver Kinetic, Laser is the second real family with sustained Energy DPS. BeamRenderer/BeamStyle are presentation-only and Inspector-editable, independent of target/damage/stat math. BeamStats is an optional float capability in the same eight-stage resolver; Laser uses the existing paid tier/catalog/HUD/placement system. Shared targeting/aiming were reused; no giant universal weapon/cooldown engine was introduced. Missile/Mortar, extra effects and broader shared weapon-module extraction await actual consumers. See LaserTower/README.md for current balance, retargeting and verification limits.

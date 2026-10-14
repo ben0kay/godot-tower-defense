@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="DamageResponseProfile" load_steps=2 format=3]
+[ext_resource type="Script" path="res://COMBAT/Damage/DamageResponseProfile.cs" id="1"]
+[resource]
+script = ExtResource("1")
+KineticShield = 0.5
+KineticHull = 1.0
+EnergyShield = 2.0
+EnergyHull = 0.85
+ExplosiveShield = 0.25
+ExplosiveHull = 1.25

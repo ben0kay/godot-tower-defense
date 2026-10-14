@@ -6,7 +6,7 @@ The CanvasLayer HUD displays gameplay state. ECONOMY owns balances, CitadelSessi
 
 TopBar remains permanent: Credits left, Citadel current/max HP and compact health fill at the true viewport center, Wave right. Start/Next Wave sits below the right zone; SetWaveControls updates button/tooltip from real wave state. Health colors/clamping and the compatibility SetCoreHealth forwarding API remain intact. UIMasterConfig controls layout and appearance.
 
-Ctrl independently opens/closes TowerBar with the existing slide/fade. Its horizontal ScrollContainer supports arbitrary registered type counts without widening the HUD. `BindCatalog` reads available definitions and generates `UIButtonFactory` TowerTile buttons with canonical config name, category, construction recipe, icon and tooltip; it never instantiates tower scenes or owns stat math. DefaultTowerCatalog registers only Battle Tower. Unavailable entries are omitted; an empty catalog shows a safe message. No nonfunctional Laser/Missile/Repair/Solar/Resource samples remain.
+Ctrl independently opens/closes TowerBar with the existing slide/fade. Its horizontal ScrollContainer supports arbitrary registered type counts without widening the HUD. `BindCatalog` reads available definitions and generates `UIButtonFactory` TowerTile buttons with canonical config name, category, construction recipe, icon and tooltip; it never instantiates tower scenes or owns stat math. DefaultTowerCatalog registers Battle and Laser towers. Unavailable entries are omitted; an empty catalog shows a safe message. No nonfunctional Laser/Missile/Repair/Solar/Resource samples remain.
 
 Placement validates/rebuilds the exported Catalog at startup, then calls BindCatalog after the HUD is ready. Explicitly rebuild/rebind after runtime registration/availability changes; there is no frame-based registry/menu polling. GetBuildButton(typeId) accesses a generated action independently of scene-node names. TowerChoiceRequested carries that stable ID. Buttons retain keyboard focus and the shared factory's visual states; horizontal scrolling makes distant entries reachable.
 
@@ -21,3 +21,6 @@ GameplayHUD.cs supplies status/action APIs and dynamic entries; TowerBar/TowerBa
 TowerBuildBarChecks covers 40 definitions, unavailable types, prices/icons, action IDs, focus, scrolling bounds, rebinding/empty state and independent panels. TowerCatalogChecks covers actual mixed-type placement/selection. Existing HudTowerChecks, MenuFoundationChecks, TowerStatChecks and TowerUpgradeChecks remain active. MenuTowerFlowChecks separately drives actual Boot/Main/Campaign/Level001 menu buttons and paid Battle construction/upgrades with an in-memory test profile, without writing saves.
 
 Category filtering, extra inventories, selling, tower health and new weapon types remain future work. Phase 4C weapon extraction is not part of this HUD pass.
+
+
+Phase 4C-2 registers real Laser Tower beside Battle Tower; its generated entry/Inspector/upgrade action require no generic HUD or placement branches. Laser displays effective DPS/range and Energy type rather than projectile rate/damage.

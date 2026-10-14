@@ -15,3 +15,6 @@ Preview/apply use the same pipeline and current source inputs. The Inspector sho
 TESTS/TowerUpgradeChecks exercises production HUD purchases, preview parity, level progression, multi-resource atomic payments, missing funds, disabled rules, stale/same-frame requests, max tier, external resource isolation, arithmetic, repeated rebuilds, layout bounds and unchanged navigation.
 
 Phase 4A/4B placement/Inspector use the selected TowerBase's private config, tiers and resolver rather than the build choice's Battle defaults. No-upgrade passive fixtures show a safe disabled state with no combat snapshot. Per-type configs describe real preview differences; payment/math remain unchanged.
+
+
+Laser Tower now demonstrates capability-specific BeamDps modifiers through the same stage 02 and paid transaction. Its level 2 tier costs 175 Credits and adds 10 DPS/32px range. Preview/application share the resolver, source/tier copies remain isolated and no navigation state changes.

@@ -14,3 +14,6 @@ TowerStatPipeline.cs is the single coordinator. Each stage is an ordinary static
 | 08_FinalStats.cs | Fresh immutable final snapshot |
 
 Future stages receive their own read-only inputs through TowerStatContext and return a new TowerStatBlock. Keep stage arithmetic/order explicit, rebuild from original inputs and use this same resolver for upgrade previews. Stage files must not spend money, own progression saves, attribute kills or schedule timed effects.
+
+
+Optional BeamStats now propagates through all eight stages. Stage 02 applies TowerStatId.BeamDps with existing arithmetic, Stage 07 clamps DPS, Stage 08 includes the immutable capability. Original Battle fields/adapter/constructors and neutral future stages remain supported; no parallel Laser pipeline exists.

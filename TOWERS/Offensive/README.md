@@ -1,7 +1,3 @@
-# Offensive Towers
+# Offensive towers
 
-Towers whose primary purpose is attacking enemy ships. The first placeable tower is `BattleTower/`, a single-barrel all-rounder between Sniper and Minigun. `LaserTower/` and `MissileTower/` remain planned.
-
-Future attributes can include targeting priority, fire interval, range, weapon type, optional AoE/status effects, and upgrade paths. Begin with one SVG per tower and bullets fired from the center. Split base and rotating gun with `Marker2D` muzzles/recoil only when artwork and gameplay warrant it.
-
-Only Battle Tower placement and selection exist; combat does not.
+BattleTower is the working guided Kinetic projectile family. LaserTower is the sustained Energy DPS/beam family, with presentation separated in Shared/Weapons/Beams. Both use shared targeting/aiming, catalog-driven generic placement/HUD, canonical ResourceCost recipes and the same cached eight-stage stats/paid upgrades. COMBAT/Damage owns shield/hull responses. Missile and additional families remain planned; no splash, armor, line-of-sight, effects or heat system is implemented.

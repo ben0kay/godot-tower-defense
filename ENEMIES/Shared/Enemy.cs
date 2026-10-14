@@ -33,11 +33,24 @@ public partial class Enemy : Node2D
     public void TakeDamage(float amount)
     {
         if (!IsAlive || !float.IsFinite(amount) || amount <= 0f) return;
-        float absorbed = Mathf.Min(CurrentShield, amount);
-        CurrentShield -= absorbed;
-        float hullDamage = amount - absorbed;
-        if (hullDamage <= 0f) return;
-        Health = Mathf.Max(0f, Health - hullDamage);
+        CommitDamage(DamageResolver.ResolveLegacy(amount, CurrentShield, Health));
+    }
+
+    // =========================================================
+    // Typed attacks supply base units; the global resolver owns all defense-layer math.
+    public void ApplyDamage(DamageInfo hit)
+    {
+        if (!IsAlive || hit.Amount == 0) return;
+        CommitDamage(DamageResolver.Resolve(hit, CurrentShield, Health));
+    }
+
+    // =========================================================
+    // One lifecycle path updates hull feedback and publishes a kill at most once.
+    private void CommitDamage(DamageResult result)
+    {
+        float oldHealth = Health;
+        CurrentShield = result.Shield; Health = result.Health;
+        if (Health == oldHealth) return;
         _defenseBar?.SetHealth(Health, Definition.MaxHealth);
         if (Health <= 0f) Finish(false);
     }

@@ -8,9 +8,9 @@ Umbrella folder for **every player-buildable tower**, not just weapons: offensiv
 
 **Phase 4A/4B implemented:** `TowerConfig`, `TowerDefinition`, `TowerCatalog` and `TowerPresentation` are the shared foundation. `TowerBase` additionally owns stable type identity, definition, grid anchor/footprint, config compatibility/application, placement/selection hooks and optional range inspection. Placement indexes `TowerBase` and resolves catalog IDs without Battle-specific branches or scene-node assumptions. The HUD creates available catalog entries in a horizontal scrolling tray, using `UIButtonFactory`. Construction identity/prices stay on the canonical Config, referenced by definitions; no second price or stat list exists.
 
-**Default playable roster:** Battle Tower only. The passive scene under `TESTS/Towers/` is a regression fixture, not a promised Repair/Solar tower or a default menu entry. Registering a valid additional definition creates its build choice without editing placement or HUD. Only 1×1 footprints are supported; other footprints fail registration.
+**Default playable roster:** Battle Tower and Laser Tower. The passive scene under `TESTS/Towers/` is a regression fixture, not a promised Repair/Solar tower or a default menu entry. Registering a valid additional definition creates its build choice without editing placement or HUD. Only 1×1 footprints are supported; other footprints fail registration.
 
-**Still local/future:** Battle Tower keeps its existing targeting/cooldown/guided-projectile loop. **Phase 4C-1 typed damage and 4C-2 Laser Tower/beam visuals are not implemented yet.** Enemy shields do exist as opt-in full `MaxShield` at wave spawn, but current attacks remain untyped shield-first 1:1. Stage 02 upgrades stays active; ranks/research/level modifiers/effects remain neutral. Selling, tower HP, shield visuals and multi-cell placement are later work.
+**Phase 4C-1/4C-2 implemented:** COMBAT/Damage owns typed base hits and a cached canonical shield/hull response profile. Battle bullets deliver Kinetic; legacy TakeDamage keeps 1:1 semantics. Laser Tower sustains Energy DPS through the same resolver, with a separate endpoint-only BeamRenderer and Inspector-editable copied BeamStyle. Its genuine float BeamStats capability uses the same eight stages and paid upgrades. Shared targeting/aiming are reused; delivery remains type-specific rather than introducing a universal weapon switch. Ranks/research/level modifiers/effects, selling, tower HP, shield visuals and multi-cell placement remain future work.
 
 **Codex:** read `NOTES/CodePreferences.md`, this README, `tower_ideas.md`, `Shared/README.md`, `Shared/Stats/README.md`, `Shared/Upgrades/README.md`, `Placement/README.md` and `Offensive/BattleTower/README.md` before editing. Work against latest HEAD, preserve the newly implemented upgrade work, and run existing tests.
 
@@ -25,7 +25,9 @@ Umbrella folder for **every player-buildable tower**, not just weapons: offensiv
 | `Shared/TowerDefinition.cs` and `Shared/TowerCatalog.cs` | EXISTS (Phase 4A) | Type metadata, scene/config registry, dynamic build choices |
 | `Placement/TowerPlacementController.cs` | EXISTS (generic TowerBase) | Generalize placement/selection/ghost, keep grid/economy ownership |
 | `Offensive/BattleTower/` and `Offensive/BattleTower/Upgrades/` | EXISTS | First working offensive type; Level2/Level3 assets |
-| `Offensive/LaserTower/`, `Offensive/MissileTower/` | PLANNED | Future beam/explosive example towers, not active |
+| `Offensive/LaserTower/` | EXISTS (4C-2) | Sustained Energy DPS, muzzle beam renderer and paid tier |
+| `Offensive/MissileTower/` | PLANNED | Future explosive weapon |
+| `COMBAT/Damage/` | EXISTS (4C-1) | Shared typed base damage and canonical shield/hull responses |
 | `Support/`, `Economy/`, `Utility/` | PLANNED | Passive and hybrid tower categories, never mandatory weapon logic |
 | `UI/GameplayHUD/` | EXISTS (dynamic catalog entries) | Replace build choice inputs with catalog data |
 | `ECONOMY/` | EXISTS | The **only** wallet, ResourceCost and purchase authority |
@@ -279,17 +281,17 @@ Do not redo Phase 3A/3B in Phase 4. Maintain stable Source Config values, `Tower
 
 **Phase 4B acceptance:** registering a new valid type makes a build-bar entry appear without a new hardcoded name/button/branch. Clicking it uses that type's scene, construction rules, icon and Inspector. Single Battle Tower gameplay and its Upgrade button remain unchanged. Test many catalog entries, disabled/unimplemented entries, save-free direct `Main.tscn` testing and the F5 Boot→Main→Campaign→Level001 flow.
 
-### Phase 4C — Typed damage and the first continuous-beam weapon (PLANNED; NEXT)
+### Phase 4C — Typed damage and the first continuous-beam weapon (implemented)
 
 **Implement in strict order: 4C-1 first, verify it independently, then 4C-2.** Phase 4A/4B catalog/placement/UI, Phase 3A/3B stats/upgrades, and the opt-in enemy `MaxShield`/`CurrentShield` groundwork already exist. Do not create a new tower registry, wallet, targeting service, replacement stat pipeline, or all-purpose weapon superclass.
 
 **Core architectural rule:** `TowerBase` is *tower identity, instance progression, placement and optional inspection*, not a damage type or mandatory weapon. The **weapon/config** supplies the damage type, the **shared combat resolver** interprets that type against the victim's shield/hull, and the **beam renderer** draws only visuals. A future hybrid tower may have a kinetic gun and an energy beam with different damage types. `Offensive` is a tower category; `Kinetic/Energy/Explosive` are damage types; `Projectile/Beam/Explosion` are delivery mechanisms—keep those three concepts independent.
 
-#### 4C-1 — Shared typed damage and shield/hull response (FIRST; no Laser yet)
+#### 4C-1 — Shared typed damage and shield/hull response (implemented and independently verified first)
 
 **Goal:** Introduce typed hits while preserving every currently working projectile/health behavior and the just-implemented opt-in shield spawn feature. Put shared attack/defense math outside `TOWERS/`, because enemy attacks and other sources may eventually use it.
 
-**Proposed small folder, not yet present:**
+**Implemented shared folder:**
 
 ```text
 COMBAT/
@@ -335,11 +337,11 @@ TOWERS/Shared/Projectiles/
 - Verify the live Battle Tower still fires guided projectiles, costs **200 Credits**, deals **12** base damage to unshielded Enemy001 at level 1, supports levels 2/3 (150/250 Credits), and retains targeting, rotation, 3-Credit kill reward, Citadel arrival damage, the 100-shield opt-in wave and F2 behavior. Preserve exact route-safe placement, wave scheduling and all existing regression tests.
 - **Stop after 4C-1 and confirm compilation and headless tests before implementing Laser Tower.** Update `COMBAT/Damage/README.md`, `ENEMIES/Shared/README.md`, projectile README and `TESTS/README.md` to describe actual behavior.
 
-#### 4C-2 — Laser Tower with sustained Energy beam and separate visual component (SECOND)
+#### 4C-2 — Laser Tower with sustained Energy beam and separate visual component (implemented after 4C-1 verification)
 
 **Goal:** Add a **real, catalog-registered Laser Tower** that holds a visible beam onto its target and deals **Energy damage per second**; it is *not* a fast invisible projectile, repeated hitscan spawn, series of discrete shots, or special-case inside `BattleTower.cs`. It should demonstrate the second actual offensive weapon family and be easily restyled in the Inspector without editing its combat logic.
 
-**Proposed files (author names may differ slightly, keep responsibilities):**
+**Implemented files/responsibilities (the following contract remains authoritative):**
 
 ```text
 TOWERS/
@@ -403,13 +405,13 @@ TOWERS/DefaultTowerCatalog.tres              # Add the real Laser definition
 - **30 types ≠ 30 active towers.** Profile actual *placed instances*, target searches, projectiles and active effects. Cache scene/service refs in `_Ready()`, stagger target searches, validate cached targets cheaply, resolve stats on invalidation (not per physics tick), and disable physics for passive towers. Avoid rebuilding the catalog/list or scanning every enemy for every tower each frame. Pool effects only if measured.
 - Run and preserve `TESTS/EnemyIntegrationChecks`, `HudTowerChecks`, `EconomyChecks`, `TowerStatChecks`, `TowerUpgradeChecks` and terrain/navigation/wave regression checks. Add catalog ID/asset tests, a non-Battle passive test type, multi-type placement/selection/upgrade tests, failed purchase rollback tests and dynamic UI entry checks. Verify the live Battle baseline numbers and the Phase 3B upgrade payments/Inspector parity.
 - Keep `Main.tscn`, `World/Towers`, existing terrain layers, waves, existing Citadel/portal reservation and navigation, `ECONOMY/` wallet and profile/menu startup working. Do not move unrelated modules or create a generic engine larger than needed. Use compact C#, Inspector `[ExportGroup]` Resources, explicit contracts and feature README updates. **Do not claim local Godot runtime tests passed without actually running them.**
-- **4A/4B are implemented and already regression-tested.** Codex's next work is **4C-1 → 4C-2**, with independent build/headless checkpoints and README updates reflecting implemented behavior only. Ranks, permanent research, level effects, selling and tower HP remain future passes.
+- **4A/4B and 4C-1/4C-2 are implemented and regression-tested.** 4C-1 compiled and passed the headless suite before Laser work started. Ranks, permanent research, level effects, selling and tower HP remain future passes.
 
 **Finish condition:** adding a new tower should require authoring its definition/config/scene/art and registration—**no new tower-specific case in placement or HUD**. Do not implement 30 complete towers as part of this foundation pass.
 
 ## Next implementation pass
 
-**Phase 4A+4B are complete. NEXT: implement 4C-1 typed damage, test it, then 4C-2 Laser Tower + reusable BeamRenderer and typed DPS capability.** Preserve Battle Tower baseline and paid upgrades after each checkpoint. Do not start Missile Tower, ranks, profile research, level modifiers, active effects, selling or tower HP in these passes.
+**Phase 4A/4B/4C-1/4C-2 are complete.** Review Laser visuals in a live Godot window and tune Inspector resources before the next weapon pass. Preserve Battle Tower baseline and paid upgrades after each checkpoint. Do not start Missile Tower, ranks, profile research, level modifiers, active effects, selling or tower HP in these passes.
 
 ## Current live Inspector files
 
@@ -433,8 +435,14 @@ TowerUpgradeChecks covers paid HUD actions, stale/same-frame duplicate protectio
 
 ## Implemented Phase 4A/4B verification and authoring
 
-`DefaultTowerCatalog.tres` references `Offensive/BattleTower/BattleTowerDefinition.tres`. Add a tower by authoring a compatible `TowerBase` scene/script, typed `TowerConfig`, icon and `TowerDefinition` (ID/category/scene/config/icon/1×1 footprint), then adding the definition to the catalog's Definitions array. Expand DefaultConfig to edit its name, description, construction costs and tiers. Definitions do not independently override prices or names. Rebuild the catalog and rebind the HUD after runtime registration/availability edits; ordinary frames do neither. Available=false hides the build entry and rejects placement; asset/config validation still applies to registered entries. Empty catalogs display a safe message.
+`DefaultTowerCatalog.tres` references BattleTowerDefinition and LaserTowerDefinition. Add a tower by authoring a compatible `TowerBase` scene/script, typed `TowerConfig`, icon and `TowerDefinition` (ID/category/scene/config/icon/1×1 footprint), then adding the definition to the catalog's Definitions array. Expand DefaultConfig to edit its name, description, construction costs and tiers. Definitions do not independently override prices or names. Rebuild the catalog and rebind the HUD after runtime registration/availability edits; ordinary frames do neither. Available=false hides the build entry and rejects placement; asset/config validation still applies to registered entries. Empty catalogs display a safe message.
 
 Passive scenes need no pivot, projectile node, weapon stats, range ring or processing. `TowerConfig.ResolveStats`/`DescribeStats`/`DescribeChanges` are type-aware adapters; Battle keeps the unchanged eight numerical stages and real upgrade preview. Future passive progression with actual capability stats can supply its own typed data when that consumer exists; the passive fixture deliberately has no upgrades or combat snapshot.
 
 At the 4A checkpoint the real Godot headless integration scene passed catalog/mixed-type tests and all existing combat, stat, upgrade, economy, terrain, wave, feedback and navigation checks. After 4B it passed again, with 40 registered variants testing availability, canonical prices/icons, generated ID actions, focus, scrolling, rebinding and independent panels. `MenuTowerFlowChecks.tscn` separately exercises actual Boot profile-button → Main → Campaign → Level001 buttons, then paid Battle placement/upgrade using an injected memory-only profile (no save writes). The suite includes the existing 500-ship fixture; headless timings are not a rendered-FPS or visual-layout guarantee.
+
+## Implemented Phase 4C verification
+
+4C-1 was committed/verified separately before any Laser code: direct C# compilation with Godot source generators and the actual Godot 4.7.2 headless integration scene passed, including DamageTypeChecks, opt-in shield waves and all old Battle/navigation/economy tests. Stage4C-2 then passed the full suite with LaserTowerChecks and the 500-ship fixture. Default Laser price 250 Credits, base20 DPS/256px; its175-Credit level 2 tier resolves 30 DPS/288px.20 Energy base DPS removes 40 shield or17 unshielded hull per second, within float tolerance. Battle's200 construction,150/250 upgrades,12 base hull hit, guided delivery and kill rewards remain unchanged.
+
+The environment's ordinary editor SDK/MSBuild build could not run (missing/incomplete .NET SDK/MSBuild setup). Compilation was performed successfully using Roslyn with the actual Godot API/source generator, then the compiled assembly was exercised by Godot headless. Manual live-window rendered beam quality/moving-target visual review is not claimed; automated endpoint geometry, style independence, cleanup and timing are covered.

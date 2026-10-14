@@ -1,0 +1,17 @@
+[gd_scene load_steps=6 format=3]
+[ext_resource type="Script" path="res://TOWERS/Offensive/LaserTower/LaserTower.cs" id="1"]
+[ext_resource type="Resource" path="res://TOWERS/Offensive/LaserTower/DefaultLaserTowerConfig.tres" id="2"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/laser_tower.svg" id="3"]
+[ext_resource type="PackedScene" path="res://TOWERS/Shared/Weapons/Beams/BeamRenderer.tscn" id="4"]
+[ext_resource type="Resource" path="res://TOWERS/Offensive/LaserTower/Beam/DefaultLaserBeamStyle.tres" id="5"]
+[node name="LaserTower" type="Node2D"]
+script = ExtResource("1")
+Config = ExtResource("2")
+[node name="TurretPivot" type="Node2D" parent="."]
+[node name="Sprite" type="Sprite2D" parent="TurretPivot"]
+texture = ExtResource("3")
+[node name="Muzzle" type="Marker2D" parent="TurretPivot"]
+position = Vector2(0, -29)
+[node name="BeamRenderer" parent="." instance=ExtResource("4")]
+z_index = 1
+Style = ExtResource("5")

@@ -4,11 +4,16 @@ using Godot;
 public partial class BasicProjectile : Node2D
 {
     private Enemy _target;
-    private float _speed, _damage, _life = 5f;
+    private float _speed, _life = 5f;
+    private DamageInfo _damage;
 
     // =========================================================
     // Explicit initialization keeps this helper independent of any enemy/tower type.
-    public void Initialize(Enemy target, float speed, float damage)
+    public void Initialize(Enemy target, float speed, float damage) => Initialize(target, speed, new DamageInfo(damage, DamageType.Kinetic));
+
+    // =========================================================
+    // Future projectile types can supply a typed base payload without duplicating defense math.
+    public void Initialize(Enemy target, float speed, DamageInfo damage)
     { _target = target; _speed = Mathf.Max(1f, speed); _damage = damage; }
 
     // =========================================================
@@ -20,7 +25,7 @@ public partial class BasicProjectile : Node2D
         { QueueFree(); return; }
         float radius = _target.Definition.RadiusPixels + 3f;
         if (GlobalPosition.DistanceTo(_target.GlobalPosition) <= _speed * (float)delta + radius)
-        { _target.TakeDamage(_damage); QueueFree(); return; }
+        { _target.ApplyDamage(_damage); QueueFree(); return; }
         GlobalPosition = GlobalPosition.MoveToward(_target.GlobalPosition, _speed * (float)delta);
     }
 

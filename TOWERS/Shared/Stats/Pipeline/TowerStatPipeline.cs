@@ -14,19 +14,27 @@ public static class TowerStatPipeline
     public static TowerFinalStats Resolve(BattleTowerConfig config, int level, TowerStatTrace trace = null)
     {
         if (config == null) throw new ArgumentNullException(nameof(config));
+        return Resolve(new TowerStatBlock(config.RangePixels, config.ShotsPerSecond, config.DamagePerShot,
+            config.ProjectileSpeed, config.RotationSpeedDegrees, config.AimToleranceDegrees, config.TargetSearchInterval),
+            config.UpgradeTiers, level, trace);
+    }
+
+    // =========================================================
+    // Shared authored input adapter keeps tier snapshotting identical across weapon capabilities.
+    public static TowerFinalStats Resolve(TowerStatBlock baseStats, Godot.Collections.Array<TowerUpgradeTier> tiers,
+        int level, TowerStatTrace trace = null)
+    {
         if (level < 1) throw new ArgumentOutOfRangeException(nameof(level));
         var modifiers = ImmutableArray.CreateBuilder<TowerStatModifier>();
         if (level > 1)
         {
-            TowerUpgradeController.Validate(config.UpgradeTiers);
-            if (level > config.UpgradeTiers.Count + 1) throw new ArgumentOutOfRangeException(nameof(level));
+            TowerUpgradeController.Validate(tiers);
+            if (level > tiers.Count + 1) throw new ArgumentOutOfRangeException(nameof(level));
             for (int i = 0; i < level - 1; i++)
-                foreach (TowerUpgradeModifier entry in config.UpgradeTiers[i].Modifiers)
+                foreach (TowerUpgradeModifier entry in tiers[i].Modifiers)
                     modifiers.Add(new TowerStatModifier(entry.Stat, entry.Operation, entry.Amount, $"tier:{i + 2}"));
         }
-        TowerStatContext context = new(new TowerStatBlock(config.RangePixels, config.ShotsPerSecond,
-            config.DamagePerShot, config.ProjectileSpeed, config.RotationSpeedDegrees,
-            config.AimToleranceDegrees, config.TargetSearchInterval), modifiers.ToImmutable());
+        TowerStatContext context = new(baseStats, modifiers.ToImmutable());
         return Resolve(context, trace);
     }
 

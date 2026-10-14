@@ -17,3 +17,6 @@ A killed enemy (only `Finish(false)`) calls the shared `FEEDBACK/DeathExplosion/
 `EnemyDefinition.MaxShield` is an Inspector-editable **capacity** (default `0`); it does **not** mean every spawn has shields. `Enemy.CurrentShield` is private-set, per-instance runtime state initialized by `Enemy.Initialize(..., spawnWithShield: false)`. A wave entry with `shield: true` starts that specific ship at full `MaxShield`; all default spawns, including F2/debug, start at zero. If a definition has zero capacity, the opt-in remains zero.
 
 `Enemy.TakeDamage` absorbs finite positive damage into the shield first and applies overflow to hull `Health` in the same hit. The existing `DefenseBar` continues showing **hull HP only**; shield-only hits leave it hidden at full hull health. Shield rendering, regeneration, resistance and armor are separate future features. Dying/arriving/rewards work as before. No wave or spawn changes are stored on the shared authored `.tres` file.
+
+
+Typed ApplyDamage(DamageInfo) now delegates base hits to COMBAT/Damage. TakeDamage(float) keeps 1:1 shield-first behavior. One internal helper commits state; only hull changes update DefenseBar, only hull death pays a kill. Capacity/opt-in spawning remain unchanged.

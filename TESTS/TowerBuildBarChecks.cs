@@ -12,8 +12,8 @@ public static class TowerBuildBarChecks
         GameplayHUD hud = main.GetNode<GameplayHUD>("UI/GameplayHUD");
         TowerPlacementController placement = main.GetNode<TowerPlacementController>("TowerPlacement");
         TowerDefinition battle = placement.Catalog.Find("battle");
-        Require(hud.GetBuildButton("battle") != null && hud.GetBuildButton("laser") == null,
-            "Default build bar contains only playable Battle Tower");
+        Require(hud.GetBuildButton("battle") != null && hud.GetBuildButton("laser") != null,
+            "Default build bar contains playable Battle and Laser towers");
         TowerCatalog many = new();
         for (int i = 0; i < 40; i++)
         {

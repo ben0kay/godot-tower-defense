@@ -28,3 +28,6 @@ Select a placed tower after exiting build mode to see its current level and next
 
 ## Phase 4A catalog migration
 BattleTowerDefinition.tres references the existing scene/art and canonical config; DefaultTowerCatalog.tres registers it. BattleTower implements shared config/selection/placement contracts while retaining its existing local targeting, cooldown, rotation and guided projectile loop. TowerConfig supplies identity/cost/tiers, BattleTowerConfig retains all weapon fields, change notifications and the same eight-stage input adapter. Level2/Level3 costs and calculations are unchanged. No weapon-family extraction was performed.
+
+
+Phase 4C-1 changes only guided contact payload to explicitly Kinetic base damage:12 still damages unshielded hull by 12, and damages shields by 6 under DefaultDamageProfile. Legacy debug TakeDamage remains1:1. Projectile timing, cooldown/aim,200 construction,150/250 upgrades and3-Credit kill rewards are preserved.

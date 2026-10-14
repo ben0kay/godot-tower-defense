@@ -17,7 +17,8 @@ public static class TowerUpgradesStage
             ProjectileSpeed = Resolve(stats.ProjectileSpeed, TowerStatId.ProjectileSpeed, context),
             RotationSpeedDegrees = Resolve(stats.RotationSpeedDegrees, TowerStatId.RotationSpeed, context),
             AimToleranceDegrees = Resolve(stats.AimToleranceDegrees, TowerStatId.AimTolerance, context),
-            TargetSearchInterval = Resolve(stats.TargetSearchInterval, TowerStatId.SearchInterval, context)
+            TargetSearchInterval = Resolve(stats.TargetSearchInterval, TowerStatId.SearchInterval, context),
+            Beam = stats.Beam.HasValue ? new BeamStats(Resolve(stats.Beam.Value.DamagePerSecond, TowerStatId.BeamDps, context)) : null
         };
     }
 

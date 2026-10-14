@@ -72,3 +72,9 @@ Run `Godot --headless --path . TESTS/MenuTowerFlowChecks.tscn` separately to exe
 ## Enemy shields — optional wave spawn flag
 
 `TESTS/EnemyShieldChecks.cs` runs after `WaveChecks` in `EnemyIntegrationChecks`. It checks the shared `MaxShield` default and Enemy001's authored capacity, exact weighted composition of same-ID entries with distinct shield flags, real WaveManager → SpawnManager flag propagation, full and zero starting shields, shield-first damage, exact shield break, overflow into hull, existing hull DefenseBar updates, unaffected debug/F2 spawning and per-instance independence. Test-created ships are removed and the original level wave set restored without changing authored files. Shield rendering and regeneration are not part of this pass.
+
+
+DamageTypeChecks covers typed coefficients, exact shield break,20/30/4.25 base spillover, zero absorption blocking, invalid payloads/profiles, overflow safety, isolated enemy state, legacy behavior and idempotent kill/arrival rewards. The independent 4C-1 checkpoint runs before Laser implementation.
+
+
+LaserTowerChecks runs after the independent 4C-1 damage/shield fixture: real catalog placement/recipe/upgrade actions, private source data, shared DPS operations/clamps,30/60/120 Hz parity, typed hull/shield spillover, First/Closest/retargeting, range/alignment/disable/zero-DPS/arrival/death/unload gates, endpoints/visual independence and no per-tick node creation. TowerBuildBarChecks now expects both playable default entries. Full regression and standalone menu flow are exercised with the Godot assembly compiled via Roslyn/source generators; standard editor SDK/MSBuild is unavailable here and no live rendered visual-quality check is claimed.
