@@ -237,12 +237,8 @@ public partial class GameplayHUD : Control
         _towerBar.AddThemeStyleboxOverride("panel", MakePanel(Config.PanelColor, Config.AccentColor));
         _inspector.AddThemeStyleboxOverride("panel", MakePanel(Config.PanelColor, Config.AccentColor));
 
-        _startWave.AddThemeColorOverride("font_color", Config.TextColor);
-        _startWave.AddThemeColorOverride("font_disabled_color", Config.MutedTextColor);
-        _startWave.AddThemeStyleboxOverride("normal", MakePanel(Config.ButtonColor, Config.AccentColor));
-        _startWave.AddThemeStyleboxOverride("hover", MakePanel(Config.ButtonColor.Lightened(0.2f), Config.AccentColor));
-        _startWave.AddThemeStyleboxOverride("disabled", MakePanel(Config.TopBarColor, Config.MutedTextColor));
-        _startWave.AddThemeStyleboxOverride("focus", MakeFocusPanel(Config.AccentColor));
+        // Existing buttons keep their scene paths and signals; only appearance is shared.
+        UIButtonFactory.Apply(_startWave, UIButtonStyle.Action, Config);
         _healthFill = new StyleBoxFlat { BgColor = Config.HealthHealthyColor };
         _healthBar.AddThemeStyleboxOverride("fill", _healthFill);
         _healthBar.AddThemeStyleboxOverride("background", new StyleBoxFlat { BgColor = Config.ButtonColor });
@@ -253,12 +249,7 @@ public partial class GameplayHUD : Control
         {
             Button button = GetNode<Button>($"BottomArea/TraySlot/TowerBar/Insets/Tray/Buttons/{name}");
             button.CustomMinimumSize = new Vector2(Config.TowerButtonWidth, 65f);
-            button.AddThemeColorOverride("font_color", Config.TextColor);
-            button.AddThemeColorOverride("font_hover_color", Colors.White);
-            button.AddThemeStyleboxOverride("normal", MakePanel(Config.ButtonColor, Config.ButtonColor.Lightened(0.30f)));
-            button.AddThemeStyleboxOverride("hover", MakePanel(Config.ButtonColor.Lightened(0.2f), Config.AccentColor));
-            button.AddThemeStyleboxOverride("pressed", MakePanel(Config.ButtonColor.Lightened(0.32f), Config.AccentColor));
-            button.AddThemeStyleboxOverride("focus", MakeFocusPanel(Config.AccentColor));
+            UIButtonFactory.Apply(button, UIButtonStyle.TowerTile, Config);
         }
 
         Label[] primary = { _wave, _credits, _core, _towerName };
@@ -274,8 +265,7 @@ public partial class GameplayHUD : Control
         foreach (Label label in accents) label.AddThemeColorOverride("font_color", Config.AccentColor);
 
         Button close = GetNode<Button>("BottomArea/Inspector/Insets/Body/Heading/CloseButton");
-        close.AddThemeColorOverride("font_color", Config.AccentColor);
-        close.AddThemeColorOverride("font_hover_color", Colors.White);
+        UIButtonFactory.Apply(close, UIButtonStyle.Compact, Config);
     }
 
     // =========================================================
@@ -289,13 +279,5 @@ public partial class GameplayHUD : Control
         CornerRadiusBottomLeft = 4, CornerRadiusBottomRight = 4
     };
 
-    // =========================================================
-    // Keep keyboard focus visible without painting over selected tower buttons.
-    private static StyleBoxFlat MakeFocusPanel(Color border) => new()
-    {
-        DrawCenter = false, BorderColor = border,
-        BorderWidthLeft = 1, BorderWidthTop = 1,
-        BorderWidthRight = 1, BorderWidthBottom = 1
-    };
     #endregion
 }

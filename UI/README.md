@@ -1,11 +1,11 @@
-# UI
+# UI — Shared menus and live gameplay HUD
 
-Dedicated, C#-based interface area, following the organization of `ben0kay/isometric-new-2d/UI`.
+`UIMasterConfig.cs` / `DefaultUIConfig.tres` provide the Inspector-editable common HUD palette/layout. `Shared/UIButtonFactory.cs` centralizes styling and creation of all interface buttons; `Shared/MenuLayout.cs` provides consistent menu panels.
 
-- `UIMasterConfig.cs` — layout heights/widths, visual palette and tower tray animation settings.
-- `DefaultUIConfig.tres` — Inspector-editable shared HUD settings.
-- `GameplayHUD/` — active in-world HUD: permanent top strip, Ctrl-to-toggle build tray, bottom-right inspector.
-- `Menus/` — reserved folders for Boot, Main and Pause menus; not implemented yet.
-- `Shared/` — reserved for reusable UI styles/buttons and helpers when needed.
+- `Menus/Boot/` is the active F5 startup for creating/selecting locally persistent profiles.
+- `Menus/Main/` shows the active profile and Campaign / Change Profile / Exit Game.
+- `Menus/Campaign/` offers **Play Level 001**; later it will lead to a Levels selection screen.
+- `Menus/MenuNavigation.cs` owns scene switching; `Menus/Pause/` remains future work.
+- `GameplayHUD/` remains the actual combat interface under `Main.tscn/UI`: credits, health, waves, Ctrl tower tray and bottom-right inspector. Existing .tscn button nodes receive shared factory styles without recreating signals or changing gameplay.
 
-**UI uses the existing CanvasLayer in `Main.tscn`.** The root GameplayHUD ignores mouse events in unused screen space; its visible panels/buttons consume them to avoid interfering with camera/world interactions. Battle Tower placement and inspection are integrated. The top bar displays Credits / centered Citadel HP / Wave through event-ready setters; authoritative economy, Citadel durability and waves remain future work.
+The gameplay world is intentionally not loaded by Boot/Main/Campaign menus. Open `Main.tscn` and run current scene (F6) for direct editor testing; F5 launches the Boot flow. Profile persistence lives in `SYSTEMS/Profiles/`; **campaign/game saves are not implemented** (planned in `SYSTEMS/Saving/`).

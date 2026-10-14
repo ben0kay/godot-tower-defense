@@ -1,31 +1,28 @@
-# Godot Tower Defense: Interactive Battlefield + HUD
+# Godot Tower Defense — C#/.NET
 
-Fully 2D top-down space tower defense in **Godot C#/.NET**. This stage includes a large camera-navigable grid map and the first persistent gameplay HUD foundation. The first **Battle Tower** can be placed and inspected. Enemies, projectiles, waves and economy have **not** been implemented yet.
+A 2D top-down sci-fi tower-defense game in Godot 4.7.x. An editable Level001 map, enemy spawning and A* routing, finite manual waves, Battle Tower combat, wallet/kill credits, Citadel HP and the eight-stage tower-stat foundation are implemented.
 
-## Open and run
-Open in the Godot **.NET** editor (project SDK 4.7.x), build C# and press **F5**. The configured `Main.tscn` loads directly into the battlefield.
+## Launch
 
-## Current controls
-- **WASD / arrow keys:** pan.
-- **Middle mouse drag:** pan directly.
-- **Mouse wheel:** zoom toward the pointer.
-- **Ctrl:** toggle tower build tray.
-- **Click BATTLE:** begin grid-snapped tower placement. **Left-click:** place on a free cell; **right-click / Escape:** cancel. After canceling, left-click a placed tower to inspect it.
-- **X in Inspector:** close inspector independently of build tray.
+Build C# in the Godot .NET editor, then press **F5**. The project starts at **Boot**, where you create/select a local profile. Select **Campaign** in Main Menu, then **Play Level 001** to enter the existing battlefield. Profiles persist to Godot `user://Profiles/profiles.json` (versioned JSON with backup recovery). **Campaign/gameplay saves are not yet implemented**: each deployment starts a fresh level session.
 
-## Settings
-- `CAMERA/DefaultCameraConfig.tres`: pan speed, smoothing, zoom and boundaries.
-- `WORLD/DefaultWorldConfig.tres`: map dimensions, grid, colors.
-- `UI/DefaultUIConfig.tres`: HUD dimensions, tray animation, colors and initial visibility.
-- `TOWERS/DefaultTowerConfig.tres`: shared range/preview switches; `TOWERS/Offensive/BattleTower/DefaultBattleTowerConfig.tres`: proposed baseline stats.
+For rapid map or combat testing, open `Main.tscn` and press **F6** (Run Current Scene). This bypasses profile/menus and remains valid for headless integration checks.
 
-## Folder plans
-- `UI/GameplayHUD/` — TopBar, TowerBar, Inspector and their individual READMEs.
-- `UI/Menus/` — reserved Boot, Main and Pause.
-- `UI/Shared/` — future reused UI helpers.
-- `TOWERS/Placement/` — Battle Tower build ghost, occupied-cell checks and tower selection.
-- `FEEDBACK/` — future defense bars, damage numbers and camera effects.
+## Game controls
 
-The world grid renders only visible lines using one `Node2D`. The HUD roots ignore mouse input outside visible panels. Status labels show `--` because actual gameplay systems do not exist.
+- WASD/arrows: move camera; middle mouse: pan; mouse wheel: zoom.
+- Ctrl: toggle tower build tray. Choose Battle, left-click valid cells to place, right-click/Escape to cancel; select towers to inspect them.
+- F2: spawn Enemy001 through the level's debug system.
+- Start/Next Wave: use the top-right wave button.
 
-See `NOTES/CodePreferences.md`, `NOTES/NAVIGATION_PERFORMANCE_PLAN.md` and `UI/GameplayHUD/README.md`. In-engine compilation and gameplay verification are still needed locally.
+## Configuration and structure
+
+- `UI/DefaultUIConfig.tres`: HUD layout, palette and common button colors.
+- `UI/Shared/UIButtonFactory.cs`: consistent button styling across menus, HUD and dialogs.
+- `UI/Menus/`: Boot, Main, Campaign and future Pause.
+- `SYSTEMS/Profiles/`: local profile records and persistence.
+- `SYSTEMS/Saving/`: planned campaign persistence boundaries (not implemented yet).
+- `LEVELS/Level001/`: editable terrain, portal/objective configuration and finite waves.
+- `WORLD/`, `ENEMIES/`, `TOWERS/`, `ECONOMY/`: reusable gameplay systems.
+
+Use feature READMEs for detailed implementation and development plans, especially `TOWERS/README.md`, `LEVELS/README.md`, `UI/Menus/README.md`, `SYSTEMS/Saving/README.md` and `NOTES/CodePreferences.md`. Run `TESTS/EnemyIntegrationChecks.tscn` in the Godot .NET headless runner for gameplay regression checks.

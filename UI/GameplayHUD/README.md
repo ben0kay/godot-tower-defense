@@ -108,3 +108,7 @@ EconomyManager initializes from the active LevelConfig.StartingCredits and pushe
 
 ## Manual wave controls
 TopBar/Status/StartWave is a compact button below the right Wave zone, leaving the thin bar and true-centered Citadel unchanged. WaveManager calls SetWaveControls on state/count events; the button emits WaveStartRequested without owning timers or enemies. Before starting Level001 displays WAVE 00 / 03. Ready/Completed enable Start/Next; active waves disable it and show remaining planned + owned alive. Blocked/error reasons and detailed counts appear in the tooltip. Final completion disables the button; levels without wave sets hide it.
+
+## Unified button styling (implemented)
+
+`UI/Shared/UIButtonFactory.cs` now styles the **existing** TopBar/StartWave Button (`Action`), TowerBar six buttons (`TowerTile`) and Inspector X (`Compact`). The nodes, input callbacks, panel geometry, UIMasterConfig palette, placement signals and wave controls remain owned by this HUD. Future buttons (Upgrade, Sell) should call `UIButtonFactory.Apply(...)` rather than creating independent StyleBox definitions. Main/Boot/Campaign use `UIButtonFactory.Create(...)` because their menu controls are assembled dynamically.

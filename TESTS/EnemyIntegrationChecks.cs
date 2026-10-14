@@ -29,6 +29,7 @@ public partial class EnemyIntegrationChecks : Node
             // Disable cosmetic particles during mass-kill fixtures; test them separately below.
             FeedbackMasterConfig feedback = GD.Load<FeedbackMasterConfig>("res://FEEDBACK/DefaultFeedbackConfig.tres");
             feedback.DeathExplosionsEnabled = false;
+            MenuFoundationChecks.Run(_battle);
             TowerStatChecks.Run(_battle);
             TerrainCategoryChecks.Run(_grid);
             PortalSpawnChecks.Run(_grid, _spawns);

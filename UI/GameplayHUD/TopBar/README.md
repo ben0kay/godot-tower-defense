@@ -21,3 +21,5 @@ Main/Waves now supplies wave status through SetWaveControls and owns manual prog
 ## Live Citadel durability
 
 The central health number/bar now reflects **actual Citadel HP**. The active level's `LevelConfig.CitadelMaxHealth` initializes the reusable `WORLD/OBJECTIVES/Citadel/CitadelHealth`; `Main/CitadelSession` listens to `HealthChanged` and calls the already-existing `GameplayHUD.SetCitadelHealth(current, maximum)`. Arriving ships subtract their configured `CitadelDamage`; killed ships do not. The HUD remains display-only and never owns health or defeat rules. Zero HP emits the model's `Destroyed` event but does not yet show game over.
+
+The Start/Next Wave `Button` now receives `UIButtonFactory.Apply(..., UIButtonStyle.Action)`. The wave scheduler still owns whether it is enabled and the existing HUD still owns its responsive position and click signal. This is styling only.
