@@ -15,12 +15,22 @@ public static class HudTowerChecks
         Label health = hud.GetNode<Label>("TopBar/Status/Citadel/Health");
         ProgressBar bar = hud.GetNode<ProgressBar>("TopBar/Status/Citadel/Bar");
         CitadelHealth citadel = battle.GetNode<CitadelSession>("CitadelSession").Health;
-        Require(credits.Text == $"CREDITS {battle.GetNode<EconomyManager>("Economy").GetBalance(battle.GetNode<EconomyManager>("Economy").CreditsResource):N0}" && wave.Text == "WAVE 00 / 03" &&
+        Require(hud.TargetCredits == battle.GetNode<EconomyManager>("Economy").GetBalance(battle.GetNode<EconomyManager>("Economy").CreditsResource) &&
+            credits.Text.StartsWith("Credits: ") && wave.Text == "WAVE 00 / 03" &&
             health.Text == $"CITADEL {citadel.CurrentHealth:N0} / {citadel.MaxHealth:N0}" && bar.Visible,
             "HUD shows authoritative live credits and Citadel HP with prepared wave state");
         hud.SetCredits(12345678, true); hud.SetWave(100); hud.SetCitadelHealth(800, 1000, false);
-        Require(credits.Text == "Credits: 12,345,678" && wave.Text == "WAVE 100" && bar.Value == 80,
+        Require(credits.Text == $"Credits: {12345678:N0}" && wave.Text == "WAVE 100" && bar.Value == 80,
             "Status setters update their respective zones");
+        hud.SetCredits(100, true); hud.SetCredits(300);
+        Require(hud.TargetCredits == 300 && credits.Text == "Credits: 100",
+            "Wallet target updates instantly while the visible credit number is still easing");
+        hud._Process(hud.Config.CreditCountSeconds + 0.02);
+        Require(credits.Text == "Credits: 300", "Credit balance animation converges to its exact target");
+        hud.SetCredits(12345678, true);
+        hud.SetWave(101);
+        Require(wave.Scale.X > 1f, "A newly advanced wave pulses the number without affecting wave state");
+
         foreach (int width in new[] {1920, 1366, 640})
         {
             Control status = hud.GetNode<Control>("TopBar/Status");
