@@ -18,6 +18,7 @@ public partial class TowerPlacementController : Node2D
     #region State
     private WorldGrid _grid;
     private GameplayHUD _hud;
+    private SpawnManager _spawns;
     private Node2D _towers;
     private Sprite2D _ghost;
     private readonly Dictionary<Vector2I, BattleTower> _placedTowers = new();
@@ -32,6 +33,7 @@ public partial class TowerPlacementController : Node2D
     public override void _Ready()
     {
         _grid = GetNode<WorldGrid>("../World/Grid");
+        _spawns = GetNode<SpawnManager>("../World/EnemySystems/Spawning");
         _towers = GetNode<Node2D>("../World/Towers");
         _hud = GetNode<GameplayHUD>("../UI/GameplayHUD");
         _hud.TowerChoiceRequested += OnTowerChoiceRequested;
@@ -139,11 +141,18 @@ public partial class TowerPlacementController : Node2D
     }
 
     // =========================================================
-    // Spawn an idle tower centered on a valid, unoccupied grid cell.
+    // Spawn a configured firing tower centered on a valid, unoccupied grid cell.
     private void TryPlace(Vector2I cell)
     {
         if (_grid.PlacementFailure(cell).Length != 0) return;
+        string failure = _spawns.PlacementFailure(cell);
+        if (failure.Length != 0)
+        {
+            _hud.ShowTowerDetails(BattleConfig.DisplayName, "Placement rejected", DescribeTower(), failure);
+            return;
+        }
         BattleTower tower = BattleTowerScene.Instantiate<BattleTower>();
+        tower.Config = (BattleTowerConfig)BattleConfig.Duplicate();
         if (!_grid.TryOccupy(cell)) { tower.Free(); return; }
         _towers.AddChild(tower);
         tower.SetPlacement(cell, _grid.CellToWorldCenter(cell));
@@ -164,7 +173,7 @@ public partial class TowerPlacementController : Node2D
             _selected.SetSelected(true);
             _hud.ShowTowerDetails(BattleConfig.DisplayName, "Offensive / Placed",
                 DescribeTower($"Grid cell: {_selected.GridCell.X}, {_selected.GridCell.Y}"),
-                BattleConfig.Description + "\nFiring and credits are not active yet.");
+                _selected.Config.Description + "\nAutomatic firing active; credits are not charged.");
         }
         QueueRedraw();
     }
@@ -180,23 +189,24 @@ public partial class TowerPlacementController : Node2D
 
     #region Feedback
     // =========================================================
-    // Clearly label stats as planned until shots and the economy exist.
+    // Show active weapon stats; only the future economy price remains planned.
     private string DescribeTower(string extra = "")
     {
+        BattleTowerConfig config = _selected?.Config ?? BattleConfig;
         string stats = $"Footprint: 1 x 1 | Barrels: 1\n" +
-            $"Cost (planned): {BattleConfig.BuildCost}\n" +
-            $"Range (planned): {BattleConfig.RangePixels:0} px\n" +
-            $"Rate (planned): {BattleConfig.ShotsPerSecond:0.##} shots/s\n" +
-            $"Damage (planned): {BattleConfig.DamagePerShot}";
+            $"Cost (planned): {config.BuildCost}\n" +
+            $"Range: {config.RangePixels:0} px\n" +
+            $"Rate: {config.ShotsPerSecond:0.##} shots/s\n" +
+            $"Damage: {config.DamagePerShot}\nTargeting: {config.TargetPriority}";
         return extra.Length == 0 ? stats : stats + "\n" + extra;
     }
 
     // =========================================================
-    // Draw only the active preview cell and selected tower's proposed range.
+    // Draw only the active preview cell and selected tower's weapon range.
     public override void _Draw()
     {
         if (GodotObject.IsInstanceValid(_selected) && Settings.ShowSelectionRange)
-            DrawArc(ToLocal(_selected.GlobalPosition), BattleConfig.RangePixels, 0f,
+            DrawArc(ToLocal(_selected.GlobalPosition), _selected.Config.RangePixels, 0f,
                 Mathf.Tau, 96, new Color(0.37f, 0.82f, 0.95f, 0.55f), 2f);
 
         if (!_previewVisible || !Settings.ShowPlacementPreview) return;

@@ -1,5 +1,5 @@
-# Enemy Types (Future)
+# Enemy types
 
-Reserved for reusable enemy ship scenes/definitions, special variants, health, speed and later damage/armor characteristics.
+`Enemy001/` is the first reusable basic test ship. Enemy002 and later variants can reuse Shared/Enemy.cs and Movement/EnemyMovement.cs, changing scenes, artwork and EnemyDefinition resources instead of duplicating scripts.
 
-No enemy ship scene or AI logic exists yet. Keep data shared across maps; level-specific enemy/wave choices belong to wave and level definitions.
+Level-specific composition and future waves belong elsewhere. File identity, definition EnemyId and player-facing DisplayName are independent.

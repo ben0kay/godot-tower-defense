@@ -1,20 +1,12 @@
-# Battle Tower
+# Battle Tower — first automatic weapon
 
-**First placeable tower:** balanced, single-barrel offensive turret between the slower longer-range Sniper and the rapid-firing Minigun.
+F5 -> Ctrl -> BATTLE -> place on buildable terrain. Press F2 repeatedly to spawn Enemy001 from the Portal. Towers fire at enemies within range. First targets the shortest remaining path to the Citadel; Closest targets nearest to the tower. Defaults: range 256px, 1 shot/s, 12 damage, bullet speed 600px/s, search every 0.15s. Enemy001 takes five baseline hits to kill.
 
-Open `DefaultBattleTowerConfig.tres` in Godot to tune these **proposed, nonfunctional combat values**:
+## Inspector tuning
 
-| Stat | Starting value |
-| --- | --- |
-| Footprint | 1 x 1 grid cell (64 px square) |
-| Barrels | 1 |
-| Price | 100 credits (not yet charged) |
-| Range | 256 world pixels / four grid cells |
-| Fire rate | 1 shot/second |
-| Damage | 12 per shot |
+- Select `DefaultBattleTowerConfig.tres` to change defaults for newly built towers, or select TowerPlacement in Main.tscn and expand BattleConfig.
+- Open BattleTower.tscn, select its root and expand Config to view the same defaults.
+- Each placed tower receives a separate Config copy. During play, switch Scene to Remote, expand Battlefield/World/Towers, select a BattleTower and expand Config to tune only that tower's range, fire rate, damage, projectile speed and targeting. Runtime edits are temporary; edit the saved resource for permanent defaults.
+- Fire rate zero disables shooting. BuildCost is displayed but not charged; economy is future work.
 
-The single-piece top-down SVG lives in `Artwork/battle_tower.svg`, used by `BattleTower.tscn`. Future art can separate the fixed base, rotating gun pivot and `Marker2D` muzzle, adding recoil and gunfire without throwing away placement logic.
-
-**Test:** Ctrl -> BATTLE -> hover a grid square -> left-click. Green means buildable; red means already occupied. Build multiple or exit with right-click/Esc. Left-click a placed Battle Tower afterward to inspect its cell, planned stats and range ring.
-
-No aiming, firing, projectiles, enemies, damage, spending money, upgrades, saving or navigation connectivity checks in this pass.
+The one-piece SVG is unchanged; bullets fire from its center. No rotating turret, line-of-sight/terrain-blocked bullets, upgrades, rewards, saving or objective-health/waves yet. Tower placement prevents sealing currently usable entries or trapping existing ships. Click a tower to inspect active stats and its range ring.

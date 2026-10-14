@@ -1,7 +1,3 @@
-# Shared Tower Foundation (Future)
+# Shared tower helpers
 
-Common tower attributes belong here when implementation begins: a small base class or composition helpers, per-type `Resource` definitions, footprint/cost/upgrade data, and optional behaviors.
-
-**Do not** force every tower to inherit weapon targeting, recoil or projectile code. A repair tower and income tower may never attack. A hybrid Solar Tower may add a weapon behavior after an upgrade.
-
-Prefer simple, data-driven Godot **C#**, not a large inheritance hierarchy. No runtime code yet.
+Targeting/TowerTargeting.cs supports First (shortest remaining valid route to the Citadel) and Closest (nearest to the tower), filtering living enemies within weapon range. Projectiles/BasicProjectile.cs provides a lightweight visible guided test bullet calling Enemy.TakeDamage. Both can be reused by future offensive towers without forcing utility/economy towers to inherit weapon behavior.

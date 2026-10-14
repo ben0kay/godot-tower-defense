@@ -8,6 +8,10 @@
 [ext_resource type="PackedScene" path="res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn" id="5_portal"]
 [ext_resource type="PackedScene" path="res://WORLD/OBJECTIVES/Citadel/Citadel.tscn" id="6_citadel"]
 
+[ext_resource type="Script" path="res://WORLD/LEVELS/Debug/LevelDebugController.cs" id="7_debug"]
+[ext_resource type="PackedScene" path="res://ENEMIES/Types/Enemy001/Enemy001.tscn" id="8_enemy"]
+[ext_resource type="Script" path="res://WORLD/GRID/GridDebugOverlay.cs" id="9_info"]
+
 [node name="Level001" type="Node2D" unique_id=864740696]
 script = ExtResource("3_root")
 Settings = ExtResource("4_config")
@@ -49,3 +53,19 @@ position = Vector2(2336, 2528)
 
 [node name="Citadel" parent="Objectives" instance=ExtResource("6_citadel")]
 position = Vector2(3872, 2528)
+
+[node name="Debug" type="Node" parent="."]
+script = ExtResource("7_debug")
+EnemyScene = ExtResource("8_enemy")
+
+[node name="HUD" type="CanvasLayer" parent="Debug"]
+
+[node name="Info" type="Label" parent="Debug/HUD"]
+offset_left = 16.0
+offset_top = 62.0
+offset_right = 1250.0
+offset_bottom = 185.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.68, 0.91, 0.96, 0.86)
+theme_override_font_sizes/font_size = 14
+script = ExtResource("9_info")

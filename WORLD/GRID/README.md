@@ -6,4 +6,4 @@ It reads the live `World/Level` Ground and Walls layers on startup, applies obje
 
 `WorldObjectFootprint.cs` reserves authored Portal/Citadel cells. Its root is the upper-left footprint cell center; SizeCells and BlocksEnemies are Inspector-editable.
 
-`GridDebugOverlay.cs` reports cell rules, occupancy, camera metrics and navigation revision. `NavigationRevision` is an invalidation counter for future pathing, not a navigation implementation. Background rendering belongs to the level, keeping grid lines/hover overlays transparent.
+`GridDebugOverlay.cs`, now mounted under Level001/Debug/HUD, reports cell rules, occupancy, camera metrics and navigation revision. `NavigationRevision` invalidates WORLD/NAVIGATION routes and spawn connectivity caches. Background rendering belongs to the level, keeping grid lines/hover overlays transparent.

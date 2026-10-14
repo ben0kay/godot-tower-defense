@@ -8,6 +8,7 @@ public partial class GridDebugOverlay : Label
     private WorldGrid _grid;
     private CameraController _camera;
     private float _elapsed;
+    private SpawnManager _spawns;
     #endregion
 
     #region Lifecycle
@@ -15,10 +16,19 @@ public partial class GridDebugOverlay : Label
     // Cache the world and camera once; the overlay never captures mouse input.
     public override void _Ready()
     {
-        _grid = GetNode<WorldGrid>("../../World/Grid");
-        _camera = GetNode<CameraController>("../../CameraRig");
         MouseFilter = MouseFilterEnum.Ignore;
-        UpdateDisplay();
+        Callable.From(ConnectServices).CallDeferred();
+    }
+
+    // =========================================================
+    // The level Debug parent also works safely when the map is viewed alone with F6.
+    private void ConnectServices()
+    {
+        _grid = GetNodeOrNull<WorldGrid>("../../../../Grid");
+        _camera = GetNodeOrNull<CameraController>("../../../../../CameraRig");
+        _spawns = GetNodeOrNull<SpawnManager>("../../../../EnemySystems/Spawning");
+        SetProcess(_grid != null && _camera != null && _spawns != null);
+        if (_grid != null && _camera != null && _spawns != null) UpdateDisplay();
     }
 
     // =========================================================
@@ -43,7 +53,9 @@ public partial class GridDebugOverlay : Label
             $"Grid: {_grid.Config.CellSize}px     Map: {_grid.Config.WidthCells} x {_grid.Config.HeightCells} cells\n" +
             $"Cell: {hover}     Zoom: {_camera.ZoomLevel:0.00}x     " +
             $"Camera: {_camera.GlobalPosition.X:0}, {_camera.GlobalPosition.Y:0}     FPS: {Engine.GetFramesPerSecond()}\n" +
-            $"{rules}     Navigation revision: {_grid.NavigationRevision} (terrain test; no enemy AI yet)";
+            $"{rules}     Navigation revision: {_grid.NavigationRevision}\n" +
+            $"F2: Spawn Enemy001 | Alive: {_spawns.Registry.Living.Count} | Killed: {_spawns.Registry.KilledCount} | Arrived: {_spawns.Registry.ArrivedCount} | Paths queued: {_spawns.Paths.PendingCount}\n" +
+            _spawns.LastMessage;
     }
     #endregion
 }

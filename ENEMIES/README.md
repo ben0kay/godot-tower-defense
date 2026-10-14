@@ -2,9 +2,11 @@
 
 This top-level folder owns **enemy gameplay mechanics** in the Godot 4 C#/.NET space tower-defense project. The first enemy will be a deliberately simple **basic test ship** named **`Enemy001` internally** — **not** "ScoutShip". This is the baseline implementation that subsequent enemies can reuse.
 
-**Codex handoff / implementation plan (October 2026):** This README specifies what to build next; the classes/scenes listed below are **proposed**, not already present. The currently playable Level001 tilemap, Battle Tower placement, Portal scene, Citadel scene, camera and HUD must keep working.
+**Implemented baseline (October 2026):** Enemy001, shared enemy state/registry, budgeted AStarGrid2D, portal/edge spawning, debug F2 and Battle Tower targeting/projectiles are now present. Level001's Debug parent owns F2 and the debug HUD. Existing terrain, camera, HUD and placement remain intact. See Types/Enemy001/README.md and WORLD/LEVELS/Level001/README.md for playtesting.
 
-## Planned folder and file structure
+The planning sections below describe the architecture and acceptance goals. Current targeting defaults to **First** (shortest remaining route), with **Closest** selectable in BattleTowerConfig. No waves, economy, armor mechanics or Citadel health yet.
+
+## Folder and file structure
 
 ```text
 ENEMIES/
@@ -98,13 +100,13 @@ For this first pass favor correctness and simplicity. No RigidBody2D per ship, t
 
 ## Tower targeting and basic damage (follow-up integration)
 
-The existing `TOWERS/Offensive/BattleTower/` baseline has **proposed** stats: 256px range, 1 shot/second and 12 damage. These should start working against `Enemy001` after pathing works.
+The active `TOWERS/Offensive/BattleTower/` baseline has editable stats: 256px range, 1 shot/second and 12 damage. These now work against `Enemy001`.
 
 - Put **reusable targeting** in `TOWERS/Shared/Targeting/`, and **reusable basic projectiles** in `TOWERS/Shared/Projectiles/`; do not embed projectile behavior in Enemy001.
-- Start with **Closest** living enemy within range. Use `EnemyRegistry` and cache the chosen target; search again only when invalid/out of range or on staggered intervals.
+- Default to **First** (shortest remaining valid route) among living enemies within range; **Closest** remains selectable. Use `EnemyRegistry` and cache the chosen target; compare again on staggered intervals so overtaking can update First; validate cached range/alive state between queries.
 - First projectile can fire from the **center** of the current one-piece Battle Tower sprite (no rotating multi-part tower/art overhaul yet).
 - Projectile hits call `Enemy.TakeDamage(amount)`. Zero health marks the enemy dead, deregisters it and removes it cleanly. Avoid targeting or damaging already dead enemies.
-- Leave stronger/weaker/first/last targeting priorities, upgrades, credits/rewards, special damage types, VFX and armor mechanics for later.
+- Leave stronger/weaker/first/last targeting priorities, upgrades, credits/rewards, special damage types, VFX and armor mechanics for later; First and Closest are already available.
 
 ## Suggested Codex implementation passes
 
@@ -134,4 +136,4 @@ Test multiple ships, multiple buildable placements, navigation revision/repath b
 
 **C#/.NET only, not GDScript.** Follow `NOTES/CodePreferences.md`: short header comments explaining scripts, `// =========================================================` above methods, reasonable `#region` blocks, Inspector `[Export]` / `[ExportGroup]`, compact reusable code, and a README in each feature folder. Keep per-enemy nodes minimal; one central registry and a bounded navigation-request manager support future hundreds of ships. Refer to the user's existing `isometric-new-2d` project when appropriate.
 
-**Status at documentation time:** The only functional tower is the placed-but-non-firing Battle Tower; enemy movement, spawn gameplay, registry, targeting and combat are not yet implemented. This document tells Codex what to implement; it is not a claim that these classes are already present.
+**Current status:** Basic Enemy001 and Battle Tower combat are implemented. TESTS/EnemyIntegrationChecks.tscn validates movement, budgets, targeting, damage and placement connectivity. Larger-ship routing, ship separation, flow fields, waves/economy/objective health and advanced target priorities remain future work.

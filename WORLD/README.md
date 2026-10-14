@@ -2,7 +2,7 @@
 
 This folder owns the playable **top-down 2D world** of the space tower-defense game. The long-term direction is **hand-authored maps** painted directly in the Godot 4 editor, with large areas of open space, detailed metal base corridors, disconnected wall/platform islands, dirt/rock formations and independent nebula/star backgrounds.
 
-**Current status (October 2026):** Level001 is now mounted in the live world. Shared 64×64 TileSet, saved editable terrain, cached tile rules, tower build restrictions, space backdrop and visible Portal/Citadel placeholders are implemented. LevelConfig declares portal/edge/both source permissions. This is a terrain/placement playtest: enemy spawning, waves, navigation/route-preservation checks, firing, economy and Citadel health are not implemented. See `LEVELS/Level001/README.md` for exact testing and painting steps.
+**Current status (October 2026):** Level001 is now mounted in the live world. Shared 64×64 TileSet, saved editable terrain, cached tile rules, tower build restrictions, space backdrop and visible Portal/Citadel placeholders are implemented. LevelConfig declares portal/edge/both source permissions. Enemy001 spawning, budgeted A* navigation, route-preserving build checks and Battle Tower firing are now active. Waves, economy and Citadel health remain future work. See `LEVELS/Level001/README.md` for exact testing and painting steps.
 
 ## Folders and responsibilities
 
@@ -35,7 +35,7 @@ Every effective terrain cell should provide **two independent Boolean rules** (G
 
 For cells where multiple terrain layers overlap, choose **one authoritative gameplay tile**: `Walls` should take precedence over `Ground`; `Decorations` should never override navigation/build permissions. Keep a single, cached logical grid that merges authored tile data and runtime tower occupancy, rather than querying TileMapLayer nodes once per enemy every frame.
 
-With enemy navigation/economy implemented later, tower placement must check, in order: cell inside map, terrain `can_build`, currently unoccupied, sufficient funds when economy exists, and **active spawn-source-to-Citadel route validity** (Portal or map-edge sources) if construction would newly block an enemy-passable cell. Current placement enforces bounds, terrain permission, object reservations and occupancy; route validation/funds remain future work. A tower on a pre-blocked solid platform does not create additional navigation blockage. See `NOTES/NAVIGATION_PERFORMANCE_PLAN.md` for pathfinding and caching plans.
+With enemy navigation/economy implemented later, tower placement must check, in order: cell inside map, terrain `can_build`, currently unoccupied, sufficient funds when economy exists, and **active spawn-source-to-Citadel route validity** (Portal or map-edge sources) if construction would newly block an enemy-passable cell. Current placement enforces bounds, terrain permission, object reservations and occupancy; route preservation is checked on build clicks; funds remain future work. A tower on a pre-blocked solid platform does not create additional navigation blockage. See `NOTES/NAVIGATION_PERFORMANCE_PLAN.md` for pathfinding and caching plans.
 
 ## Enemy entry and destination — world objects vs enemy mechanics
 
@@ -46,7 +46,7 @@ Enemy spawning can come from **Portals**, **map edges**, or **both**, chosen **p
 - `WORLD/OBJECTIVES/Citadel/Citadel.tscn`: the destination object. Enemies should navigate toward **reachable approach locations**, not blindly into the Citadel's future solid footprint.
 - `ENEMIES/Spawning/`: **SpawnManager logic** that chooses where to spawn from level-approved sources.
 - `ENEMIES/Waves/`: **WaveManager logic** that controls what/when/how many ships to spawn.
-- `ENEMIES/Movement/`: later centralized enemy movement/nav.
+- `ENEMIES/Movement/`: waypoint following using shared WORLD/NAVIGATION services.
 - `WORLD/LEVELS/`: per-level authored Portal/Citadel positions and future **level spawn parameters** (`Portals`, `MapEdges`, `Both`, allowed edge directions and optionally active Portal references).
 
 `Level001.tscn` now instances reusable EnemyPortal/Citadel objects under Portals/Objectives; legacy GameplayMarkers have been removed. Physical objects use `WorldObjectFootprint.cs` to reserve cells. Edge-only maps need no Portal instance. The empty LevelTemplate defaults to edge sources; Level001 defaults to its single Portal. All NodePaths in LevelConfig are relative to the level root.
@@ -71,7 +71,7 @@ Level001 (Node2D)
 
 This is now the actual Level001 arrangement. Ground, Walls and Decorations share `TERRAIN/TileSets/WorldTerrain.tres`. Select a layer in Godot's 2D editor and paint the map; save and press F5 to test with camera/HUD/placement. F6 runs only the level scene. Empty unpainted regions reveal space scenery.
 
-`LEVELS/LevelConfig.cs` is the single Inspector-editable per-level spawn Resource: SpawnMode, AllowedEdges, ActivePortals and CitadelPath. These are metadata for future ENEMIES systems. Keep each new level's resource separate; keep WorldMasterConfig as the single source for grid/map dimensions.
+`LEVELS/LevelConfig.cs` is the single Inspector-editable per-level spawn Resource: SpawnMode, AllowedEdges, ActivePortals and CitadelPath. These are consumed by ENEMIES/Spawning/SpawnManager.cs. Keep each new level's resource separate; keep WorldMasterConfig as the single source for grid/map dimensions.
 
 ## Nebulae and space backgrounds — NOT required to be tiles
 
@@ -90,10 +90,14 @@ The shared six-tile atlas includes unbuildable metal walls, buildable solid plat
 
 The starter map is saved as editable TileMapLayer data. No map generator runs in gameplay. To switch the live level, replace World.tscn's Level scene instance, keeping its node name. For runtime terrain edits, call RebuildTerrain explicitly; editor changes take effect on the next game run.
 
-Next gameplay pass: active-source route validation, budgeted navigation, SpawnManager/WaveManager, enemy movement/health, Battle Tower firing, economy and Citadel defeat/victory. Spawning belongs under ENEMIES, tower mechanics under TOWERS. Do not infer nav clearance or route validity merely from a visible approach marker.
+Next gameplay pass: WaveManager, economy and Citadel defeat/victory; active-source route checks, budgeted navigation, SpawnManager, enemy movement/health and Battle Tower firing are now implemented. Spawning belongs under ENEMIES, tower mechanics under TOWERS. Do not infer nav clearance or route validity merely from a visible approach marker.
 
 **Avoid premature complexity:** no custom editor/plugin, procedural world generation, per-cell Godot nodes, physics bodies per tile or always-running path checks. Revisit tile auto-joining and enemy radius/clearance when the base game is functioning.
 
 ## Future master configurations
 
 The existing `WorldMasterConfig.cs` is the current single source for grid size/dimensions. When the terrain, level loading and space-background systems are programmed, add their relevant `*MasterConfig.cs` resources within the relevant feature folder **only for values that genuinely need Inspector tuning**; do not duplicate cell-size constants or create unused resource classes just to fill folders.
+
+## Enemy/combat baseline
+
+WORLD/NAVIGATION adapts WorldGrid into budgeted AStarGrid2D; ENEMIES owns registry, health, movement and spawning. World/EnemySystems contains the shared services; World/Enemies and World/Projectiles contain runtime visuals. Level001/Debug contains F2 input and its screen readout. F5 runs the complete test; F6 remains map-only. Tower Config resources expose functional combat stats and First/Closest targeting. See the relevant feature READMEs for limitations and tuning.

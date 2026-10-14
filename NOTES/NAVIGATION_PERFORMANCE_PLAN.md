@@ -1,6 +1,6 @@
 # Space Tower Defense — Navigation & Performance Plan (Godot 2D / C#)
 
-> Planning notes only; **not yet implemented**. Gameplay inspired by *Helix Defense 2*. Condensed from older GameMaker TD code and its optimization experiments. **Implementation language: C# (.NET), not GDScript.** Read [CodePreferences.md](CodePreferences.md) before implementing; refer to the user's Isometric 2D/3D repositories for organization patterns where helpful.
+> Baseline budgeted AStarGrid2D is now implemented under WORLD/NAVIGATION; the scale/alternative-algorithm sections remain planning notes. Gameplay inspired by *Helix Defense 2*. Condensed from older GameMaker TD code and its optimization experiments. **Implementation language: C# (.NET), not GDScript.** Read [CodePreferences.md](CodePreferences.md) before implementing; refer to the user's Isometric 2D/3D repositories for organization patterns where helpful.
 
 ## Core game
 - **Fully 2D, top-down** sci-fi tower defense. Alien ships attack objectives; no fixed road required.
@@ -55,3 +55,7 @@
 
 ## Project/code conventions
 **C# (.NET) is the project language, not GDScript.** Follow `NOTES/CodePreferences.md`: a short header comment per `.cs` file, `// =====` dividers and comments **above** methods, `#region` where helpful, compact readable C#, helper nodes instead of cluttered scene trees, `[Export]` and `[ExportGroup]` for Inspector settings, and a **MasterConfig** C# class/resource in major uppercase feature folders where appropriate. Use strongly typed enums/data structures and reusable stagger helpers; avoid allocations in hot loops. Prefer cohesive, simple systems; avoid overengineering. Keep existing notes authoritative when they provide specific feature context. **Do not modify game code as part of this documentation-only step.**
+
+## Implemented Enemy001 baseline
+
+WorldGrid remains authoritative. NavigationGrid synchronizes solids on revisions; PathRequestManager budgets every actual A* goal search. EnemyMovement stops on stale/failed routes, follows radius-checked waypoints and caches remaining route distance. Level001/Debug owns F2 spawning and HUD. First targeting uses remaining route distance (not elapsed spawn time or straight-line goal distance); Closest remains selectable. Build clicks preserve currently usable spawn entries and active enemy connectivity. Tests cover 100 queued ships; no 500-ship FPS guarantee has been measured.
