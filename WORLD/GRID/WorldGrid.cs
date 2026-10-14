@@ -39,7 +39,7 @@ public partial class WorldGrid : Node2D
     #endregion
 
     #region Terrain and Occupancy
-    private bool[] _buildable, _terrainBlocked, _occupied, _reserved;
+    private bool[] _buildable, _terrainBlocked, _occupied, _reserved, _painted;
     public int NavigationRevision { get; private set; }
     public event Action<Vector2I?, bool> NavigationChanged;
     public WorldLevel Level { get; private set; }
@@ -51,7 +51,7 @@ public partial class WorldGrid : Node2D
         Level = GetNode<WorldLevel>("../Level");
         int count = Config.WidthCells * Config.HeightCells;
         _buildable = new bool[count]; _terrainBlocked = new bool[count];
-        _occupied = new bool[count]; _reserved = new bool[count];
+        _occupied = new bool[count]; _reserved = new bool[count]; _painted = new bool[count];
         RebuildTerrain();
     }
 
@@ -59,9 +59,10 @@ public partial class WorldGrid : Node2D
     // Rebuild static rules on an explicit map edit/load; retain runtime tower occupancy.
     public void RebuildTerrain()
     {
-        Array.Clear(_buildable); Array.Clear(_terrainBlocked); Array.Clear(_reserved);
-        ReadLayer(Level.Ground);
-        ReadLayer(Level.Walls); // Walls replace Ground rules, including false values.
+        Array.Clear(_buildable); Array.Clear(_terrainBlocked); Array.Clear(_reserved); Array.Clear(_painted);
+        ValidateTileSet(Level.Decorations, false);
+        ReadLayer(Level.Passable, false);
+        ReadLayer(Level.Impassable, true); // Impassable overrides Passable, including build permission.
         ReadFootprints(Level);
         NavigationRevision++;
         NavigationChanged?.Invoke(null, true);
@@ -70,19 +71,40 @@ public partial class WorldGrid : Node2D
 
     // =========================================================
     // Custom data defines behavior; Decorations deliberately never enter this cache.
-    private void ReadLayer(TileMapLayer layer)
+    private void ReadLayer(TileMapLayer layer, bool expectedBlocked)
     {
-        if (layer.TileSet == null || layer.TileSet.TileSize != Vector2I.One * Config.CellSize)
-            throw new InvalidOperationException($"{layer.GetPath()}: TileSet tile size must match WorldMasterConfig.CellSize.");
+        ValidateTileSet(layer);
+        int mismatches = 0, overlaps = 0, invalidTiles = 0;
         foreach (Vector2I painted in layer.GetUsedCells())
         {
             TileData tile = layer.GetCellTileData(painted);
-            if (tile == null) continue;
+            if (tile == null) { invalidTiles++; continue; }
             Vector2I cell = WorldToCell(layer.ToGlobal(layer.MapToLocal(painted)));
             if (!IsInsideMap(cell)) { GD.PushWarning($"Ignoring terrain outside map: {cell}"); continue; }
             int index = Index(cell);
+            if (_painted[index]) overlaps++;
+            _painted[index] = true;
+            if (tile.GetCustomData("blocks_enemies").AsBool() != expectedBlocked) mismatches++;
             _buildable[index] = tile.GetCustomData("can_build").AsBool();
             _terrainBlocked[index] = tile.GetCustomData("blocks_enemies").AsBool();
+        }
+        if (mismatches > 0) GD.PushWarning($"{layer.GetPath()}: {mismatches} tiles have the wrong movement category; check the assigned TileSet.");
+        if (invalidTiles > 0) GD.PushWarning($"{layer.GetPath()}: {invalidTiles} cells reference missing tiles.");
+        if (overlaps > 0) GD.PushWarning($"Terrain has {overlaps} gameplay overlaps. Impassable wins; erase the old layer before repainting.");
+    }
+
+    // =========================================================
+    // Reject broken palette setup at load/rebuild, never through a per-frame scan.
+    private void ValidateTileSet(TileMapLayer layer, bool gameplay = true)
+    {
+        if (layer.TileSet == null || layer.TileSet.TileSize != Vector2I.One * Config.CellSize)
+            throw new InvalidOperationException($"{layer.GetPath()}: TileSet tile size must match WorldMasterConfig.CellSize.");
+        if (!gameplay) return;
+        foreach (string key in new[] { "can_build", "blocks_enemies" })
+        {
+            int index = layer.TileSet.GetCustomDataLayerByName(key);
+            if (index < 0 || layer.TileSet.GetCustomDataLayerType(index) != Variant.Type.Bool)
+                throw new InvalidOperationException($"{layer.GetPath()}: TileSet requires Boolean {key} metadata.");
         }
     }
 

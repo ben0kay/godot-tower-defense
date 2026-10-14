@@ -101,7 +101,7 @@ public static class EconomyChecks
     // Use a real authored build tile that retains all required enemy routes.
     private static Vector2I FindBuildCell(WorldGrid grid, SpawnManager spawns)
     {
-        foreach (Vector2I cell in grid.Level.Ground.GetUsedCells())
+        foreach (Vector2I cell in grid.Level.Passable.GetUsedCells())
             if (grid.PlacementFailure(cell).Length == 0 && spawns.PlacementFailure(cell).Length == 0) return cell;
         throw new InvalidOperationException("No route-safe build cell in test level.");
     }

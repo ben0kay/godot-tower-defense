@@ -10,9 +10,9 @@ public static class SmoothRepathChecks
     public static void Run(WorldGrid grid, PathRequestManager paths, SpawnManager spawns)
     {
         foreach (Enemy enemy in spawns.Registry.Living.ToArray()) enemy.TakeDamage(10000);
-        grid.Level.Walls.Clear(); grid.Level.Ground.Clear();
+        grid.Level.Impassable.Clear(); grid.Level.Passable.Clear();
         for (int y = 0; y < grid.Config.HeightCells; y++)
-            for (int x = 0; x < grid.Config.WidthCells; x++) grid.Level.Ground.SetCell(new(x, y), 0, new(2, 0));
+            for (int x = 0; x < grid.Config.WidthCells; x++) grid.Level.Passable.SetCell(new(x, y), 0, new(2, 0));
         grid.Level.GetNode<Node2D>("Portals/EnemyPortal").GlobalPosition = grid.CellToWorldCenter(new(5, 20));
         foreach (Node marker in grid.Level.Citadel.GetNode("ApproachPoints").GetChildren())
             ((Node2D)marker).GlobalPosition = grid.CellToWorldCenter(new(25, 20));

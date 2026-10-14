@@ -1,22 +1,16 @@
-# Terrain Rules — Authoring Contract for Codex
+# Terrain rules
 
-Use Godot `TileSet` custom-data **Boolean layers** named exactly:
-- `can_build`: player may place a tower on this terrain tile (subject to occupancy, economy and future route checks).
-- `blocks_enemies`: ships must not traverse this cell.
+| Example | can_build | blocks_enemies | Layer |
+| --- | --- | --- | --- |
+| Open metal/dirt floor | true | false | Passable |
+| Future nonbuildable path | false | false | Passable |
+| Raised solid platform | true | true | Impassable |
+| Wall/rock | false | true | Impassable |
+| Decal | ignored | ignored | Decorations |
+| Empty space | false | false | Unpainted |
 
-| Effective terrain | can_build | blocks_enemies |
-| --- | --- | --- |
-| Unbuildable solid wall | false | true |
-| Buildable solid platform | true | true |
-| Buildable open surface | true | false |
-| Purely decorative tile | false | false |
-| Empty/unpainted cell | false | false (passable) |
-| Dirt/other terrain | per tile | per tile |
+Metadata defines both rules independently; art/material names do not. Impassable overrides Passable if both cells are painted, including false build permission. Remove the old gameplay cell before replacing it in another layer. Decorations never contributes rules, even over empty space.
 
-**Layer precedence:** `Walls` overrides `Ground` for gameplay rules if both cover a cell. `Decorations` never contributes gameplay rules. The visual background is entirely nonphysical. Avoid ambiguous authored overlaps in the first pass.
+WorldGrid reads category layers only on load/explicit terrain rebuild, merges Portal/Citadel footprint reservations, and keeps runtime tower occupancy separate. A tower blocks an otherwise-passable cell; placing/removing one uses incremental navigation revision updates. A pre-blocked platform remains solid. Placement validates terrain, reservations, occupancy, active-enemy clearance, source-to-Citadel connectivity and economy payment.
 
-A tower being placed on a passable buildable tile sets a **runtime navigation blocker** until removed; a tower on an already-solid tile doesn't add new blockage. Dynamic occupancy is not equivalent to a painted wall.
-
-`WORLD/GRID/WorldGrid.cs` reads TileMapLayer cell data **on scene load or explicit `RebuildTerrain()` calls**, caches results in Boolean arrays indexed by grid coordinates, and exposes shared build/block/occupancy queries. Do not scan TileMapLayer/scene-tree state every frame or for each enemy. Route connectivity must be added with enemy navigation before allowing gameplay blockers in a combat level.
-
-`TowerPlacementController.cs` now enforces these terrain/bounds/occupancy rules. Object footprints reserve Portal/Citadel cells. Navigation revision changes when a tower newly blocks an open cell; no actual pathfinding or route checking exists yet. Tiles on Walls replace Ground rules even when their Boolean values are false.
+Load/rebuild checks enforce TileSet cell size and Boolean gameplay metadata and report category mismatches, invalid tiles and overlaps. No runtime auto-conversion/deletion or per-frame terrain scan is performed.

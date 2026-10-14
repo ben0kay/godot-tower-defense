@@ -29,6 +29,7 @@ public partial class EnemyIntegrationChecks : Node
             // Disable cosmetic particles during mass-kill fixtures; test them separately below.
             FeedbackMasterConfig feedback = GD.Load<FeedbackMasterConfig>("res://FEEDBACK/DefaultFeedbackConfig.tres");
             feedback.DeathExplosionsEnabled = false;
+            TerrainCategoryChecks.Run(_grid);
             PortalSpawnChecks.Run(_grid, _spawns);
             _battle.GetNode<EconomyManager>("Economy").Initialize(_grid.Level.Settings);
             // Legacy route/source fixtures use exact centers; the focused check covers variation.
@@ -162,12 +163,12 @@ public partial class EnemyIntegrationChecks : Node
     // Replace terrain only inside this isolated test instance, keeping committed level art untouched.
     private void ConfigureCorridor()
     {
-        _grid.Level.Ground.Clear(); _grid.Level.Walls.Clear();
+        _grid.Level.Passable.Clear(); _grid.Level.Impassable.Clear();
         for (int y = 0; y < _grid.Config.HeightCells; y++)
             for (int x = 0; x < _grid.Config.WidthCells; x++)
-                _grid.Level.Walls.SetCell(new(x, y), 0, new(0, 0));
+                _grid.Level.Impassable.SetCell(new(x, y), 0, new(0, 0));
         for (int x = 2; x <= 9; x++)
-        { _grid.Level.Walls.EraseCell(new(x, 10)); _grid.Level.Ground.SetCell(new(x, 10), 0, new(2, 0)); }
+        { _grid.Level.Impassable.EraseCell(new(x, 10)); _grid.Level.Passable.SetCell(new(x, 10), 0, new(2, 0)); }
         Node2D portal = _grid.Level.GetNode<Node2D>("Portals/EnemyPortal");
         portal.GlobalPosition = _grid.CellToWorldCenter(new(2, 10));
         Node points = _grid.Level.Citadel.GetNode<Node>("ApproachPoints");

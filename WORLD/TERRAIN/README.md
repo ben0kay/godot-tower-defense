@@ -1,7 +1,9 @@
-# TERRAIN — Shared Artwork and Tile Rules
+# Terrain — Category-filtered authoring
 
-`TileSets/WorldTerrain.tres` is the shared 64×64 TileSet assigned to each level's Ground, Walls and Decorations layers. `Tiles/Metal/prototype_atlas.svg` contains six temporary metal/natural/decal tiles; the mixed atlas can be replaced with final material-specific artwork later. Logical behavior comes from Boolean custom data `can_build` and `blocks_enemies`, never colors or atlas coordinates.
+Each level has Terrain/Passable, Terrain/Impassable and Terrain/Decorations TileMapLayers. Their respective TileSets are PassableTerrain.tres, ImpassableTerrain.tres and DecorationTerrain.tres under TileSets/. They share prototype_atlas.svg, but define only the matching selectable tile coordinates.
 
-`WORLD/GRID/WorldGrid.cs` caches Ground, then Walls, on level load. Walls override Ground; Decorations are ignored. Empty cells default to unbuildable/passable. Runtime tower occupancy and object reservations are separate from painted terrain. `RebuildTerrain()` explicitly refreshes static rules after a future runtime terrain edit; ordinary editor edits take effect on the next run.
+Passable contains open metal/dirt floors; Impassable contains walls, rocks and buildable raised platforms; Decorations contains cosmetic decals. Movement and tower permission are independent Boolean custom data (can_build, blocks_enemies), not inferred from art. Empty space is passable/unbuildable; decals never change these rules.
 
-See `Rules/README.md` for semantics and `LEVELS/Level001/README.md` for the palette. No navigation engine or per-cell physics nodes are created by this terrain pass.
+WorldGrid caches Passable then Impassable, which wins on accidental overlap. Erase the old gameplay cell before changing its category. Static rebuilds diagnose overlaps, category errors and invalid setup; ordinary tower placement retains incremental occupancy updates. No per-frame tile scans or physics bodies are added.
+
+WorldTerrain.tres remains a legacy mixed palette. Current Level001/template use the separate palettes. See LEVELS/README.md and LEVELS/Level001/README.md for editor workflow and TESTS/TerrainMigration.md for preservation checks.

@@ -10,9 +10,9 @@ public static class RepathMovementChecks
     public static void Run(WorldGrid grid, PathRequestManager paths, SpawnManager spawns)
     {
         foreach (Enemy enemy in spawns.Registry.Living.ToArray()) enemy.TakeDamage(10000);
-        grid.Level.Walls.Clear(); grid.Level.Ground.Clear();
+        grid.Level.Impassable.Clear(); grid.Level.Passable.Clear();
         for (int y = 0; y < grid.Config.HeightCells; y++)
-            for (int x = 0; x < grid.Config.WidthCells; x++) grid.Level.Ground.SetCell(new(x, y), 0, new(2, 0));
+            for (int x = 0; x < grid.Config.WidthCells; x++) grid.Level.Passable.SetCell(new(x, y), 0, new(2, 0));
         Vector2I start = new(5, 10), goal = new(25, 10);
         grid.Level.GetNode<Node2D>("Portals/EnemyPortal").GlobalPosition = grid.CellToWorldCenter(start);
         foreach (Node node in grid.Level.Citadel.GetNode("ApproachPoints").GetChildren())
@@ -90,7 +90,7 @@ public static class RepathMovementChecks
         }
         // A nearly full-cell-radius ship in a one-cell corridor must taper its lateral offset.
         for (int x = 5; x <= 25; x++)
-        { grid.Level.Walls.SetCell(new(x, 9), 0, new(0, 0)); grid.Level.Walls.SetCell(new(x, 11), 0, new(0, 0)); }
+        { grid.Level.Impassable.SetCell(new(x, 9), 0, new(0, 0)); grid.Level.Impassable.SetCell(new(x, 11), 0, new(0, 0)); }
         grid.RebuildTerrain(); paths.Navigation.Refresh();
         Enemy narrow = varied.OrderByDescending(s => Math.Abs(s.Movement.LateralOffsetPixels)).First();
         narrow.Definition = (EnemyDefinition)narrow.Definition.Duplicate(); narrow.Definition.RadiusPixels = 30f;

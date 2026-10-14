@@ -1,7 +1,9 @@
 [gd_scene format=4]
 
 [ext_resource type="Texture2D" path="res://WORLD/BACKGROUNDS/Stars/level001_space.svg" id="1_p5ed7"]
-[ext_resource type="TileSet" path="res://WORLD/TERRAIN/TileSets/WorldTerrain.tres" id="2_8pvwx"]
+[ext_resource type="TileSet" path="res://WORLD/TERRAIN/TileSets/PassableTerrain.tres" id="2_passable"]
+[ext_resource type="TileSet" path="res://WORLD/TERRAIN/TileSets/ImpassableTerrain.tres" id="2_impassable"]
+[ext_resource type="TileSet" path="res://WORLD/TERRAIN/TileSets/DecorationTerrain.tres" id="2_decorations"]
 
 [ext_resource type="Script" path="res://LEVELS/WorldLevel.cs" id="3_root"]
 [ext_resource type="Resource" path="res://LEVELS/DefaultLevelConfig.tres" id="4_config"]
@@ -28,14 +30,14 @@ scale = Vector2(4, 4)
 
 [node name="Terrain" type="Node2D" parent="." unique_id=833107286]
 
-[node name="Ground" type="TileMapLayer" parent="Terrain" unique_id=1382848671]
-tile_set = ExtResource("2_8pvwx")
+[node name="Passable" type="TileMapLayer" parent="Terrain" unique_id=1382848671]
+tile_set = ExtResource("2_passable")
 
-[node name="Walls" type="TileMapLayer" parent="Terrain" unique_id=1176658847]
-tile_set = ExtResource("2_8pvwx")
+[node name="Impassable" type="TileMapLayer" parent="Terrain" unique_id=1176658847]
+tile_set = ExtResource("2_impassable")
 
 [node name="Decorations" type="TileMapLayer" parent="Terrain" unique_id=1034975239]
-tile_set = ExtResource("2_8pvwx")
+tile_set = ExtResource("2_decorations")
 
 [node name="Portals" type="Node2D" parent="." unique_id=219222935]
 

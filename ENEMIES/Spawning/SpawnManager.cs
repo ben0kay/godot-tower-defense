@@ -23,6 +23,7 @@ public partial class SpawnManager : Node
         Registry = GetNode<EnemyRegistry>("../Registry");
         Paths = GetNode<PathRequestManager>("../Paths");
         _ships = GetNode<Node2D>("../../Enemies");
+        RefreshSources();
     }
 
     // =========================================================
@@ -39,6 +40,7 @@ public partial class SpawnManager : Node
             foreach (NodePath path in settings.ActivePortals)
             {
                 Marker2D exit = grid.Level.GetNodeOrNull<Node2D>(path)?.GetNodeOrNull<Marker2D>("SpawnExit");
+                if (exit == null) GD.PushWarning("Registered Portal has no SpawnExit: " + path);
                 if (exit != null && !_portalPaths.Contains(path.ToString()))
                 { _entries.Add(exit.GlobalPosition); _portalPaths.Add(path.ToString()); }
             }
@@ -56,6 +58,11 @@ public partial class SpawnManager : Node
                 if (settings.AllowedEdges.HasFlag(LevelConfig.MapEdge.Right)) _entries.Add(grid.CellToWorldCenter(new(grid.Config.WidthCells - 1, y)));
             }
         }
+        for (int i = 0; i < _portalCount; i++)
+            if (!nav.IsReachable(_reachable, grid.WorldToCell(_entries[i])) || !nav.HasClearance(_entries[i], 0f))
+                GD.PushWarning("Portal SpawnExit is blocked or cannot reach the Citadel: " + _portalPaths[i]);
+        if (nav.Goals.Count == 0)
+            GD.PushWarning("No usable Citadel approach markers; enemies cannot find a destination.");
         _cachedRevision = nav.Revision;
     }
 

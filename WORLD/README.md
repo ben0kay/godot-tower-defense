@@ -33,7 +33,7 @@ Every effective terrain cell should provide **two independent Boolean rules** (G
 
 **Empty/unpainted space** should default to **enemy-passable, not buildable**. A tower cannot be placed in plain empty space unless an explicitly buildable tile is painted there.
 
-For cells where multiple terrain layers overlap, choose **one authoritative gameplay tile**: `Walls` should take precedence over `Ground`; `Decorations` should never override navigation/build permissions. Keep a single, cached logical grid that merges authored tile data and runtime tower occupancy, rather than querying TileMapLayer nodes once per enemy every frame.
+For cells where multiple terrain layers overlap, choose **one authoritative gameplay tile**: `Impassable` takes precedence over `Passable`; `Decorations` should never override navigation/build permissions. Keep a single, cached logical grid that merges authored tile data and runtime tower occupancy, rather than querying TileMapLayer nodes once per enemy every frame.
 
 With enemy navigation/economy implemented later, tower placement must check, in order: cell inside map, terrain `can_build`, currently unoccupied, sufficient funds when economy exists, and **active spawn-source-to-Citadel route validity** (Portal or map-edge sources) if construction would newly block an enemy-passable cell. Current placement enforces bounds, terrain permission, object reservations and occupancy; route preservation is checked on build clicks; funds remain future work. A tower on a pre-blocked solid platform does not create additional navigation blockage. See `NOTES/NAVIGATION_PERFORMANCE_PLAN.md` for pathfinding and caching plans.
 
@@ -62,14 +62,14 @@ Level001 (Node2D)
 │   ├── Stars (Node2D)             # optional Parallax2D later
 │   └── Planets (Node2D)
 ├── Terrain (Node2D)
-│   ├── Ground (TileMapLayer)      # metal / dirt / buildable passable tiles
-│   ├── Walls (TileMapLayer)       # solid walls / buildable solid platforms
+│   ├── Passable (TileMapLayer)      # metal / dirt / buildable passable tiles
+│   ├── Impassable (TileMapLayer)       # solid walls / buildable solid platforms
 │   └── Decorations (TileMapLayer) # only surface art
 ├── Portals (Node2D)               # zero or more EnemyPortal scene instances
 └── Objectives (Node2D)            # Citadel scene instance(s)
 ```
 
-This is now the actual Level001 arrangement. Ground, Walls and Decorations share `TERRAIN/TileSets/WorldTerrain.tres`. Select a layer in Godot's 2D editor and paint the map; save and press F5 to test with camera/HUD/placement. F6 runs only the level scene. Empty unpainted regions reveal space scenery.
+This is now the actual Level001 arrangement. Passable, Impassable and Decorations use separate category TileSets from `WORLD/TERRAIN/TileSets/`, sharing one atlas texture. Select a layer in Godot's 2D editor and paint the map; save and press F5 to test with camera/HUD/placement. F6 runs only the level scene. Empty unpainted regions reveal space scenery.
 
 `LEVELS/LevelConfig.cs` is the single Inspector-editable per-level spawn Resource: SpawnMode, AllowedEdges, ActivePortals and CitadelPath. These are consumed by ENEMIES/Spawning/SpawnManager.cs. Keep each new level's resource separate; keep WorldMasterConfig as the single source for grid/map dimensions.
 
@@ -86,7 +86,7 @@ Large nebula textures, stars and planets can be ordinary `Sprite2D` nodes, optio
 
 ## Implemented terrain pass and next work
 
-The shared six-tile atlas includes unbuildable metal walls, buildable solid platforms, buildable open floors, rocky obstacles, open dirt and transparent decals. Ground/Walls custom data is cached once at startup; Walls override Ground and Decorations are ignored. Tower occupancy is committed through WorldGrid, with navigation revision updated only when occupancy creates a new blocker. Portal/Citadel footprints are reserved against construction.
+The shared six-tile atlas includes unbuildable metal walls, buildable solid platforms, buildable open floors, rocky obstacles, open dirt and transparent decals. Passable/Impassable custom data is cached once at startup; Impassable overrides Passable and Decorations are ignored. Tower occupancy is committed through WorldGrid, with navigation revision updated only when occupancy creates a new blocker. Portal/Citadel footprints are reserved against construction.
 
 The starter map is saved as editable TileMapLayer data. No map generator runs in gameplay. To switch the live level, replace World.tscn's Level scene instance, keeping its node name. For runtime terrain edits, call RebuildTerrain explicitly; editor changes take effect on the next game run.
 

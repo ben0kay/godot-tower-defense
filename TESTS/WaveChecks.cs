@@ -107,10 +107,10 @@ public static class WaveChecks
         Require(manager.State == WaveManager.WaveState.Disabled, "Old ship resolution cannot revive a reset scheduler");
 
         Vector2I blockedCell = grid.WorldToCell(sources[1]);
-        int oldSource = grid.Level.Walls.GetCellSourceId(blockedCell);
-        Vector2I oldAtlas = grid.Level.Walls.GetCellAtlasCoords(blockedCell);
-        int oldAlternative = grid.Level.Walls.GetCellAlternativeTile(blockedCell);
-        grid.Level.Walls.SetCell(blockedCell, 0, new(0, 0)); grid.RebuildTerrain();
+        int oldSource = grid.Level.Impassable.GetCellSourceId(blockedCell);
+        Vector2I oldAtlas = grid.Level.Impassable.GetCellAtlasCoords(blockedCell);
+        int oldAlternative = grid.Level.Impassable.GetCellAlternativeTile(blockedCell);
+        grid.Level.Impassable.SetCell(blockedCell, 0, new(0, 0)); grid.RebuildTerrain();
         for (int i = 0; i < 20; i++)
         {
             Enemy safe = spawns.SpawnWave(scenes["enemy001"], rng);
@@ -120,8 +120,8 @@ public static class WaveChecks
         }
         Require(spawns.SpawnWave(scenes["enemy001"], rng, "Portals/EnemyPortal2") == null,
             "Blocked named portal never falls back to a different source");
-        if (oldSource < 0) grid.Level.Walls.EraseCell(blockedCell);
-        else grid.Level.Walls.SetCell(blockedCell, oldSource, oldAtlas, oldAlternative);
+        if (oldSource < 0) grid.Level.Impassable.EraseCell(blockedCell);
+        else grid.Level.Impassable.SetCell(blockedCell, oldSource, oldAtlas, oldAlternative);
         grid.RebuildTerrain();
 
         int max = spawns.Paths.Config.MaxActiveEnemies;

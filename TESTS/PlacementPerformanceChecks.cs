@@ -19,9 +19,9 @@ public partial class PlacementPerformanceChecks : Node
             WorldGrid grid = main.GetNode<WorldGrid>("World/Grid");
             SpawnManager spawns = main.GetNode<SpawnManager>("World/EnemySystems/Spawning");
             PathRequestManager paths = spawns.Paths;
-            grid.Level.Walls.Clear(); grid.Level.Ground.Clear();
+            grid.Level.Impassable.Clear(); grid.Level.Passable.Clear();
             for (int y = 0; y < grid.Config.HeightCells; y++)
-                for (int x = 0; x < grid.Config.WidthCells; x++) grid.Level.Ground.SetCell(new(x, y), 0, new(2, 0));
+                for (int x = 0; x < grid.Config.WidthCells; x++) grid.Level.Passable.SetCell(new(x, y), 0, new(2, 0));
             grid.RebuildTerrain();
             foreach (int population in new[] { 100, 500 })
             {

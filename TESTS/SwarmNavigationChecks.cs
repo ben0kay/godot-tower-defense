@@ -16,14 +16,14 @@ public static class SwarmNavigationChecks
         float strength = config.PathDiversityStrength, congestion = config.CongestionInfluence;
         int profiles = config.RouteProfileCount;
         foreach (Enemy enemy in spawns.Registry.Living.ToArray()) enemy.TakeDamage(10000);
-        grid.Level.Ground.Clear(); grid.Level.Walls.Clear();
+        grid.Level.Passable.Clear(); grid.Level.Impassable.Clear();
         for (int y = 0; y < grid.Config.HeightCells; y++)
-            for (int x = 0; x < grid.Config.WidthCells; x++) grid.Level.Walls.SetCell(new(x, y), 0, new(0, 0));
+            for (int x = 0; x < grid.Config.WidthCells; x++) grid.Level.Impassable.SetCell(new(x, y), 0, new(0, 0));
         for (int y = 2; y <= 28; y++)
             for (int x = 2; x <= 38; x++)
             {
                 if (x == 20 && !(y >= 7 && y <= 9) && !(y >= 21 && y <= 23)) continue;
-                grid.Level.Walls.EraseCell(new(x, y)); grid.Level.Ground.SetCell(new(x, y), 0, new(2, 0));
+                grid.Level.Impassable.EraseCell(new(x, y)); grid.Level.Passable.SetCell(new(x, y), 0, new(2, 0));
             }
         Vector2 start = grid.CellToWorldCenter(new(5, 15)); Vector2I goal = new(35, 15);
         grid.Level.GetNode<Node2D>("Portals/EnemyPortal").GlobalPosition = grid.CellToWorldCenter(new(5, 15));

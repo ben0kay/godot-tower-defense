@@ -7,8 +7,8 @@
 1. Pull the latest commit, let Godot import assets, and build the C# project.
 2. Run **F5** to play the main game. The camera starts over the central base. WASD/arrows pan, middle mouse drags, wheel zooms; Ctrl toggles the tower tray.
 3. Choose Battle Tower and try the different terrain tiles. Green previews allow building; red previews reject it. Empty space and unbuildable walls reject towers. Buildable open floors and solid platforms accept them. The debug overlay reports current cell rules and occupancy.
-4. Stop the game, open **Level001.tscn**, select `Terrain/Ground` or `Terrain/Walls`, and paint using the shared TileSet palette. Save, then press F5 again. F6 runs only the map scene, without the gameplay camera/HUD/placement controller.
-5. Select `Terrain/Decorations` for cosmetic tiles only. Erase ground tiles to expose open space. Walls override Ground; Decorations never change cell rules.
+4. Stop the game, open **Level001.tscn**, select `Terrain/Passable` or `Terrain/Impassable`, and paint using that layer's own filtered TileSet palette. Save, then press F5 again. F6 runs only the map scene, without the gameplay camera/HUD/placement controller.
+5. Select `Terrain/Decorations` for cosmetic tiles only. Erase gameplay-layer tiles to expose open space. Impassable overrides Passable; Decorations never change cell rules.
 6. Move Portal/Citadel instances with grid snapping at 64 px. Object root positions sit at cell centers (32 + 64*n). A Citadel root is the upper-left cell center of its 3×3 footprint.
 7. Select the root and edit its `Settings` resource for spawn mode, allowed edges, active Portal paths and Citadel reference. These configure SpawnManager source permissions.
 
@@ -25,7 +25,7 @@ The main base occupies roughly cells (34,31)–(65,49), with disconnected island
 | (4,0) | Open dirt ground | Yes | No |
 | (5,0) | Transparent surface decal | No | No |
 
-Paint decals on Decorations. A decal alone never grants build permission. The atlas is shared by all three layers and other levels; changing tile metadata affects every level using it.
+Paint decals on Decorations. A decal alone never grants build permission. The atlas is shared texture is used by separate category TileSets and other levels; changing tile metadata affects every level using it.
 
 Portal cells are reserved against towers but passable; Citadel cells are reserved and blocked. Enemy spawning, budgeted pathfinding, route-preserving placement and Battle Tower firing are active. Paid tower construction is active; Citadel health and win/lose remain future work.
 
@@ -54,3 +54,6 @@ In Level001Config.tres (or the level root Settings), edit Starting Resources / S
 
 ## Manual finite waves
 F5 prepares Wave 00 / 03; START WAVE appears just below the top-right status. Three Enemy001-only test waves are authored in LEVELS/Level001/Level001Waves.cs. Previous batch ships keep moving during later batches. NEXT WAVE unlocks only after all scheduled and wave-owned ships resolve, while F2 debug enemies do not count. Ordinary ships randomly choose eligible registered portals per spawn; debug F2 stays round-robin. There is no wave reward or automatic next wave yet.
+
+## Terrain categories
+Passable offers metal/dirt floors; Impassable offers walls, raised platforms and rocks; Decorations offers only decals. Build permission is independent of movement: raised platforms are solid but buildable. Erase the old gameplay-layer cell before changing a cell from solid to passable or vice versa. Empty space stays passable/unbuildable. All 176 previously authored cells were preserved during the palette migration.

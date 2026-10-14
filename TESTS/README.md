@@ -45,3 +45,6 @@ WaveChecks runs against Main's WaveManager/SpawnManager. It asserts immediate fi
 ## Death explosion feedback
 
 `DeathExplosionChecks` runs once in the Main scene integration suite. It tests that a killed Enemy001 creates exactly one shared puff, actual Sprite2D scale changes explosion size, optional per-enemy multiplier overrides the result, and arriving ships or repeated damage never trigger explosions. It checks active-effect cleanup and turns GPU particles off for the mass-kill navigation/wave suites. The test validates spawn/sizing logic; the rendered orange/grey smoke still needs an F5 visual check in Godot .NET.
+
+## Terrain authoring cleanup
+TerrainCategoryChecks verifies the three filtered palettes, independent movement/build permissions, empty/decorative space, decals over floor/solid cells, overlap fallback and object reservations. Fixtures use WorldLevel.Passable/Impassable. TerrainMigration.md records the exact before/after comparison of all 176 existing authored tiles.
