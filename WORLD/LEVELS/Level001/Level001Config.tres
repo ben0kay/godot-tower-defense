@@ -5,4 +5,3 @@
 [resource]
 script = ExtResource("1")
 ActivePortals = Array[NodePath]([NodePath("Portals/EnemyPortal"), NodePath("Portals/EnemyPortal2")])
-StartingCredits = 1000
