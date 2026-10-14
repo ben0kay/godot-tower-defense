@@ -143,20 +143,137 @@ Tower tier and tower rank remain separate: buying level 2 does not erase earned 
 
 Examples (illustrative, not balance): a permanent range-research bonus applies on both Level001 and Level002. Level001's −15% range condition disappears when leaving that map. An enemy's −30% fire-rate debuff expires independently; removing it preserves the tower's purchased tier, earned rank, research and current level rules.
 
-### Suggested ownership and folders — future files
+### Required code layout — readable, numbered stat pipeline (planned)
 
-| Location | Intended responsibility |
-| --- | --- |
-| `TOWERS/Shared/TowerBase.cs` | Lightweight instance identity, purchased tier, rank/kill progression and stat-change hooks; no mandatory weapon ticks. |
-| `TOWERS/Shared/Upgrades/` | Shared tier data and purchase/application controller, reusing ECONOMY ResourceCost and atomic payment. |
-| `TOWERS/Shared/Stats/` | Typed capability-specific base/final stat values, modifier operations and the shared resolver. |
-| `TOWERS/Shared/Ranks/` | Rank thresholds/bonuses and once-only per-tower kill progression. |
-| `TOWERS/Shared/Modifiers/` | Reusable active-effect instance/source/stacking lifecycle; level conditions remain separate inputs. |
-| `TOWERS/Offensive/BattleTower/Upgrades/` | Battle Tower's authored tier resources and future tier-specific art. |
-| `LEVELS/LevelConfig.cs` / per-level settings | Future level-condition data, separate from tower effects and persistent research. |
-| Future player/profile research system | Permanent research ownership, save/load and eligibility rules; outside the loaded level and any individual research-center tower. Exact folder/service to be decided when implemented. |
+**Codex implementation target:** keep every stat stage clearly visible under **`TOWERS/Shared/Stats/Pipeline/`**, with **one small C# file per stage in the exact order below**. These filenames and types are a proposed architecture, **not files already in the repository**. The leading numbers sort them in VS Code/Godot's FileSystem; ordinary C# class names do **not** start with digits.
 
-These names describe the intended boundaries, **not files already implemented**. Keep the initial implementation compact; do not create empty managers or weapon-only stat requirements for support/economy towers.
+```text
+TOWERS/
+├── Shared/
+│   ├── TowerBase.cs                          # Planned: lightweight instance/progression owner
+│   ├── Stats/
+│   │   ├── README.md                         # Planned: authoring, data ownership and debugging
+│   │   ├── TowerStatBlock.cs                 # Typed in-progress stat values/capability groups
+│   │   ├── TowerStatContext.cs               # All read-only inputs for one resolution
+│   │   ├── TowerStatModifier.cs              # Flat/percent/multiplier operation and target stat
+│   │   ├── TowerFinalStats.cs                 # Read-only effective values consumed by gameplay
+│   │   ├── TowerStatTrace.cs                 # Optional debug-only snapshots per stage
+│   │   └── Pipeline/
+│   │       ├── README.md                     # The order and rules, easy to find
+│   │       ├── TowerStatPipeline.cs          # SINGLE coordinator, explicit ordered calls
+│   │       ├── 01_BaseStats.cs               # BaseStatsStage
+│   │       ├── 02_TowerUpgrades.cs           # TowerUpgradesStage
+│   │       ├── 03_TowerRanks.cs              # TowerRanksStage
+│   │       ├── 04_PermanentResearch.cs       # PermanentResearchStage
+│   │       ├── 05_LevelModifiers.cs          # LevelModifiersStage
+│   │       ├── 06_ActiveEffects.cs           # ActiveEffectsStage
+│   │       ├── 07_SafetyClamps.cs            # SafetyClampsStage
+│   │       └── 08_FinalStats.cs              # FinalStatsStage
+│   ├── Upgrades/
+│   │   ├── TowerUpgradeTier.cs              # Planned: purchased tier definition and ResourceCost
+│   │   ├── TowerUpgradeController.cs        # Planned: validated atomic upgrade transaction
+│   │   └── README.md
+│   ├── Ranks/
+│   │   └── README.md                         # Planned: kill milestones/bonuses/ownership
+│   ├── Modifiers/
+│   │   └── README.md                         # Planned: timed effect source, duration, stacking
+│   ├── Targeting/                             # EXISTS: common tower targeting
+│   ├── Weapons/                               # EXISTS: TurretAiming
+│   └── Projectiles/                           # EXISTS: BasicProjectile
+├── Offensive/
+│   └── BattleTower/
+│       ├── BattleTower.cs                    # EXISTS: must eventually consume FinalStats
+│       ├── BattleTowerConfig.cs              # EXISTS: source of Battle Tower base values
+│       ├── DefaultBattleTowerConfig.tres     # EXISTS: authored, never mutate during resolution
+│       └── Upgrades/                          # Planned: Battle Tower tier Resources/art
+├── Support/                                   # Future shared pipeline consumers
+├── Economy/                                   # Future shared pipeline consumers
+└── Utility/
+
+LEVELS/
+├── LevelConfig.cs                             # EXISTS: level settings; add reference later
+├── Level001/
+│   ├── Level001Config.tres                    # EXISTS
+│   ├── Level001Waves.cs                       # EXISTS
+│   └── Level001TowerModifiers.cs              # OPTIONAL FUTURE: authored level-only rules
+└── Level002/
+    └── Level002TowerModifiers.cs              # OPTIONAL FUTURE: separate authored level rules
+
+PROGRESSION/                                   # PROPOSED FUTURE umbrella; do not create now
+└── Research/                                  # Persistent player/profile research ownership
+    └── README.md
+```
+
+`PROGRESSION/Research/` is a **suggested** future home, not an existing service or finalized save design. Level-specific conditions may be authored in a readable per-level C# file **or** a small referenced Resource if that suits Godot; **avoid huge Inspector arrays**. The active level passes its modifiers to the shared resolver; `05_LevelModifiers.cs` must never hardcode `Level001` or read a specific scene file. **Do not move existing `LEVELS/`, `ECONOMY/` or tower files** just to create this layout.
+
+#### Explicit pipeline orchestration — one file shows the complete order
+
+`TowerStatPipeline.cs` should be immediately comprehensible when opened: the ordered stages are invoked **explicitly in one place**, without hidden ordering by class discovery, reflection, enum values or file-system iteration.
+
+**Illustrative C# shape, not runnable code today:**
+
+```csharp
+public static TowerFinalStats Resolve(TowerStatContext context)
+{
+    TowerStatBlock stats = BaseStatsStage.Create(context);
+    stats = TowerUpgradesStage.Apply(stats, context);
+    stats = TowerRanksStage.Apply(stats, context);
+    stats = PermanentResearchStage.Apply(stats, context);
+    stats = LevelModifiersStage.Apply(stats, context);
+    stats = ActiveEffectsStage.Apply(stats, context);
+    stats = SafetyClampsStage.Apply(stats, context);
+    return FinalStatsStage.Create(stats, context);
+}
+```
+
+Each file owns **the rules for applying its stage**, not the source data, level lookup, runtime timers or purchases. A stage operates on typed inputs and returns a new value/snapshot (or updates an isolated mutable working copy) instead of overwriting shared base Resources or last frame's `FinalStats`. `01_BaseStats.cs` is the start of every calculation, **not a permanent value being mutated by later steps**. `08_FinalStats.cs` turns the validated working values into an immutable/read-only final result and applies explicit presentation/gameplay conversion/rounding where required.
+
+**No per-stat files or separate pipelines per tower type.** One typed pipeline may contain only the capabilities present on the tower (e.g. optional weapon, repair, production groups). Don't make a passive Solar or Repair tower carry fictitious damage, projectile or firing fields. If future capability-specific rules genuinely differ, use small typed helpers without duplicating these eight stages. Keep construction prices/ResourceCost, targeting priority, identity and other non-stat metadata separate unless explicitly designed as modifiers.
+
+#### Stage-by-stage source ownership
+
+| File / stage | Data originates from | Lifetime and expected role |
+| --- | --- | --- |
+| `01_BaseStats.cs` | Tower type's immutable authored base definition / `.tres` (initially existing `BattleTowerConfig`) | Establish original stats for the specific placed instance, without upgrades or bonuses. |
+| `02_TowerUpgrades.cs` | `TOWERS/Shared/Upgrades/` and `Offensive/BattleTower/Upgrades/` etc. | Applies the current **purchased** tier for this tower instance only; payment handled elsewhere. |
+| `03_TowerRanks.cs` | `TOWERS/Shared/Ranks/` and this tower's attributed kill count / earned rank | Adds kill-based progression independently of purchased tiers; rank milestones and attribution are separate logic. |
+| `04_PermanentResearch.cs` | Future **player/profile-owned** `PROGRESSION/Research/` state | Applies eligible permanent unlocks across levels and after reload; never owned or reset by a level, tower or research-center building. |
+| `05_LevelModifiers.cs` | **Current** `LEVELS/` level's authored rule set, supplied through level/session context | Applies that map's conditions only; changing maps replaces these inputs, leaving research untouched. |
+| `06_ActiveEffects.cs` | `TOWERS/Shared/Modifiers/` active runtime effects, e.g. enemy slow, aura, player ability | Applies stack/refresh/expire rules from the effect owners; no level-specific conditions in this collection. |
+| `07_SafetyClamps.cs` | Shared typed stat validity/bound rules | Clamp nonfinite, invalid or out-of-bounds values. Preserve deliberately valid **0 shots/sec = disabled firing**. |
+| `08_FinalStats.cs` | The preceding validated working stat block | Publishes the per-instance **effective stats** used by combat/support/economy systems, not authoritative saved inputs. |
+
+`TowerStatContext` should expose the minimum read-only inputs needed to resolve a specific tower (tower definition/base stats, purchased tier, earned rank, eligible persistent research snapshot, active level rules, active effects and relevant capability metadata). Gather these from the proper owners **before** resolution; do not let stages search arbitrary scene nodes or load `Level001` directly. Future research unlocks use the existing/current profile state; new towers must immediately resolve against that state and their active level.
+
+**Distinguish two kinds of modifier concepts:** `TowerStatModifier.cs` is the small reusable **math operation** (target stat, flat/percent/multiplier) shared by stages, while `TOWERS/Shared/Modifiers/` owns the **runtime temporary-effect lifecycle** (source identity, durations, refresh/stack/remove). Level conditions and permanent research can reuse the same math operation without being misclassified as temporary buffs.
+
+#### Debugging and intermediate values — essential for balancing
+
+Offer an **optional, explicitly enabled stage trace** so inspecting one tower can show how each step changed its values. For example, an illustrative Damage calculation could display:
+
+| Snapshot | Damage (example only) |
+| --- | ---: |
+| Base | 12 |
+| Purchased tier | 16 |
+| Earned rank | 18 |
+| Permanent research | 21.6 |
+| Current level modifiers | 21.6 |
+| Temporary debuff | 17.28 |
+| Safety validation / final rounded value | 17 |
+
+A `TowerStatTrace` can store a **stage-name + copied stat snapshot** after each explicit stage (including unchanged stages). Build/display that trace **only when debugging or inspecting a tower**, not every frame for every tower. Use the **same real pipeline** for the gameplay result and the trace; never maintain competing calculation implementations or falsify the intermediate values. Keep fractional precision during calculations and define rounding **once at the final boundary** for integer gameplay values (e.g. damage); choose and document rounding behavior. Avoid recalculating snapshots when a tooltip simply redraws.
+
+#### Recalculation, caching and cross-system contracts
+
+- **One authoritative `TowerFinalStats` per placed instance**, computed from source inputs and cached. Existing `BattleTower.cs` currently reads live combat values from `Config.RangePixels`, `Config.DamagePerShot`, `Config.ShotsPerSecond`, etc.; Phase 3 must deliberately switch **runtime consumers** to the resolved final values while keeping authored Config as the base input. Aim speed/turning, repair rate or economy output should follow the same pattern as capabilities are introduced.
+- Mark final stats **dirty** on relevant events: tier purchase, individual rank gain, research change/load, level-rule replacement, new effect, expired/removed effect. Recalculate on change or the next safe access, **not on every physics frame**; avoid per-frame allocations or scanning all research/levels for every tower. Research invalidation should target eligible towers when possible.
+- The **same resolver** should calculate both the currently applied result and a proposed upgrade preview; for preview only the hypothetical tier changes, while current rank, research, level rules and temporary effects stay identical. Preview must never spend Credits or mutate the placed tower.
+- Apply flat/additive-percent/explicit-multiplier operations using the existing Phase 3 arithmetic rules **within each stage**, in the fixed stage order. Identical inputs and seed-free stat calculations must produce identical outputs; never add upgrades to the old final cache or reverse expired debuffs by subtracting/dividing previous results.
+- On save/load, restore authoritative progression inputs (purchased tier, earned rank and profile research), then resolve final stats. Do not serialize the derived final result as a substitute for those inputs. Level rules should be **replaced** when switching levels; persistent research must survive. Do not implement the future profile-save system just to implement Battle Tower Phase 3.
+- Keep existing `ECONOMY/Wallet/EconomyManager`/`ResourceCost` as the **only** authoritative payment service and existing `TowerPlacementController` as the placement owner. A stat-stage file must never charge resources, attribute kills, schedule timed effects, own a research-center UI, or directly alter enemy navigation.
+- Match project style: brief header comments, `// =========================================================` comments above methods, sensible `#region` groups, compact code and README files in newly created folders. Avoid empty services and excessive abstraction; neutral stage methods can remain lightweight until their feature is built.
+
+**Acceptance for this architecture:** a developer can open **`TOWERS/Shared/Stats/Pipeline/TowerStatPipeline.cs` and see the entire actual execution sequence at a glance**, open any numbered file to find that step's implementation, inspect optional stage-by-stage values, and follow each source back to its natural owning feature folder. No other class should contain a competing full copy of the pipeline.
 
 ### Implementation order within Phase 3
 
