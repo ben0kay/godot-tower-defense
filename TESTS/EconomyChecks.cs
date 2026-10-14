@@ -23,6 +23,9 @@ public static class EconomyChecks
 
         var duplicate = Costs((credits, 100), (credits, 150));
         Require(wallet.TrySpend(duplicate) && wallet.GetBalance(credits) == 150, "Duplicate IDs charge the combined amount once");
+        CreditGainIndicator gain = hud.GetNode<CreditGainIndicator>("TopBar/Status/CreditGain");
+        Require(gain.Text == "(-250)" && gain.IsExpense,
+            "Committed credit spending produces one amber inline expense popup");
         Require(!wallet.TrySpend(Costs((credits, 100), (alloy, 1))) && wallet.GetBalance(credits) == 150,
             "Insufficient secondary material causes no partial deduction");
         Require(!wallet.TrySpend(Costs((credits, -1))) && !wallet.TrySpend(Costs((null, 0))),
