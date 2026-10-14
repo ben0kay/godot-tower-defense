@@ -16,6 +16,8 @@ public partial class GameplayHUD : Control
     private PanelContainer _topBar, _towerBar, _inspector;
     private HBoxContainer _bottomArea;
     private Label _wave, _credits, _core, _towerName, _towerCategory, _towerStats, _towerNotes;
+    private ProgressBar _healthBar;
+    private StyleBoxFlat _healthFill;
     private Tween _trayTween;
     private bool _trayOpen;
     #endregion
@@ -47,14 +49,16 @@ public partial class GameplayHUD : Control
         _towerBar = GetNode<PanelContainer>("BottomArea/TraySlot/TowerBar");
         _inspector = GetNode<PanelContainer>("BottomArea/Inspector");
 
-        _wave = GetNode<Label>("TopBar/Insets/Status/Wave");
-        _credits = GetNode<Label>("TopBar/Insets/Status/Credits");
-        _core = GetNode<Label>("TopBar/Insets/Status/Core");
+        _wave = GetNode<Label>("TopBar/Status/Wave");
+        _credits = GetNode<Label>("TopBar/Status/Credits");
+        _core = GetNode<Label>("TopBar/Status/Citadel/Health");
         _towerName = GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerName");
         _towerCategory = GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerCategory");
         _towerStats = GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerStats");
         _towerNotes = GetNode<Label>("BottomArea/Inspector/Insets/Body/Notes");
 
+        _healthBar = GetNode<ProgressBar>("TopBar/Status/Citadel/Bar");
+        _topBar.GetNode<Control>("Status").Resized += LayoutStatus;
         ApplyLayout();
         ApplyAppearance();
         BindTowerButtons();
@@ -151,11 +155,21 @@ public partial class GameplayHUD : Control
     public void SetCredits(int amount) => _credits.Text = $"CREDITS {amount:N0}";
 
     // =========================================================
-    // Bind core durability here when the defended objective exists.
-    public void SetCoreHealth(int current, int maximum)
+    // Preserve existing callers while naming the physical objective correctly.
+    public void SetCoreHealth(int current, int maximum) => SetCitadelHealth(current, maximum);
+
+    // =========================================================
+    // Display authoritative health only; absent maximum leaves the status unknown.
+    public void SetCitadelHealth(int current, int maximum)
     {
-        float percent = maximum > 0 ? 100f * current / maximum : 0f;
-        _core.Text = $"CORE {Mathf.Clamp(percent, 0f, 100f):0}%";
+        _healthBar.Visible = maximum > 0;
+        if (maximum <= 0) { _core.Text = "CITADEL --"; _healthBar.Value = 0; return; }
+        int health = Mathf.Clamp(current, 0, maximum);
+        float fraction = (float)health / maximum;
+        _core.Text = $"CITADEL {health:N0} / {maximum:N0}";
+        _healthBar.Value = fraction * 100f;
+        _healthFill.BgColor = fraction <= Config.HealthCriticalThreshold ? Config.HealthCriticalColor
+            : fraction <= Config.HealthWarningThreshold ? Config.HealthWarningColor : Config.HealthHealthyColor;
     }
     #endregion
 
@@ -165,11 +179,32 @@ public partial class GameplayHUD : Control
     private void ApplyLayout()
     {
         _topBar.OffsetBottom = Config.TopBarHeight;
+        LayoutStatus();
         _bottomArea.OffsetLeft = Config.EdgeMargin;
         _bottomArea.OffsetRight = -Config.EdgeMargin;
         _bottomArea.OffsetTop = -(Config.BottomBarHeight + Config.EdgeMargin);
         _bottomArea.OffsetBottom = -Config.EdgeMargin;
         _inspector.CustomMinimumSize = new Vector2(Config.InspectorWidth, 0f);
+    }
+
+    // =========================================================
+    // Reserve non-overlapping side zones around an exactly viewport-centered objective.
+    private void LayoutStatus()
+    {
+        if (_core == null) return;
+        Control status = _topBar.GetNode<Control>("Status");
+        float width = status.Size.X, height = status.Size.Y;
+        float margin = Mathf.Min(Config.EdgeMargin, width * 0.05f);
+        float centerWidth = Mathf.Min(Config.CitadelBlockWidth, width * 0.46f);
+        float sideWidth = Mathf.Max(0f, (width - centerWidth) * 0.5f - margin - Config.StatusGapPixels);
+        _credits.Position = new Vector2(margin, 0); _credits.Size = new Vector2(sideWidth, height);
+        _wave.Position = new Vector2(width - margin - sideWidth, 0); _wave.Size = new Vector2(sideWidth, height);
+        Control center = status.GetNode<Control>("Citadel");
+        center.Position = new Vector2((width - centerWidth) * 0.5f, 0);
+        center.Size = new Vector2(centerWidth, height);
+        int fontSize = Mathf.Clamp((int)(Config.StatusFontSize * Mathf.Min(1f, width / 900f)), 10, Config.StatusFontSize);
+        foreach (Label label in new[] { _credits, _core, _wave }) label.AddThemeFontSizeOverride("font_size", fontSize);
+        _healthBar.CustomMinimumSize = new Vector2(Mathf.Min(Config.CitadelBarWidth, centerWidth), Config.CitadelBarHeight);
     }
 
     // =========================================================
@@ -179,6 +214,10 @@ public partial class GameplayHUD : Control
         _topBar.AddThemeStyleboxOverride("panel", MakePanel(Config.TopBarColor, Config.AccentColor));
         _towerBar.AddThemeStyleboxOverride("panel", MakePanel(Config.PanelColor, Config.AccentColor));
         _inspector.AddThemeStyleboxOverride("panel", MakePanel(Config.PanelColor, Config.AccentColor));
+
+        _healthFill = new StyleBoxFlat { BgColor = Config.HealthHealthyColor };
+        _healthBar.AddThemeStyleboxOverride("fill", _healthFill);
+        _healthBar.AddThemeStyleboxOverride("background", new StyleBoxFlat { BgColor = Config.ButtonColor });
 
         string[] buttons = { "BattleButton", "LaserButton", "MissileButton",
             "RepairButton", "SolarButton", "ResourceButton" };
@@ -198,7 +237,6 @@ public partial class GameplayHUD : Control
         foreach (Label label in primary) label.AddThemeColorOverride("font_color", Config.TextColor);
 
         Label[] muted = { _towerCategory, _towerStats, _towerNotes,
-            GetNode<Label>("TopBar/Insets/Status/Shortcut"),
             GetNode<Label>("BottomArea/TraySlot/TowerBar/Insets/Tray/Header/Hint") };
         foreach (Label label in muted) label.AddThemeColorOverride("font_color", Config.MutedTextColor);
 

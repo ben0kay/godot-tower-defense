@@ -148,3 +148,6 @@ Keep actual progression per tower editable in Resources, not in a global switch 
 - `FEEDBACK/DefenseBars/DefaultDefenseBarConfig.tres`: reusable health bar appearance when towers become damageable.
 
 **This README is the implementation specification, not evidence that Phases 1–3 have been coded.**
+
+## Implemented Phase 1
+BattleTower now uses the shared Weapons/TurretAiming helper and a child TurretPivot. Its Inspector Aiming group controls speed, tolerance and tracking. Existing targeting, cooldown and center-spawned guided bullets remain in use. Costs, upgrades and other phases remain future work.

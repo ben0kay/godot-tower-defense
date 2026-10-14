@@ -15,6 +15,11 @@ public partial class BattleTowerConfig : Resource
     [Export(PropertyHint.Range, "0.1,10,0.1")] public float ShotsPerSecond { get; set; } = 1f;
     [Export(PropertyHint.Range, "1,100,1")] public int DamagePerShot { get; set; } = 12;
     [Export(PropertyHint.Range, "50,3000,25")] public float ProjectileSpeed { get; set; } = 600f;
+    [ExportGroup("Aiming")]
+    [Export(PropertyHint.Range, "0,720,5")] public float RotationSpeedDegrees { get; set; } = 180f;
+    [Export(PropertyHint.Range, "0,180,1")] public float AimToleranceDegrees { get; set; } = 12f;
+    [Export] public bool RotateWhileTracking { get; set; } = true;
+
     [ExportGroup("Targeting")]
     [Export] public TowerTargeting.Priority TargetPriority { get; set; } = TowerTargeting.Priority.First;
     [Export(PropertyHint.Range, "0.05,2,0.05")] public float TargetSearchInterval { get; set; } = 0.15f;

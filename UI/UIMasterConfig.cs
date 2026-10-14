@@ -12,6 +12,18 @@ public partial class UIMasterConfig : Resource
     [Export(PropertyHint.Range, "0,36,1")] public int EdgeMargin { get; set; } = 12;
     [Export(PropertyHint.Range, "80,180,1")] public int TowerButtonWidth { get; set; } = 112;
 
+    [ExportGroup("Top Status")]
+    [Export] public int StatusFontSize { get; set; } = 16;
+    [Export] public int StatusGapPixels { get; set; } = 16;
+    [Export] public int CitadelBlockWidth { get; set; } = 280;
+    [Export] public int CitadelBarWidth { get; set; } = 220;
+    [Export] public int CitadelBarHeight { get; set; } = 5;
+    [Export] public Color HealthHealthyColor { get; set; } = new Color("#69cddc");
+    [Export] public Color HealthWarningColor { get; set; } = new Color("#efbc62");
+    [Export] public Color HealthCriticalColor { get; set; } = new Color("#ed6666");
+    [Export(PropertyHint.Range, "0,1,0.05")] public float HealthWarningThreshold { get; set; } = 0.5f;
+    [Export(PropertyHint.Range, "0,1,0.05")] public float HealthCriticalThreshold { get; set; } = 0.25f;
+
     [ExportGroup("Interaction")]
     [Export] public bool StartWithTowerBarOpen { get; set; } = false;
     [Export(PropertyHint.Range, "0,0.5,0.01")] public float TowerBarTransitionSeconds { get; set; } = 0.17f;

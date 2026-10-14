@@ -8,9 +8,9 @@ This is the **permanent thin top section** of `UI/GameplayHUD/` in the existing 
 
 Keep the middle block *actually centered on the viewport* independently of the amount of credit or wave text. Fit comfortably at different window widths and keep the center readable. A small Ctrl/Towers hint can move elsewhere rather than crowding this area.
 
-**Currently implemented:** `TopBar.tscn` has plain `Wave`, `Credits`, `Core`, and `Shortcut` labels in a single horizontal container, in the wrong target order; `GameplayHUD.cs` exposes `SetWave`, `SetCredits` and `SetCoreHealth` for future state updates. No real credit balance, Citadel HP or wave system is connected.
+**Currently implemented:** TopBar/Status has independent Credits and Wave labels and a centered Citadel VBox containing Health and Bar. GameplayHUD updates the three reserved zones on resize, keeping the objective centered as numbers grow. Narrow screens scale text and truncate overflow. The Ctrl shortcut remains in the bottom build tray.
 
-**Codex HUD-only pass:** rearrange the TopBar layout (Credits left, Citadel center, Wave right), replace visible `CORE` with `CITADEL`, and add a styled health fill with safe `current/max` formatting. Retain compatibility with the current setters and NodePaths when refactoring. Show `--` for uninitialized state, not fake numbers.
+SetCredits and SetWave update text; SetCitadelHealth updates current/max, clamped fill and configured threshold colors. SetCoreHealth forwards for compatibility. Unknown state remains -- with no health fill. Layout and palette settings live in UIMasterConfig / DefaultUIConfig.tres.
 
 **Later integration:** `WORLD/LEVELS/LevelConfig.cs` will eventually specify starting credits per level; a central economy/session service owns the changing balance; Citadel durability is owned by `WORLD/OBJECTIVES/Citadel/`; future `ENEMIES/Waves/` owns wave state. Bind event-driven updates to the HUD. Don't simulate those mechanics here.
 

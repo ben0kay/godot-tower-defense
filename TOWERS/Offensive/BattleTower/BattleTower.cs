@@ -7,6 +7,7 @@ public partial class BattleTower : Node2D
     [Export] public BattleTowerConfig Config { get; set; }
     public Vector2I GridCell { get; private set; }
     private Sprite2D _sprite;
+    private Node2D _turret;
     private EnemyRegistry _registry;
     private Node2D _projectiles;
     private Enemy _target;
@@ -18,7 +19,8 @@ public partial class BattleTower : Node2D
     // Cache visuals and world services once; stagger periodic target acquisition.
     public override void _Ready()
     {
-        _sprite = GetNode<Sprite2D>("Sprite");
+        _turret = GetNode<Node2D>("TurretPivot");
+        _sprite = _turret.GetNode<Sprite2D>("Sprite");
         SetProcess(false);
         _registry = GetNodeOrNull<EnemyRegistry>("../../EnemySystems/Registry");
         _projectiles = GetNodeOrNull<Node2D>("../../Projectiles");
@@ -35,8 +37,10 @@ public partial class BattleTower : Node2D
             _target = TowerTargeting.Find(_registry, GlobalPosition, Mathf.Max(0f, Config.RangePixels), Config.TargetPriority);
             _searchTimer = Mathf.Max(0.05f, Config.TargetSearchInterval);
         }
-        if (_shotTimer > 0f || Config.ShotsPerSecond <= 0f
-            || !TowerTargeting.Valid(_target, GlobalPosition, Mathf.Max(0f, Config.RangePixels))) return;
+        if (!TowerTargeting.Valid(_target, GlobalPosition, Mathf.Max(0f, Config.RangePixels))) return;
+        bool aligned = TurretAiming.Track(_turret, _target.GlobalPosition, Config.RotationSpeedDegrees,
+            Config.AimToleranceDegrees, Config.RotateWhileTracking, delta);
+        if (!aligned || _shotTimer > 0f || Config.ShotsPerSecond <= 0f) return;
         BasicProjectile bullet = new();
         bullet.Initialize(_target, Config.ProjectileSpeed, Config.DamagePerShot);
         _projectiles.AddChild(bullet); bullet.GlobalPosition = GlobalPosition;

@@ -88,6 +88,14 @@ public partial class EnemyIntegrationChecks : Node
             tower.Config = (BattleTowerConfig)tower.Config.Duplicate();
             _battle.GetNode<Node2D>("World/Towers").AddChild(tower); tower.SetPhysicsProcess(false);
             tower.GlobalPosition = target.GlobalPosition + new Vector2(100, 0);
+            tower.Config.TargetSearchInterval = 0.05f;
+            tower.GetNode<Node2D>("TurretPivot").Rotation = Mathf.Pi * 0.5f;
+            for (int i = 0; i < 12; i++) tower._PhysicsProcess(1.0 / 60);
+            Check(_battle.GetNode<Node2D>("World/Projectiles").GetChildCount() == 0,
+                "Tower holds fire while turning toward an opposite target");
+            Check(tower.Rotation == 0, "Aiming leaves placement root fixed");
+            tower.GetNode<Node2D>("TurretPivot").Rotation = -Mathf.Pi * 0.5f;
+            HudTowerChecks.Run(_battle);
             int killedBefore = _spawns.Registry.KilledCount;
             for (int i = 0; i < 380 && target.IsAlive; i++)
             {

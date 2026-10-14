@@ -4,3 +4,10 @@
 
 [resource]
 script = ExtResource("1_ui")
+StatusFontSize = 16
+StatusGapPixels = 16
+CitadelBlockWidth = 280
+CitadelBarWidth = 220
+CitadelBarHeight = 5
+HealthWarningThreshold = 0.5
+HealthCriticalThreshold = 0.25

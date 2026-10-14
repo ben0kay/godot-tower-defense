@@ -8,5 +8,7 @@
 script = ExtResource("1_tower")
 Config = ExtResource("2_config")
 
-[node name="Sprite" type="Sprite2D" parent="."]
+[node name="TurretPivot" type="Node2D" parent="."]
+
+[node name="Sprite" type="Sprite2D" parent="TurretPivot"]
 texture = ExtResource("3_art")

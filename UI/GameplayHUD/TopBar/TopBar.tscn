@@ -3,38 +3,41 @@
 [node name="TopBar" type="PanelContainer"]
 mouse_filter = 0
 
-[node name="Insets" type="MarginContainer" parent="."]
-layout_mode = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 6
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 6
-
-[node name="Status" type="HBoxContainer" parent="Insets"]
-layout_mode = 2
-theme_override_constants/separation = 20
-
-[node name="Wave" type="Label" parent="Insets/Status"]
-layout_mode = 2
-text = "WAVE --"
-theme_override_font_sizes/font_size = 16
-
-[node name="Credits" type="Label" parent="Insets/Status"]
-layout_mode = 2
-text = "CREDITS --"
-theme_override_font_sizes/font_size = 16
-
-[node name="Spacer" type="Control" parent="Insets/Status"]
+[node name="Status" type="Control" parent="."]
 layout_mode = 2
 mouse_filter = 2
-size_flags_horizontal = 3
 
-[node name="Core" type="Label" parent="Insets/Status"]
-layout_mode = 2
-text = "CORE --"
-theme_override_font_sizes/font_size = 16
+[node name="Credits" type="Label" parent="Status"]
+layout_mode = 0
+text = "CREDITS --"
+text_overrun_behavior = 3
+vertical_alignment = 1
+mouse_filter = 2
 
-[node name="Shortcut" type="Label" parent="Insets/Status"]
+[node name="Citadel" type="VBoxContainer" parent="Status"]
+layout_mode = 0
+theme_override_constants/separation = 2
+alignment = 1
+mouse_filter = 2
+
+[node name="Health" type="Label" parent="Status/Citadel"]
 layout_mode = 2
-text = "CTRL  /  TOWERS"
-theme_override_font_sizes/font_size = 13
+text = "CITADEL --"
+horizontal_alignment = 1
+text_overrun_behavior = 3
+mouse_filter = 2
+
+[node name="Bar" type="ProgressBar" parent="Status/Citadel"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+show_percentage = false
+mouse_filter = 2
+
+[node name="Wave" type="Label" parent="Status"]
+layout_mode = 0
+text = "WAVE --"
+horizontal_alignment = 2
+vertical_alignment = 1
+text_overrun_behavior = 3
+mouse_filter = 2

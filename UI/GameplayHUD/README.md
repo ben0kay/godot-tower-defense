@@ -2,15 +2,15 @@
 
 The HUD runs in the existing **CanvasLayer** from `Main.tscn`, above the hand-painted level. Its job is to **display gameplay state**, not own credits, Citadel durability, wave scheduling, tower prices, or placement mechanics.
 
-## Current implementation (before the planned top-bar refinement)
+## Current implementation
 
-- A permanent `TopBar/` with placeholder Wave, Credits, and `CORE --` labels, plus a Ctrl/Towers shortcut hint. **The current left-to-right order is Wave, Credits, Core**, not the intended final layout.
+- A permanent `TopBar/`: Credits left, Citadel current/max and compact health fill at true viewport center, Wave right. Unknown values remain `--`; the Ctrl hint lives in the build tray.
 - `TowerBar/` opens/closes with **Ctrl** (toggle, not hold); it starts hidden and uses a slide/fade animation.
 - **Battle** opens the working tower placement preview. Laser, Missile, Repair, Solar and Resource buttons are still examples.
 - The **bottom-right Inspector** is separate from the Ctrl tray. Clicking a build-menu button or placed tower can display information; closing the tray must not close the Inspector.
 - The full-screen HUD root ignores mouse events in unused space; its visible controls consume clicks so map placement and camera interaction continue to work.
 
-`GameplayHUD.cs` already exposes **`SetCredits(int amount)`**, **`SetCoreHealth(int current, int maximum)`**, and **`SetWave(int current, int total = 0)`**. They currently update text only; no real economy, Citadel health, or WaveManager is connected. Preserve these existing entry points while refactoring and provide a better-named `SetCitadelHealth` API if useful, with `SetCoreHealth` forwarding to it until all callers are updated.
+`GameplayHUD.cs` already exposes **`SetCredits(int amount)`**, **`SetCoreHealth(int current, int maximum)`**, and **`SetWave(int current, int total = 0)`**. They update their corresponding status zones, including health fill and color; no real economy, Citadel health, or WaveManager is connected. Preserve these existing entry points while refactoring and provide a better-named `SetCitadelHealth` API if useful, with `SetCoreHealth` forwarding to it until all callers are updated.
 
 ## Target: thin, persistent top status bar
 
@@ -99,4 +99,6 @@ GameplayHUD (Control, CanvasLayer parent)
 
 **Acceptance checks:** the three zones are in the requested positions, the center does not shift as left/right numbers grow, and labels stay readable at multiple resolutions; no false gameplay numbers appear before systems exist; simulated calls to each setter update only the proper zone, including Citadel bar fill/thresholds; the Ctrl build menu, Battle Tower placement, Inspector, camera interactions and Enemy001 combat remain unaffected.
 
-**Status:** this README describes the *requested* top-bar revision. It is **not yet implemented in `TopBar.tscn`**; wave progression, credits economy and Citadel HP gameplay do not exist yet.
+**Status:** the HUD-only pass is implemented. SetCitadelHealth displays clamped current/max health and inclusive warning/critical thresholds; SetCoreHealth forwards to it. Missing maximum hides the bar and restores CITADEL --. No wave progression, economy or Citadel HP gameplay exists yet.
+
+TopBar/Status uses independent side labels and a center block. Resize events reserve disjoint zones, scale fonts on narrow windows and truncate overflow without shifting the objective. UIMasterConfig exposes status font/gap, Citadel block/bar dimensions and health colors/thresholds. TESTS/HudTowerChecks exercises placeholders, setters, 1920/1366/640 widths, thresholds and independent tray/Inspector behavior.
