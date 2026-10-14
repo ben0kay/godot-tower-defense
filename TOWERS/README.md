@@ -6,7 +6,7 @@ Umbrella folder for **every player-buildable tower**, not just weapons: offensiv
 
 **Implemented:** 1×1 grid-snapped Battle Tower placement/selection, tile-aware placement restrictions, a saved `BattleTowerConfig` Resource, First/Closest target selection, cooldown-based automatic shooting and guided test projectiles that damage Enemy001. The shared `FEEDBACK/DefenseBars/` component currently works on enemies and can be reused when towers become damageable.
 
-**Not yet implemented:** the Battle Tower sprite **does not rotate toward its target**; shots launch from the center regardless of visual aim. `BuildCost` is a display-only integer with **no credit deduction**. Upgrades, resource inventory, upgrade buttons, tower health/damage, and tower selling gameplay are not implemented. `TowerMasterConfig.AllowUpgrades`, `AllowSelling` and sell refund values are future rules, not proof those mechanics work.
+**Already implemented since the original rotation plan:** the Battle Tower has a rotating `TurretPivot`, reusable `TurretAiming` and Inspector-editable turning speed/aim tolerance. **Not yet implemented:** `BuildCost` is a display-only integer with **no credit deduction**. Upgrades, resource inventory, upgrade buttons, tower health/damage, and tower selling gameplay are not implemented. `TowerMasterConfig.AllowUpgrades`, `AllowSelling` and sell refund values are future rules, not proof those mechanics work.
 
 **Codex: read `NOTES/CodePreferences.md`, this file, `Offensive/BattleTower/README.md`, `Shared/README.md` and the current code before implementing.** Favor lightweight reusable C# code and Inspector-configurable Resources; do not replace or break the working HUD, navigation, place/select flow, or Enemy001 combat.
 
@@ -32,8 +32,7 @@ TOWERS/
 │   ├── TowerBase.cs                         # Planned: identity, instance state, upgrade level
 │   ├── TowerDefinition.cs                   # Planned: shared data for any tower type
 │   ├── Costs/
-│   │   ├── TowerCostEntry.cs                # Planned: resource identifier + amount
-│   │   └── README.md
+│   │   └── README.md                        # Planned: tower cost usage; shared entries live in ECONOMY/Transactions/
 │   ├── Upgrades/
 │   │   ├── TowerUpgradeTier.cs              # Planned: next-level cost and effect data
 │   │   ├── TowerUpgradeController.cs        # Planned: shared upgrade/validation logic
@@ -59,11 +58,9 @@ TOWERS/
 
 Keep the actual economy/inventory service **outside** `TOWERS/`; multiple game systems will eventually spend and award the same resources. The entries in `Shared/Costs/` describe a price, not a wallet.
 
-## Phase 1 — Make the Battle Tower rotate toward its target
+## Phase 1 — Battle Tower rotation (already implemented)
 
-**This is the immediate next task**; implement it before costs or upgrades.
-
-Today `BattleTower.cs` acquires targets and fires bullets but doesn't turn the art. Add a lightweight reusable turret-aiming helper in `Shared/Weapons/` that **only weapon-capable towers opt into**. Never require a weapon or targeting loop on Repair, Radar, Solar or other passive towers.
+**Already implemented:** `BattleTower.cs` uses `Shared/Weapons/TurretAiming.cs` with a rotating visual `TurretPivot`, Inspector settings and aim tolerance. The following notes document the intended behavior; **Codex must not implement a duplicate rotation system.** Weapon behavior remains optional for non-offensive towers. Never require a weapon or targeting loop on Repair, Radar, Solar or other passive towers.
 
 - Preserve existing `TowerTargeting` (First/Closest), range checks, staggered searches, `ShotsPerSecond`, damage and projectile speed.
 - Add Inspector-exported **`RotationSpeedDegrees`** (initially **180 degrees/sec**), **`AimToleranceDegrees`** (initially **12 degrees**) and `RotateWhileTracking` (default true). Optionally provide an idle-rotation policy, default disabled.
@@ -86,6 +83,31 @@ BattleTower (root: fixed grid/world position)
 
 **Acceptance:** F5 → Ctrl → build Battle Tower → F2 spawns Enemy001 → tower visibly and smoothly turns toward moving targets at the set speed; fires only after achieving its allowed aim; retains existing targeting/damage/cooldown and scene Inspector controls. No C# compile errors or unintentional sprite/grid rotations.
 
+## Economy foundation for Codex — folder now exists
+
+The standalone **`ECONOMY/`** umbrella folder now exists alongside `TOWERS/`:
+
+```text
+ECONOMY/
+├── EconomyMasterConfig.cs            # Shared balance limits, currently not connected
+├── DefaultEconomyConfig.tres
+├── README.md                         # Canonical economy implementation handoff
+├── Resources/
+│   ├── ResourceDefinition.cs         # Reusable typed resource identity/metadata
+│   ├── Credits.tres                  # First resource asset, ID 'credits'
+│   └── README.md
+├── Wallet/
+│   └── README.md                     # Planned EconomyManager.cs; no runtime wallet yet
+└── Transactions/
+    └── README.md                     # Planned ResourceCost.cs and atomic spend/grant
+```
+
+**Do not confuse `TOWERS/Economy/` (buildable Solar/Resource/Refinery tower TYPES) with `ECONOMY/` (game-wide credits/resources, wallet and transactions).** The economy system must not live on any particular tower or inside the HUD.
+
+Codex should read **`ECONOMY/README.md` first** when implementing balances and tower costs. Define per-level starting balances on the existing `WORLD/LEVELS/LevelConfig.cs` and `.tres` resources, not in the global economy config. Connect a single level/session-scoped runtime wallet to `UI/GameplayHUD/GameplayHUD.SetCredits` using event-driven updates. `TOWERS/Placement` can then validate affordability and deduct typed costs atomically, while retaining its terrain and navigation connectivity checks. Upgrades must use the exact same shared cost-entry type.
+
+The basic `ResourceDefinition.cs` and `Credits.tres` are **data scaffolds only**; `EconomyManager`, `ResourceCost` and transactions are Codex's implementation task. The Battle Tower's existing `BuildCost=100` remains display-only until Codex migrates it to a 100-Credits entry. Do not charge twice.
+
 ## Phase 2 — Shared multi-resource construction costs (data foundation first)
 
 Replace the long-term single-resource `BattleTowerConfig.BuildCost` model with an **Inspector-editable collection of cost entries** shared by *all* towers. Credits should be the default resource; extra materials should be optional.
@@ -102,8 +124,8 @@ Solar Tower — ConstructionCosts
   [1] Resource: EnergyCell Amount: 2       # Optional example
 ```
 
-- Proposed `TowerCostEntry : Resource` includes a stable resource identifier (or future reference to a reusable `ResourceDefinition`) and non-negative integer amount. Prefer a typed reusable Resource asset/reference as the economy system matures; avoid scattered magic strings and resource-name comparisons in gameplay code.
-- Export `Godot.Collections.Array<TowerCostEntry>` (or an equally Inspector-friendly collection) in the tower's definition/config. A tower may require only Credits or multiple resource types.
+- **Use one shared typed cost-entry Resource**: implement `ECONOMY/Transactions/ResourceCost.cs` referencing the already scaffolded `ECONOMY/Resources/ResourceDefinition.cs` asset and a non-negative amount. Reuse it for tower construction and upgrades rather than also defining a competing `TowerCostEntry` type. Cost entries describe requirements; `ECONOMY/Wallet/` owns balances and payment validation.
+- Export `Godot.Collections.Array<ResourceCost>` (or an equally Inspector-friendly collection) in the tower's definition/config. A tower may require only Credits or multiple resource types.
 - Use the **same cost entry shape** for build costs **and upgrade costs**. The UI should eventually show missing resources and affordability clearly.
 - **Migration:** preserve today's 100-credit Battle Tower price when converting from `BuildCost`; don't accidentally charge both the old integer and the new cost array. Decide the one authoritative source; keep temporary compatibility only if needed.
 - Later, after terrain/route validation, the shared economy service should **validate and deduct the complete cost atomically** before committing a tower/upgrade. On any failure, no partial deduction or partially placed tower. Successful sale/refund should use recorded paid costs and the existing shared sell refund rules where appropriate.
@@ -134,7 +156,7 @@ Keep actual progression per tower editable in Resources, not in a global switch 
 
 ## Implementation order for Codex
 
-1. **Do Phase 1 first:** reusable turret rotation, correct art-facing angle, aim tolerance and Inspector settings. Verify firing against Enemy001.
+1. **Phase 1 is already implemented:** check existing turret aiming only for regressions; do not rebuild it. Start new implementation with `ECONOMY/README.md` and **Phase 2** (resource balances and construction costs).
 2. **Then Phase 2:** define shared typed construction cost entries with optional secondary resources; migrate the Battle Tower's displayed cost without enabling real economy spending.
 3. **Then Phase 3:** establish generic upgrade/tier Resources and instance state, later adding build/upgrade economy transactions and HUD upgrades in a separate focused pass.
 4. Update corresponding per-feature README files when each feature actually exists, and add focused tests for aiming tolerance/cooldown, cost migration, instance isolation and upgrade level changes.
@@ -147,7 +169,5 @@ Keep actual progression per tower editable in Resources, not in a global switch 
 - `DefaultTowerConfig.tres`: shared placement preview/selection range toggles and future upgrade/sell switches.
 - `FEEDBACK/DefenseBars/DefaultDefenseBarConfig.tres`: reusable health bar appearance when towers become damageable.
 
-**This README is the implementation specification, not evidence that Phases 1–3 have been coded.**
+**Current status:** turret rotation (Phase 1) works; economy/typed costs (Phase 2) and upgrades (Phase 3) are planned. The new `ECONOMY/` folder contains scaffolding only, not runtime wallet or purchasing logic.
 
-## Implemented Phase 1
-BattleTower now uses the shared Weapons/TurretAiming helper and a child TurretPivot. Its Inspector Aiming group controls speed, tolerance and tracking. Existing targeting, cooldown and center-spawned guided bullets remain in use. Costs, upgrades and other phases remain future work.
