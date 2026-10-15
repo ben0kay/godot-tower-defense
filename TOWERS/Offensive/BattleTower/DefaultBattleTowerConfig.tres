@@ -3,11 +3,7 @@
 [ext_resource type="Script" uid="uid://cin5m60oapsu1" path="res://TOWERS/Offensive/BattleTower/BattleTowerConfig.cs" id="1_config"]
 [ext_resource type="Script" uid="uid://dijgxk6tq64p5" path="res://ECONOMY/Transactions/ResourceCost.cs" id="2_cost"]
 [ext_resource type="Resource" path="res://ECONOMY/Resources/Credits.tres" id="3_credits"]
-
-[ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/Upgrades/Level2.tres" id="4_level2"]
-[ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/Upgrades/Level3.tres" id="5_level3"]
-
-[ext_resource type="Script" path="res://TOWERS/Shared/Upgrades/TowerUpgradeTier.cs" id="6_tier"]
+[ext_resource type="Script" uid="uid://dbguch1a3weqm" path="res://TOWERS/Shared/Upgrades/TowerUpgradeTier.cs" id="6_tier"]
 
 [sub_resource type="Resource" id="Resource_credit_cost"]
 script = ExtResource("2_cost")
@@ -17,4 +13,3 @@ Amount = 200
 [resource]
 script = ExtResource("1_config")
 ConstructionCosts = Array[ExtResource("2_cost")]([SubResource("Resource_credit_cost")])
-UpgradeTiers = Array[ExtResource("6_tier")]([ExtResource("4_level2"), ExtResource("5_level3")])

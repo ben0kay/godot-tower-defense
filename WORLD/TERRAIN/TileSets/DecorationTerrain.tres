@@ -1,4 +1,4 @@
-[gd_resource type="TileSet" format=3]
+[gd_resource type="TileSet" format=3 uid="uid://bwnwc1jg7xakk"]
 
 [ext_resource type="Texture2D" uid="uid://dkyx0lp88jisq" path="res://WORLD/TERRAIN/Tiles/Metal/prototype_atlas.svg" id="1"]
 

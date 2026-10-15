@@ -4,5 +4,4 @@
 
 [resource]
 script = ExtResource("1")
-MaxShield = 100.0
 KillRewardCredits = 3
