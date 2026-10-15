@@ -1,4 +1,4 @@
-// Editable finite test encounters: only Enemy001 exists in this first wave pass.
+// Editable Level001 test encounters: currently Enemy001-only; other enemy types are registered.
 using static WaveBuilder;
 
 public static class Level001Waves

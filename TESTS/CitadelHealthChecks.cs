@@ -30,9 +30,11 @@ public static class CitadelHealthChecks
             Enemy arrival = spawns.Spawn(scene, true);
             Require(arrival != null && arrival.Definition.CitadelDamage == 1, "Enemy001 has 1 arrival damage");
             arrival.Movement.SetPhysicsProcess(false); arrival.Arrive();
-            Require(health.CurrentHealth == 9 && label.Text == "CITADEL 9 / 10" && bar.Value == 90,
-                "An actual arrival applies enemy-configured damage and immediately updates HUD");
-            int afterArrival = changed;
+            Require(health.CurrentHealth == 9 && label.Text == "CITADEL 9 / 10" && bar.Value <= 100 && bar.Value >= 90,
+                "An actual arrival applies damage, updates health text immediately and begins the bar transition");
+            hud.SetCitadelHealth(9, 10, false);
+        Require(bar.Value == 90, "Citadel bar has the correct destination value when the transition is snapped");
+        int afterArrival = changed;
             arrival.Arrive(); arrival.TakeDamage(9999);
             Require(health.CurrentHealth == 9 && changed == afterArrival,
                 "Repeated arrival or post-arrival hits never subtract additional HP");

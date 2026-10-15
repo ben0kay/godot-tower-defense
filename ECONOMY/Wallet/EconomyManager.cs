@@ -145,7 +145,12 @@ public partial class EconomyManager : Node
         }
         finally { _transactionActive = false; }
         if (committed)
+        {
             foreach (var pair in totals) EmitSignal(SignalName.BalanceChanged, pair.Key, _balances[pair.Key]);
+            if (totals.TryGetValue(CreditsResource.ResourceId, out int spent) &&
+                spent > 0 && GodotObject.IsInstanceValid(_hud))
+                _hud.ShowCreditExpense(spent);
+        }
         return committed;
     }
 

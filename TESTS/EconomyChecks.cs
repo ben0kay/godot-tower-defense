@@ -13,7 +13,7 @@ public static class EconomyChecks
         GameplayHUD hud = battle.GetNode<GameplayHUD>("UI/GameplayHUD");
         Label label = hud.GetNode<Label>("TopBar/Status/Credits");
         Require(wallet.GetBalance(credits) == grid.Level.Settings.StartingCredits, "Live level seeds its wallet");
-        Require(label.Text == $"CREDITS {wallet.GetBalance(credits):N0}", "HUD starts with the actual credit balance");
+        Require(label.Text == $"Credits: {wallet.GetBalance(credits):N0}", "HUD starts with the actual credit balance");
         wallet.Initialize(new LevelConfig { StartingCredits = 700 });
         Require(wallet.GetBalance(credits) == 700, "First level uses its starting amount");
         ResourceDefinition alloy = new() { ResourceId = "alloy", DisplayName = "Alloy" };
@@ -23,6 +23,9 @@ public static class EconomyChecks
 
         var duplicate = Costs((credits, 100), (credits, 150));
         Require(wallet.TrySpend(duplicate) && wallet.GetBalance(credits) == 150, "Duplicate IDs charge the combined amount once");
+        CreditGainIndicator gain = hud.GetNode<CreditGainIndicator>("TopBar/Status/CreditGain");
+        Require(gain.Text == "(-250)" && gain.IsExpense,
+            "Committed credit spending produces one amber inline expense popup");
         Require(!wallet.TrySpend(Costs((credits, 100), (alloy, 1))) && wallet.GetBalance(credits) == 150,
             "Insufficient secondary material causes no partial deduction");
         Require(!wallet.TrySpend(Costs((credits, -1))) && !wallet.TrySpend(Costs((null, 0))),
@@ -39,7 +42,7 @@ public static class EconomyChecks
         wallet.BalanceChanged += Changed;
         Require(wallet.TrySpend(Costs((credits, 50), (alloy, 2))) && allCommittedAtEvent, "Events observe the fully committed multi-resource payment");
         wallet.BalanceChanged -= Changed;
-        Require(label.Text == "CREDITS 100", "Credit changes push the HUD without polling");
+        Require(hud.TargetCredits == 100 && label.Text.StartsWith("Credits: "), "Credit target updates without polling while the visual number counts");
         Require(!wallet.TryPurchase(Costs((credits, 50)), () => false) && wallet.GetBalance(credits) == 100,
             "Failed build callback leaves funds untouched");
         try { wallet.TryPurchase(Costs((credits, 50)), () => throw new InvalidOperationException("Test creation failure")); }

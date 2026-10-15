@@ -15,12 +15,22 @@ public static class HudTowerChecks
         Label health = hud.GetNode<Label>("TopBar/Status/Citadel/Health");
         ProgressBar bar = hud.GetNode<ProgressBar>("TopBar/Status/Citadel/Bar");
         CitadelHealth citadel = battle.GetNode<CitadelSession>("CitadelSession").Health;
-        Require(credits.Text == $"CREDITS {battle.GetNode<EconomyManager>("Economy").GetBalance(battle.GetNode<EconomyManager>("Economy").CreditsResource):N0}" && wave.Text == "WAVE 00 / 03" &&
+        Require(hud.TargetCredits == battle.GetNode<EconomyManager>("Economy").GetBalance(battle.GetNode<EconomyManager>("Economy").CreditsResource) &&
+            credits.Text.StartsWith("Credits: ") && wave.Text == "WAVE 00 / 03" &&
             health.Text == $"CITADEL {citadel.CurrentHealth:N0} / {citadel.MaxHealth:N0}" && bar.Visible,
             "HUD shows authoritative live credits and Citadel HP with prepared wave state");
-        hud.SetCredits(12345678); hud.SetWave(100); hud.SetCitadelHealth(800, 1000);
-        Require(credits.Text.Contains("12") && wave.Text == "WAVE 100" && bar.Value == 80,
+        hud.SetCredits(12345678, true); hud.SetWave(100); hud.SetCitadelHealth(800, 1000, false);
+        Require(credits.Text == $"Credits: {12345678:N0}" && wave.Text == "WAVE 100" && bar.Value == 80,
             "Status setters update their respective zones");
+        hud.SetCredits(100, true); hud.SetCredits(300);
+        Require(hud.TargetCredits == 300 && credits.Text == "Credits: 100",
+            "Wallet target updates instantly while the visible credit number is still easing");
+        hud._Process(hud.Config.CreditCountSeconds + 0.02);
+        Require(credits.Text == "Credits: 300", "Credit balance animation converges to its exact target");
+        hud.SetCredits(12345678, true);
+        hud.SetWave(101);
+        Require(wave.Scale.X > 1f, "A newly advanced wave pulses the number without affecting wave state");
+
         foreach (int width in new[] {1920, 1366, 640})
         {
             Control status = hud.GetNode<Control>("TopBar/Status");
@@ -34,25 +44,29 @@ public static class HudTowerChecks
         // Cosmetic feedback does not alter the authoritative credit balance.
         hud.ResetCreditReward();
         hud.ShowCreditReward(5); hud.ShowCreditReward(5);
-        Require(reward.Visible && reward.AccumulatedReward == 10 && reward.Text == "+10",
+        Require(reward.Visible && reward.AccumulatedReward == 10 && reward.Text == "(+10)" && reward.Scale.X > 1f,
             "Back-to-back gains stack into one top-left popup");
         reward._Process(hud.Config.CreditRewardStackSeconds + 0.01);
         hud.ShowCreditReward(5);
-        Require(reward.AccumulatedReward == 5 && reward.Text == "+5",
+        Require(reward.AccumulatedReward == 5 && reward.Text == "(+5)",
             "A quiet interval starts a fresh credit gain stack");
         reward._Process(hud.Config.CreditRewardStackSeconds + hud.Config.CreditRewardFadeSeconds + 0.01);
         Require(!reward.Visible && reward.AccumulatedReward == 0,
             "Credit gain popup fades, hides and stops retaining an expired stack");
         hud.ResetCreditReward();
+        hud.ShowCreditExpense(200);
+        Require(reward.Visible && reward.Text == "(-200)" && reward.IsExpense,
+            "Successful spend feedback uses one amber negative popup");
+        hud.ResetCreditReward();
 
         hud.SetCoreHealth(-10, 100);
         Require(bar.Value == 0 && ((StyleBoxFlat)bar.GetThemeStylebox("fill")).BgColor == hud.Config.HealthCriticalColor,
             "Compatibility API clamps health and applies critical color");
-        hud.SetCitadelHealth(50, 100);
+        hud.SetCitadelHealth(50, 100, false);
         Require(((StyleBoxFlat)bar.GetThemeStylebox("fill")).BgColor == hud.Config.HealthWarningColor, "Warning threshold is inclusive");
-        hud.SetCitadelHealth(200, 100); Require(bar.Value == 100, "Over-healing clamps fill");
-        hud.SetCitadelHealth(0, 0); Require(!bar.Visible && health.Text == "CITADEL --", "Missing maximum is safe");
-        hud.SetCitadelHealth(citadel.CurrentHealth, citadel.MaxHealth); // Restore live display after synthetic setter tests.
+        hud.SetCitadelHealth(200, 100, false); Require(bar.Value == 100, "Over-healing clamps fill");
+        hud.SetCitadelHealth(0, 0, false); Require(!bar.Visible && health.Text == "CITADEL --", "Missing maximum is safe");
+        hud.SetCitadelHealth(citadel.CurrentHealth, citadel.MaxHealth, false); // Restore live display after synthetic setter tests.
         hud.ShowTowerDetails("Test", "Offensive", "Test");
         hud.SetTowerBarOpen(true, true); hud.SetTowerBarOpen(false, true);
         Require(hud.GetNode<Control>("BottomArea/Inspector").Visible, "Tray close preserves Inspector");

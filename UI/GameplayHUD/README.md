@@ -25,6 +25,6 @@ Category filtering, extra inventories, selling, tower health and new weapon type
 
 Phase 4C-2 registers real Laser Tower beside Battle Tower; its generated entry/Inspector/upgrade action require no generic HUD or placement branches. Laser displays effective DPS/range and Energy type rather than projectile rate/damage.
 
-## Credit reward popup
+## Top-bar polish
 
-`TopBar/CreditGainIndicator.cs` shows a temporary green `+credits` below the balance. It combines grants made within the UI-configured 0.8-second quiet window, then floats upward and fades. The authoritative Credits label still updates immediately. See `TopBar/README.md` for configuration, wallet integration and regression coverage.
+Credits use `Credits: 250 (+10)` inline, with a quick pulse/glow on repeated rewards and amber `(-200)` feedback for successful spending. The displayed balance counts smoothly to the already-committed wallet amount. Citadel HP text flashes and its bar eases on damage; newly advanced wave numbers briefly brighten and pulse. All values and animation durations are Inspector-editable under `UI/DefaultUIConfig.tres`; see `TopBar/README.md`. No combat or economy balance rules have been changed.

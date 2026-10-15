@@ -11,7 +11,7 @@ mouse_filter = 2
 
 [node name="Credits" type="Label" parent="Status"]
 layout_mode = 0
-text = "CREDITS --"
+text = "Credits: --"
 text_overrun_behavior = 3
 vertical_alignment = 1
 mouse_filter = 2
@@ -20,6 +20,7 @@ mouse_filter = 2
 visible = false
 layout_mode = 0
 mouse_filter = 2
+text_overrun_behavior = 3
 z_index = 2
 script = ExtResource("1_reward")
 
