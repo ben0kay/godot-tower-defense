@@ -6,7 +6,7 @@ Only 1×1 is supported. WorldGrid terrain/occupancy/reservations and SpawnManage
 
 ConstructionCosts on the type config is the sole price. Wallet/config events refresh preview affordability; cursor movement does not aggregate prices each frame. Selected identity/stats/tiers and previews come from the actual instance. Types format their capability-specific stats; range draws only when InspectionRange exists. Paid upgrades preserve aim/cooldown/navigation and use the same resolver as preview. A type with no tiers shows No upgrades available.
 
-Ctrl toggles the independent tray; left-click builds repeatedly, right-click/Esc cancels; selecting a world instance opens the independent Inspector. Test-only PassiveTestTower proves paid nonweapon placement without turret nodes.
+Ctrl opens the tray or closes it and immediately cancels active placement. Left-click builds repeatedly; right-click/Esc clears the placement ghost and build-preview Inspector while leaving the tray open. Reopening the tray requires a fresh tower choice; selecting a world instance opens the independent Inspector. Test-only PassiveTestTower proves paid nonweapon placement without turret nodes.
 
 ## Startup recovery
 

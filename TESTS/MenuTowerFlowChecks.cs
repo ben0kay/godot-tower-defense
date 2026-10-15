@@ -36,6 +36,23 @@ public partial class MenuTowerFlowChecks : Node
             Require(hud.GetBuildButton("battle") != null && hud.GetBuildButton("blaster_cannon") != null && hud.GetBuildButton("shockwave") != null && wallet.GetBalance(wallet.CreditsResource) == 1000,
                 "Campaign launch initializes default catalog and level wallet");
             hud.GetBuildButton("battle").EmitSignal(Button.SignalName.Pressed);
+            PanelContainer tray = hud.GetNode<PanelContainer>("BottomArea/TraySlot/TowerBar");
+            Sprite2D ghost = placement.GetNode<Sprite2D>("PlacementGhost");
+            hud.SetTowerBarOpen(true, true);
+            ghost.Show(); // Headless cursor position is outside the map; exercise preview cleanup explicitly.
+            placement._Input(new InputEventMouseButton { ButtonIndex = MouseButton.Right, Pressed = true });
+            Require(tray.Visible && !ghost.Visible && !placement.IsProcessing() && !hud.IsInspectionVisible,
+                "RMB clears placement and build details while leaving the tray open");
+            hud.GetBuildButton("battle").EmitSignal(Button.SignalName.Pressed);
+            ghost.Show();
+            hud._UnhandledKeyInput(new InputEventKey { Keycode = Key.Ctrl, Pressed = true });
+            Require(!ghost.Visible && !placement.IsProcessing() && !hud.IsInspectionVisible,
+                "Ctrl immediately cancels placement before the close animation ends");
+            await ToSignal(GetTree().CreateTimer(0.5), SceneTreeTimer.SignalName.Timeout);
+            Require(!tray.Visible, "Ctrl closes the build tray");
+            hud._UnhandledKeyInput(new InputEventKey { Keycode = Key.Ctrl, Pressed = true });
+            Require(tray.Visible && !ghost.Visible && !placement.IsProcessing(), "Reopening the tray does not resume placement");
+            hud.GetBuildButton("battle").EmitSignal(Button.SignalName.Pressed);
             bool placed = false;
             foreach (Vector2I cell in grid.Level.Passable.GetUsedCells())
                 if (grid.PlacementFailure(cell).Length == 0 && spawns.PlacementFailure(cell).Length == 0)
@@ -45,6 +62,8 @@ public partial class MenuTowerFlowChecks : Node
             BattleTower tower = battlefield.GetNode("World/Towers").GetChild<BattleTower>(0);
             Require(tower.UpgradeLevel == 2 && tower.FinalStats.DamagePerShot == 16 && wallet.GetBalance(wallet.CreditsResource) == 650,
                 "Menu-launched paid Upgrade action uses the same pipeline and wallet");
+            hud.SetTowerBarOpen(false, true);
+            Require(hud.IsInspectionVisible, "Closing the tray preserves placed-tower inspection");
             GD.Print("PASS: Boot → Main → Campaign → Level001 real button flow, catalog build and paid Battle upgrade (no save writes)");
             GetTree().Quit(0);
         }

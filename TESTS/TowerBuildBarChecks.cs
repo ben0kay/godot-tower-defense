@@ -50,7 +50,7 @@ public static class TowerBuildBarChecks
         scroll.EnsureControlVisible(last);
         Require(scroll.ScrollHorizontal > 0, "Last registered entry is reachable via scrolling");
         hud.SetTowerBarOpen(false, true);
-        Require(hud.IsInspectionVisible, "Closing large tray preserves independent Inspector");
+        Require(!hud.IsInspectionVisible, "Closing large tray clears active build-preview Inspector");
         placement.Call("CancelPlacement");
         TowerCatalog empty = new(); empty.Rebuild(); hud.BindCatalog(empty);
         Require(hud.GetBuildButton("variant-39") == null && entries.GetChildCount() == 1,

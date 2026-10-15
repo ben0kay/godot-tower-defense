@@ -63,6 +63,7 @@ public partial class TowerPlacementController : Node2D
         AddChild(_ghost);
         _economy.BalanceChanged += OnBalanceChanged;
         _hud.TowerChoiceRequested += OnTowerChoiceRequested;
+        _hud.TowerBarClosed += CancelPlacement;
         _hud.TowerUpgradeRequested += OnUpgradeRequested;
         SetProcessUnhandledInput(true);
     }
@@ -72,7 +73,7 @@ public partial class TowerPlacementController : Node2D
     public override void _ExitTree()
     {
         if (GodotObject.IsInstanceValid(_hud))
-        { _hud.TowerChoiceRequested -= OnTowerChoiceRequested; _hud.TowerUpgradeRequested -= OnUpgradeRequested; }
+        { _hud.TowerBarClosed -= CancelPlacement; _hud.TowerChoiceRequested -= OnTowerChoiceRequested; _hud.TowerUpgradeRequested -= OnUpgradeRequested; }
         if (GodotObject.IsInstanceValid(_economy)) _economy.BalanceChanged -= OnBalanceChanged;
         if (GodotObject.IsInstanceValid(_buildDefinition?.DefaultConfig)) _buildDefinition.DefaultConfig.Changed -= OnPreviewConfigChanged;
         if (GodotObject.IsInstanceValid(_selected))
@@ -139,9 +140,10 @@ public partial class TowerPlacementController : Node2D
     }
 
     // =========================================================
-    // Exit build mode without closing the independent Inspector or tower tray.
+    // Clear build previews without closing the tray or a placed-tower Inspector.
     private void CancelPlacement()
     {
+        if (_placing && _selected == null) _hud.ClearInspection();
         _placing = false;
         _previewVisible = false;
         _previewValid = false;
@@ -152,6 +154,16 @@ public partial class TowerPlacementController : Node2D
     #endregion
 
     #region World Input
+    // =========================================================
+    // RMB cancels placement even when the cursor is over the build tray or Inspector.
+    public override void _Input(InputEvent input)
+    {
+        if (!_placing || input is not InputEventMouseButton mouse || !mouse.Pressed
+            || mouse.ButtonIndex != MouseButton.Right) return;
+        CancelPlacement();
+        GetViewport().SetInputAsHandled();
+    }
+
     // =========================================================
     // Unhandled world clicks only; GUI panels consume mouse events independently.
     public override void _UnhandledInput(InputEvent input)
@@ -164,12 +176,6 @@ public partial class TowerPlacementController : Node2D
             return;
         }
         if (input is not InputEventMouseButton mouse || !mouse.Pressed || IsOverUi()) return;
-        if (mouse.ButtonIndex == MouseButton.Right && _placing)
-        {
-            CancelPlacement();
-            GetViewport().SetInputAsHandled();
-            return;
-        }
         if (mouse.ButtonIndex != MouseButton.Left) return;
 
         Vector2I cell = _grid.WorldToCell(GetGlobalMousePosition());

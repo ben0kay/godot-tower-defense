@@ -21,6 +21,10 @@ public partial class GameplayHUD : Control
     [Signal] public delegate void TowerUpgradeRequestedEventHandler();
     #endregion
 
+    // =========================================================
+    // Closing the build tray also ends any active placement in its owning controller.
+    [Signal] public delegate void TowerBarClosedEventHandler();
+
     public bool IsInspectionVisible => _inspector?.Visible == true;
 
     #region Cached Nodes
@@ -104,6 +108,7 @@ public partial class GameplayHUD : Control
     public void SetTowerBarOpen(bool open, bool immediate = false)
     {
         _trayOpen = open;
+        if (!open) EmitSignal(SignalName.TowerBarClosed);
         _trayTween?.Kill();
         if (open) _towerBar.Show();
 
