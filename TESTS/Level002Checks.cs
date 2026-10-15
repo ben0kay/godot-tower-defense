@@ -29,7 +29,7 @@ public static class Level002Checks
             Require(wallTile != null && wallTile.GetCustomData("can_build").AsBool() &&
                 wallTile.GetCustomData("blocks_enemies").AsBool(),
                 "Maze walls are buildable Foundation, not ordinary unbuildable obstacles");
-            Require(ground.Contains(new(60, 25)) && foundation.Contains(new(60, 27)) &&
+            Require(ground.Contains(new(60, 25)) && foundation.Contains(new(61, 27)) &&
                 ground.Contains(new(74, 37)) && ground.Contains(new(73, 37)) && ground.Contains(new(72, 37)),
                 "Single-lane and three-wide corridors exist in the maze");
             var approaches = new HashSet<Vector2I>() { new(89, 40), new(91, 38), new(93, 40), new(91, 42) };
