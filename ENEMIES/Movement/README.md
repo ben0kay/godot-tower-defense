@@ -45,3 +45,7 @@ Navigation owns one extra shared neutral A* grid, never one per ship. Its point 
 ## Swept Interactive Terrain
 
 Each clearance-approved movement segment reports its actual endpoints, travel duration (distance/speed) and offset within the physics tick to the world's InteractiveTileManager when Lava exists. A lethal entry/periodic encounter stops the loop before committing the planned endpoint. Ordinary movement retains the shared registry's spatial update; direct position assignments remain teleports and do not traverse intervening hazards. The late terrain manager accounts for only the remaining stationary time of active occupants, including stopped/waiting enemies. No Lava routing weights or A* changes are introduced. See WORLD/TERRAIN/Interactive/README.md.
+
+## F3 route preview — implemented
+
+`RoutePreviewJob` performs bounded debug queries against the production shared A* profiles, then optional production EnemyRoute refinements. `RoutePreviewOverlay` owns one cached world drawing and a debug-only control panel. Open F3, choose portal/type/sample count and Raw/Refined, then Simulate Paths; Clear/F3 removes results. Neutral comparison, distance overhead, duplicate labels and failure diagnostics are included. Samples do not consume live assignment streams or wave RNG, spawn ships or modify live routes. Input/settings/navigation changes discard cached output; an active congestion snapshot change cancels partial work. No checkpoints are implemented. See pathoverlay_tweaks.md and TESTS/RoutePreview.md.

@@ -13,6 +13,7 @@ For rapid map or combat testing, open `Main.tscn` (Level001) or `MainLevel002.ts
 - WASD/arrows: move camera; middle mouse: pan; mouse wheel: zoom.
 - Ctrl: toggle tower build tray. Choose Battle, Laser or Blaster Cannon, left-click valid cells to place, right-click/Escape to cancel; select towers to inspect them.
 - F2: cycle the enemy catalog through the level's debug system.
+- F3: open Route Preview; choose portal/enemy/path samples and click Simulate Paths (debug only).
 - Start/Next Wave: use the top-right wave button.
 
 ## Configuration and structure

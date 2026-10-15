@@ -11,6 +11,7 @@ public partial class NavigationGrid : Node
     public readonly List<Vector2I> Goals = new();
     [Export] public EnemyMasterConfig Config { get; set; }
     public int CostRevision { get; private set; }
+    public int CongestionRevision => _crowdRevision;
     public const int NeutralProfile = -1;
     public int SharedProfileCount => _profiles.Count - 1;
     public int TotalSharedProfileCount => _profiles.Count;
@@ -130,6 +131,15 @@ public partial class NavigationGrid : Node
                 * profile.AStar.GetPointWeightScale(cells[i]);
         }
         return points;
+    }
+
+    // =========================================================
+    // Debug queries share deterministic caches but leave live path-manager timing diagnostics unchanged.
+    public Vector2[] FindPreviewPath(Vector2 position, Vector2I goal, int profile, out float cost)
+    {
+        double previous = LastAStarMilliseconds;
+        try { return FindPath(position, goal, profile, out cost); }
+        finally { LastAStarMilliseconds = previous; }
     }
 
     // =========================================================

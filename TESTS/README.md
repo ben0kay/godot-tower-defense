@@ -200,3 +200,7 @@ Resumed verification after rebasing onto3c1c759: direct C# compilation and Enemy
 ## Level002 five-portal maze
 
 `Level002Checks.Run()` verifies the authored 100×80 TileMap geometry, five configured portals, Citadel approaches, representative one- and three-cell-wide corridors, buildable solid Foundation walls, passable ground, all five portal-to-Citadel routes and the four registered level002 test waves. Launch via Campaign → Play Level 002 or F6 on `MainLevel002.tscn`. The existing standalone Level001 integration path remains unchanged.
+
+## Route preview
+
+Run `RoutePreviewChecks.tscn` for the F3 debug controls and bounded deterministic planning on both campaign levels, including 500-ship isolation. See `RoutePreview.md` for usage, timings and the independently reproduced upstream Level002 map-test failure.

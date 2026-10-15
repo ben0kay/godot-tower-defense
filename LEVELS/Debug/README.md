@@ -25,3 +25,9 @@ The HUD shows living/killed/arrived ships, queued paths and source failures, alo
 Debug only calls the production SpawnManager; navigation, enemy state and weapons remain normal gameplay services outside Debug. Future level-specific debug controls belong under this same parent. WorldGrid owns its optional grid/hover drawing via WorldMasterConfig.
 
 F2 cycles **catalog scene order**, not the internal `EnemyId`, display name or intended wave order. Changing an enemy's gameplay ID does not alter the F2 sequence.
+
+## F3 route preview
+
+With Debug.Enabled and live world services, **F3** opens a small panel below the existing debug readout. Select an active portal, enemy type, 1–12 samples and Final Refined/Raw A*, then **Simulate Paths**. Final Refined is the default. White shows neutral shortest routing; colored lines and legend show sample profile, physical distance, distance overhead and duplicate routes. **Clear Paths** removes results; F3 hides the panel/lines and cancels work. Nothing is spawned.
+
+`PreviewKey` defaults F3; `PreviewCalculationsPerFrame` defaults 1 and `PreviewMillisecondsPerFrame` defaults 1 ms (soft, 0 disables time limiting). These budgets are separate from gameplay PathRequestManager budgets. No preview calculations run while closed. Current settings and per-type permissions apply; source/radius failures draw no unsafe lines. Map/settings changes clear results for explicit resimulation. Congestion is a snapshot, not a traffic prediction. Only direct portal-to-Citadel previews are implemented; checkpoints remain deferred. No panel exists in isolated F6 map scenes lacking world services.
