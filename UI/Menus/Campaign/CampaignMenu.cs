@@ -1,4 +1,4 @@
-// Temporary campaign gateway. Level selection/save slots will replace the single Level001 entry later.
+// Simple campaign gateway for two standalone authored battlefields; saves/unlocks remain later.
 using Godot;
 using System;
 
@@ -21,12 +21,18 @@ public partial class CampaignMenu : Control
         VBoxContainer content = MenuLayout.Create(this, "CAMPAIGN",
             "Commander " + ProfileStore.Selected.Name + "  /  Select a deployment", PanelWidth);
         content.AddChild(UIButtonFactory.Label("LEVEL 001  —  DEFEND THE CITADEL", 17));
-        Label details = UIButtonFactory.Label("Initial combat test map. Further levels and campaign saves are planned.", 14);
+        Label details = UIButtonFactory.Label("Initial combat test map with compact routes.", 14);
         details.AutowrapMode = TextServer.AutowrapMode.WordSmart;
         content.AddChild(details);
         Button play = UIButtonFactory.Create("PLAY LEVEL 001", () => Navigate(MenuNavigation.Level001Scene),
             UIButtonStyle.Action, 64f);
         content.AddChild(play);
+        content.AddChild(UIButtonFactory.Label("LEVEL 002  —  THE FIVE GATES", 17));
+        Label mazeDetails = UIButtonFactory.Label("Five western portals. Open staging ground and a sprawling eastern maze with multiple paths.", 14);
+        mazeDetails.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        content.AddChild(mazeDetails);
+        content.AddChild(UIButtonFactory.Create("PLAY LEVEL 002", () => Navigate(MenuNavigation.Level002Scene),
+            UIButtonStyle.Action, 64f));
         content.AddChild(UIButtonFactory.Create("BACK TO MAIN MENU",
             () => Navigate(MenuNavigation.MainScene), UIButtonStyle.Compact));
         _errorDialog = new AcceptDialog { Title = "Could not launch" };
@@ -38,7 +44,7 @@ public partial class CampaignMenu : Control
 
     #region Routing
     // =========================================================
-    // For now the campaign's only playable destination is the existing Main.tscn battlefield.
+    // Both authored battlefields use identical shared navigation, combat, UI and wallet systems.
     private void Navigate(string scene)
     {
         try { MenuNavigation.Open(this, scene); }

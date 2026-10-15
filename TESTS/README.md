@@ -196,3 +196,7 @@ Lava's SVG was imported/rendered through Godot and its exported image visually i
 Observed Lava stress sample:500 active occupants, four due hits each (2000 typed damage applications),9.500ms in the resumed final integrated run alongside other headless suites. This is a synthetic large-delta burst with rendering disabled, not a normal-frame or FPS guarantee.
 
 Resumed verification after rebasing onto3c1c759: direct C# compilation and EnemyIntegrationChecks, MenuTowerFlowChecks, CorridorNavigationChecks and PlacementPerformanceChecks all exited0. The complete repeated-world corridor suite passes with the explicit fixture-resource cleanup; no navigation assertion was removed. New economy/vision/per-enemy movement planning notes remain preserved.
+
+## Level002 five-portal maze
+
+`Level002Checks.Run()` verifies the authored 100×80 TileMap geometry, five configured portals, Citadel approaches, representative one- and three-cell-wide corridors, buildable solid Foundation walls, passable ground, all five portal-to-Citadel routes and the four registered level002 test waves. Launch via Campaign → Play Level 002 or F6 on `MainLevel002.tscn`. The existing standalone Level001 integration path remains unchanged.

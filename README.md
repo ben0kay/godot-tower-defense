@@ -1,12 +1,12 @@
 # Godot Tower Defense — C#/.NET
 
-A 2D top-down sci-fi tower-defense game in Godot 4.7.x. An editable Level001 map, enemy spawning and A* routing, finite manual waves, Battle/Laser/Blaster combat, shared instant area damage, wallet/kill credits, Citadel HP and the eight-stage tower-stat foundation are implemented.
+A 2D top-down sci-fi tower-defense game in Godot 4.7.x. Editable Level001 and five-portal Level002 maps, enemy spawning and A* routing, finite manual waves, Battle/Laser/Blaster combat, shared instant area damage, wallet/kill credits, Citadel HP and the eight-stage tower-stat foundation are implemented.
 
 ## Launch
 
-Build C# in the Godot .NET editor, then press **F5**. The project starts at **Boot**, where you create/select a local profile. Select **Campaign** in Main Menu, then **Play Level 001** to enter the existing battlefield. Profiles persist to Godot `user://Profiles/profiles.json` (versioned JSON with backup recovery). **Campaign/gameplay saves are not yet implemented**: each deployment starts a fresh level session.
+Build C# in the Godot .NET editor, then press **F5**. The project starts at **Boot**, where you create/select a local profile. Select **Campaign** in Main Menu, then **Play Level 001** or **Play Level 002** to enter the selected battlefield. Profiles persist to Godot `user://Profiles/profiles.json` (versioned JSON with backup recovery). **Campaign/gameplay saves are not yet implemented**: each deployment starts a fresh level session.
 
-For rapid map or combat testing, open `Main.tscn` and press **F6** (Run Current Scene). This bypasses profile/menus and remains valid for headless integration checks.
+For rapid map or combat testing, open `Main.tscn` (Level001) or `MainLevel002.tscn` (Level002) and press **F6** (Run Current Scene). This bypasses profile/menus and remains valid for headless integration checks.
 
 ## Game controls
 

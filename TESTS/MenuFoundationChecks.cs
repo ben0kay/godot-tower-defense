@@ -9,7 +9,10 @@ public static class MenuFoundationChecks
     // Run from the existing Main-scene test; never write into the user's profile directory.
     public static void Run(Node main)
     {
-        Require(MenuNavigation.Level001Scene == "res://Main.tscn", "Campaign uses the original Main.tscn");
+        Require(MenuNavigation.Level001Scene == "res://Main.tscn", "Campaign keeps the original Main.tscn");
+        Require(MenuNavigation.Level002Scene == "res://MainLevel002.tscn" && ResourceLoader.Exists(MenuNavigation.Level002Scene),
+            "Campaign exposes the playable Level002 launch scene");
+        Level002Checks.Run();
         foreach (string scenePath in new[] {
             MenuNavigation.BootScene, MenuNavigation.MainScene, MenuNavigation.CampaignScene })
         {

@@ -1,6 +1,6 @@
-# Campaign — Level001 Gateway (implemented foundation)
+# Campaign — Two standalone playable levels
 
-`CampaignMenu.tscn` / `CampaignMenu.cs` display **Level 001 — Defend the Citadel**, a **Play Level 001** button and **Back to Main Menu**. It requires a selected local profile. Play opens the existing `res://Main.tscn` battlefield without touching its scene or level state.
+`CampaignMenu.tscn` / `CampaignMenu.cs` display **Level 001 — Defend the Citadel**, **Level 002 — The Five Gates**, buttons to launch either level, and **Back to Main Menu**. It requires a selected local profile. Level001 opens the original `res://Main.tscn`; Level002 opens `res://MainLevel002.tscn` (which shares combat/UI services via a small World variant). These are standalone fresh levels; profile saves and unlock gating are not implemented.
 
 **No campaign save is created or restored in this pass.** This button starts a fresh Level001 session. Do not enable misleading Continue, Load, stage completion or level unlock buttons before `SYSTEMS/Saving` and progression actually support them.
 
