@@ -1,0 +1,9 @@
+# Interactive Foundation migration — verified 2026-10-15
+
+Baseline: `fd2f6cf` (the later Bulwark Drone push retained the same terrain as `1844dcb`). Level001 originally contains 96 Passable cells and 80 Impassable cells. Exactly 74 are the raised/buildable platform at source0, atlas(1,0).
+
+The serialized12-byte cell records were moved unchanged into Terrain/Interactive. Its source0 deliberately references the same unmodified Metal/prototype_atlas.svg and atlas coordinate(1,0); can_build=true/blocks_enemies=true are unchanged. The remaining 6 wall/rock cells and all 96 floor cells remain in their original layers. No cell is duplicated across gameplay layers. The full effective coordinate/source/atlas/alternative/buildable/blocked dictionaries match exactly before/after: 176 cells, SHA256 `13446bda1dbb0217b3b0704ff9c75ded469f7681e54dcd65b5360d2ef799cbd7`. Backgrounds, Portals, Citadel, settings and decorations are unchanged.
+
+LevelTemplate had no painted Foundation cells; it now exposes the same Interactive palette. The old selectable Foundation entry was removed from ImpassableTerrain only after both tracked scenes were migrated. WorldTerrain.tres remains the unchanged legacy mixed palette. Other old maps using Impassable source0/atlas(1,0) must likewise migrate those cells before adopting this current palette; no runtime guessing/remapping is performed.
+
+Headless InteractiveTerrainChecks loads both palettes/artwork, verifies buildability/blocking/occupancy, passable nonbuildable Lava overlays, structural/reservation priority, and no navigation revision for hazard-only changes. Isolated corridor/swarm fixtures clear the new gameplay layer when replacing their maps. The exact migration snapshot is a one-time verification, not a requirement to freeze future designer edits to Level001.

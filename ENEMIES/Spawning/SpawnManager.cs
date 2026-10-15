@@ -26,8 +26,17 @@ public partial class SpawnManager : Node
         Registry = GetNode<EnemyRegistry>("../Registry");
         Paths = GetNode<PathRequestManager>("../Paths");
         _ships = GetNode<Node2D>("../../Enemies");
+        Paths.Navigation.Grid.TerrainRebuilt += InvalidateSources;
         RefreshSources();
     }
+
+    // =========================================================
+    // Explicit level edits can change portal/edge policy without changing walkability or repathing enemies.
+    private void InvalidateSources() => _cachedRevision = -1;
+    // =========================================================
+    // Release the level edit subscription with its spawning service.
+    public override void _ExitTree()
+    { if (GodotObject.IsInstanceValid(Paths?.Navigation?.Grid)) Paths.Navigation.Grid.TerrainRebuilt -= InvalidateSources; }
 
     // =========================================================
     // Catalog IDs provide generic spawn requests while preserving debug's original scene overload.

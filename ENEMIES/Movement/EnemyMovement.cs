@@ -212,7 +212,9 @@ public partial class EnemyMovement : Node
             if (_retry <= 0f) RequestRoute(float.PositiveInfinity);
             return;
         }
-        float travel = Mathf.Max(0f, Enemy.Definition.MoveSpeed) * (float)delta;
+        float speed = Mathf.Max(0f, Enemy.Definition.MoveSpeed);
+        float travel = speed * (float)delta;
+        double terrainElapsed = 0;
         while (_next < _route.Points.Length)
         {
             if (_route.CornerBlocked(_next, _paths.Navigation))
@@ -227,7 +229,12 @@ public partial class EnemyMovement : Node
             _travelDirection = direction.Normalized();
             Enemy.Rotation = Mathf.LerpAngle(Enemy.Rotation, direction.Angle(),
                 1f - Mathf.Exp(-Mathf.Max(0f, Enemy.Definition.TurnSpeed) * (float)delta));
-            Enemy.GlobalPosition = nextPosition; Enemy.Registry.UpdatePosition(Enemy); Enemy.UpdateDefenseBarTransform(); travel -= distance;
+            Vector2 previous = Enemy.GlobalPosition;
+            double segmentSeconds = speed > 0 ? previous.DistanceTo(nextPosition) / speed : 0;
+            if (GodotObject.IsInstanceValid(Enemy.Terrain) && Enemy.Terrain.LavaCellCount > 0
+                && !Enemy.Terrain.Traverse(Enemy, previous, nextPosition, segmentSeconds, terrainElapsed)) return;
+            terrainElapsed += segmentSeconds;
+            Enemy.SetMovementPosition(nextPosition); Enemy.Registry.UpdatePosition(Enemy); Enemy.UpdateDefenseBarTransform(); travel -= distance;
             if (nextPosition == target) _next++; else break;
         }
         UpdateDistance();

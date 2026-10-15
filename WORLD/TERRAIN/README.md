@@ -1,19 +1,9 @@
-# Terrain — Category-filtered authoring
+# Terrain — category-filtered authoring
 
-Each level has Terrain/Passable, Terrain/Impassable and Terrain/Decorations TileMapLayers. Their respective TileSets are PassableTerrain.tres, ImpassableTerrain.tres and DecorationTerrain.tres under TileSets/. They share prototype_atlas.svg, but define only the matching selectable tile coordinates.
+Levels expose Terrain/Passable, Impassable, Interactive and Decorations TileMapLayers with matching TileSets under TileSets/. Passable contains metal/dirt floors; Impassable contains structural walls/rocks; Interactive contains raised Foundation and Lava; Decorations contains cosmetic decals. Boolean can_build/blocks_enemies rules are independent of appearance. Empty space is passable/unbuildable; decorations contribute no rules.
 
-Passable contains open metal/dirt floors; Impassable contains walls, rocks and buildable raised platforms; Decorations contains cosmetic decals. Movement and tower permission are independent Boolean custom data (can_build, blocks_enemies), not inferred from art. Empty space is passable/unbuildable; decals never change these rules.
+WorldGrid caches Passable → Interactive → Impassable, then applies Portal/Citadel reservations and separate runtime tower occupancy. Intentional Interactive-over-floor overlays are supported, including Lava's false construction permission. Structural blockers cannot become walkable through Lava overlays. Raised Foundation preserves its buildable/solid semantics and original artwork; all74 saved platforms moved explicitly to Interactive. See TESTS/InteractiveTerrainMigration.md.
 
-WorldGrid caches Passable then Impassable, which wins on accidental overlap. Erase the old gameplay cell before changing its category. Static rebuilds diagnose overlaps, category errors and invalid setup; ordinary tower placement retains incremental occupancy updates. No per-frame tile scans or physics bodies are added.
+One world-scoped InteractiveTileManager handles immediate-entry and periodic Lava damage for only active occupants, with actual swept-segment exposure and no per-tile nodes or full-world enemy scans. Adjacent Lava retains one timer, exit removes it, teleports only enter their destination. Inspector LavaTileConfig owns damage/interval/entry toggle/type. Artwork is vivid orange liquid with tiny sparse highlights. Paint Lava in Terrain/Interactive source1; it has not been arbitrarily added to the playable map. See Interactive/README.md for complete behavior and tests.
 
-WorldTerrain.tres remains a legacy mixed palette. Current Level001/template use the separate palettes. See LEVELS/README.md and LEVELS/Level001/README.md for editor workflow and TESTS/TerrainMigration.md for preservation checks.
-
-## Planned next pass — Interactive Terrain (Foundation + Lava)
-
-**Documentation only, NOT implemented.** After the separate tower-targeting/area-attack spatial optimization pass finishes, implement the plan in [`Interactive/README.md`](Interactive/README.md). This adds a dedicated editor paint category for gameplay-aware tiles while preserving existing Passable, Impassable and Decorations rules, navigation and tower placement.
-
-- **Foundation:** buildable terrain; preserve the existing raised foundation/platform tile's `can_build=true` and `blocks_enemies=true` semantics when moving its editor category. Existing Level001/template painted terrain must be migrated compatibly, not silently remapped or removed.
-- **Lava:** passable, **nonbuildable**; **immediate damage when an enemy enters Lava, followed by configurable periodic damage while it remains on Lava**, including when stationary. Adjacent Lava cells are **one continuous hazard** (no repeated entry hits/timer resets), and exit/re-entry resets exposure. Swept movement catches fast crossings. `LavaTileConfig` owns entry toggle, damage amount, damage interval and existing damage type; no per-tile physics/timers.
-- **Art direction:** Lava is **predominantly vivid molten orange**, with only tiny sparse molten flecks, highlights and very little dark crust; legible, contiguous 64x64 tiles, not a mostly black cracked-rock texture.
-
-Use one lightweight `InteractiveTileManager`, a new `Terrain/Interactive` TileMapLayer and editor TileSet, and Inspector-editable Lava entry/periodic damage settings. The manager must not scan all painted tiles or every enemy per tick. The full migration, test requirements and Codex-ready one-pass prompt are in `Interactive/README.md`. Do not confuse these notes with a completed gameplay feature.
+Explicit WorldGrid.RebuildTerrain updates rules and reconciles hazards; hazard/build-permission-only changes do not unnecessarily rebuild A*. Blocking/goal changes retain navigation invalidation. Tower placement/removal retains incremental occupancy behavior. WorldTerrain.tres remains a legacy mixed palette; current scenes use the category palettes.

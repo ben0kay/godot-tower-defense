@@ -2,6 +2,7 @@
 // One transparent canvas draws only visible grid lines; no per-cell nodes or physics.
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public partial class WorldGrid : Node2D
 {
@@ -39,10 +40,13 @@ public partial class WorldGrid : Node2D
     #endregion
 
     #region Terrain and Occupancy
+    private readonly List<Vector2I> _approaches = new();
     private bool[] _buildable, _terrainBlocked, _occupied, _reserved, _painted;
     public int NavigationRevision { get; private set; }
     public event Action<Vector2I?, bool> NavigationChanged;
     public WorldLevel Level { get; private set; }
+    public InteractiveTileManager InteractiveTiles { get; internal set; }
+    public event Action TerrainRebuilt;
 
     // =========================================================
     // Read authored terrain once, after the preceding Level scene has entered the tree.
@@ -59,19 +63,29 @@ public partial class WorldGrid : Node2D
     // Rebuild static rules on an explicit map edit/load; retain runtime tower occupancy.
     public void RebuildTerrain()
     {
+        bool[] previous = (bool[])_terrainBlocked.Clone();
         Array.Clear(_buildable); Array.Clear(_terrainBlocked); Array.Clear(_reserved); Array.Clear(_painted);
         ValidateTileSet(Level.Decorations, false);
         ReadLayer(Level.Passable, false);
+        if (Level.Interactive != null) ReadLayer(Level.Interactive, null);
         ReadLayer(Level.Impassable, true); // Impassable overrides Passable, including build permission.
         ReadFootprints(Level);
-        NavigationRevision++;
-        NavigationChanged?.Invoke(null, true);
+        List<Vector2I> approaches = new();
+        Node points = Level.Citadel?.GetNodeOrNull<Node>("ApproachPoints");
+        if (points != null) foreach (Node child in points.GetChildren())
+            if (child is Marker2D marker) approaches.Add(WorldToCell(marker.GlobalPosition));
+        bool navigationChanged = NavigationRevision == 0 || approaches.Count != _approaches.Count;
+        for (int i = 0; i < approaches.Count && !navigationChanged; i++) navigationChanged = approaches[i] != _approaches[i];
+        _approaches.Clear(); _approaches.AddRange(approaches);
+        for (int i = 0; i < previous.Length && !navigationChanged; i++) navigationChanged = previous[i] != _terrainBlocked[i];
+        if (navigationChanged) { NavigationRevision++; NavigationChanged?.Invoke(null, true); }
+        TerrainRebuilt?.Invoke();
         QueueRedraw();
     }
 
     // =========================================================
     // Custom data defines behavior; Decorations deliberately never enter this cache.
-    private void ReadLayer(TileMapLayer layer, bool expectedBlocked)
+    private void ReadLayer(TileMapLayer layer, bool? expectedBlocked)
     {
         ValidateTileSet(layer);
         int mismatches = 0, overlaps = 0, invalidTiles = 0;
@@ -82,9 +96,9 @@ public partial class WorldGrid : Node2D
             Vector2I cell = WorldToCell(layer.ToGlobal(layer.MapToLocal(painted)));
             if (!IsInsideMap(cell)) { GD.PushWarning($"Ignoring terrain outside map: {cell}"); continue; }
             int index = Index(cell);
-            if (_painted[index]) overlaps++;
+            if (_painted[index] && expectedBlocked != null) overlaps++;
             _painted[index] = true;
-            if (tile.GetCustomData("blocks_enemies").AsBool() != expectedBlocked) mismatches++;
+            if (expectedBlocked.HasValue && tile.GetCustomData("blocks_enemies").AsBool() != expectedBlocked.Value) mismatches++;
             _buildable[index] = tile.GetCustomData("can_build").AsBool();
             _terrainBlocked[index] = tile.GetCustomData("blocks_enemies").AsBool();
         }
@@ -133,6 +147,7 @@ public partial class WorldGrid : Node2D
     private int Index(Vector2I cell) => cell.Y * Config.WidthCells + cell.X;
     public bool CanBuild(Vector2I cell) => IsInsideMap(cell) && _buildable[Index(cell)] && !_reserved[Index(cell)];
     public bool IsOccupied(Vector2I cell) => IsInsideMap(cell) && _occupied[Index(cell)];
+    public bool TerrainBlocksEnemies(Vector2I cell) => !IsInsideMap(cell) || _terrainBlocked[Index(cell)];
     public bool BlocksEnemies(Vector2I cell) => !IsInsideMap(cell) || _terrainBlocked[Index(cell)] || _occupied[Index(cell)];
     public string PlacementFailure(Vector2I cell)
     {

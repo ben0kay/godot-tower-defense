@@ -14,6 +14,9 @@ public partial class Enemy : Node2D
     public event Action<Enemy> Initialized;
     public EnemyRegistry Registry => _registry;
     private EnemyRegistry _registry;
+    internal InteractiveTileManager Terrain { get; private set; }
+    private Vector2 _terrainPosition;
+    private bool _terrainMovement;
     private DefenseBar _defenseBar;
     private double _initialDurability, _damageConsumed, _damageXpPool, _killXp;
     private int _xpCredits;
@@ -35,6 +38,8 @@ public partial class Enemy : Node2D
         SetNotifyLocalTransform(true); SetNotifyTransform(true);
         _registry.Register(this);
         Movement.Initialize(this, paths);
+        Terrain = paths.Navigation.Grid.InteractiveTiles; _terrainPosition = GlobalPosition;
+        Terrain?.Reposition(this);
         Initialized?.Invoke(this);
     }
 
@@ -43,7 +48,26 @@ public partial class Enemy : Node2D
     public override void _Notification(int what)
     {
         if ((what == NotificationLocalTransformChanged || what == NotificationTransformChanged) && IsAlive
-            && GodotObject.IsInstanceValid(_registry)) _registry.UpdatePosition(this);
+            && GodotObject.IsInstanceValid(_registry))
+        {
+            _registry.UpdatePosition(this);
+            if (_terrainMovement) return;
+            Vector2 position = GlobalPosition;
+            if (position != _terrainPosition)
+            {
+                _terrainPosition = position;
+                if (!_terrainMovement && GodotObject.IsInstanceValid(Terrain)) Terrain.Reposition(this);
+            }
+        }
+    }
+
+    // =========================================================
+    // Actual movement keeps spatial notifications but bypasses teleport semantics in terrain notifications.
+    internal void SetMovementPosition(Vector2 position)
+    {
+        _terrainMovement = true;
+        try { GlobalPosition = position; _terrainPosition = position; }
+        finally { _terrainMovement = false; }
     }
 
     // =========================================================
@@ -130,5 +154,6 @@ public partial class Enemy : Node2D
 
     // =========================================================
     // Also clean up when the whole level is unloaded.
-    public override void _ExitTree() { IsAlive = false; _registry?.Unregister(this); }
+    public override void _ExitTree()
+    { IsAlive = false; _registry?.Unregister(this); Terrain = null; }
 }

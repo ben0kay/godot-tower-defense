@@ -250,3 +250,7 @@ Each `WaveEnemyEntry` now includes `SpawnWithShield` (default `false`) and `Wave
 ## E2A/E2B enemy registration (IMPLEMENTED)
 
 `WaveCatalog.LoadScenes()` adapts `EnemyCatalog.Default` and `WaveManager` uses the actual `SpawnManager.Catalog` scene map. Register new enemy scenes in **`ENEMIES/DefaultEnemyCatalog.tres`** instead of a WaveCatalog dictionary. The IDs `enemy001`, `enemy002` and `shieldgenerator` already work; default Level001 waves are deliberately unchanged. Quotas, per-wave RNG, required portals, bounded retries, full starting-shield option and wave-owned completion work for registered enemies. `ShieldEmitter` restores *instance* shields without altering authored resources or wave ownership. E3 death-spawn/attack mechanics remain future work.
+
+## Environmental damage at spawn
+
+A valid spawn can be killed immediately by an Interactive Lava entry. The scheduler still consumes that planned spawn and advances the batch, but subscribes living ownership only for an alive, nonqueued ship. This prevents waiting forever on a death that occurred before ownership could subscribe; kill Credits and removal remain in Enemy. InteractiveTerrainChecks includes a lethal authored-portal Lava spawn and verifies wave completion.

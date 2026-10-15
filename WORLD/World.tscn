@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://WORLD/GRID/WorldGrid.cs" id="1_script"]
 [ext_resource type="Resource" path="res://WORLD/DefaultWorldConfig.tres" id="2_config"]
@@ -9,6 +9,9 @@
 [ext_resource type="Script" path="res://ENEMIES/Shared/EnemyRegistry.cs" id="6_registry"]
 [ext_resource type="Script" path="res://ENEMIES/Spawning/SpawnManager.cs" id="7_spawn"]
 [ext_resource type="Resource" path="res://ENEMIES/DefaultEnemyConfig.tres" id="8_config"]
+
+[ext_resource type="Script" path="res://WORLD/TERRAIN/Interactive/InteractiveTileManager.cs" id="9_interactive"]
+[ext_resource type="Resource" path="res://WORLD/TERRAIN/Interactive/Lava/DefaultLavaTileConfig.tres" id="10_lava"]
 
 [node name="World" type="Node2D"]
 
@@ -46,3 +49,7 @@ Config = ExtResource("8_config")
 
 [node name="Spawning" type="Node" parent="EnemySystems"]
 script = ExtResource("7_spawn")
+
+[node name="InteractiveTiles" type="Node" parent="."]
+script = ExtResource("9_interactive")
+LavaConfig = ExtResource("10_lava")

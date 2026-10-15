@@ -16,7 +16,7 @@ public static class SwarmNavigationChecks
         float strength = config.PathDiversityStrength, congestion = config.CongestionInfluence;
         int profiles = config.RouteProfileCount;
         foreach (Enemy enemy in spawns.Registry.Living.ToArray()) enemy.TakeDamage(10000);
-        grid.Level.Passable.Clear(); grid.Level.Impassable.Clear();
+        grid.Level.Passable.Clear(); grid.Level.Impassable.Clear(); grid.Level.Interactive?.Clear();
         for (int y = 0; y < grid.Config.HeightCells; y++)
             for (int x = 0; x < grid.Config.WidthCells; x++) grid.Level.Impassable.SetCell(new(x, y), 0, new(0, 0));
         for (int y = 2; y <= 28; y++)

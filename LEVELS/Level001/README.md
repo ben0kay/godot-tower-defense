@@ -56,7 +56,7 @@ In Level001Config.tres (or the level root Settings), edit Starting Resources / S
 F5 prepares Wave 00 / 03; START WAVE appears just below the top-right status. Three Enemy001-only test waves are authored in LEVELS/Level001/Level001Waves.cs. Previous batch ships keep moving during later batches. NEXT WAVE unlocks only after all scheduled and wave-owned ships resolve, while F2 debug enemies do not count. Ordinary ships randomly choose eligible registered portals per spawn; debug F2 stays round-robin. There is no wave reward or automatic next wave yet.
 
 ## Terrain categories
-Passable offers metal/dirt floors; Impassable offers walls, raised platforms and rocks; Decorations offers only decals. Build permission is independent of movement: raised platforms are solid but buildable. Erase the old gameplay-layer cell before changing a cell from solid to passable or vice versa. Empty space stays passable/unbuildable. All 176 previously authored cells were preserved during the palette migration.
+Passable offers metal/dirt floors; Impassable offers walls/rocks; Interactive offers raised Foundation and Lava; Decorations offers only decals. Build permission is independent of movement: raised platforms are solid but buildable. Erase the old gameplay-layer cell before changing a cell from solid to passable or vice versa. Empty space stays passable/unbuildable. All 176 previously authored cells were preserved during the palette migration.
 
 ## Citadel durability
 
@@ -65,3 +65,7 @@ Open `Level001Config.tres` → **Destination / Citadel Max Health** to choose th
 ## Wave-controlled enemy shields
 
 Enemy001 has **MaxShield = 100** in `ENEMIES/Types/Enemy001/Enemy001.tres`, but all existing Level001 wave entries remain unshielded. To opt in a specific weighted group, edit `Level001Waves.cs` and use `Enemy("enemy001", shield: true)`. Shields absorb incoming damage before hull HP. F2 defaults to zero shield, and no separate shield visual is implemented yet.
+
+## Interactive Terrain
+
+Terrain/Interactive now exposes raised Foundation (source0 atlas1,0) and Lava (source1 atlas0,0). The74 saved Level001 platforms migrated without changing art/buildability/blocking; Template exposes the same palette. Lava is passable/nonbuildable and uses World/InteractiveTiles.LavaConfig for immediate entry plus periodic exposure damage. No Lava was arbitrarily painted into the current playable map. Use WorldGrid.RebuildTerrain after runtime edits; hazard-only changes avoid unnecessary navigation rebuilds. See WORLD/TERRAIN/Interactive/README.md and TESTS/InteractiveTerrainMigration.md.

@@ -10,7 +10,7 @@ public static class RepathMovementChecks
     public static void Run(WorldGrid grid, PathRequestManager paths, SpawnManager spawns)
     {
         foreach (Enemy enemy in spawns.Registry.Living.ToArray()) enemy.TakeDamage(10000);
-        grid.Level.Impassable.Clear(); grid.Level.Passable.Clear();
+        grid.Level.Impassable.Clear(); grid.Level.Passable.Clear(); grid.Level.Interactive?.Clear();
         for (int y = 0; y < grid.Config.HeightCells; y++)
             for (int x = 0; x < grid.Config.WidthCells; x++) grid.Level.Passable.SetCell(new(x, y), 0, new(2, 0));
         Vector2I start = new(5, 10), goal = new(25, 10);

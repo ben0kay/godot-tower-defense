@@ -63,13 +63,14 @@ Level001 (Node2D)
 │   └── Planets (Node2D)
 ├── Terrain (Node2D)
 │   ├── Passable (TileMapLayer)      # metal / dirt / buildable passable tiles
-│   ├── Impassable (TileMapLayer)       # solid walls / buildable solid platforms
+│   ├── Impassable (TileMapLayer)       # solid walls / rocks
+│   ├── Interactive (TileMapLayer)  # raised Foundation / Lava
 │   └── Decorations (TileMapLayer) # only surface art
 ├── Portals (Node2D)               # zero or more EnemyPortal scene instances
 └── Objectives (Node2D)            # Citadel scene instance(s)
 ```
 
-This is now the actual Level001 arrangement. Passable, Impassable and Decorations use separate category TileSets from `WORLD/TERRAIN/TileSets/`, sharing one atlas texture. Select a layer in Godot's 2D editor and paint the map; save and press F5 to test with camera/HUD/placement. F6 runs only the level scene. Empty unpainted regions reveal space scenery.
+This is now the actual Level001 arrangement. Passable, Impassable, Interactive and Decorations use separate category TileSets from `WORLD/TERRAIN/TileSets/`, sharing the original atlas plus separate Lava artwork. Select a layer in Godot's 2D editor and paint the map; save and press F5 to test with camera/HUD/placement. F6 runs only the level scene. Empty unpainted regions reveal space scenery.
 
 `LEVELS/LevelConfig.cs` is the single Inspector-editable per-level spawn Resource: SpawnMode, AllowedEdges, ActivePortals and CitadelPath. These are consumed by ENEMIES/Spawning/SpawnManager.cs. Keep each new level's resource separate; keep WorldMasterConfig as the single source for grid/map dimensions.
 
@@ -86,7 +87,7 @@ Large nebula textures, stars and planets can be ordinary `Sprite2D` nodes, optio
 
 ## Implemented terrain pass and next work
 
-The shared six-tile atlas includes unbuildable metal walls, buildable solid platforms, buildable open floors, rocky obstacles, open dirt and transparent decals. Passable/Impassable custom data is cached once at startup; Impassable overrides Passable and Decorations are ignored. Tower occupancy is committed through WorldGrid, with navigation revision updated only when occupancy creates a new blocker. Portal/Citadel footprints are reserved against construction.
+The shared six-tile atlas includes unbuildable metal walls, buildable solid platforms, buildable open floors, rocky obstacles, open dirt and transparent decals. Passable/Interactive/Impassable custom data is cached at startup/explicit edits in that precedence order; Decorations are ignored. Foundation migrated into Interactive unchanged. Lava is nonbuildable/passable and uses one world manager for swept entry plus per-occupant periodic damage; see TERRAIN/Interactive/README.md. Tower occupancy is committed through WorldGrid, with navigation revision updated only when occupancy creates a new blocker. Portal/Citadel footprints are reserved against construction.
 
 The starter map is saved as editable TileMapLayer data. No map generator runs in gameplay. To switch the live level, replace World.tscn's Level scene instance, keeping its node name. For runtime terrain edits, call RebuildTerrain explicitly; editor changes take effect on the next game run.
 

@@ -1,0 +1,25 @@
+[gd_resource type="TileSet" load_steps=5 format=3]
+[ext_resource type="Texture2D" path="res://WORLD/TERRAIN/Tiles/Metal/prototype_atlas.svg" id="1"]
+[ext_resource type="Texture2D" path="res://WORLD/TERRAIN/Tiles/Interactive/Lava/lava.svg" id="2"]
+[sub_resource type="TileSetAtlasSource" id="Foundation"]
+texture = ExtResource("1")
+texture_region_size = Vector2i(64, 64)
+1:0/0 = 0
+1:0/0/custom_data_0 = true
+1:0/0/custom_data_1 = true
+1:0/0/custom_data_2 = "foundation"
+[sub_resource type="TileSetAtlasSource" id="Lava"]
+texture = ExtResource("2")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+0:0/0/custom_data_2 = "lava"
+[resource]
+tile_size = Vector2i(64, 64)
+custom_data_layer_0/name = "can_build"
+custom_data_layer_0/type = 1
+custom_data_layer_1/name = "blocks_enemies"
+custom_data_layer_1/type = 1
+custom_data_layer_2/name = "interaction"
+custom_data_layer_2/type = 4
+sources/0 = SubResource("Foundation")
+sources/1 = SubResource("Lava")

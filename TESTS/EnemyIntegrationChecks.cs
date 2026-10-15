@@ -51,6 +51,7 @@ public partial class EnemyIntegrationChecks : Node
             TowerStatChecks.Run(_battle);
             await TowerUpgradeChecks.Run(_battle);
             TerrainCategoryChecks.Run(_grid);
+            InteractiveTerrainChecks.Run(_battle, _spawns, _grid);
             PortalSpawnChecks.Run(_grid, _spawns);
             _battle.GetNode<EconomyManager>("Economy").Initialize(_grid.Level.Settings);
             // Legacy route/source fixtures use exact centers; the focused check covers variation.
@@ -199,7 +200,7 @@ public partial class EnemyIntegrationChecks : Node
     // Replace terrain only inside this isolated test instance, keeping committed level art untouched.
     private void ConfigureCorridor()
     {
-        _grid.Level.Passable.Clear(); _grid.Level.Impassable.Clear();
+        _grid.Level.Passable.Clear(); _grid.Level.Impassable.Clear(); _grid.Level.Interactive?.Clear();
         for (int y = 0; y < _grid.Config.HeightCells; y++)
             for (int x = 0; x < _grid.Config.WidthCells; x++)
                 _grid.Level.Impassable.SetCell(new(x, y), 0, new(0, 0));

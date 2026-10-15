@@ -1,13 +1,12 @@
-# Terrain TileSets
+# Terrain palettes
 
-Select a scene layer to get its own palette, without manually switching resources:
+Each level's matching TileMapLayer selects a category resource:
 
-| Resource | Layer | Source 0 atlas coordinates |
-| --- | --- | --- |
-| PassableTerrain.tres | Terrain/Passable | (2,0), (4,0) |
-| ImpassableTerrain.tres | Terrain/Impassable | (0,0), (1,0), (3,0) |
-| DecorationTerrain.tres | Terrain/Decorations | (5,0) |
+- PassableTerrain.tres: Metal atlas(2,0)/(4,0), open floors.
+- ImpassableTerrain.tres: Metal atlas(0,0)/(3,0), structural wall/rock.
+- InteractiveTerrain.tres: source0 Metal atlas(1,0) raised Foundation; source1 atlas(0,0) molten Lava SVG.
+- DecorationTerrain.tres: cosmetic Metal atlas(5,0).
 
-All use 64px regions of the same prototype_atlas.svg. Custom data is Boolean can_build and blocks_enemies; keep both movement/build combinations independent. Gameplay layers are read into WorldGrid; Decorations is always ignored. Only tiles defined in each atlas source can be selected/painted, although Godot may show the full shared texture in the atlas preview.
+All use64px tile regions; WorldMasterConfig.CellSize must match. Gameplay palettes expose Boolean can_build and blocks_enemies. Interactive also exposes String interaction (foundation/lava), independent of art. Lava overrides buildable floors but cannot override structural blockers or object reservations. Foundation is buildable/solid; Lava is nonbuildable/walkable.
 
-WorldTerrain.tres is retained as the original legacy atlas; the current level/template have no references to it. Add future art and rules to the correct category resource. Changing a shared TileSet affects every level using it; duplicate a resource for a level-specific variant when needed.
+Level001's74 Foundation records were moved without changing coordinates, source/atlas IDs, art or effective rules before the old Foundation entry was removed from the current Impassable palette. Template exposes the same new layer. WorldTerrain.tres remains an unchanged legacy mixed palette; migrate other old maps' Impassable(1,0) cells explicitly before switching them to these current palettes. See TESTS/InteractiveTerrainMigration.md and ../Interactive/README.md.

@@ -20,17 +20,28 @@ public partial class CorridorNavigationChecks : Node
     {
         Fixture correctness = await Create(owner, false, 3);
         try { Geometry(correctness); }
-        finally { correctness.Main.Free(); }
+        finally { await Release(owner, correctness); }
         foreach (bool winding in new[] { false, true })
             foreach (int population in new[] { 100, 500 })
                 foreach (int percent in new[] { 0, 50, 100 })
                 {
                     Fixture fixture = await Create(owner, winding, 3);
                     try { Benchmark(fixture, population, percent, winding); }
-                    finally { fixture.Main.Free(); }
+                    finally { await Release(owner, fixture); }
                 }
         GD.Print("PASS: N4 straight/winding geometry, parity/stability, safe dynamic tower repathing and 0/50/100% 100/500-ship benchmarks");
     }
+    // =========================================================
+    // Release fixture-owned resource copies on the main thread after deferred scene teardown.
+    // Repeated stress worlds must not leave script-backed copies for native finalizer-thread disposal.
+    private static async System.Threading.Tasks.Task Release(Node owner, Fixture fixture)
+    {
+        LevelConfig settings = fixture.Grid.Level.Settings;
+        fixture.Main.QueueFree();
+        await owner.ToSignal(owner.GetTree(), SceneTree.SignalName.ProcessFrame);
+        fixture.Config.Dispose(); settings.Dispose();
+    }
+
     // =========================================================
     // Paint an isolated bounded three-cell band or right-angle passage, keeping a solid Citadel beyond the goal.
     private static async System.Threading.Tasks.Task<Fixture> Create(Node owner, bool winding, int width)
@@ -48,7 +59,7 @@ public partial class CorridorNavigationChecks : Node
         config.MaxPathfindingMillisecondsPerFrame = 2; config.MaxRouteValidationsPerFrame = 16; config.MaxRouteValidationMillisecondsPerFrame = 0.5f;
         config.EnableCorridorVariation = true; config.CorridorVariationPercent = 100; config.CorridorVariationStrength = 0.65f;
         config.CorridorVariationSpacingCells = 3; config.RoutePreferenceSeed = 12345;
-        grid.Level.Passable.Clear(); grid.Level.Impassable.Clear();
+        grid.Level.Passable.Clear(); grid.Level.Impassable.Clear(); grid.Level.Interactive?.Clear();
         for (int y = 0; y < grid.Config.HeightCells; y++)
             for (int x = 0; x < grid.Config.WidthCells; x++) grid.Level.Impassable.SetCell(new(x, y), 0, new(0, 0));
         int half = width / 2;

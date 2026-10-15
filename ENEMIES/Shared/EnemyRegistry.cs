@@ -17,6 +17,7 @@ public partial class EnemyRegistry : Node
     public int KilledCount { get; private set; }
     public int ArrivedCount { get; private set; }
     public event Action<Enemy> EnemyKilled;
+    public event Action<Enemy> EnemyUnregistered;
     public event Action<Enemy> EnemyArrived;
 
     // =========================================================
@@ -25,7 +26,7 @@ public partial class EnemyRegistry : Node
 
     // =========================================================
     // Exit-tree cleanup is idempotent and does not count an outcome twice.
-    public void Unregister(Enemy enemy) { if (_members.Remove(enemy)) { _living.Remove(enemy); Spatial.Remove(enemy); } }
+    public void Unregister(Enemy enemy) { if (_members.Remove(enemy)) { _living.Remove(enemy); Spatial.Remove(enemy); EnemyUnregistered?.Invoke(enemy); } }
 
     // =========================================================
     // Snapshot-based attacks recheck removal in constant time without rescanning the living list.
@@ -63,7 +64,7 @@ public partial class EnemyRegistry : Node
 
     // =========================================================
     // World unload releases index history, membership and reusable query storage together.
-    public override void _ExitTree() { _living.Clear(); _members.Clear(); _queryBuffers.Clear(); _spatial = null; }
+    public override void _ExitTree() { _living.Clear(); _members.Clear(); _queryBuffers.Clear(); _spatial = null; EnemyUnregistered = null; }
 
     // =========================================================
     // Emit kill-only notifications after an enemy leaves the living registry.

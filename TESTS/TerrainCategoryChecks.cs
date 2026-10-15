@@ -11,20 +11,20 @@ public static class TerrainCategoryChecks
     {
         TileMapLayer passable = grid.Level.Passable, impassable = grid.Level.Impassable, decor = grid.Level.Decorations;
         VerifyPalette(passable.TileSet, new[] { 2, 4 });
-        VerifyPalette(impassable.TileSet, new[] { 0, 1, 3 });
+        VerifyPalette(impassable.TileSet, new[] { 0, 3 });
         VerifyPalette(decor.TileSet, new[] { 5 });
         WorldLevel template = GD.Load<PackedScene>("res://LEVELS/LevelTemplate.tscn").Instantiate<WorldLevel>();
         try
         {
             VerifyPalette(template.Passable.TileSet, new[] { 2, 4 });
-            VerifyPalette(template.Impassable.TileSet, new[] { 0, 1, 3 });
+            VerifyPalette(template.Impassable.TileSet, new[] { 0, 3 });
             VerifyPalette(template.Decorations.TileSet, new[] { 5 });
         }
         finally { template.Free(); }
         TileSet original = passable.TileSet;
         Vector2I[] cells = { new(1, 1), new(2, 1), new(3, 1), new(4, 1), new(5, 1), new(6, 1), new(7, 1) };
         List<(TileMapLayer layer, Vector2I cell, int source, Vector2I atlas, int alternative)> backup = new();
-        foreach (TileMapLayer layer in new[] { passable, impassable, decor })
+        foreach (TileMapLayer layer in new[] { passable, impassable, grid.Level.Interactive, decor })
             foreach (Vector2I cell in cells)
             {
                 backup.Add((layer, cell, layer.GetCellSourceId(cell), layer.GetCellAtlasCoords(cell), layer.GetCellAlternativeTile(cell)));
@@ -36,7 +36,7 @@ public static class TerrainCategoryChecks
             ((TileSetAtlasSource)passable.TileSet.GetSource(0)).GetTileData(new(4, 0), 0).SetCustomData("can_build", false);
             passable.SetCell(cells[0], 0, new(2, 0));
             passable.SetCell(cells[1], 0, new(4, 0));
-            impassable.SetCell(cells[2], 0, new(1, 0));
+            grid.Level.Interactive.SetCell(cells[2], 0, new(1, 0));
             impassable.SetCell(cells[3], 0, new(0, 0));
             decor.SetCell(cells[4], 0, new(5, 0));
             decor.SetCell(cells[0], 0, new(5, 0));

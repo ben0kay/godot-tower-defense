@@ -40,3 +40,7 @@ Active Shockwave emitters hold revision cursors in this same service. Movement r
 ## Enemy identity and waves
 
 `EnemyDefinition.EnemyId` is the unique, stable internal catalog key (e.g. `basic_mk1`) and `DisplayName` is the player-visible label (e.g. `Standard Drone`). Numbered scene filenames (`Enemy001.tscn`, etc.) are merely development assets. The catalog validates nonempty, unique IDs and wave entries resolve scenes by those IDs. New definition instances deliberately default to a blank `EnemyId`, so register types only after assigning one. Enemy ordering in waves is independent of filesystem and catalog order.
+
+## Interactive terrain integration
+
+Enemy initialization reports destination arrival to the world InteractiveTileManager. Direct position changes use teleport semantics; normal movement uses SetMovementPosition to retain spatial notifications while bypassing teleport re-entry. The per-world registry now emits EnemyUnregistered after authoritative list/index removal, allowing the single terrain manager to release exposure synchronously for death, arrival, external free and manual unregister. No spatial query algorithm, level stats, target priority or damage source semantics were replaced. Environmental hits use ApplyDamage with no tower source; existing shields/hull, kill Credits and finite damage-XP budget remain authoritative.

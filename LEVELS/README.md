@@ -38,24 +38,25 @@ Select the matching TileMapLayer in the scene tree; each has its own category-fi
 | Terrain layer | Assigned TileSet | Available atlas tiles | Movement / construction |
 | --- | --- | --- | --- |
 | Passable | WORLD/TERRAIN/TileSets/PassableTerrain.tres | (2,0) open metal floor; (4,0) open dirt | Passable; each tile independently allows/disallows towers. Both current floors are buildable. |
-| Impassable | WORLD/TERRAIN/TileSets/ImpassableTerrain.tres | (0,0) metal wall; (1,0) raised platform; (3,0) rocky obstacle | Solid; only the raised platform is currently buildable. |
+| Impassable | WORLD/TERRAIN/TileSets/ImpassableTerrain.tres | (0,0) metal wall; (3,0) rocky obstacle | Solid/nonbuildable. |
+| Interactive | WORLD/TERRAIN/TileSets/InteractiveTerrain.tres | Source0 (1,0) raised Foundation; source1 (0,0) Lava | Foundation buildable/solid; Lava nonbuildable/passable. |
 | Decorations | WORLD/TERRAIN/TileSets/DecorationTerrain.tres | (5,0) transparent decal | Visual-only; never changes movement or construction. |
 
-The three TileSets share the original prototype_atlas.svg texture and preserve source 0, atlas coordinates, art, 64px cells and Boolean can_build / blocks_enemies metadata. Only category-matching tiles are defined in each atlas source, so they are the only selectable paint choices. The shared texture preview may still show surrounding artwork; undefined atlas regions are not paintable tiles. WorldTerrain.tres is retained as a legacy asset, but neither Level001 nor LevelTemplate uses the mixed palette.
+The original category TileSets share prototype_atlas.svg; Interactive also references its separate Lava SVG. These resources preserve source 0, atlas coordinates, art, 64px cells and Boolean can_build / blocks_enemies metadata. Only category-matching tiles are defined in each atlas source, so they are the only selectable paint choices. The shared texture preview may still show surrounding artwork; undefined atlas regions are not paintable tiles. WorldTerrain.tres is retained as a legacy asset, but neither Level001 nor LevelTemplate uses the mixed palette.
 
 ### Painting rules
 
-Passable/Impassable describe **movement**, not material or tower permission. A metal or dirt tile can be in either category according to its gameplay metadata. Buildability is independent: all four movement/build combinations remain supported. The prototype lacks a passable/nonbuildable floor; add a future tile with can_build=false without changing today's floor defaults.
+Passable/Impassable describe **movement**, not material or tower permission. A metal or dirt tile can be in either category according to its gameplay metadata. Buildability is independent: all four movement/build combinations remain supported. Lava now supplies a passable/nonbuildable Interactive overlay without changing ordinary floor defaults.
 
-To turn a solid cell into floor, **erase its Impassable cell first**, then paint Passable. To turn floor into a wall, erase Passable and paint Impassable. Keep gameplay layers mutually exclusive. If both exist, Impassable deterministically overrides Passable—including tower permission—and load/rebuild emits a warning.
+To turn a solid cell into floor, **erase its Impassable cell first**, then paint Passable. To turn floor into a wall, erase Passable and paint Impassable. Interactive-over-Passable is an intentional overlay; avoid unintended structural overlaps. If both exist, Impassable deterministically overrides Passable—including tower permission—and load/rebuild emits a warning.
 
 Decorations may cover floor, obstacles or empty space without affecting gameplay. SpaceBackground remains separate. Empty/unpainted cells stay passable for ships and unbuildable for towers. Portals and Citadel still reserve construction cells; placed towers remain runtime obstacles on passable floors.
 
 ### Migration and diagnostics
 
-Level001's prior Ground/Walls painting was recorded through Godot before conversion. It had 102 dirt-floor cells, 74 raised-platform cells, no decorations and no overlaps. All 176 effective tiles retain their exact coordinates, source/atlas/alternative IDs and gameplay values. No painted map, Portal/Citadel position, background, marker or level settings was reset. Layer unique IDs and existing resource UIDs are retained; visual ordering is Passable, Impassable, Decorations. The template uses the same three palettes.
+Level001's prior Ground/Walls painting was recorded through Godot before conversion. It had 102 dirt-floor cells, 74 raised-platform cells, no decorations and no overlaps. All 176 effective tiles retain their exact coordinates, source/atlas/alternative IDs and gameplay values. No painted map, Portal/Citadel position, background, marker or level settings was reset. Layer unique IDs and existing resource UIDs are retained; the original category migration is recorded in TESTS/TerrainMigration.md. The subsequent Interactive migration moves Foundation into its own layer with identical rules/art; both scenes now have four palettes.
 
-WorldLevel exposes Passable, Impassable and Decorations. WorldGrid caches Passable then Impassable on load/explicit rebuild and never reads cosmetic tiles into gameplay caches. It reports overlapping gameplay cells, category mismatches and missing tiles, and rejects null/wrong-size gameplay TileSets or missing/non-Boolean metadata. Decorations requires the correct tile size but no gameplay metadata. These checks do not scan each frame.
+WorldLevel exposes Passable, Impassable, Interactive and Decorations. WorldGrid caches Passable then Interactive then Impassable on load/explicit rebuild and never reads cosmetic tiles into gameplay caches. It reports overlapping gameplay cells, category mismatches and missing tiles, and rejects null/wrong-size gameplay TileSets or missing/non-Boolean metadata. Decorations requires the correct tile size but no gameplay metadata. These checks do not scan each frame.
 
 SpawnManager reports missing registered exits, blocked/unreachable Portal SpawnExit cells and missing usable Citadel approaches when source caches refresh. Such warnings identify authored map problems; they do not move objects, repaint tiles or bypass navigation safety. Portal center placement must have sufficient clearance for the enemy radius and a route to an approach.
 
@@ -68,3 +69,7 @@ This was one cleanup pass; no procedural generation, art overhaul, new pathfindi
 ## Per-level Citadel starting health (implemented)
 
 Each level's `LevelConfig` now provides **Destination / Citadel Max Health**. Set `CitadelMaxHealth` in `LEVELS/Level001/Level001Config.tres` (currently **1,000**) or in another LevelXXX config independently. `DefaultLevelConfig.tres` starts at 1,000. The `Main/CitadelSession` integration initializes the matching level `Objectives/Citadel/Health` at full health and uses enemy arrivals to subtract `EnemyDefinition.CitadelDamage`. `HealthChanged` updates the center HUD automatically; `Destroyed` emits once at zero. The defeat UI/level-loss consequences remain future work. There is **no separate per-level Citadel script or duplicate health config**; keep reusable logic under `WORLD/OBJECTIVES/Citadel/`.
+
+## Interactive Terrain
+
+Terrain/Interactive now exposes raised Foundation (source0 atlas1,0) and Lava (source1 atlas0,0). The74 saved Level001 platforms migrated without changing art/buildability/blocking; Template exposes the same palette. Lava is passable/nonbuildable and uses World/InteractiveTiles.LavaConfig for immediate entry plus periodic exposure damage. No Lava was arbitrarily painted into the current playable map. Use WorldGrid.RebuildTerrain after runtime edits; hazard-only changes avoid unnecessary navigation rebuilds. See WORLD/TERRAIN/Interactive/README.md and TESTS/InteractiveTerrainMigration.md.

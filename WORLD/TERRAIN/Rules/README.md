@@ -1,16 +1,15 @@
 # Terrain rules
 
-| Example | can_build | blocks_enemies | Layer |
+| Terrain | can_build | blocks_enemies | Layer |
 | --- | --- | --- | --- |
 | Open metal/dirt floor | true | false | Passable |
-| Future nonbuildable path | false | false | Passable |
-| Raised solid platform | true | true | Impassable |
+| Nonbuildable path | false | false | Passable |
+| Raised Foundation | true | true | Interactive |
+| Lava | false | false | Interactive |
 | Wall/rock | false | true | Impassable |
 | Decal | ignored | ignored | Decorations |
 | Empty space | false | false | Unpainted |
 
-Metadata defines both rules independently; art/material names do not. Impassable overrides Passable if both cells are painted, including false build permission. Remove the old gameplay cell before replacing it in another layer. Decorations never contributes rules, even over empty space.
+Metadata defines both rules independently; material/color names do not. WorldGrid applies Passable → Interactive → Impassable, then object reservations. Interactive overlays deliberately replace floor rules, including false build permission; structural blockers remain authoritative. Decorations never contribute rules. A tower's separate occupancy blocks an otherwise-passable cell; preblocked Foundation remains solid before and after construction. Placement still validates terrain, reservations, occupancy, enemy clearance, connectivity and payment.
 
-WorldGrid reads category layers only on load/explicit terrain rebuild, merges Portal/Citadel footprint reservations, and keeps runtime tower occupancy separate. A tower blocks an otherwise-passable cell; placing/removing one uses incremental navigation revision updates. A pre-blocked platform remains solid. Placement validates terrain, reservations, occupancy, active-enemy clearance, source-to-Citadel connectivity and economy payment.
-
-Load/rebuild checks enforce TileSet cell size and Boolean gameplay metadata and report category mismatches, invalid tiles and overlaps. No runtime auto-conversion/deletion or per-frame terrain scan is performed.
+Interactive interaction metadata identifies foundation/lava. The world manager caches only effective non-structurally-blocked Lava cells and owns environmental exposure. It never substitutes a second blocking authority or alters route weights. Explicit rebuilds reconcile hazard edits through spatial queries; only changed static blocking or Citadel approach cells require navigation invalidation. Spawn-source policy gets a separate cache invalidation notification. Cell size/Boolean metadata validation and diagnostics remain on load/rebuild, with no per-frame tile scan. See ../Interactive/README.md.

@@ -118,7 +118,8 @@ public partial class WaveManager : Node
                 _countdown = Mathf.Max(0.1f, _spawns.Paths.Config.WaveSpawnRetrySeconds);
                 Publish(); return;
             }
-            _owned.Add(ship); ship.Removed += OnEnemyRemoved;
+            // Entry hazards can resolve a successfully spawned ship before ownership subscribes.
+            if (ship.IsAlive && !ship.IsQueuedForDeletion()) { _owned.Add(ship); ship.Removed += OnEnemyRemoved; }
             PlannedRemaining--; _entryIndex++;
             State = WaveState.Spawning; StatusMessage = "";
             if (_entryIndex == _sequence.Length)

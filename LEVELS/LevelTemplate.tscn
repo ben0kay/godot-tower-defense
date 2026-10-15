@@ -5,6 +5,7 @@
 [ext_resource type="TileSet" path="res://WORLD/TERRAIN/TileSets/ImpassableTerrain.tres" id="2_impassable"]
 [ext_resource type="TileSet" path="res://WORLD/TERRAIN/TileSets/DecorationTerrain.tres" id="2_decorations"]
 
+[ext_resource type="TileSet" path="res://WORLD/TERRAIN/TileSets/InteractiveTerrain.tres" id="2_interactive"]
 [ext_resource type="Script" path="res://LEVELS/WorldLevel.cs" id="3_root"]
 [ext_resource type="Resource" path="res://LEVELS/DefaultLevelConfig.tres" id="4_config"]
 [ext_resource type="PackedScene" path="res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn" id="5_portal"]
@@ -35,6 +36,9 @@ tile_set = ExtResource("2_passable")
 
 [node name="Impassable" type="TileMapLayer" parent="Terrain" unique_id=1176658847]
 tile_set = ExtResource("2_impassable")
+
+[node name="Interactive" type="TileMapLayer" parent="Terrain"]
+tile_set = ExtResource("2_interactive")
 
 [node name="Decorations" type="TileMapLayer" parent="Terrain" unique_id=1034975239]
 tile_set = ExtResource("2_decorations")
