@@ -411,6 +411,8 @@ TOWERS/DefaultTowerCatalog.tres              # Add the real Laser definition
 
 ## Next implementation pass
 
+**Proposed bounded next combat pass — Phase 4C-3 (PLANNED, NOT IMPLEMENTED):** Follow the single Codex-ready specification in [`COMBAT/Damage/README.md`](../COMBAT/Damage/README.md), section **“PLANNED — Phase 4C-3: per-weapon defense overrides and ballistic shield penetration.”** It proposes **absolute per-weapon shield/hull coefficient overrides** (Laser effective 6.00x shield / 0.15x hull, provisional 12 base DPS) and **Battle Tower 5% baseline shield penetration** shown in the Inspector. Penetration improvement comes from **future permanent research**, *not* Battle Tower Level 2/3 purchases. Keep stage 04 neutral and defer research progression/saving; this one pass changes only combat delivery/resolution, minimal stats/Inspector display, tests and accurate documentation. The existing Phase 4C-1/4C-2 implementation notes below remain historical baseline, not the proposed new numbers.
+
 **Phase 4A/4B/4C-1/4C-2 are complete.** Review Laser visuals in a live Godot window and tune Inspector resources before the next weapon pass. Preserve Battle Tower baseline and paid upgrades after each checkpoint. Do not start Missile Tower, ranks, profile research, level modifiers, active effects, selling or tower HP in these passes.
 
 ## Current live Inspector files
