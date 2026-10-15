@@ -1,6 +1,6 @@
 # Shared tower foundation
 
-Phase 4A adds TowerConfig (Inspector identity, private complete level rows/recipes), TowerDefinition (stable ID, category, scene, config reference, icon and 1×1 footprint) and TowerCatalog (validated ID lookup). Name/description are read from Config; prices come from its C# level rows, never duplicated in definition/HUD. The default catalog registers Battle, Laser and Blaster Cannon towers. Unavailable types remain registered but cannot be built. Rebuild validates blank/duplicate IDs, costs, category, footprint, scene root, config compatibility and type-specific scene prerequisites; call Rebuild after editing registration data.
+Phase 4A adds TowerConfig (Inspector identity, private complete level rows/recipes), TowerDefinition (stable ID, category, scene, config reference, icon and 1×1 footprint) and TowerCatalog (validated ID lookup). Name/description are read from Config; prices come from its C# level rows, never duplicated in definition/HUD. The default catalog registers Battle, Laser, Blaster Cannon and Shockwave towers. Unavailable types remain registered but cannot be built. Rebuild validates blank/duplicate IDs, costs, category, footprint, scene root, config compatibility and type-specific scene prerequisites; call Rebuild after editing registration data.
 
 TowerBase owns type/definition, fixed grid anchor, footprint, placement/selection hooks, optional range capability, purchased UpgradeLevel, FinalStats and StatsChanged. Types supply config compatibility/application and resolution; it has no mandatory weapon nodes or processing. TowerConfig explicitly copies runtime rows/cost recipes per instance. Passive types can have no combat snapshot, range or upgrades.
 
@@ -8,3 +8,5 @@ Targeting/, Weapons/TurretAiming and Projectiles/ are optional existing weapon h
 
 
 Phase 4C adds COMBAT/Damage typed response authority and optional Beams/ presentation. Laser Tower is the second actual weapon family, reusing targeting/aiming and the shared progression pipeline. Battle delivery remains guided projectiles; Laser delivery remains sustained DPS. No mandatory combat was added to TowerBase.
+
+Phase4E: optional ShockwaveStats and ShockwaveEmitter provide timed outward contact, separate from instant AreaDamage. Purple Shockwave Tower emits independent fronts with per-emission snapshots/hit-once IDs. FEEDBACK/Shockwave handles shared visual-only rings for both weapons, with exact radius synchronization only when gameplay drives them. No weapon loop is required by passive types.

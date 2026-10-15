@@ -33,8 +33,9 @@ public partial class EnemyIntegrationChecks : Node
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
             Check(placement.Catalog != null && _battle.GetNode<GameplayHUD>("UI/GameplayHUD").GetBuildButton("battle") != null
                 && _battle.GetNode<GameplayHUD>("UI/GameplayHUD").GetBuildButton("laser") != null
-                && _battle.GetNode<GameplayHUD>("UI/GameplayHUD").GetBuildButton("blaster_cannon") != null,
-                "Missing catalog export recovers the default catalog and all three build buttons on startup");
+                && _battle.GetNode<GameplayHUD>("UI/GameplayHUD").GetBuildButton("blaster_cannon") != null
+                && _battle.GetNode<GameplayHUD>("UI/GameplayHUD").GetBuildButton("shockwave") != null,
+                "Missing catalog export recovers the default catalog and all four build buttons on startup");
             DisableTicks(_battle);
             _grid = _battle.GetNode<WorldGrid>("World/Grid");
             _spawns = _battle.GetNode<SpawnManager>("World/EnemySystems/Spawning");
@@ -63,6 +64,7 @@ public partial class EnemyIntegrationChecks : Node
             await LaserTowerChecks.Run(_battle, _spawns);
             AreaDamageChecks.Run(_battle, _spawns);
             await BlasterCannonChecks.Run(_battle, _spawns);
+            await ShockwaveChecks.Run(_battle, _spawns);
             EnemyKillRewardChecks.Run(_battle, _spawns);
             DeathExplosionChecks.Run(_battle, _spawns, feedback);
             CitadelHealthChecks.Run(_battle, _spawns);

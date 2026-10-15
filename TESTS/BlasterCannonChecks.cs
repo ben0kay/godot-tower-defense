@@ -67,7 +67,7 @@ public static class BlasterCannonChecks
         RangeAfterLaunch(main, spawns, definition);
         Clear(spawns);
         foreach (Node projectile in projectiles.GetChildren()) projectile.Free();
-        foreach (Node effect in effects.GetChildren()) if (effect is BlastFlash) effect.Free();
+        foreach (Node effect in effects.GetChildren()) if (effect is ShockwaveEffect) effect.Free();
         hud.ClearInspection(); wallet.Initialize(grid.Level.Settings);
         GD.Print("PASS: Blaster catalog/300-credit placement,200-credit tier, AoE Inspector/cache, launch snapshots,30/60/120Hz instant-only impact and lost-target/unload/timeout cleanup");
     }
@@ -109,6 +109,7 @@ public static class BlasterCannonChecks
         tower._PhysicsProcess(0.2);
         SplashProjectile shot = main.GetNode("World/Projectiles").GetChild<SplashProjectile>(0);
         Require(!shot.HasDetonated && primary.Health == 60 && half.Health == 60, "Launching never applies immediate direct or area damage");
+        tower.Config.ImpactStyle.RingColor = Colors.Green;
         tower.Config.DamagePerShot = 120; tower.Config.BlastRadiusPixels = 200; tower.Config.EdgeDamageFraction = 1;
         tower.Config.OverrideHullCoefficient = true; tower.Config.HullCoefficient = 4; tower.Config.ShieldPenetration = 1;
         EconomyManager wallet = main.GetNode<EconomyManager>("Economy"); int credits = wallet.GetBalance(wallet.CreditsResource);
@@ -125,7 +126,14 @@ public static class BlasterCannonChecks
         Near(edge.Health, 41.25f, "Fired shot preserves launch radius/edge fraction"); Near(outside.Health, 60, "Outside launch radius remains untouched");
         shot._PhysicsProcess(1); Require(wallet.GetBalance(wallet.CreditsResource) == credits + 3, "Repeated ticks cannot detonate/pay twice");
         foreach (Node effect in main.GetNode("World/Effects").GetChildren())
-            if (effect is BlastFlash flash) { flash._Process(0.5); flash.Free(); }
+            if (effect is ShockwaveEffect flash)
+            {
+                Require(flash.Style.RingColor != Colors.Green && flash.Style.ExpansionDuration == .22f,
+                    "Blaster impact uses its orange launch-style snapshot, not subsequent source edits");
+                flash.Style.ExpansionDuration = 10; flash.Style.VisualRadius = 1000; flash._Process(.5);
+                Near(half.Health, 13.125f, "Longer/larger cosmetic ring never reapplies or delays instant damage");
+                flash.Free();
+            }
         Near(half.Health, 13.125f, "Visual animation/expiry never deals extra damage");
         tower.Free(); Clear(spawns); shot.Free();
     }

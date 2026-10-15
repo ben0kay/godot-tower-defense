@@ -33,7 +33,7 @@ The fixed placement root never rotates; TurretPivot holds the up-facing placehol
 
 Each projectile snapshots base hit/type/overrides/penetration plus radius/edge retention at launch, keeping no mutable tower/config reference. It tracks a living target's position; death/arrival/external free captures the last valid target point and leaves the projectile traveling toward it. Scene unload cancels delivery and releases subscriptions; timeout expires without an impact. A target leaving firing range after launch does not cancel the shot. Contact is the actual destination point.
 
-At impact the projectile dispatches one `AreaDamage.ApplyInstant` call. Enemy centers at distance <= radius are included; the primary receives only the area hit, with no additional direct damage. For 60 base / 80 px / 25% edge, center/half/edge base damage is 60 / 37.5 / 15 **before** shield/hull defenses. The helper owns math/selection, the projectile owns travel/timing, and `FEEDBACK/AreaBlast/BlastFlash.cs` owns the optional post-impact visual under World/Effects. Its ring animation never repeats or delays damage.
+At impact the projectile dispatches one `AreaDamage.ApplyInstant` call. Enemy centers at distance <= radius are included; the primary receives only the area hit, with no additional direct damage. For 60 base / 80 px / 25% edge, center/half/edge base damage is 60 / 37.5 / 15 **before** shield/hull defenses. The helper owns math/selection, the projectile owns travel/timing, and `FEEDBACK/Shockwave/ShockwaveEffect.cs` owns the optional post-impact visual under World/Effects. Its ring animation never repeats or delays damage.
 
 ## Implemented files
 
@@ -44,10 +44,14 @@ At impact the projectile dispatches one `AreaDamage.ApplyInstant` call. Enemy ce
 - `TOWERS/Shared/Projectiles/SplashProjectile.cs`: reusable travel/last-known-point/one-shot delivery.
 - `TOWERS/Shared/Stats/AreaBlastStats.cs`: optional capability in the existing pipeline.
 - `COMBAT/AreaDamage/AreaDamage.cs`: stateless recipient selection and weapon-input falloff.
-- `FEEDBACK/AreaBlast/BlastFlash.cs`: damage-independent cosmetic flash.
+- `FEEDBACK/Shockwave/ShockwaveEffect.cs`: damage-independent cosmetic flash.
 
 ## Verification and scope
 
 `AreaDamageChecks` and `BlasterCannonChecks` run in the full headless integration suite: real catalog/action/payment/selection and private data; paid preview parity; cache/Inspector invalidation; 30/60/120 Hz travel/contact; one hit per primary/nearby/edge enemy; outside exclusion; target death/free/arrival; launch snapshots after source edits; coefficient overrides/penetration; edited falloff in newly fired attacks; range-after-launch; timeout/unload cleanup; visual independence and 500-recipient impact behavior. Existing Battle/Laser, upgrades, shield emitter, waves, economy, navigation and menu suites remain active. See TESTS/README.md for actual results.
 
-The headless run cannot verify artistic quality; the projectile and flash need a live-window visual review. No timed damage wavefront, terrain impacts, line of sight, pooling framework, Missile Tower, armour, permanent research or saving was added. Future Phase 4E remains defined separately in `TOWERS/Shared/Weapons/Shockwaves/README.md`.
+The headless run cannot verify artistic quality; the projectile and flash need a live-window visual review. No timed damage wavefront is used by this weapon. Terrain impacts, line of sight, pooling, Missile Tower, armour, permanent research and saving remain deferred. Implemented Phase4E travelling damage is defined separately in `TOWERS/Shared/Weapons/Shockwaves/README.md`.
+
+## Phase4E visual migration
+
+Effects/BlasterShockwaveStyle.tres now owns the orange plasma ring/glow, .22s expansion and fade. DefaultBlasterCannonConfig references it through ImpactStyle. Config copies isolate the style; SplashProjectile snapshots it at launch and passes it to the shared ShockwaveEffect after instant damage. Style duration/radius/colour edits cannot delay or repeat AoE. Shared feedback contains no hardcoded Blaster colours. The separate purple Shockwave Tower uses the same visual in externally driven mode, with damage timing owned by ShockwaveEmitter. The former BlastFlash script/UID were removed.

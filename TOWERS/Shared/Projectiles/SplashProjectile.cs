@@ -10,6 +10,7 @@ public partial class SplashProjectile : Node2D
     private Vector2 _impact;
     private DamageInfo _hit;
     private AreaBlastStats _blast;
+    private ShockwaveStyle _style;
     private float _speed, _life;
     private bool _initialized, _finished;
     public bool HasDetonated { get; private set; }
@@ -18,7 +19,7 @@ public partial class SplashProjectile : Node2D
     // =========================================================
     // Values are immutable copies; the projectile retains no tower or mutable config reference.
     public void Initialize(Enemy target, EnemyRegistry registry, Vector2 lastKnownImpact, float speed,
-        DamageInfo hit, AreaBlastStats blast, Node2D effects = null, float lifetime = 5f)
+        DamageInfo hit, AreaBlastStats blast, Node2D effects = null, float lifetime = 5f, ShockwaveStyle style = null)
     {
         if (_initialized) throw new InvalidOperationException("Projectile is already initialized.");
         AreaDamage.Validate(blast.RadiusPixels, blast.EdgeDamageFraction);
@@ -27,7 +28,7 @@ public partial class SplashProjectile : Node2D
             || !float.IsFinite(lastKnownImpact.X) || !float.IsFinite(lastKnownImpact.Y))
             throw new ArgumentOutOfRangeException(nameof(speed));
         _registry = registry; _effects = effects; _impact = lastKnownImpact; _speed = speed; _life = lifetime;
-        _hit = hit; _blast = blast; _initialized = true;
+        _hit = hit; _blast = blast; _style = style == null ? null : (ShockwaveStyle)style.Duplicate(true); _initialized = true;
         if (GodotObject.IsInstanceValid(target) && target.IsAlive && target.IsInsideTree() && !target.IsQueuedForDeletion())
         { _target = target; _target.Removed += OnTargetRemoved; _target.TreeExiting += OnTargetExiting; }
     }
@@ -48,7 +49,7 @@ public partial class SplashProjectile : Node2D
             try
             {
                 AppliedHits = AreaDamage.ApplyInstant(_impact, _blast.RadiusPixels, _hit, _blast.EdgeDamageFraction, _registry);
-                BlastFlash.Spawn(_effects, _impact, _blast.RadiusPixels);
+                ShockwaveEffect.Spawn(_effects, _impact, _style, _blast.RadiusPixels);
             }
             finally { QueueFree(); }
             return;

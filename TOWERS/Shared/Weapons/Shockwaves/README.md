@@ -1,19 +1,31 @@
-# Expanding Shockwaves — future Phase 4E (PLANNED, NOT IMPLEMENTED)
+# Expanding gameplay wavefront — Phase 4E implemented
 
-This folder is a **design contract only**. Do **not** add shockwave runtime classes, scenes, physics shapes or timers in Phase 4D. The first real AoE tower is the instant-hit Blaster Cannon, with reusable selection/falloff in `COMBAT/AreaDamage/`.
+`ShockwaveEmitter` is one lightweight Node2D per emission, normally under World/Projectiles. It owns a fixed world origin, immutable DamageInfo, weapon-supplied maximum radius/speed/edge retention, previous/current radius, previous sampled enemy positions and a per-emission HashSet of damaged instance IDs. Multiple emissions overlap independently. No physics bodies, per-enemy Areas, timers or full-disc attack calls are used.
 
-## Distinguishing damage delivery from visuals
+## Delivery and geometry
 
-- **Blaster Cannon / instant explosion:** damage is applied to all eligible targets in the impact circle **at one moment**. The visual explosion is allowed to animate outward, but this animation never applies more damage.
-- **Shockwave Tower / expanding damage front:** at emission, create one wavefront centered at the source. Its radius increases with elapsed time, and enemies take damage only when the outward-moving **edge crosses them**. An enemy left inside an already-passed ring takes no new damage just because it is still inside the overall maximum radius. Visual expansion should follow real radius but not own the combat calculation.
+Initialize snapshots inputs and enemy positions; Ready creates optional shared feedback under World/Effects. The source tower can move, upgrade or disappear afterward without changing an emitted wave. World/registry unload cancels it safely. Each physics tick advances to `min(maxRadius, previousRadius + speed * delta)`.
 
-Future wavefront-specific authored stats could include `MaxRadiusPixels`, `ExpansionSpeedPixelsPerSecond`, `WavefrontWidthPixels`, `DamagePerWave`, `EdgeDamageFraction`, optional `DamageType` and weapon shield/hull overrides or penetration. Any distance falloff number belongs to **that weapon's own config/final stats**, never as a global hardcoded damage minimum.
+For each valid unhit enemy, solve the swept relative contact equation over this active tick:
 
-## Future Phase 4E implementation rules
+`|previousPosition + (currentPosition - previousPosition) * t - origin|² = (previousRadius + (currentRadius - previousRadius) * t)²`
 
-- Reuse `COMBAT/AreaDamage/` for distance/falloff math and `COMBAT/Damage/DamageResolver` indirectly through per-target `Enemy.ApplyDamage(DamageInfo)`. The wavefront delivery decides **WHEN** a hit occurs; it should NOT call the instant full-circle attack on every frame.
-- Sample `previousRadius -> currentRadius` each physics tick; detect swept annulus crossings to avoid tunneling across enemies at large `delta`, and keep a per-emission set of already-hit enemy instance IDs so one emission never damages the same target twice. Respect enemy alive/unload states and movement; consider swept relative enemy motion for fast targets rather than silently missing them.
-- Keep shockwave parameters in typed weapon config and the **existing eight-stage immutable stat pipeline**, with eventual research (stage 04) separate from tower paid tiers (stage 02). Visuals are independent; keep timed wavefronts bounded and cleaned up on expiry/unload.
-- Test deterministic reach times, increasing radius, no damage ahead/behind the wavefront, one hit per enemy, variable `delta`/30-60-120 Hz and long-tick crossings, multiple overlapping emissions, valid shield/hull response, no leaking timers/nodes, and the existing 500-enemy fixture.
+The earliest root in [0,1] is contact. This handles stationary enemies skipped by a large radial step and fast enemies that pass through the front between two samples, even if both sampled positions are outside. A new enemy with no previous sample is treated as stationary at its observed position: one spawned behind the previous front is not damaged by the filled interior. An unhit enemy crossing the front outward can also touch it. Enemies already hit cannot be hit again by this emission. Geometry uses centers, matching instant AoE; visual width/glow do not enlarge the damage front. Radius zero hits only the exact origin.
 
-**Status:** Planned only. Implement Phase 4D first and update this document later when a real Shockwave Tower is approved.
+On a terminal tick, interpolate motion only through the fraction of delta before the wave reaches maximum radius. Motion after expiry cannot create retroactive hits. As with any sampled system, sub-tick enemy motion is approximated linearly between observed world positions; curved/teleport motion has no separate historical path reconstruction.
+
+At contact, use the encounter radius with `AreaDamage.AtDistance` to scale base damage. Each resulting DamageInfo preserves type, independent absolute shield/hull overrides and penetration. Only Enemy.ApplyDamage performs defense/health/lifecycle work. **Never repeatedly call AreaDamage.ApplyInstant.**
+
+## Mutation, lifetime and cost
+
+Each tick collects crossings into reusable local scratch storage before applying damage, so immediate death/removal callbacks cannot corrupt living-registry enumeration. Recheck native validity, alive/tree/queue state and constant-time membership before dispatch. Mark hit-once IDs before callbacks, including zero-damage contacts. Reentrant unload stops remaining recipients safely; malformed defense failures finish the emission rather than retrying it next tick. Dead/freed enemies are never dereferenced from stored positions, which are keyed by ID rather than Enemy references.
+
+Unhit moving positions are updated each tick; hit IDs allow later scans to skip work. Per-emission position/hit/scratch collections are reused during that emission and cleared on expiry/unload. Complexity is O(living enemies) per active wave tick; there is no full scene query or per-recipient node allocation. The500-enemy fixture verifies one emitter node, hit-once correctness and reports observed contact/dispatch time. This is not a hardware-independent FPS promise; spatial indexing/pooling remains measurement-driven future work.
+
+## Stats, source and visuals
+
+Shockwave Tower's complete typed `ShockwaveTowerLevels.cs` rows own all prices and combat values. Shared RangePixels is maximum radius, optional ShockwaveStats holds float DamagePerWave, ExpansionSpeedPixelsPerSecond, IntervalSeconds and EdgeDamageFraction. WeaponDamageStats and ShieldPenetration preserve shared damage semantics. The same eight-stage pipeline selects a complete row at Stage02; Stages03–06 remain neutral and Stage07 clamps safe values. Later research can modify these inputs through its existing stage/invalidation route; research/saving are not implemented.
+
+The emitter calls FEEDBACK/Shockwave/ShockwaveEffect.SetWavefront with exact simulation radius/progress and completes it on expiry. The purple tower owns its own style. The visual never independently calculates enemy damage or advances the external radius. Blaster uses the same visual in autonomous mode **after instant damage**, not this timed emitter.
+
+ShockwaveChecks covers30/60/120Hz reach/cadence, linear relative crossings/contact falloff, long/terminal ticks, behind-front spawns, exact zero radius, overlapping/subsequent waves, shield break/overrides/penetration, deaths/frees/unload/reentrancy, missing/mutated visuals, explicit stats, purchases/previews/max level and500 recipients. See TESTS/README.md for executed results.

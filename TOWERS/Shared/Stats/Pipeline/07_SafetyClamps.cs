@@ -17,6 +17,11 @@ public static class SafetyClampsStage
         TargetSearchInterval = FiniteMinimum(stats.TargetSearchInterval, 0.05f),
         Area = stats.Area.HasValue ? new AreaBlastStats(FiniteMinimum(stats.Area.Value.RadiusPixels, 0),
             Mathf.Min(1, FiniteMinimum(stats.Area.Value.EdgeDamageFraction, 0))) : null,
+        Shockwave = stats.Shockwave.HasValue ? new ShockwaveStats(
+            FiniteMinimum(stats.Shockwave.Value.DamagePerWave, 0),
+            FiniteMinimum(stats.Shockwave.Value.ExpansionSpeedPixelsPerSecond, 1),
+            FiniteMinimum(stats.Shockwave.Value.IntervalSeconds, .05f),
+            Mathf.Min(1, FiniteMinimum(stats.Shockwave.Value.EdgeDamageFraction, 0))) : null,
         Beam = stats.Beam.HasValue ? new BeamStats(FiniteMinimum(stats.Beam.Value.DamagePerSecond, 0)) : null
     };
 

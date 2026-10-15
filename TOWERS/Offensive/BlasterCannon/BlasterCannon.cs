@@ -74,7 +74,7 @@ public partial class BlasterCannon : TowerBase
         DamageInfo hit = Config.CreateHit(FinalStats);
         SplashProjectile bullet = new();
         bullet.Initialize(_target, _registry, _target.GlobalPosition, FinalStats.ProjectileSpeed,
-            hit, FinalStats.Area.Value, _effects);
+            hit, FinalStats.Area.Value, _effects, style: Config.ImpactStyle);
         _projectiles.AddChild(bullet); bullet.GlobalPosition = GlobalPosition;
         _shotTimer = 1f / FinalStats.ShotsPerSecond;
     }

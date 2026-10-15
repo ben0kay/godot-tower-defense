@@ -13,6 +13,9 @@ public partial class BlasterCannonConfig : TowerConfig
         Levels = BlasterCannonLevels.Create();
     }
 
+    [ExportGroup("Effects")]
+    [Export] public ShockwaveStyle ImpactStyle { get; set; }
+
     [ExportGroup("Aiming")]
     [Export] public bool RotateWhileTracking { get; set; } = true;
     [ExportGroup("Targeting")]
@@ -37,7 +40,12 @@ public partial class BlasterCannonConfig : TowerConfig
 
     // =========================================================
     // Explicitly clone runtime rows/recipes while keeping authored defaults separate.
-    public override BlasterCannonConfig CreateInstanceCopy() => (BlasterCannonConfig)base.CreateInstanceCopy();
+    public override BlasterCannonConfig CreateInstanceCopy()
+    {
+        var copy = (BlasterCannonConfig)base.CreateInstanceCopy();
+        copy.ImpactStyle = ImpactStyle == null ? null : (ShockwaveStyle)ImpactStyle.Duplicate(true);
+        return copy;
+    }
 
     // =========================================================
     // Every weapon selects its full row through the same eight stages.

@@ -1,6 +1,6 @@
 # Headless gameplay checks
 
-**Phase 4D implemented:** AreaDamageChecks and BlasterCannonChecks run in EnemyIntegrationChecks; shared instant AoE and the registered Blaster Cannon are production code. See the completed Phase 4D section below. Wavefront shockwave tests remain future Phase 4E.
+**Phase 4D implemented:** AreaDamageChecks and BlasterCannonChecks run in EnemyIntegrationChecks; shared instant AoE and the registered Blaster Cannon are production code. See the completed Phase 4D section below. Phase4E ShockwaveChecks now covers the separate timed wavefront, shared styles and purple Shockwave Tower.
 
 Build C# first, then run the Godot .NET executable:
 
@@ -141,7 +141,7 @@ One isolated blast also hits 500 living recipients without creating any scene no
 
 The ordinary `dotnet build --no-restore` route remains blocked before compilation by the environment's missing compatible NuGet.Protocol dependency; the successful compile above uses the actual Godot source generators directly and its resulting assembly was run by Godot. Live-window visual review of the new vector cannon/projectile/flash is outstanding; headless checks establish combat/timing and visual independence, not artistic quality.
 
-No permanent research, saving, Missile Tower, armour or timed shockwave runtime was implemented. Stage 04 and the Phase 4E shockwave design remain deferred.
+That Phase4D milestone added no research, saving, Missile Tower, armour or timed shockwave runtime. Stage04 remains deferred; Phase4E timed wavefronts were subsequently implemented below.
 
 ## Explicit C# tower-level refactor (2026-10-15)
 
@@ -150,3 +150,13 @@ TowerStatChecks independently compares every field and credit price at Battle Le
 Validation: direct Roslyn C# compilation against .NET 8 and GodotSharp with the Godot source generator passed. The ordinary dotnet build command is blocked before compilation by the environment's missing NuGet.Protocol 6.11.2.1 assembly. Actual Godot 4.7.2 .NET headless import, EnemyIntegrationChecks, MenuTowerFlowChecks, CorridorNavigationChecks, PlacementPerformanceChecks and direct Main startup passed. Headless suites retain 500-enemy movement/placement/AoE fixtures and cached combat checks; timing observations are not a rendered-FPS guarantee. Existing terrain-overlap fixture warnings remain. No live-window visual review was performed.
 
 Push integration: rebased onto the newer map/Main/profile commit, retaining KineticShield=0.25 and the optional missing catalog export. Kinetic inherited-response expectations read the authored coefficient; shield-break fixtures scale their starting shield to retain the same base-unit boundary. The integration runner verifies the placement controller and the existing default-catalog recovery rather than requiring an explicit scene binding.
+
+## Phase4E shared visual/wavefront and purple Shockwave Tower (2026-10-15)
+
+ShockwaveChecks runs in EnemyIntegrationChecks. It verifies no instant full-disc damage at emission;30/60/120Hz wave timing, reach/falloff, unchanged behind-front health and inclusive maximum edge; fast relative through-passes with both endpoints outside; earliest-contact falloff; terminal-tick motion clamping; exact zero radius; independent overlapping/subsequent emissions; shield/hull inherited responses, spillover, optional/zero overrides and penetration. Lifecycle cases cover dead/free/arrived targets, mutation/reentrant unload during kill dispatch, registry loss, invalid speed and malformed defense cancellation. Style copies/changes/missing visuals never alter combat; external visual radius exactly tracks gameplay and ignores autonomous clocks/radius. Standalone cosmetic expansion/cleanup remains independently tested.
+
+The real catalog/build-bar/placement fixture pays350 Credits, rejects repeated occupancy, validates all baseline numbers, displays effective damage/range/speed/interval/falloff, then pays225 for independent Level2 and compares the committed cache to its preview. It verifies maximum level, unchanged navigation, source/row/style copies, no tick/style-based stat resolution, launched wave snapshots, new waves using upgraded values,30/60/120Hz4-second cadence and no post-hitch bursts. The500-enemy fixture uses one emitter and zero per-enemy physics/nodes; the observed contact/dispatch pass was about1.7–1.9ms on this headless host, not a rendered FPS claim.
+
+BlasterCannonChecks retains its30/60/120Hz actual instant-impact tests, now asserting orange style snapshots after source edits and that a long/larger shared cosmetic effect never reapplies or delays damage. The default catalog/menu suites require the fourth Shockwave entry. Existing Battle/Laser/Blaster, shields, economy, waves, enemy lifecycle and navigation checks remain active.
+
+Validation: direct Roslyn C# compilation against .NET8/GodotSharp with Godot source generators passed. Godot4.7.2 .NET headless EnemyIntegrationChecks, MenuTowerFlowChecks, CorridorNavigationChecks, PlacementPerformanceChecks and direct Main startup passed. Standard dotnet build remains blocked before compilation by the environment's missing NuGet.Protocol6.11.2.1 assembly; editor import additionally reports the incomplete SDK/MSBuild installation while importing assets. Existing terrain-overlap warnings remain. No live-window visual-quality review was performed.

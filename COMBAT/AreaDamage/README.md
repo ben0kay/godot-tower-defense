@@ -31,14 +31,12 @@ Temporary recipient storage is local to the impact, making nested impacts indepe
 
 ## Delivery and visual ownership
 
-`TOWERS/Shared/Projectiles/SplashProjectile.cs` tracks a target/last-known point and dispatches this helper **once on contact**, using its launch snapshot. It never also deals a direct hit. Tower range is a launch constraint, not an impact constraint. `FEEDBACK/AreaBlast/BlastFlash.cs` adds a short cosmetic flash after damage is complete. Its expanding/fading ring cannot damage enemies.
+`TOWERS/Shared/Projectiles/SplashProjectile.cs` tracks a target/last-known point and dispatches this helper **once on contact**, using its launch snapshot. It never also deals a direct hit. Tower range is a launch constraint, not an impact constraint. `FEEDBACK/Shockwave/ShockwaveEffect.cs` adds a short cosmetic flash after damage is complete. Its expanding/fading ring cannot damage enemies.
 
 ## Regression coverage and status
 
 `TESTS/AreaDamageChecks.cs` exercises center/half/edge/outside geometry, zero radius, 0/25/75/100% retention, invalid inputs, finite extreme amounts, unique recipients, mutation during a kill callback, queued/freed/unregistered targets, isolated rewards and 500 recipients. Defense fixtures cover Explosive shield-only, hull-only and break spillover plus absolute overrides and penetration. `BlasterCannonChecks` exercises actual fired delivery, launch snapshots, falloff tuning, paid construction/upgrades, caches/Inspector, rates and cleanup. See `TESTS/README.md` for actual build/headless results.
 
-## Future Phase 4E — expanding wavefront remains deferred
+## Phase4E — expanding delivery implemented separately
 
-An instant blast damages a full disc at one moment. A true shockwave must instead damage when a swept advancing annulus crosses an enemy, with a per-emission hit-once set and previous/current radii so long frames cannot skip targets. It may reuse `AtDistance` at encounter distance, but must **not** invoke `ApplyInstant` on the already-expanded disc each tick. Visual thickness is independent of damage geometry.
-
-The complete future contract remains in `TOWERS/Shared/Weapons/Shockwaves/README.md`. No shockwave runtime, research, saving, armour, Missile Tower or unrelated mechanics were added in 4D.
+Instant blast damage remains a full-disc event at contact. ShockwaveEmitter under TOWERS/Shared/Weapons/Shockwaves instead advances a swept moving front, tracks per-emission hit-once IDs and applies damage only on encounter. It reuses AtDistance at contact radius but never repeatedly invokes ApplyInstant. FEEDBACK/Shockwave draws both modes with weapon-specific styles; width/glow/fade do not affect recipient geometry. See the emitter README and ShockwaveChecks for implementation/tests. Research, saving, armour and Missile Tower remain deferred.

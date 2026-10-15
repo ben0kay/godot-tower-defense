@@ -4,7 +4,7 @@ Umbrella folder for **every player-buildable tower**, not just weapons: offensiv
 
 ## Explicit C# tower levels (implemented)
 
-All actual level-dependent combat values and credit prices now live in one typed table per tower: `Offensive/BattleTower/BattleTowerLevels.cs`, `Offensive/LaserTower/LaserTowerLevels.cs`, `Offensive/BlasterCannon/BlasterCannonLevels.cs`. Each labeled line is a complete absolute level. Stage 02 selects that row; there are no cumulative purchased bonuses, percentage increases or level-specific upgrade resources. Changing Level 2 cannot change Level 3. Add another consecutive row to extend a tower.
+All actual level-dependent combat values and credit prices now live in one typed table per tower: `Offensive/BattleTower/BattleTowerLevels.cs`, `Offensive/LaserTower/LaserTowerLevels.cs`, `Offensive/BlasterCannon/BlasterCannonLevels.cs`, `Offensive/ShockwaveTower/ShockwaveTowerLevels.cs`. Each labeled line is a complete absolute level. Stage 02 selects that row; there are no cumulative purchased bonuses, percentage increases or level-specific upgrade resources. Changing Level 2 cannot change Level 3. Add another consecutive row to extend a tower.
 
 Battle retains 200/150/250-Credit prices and 12/16/22 damage, 1/1.2/1.5 shots/sec, 256/288/320px range and 5% penetration. Laser retains 250/175-Credit prices and 12/22 DPS at 256/288px with 6x shield/.15x hull overrides. Blaster retains 300/200-Credit prices and 60/75 damage at 80/96px radius with 25% edge retention. Every row includes its complete aiming/search/speed/response values where applicable.
 
@@ -18,7 +18,7 @@ The historical phase notes below describe earlier milestones; this explicit-leve
 
 **Phase 4A/4B implemented:** `TowerConfig`, `TowerDefinition`, `TowerCatalog` and `TowerPresentation` are the shared foundation. `TowerBase` additionally owns stable type identity, definition, grid anchor/footprint, config compatibility/application, placement/selection hooks and optional range inspection. Placement indexes `TowerBase` and resolves catalog IDs without Battle-specific branches or scene-node assumptions. The HUD creates available catalog entries in a horizontal scrolling tray, using `UIButtonFactory`. Construction identity/prices stay on the canonical Config, referenced by definitions; no second price or stat list exists.
 
-**Default playable roster:** Battle Tower, Laser Tower and Blaster Cannon. The passive scene under `TESTS/Towers/` is a regression fixture, not a promised Repair/Solar tower or a default menu entry. Registering a valid additional definition creates its build choice without editing placement or HUD. Only 1×1 footprints are supported; other footprints fail registration.
+**Default playable roster:** Battle Tower, Laser Tower, Blaster Cannon and the purple Shockwave Tower. The passive scene under `TESTS/Towers/` is a regression fixture, not a promised Repair/Solar tower or a default menu entry. Registering a valid additional definition creates its build choice without editing placement or HUD. Only 1×1 footprints are supported; other footprints fail registration.
 
 **Phase 4C-1/4C-2 implemented (see completed4C-3 below for current balance):** COMBAT/Damage owns typed base hits and a cached canonical shield/hull response profile. Battle bullets deliver Kinetic; legacy TakeDamage keeps 1:1 semantics. Laser Tower sustains Energy DPS through the same resolver, with a separate endpoint-only BeamRenderer and Inspector-editable copied BeamStyle. Its genuine float BeamStats capability uses the same eight stages and paid upgrades. Shared targeting/aiming are reused; delivery remains type-specific rather than introducing a universal weapon switch. Ranks/research/level modifiers/effects, selling, tower HP, shield visuals and multi-cell placement remain future work.
 
@@ -38,7 +38,8 @@ The historical phase notes below describe earlier milestones; this explicit-leve
 | `Offensive/LaserTower/` | EXISTS (4C-2) | Sustained Energy DPS, muzzle beam renderer and paid tier |
 | `Offensive/MissileTower/` | PLANNED | Future explosive weapon |
 | `Offensive/BlasterCannon/` | IMPLEMENTED Phase 4D | Instant AoE projectile tower; owns radius and falloff values |
-| `Shared/Weapons/Shockwaves/` | FUTURE Phase 4E; README only | Timed expanding edge-only wavefront delivery |
+| `Offensive/ShockwaveTower/` | IMPLEMENTED Phase4E | Purple Energy tower, complete wave levels and weapon-owned style |
+| `Shared/Weapons/Shockwaves/` | IMPLEMENTED Phase4E | Swept relative-motion wavefront delivery, hit-once per emission |
 | `COMBAT/Damage/` | EXISTS (4C-1) | Shared typed base damage and canonical shield/hull responses |
 | `Support/`, `Economy/`, `Utility/` | PLANNED | Passive and hybrid tower categories, never mandatory weapon logic |
 | `UI/GameplayHUD/` | EXISTS (dynamic catalog entries) | Replace build choice inputs with catalog data |
@@ -433,9 +434,9 @@ Stage 04 remains neutral. Future permanent ballistic research and saving are def
 
 [`Offensive/BlasterCannon/README.md`](Offensive/BlasterCannon/README.md) describes the registered `blaster_cannon`: 300 Credits, Explosive 60 base damage, 80 px radius, 25% edge retention, 0.5 shots/sec, 500 px/sec projectile, 256 px range and zero penetration. Its 200-Credit Level 2 adds 15 base damage and 16 px radius; edge retention stays 25%. Optional immutable AreaBlastStats flows through the existing eight stages, complete selected level snapshots, safety clamps, cached selected Inspector and real next-tier previews. Stage 04 remains neutral for future falloff research.
 
-SplashProjectile snapshots damage/type/defense overrides/penetration/radius/edge at launch and detonates once at the target or last-known point, even when the target disappears or leaves firing range. BlastFlash under FEEDBACK/AreaBlast is purely visual. No generic placement/HUD changes or Battle/BasicProjectile behavior changes are required. Tests and actual validation are recorded in TESTS/README.md.
+SplashProjectile snapshots damage/type/defense overrides/penetration/radius/edge at launch and detonates once at the target or last-known point, even when the target disappears or leaves firing range. The shared ShockwaveEffect under FEEDBACK/Shockwave is purely visual; Blaster supplies its orange style. No generic placement/HUD changes or Battle/BasicProjectile behavior changes are required. Tests and actual validation are recorded in TESTS/README.md.
 
-[`Shared/Weapons/Shockwaves/README.md`](Shared/Weapons/Shockwaves/README.md) remains the future Phase 4E contract: damage occurs only when an advancing wavefront crosses an enemy. No shockwave runtime, permanent research, saving, Missile Tower or armour is implemented in 4D.
+[`Shared/Weapons/Shockwaves/README.md`](Shared/Weapons/Shockwaves/README.md) now documents implemented Phase4E: damage occurs only when an advancing wavefront crosses an enemy. Research, saving, Missile Tower and armour remain deferred.
 
 ## Current live Inspector files
 
@@ -460,7 +461,7 @@ TowerUpgradeChecks covers paid HUD actions, stale/same-frame duplicate protectio
 
 ## Implemented Phase 4A/4B verification and authoring
 
-`DefaultTowerCatalog.tres` references BattleTowerDefinition, LaserTowerDefinition and BlasterCannonDefinition. Add a tower by authoring a compatible `TowerBase` scene/script, typed `TowerConfig`, icon and `TowerDefinition` (ID/category/scene/config/icon/1×1 footprint), then adding the definition to the catalog's Definitions array. Expand DefaultConfig to edit identity and non-level policy; edit its *Levels.cs table for all numeric combat stats and prices. Definitions do not independently override prices or names. Rebuild the catalog and rebind the HUD after runtime registration/availability edits; ordinary frames do neither. Available=false hides the build entry and rejects placement; asset/config validation still applies to registered entries. Empty catalogs display a safe message.
+`DefaultTowerCatalog.tres` references BattleTowerDefinition, LaserTowerDefinition, BlasterCannonDefinition and ShockwaveTowerDefinition. Add a tower by authoring a compatible `TowerBase` scene/script, typed `TowerConfig`, icon and `TowerDefinition` (ID/category/scene/config/icon/1×1 footprint), then adding the definition to the catalog's Definitions array. Expand DefaultConfig to edit identity and non-level policy; edit its *Levels.cs table for all numeric combat stats and prices. Definitions do not independently override prices or names. Rebuild the catalog and rebind the HUD after runtime registration/availability edits; ordinary frames do neither. Available=false hides the build entry and rejects placement; asset/config validation still applies to registered entries. Empty catalogs display a safe message.
 
 Passive scenes need no pivot, projectile node, weapon stats, range ring or processing. `TowerConfig.ResolveStats`/`DescribeStats`/`DescribeChanges` are type-aware adapters; Battle keeps the unchanged eight numerical stages and real upgrade preview. Future passive progression with actual capability stats can supply its own typed data when that consumer exists; the passive fixture deliberately has no upgrades or combat snapshot.
 
@@ -471,3 +472,11 @@ At the 4A checkpoint the real Godot headless integration scene passed catalog/mi
 4C-1 was committed/verified separately before any Laser code: direct C# compilation with Godot source generators and the actual Godot 4.7.2 headless integration scene passed, including DamageTypeChecks, opt-in shield waves and all old Battle/navigation/economy tests. Stage4C-2 then passed the full suite with LaserTowerChecks and the 500-ship fixture. Default Laser price 250 Credits, base20 DPS/256px; its175-Credit level 2 tier resolves 30 DPS/288px.20 Energy base DPS removes 40 shield or17 unshielded hull per second, within float tolerance. Battle's200 construction,150/250 upgrades,12 base hull hit, guided delivery and kill rewards remain unchanged.
 
 The environment's ordinary editor SDK/MSBuild build could not run (missing/incomplete .NET SDK/MSBuild setup). Compilation was performed successfully using Roslyn with the actual Godot API/source generator, then the compiled assembly was exercised by Godot headless. Manual live-window rendered beam quality/moving-target visual review is not claimed; automated endpoint geometry, style independence, cleanup and timing are covered.
+
+## Phase4E completed — shared visuals and purple Shockwave Tower
+
+FEEDBACK/Shockwave owns reusable ShockwaveEffect/Style, with Inspector colour/width/glow/opacity/fade/artwork and autonomous or externally driven expansion. Blaster supplies Effects/BlasterShockwaveStyle.tres and still applies instantaneous AoE once before animating its orange ring. BlastFlash was removed.
+
+TOWERS/Shared/Weapons/Shockwaves/ShockwaveEmitter owns one real moving damage front per emission: previous/current radius, swept relative enemy motion, encounter-distance falloff, per-emission hit-once IDs, mutation-safe dispatch and bounded lifetime. It calls Enemy.ApplyDamage through the shared typed defenses, never repeats instant full-disc damage. The shared effect follows exact gameplay radius and remains damage-free.
+
+The registered purple ShockwaveTower has complete independent C# levels: build350 /40 Energy /200px /250px/s /4s /25% edge /0 penetration; upgrade225 /55 /240px /300px/s /3.5s /25% /0. Its exposed cached ShockwaveStats uses the existing eight-stage pipeline, real Inspector/previews/economy and max-level behavior. Default inherited Energy defenses remain2x shield/.85x hull. The tower pulses without a target/aim loop, and emitted fronts keep their own launch inputs after upgrades/source removal. Art and travelling ring are purple-themed. See Offensive/ShockwaveTower/README.md for full ownership/cadence details and TESTS/README.md for actual checks. No permanent research, saving, armour, Missile Tower or unrelated mechanics were added.

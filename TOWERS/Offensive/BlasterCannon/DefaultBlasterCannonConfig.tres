@@ -2,5 +2,8 @@
 
 [ext_resource type="Script" path="res://TOWERS/Offensive/BlasterCannon/BlasterCannonConfig.cs" id="1"]
 
+[ext_resource type="Resource" path="res://TOWERS/Offensive/BlasterCannon/Effects/BlasterShockwaveStyle.tres" id="2"]
+
 [resource]
 script = ExtResource("1")
+ImpactStyle = ExtResource("2")

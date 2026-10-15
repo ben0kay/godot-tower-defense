@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ShockwaveStyle" format=3]
+[ext_resource type="Script" path="res://FEEDBACK/Shockwave/ShockwaveStyle.cs" id="1"]
+[resource]
+script = ExtResource("1")
+RingColor = Color(0.83, 0.5, 1, 1)
+RingWidth = 3.0
+GlowColor = Color(0.48, 0.12, 1, 0.35)
+GlowWidth = 10.0
+ExpansionDuration = 0.8
+VisualRadius = 200.0
+StartRadiusFraction = 0.0
+FadeStartFraction = 0.65
+FadePower = 0.7
