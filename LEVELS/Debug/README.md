@@ -28,6 +28,12 @@ F2 cycles **catalog scene order**, not the internal `EnemyId`, display name or i
 
 ## F3 route preview
 
-With Debug.Enabled and live world services, **F3** opens a small panel below the existing debug readout. Select an active portal, enemy type, 1–12 samples and Final Refined/Raw A*, then **Simulate Paths**. Final Refined is the default. White shows neutral shortest routing; colored lines and legend show sample profile, physical distance, distance overhead and duplicate routes. **Clear Paths** removes results; F3 hides the panel/lines and cancels work. Nothing is spawned.
+With Debug.Enabled and live world services, **F3** opens a small panel below the existing debug readout. Select an active portal or **ALL PORTALS**, enemy type, **1–50 paths per portal** and Final Refined/Raw A*, then **Simulate Paths**. Final Refined is the default. White shows neutral shortest routing; colored lines and legend show sample profile, physical distance, distance overhead and duplicate routes. **Clear Paths** removes results; F3 hides the panel/lines and cancels work. Nothing is spawned.
 
 `PreviewKey` defaults F3; `PreviewCalculationsPerFrame` defaults 1 and `PreviewMillisecondsPerFrame` defaults 1 ms (soft, 0 disables time limiting). These budgets are separate from gameplay PathRequestManager budgets. No preview calculations run while closed. Current settings and per-type permissions apply; source/radius failures draw no unsafe lines. Map/settings changes clear results for explicit resimulation. Congestion is a snapshot, not a traffic prediction. Only direct portal-to-Citadel previews are implemented; checkpoints remain deferred. No panel exists in isolated F6 map scenes lacking world services.
+
+### Preview-only diversity controls
+
+F3 provides Enable Path Diversity, Diversity Strength (0–3), Weighted Profiles (1–16) and Reset to Game Settings. Values are held in a private copied EnemyMasterConfig and a detached preview-only A* profile pool, shared across that preview batch's portals. They never modify the live resource, live profile caches, authored files or enemy routes. Reset copies current game settings into the panel. The legend displays the values so they can be transferred manually into normal configuration later. Closing F3 retains the local control values for reopening; leaving the level discards them.
+
+ALL PORTALS draws up to 50 samples for each active portal (five portals means up to 250 paths), with portal color families and per-portal unique-route counts. Every portal shares the same per-frame debug work cap; the cap is not multiplied by portal count. Large batches can take several seconds to fill in. The scrollable panel keeps all controls and the legend accessible. Weighted profiles still may choose duplicate routes.

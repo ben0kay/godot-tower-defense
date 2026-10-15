@@ -1,35 +1,46 @@
-# F3 route preview verification
+# F3 route preview — usage and verification
 
-Implemented/tested 2026-10-15 on GitHub base `3470c61` using Godot 4.7.2 Mono and .NET 8. No checkpoint routing is included. Rebased before push onto `e1c5500` (planning-document changes only; runtime source unchanged).
+Expanded 2026-10-15 on GitHub base `9e0cb0f`, Godot 4.7.2 Mono / .NET 8. Rebased before push onto `0b0adc0` (economy planning-doc changes only; runtime source unchanged). Checkpoints remain deferred.
 
 ## Try it
 
-Launch a campaign level normally, or F6 Main/MainLevel002. Press **F3**, choose **Portal**, **Enemy type**, **Path samples (1–12)** and **Final Refined / Raw A***. Click **Simulate Paths**. Toggle the neutral comparison, click **Clear Paths**, or press F3 again to hide/cancel everything. Changes to controls or relevant map/settings clear old results; press Simulate again. No enemy ships are spawned by the tool. F6 on an isolated map without the live world services does not offer this panel.
+Load a campaign level normally (or F6 Main/MainLevel002). Press **F3**. Choose one portal or **ALL PORTALS**, a catalog enemy type, **1–50 paths per portal**, and Final Refined / Raw A*. Click **Simulate Paths**. White shows unweighted shortest routing; colored portal families show sample paths. The scrollable legend reports profile, distance overhead, duplicate samples and unique routes per portal. Clear Paths or F3 cancels/removes everything. Isolated map-only F6 scenes without world services have no panel.
 
-White = neutral shortest unrefined routing. Colors = deterministic preview sample routes. Legend reports profile, physical distance, distance overhead and duplicates. Samples may overlap. Spawn jitter, enemy timing and future congestion are not simulated; current congestion is a snapshot. A mid-job snapshot change cancels that job rather than mixing costs. Invalid clearance/unreachable routes are reported without unsafe drawn connectors.
+### Preview-only settings
 
-## Actual results
+- Enable Path Diversity
+- Diversity Strength: 0–3
+- Weighted Profiles: 1–16
+- Reset to Game Settings
 
-- Direct Roslyn C# compilation with Godot source generators: passed, no diagnostics. Final production sources include the original, unchanged Level002Checks call.
-- `RoutePreviewChecks.tscn`: exit 0 on final code. Uses real F3 handler, real controls/button callbacks and both Main/Level001 and MainLevel002/Level002 services. Covers hidden defaults; opening/closing; all registered enemy choices; 12-sample raw/refined repeatability; neutral comparison; duplicate labels; all eight type permission combinations in both modes; one-query debug budget; mid-job input/settings/navigation cancellation; no-goal/invalid-start failure; Clear; ignored key repeat; disabling Debug; unsnapped SpawnExit connectors; and unchanged live assignment ordinals, registry, queue/count state. Real preview jobs are also run with 500 living ships.
-- `CorridorNavigationChecks.tscn`: exit 0, including MovementPermissionChecks, existing corridor geometry/repath assertions and all twelve straight/winding, 100/500-enemy, 0/50/100% cases.
-- `MenuTowerFlowChecks.tscn`: exit 0, real Boot/Main/Campaign/Level001 button flow and placement/upgrades.
-- `PlacementPerformanceChecks.tscn`: exit 0 for 100 and 500 enemies.
-- Full unmodified `EnemyIntegrationChecks.tscn`: **fails** at `Level002Checks`' pre-existing assertion "The western open ground and eastern maze are fully painted". Reproduced the identical failure on a separate untouched worktree at GitHub base `3470c61`; the overlay does not change Level002 tiles or that test.
-- Diagnostic integration run with only the `Level002Checks.Run()` invocation temporarily skipped: exit 0, all remaining combat/terrain/spatial/wave/rank/navigation checks passed (final 31 integration checks), including CorridorAssignmentChecks, SwarmNavigationChecks, RepathMovementChecks and SmoothRepathChecks. The skipped call was restored immediately after compiling the diagnostic binary and is **not** omitted in committed source. This diagnostic run is not claimed as a clean full-suite pass.
+These controls edit a private EnemyMasterConfig copy. Each Simulate creates one detached private NavigationGrid pool (up to 16 weighted grids plus neutral) for the whole batch, never per path, portal or enemy. The pool reads authoritative WorldGrid solidity and a frozen copy of the current crowd snapshot, but it never changes live enemy weights/configuration or scans the enemy registry. Closing/resetting/clearing releases preview native grids explicitly; level exit also disposes the settings copy. No .cs/.tres files are saved, and no Apply-to-Game action exists. The legend prints tested values for manual transfer into normal configuration.
+
+The normal game's profile limit also rises to 16; default remains 4. One sample uses only its selected profile. More raw samples can repeat profile routes. Per-type diversity/offset/corridor permissions still apply. Offset/corridor settings are copied from the game; this pass adds UI controls for Path Diversity only.
+
+ALL uses **50 per portal**, not 50 spread across the map: five portals can show 250 paths. All jobs together share the existing debug default of one A* query / soft 1 ms per physics step. Single native queries and refinement are indivisible, so the time cap is soft. For five portals/four goals/50 samples, 1,020 queries require at least 1,020 physics steps (about 17 seconds at 60Hz), with results filling in as available. Nothing recalculates after completion. Inputs/map/settings changes discard stale output for explicit resimulation. Closing F3 stops preview processing.
+
+## Verification
+
+- Direct Roslyn C# compilation + Godot source generators: passed, no diagnostics. Standard MSBuild remains unavailable in this container due to the previously verified missing NuGet.Protocol dependency.
+- `RoutePreviewChecks.tscn`: passed on both campaign levels. Real panel/button/key callbacks; Raw/Refined reproducibility; all eight type permissions; neutral baseline; unsnapped exits; invalid/no-goal handling; stale-input cancellation; duplicate reporting; 50 paths per portal; ALL; 16-profile grid ownership/selection; preview-only on/off/strength/count edits; reset; live-config identity/value/pool isolation; unchanged assignment counters and live queues; F3 close/Debug disable cleanup. Production AssignProfile is separately checked for two complete 0–15 cycles. ALL/50/16 also runs with 500 living enemies.
+- `CorridorNavigationChecks.tscn`: exit 0, all existing geometry, MovementPermissionChecks and twelve 100/500 × straight/winding × 0/50/100% cases.
+- `MenuTowerFlowChecks.tscn`: exit 0, Boot/Main/Campaign, tower build and paid upgrade flow.
+- `PlacementPerformanceChecks.tscn`: exit 0 for 100/500.
+- Unmodified `EnemyIntegrationChecks.tscn`: fails at the existing `Level002Checks` painted-tile-count assertion. This was independently reproduced on untouched `3470c61` during the first overlay pass; subsequent GitHub changes before this pass are planning docs only. No map or map-test assertions are changed here.
+- Diagnostic run with only the `Level002Checks.Run()` invocation temporarily skipped: exit 0; all remaining combat, spatial, terrain, waves, ranks and navigation checks passed (final 31 integration checks, including SwarmNavigationChecks/RepathMovementChecks/SmoothRepathChecks). Original source call was restored immediately after diagnostic compilation and the final production binary rebuilt. This is not a clean unmodified full-suite pass.
 - `git diff --check`: passed.
 
-Normal `dotnet build --no-restore` is blocked by this container's missing `NuGet.Protocol, Version=6.11.2.1` dependency before project compilation. Direct C# compilation and actual Godot .NET headless execution succeeded. No manual graphical playtest is claimed. Expected existing missing-catalog fallback warnings remain.
+No manual graphical playtest is claimed. Expected existing missing-catalog fallback warnings remain.
 
-## Performance and isolation
+## Recorded expanded-pass timings
 
-Final preview test, with 500 living enemies (total work distributed across bounded steps):
+Headless CPU totals, distributed over bounded preview steps, including private-grid setup and debug output. Other suites ran concurrently; not FPS or a controlled speedup measurement.
 
-| Level | Twelve samples plus neutral | Total preview work |
-| --- | --- | --- |
-| Level001 | 13 A* goal queries | 4.16 ms |
-| Level002 | 52 A* goal queries, four Citadel goals | 72.53 ms |
+| Scenario | Samples | Queries | Total CPU work |
+| --- | --- | --- | --- |
+| Level001, ALL | 2 portals × 50 | 102 | 124.14 ms |
+| Level002, ALL | 5 portals × 50 | 1,020 | 1,657.02 ms |
+| Level001, ALL with 500 live enemies | 2 portals × 50 | 102 | 122.45 ms |
+| Level002, ALL with 500 live enemies | 5 portals × 50 | 1,020 | 1,494.24 ms |
 
-Defaults: one query and soft 1 ms per preview physics step, separate from live gameplay requests. An individual native A* plus safety/refinement step cannot be interrupted and can exceed the soft time cap. Results are cached, with zero path recomputation per frame when finished and no preview processing when closed. Timings include safety/refinement; these are headless CPU measurements, not rendered FPS or a before/after optimization claim.
-
-Preview never calls AssignProfile, AssignCorridorSeed, Spawn, Enemy.Initialize or the live path queues. Catalog definitions are read through packed-scene state without instantiating enemy scenes. Preview seeds/offsets are local deterministic samples; weights/solidity and refinement algorithms are the production ones. Shared profile crowd-cache synchronization is deterministic, and FindPreviewPath restores the live native-A* timing diagnostic. Live routes, Credits, XP and wave RNG are not modified.
+Live path queues/calculation counters remain unchanged during these runs. Weighted grid preparation happens on Simulate; no private grids are constructed per sample. Legend/draw caches update when a sample finishes, rather than after every goal query. Large batches still have noticeable total debug work and can overrun the soft limit on individual searches; they are deliberately spread across frames.

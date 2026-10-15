@@ -29,7 +29,7 @@ Duplicate requests coalesce. Ships close to the blocking segment get higher path
 
 ## Route preferences and congestion
 
-EnablePathDiversity, PathDiversityStrength (0.6), RouteProfileCount (4, capped at 8), PreferencePatchCells (8), and RoutePreferenceSeed configure smooth deterministic cost patterns. Ships receive a profile on spawn. Disable diversity for ordinary shortest paths. No algorithm can create another corridor where only one exists.
+EnablePathDiversity, PathDiversityStrength (0.6), RouteProfileCount (4, capped at 16), PreferencePatchCells (8), and RoutePreferenceSeed configure smooth deterministic cost patterns. Ships receive a profile on spawn. Disable diversity for ordinary shortest paths. No algorithm can create another corridor where only one exists.
 
 CongestionInfluence defaults to 0/off. Throttled snapshots of living ship density affect new/repath queries; existing routes are not periodically recalculated for crowds. Per-profile sparse weight caches restore old snapshot costs before replacing them. A* candidates are rescored consistently against the current snapshot. Separation settings remain reserved and inactive.
 
@@ -57,6 +57,8 @@ Actual varied geometry supplies cached route dependencies, physical remaining di
 
 EnemyDefinition.AllowPathDiversity=false uses reserved NavigationGrid.NeutralProfile (-1). One extra shared A* grid has unit point weights and never receives congestion, including RouteCost multi-goal comparisons. Existing weighted IDs and assignment stream are unchanged; profile zero is not neutral when diversity is enabled. SharedProfileCount retains its weighted-pool diagnostic meaning; TotalSharedProfileCount includes the extra neutral grid. Every grid shares blocked cells, corner policy, revisions and incremental tower updates. No additional requests, budget changes or per-enemy grids are introduced. Permissions are cached at initialization. Corridor/offset gates remain independent geometric refinements. See TESTS/MovementPermissions.md.
 
-## Read-only debug route queries
+## Isolated debug route queries
 
-F3 RoutePreviewJob uses shared weighted/neutral profiles with separate count/soft-time budgets and does not enqueue gameplay requests or advance profile/seed assignment counters. FindPreviewPath preserves LastAStarMilliseconds so preview queries do not overwrite live native-A* diagnostics. Applying an existing crowd snapshot only synchronizes deterministic shared caches. Preview output validates actual-radius swept/corner safety, uses the real SpawnExit and compares all current Citadel goals using the selected profile's costs. Completed polylines are cached; changed inputs invalidate them. This is a route-plan overlay, not full enemy simulation or checkpoint routing.
+F3 owns a detached NavigationGrid preview pool created from a private EnemyMasterConfig copy. It reuses production A* construction, unit-cost neutral routing and the same authoritative WorldGrid solidity, but no weighted/crowd caches are shared with live navigation. One preview pool is reused across all portals in a batch. Congestion is copied once from the live sparse snapshot, never rescanned by the debugger. The pool and copied resource are explicitly released on reset/close/level exit as appropriate.
+
+Live and preview RouteProfileCount accept 1–16, with the existing default 4 unchanged. F3 controls expose preview-only diversity enable/strength/count; no file writes or live-config assignments are made. Jobs respect type permissions and compare every current Citadel goal using selected costs, including neutral -1. All portals together use one bounded debug request budget, never gameplay request queues or assignment counters. Native timing diagnostics of live navigation remain unchanged. Finished plans are cached; source/settings/navigation changes cancel output. No checkpoint routing is implemented.

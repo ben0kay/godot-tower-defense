@@ -33,7 +33,7 @@ public sealed class RoutePreviewJob
     {
         _nav = nav; _config = nav.Config; nav.Refresh(); _start = start; _radius = enemy.RadiusPixels;
         _refined = refined; _offsets = enemy.AllowPathOffsets; _corridors = enemy.AllowCorridorVariation;
-        _diversity = enemy.AllowPathDiversity; _count = Mathf.Clamp(count, 1, 12);
+        _diversity = enemy.AllowPathDiversity; _count = Mathf.Clamp(count, 1, 50);
         _goals = nav.Goals.ToArray(); _revision = nav.Revision; _costRevision = nav.CostRevision;
         _settings = SettingsHash(_config); _crowdRevision = nav.CongestionRevision;
         if (!float.IsFinite(_radius) || _radius <= 0 || _radius >= nav.Grid.Config.CellSize * 0.5f)
@@ -54,7 +54,7 @@ public sealed class RoutePreviewJob
         while (!Complete && LastCalculations < Mathf.Clamp(maxCalculations, 1, 8))
         {
             int profile = _sample < 0 || !_diversity || !_config.EnablePathDiversity ? NavigationGrid.NeutralProfile
-                : _sample % Mathf.Clamp(_config.RouteProfileCount, 1, 8);
+                : _sample % Mathf.Clamp(_config.RouteProfileCount, 1, 16);
             Vector2[] route = _nav.FindPreviewPath(_start, _goals[_goal++], profile, out float cost);
             LastCalculations++; TotalCalculations++;
             if (cost < _bestCost && Safe(route)) { _best = route; _bestCost = cost; }

@@ -14,6 +14,10 @@ public partial class RoutePreviewChecks : Node
     {
         try
         {
+            EnemyMasterConfig sixteen = new() { RouteProfileCount = 16 };
+            PathRequestManager assignment = new() { Config = sixteen };
+            try { for (int i = 0; i < 32; i++) Require(assignment.AssignProfile() == i % 16, "Production assignment cycles all sixteen profile IDs"); }
+            finally { assignment.Free(); sixteen.Dispose(); }
             foreach (string scene in new[] { "Main.tscn", "MainLevel002.tscn" }) await CheckLevel(scene);
             GD.Print("PASS: F3 preview UI, deterministic raw/refined paths, budgets, neutral comparison, duplicate reporting, input cancellation and gameplay isolation on both levels");
             GetTree().Quit();
@@ -58,6 +62,30 @@ public partial class RoutePreviewChecks : Node
             simulate.EmitSignal(Button.SignalName.Pressed); Run(overlay);
             Require(last.SequenceEqual(overlay.Job.Results[0].Points), "Same settings give stable repeated samples");
         }
+        SpinBox strength = Find<SpinBox>(panel, "DiversityStrength"), profiles = Find<SpinBox>(panel, "Profiles");
+        CheckButton diversity = Find<CheckButton>(panel, "Diversity");
+        EnemyMasterConfig liveConfig = nav.Config; int liveHash = RoutePreviewJob.SettingsHash(liveConfig), livePools = nav.TotalSharedProfileCount;
+        Require(count.MaxValue == 50 && profiles.MaxValue == 16 && portal.GetItemText(portal.ItemCount - 1) == "ALL PORTALS", "Expanded Inspector/UI limits and ALL option");
+        profiles.Value = 16; strength.Value = 2.5; diversity.ButtonPressed = true;
+        portal.Select(portal.ItemCount - 1); mode.Select(1); count.Value = 50;
+        Stopwatch allClock = Stopwatch.StartNew(); simulate.EmitSignal(Button.SignalName.Pressed);
+        NavigationGrid privatePool = Field<NavigationGrid>(overlay, "_previewNav");
+        Require(!ReferenceEquals(privatePool, nav) && !ReferenceEquals(privatePool.Config, liveConfig) && privatePool.SharedProfileCount == 16,
+            "Sixteen actual preview grids are privately owned, plus neutral");
+        Run(overlay);
+        RoutePreviewJob[] all = overlay.PortalJobs.ToArray();
+        Require(all.Length == portal.ItemCount - 1 && all.All(j => j.Complete && j.Results.Count + j.Failed == 50), "ALL completes 50 samples for each registered portal");
+        Require(all.SelectMany(j => j.Results).Any(r => r.Profile == 15), "Sixteenth weighted profile participates in preview selection");
+        Require(ReferenceEquals(nav.Config, liveConfig) && RoutePreviewJob.SettingsHash(liveConfig) == liveHash && nav.TotalSharedProfileCount == livePools,
+            "Preview overrides never mutate live config or live A* pool");
+        GD.Print($"PREVIEW ALL {scene}: {all.Length} portals x 50 samples, {all.Sum(j => j.TotalCalculations)} queries, {allClock.Elapsed.TotalMilliseconds:0.00}ms total bounded work including private grid setup");
+        diversity.ButtonPressed = false; Require(overlay.Job == null, "Preview setting edit cancels all cached portals");
+        count.Value = 2; simulate.EmitSignal(Button.SignalName.Pressed); Run(overlay);
+        Require(overlay.PortalJobs.All(j => j.Results.All(r => r.Profile == -1)), "Preview diversity OFF uses neutral paths for every portal");
+        overlay.ResetSettings();
+        Require((int)profiles.Value == Mathf.Clamp(liveConfig.RouteProfileCount, 1, 16) && Mathf.IsEqualApprox((float)strength.Value, liveConfig.PathDiversityStrength)
+            && diversity.ButtonPressed == liveConfig.EnablePathDiversity && overlay.Job == null, "Reset restores game values without writing them");
+        portal.Select(0); count.Value = 12;
         Require(nextProfile == Field<int>(paths, "_nextProfile") && ordinal == Field<uint>(paths, "_corridorSpawnOrdinal")
             && living == spawns.Registry.Living.Count && calculations == paths.TotalCalculations && pending == paths.PendingCount,
             "Preview changes no live assignments, registry, queues or gameplay calculation count");
@@ -118,7 +146,14 @@ public partial class RoutePreviewChecks : Node
                 int queued = paths.PendingCount; long calls = paths.TotalCalculations; Stopwatch perf = Stopwatch.StartNew();
                 RoutePreviewJob busy = new(nav, fixture, start, 12, true); Complete(busy);
                 Require(paths.PendingCount == queued && paths.TotalCalculations == calls && spawns.Registry.Living.Count == 500, "Preview with 500 ships leaves live requests untouched");
-                GD.Print($"PREVIEW BENCH {scene}: 500 live ships; {busy.TotalCalculations} preview queries, {perf.Elapsed.TotalMilliseconds:0.00}ms total spread over bounded steps");
+                if (!overlay.IsOpen) overlay.Toggle();
+                portal.Select(portal.ItemCount - 1); count.Value = 50; profiles.Value = 16; strength.Value = 1.5; diversity.ButtonPressed = true;
+                perf.Restart(); simulate.EmitSignal(Button.SignalName.Pressed); Run(overlay);
+                Require(overlay.PortalJobs.All(j => j.Results.Count + j.Failed == 50) && paths.PendingCount == queued && paths.TotalCalculations == calls,
+                    "ALL/50/16 with 500 enemies preserves every live request");
+                GD.Print($"PREVIEW ALL500 {scene}: {overlay.PortalJobs.Count} portals x 50 samples, {perf.Elapsed.TotalMilliseconds:0.00}ms bounded work; live queue unchanged");
+                overlay.Toggle();
+
             }
             finally { foreach (Enemy enemy in population) enemy.Free(); }
         }
@@ -131,7 +166,7 @@ public partial class RoutePreviewChecks : Node
     // Bound each debug tick independently and ensure every A* query fits the selected count cap.
     private static void Run(RoutePreviewOverlay overlay)
     {
-        for (int i = 0; overlay.Job != null && !overlay.Job.Complete && i < 1000; i++)
+        for (int i = 0; overlay.Job != null && !overlay.Job.Complete && i < 10000; i++)
         { overlay._PhysicsProcess(1.0 / 60); Require(overlay.Job == null || overlay.Job.LastCalculations <= 1, "Debug A* count cap"); }
         Require(overlay.Job != null && overlay.Job.Complete, "Preview completes within bounded work");
     }

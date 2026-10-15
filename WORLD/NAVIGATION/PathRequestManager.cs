@@ -52,7 +52,7 @@ public partial class PathRequestManager : Node
 
     // =========================================================
     // Profiles are balanced independently from offset randomization.
-    public int AssignProfile() => _nextProfile++ % Mathf.Clamp(Config.RouteProfileCount, 1, 8);
+    public int AssignProfile() => _nextProfile++ % Mathf.Clamp(Config.RouteProfileCount, 1, 16);
 
     // =========================================================
     // One independent ordinal per initialized ship; does not change profile/wave/portal random streams.

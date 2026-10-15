@@ -3,6 +3,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 public partial class RoutePreviewOverlay : Node2D
 {
@@ -11,7 +12,15 @@ public partial class RoutePreviewOverlay : Node2D
     public int MaxCalculationsPerFrame { get; set; } = 1;
     public double MaxMillisecondsPerFrame { get; set; } = 1;
     private SpawnManager _spawns;
-    private NavigationGrid _nav;
+    private NavigationGrid _nav, _previewNav;
+    private EnemyMasterConfig _previewSettings;
+    public IReadOnlyList<RoutePreviewJob> PortalJobs => _plans.Select(p => p.Job).ToArray();
+    private sealed record Plan(string Portal, Vector2 Start, RoutePreviewJob Job, int ColorIndex);
+    private readonly List<Plan> _plans = new();
+    private int _planIndex;
+    private CheckButton _diversity;
+    private SpinBox _strength, _profiles;
+    private bool _resetting;
     private CanvasLayer _canvas;
     private OptionButton _portals, _enemies, _mode;
     private SpinBox _count;
@@ -20,7 +29,7 @@ public partial class RoutePreviewOverlay : Node2D
     private readonly List<Marker2D> _exits = new();
     private readonly List<EnemyDefinition> _definitions = new();
     private int _inputStamp;
-    private Vector2 _start;
+
 
     #region Panel and Input
     // =========================================================
@@ -29,17 +38,28 @@ public partial class RoutePreviewOverlay : Node2D
     {
         _spawns = spawns; _nav = spawns.Paths.Navigation; ZIndex = 90;
         _canvas = new CanvasLayer { Name = "PreviewUI", Layer = 20, Visible = false }; AddChild(_canvas);
-        PanelContainer panel = new() { Name = "Panel", Position = new(16, 190), Size = new(390, 480) };
+        PanelContainer panel = new() { Name = "Panel", Position = new(16, 190), Size = new(420, 490) };
         UIMasterConfig theme = GD.Load<UIMasterConfig>("res://UI/DefaultUIConfig.tres");
         panel.AddThemeStyleboxOverride("panel", UIButtonFactory.Box(theme.PanelColor, theme.AccentColor)); _canvas.AddChild(panel);
-        VBoxContainer box = new(); panel.AddChild(box);
+        ScrollContainer scroll = new() { HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
+        panel.AddChild(scroll);
+        VBoxContainer box = new() { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill }; scroll.AddChild(box);
         box.AddChild(UIButtonFactory.Label("ROUTE PREVIEW · F3", 18));
         _portals = Choice(box, "Portal", "Portal");
         _enemies = Choice(box, "Enemy type", "Enemy");
-        HBoxContainer samples = new(); box.AddChild(samples); samples.AddChild(UIButtonFactory.Label("Path samples", 14));
-        _count = new SpinBox { Name = "Samples", MinValue = 1, MaxValue = 12, Step = 1, Value = 8, SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
+        HBoxContainer samples = new(); box.AddChild(samples); samples.AddChild(UIButtonFactory.Label("Paths per portal", 14));
+        _count = new SpinBox { Name = "Samples", MinValue = 1, MaxValue = 50, Step = 1, Value = 8, SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
         samples.AddChild(_count);
         _mode = Choice(box, "Display", "Mode"); _mode.AddItem("Final Refined"); _mode.AddItem("Raw A*");
+        box.AddChild(UIButtonFactory.Label("PREVIEW ONLY · game settings unchanged", 13));
+        _diversity = new CheckButton { Name = "Diversity", Text = "Enable Path Diversity" }; box.AddChild(_diversity);
+        _strength = Number(box, "Diversity strength", "DiversityStrength", 0, 3, 0.05);
+        _profiles = Number(box, "Weighted profiles", "Profiles", 1, 16, 1);
+        box.AddChild(UIButtonFactory.Create("Reset to Game Settings", ResetSettings, UIButtonStyle.Compact, 28));
+        _diversity.Toggled += value => { if (_resetting) return; _previewSettings.EnablePathDiversity = value; Clear("Preview diversity changed. Simulate Paths to refresh."); };
+        _strength.ValueChanged += value => { if (_resetting) return; _previewSettings.PathDiversityStrength = (float)value; Clear("Preview strength changed. Simulate Paths to refresh."); };
+        _profiles.ValueChanged += value => { if (_resetting) return; _previewSettings.RouteProfileCount = (int)value; Clear("Preview profiles changed. Simulate Paths to refresh."); };
+        ResetSettings();
         _comparison = new CheckButton { Name = "Comparison", Text = "Show neutral shortest route", ButtonPressed = true };
         box.AddChild(_comparison); _comparison.Toggled += _ => { QueueRedraw(); UpdateLegend(); };
         HBoxContainer actions = new(); box.AddChild(actions);
@@ -66,6 +86,33 @@ public partial class RoutePreviewOverlay : Node2D
     }
 
     // =========================================================
+    // Small numeric controls keep experimentation entirely in the debug-owned settings copy.
+    private static SpinBox Number(VBoxContainer box, string caption, string name, double min, double max, double step)
+    {
+        HBoxContainer row = new(); box.AddChild(row); row.AddChild(UIButtonFactory.Label(caption, 14));
+        SpinBox value = new() { Name = name, MinValue = min, MaxValue = max, Step = step, SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
+        row.AddChild(value); return value;
+    }
+
+    // =========================================================
+    // Recopy defaults explicitly; never save, assign or mutate the live EnemyMasterConfig resource.
+    public void ResetSettings()
+    {
+        Clear("Preview values reset to current game settings.");
+        _previewSettings?.Dispose(); _previewSettings = (EnemyMasterConfig)_nav.Config.Duplicate(true);
+        _resetting = true;
+        _diversity.ButtonPressed = _previewSettings.EnablePathDiversity;
+        _strength.Value = _previewSettings.PathDiversityStrength;
+        _profiles.Value = Mathf.Clamp(_previewSettings.RouteProfileCount, 1, 16);
+        _resetting = false;
+    }
+
+    // =========================================================
+    // Dispose all detached native/resource owners before scene teardown can defer them to GC.
+    public override void _ExitTree()
+    { Clear(""); _previewSettings?.Dispose(); _previewSettings = null; }
+
+    // =========================================================
     // F3 hides both panel and paths; reopen starts clean and reflects current registered sources.
     public void Toggle()
     {
@@ -87,6 +134,7 @@ public partial class RoutePreviewOverlay : Node2D
                 if (exit == null) continue;
                 _portals.AddItem(path.ToString()); _exits.Add(exit);
             }
+        if (_exits.Count > 0) _portals.AddItem("ALL PORTALS");
         _enemies.Clear(); _definitions.Clear();
         foreach (PackedScene scene in _spawns.Catalog.Scenes)
         {
@@ -106,17 +154,26 @@ public partial class RoutePreviewOverlay : Node2D
         Clear("Calculating route plans…");
         if (_portals.Selected < 0 || _enemies.Selected < 0 || _exits.Count == 0 || _definitions.Count == 0)
         { Clear("No registered active portal/enemy. Map-edge-only levels have no portal preview."); return; }
-        Marker2D exit = _exits[_portals.Selected];
-        if (!GodotObject.IsInstanceValid(exit)) { Clear("Portal removed. Close/reopen F3 to refresh choices."); return; }
         WorldLevel level = _nav.Grid.Level;
-        string selectedPath = _portals.GetItemText(_portals.Selected);
-        bool active = false;
-        if (level.Settings.SpawnMode != LevelConfig.SpawnSourceMode.MapEdges)
-            foreach (NodePath path in level.Settings.ActivePortals)
-                if (path.ToString() == selectedPath && level.GetNodeOrNull<Node2D>(path)?.GetNodeOrNull<Marker2D>("SpawnExit") == exit) active = true;
-        if (!active) { Clear("Active portals changed. Close/reopen F3 to refresh choices."); return; }
-        _start = exit.GlobalPosition;
-        Job = new(_nav, _definitions[_enemies.Selected], _start, (int)_count.Value, _mode.Selected == 0);
+        bool all = _portals.Selected == _exits.Count;
+        IEnumerable<int> selected = all ? Enumerable.Range(0, _exits.Count) : new[] { _portals.Selected };
+        foreach (int index in selected)
+        {
+            Marker2D exit = _exits[index];
+            if (!GodotObject.IsInstanceValid(exit)) { Clear("Portal removed. Close/reopen F3 to refresh choices."); return; }
+            string pathName = _portals.GetItemText(index);
+            bool active = level.Settings.SpawnMode != LevelConfig.SpawnSourceMode.MapEdges && level.Settings.ActivePortals.Any(path =>
+                path.ToString() == pathName && level.GetNodeOrNull<Node2D>(path)?.GetNodeOrNull<Marker2D>("SpawnExit") == exit);
+            if (!active) { Clear("Active portals changed. Close/reopen F3 to refresh choices."); return; }
+        }
+        _previewNav = NavigationGrid.CreatePreview(_nav, _previewSettings);
+        foreach (int index in selected)
+        {
+            Vector2 start = _exits[index].GlobalPosition;
+            RoutePreviewJob job = new(_previewNav, _definitions[_enemies.Selected], start, (int)_count.Value, _mode.Selected == 0);
+            _plans.Add(new(_portals.GetItemText(index), start, job, index));
+        }
+        _planIndex = 0; Job = _plans[0].Job;
         _inputStamp = InputStamp(); UpdateLegend(); QueueRedraw();
     }
 
@@ -126,8 +183,14 @@ public partial class RoutePreviewOverlay : Node2D
     {
         if (Job == null) return;
         if (_inputStamp != InputStamp()) { Clear("Map/settings/enemy/portal changed. Simulate Paths to refresh."); return; }
-        if (Job.Complete) return;
-        Job.Step(MaxCalculationsPerFrame, MaxMillisecondsPerFrame); UpdateLegend(); QueueRedraw();
+        if (Job.Complete && _planIndex == _plans.Count - 1) return;
+        RoutePreviewJob previous = Job;
+        int before = Job.Results.Count + Job.Failed + (Job.Neutral.Length > 0 ? 1 : 0);
+        Job.Step(MaxCalculationsPerFrame, MaxMillisecondsPerFrame);
+        if (Job.Complete && ++_planIndex < _plans.Count) Job = _plans[_planIndex].Job;
+        else if (Job.Complete) _planIndex = _plans.Count - 1;
+        int after = previous.Results.Count + previous.Failed + (previous.Neutral.Length > 0 ? 1 : 0);
+        if (before != after || previous.Complete) { UpdateLegend(); QueueRedraw(); }
     }
 
     // =========================================================
@@ -135,11 +198,12 @@ public partial class RoutePreviewOverlay : Node2D
     private int InputStamp()
     {
         HashCode h = new(); h.Add(_nav.Revision); h.Add(RoutePreviewJob.SettingsHash(_nav.Config));
+        h.Add(RoutePreviewJob.SettingsHash(_previewSettings));
         h.Add(_nav.Grid.Level.Settings.SpawnMode);
         foreach (NodePath path in _nav.Grid.Level.Settings.ActivePortals) h.Add(path.ToString());
         foreach (Vector2I goal in _nav.Goals) h.Add(goal);
-        if (_portals.Selected >= 0 && _portals.Selected < _exits.Count)
-        { Marker2D exit = _exits[_portals.Selected]; h.Add(GodotObject.IsInstanceValid(exit) ? exit.GlobalPosition : Vector2.Inf); }
+        foreach (Marker2D exit in _exits)
+            h.Add(GodotObject.IsInstanceValid(exit) ? exit.GlobalPosition : Vector2.Inf);
         if (_enemies.Selected >= 0 && _enemies.Selected < _definitions.Count)
         {
             EnemyDefinition d = _definitions[_enemies.Selected]; h.Add(d.RadiusPixels); h.Add(d.AllowPathDiversity);
@@ -151,24 +215,37 @@ public partial class RoutePreviewOverlay : Node2D
     // =========================================================
     // Clearing cancels pending work immediately; the next run cannot publish old results.
     public void Clear(string message)
-    { Job = null; if (_legend != null) _legend.Text = message; QueueRedraw(); }
+    {
+        Job = null; _plans.Clear(); _planIndex = 0;
+        _previewNav?.ReleasePreview(); _previewNav = null;
+        if (_legend != null) _legend.Text = message; QueueRedraw();
+    }
 
     // =========================================================
     // Colors match polylines; duplicate samples remain honest and independently labeled.
     private void UpdateLegend()
     {
         if (Job == null) return;
-        StringBuilder text = new(); text.AppendLine(Job.Message);
-        if (_nav.Config.CongestionInfluence > 0) text.AppendLine("Congestion weights: calculation-time snapshot.");
-        if (Job.Neutral.Length > 0) text.AppendLine($"[color=#ffffff]Neutral shortest: {Job.NeutralLength:0} px[/color]");
-        else text.AppendLine("Neutral shortest: unavailable / calculating.");
-        foreach (RoutePreviewJob.Result r in Job.Results)
+        StringBuilder text = new();
+        text.AppendLine($"PREVIEW ONLY: Diversity {_previewSettings.EnablePathDiversity}; Strength {_previewSettings.PathDiversityStrength:0.00}; Profiles {_previewSettings.RouteProfileCount}");
+        text.AppendLine("Plans, not traffic predictions. Values do not change game settings.");
+        if (_previewSettings.CongestionInfluence > 0) text.AppendLine("Congestion: frozen snapshot from Simulate.");
+        foreach (Plan plan in _plans)
         {
-            string extra = Job.NeutralLength > 0 ? $" ({(r.Length / Job.NeutralLength - 1) * 100:+0.0;-0.0;0.0}% distance)" : "";
-            string duplicate = r.DuplicateOf > 0 ? $" · same as #{r.DuplicateOf}" : "";
-            text.AppendLine($"[color=#{SampleColor(r.Sample).ToHtml(false)}]#{r.Sample} · {(r.Profile < 0 ? "neutral" : "profile " + r.Profile)} · {r.Length:0}px{extra}{duplicate}[/color]");
+            RoutePreviewJob job = plan.Job;
+            int unique = job.Results.Count(r => r.DuplicateOf == 0);
+            string portalColor = PortalColor(plan.ColorIndex).ToHtml(false);
+            text.AppendLine($"[color=#{portalColor}]{plan.Portal} · {job.Results.Count}/{(int)_count.Value} paths · {unique} unique · {job.Failed} failed[/color]");
+            if (job.Neutral.Length > 0) text.AppendLine($"Neutral shortest: {job.NeutralLength:0} px");
+            if (job.Results.Count == 0) text.AppendLine(job.Message);
+            foreach (RoutePreviewJob.Result r in job.Results)
+            {
+                string extra = job.NeutralLength > 0 ? $" ({(r.Length / job.NeutralLength - 1) * 100:+0.0;-0.0;0.0}% distance)" : "";
+                string duplicate = r.DuplicateOf > 0 ? $" · same as #{r.DuplicateOf}" : "";
+                text.AppendLine($"[color=#{SampleColor(plan.ColorIndex, r.Sample).ToHtml(false)}]#{r.Sample} · {(r.Profile < 0 ? "neutral" : "profile " + r.Profile)} · {r.Length:0}px{extra}{duplicate}[/color]");
+            }
         }
-        text.Append("Portal center SpawnExit → Citadel; spawn spread and traffic timing are not simulated.");
+        text.Append("Portal SpawnExit → Citadel. Spawn spread/timing not simulated.");
         _legend.Text = text.ToString();
     }
     #endregion
@@ -179,10 +256,13 @@ public partial class RoutePreviewOverlay : Node2D
     public override void _Draw()
     {
         if (!IsOpen || Job == null) return;
-        if (_comparison.ButtonPressed && Job.Neutral.Length > 0) DrawRoute(Job.Neutral, Colors.White, 4);
-        foreach (RoutePreviewJob.Result result in Job.Results) DrawRoute(result.Points, SampleColor(result.Sample), 2);
-        DrawCircle(ToLocal(_start), 7, Colors.White);
-        DrawString(ThemeDB.FallbackFont, ToLocal(_start) + new Vector2(10, -10), "PORTAL", fontSize: 16);
+        foreach (Plan plan in _plans)
+        {
+            if (_comparison.ButtonPressed && plan.Job.Neutral.Length > 0) DrawRoute(plan.Start, plan.Job.Neutral, Colors.White, 4);
+            foreach (RoutePreviewJob.Result result in plan.Job.Results) DrawRoute(plan.Start, result.Points, SampleColor(plan.ColorIndex, result.Sample), 2);
+            DrawCircle(ToLocal(plan.Start), 7, PortalColor(plan.ColorIndex));
+            DrawString(ThemeDB.FallbackFont, ToLocal(plan.Start) + new Vector2(10, -10), plan.Portal, fontSize: 16);
+        }
         foreach (Vector2I goal in _nav.Goals)
         {
             Vector2 point = ToLocal(_nav.Grid.CellToWorldCenter(goal)); DrawCircle(point, 6, Colors.White);
@@ -191,14 +271,17 @@ public partial class RoutePreviewOverlay : Node2D
     }
     // =========================================================
     // Include the actual unsnapped SpawnExit connector and convert world coordinates into this level-owned canvas.
-    private void DrawRoute(Vector2[] points, Color color, float width)
+    private void DrawRoute(Vector2 start, Vector2[] points, Color color, float width)
     {
-        Vector2[] local = new Vector2[points.Length + 1]; local[0] = ToLocal(_start);
+        Vector2[] local = new Vector2[points.Length + 1]; local[0] = ToLocal(start);
         for (int i = 0; i < points.Length; i++) local[i + 1] = ToLocal(points[i]);
         DrawPolyline(local, color, width, true);
     }
     // =========================================================
     // Stable sample palette independent of any gameplay RNG.
-    private static Color SampleColor(int sample) => Color.FromHsv((sample * 0.618034f) % 1, 0.65f, 1);
+    private static Color SampleColor(int portal, int sample) => Color.FromHsv((portal * 0.618034f + sample * 0.002f) % 1, 0.55f + sample % 4 * 0.1f, 1);
+    // =========================================================
+    // Each portal owns a stable color family in the world and legend.
+    private static Color PortalColor(int portal) => Color.FromHsv((portal * 0.618034f) % 1, 0.65f, 1);
     #endregion
 }

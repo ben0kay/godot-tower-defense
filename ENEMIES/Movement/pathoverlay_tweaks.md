@@ -33,11 +33,15 @@ The user has requested **two features**: (1) a path-simulation/debug overlay, an
 
 ### Implemented first-pass controls
 
-Load Main/Level001 or MainLevel002/Campaign Level002 normally, then press **F3**. Choose a registered active portal, catalog enemy type, **1–12 path samples**, and **Final Refined** (default) or **Raw A***. Click **Simulate Paths**. Toggle the white neutral-shortest comparison; use **Clear Paths** or F3 to remove the lines. F3 closes both panel and overlay and cancels pending work. No gameplay enemies are spawned.
+Load Main/Level001 or MainLevel002/Campaign Level002 normally, then press **F3**. Choose a registered active portal, catalog enemy type, **1–50 paths per portal**, and **Final Refined** (default) or **Raw A***. Click **Simulate Paths**. Toggle the white neutral-shortest comparison; use **Clear Paths** or F3 to remove the lines. F3 closes both panel and overlay and cancels pending work. No gameplay enemies are spawned.
 
-Colored samples show profile ID, physical distance, percentage difference from neutral and exact duplicate labels. The neutral baseline uses the same start/approach goals and radius with unweighted costs and no refinements. Samples use preview-only deterministic seeds and offsets; they illustrate plans, not exact spawn jitter, future traffic or timing. Start is the selected portal's real centered SpawnExit. Congestion is a calculation-time snapshot; if it changes during a job, that job is cancelled for an explicit rerun.
+Colored samples show profile ID, physical distance, percentage difference from neutral and exact duplicate labels. The neutral baseline uses the same start/approach goals and radius with unweighted costs and no refinements. Samples use preview-only deterministic seeds and offsets; they illustrate plans, not exact spawn jitter, future traffic or timing. Start is the selected portal's real centered SpawnExit. Congestion is frozen when Simulate is pressed; live crowd updates cannot change a batch halfway through.
 
-Separate Inspector debug budgets on the level's Debug node default to one A* query / soft 1 ms per physics frame. Completed lines are cached. Input, map, source or relevant Inspector setting changes clear old results; press Simulate again. Changing inputs mid-calculation never combines old/new samples. No background work while closed and no permanent gameplay HUD panel. Runtime debug gameplay is supported; editor-only F6 map scenes without world services do not provide the panel. Checkpoint controls and All Portals mode are deferred.
+Separate Inspector debug budgets on the level's Debug node default to one A* query / soft 1 ms per physics frame. Completed lines are cached. Input, map, source or relevant Inspector setting changes clear old results; press Simulate again. Changing inputs mid-calculation never combines old/new samples. No background work while closed and no permanent gameplay HUD panel. Runtime debug gameplay is supported; editor-only F6 map scenes without world services do not provide the panel. Checkpoint controls remain deferred. ALL PORTALS is implemented.
+
+### Preview-only experimentation
+
+Enable/disable Path Diversity, set Strength (0–3), and choose Weighted Profiles (1–16) inside F3. These use a private settings copy and private shared preview navigation pool, never writing .cs/.tres files or changing live enemy path weights. Reset to Game Settings recopies current normal settings. The legend shows tested values for manual configuration later. Select ALL PORTALS for 1–50 paths **per portal**, color-grouped with unique counts. No Apply-to-Game or save action exists.
 
 ### Purpose
 
@@ -46,9 +50,9 @@ In a running debug game (and ideally usable with existing level editing workflow
 ### Suggested user controls
 
 - Master debug **Show Route Preview** on/off; **no overlay in normal gameplay when disabled**.
-- Choose a portal from the level's registered active portals; optional **All Portals** mode later.
+- Choose a portal from the level's registered active portals; **All Portals** is available.
 - Choose a reference enemy type or clearance radius and respect its three movement permission flags; default to a basic enemy.
-- Select a bounded **sample count**, e.g. 1–12 previews. Show **profile ID** (including neutral), distinct line colors, a concise legend, and clearly labeled start/checkpoint/Citadel.
+- Select a bounded **sample count**, 1–50 previews per portal. Show **profile ID** (including neutral), distinct line colors, a concise legend, and clearly labeled start/checkpoint/Citadel.
 - Modes: **Raw A* route** (priority), then optional **Final Refined Route** (showing Path Offsets + Corridor Variation with deterministic sample seeds). A distinct toggle for checkpoint circles and stage boundaries.
 - A **Refresh Preview** action should redraw using live config; optional refresh on relevant settings/level edits or changed tower occupancy is acceptable if debounced/budgeted.
 - Display useful diagnostics: calculated/failed paths, selected profile, approximate physical route length vs neutral shortest route, checkpoint state, and errors such as unreachable checkpoints.
@@ -59,7 +63,7 @@ In a running debug game (and ideally usable with existing level editing workflow
 2. Keep shared live spawn/profile counters, wave RNG, enemy placement, tower stats, wave scheduling, route queues, source definition resources, enemy registry and **live enemy routes unchanged**. Running a preview must not spawn actual enemies or consume gameplay RNG. Preview-only routing may use existing shared profiles in a read-only/controlled way.
 3. Use the **actual chosen portal SpawnExit**, current map cell solidity, the correct enemy radius and the current Citadel approach markers. If a checkpoint is linked, preview **Portal → checkpoint area → Citadel**, not direct-to-Citadel.
 4. Respect global master controls and per-type permissions. If diversity is denied, show **neutral A***; disabling offsets/corridor should show appropriately unrefined route geometry. Draw safety-valid lines only.
-5. Do not compute 12 routes × every Citadel/checkpoint target **each frame**. Bound preview calculations per frame using separate debug work budgets and cache results until the portal, settings, selected enemy, checkpoint geometry or navigation revision changes. It must remain usable with 500+ enemies. Debug drawing should be batched efficiently in one owner/overlay, not a node per path segment.
+5. Do not compute 50 routes × all portals × every Citadel/checkpoint target **each frame**. Bound preview calculations per frame using separate debug work budgets and cache results until the portal, settings, selected enemy, checkpoint geometry or navigation revision changes. It must remain usable with 500+ enemies. Debug drawing should be batched efficiently in one owner/overlay, not a node per path segment.
 6. Show clearly when a preview is a **route plan** rather than a prediction of exact enemy timing/traffic. With the optional congestion influence, indicate the snapshot nature of previewed weights.
 
 **Implementation suggestion:** a level/debug-owned `RoutePreviewOverlay.cs` under `ENEMIES/Movement/` (or a small `LEVELS/Debug/` counterpart if cleaner), drawing via `_Draw` in world coordinates; optional debug UI controls in the existing level Debug node, not a new permanent gameplay HUD panel. Do not modify `WorldGrid` into a giant debugger.

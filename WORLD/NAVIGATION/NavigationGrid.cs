@@ -49,6 +49,26 @@ public partial class NavigationGrid : Node
     }
 
     // =========================================================
+    // One explicitly owned debug pool isolates preview weights from every live enemy profile/cache.
+    // Copy the current crowd snapshot once; previews never scan enemies or refresh congestion themselves.
+    internal static NavigationGrid CreatePreview(NavigationGrid live, EnemyMasterConfig settings)
+    {
+        NavigationGrid preview = new() { Grid = live.Grid, Config = settings };
+        preview.Refresh();
+        foreach (var entry in live._crowd) preview._crowd.Add(entry.Key, entry.Value);
+        preview._crowdRevision = live._crowdRevision;
+        return preview;
+    }
+
+    // =========================================================
+    // Detached debug pools have no tree lifecycle; release native grids explicitly on the main thread.
+    internal void ReleasePreview()
+    {
+        foreach (Profile profile in _profiles) profile.AStar.Dispose();
+        _profiles.Clear(); Free();
+    }
+
+    // =========================================================
     // Synchronize only on an occupancy/terrain revision; update() would reset solid flags.
     public void Refresh()
     {
@@ -170,7 +190,7 @@ public partial class NavigationGrid : Node
     private void EnsureProfiles()
     {
         var settings = (Config.EnablePathDiversity, Mathf.Max(0f, Config.PathDiversityStrength),
-            Mathf.Clamp(Config.RouteProfileCount, 1, 8), Mathf.Max(2, Config.PreferencePatchCells), Config.RoutePreferenceSeed);
+            Mathf.Clamp(Config.RouteProfileCount, 1, 16), Mathf.Max(2, Config.PreferencePatchCells), Config.RoutePreferenceSeed);
         if (_profiles.Count > 0 && _settings == settings) return;
         foreach (Profile profile in _profiles) profile.AStar.Dispose();
         _profiles.Clear(); _settings = settings; CostRevision++; _revision = -1;

@@ -28,7 +28,7 @@ public partial class EnemyMasterConfig : Resource
     [ExportGroup("Path Diversity")]
     [Export] public bool EnablePathDiversity { get; set; } = true;
     [Export(PropertyHint.Range, "0,3,0.05")] public float PathDiversityStrength { get; set; } = 0.6f;
-    [Export(PropertyHint.Range, "1,8,1")] public int RouteProfileCount { get; set; } = 4;
+    [Export(PropertyHint.Range, "1,16,1")] public int RouteProfileCount { get; set; } = 4;
     [Export(PropertyHint.Range, "2,32,1")] public int PreferencePatchCells { get; set; } = 8;
     [Export] public int RoutePreferenceSeed { get; set; } = 12345;
     [ExportGroup("Optional Congestion")]
