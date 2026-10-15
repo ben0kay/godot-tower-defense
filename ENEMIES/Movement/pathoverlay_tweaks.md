@@ -1,6 +1,6 @@
 # Enemy Movement — Route Preview Overlay and Portal Checkpoint Areas
 
-> **STATUS: ROUTE PREVIEW IMPLEMENTED; CHECKPOINTS STILL PLANNED.** F3 opens the debug route panel. The first-pass direct portal-to-Citadel overlay is implemented; checkpoint nodes/stages and checkpoint-aware previews below remain future specifications. Read the latest GitHub commit, `NOTES/CodePreferences.md`, `ENEMIES/Movement/README.md`, `WORLD/NAVIGATION/README.md`, `WORLD/PORTALS/EnemyPortal/README.md` and the relevant scripts before implementing. Preserve existing movement, combat, terrain, wave, and placement behavior.
+> **STATUS: ROUTE PREVIEW AND REQUIRED CHECKPOINT AREAS IMPLEMENTED.** F3 opens the debug route panel. The first-pass direct portal-to-Citadel overlay is implemented; checkpoint nodes/stages and checkpoint-aware previews are now implemented. See WORLD/ROUTING/RouteCheckpoint/README.md for authoring and TESTS/Checkpoints.md for actual tests and bounded-sampling limitations. Read the latest GitHub commit, `NOTES/CodePreferences.md`, `ENEMIES/Movement/README.md`, `WORLD/NAVIGATION/README.md`, `WORLD/PORTALS/EnemyPortal/README.md` and the relevant scripts before implementing. Preserve existing movement, combat, terrain, wave, and placement behavior.
 
 ## Why this is needed
 
@@ -37,7 +37,7 @@ Load Main/Level001 or MainLevel002/Campaign Level002 normally, then press **F3**
 
 Colored samples show profile ID, physical distance, percentage difference from neutral and exact duplicate labels. The neutral baseline uses the same start/approach goals and radius with unweighted costs and no refinements. Samples use preview-only deterministic seeds and offsets; they illustrate plans, not exact spawn jitter, future traffic or timing. Start is the selected portal's real centered SpawnExit. Congestion is frozen when Simulate is pressed; live crowd updates cannot change a batch halfway through.
 
-Separate Inspector debug budgets on the level's Debug node default to one A* query / soft 1 ms per physics frame. Completed lines are cached. Input, map, source or relevant Inspector setting changes clear old results; press Simulate again. Changing inputs mid-calculation never combines old/new samples. No background work while closed and no permanent gameplay HUD panel. Runtime debug gameplay is supported; editor-only F6 map scenes without world services do not provide the panel. Checkpoint controls remain deferred. ALL PORTALS is implemented.
+Separate Inspector debug budgets on the level's Debug node default to one A* query / soft 1 ms per physics frame. Completed lines are cached. Input, map, source or relevant Inspector setting changes clear old results; press Simulate again. Changing inputs mid-calculation never combines old/new samples. No background work while closed and no permanent gameplay HUD panel. Runtime debug gameplay is supported; editor-only F6 map scenes without world services do not provide the panel. Linked checkpoint circles, entry markers and both route legs are implemented. ALL PORTALS respects each link.
 
 ### Preview-only experimentation
 
@@ -110,8 +110,8 @@ A checkpoint defines a **required region** through which the ship must travel; i
 ## Recommended implementation order
 
 1. **Completed first pass: debug route overlay** using the existing weighted and neutral profiles; show direct portal-to-Citadel routes, editable sample count and profile/length diagnostics. This provides a quick way to see whether the current strong Path Diversity is creating strange detours.
-2. **Second pass: portal checkpoint areas**, with Inspector links, per-ship stage state, reachable radius-based targets, validation and repath correctness.
-3. **Third pass: checkpoint-aware previews**, reusing the *actual* checkpoint routing plan, not a separate simulator. Show both route legs and the checkpoint radius.
+2. **Completed second pass: portal checkpoint areas**, with Inspector links, per-ship stage state, reachable radius-based targets, validation and repath correctness.
+3. **Completed third pass: checkpoint-aware previews**, reusing the *actual* checkpoint routing plan, not a separate simulator. Show both route legs and the checkpoint radius.
 
 This order helps debug each feature separately. Combining them in one Codex change is possible, but keep code modular and independently testable.
 
@@ -131,4 +131,4 @@ This order helps debug each feature separately. Combining them in one Codex chan
 
 A clear, reproducible **route-preview debug mode** plus **optional portal-associated checkpoint regions**, with self-contained small reusable files, Inspector authoring, tests, and brief updates to `ENEMIES/Movement/README.md` and `WORLD/PORTALS/EnemyPortal/README.md`. Do **not** refactor the entire enemy navigation system or alter existing Level001/Level002 art/waves just to add the feature.
 
-**Route preview is implemented and tested; checkpoint functionality remains planned.** See `TESTS/RoutePreview.md` for actual verification and known upstream issues.
+**Route preview and required checkpoints are implemented and tested.** See `TESTS/RoutePreview.md` for actual verification and known upstream issues.

@@ -204,3 +204,7 @@ Resumed verification after rebasing onto3c1c759: direct C# compilation and Enemy
 ## Route preview
 
 Run `RoutePreviewChecks.tscn` for the F3 debug controls, ALL portals, 1–50 paths per portal, private diversity settings up to 16 weighted profiles, and bounded deterministic planning on both campaign levels, including 500-ship isolation. See `RoutePreview.md` for usage, timings and the independently reproduced upstream Level002 map-test failure.
+
+## Required portal checkpoints
+
+Run `CheckpointChecks.tscn` for freely placed required regions, portal attribution, all permission combinations, swept entry at30/60/120Hz, blocked retry, staged F3 plans, thin/wide passages and500-enemy bounded scheduling. See `Checkpoints.md` for outcomes and known upstream integration limitations.

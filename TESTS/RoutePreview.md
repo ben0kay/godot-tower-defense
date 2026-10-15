@@ -1,6 +1,6 @@
 # F3 route preview — usage and verification
 
-Expanded 2026-10-15 on GitHub base `9e0cb0f`, Godot 4.7.2 Mono / .NET 8. Rebased before push onto `0b0adc0` (economy planning-doc changes only; runtime source unchanged). Checkpoints remain deferred.
+Expanded 2026-10-15 on GitHub base `9e0cb0f`, Godot 4.7.2 Mono / .NET 8. Rebased before push onto `0b0adc0` (economy planning-doc changes only; runtime source unchanged). Required checkpoint areas and two-stage previews are now implemented; see `Checkpoints.md` for current-stage verification.
 
 ## Try it
 

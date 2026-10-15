@@ -22,3 +22,7 @@ Default catalog also registers `shield_emitter_mk1` (the `ShieldGenerator.tscn` 
 
 
 Portal offsets now scale by each EnemyPortal.SizeMultiplier and its authored transform. Portal references are cached alongside source metadata; current size is read on each spawn, so changing it needs no A* or navigation rebuild. The base config offset remains the shared tuning control, and all8 bounded safety attempts/center fallback still apply. Map-edge sources are unaffected.
+
+## Portal checkpoint assignment
+
+Both debug and authored wave spawns inspect only the actual selected EnemyPortal's optional CheckpointPath. Its resolved node plus a separate required flag are supplied before initial movement setup, preserving missing-link requirements. No extra wave/spawn RNG draws or changes to reservoir selection, spread, registry/economy or terrain initialization are introduced. Empty links and map-edge sources preserve existing direct routing.

@@ -138,7 +138,8 @@ public partial class SpawnManager : Node
             if (portalOnly || source < _portalCount) position = OffsetPortal(position, ship.Definition.RadiusPixels, _spawnRandom, portals[source]);
             _sourceIndex = (_sourceIndex + i + 1) % sources.Count;
             _ships.AddChild(ship); ship.GlobalPosition = position;
-            ship.Initialize(Registry, Paths); LastMessage = "Spawned " + ship.Definition.DisplayName;
+            EnemyPortal chosenPortal = portalOnly || source < _portalCount ? portals[source] as EnemyPortal : null;
+            ship.Initialize(Registry, Paths, checkpoint: chosenPortal?.ResolveCheckpoint(), requiresCheckpoint: chosenPortal?.RequiresCheckpoint == true); LastMessage = "Spawned " + ship.Definition.DisplayName;
             return ship;
         }
         ship.Free(); LastMessage = "No permitted reachable spawn exit; check tiles and Citadel approach points.";
@@ -180,7 +181,8 @@ public partial class SpawnManager : Node
         Vector2 spawn = _entries[chosen];
         if (chosen < _portalCount) spawn = OffsetPortal(spawn, ship.Definition.RadiusPixels, random, _portalObjects[chosen]);
         _ships.AddChild(ship); ship.GlobalPosition = spawn;
-        ship.Initialize(Registry, Paths, spawnWithShield); LastMessage = "Wave spawned " + ship.Definition.DisplayName;
+        EnemyPortal chosenPortal = chosen < _portalCount ? _portalObjects[chosen] as EnemyPortal : null;
+        ship.Initialize(Registry, Paths, spawnWithShield, chosenPortal?.ResolveCheckpoint(), chosenPortal?.RequiresCheckpoint == true); LastMessage = "Wave spawned " + ship.Definition.DisplayName;
         return ship;
     }
 

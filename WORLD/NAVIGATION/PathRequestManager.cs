@@ -28,7 +28,8 @@ public partial class PathRequestManager : Node
     private sealed class Request
     {
         public EnemyMovement Movement;
-        public int Revision, CostRevision, GoalIndex;
+        public int Revision, CostRevision, GoalIndex, DestinationRevision;
+        public Vector2[] Targets;
         public long LastServed;
         public float Urgency, Length = float.PositiveInfinity;
         public Vector2[] Best = System.Array.Empty<Vector2>();
@@ -100,7 +101,8 @@ public partial class PathRequestManager : Node
         if (_pending.TryGetValue(movement, out Request existing))
         { existing.Urgency = Mathf.Min(existing.Urgency, distanceToObstacle); return; }
         Request request = new() { Movement = movement, Revision = Navigation.Revision,
-            CostRevision = Navigation.CostRevision, Urgency = distanceToObstacle, LastServed = _serviceOrder++ };
+            CostRevision = Navigation.CostRevision, DestinationRevision = movement.DestinationRevision,
+            Targets = movement.HeadingToCheckpoint ? movement.CheckpointTargets() : null, Urgency = distanceToObstacle, LastServed = _serviceOrder++ };
         _pending.Add(movement, request); _requests.Add(request);
     }
 
@@ -155,21 +157,29 @@ public partial class PathRequestManager : Node
             int index = NextRequestIndex(fair); Request request = _requests[index]; EnemyMovement movement = request.Movement;
             if (!GodotObject.IsInstanceValid(movement) || !movement.Enemy.IsAlive)
             { _requests.RemoveAt(index); _pending.Remove(movement); continue; }
-            if (request.Revision != Navigation.Revision || request.CostRevision != Navigation.CostRevision)
+            if (request.Revision != Navigation.Revision || request.CostRevision != Navigation.CostRevision
+                || request.DestinationRevision != movement.DestinationRevision || (request.Targets != null) != movement.HeadingToCheckpoint)
             {
                 request.Revision = Navigation.Revision; request.CostRevision = Navigation.CostRevision;
+                request.DestinationRevision = movement.DestinationRevision;
+                request.Targets = movement.HeadingToCheckpoint ? movement.CheckpointTargets() : null;
                 request.GoalIndex = 0; request.HasOrigin = false; request.Best = System.Array.Empty<Vector2>(); request.Length = float.PositiveInfinity;
             }
-            if (request.GoalIndex < Navigation.Goals.Count)
+            int targetCount = request.Targets?.Length ?? Navigation.Goals.Count;
+            if (request.GoalIndex < targetCount)
             {
                 if (!request.HasOrigin) { request.Origin = movement.Enemy.GlobalPosition; request.HasOrigin = true; }
-                Vector2[] route = Navigation.FindPath(request.Origin, Navigation.Goals[request.GoalIndex++], movement.RouteProfile, out float length);
+                float length;
+                Vector2[] route = request.Targets != null
+                    ? CheckpointRoute.Find(Navigation, request.Origin, request.Targets[request.GoalIndex++], movement.RouteProfile,
+                        movement.Enemy.Definition.RadiusPixels, out length)
+                    : Navigation.FindPath(request.Origin, Navigation.Goals[request.GoalIndex++], movement.RouteProfile, out length);
                 LastFrameAStarMilliseconds += Navigation.LastAStarMilliseconds;
                 LastFrameCalculations++; TotalCalculations++; request.LastServed = _serviceOrder++;
                 request.Length = Navigation.RouteCost(request.Origin, request.Best, movement.RouteProfile);
                 if (length < request.Length) { request.Best = route; request.Length = length; }
             }
-            if (request.GoalIndex >= Navigation.Goals.Count)
+            if (request.GoalIndex >= targetCount)
             { _requests.RemoveAt(index); _pending.Remove(movement); movement.AcceptPath(request.Best, request.Revision); }
             if (Config.MaxPathfindingMillisecondsPerFrame > 0f
                 && Stopwatch.GetElapsedTime(started).TotalMilliseconds >= Config.MaxPathfindingMillisecondsPerFrame) break;

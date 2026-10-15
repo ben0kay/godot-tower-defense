@@ -24,7 +24,7 @@ public partial class Enemy : Node2D
 
     // =========================================================
     // Called by SpawnManager after adding the scene, using world-scoped services.
-    public void Initialize(EnemyRegistry registry, PathRequestManager paths, bool spawnWithShield = false)
+    public void Initialize(EnemyRegistry registry, PathRequestManager paths, bool spawnWithShield = false, RouteCheckpoint checkpoint = null, bool requiresCheckpoint = false)
     {
         _registry = registry; Health = Mathf.Max(1f, Definition.MaxHealth); IsAlive = true;
         CurrentShield = spawnWithShield && float.IsFinite(Definition.MaxShield)
@@ -37,7 +37,7 @@ public partial class Enemy : Node2D
         Movement = GetNode<EnemyMovement>("Movement");
         SetNotifyLocalTransform(true); SetNotifyTransform(true);
         _registry.Register(this);
-        Movement.Initialize(this, paths);
+        Movement.Initialize(this, paths, checkpoint, requiresCheckpoint);
         Terrain = paths.Navigation.Grid.InteractiveTiles; _terrainPosition = GlobalPosition;
         Terrain?.Reposition(this);
         Initialized?.Invoke(this);

@@ -170,7 +170,9 @@ public partial class RoutePreviewOverlay : Node2D
         foreach (int index in selected)
         {
             Vector2 start = _exits[index].GlobalPosition;
-            RoutePreviewJob job = new(_previewNav, _definitions[_enemies.Selected], start, (int)_count.Value, _mode.Selected == 0);
+            EnemyPortal portal = _exits[index].GetParent() as EnemyPortal;
+            RoutePreviewJob job = new(_previewNav, _definitions[_enemies.Selected], start, (int)_count.Value, _mode.Selected == 0,
+                portal?.ResolveCheckpoint(), portal?.RequiresCheckpoint == true);
             _plans.Add(new(_portals.GetItemText(index), start, job, index));
         }
         _planIndex = 0; Job = _plans[0].Job;
@@ -203,7 +205,12 @@ public partial class RoutePreviewOverlay : Node2D
         foreach (NodePath path in _nav.Grid.Level.Settings.ActivePortals) h.Add(path.ToString());
         foreach (Vector2I goal in _nav.Goals) h.Add(goal);
         foreach (Marker2D exit in _exits)
+        {
             h.Add(GodotObject.IsInstanceValid(exit) ? exit.GlobalPosition : Vector2.Inf);
+            if (GodotObject.IsInstanceValid(exit) && exit.GetParent() is EnemyPortal portal)
+            { h.Add(portal.CheckpointPath.ToString()); RouteCheckpoint checkpoint = portal.ResolveCheckpoint();
+                if (GodotObject.IsInstanceValid(checkpoint)) h.Add(checkpoint.GeometryStamp); }
+        }
         if (_enemies.Selected >= 0 && _enemies.Selected < _definitions.Count)
         {
             EnemyDefinition d = _definitions[_enemies.Selected]; h.Add(d.RadiusPixels); h.Add(d.AllowPathDiversity);
@@ -236,7 +243,8 @@ public partial class RoutePreviewOverlay : Node2D
             int unique = job.Results.Count(r => r.DuplicateOf == 0);
             string portalColor = PortalColor(plan.ColorIndex).ToHtml(false);
             text.AppendLine($"[color=#{portalColor}]{plan.Portal} · {job.Results.Count}/{(int)_count.Value} paths · {unique} unique · {job.Failed} failed[/color]");
-            if (job.Neutral.Length > 0) text.AppendLine($"Neutral shortest: {job.NeutralLength:0} px");
+            if (job.RequiresCheckpoint) text.AppendLine("Required checkpoint → Citadel (two planned stages)");
+            if (job.Neutral.Length > 0) text.AppendLine($"{(job.RequiresCheckpoint ? "Neutral staged baseline" : "Neutral shortest")}: {job.NeutralLength:0} px");
             if (job.Results.Count == 0) text.AppendLine(job.Message);
             foreach (RoutePreviewJob.Result r in job.Results)
             {
@@ -260,6 +268,16 @@ public partial class RoutePreviewOverlay : Node2D
         {
             if (_comparison.ButtonPressed && plan.Job.Neutral.Length > 0) DrawRoute(plan.Start, plan.Job.Neutral, Colors.White, 4);
             foreach (RoutePreviewJob.Result result in plan.Job.Results) DrawRoute(plan.Start, result.Points, SampleColor(plan.ColorIndex, result.Sample), 2);
+            RouteCheckpoint checkpoint = plan.Job.Checkpoint;
+            if (GodotObject.IsInstanceValid(checkpoint))
+            {
+                Vector2[] ring = new Vector2[65];
+                for (int i = 0; i < ring.Length; i++) ring[i] = ToLocal(checkpoint.GlobalPosition + Vector2.FromAngle(i * Mathf.Tau / 64) * checkpoint.RadiusPixels);
+                DrawPolyline(ring, PortalColor(plan.ColorIndex), 2, true);
+                DrawString(ThemeDB.FallbackFont, ToLocal(checkpoint.GlobalPosition), "CHECKPOINT", fontSize: 16);
+                foreach (var result in plan.Job.Results)
+                    if (result.CheckpointEntry.HasValue) DrawCircle(ToLocal(result.CheckpointEntry.Value), 4, PortalColor(plan.ColorIndex));
+            }
             DrawCircle(ToLocal(plan.Start), 7, PortalColor(plan.ColorIndex));
             DrawString(ThemeDB.FallbackFont, ToLocal(plan.Start) + new Vector2(10, -10), plan.Portal, fontSize: 16);
         }

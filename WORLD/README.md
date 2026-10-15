@@ -102,3 +102,7 @@ The existing `WorldMasterConfig.cs` is the current single source for grid size/d
 ## Enemy/combat baseline
 
 WORLD/NAVIGATION adapts WorldGrid into budgeted AStarGrid2D; ENEMIES owns registry, health, movement and spawning. World/EnemySystems contains the shared services; World/Enemies and World/Projectiles contain runtime visuals. Level001/Debug contains F2 input and its screen readout. F5 runs the complete test; F6 remains map-only. Tower Config resources expose functional combat stats and First/Closest targeting. See the relevant feature READMEs for limitations and tuning.
+
+## Routing markers
+
+`ROUTING/RouteCheckpoint/` provides freely positioned, portal-linked required circular checkpoint regions with editor/F3 visualization and no footprint or physics nodes. See its README for placement, linking and staged enemy routing.
