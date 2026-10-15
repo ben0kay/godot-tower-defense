@@ -2,7 +2,7 @@
 [ext_resource type="Script" path="res://COMBAT/Damage/DamageResponseProfile.cs" id="1"]
 [resource]
 script = ExtResource("1")
-KineticShield = 0.5
+KineticShield = 0.25
 KineticHull = 1.0
 EnergyShield = 2.0
 EnergyHull = 0.85

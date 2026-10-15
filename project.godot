@@ -15,6 +15,10 @@ run/main_scene="res://UI/Menus/Boot/BootScreen.tscn"
 config/features=PackedStringArray("4.7", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
+[audio]
+
+buses/default_bus_layout="res://AUDIO/AudioBuses.tres"
+
 [autoload]
 
 GameAudio="*res://AUDIO/AudioManager.tscn"
@@ -37,7 +41,3 @@ project/assembly_name="godot-tower-defense"
 [rendering]
 
 rendering_device/driver.windows="d3d12"
-
-[audio]
-
-buses/default_bus_layout="res://AUDIO/AudioBuses.tres"
