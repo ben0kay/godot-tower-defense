@@ -1,6 +1,6 @@
 # C# wave authoring
 
-`LEVELS/Level001/Level001Waves.cs` contains **three currently authored Enemy001-only test waves**. This is a content choice, not a restriction of the wave system: the validated catalog already includes **Enemy001, Enemy002 and ShieldGenerator**. Edit counts, internal enemy IDs, intervals and delays there. Filenames remain `Enemy001.tscn`/`Enemy002.tscn` for development history; stable IDs are `basic_mk1`, `scout_mk1`, `shield_emitter_mk1`. `WaveCatalog` maps `LevelConfig.WaveSetId = "level001"` to this file; empty IDs disable waves and unknown IDs raise setup errors.
+`LEVELS/Level001/Level001Waves.cs` contains **three currently authored Enemy001-only test waves**. This is a content choice, not a restriction of the wave system: the validated catalog already includes **Enemy001, Enemy002 and ShieldGenerator**. Edit counts, internal enemy IDs, intervals and delays there. The new medium ship `medium_mk1` (`Enemy004.tscn`, Bulwark Drone) can be authored as `Enemy("medium_mk1")`, independently of its numbered filename; current Level001 encounters have not been changed. Filenames remain `Enemy001.tscn`/`Enemy002.tscn` for development history; stable IDs are `basic_mk1`, `scout_mk1`, `shield_emitter_mk1`. `WaveCatalog` maps `LevelConfig.WaveSetId = "level001"` to this file; empty IDs disable waves and unknown IDs raise setup errors.
 
 Use static WaveBuilder helpers:
 

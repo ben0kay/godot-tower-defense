@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://ENEMIES/Shared/EnemyDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+EnemyId = "medium_mk1"
+DisplayName = "Bulwark Drone"
+MaxHealth = 160.0
+MaxShield = 0.0
+MoveSpeed = 75.0
+RadiusPixels = 22.0
+TurnSpeed = 5.5
+CitadelDamage = 2
+KillRewardCredits = 7
+DeathExplosionMultiplier = 1.35

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="48" viewBox="0 0 64 48">
+  <defs>
+    <linearGradient id="armor" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7f96a2"/>
+      <stop offset=".55" stop-color="#415c70"/>
+      <stop offset="1" stop-color="#283a50"/>
+    </linearGradient>
+    <linearGradient id="core" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#547f89"/>
+      <stop offset="1" stop-color="#a8e9ea"/>
+    </linearGradient>
+  </defs>
+  <!-- The twin swept armor fins and broad center fuselage face right (+X). -->
+  <path d="M5 3 L22 10 L39 8 L50 16 L60 24 L50 32 L39 40 L22 38 L5 45 L12 31 L3 24 L12 17 Z"
+        fill="#253644" stroke="#b0c4c8" stroke-width="1.7" stroke-linejoin="round"/>
+  <path d="M7 7 L24 13 L40 11 L48 17 L28 20 L18 18 Z"
+        fill="url(#armor)" stroke="#718998" stroke-width="1"/>
+  <path d="M7 41 L24 35 L40 37 L48 31 L28 28 L18 30 Z"
+        fill="url(#armor)" stroke="#718998" stroke-width="1"/>
+  <!-- Stepped armored midsection, not a scaled-up Enemy001 wedge. -->
+  <path d="M15 19 L35 15 L53 19 L59 24 L53 29 L35 33 L15 29 L20 24 Z"
+        fill="#556c78" stroke="#c5d2ca" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M27 20 L40 18 L53 23 L53 25 L40 30 L27 28 L30 24 Z"
+        fill="#253e50" stroke="#92bac2" stroke-width="1"/>
+  <path d="M35 22 L47 22 L54 24 L47 26 L35 26 Z"
+        fill="url(#core)"/>
+  <!-- Amber armor markings and two separated engine outlets. -->
+  <path d="M16 16 L26 17 L30 19 L21 20 Z M16 32 L26 31 L30 29 L21 28 Z"
+        fill="#df9b58" stroke="#efca8b" stroke-width=".5"/>
+  <path d="M3 18 L12 19 L12 23 L3 22 Z M3 26 L12 25 L12 29 L3 30 Z"
+        fill="#f3ad54" stroke="#ffdc83" stroke-width=".8"/>
+  <path d="M7 19 L13 20 M7 29 L13 28" stroke="#fff0c0" stroke-width="1"/>
+  <path d="M22 13 L36 12 M22 35 L36 36" stroke="#d0d9d6" stroke-opacity=".65" stroke-width=".9"/>
+</svg>

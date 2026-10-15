@@ -17,9 +17,15 @@ public static class EnemyCatalogChecks
             && GD.Load<EnemyDefinition>("res://ENEMIES/Types/ShieldGenerator/ShieldGenerator.tres").EnemyId == "shield_emitter_mk1"
             && GD.Load<EnemyDefinition>("res://ENEMIES/Types/ShieldGenerator/ShieldGenerator.tres").DisplayName == "Shield Generator",
             "Numbered scene assets have independent stable gameplay IDs and display names");
+        EnemyDefinition mediumDefinition = GD.Load<EnemyDefinition>("res://ENEMIES/Types/Enemy004/Enemy004.tres");
+        Require(mediumDefinition.EnemyId == "medium_mk1" && mediumDefinition.DisplayName == "Bulwark Drone"
+            && mediumDefinition.MaxHealth == 160 && mediumDefinition.MaxShield == 0
+            && mediumDefinition.MoveSpeed == 75 && mediumDefinition.RadiusPixels == 22
+            && mediumDefinition.KillRewardCredits == 7 && mediumDefinition.CitadelDamage == 2,
+            "Enemy004 has independent medium-ship identity, size and balance");
         EnemyCatalog catalog = spawns.Catalog;
         var scenes = WaveCatalog.LoadScenes();
-        Require(catalog.Find("basic_mk1") == scenes["basic_mk1"] && catalog.Find("scout_mk1") == scenes["scout_mk1"] && catalog.Find("unknown") == null,
+        Require(catalog.Find("basic_mk1") == scenes["basic_mk1"] && catalog.Find("scout_mk1") == scenes["scout_mk1"] && catalog.Find("medium_mk1") == scenes["medium_mk1"] && catalog.Find("unknown") == null,
             "Wave adapter reads actual enemy registration");
         Invalid(() => new EnemyCatalog { Scenes = new() { scenes["basic_mk1"], scenes["basic_mk1"] } }.Rebuild());
         Invalid(() => new EnemyCatalog { Scenes = new() { null } }.Rebuild());
@@ -66,6 +72,22 @@ public static class EnemyCatalogChecks
         Require(health.CurrentHealth == hp - 1 && waves.AliveCount == 6, "Enemy002 arrival damages Citadel/owned count once");
         foreach (Enemy ship in ships) if (ship.IsAlive) ship.TakeDamage(10000);
         Require(waves.State == WaveManager.WaveState.AllWavesComplete, "Mixed wave finishes only after every owned ship resolves");
+        // A real medium ship uses normal spawn clearance, combat, death and Credits systems.
+        Enemy medium = spawns.Spawn("medium_mk1", true);
+        Require(medium != null, "Registered medium ship spawns at a valid portal");
+        medium.Movement.SetPhysicsProcess(false);
+        Require(medium.Health == 160 && medium.CurrentShield == 0 &&
+            spawns.Paths.Navigation.HasClearance(medium.GlobalPosition, medium.Definition.RadiusPixels),
+            "Medium ship spawns without shield and respects 22px navigation clearance");
+        Texture2D mediumTexture = medium.GetNode<Sprite2D>("Sprite").Texture;
+        Require(mediumTexture != null && mediumTexture.GetWidth() == 64 && mediumTexture.GetHeight() == 48,
+            "Medium artwork is twice the baseline 32x24 ship dimensions");
+        medium.TakeDamage(50);
+        Require(medium.IsAlive && medium.Health == 110, "Medium hull survives several standard hits");
+        int creditsBeforeMedium = wallet.GetBalance(wallet.CreditsResource);
+        medium.TakeDamage(200);
+        Require(!medium.IsAlive && wallet.GetBalance(wallet.CreditsResource) == creditsBeforeMedium + 7,
+            "Medium ship's existing kill pipeline pays exactly seven Credits");
         waves.Configure(WaveCatalog.GetWaves(spawns.Paths.Navigation.Grid.Level.Settings.WaveSetId), scenes);
         wallet.Initialize(spawns.Paths.Navigation.Grid.Level.Settings); health.Initialize(health.MaxHealth);
         GD.Print("PASS: enemy catalog validation, two-type exact waves/portals, Enemy002 movement/state/targeting/reward/arrival and oversized spawn rejection");
