@@ -1,6 +1,6 @@
 # Battle Tower — first automatic weapon
 
-F5 -> Ctrl -> BATTLE -> place on buildable terrain. Press F2 repeatedly to spawn Enemy001 from the Portal. Towers fire at enemies within range. First targets the shortest remaining path to the Citadel; Closest targets nearest to the tower. Defaults: range 256px, 1 shot/s, 12 damage, bullet speed 600px/s, search every 0.15s. Enemy001 takes five baseline hits to kill.
+F5 -> Ctrl -> BATTLE -> place on buildable terrain. Press F2 repeatedly to cycle the enemy catalog through the configured spawn sources. Towers fire at enemies within range. First targets the shortest remaining path to the Citadel; Closest targets nearest to the tower. Defaults: range 256px, 1 shot/s, 12 damage, bullet speed 600px/s, search every 0.15s. Enemy001 takes five baseline hits to kill.
 
 ## Inspector tuning
 
@@ -30,4 +30,6 @@ Select a placed tower after exiting build mode to see its current level and next
 BattleTowerDefinition.tres references the existing scene/art and canonical config; DefaultTowerCatalog.tres registers it. BattleTower implements shared config/selection/placement contracts while retaining its existing local targeting, cooldown, rotation and guided projectile loop. TowerConfig supplies identity/cost/tiers, BattleTowerConfig retains all weapon fields, change notifications and the same eight-stage input adapter. Level2/Level3 costs and calculations are unchanged. No weapon-family extraction was performed.
 
 
-Phase 4C-1 changes only guided contact payload to explicitly Kinetic base damage:12 still damages unshielded hull by 12, and damages shields by 6 under DefaultDamageProfile. Legacy debug TakeDamage remains1:1. Projectile timing, cooldown/aim,200 construction,150/250 upgrades and3-Credit kill rewards are preserved.
+Phase 4C-3: guided bullets carry Kinetic base damage plus the cached ShieldPenetration stat (default5%). At12 damage against100 shield/60 hull the result is94.3 shield/59.4 hull; an exposed target still loses12 hull. The Inspector shows `Shield Penetration: 5%` at every purchased tier. Edit Shield Penetration on the private/live or authored BattleTowerConfig; values pass through the same eight stages and safety clamp to finite0..1. Fired bullets snapshot the stat at launch. Numeric changes rebuild and refresh the selected Inspector once, without per-frame resolution.
+
+Penetration is a base weapon stat, never a Level2/Level3 bonus. Both tier references are explicitly present in the default config, restoring references absent from the previous HEAD. Tier values, price, timing, targeting and reward behavior are unchanged. Permanent research remains future work; Stage 04 stays neutral. Legacy TakeDamage remains1:1 shield-first. See COMBAT/Damage/README.md and TESTS/README.md for the completed contract and validation.

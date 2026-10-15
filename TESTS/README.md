@@ -97,3 +97,25 @@ The fixture exercises straight and winding corridors at 100/500 ships and 0/50/1
 ## Missing tower catalog startup regression
 
 EnemyIntegrationChecks verifies Main's authored Catalog assignment, clears that export on the in-memory scene before it enters the tree, and checks automatic default recovery plus both Battle/Laser build buttons. The remaining production gameplay checks then exercise the recovered catalog. MenuTowerFlowChecks continues to cover the ordinary Boot/Main/Campaign launch with its authored assignment. No scene or resource is saved by this fixture.
+
+## Phase 4C-3 — completed combat regression pass
+
+`DamageTypeChecks` now verifies independent absolute shield/hull overrides, explicit zero versus inheritance, invalid/nonfinite input/state rejection, penetration at 0/5/100%, exact/partial shield breaks, exposed hull, zero shield coefficient with bypass, finite extreme state, legacy 1:1 behavior, real Battle projectile contact and launch-time payload snapshots, target isolation and once-only kill rewards. The numerical fixtures include Battle 12 → 94.3 shield / 59.4 hull from 100/60 and Laser 12 with 6.00/0.15 overrides → 0 shield / 58.95 hull from 30/60.
+
+`LaserTowerChecks` uses the authored 12 base DPS / 6.00x shield / 0.15x hull balance and 22-DPS paid tier. It asserts 72 shield/s and 1.8 exposed hull/s at 30/60/120 Hz, independent override opt-out/zero, live Inspector coefficient updates, cache invalidation versus tick reuse, and the existing beam endpoints/style/targeting/lifecycle/price/upgrade cases. `TowerStatChecks` and `TowerUpgradeChecks` assert base 5% penetration, all eight stages, finite 0..1 safety clamps, private cache/source isolation, live selected Inspector changes, and unchanged 5% at purchased levels 1/2/3. Passive fixtures still have no combat snapshot.
+
+### Explicit fixture isolation
+
+The current authored Enemy001 resource has zero shield capacity. The integration runner sets a 100-point shield capacity **in memory only** for its numerical shield fixtures and restores the authored value in `finally`; no enemy asset, ID, wave opt-in or restoration mechanic changes. Legacy offset/navigation fixtures temporarily disable the newer N4 corridor geometry and restore its flag in `finally`, so their 8-pixel lateral-only assertions remain meaningful. The dedicated `CorridorNavigationChecks.tscn` independently tests enabled N4 geometry and 0/50/100% variation. Production navigation code/settings remain unchanged.
+
+The default Battle config had lost its Level2/Level3 references before this pass. Those references were restored to the existing, unchanged tier assets so the required paid-upgrade regressions can run.
+
+### Actual validation
+
+- C# compilation: passed using Roslyn 4.11 with .NET 8 reference assemblies, Godot 4.7.2 API and Godot source generators; no compiler errors or warnings. The ordinary `dotnet build --no-restore` command could not initialize because this environment's SDK is missing a compatible `NuGet.Protocol` dependency; that standard build route is not claimed as passing.
+- Godot 4.7.2 headless `TESTS/EnemyIntegrationChecks.tscn`: passed, including all new combat fixtures and existing stats, paid upgrades, HUD, economy, waves, shield emitter, feedback, navigation and 500-ship fixtures.
+- Godot headless `TESTS/MenuTowerFlowChecks.tscn`: passed actual Boot → Main → Campaign → Level001 button flow plus paid Battle construction/upgrade using a memory-only profile.
+- Godot headless `TESTS/CorridorNavigationChecks.tscn`: passed enabled N4 straight/winding geometry, dynamic tower repathing and 100/500-ship 0/50/100% benchmarks.
+- Direct headless `Main.tscn` startup: passed. `git diff --check`: passed.
+
+These checks do not assert rendered beam appearance or hardware-independent FPS. Permanent research/stage 04, saving, armour and future tower mechanics remain deferred.

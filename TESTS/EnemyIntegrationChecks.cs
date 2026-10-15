@@ -15,8 +15,14 @@ public partial class EnemyIntegrationChecks : Node
     // Run against actual authored resources and production C# helpers.
     public override async void _Ready()
     {
+        EnemyDefinition shieldFixture = null;
+        float authoredShield = 0;
         try
         {
+            // Shield math uses a fixed100-point fixture regardless of current playtest enemy balance.
+            shieldFixture = GD.Load<EnemyDefinition>("res://ENEMIES/Types/Enemy001/Enemy001.tres");
+            authoredShield = shieldFixture.MaxShield;
+            shieldFixture.MaxShield = 100;
             _battle = GD.Load<PackedScene>("res://Main.tscn").Instantiate<Node2D>();
             // Preserve the authored binding check, then exercise missing-export recovery in the full gameplay suite.
             TowerPlacementController placement = _battle.GetNode<TowerPlacementController>("TowerPlacement");
@@ -159,7 +165,10 @@ public partial class EnemyIntegrationChecks : Node
             edge.TakeDamage(10000);
             Check(_spawns.Spawn(scene, true) == null, "Portal-only debug does not override edge-only level permissions");
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-            SwarmNavigationChecks.Run(_grid, _paths, _spawns);
+            // Legacy offset fixtures bound lateral offsets alone; N4 corridor geometry has its own standalone suite.
+            bool corridorVariation = _paths.Config.EnableCorridorVariation;
+            try { _paths.Config.EnableCorridorVariation = false; SwarmNavigationChecks.Run(_grid, _paths, _spawns); }
+            finally { _paths.Config.EnableCorridorVariation = corridorVariation; }
             ConfigureCorridor();
             Check(_spawns.PlacementFailure(new Vector2I(5, 10)).Length > 0, "Tower cannot seal the only spawn route");
             EconomyManager wallet = _battle.GetNode<EconomyManager>("Economy");
@@ -176,6 +185,7 @@ public partial class EnemyIntegrationChecks : Node
             GD.Print($"PASS: {_checks} enemy/navigation/combat integration checks"); GetTree().Quit();
         }
         catch (Exception exception) { GD.PushError(exception.ToString()); GetTree().Quit(1); }
+        finally { if (GodotObject.IsInstanceValid(shieldFixture)) shieldFixture.MaxShield = authoredShield; }
     }
 
     // =========================================================

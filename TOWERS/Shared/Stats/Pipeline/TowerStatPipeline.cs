@@ -15,7 +15,7 @@ public static class TowerStatPipeline
     {
         if (config == null) throw new ArgumentNullException(nameof(config));
         return Resolve(new TowerStatBlock(config.RangePixels, config.ShotsPerSecond, config.DamagePerShot,
-            config.ProjectileSpeed, config.RotationSpeedDegrees, config.AimToleranceDegrees, config.TargetSearchInterval),
+            config.ProjectileSpeed, config.RotationSpeedDegrees, config.AimToleranceDegrees, config.TargetSearchInterval, ShieldPenetration: config.ShieldPenetration),
             config.UpgradeTiers, level, trace);
     }
 

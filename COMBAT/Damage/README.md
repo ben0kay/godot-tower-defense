@@ -1,35 +1,50 @@
-# Typed damage — Phase 4C-1
+# Typed damage — Phases 4C-1 and 4C-3 implemented
 
-DamageInfo validates finite nonnegative base amounts and Kinetic/Energy/Explosive types. DefaultDamageProfile.tres owns separate shield/hull coefficients: Kinetic .5/1, Energy 2/.85, Explosive .25/1.25. DamageResolver references this resource once. Invalid coefficients/types/state fail before damage state commits. Zero amounts are safe no-ops.
+`DamageInfo` is an immutable validated base hit with a damage type, independently optional absolute shield/hull coefficient overrides, and a shield penetration fraction (default 0). Existing two-argument callers remain valid. Null overrides inherit the type default; explicit zero overrides remain meaningful. Negative/nonfinite amounts or overrides, unknown types, and nonfinite/out-of-range penetration are rejected before target state changes.
 
-Shields consume min(base amount, shield / shield coefficient) base units. Remaining base units damage hull using its own coefficient. Energy 20 against shield 30 consumes 15 base, then deals 4.25 hull. With a zero shield coefficient, existing shields block without being damaged or bypassed. Double intermediates avoid overflow and outputs remain finite/nonnegative.
+## Defaults and weapon authoring
 
-Enemy.ApplyDamage uses this resolver; TakeDamage(float) retains explicit 1:1 shield-first legacy behavior. Only hull loss refreshes the hull bar; hull death alone publishes the existing kill/reward lifecycle. No shield recharge/UI/armor or typed Citadel attacks were added.
+`DefaultDamageProfile.tres` remains the shared fallback, cached by DamageResolver:
 
-## PLANNED — Phase 4C-3: per-weapon defense overrides and ballistic shield penetration (single Codex pass)
+| Type | Shield coefficient | Hull coefficient |
+| --- | --- | --- |
+| Kinetic | 0.50 | 1.00 |
+| Energy | 2.00 | 0.85 |
+| Explosive | 0.25 | 1.25 |
 
-**Status: NOT IMPLEMENTED. This section is a scoped instruction for Codex, not a description of working behavior.** Keep Phase 4C-1/4C-2, existing tower tiers and all unrelated systems intact. Do not add research progression in this pass.
+Per-hit overrides **replace**, rather than multiply, the respective fallback. Laser's 6.00x override is exactly 6.00x, independent of Energy's 2.00x fallback. Disabling either Laser opt-in flag independently restores that type default. Future Energy Cryo/Stasis weapons retain the Energy defaults unless they author their own overrides.
 
-### Gameplay contract and initial playtest balance
+LaserTowerConfig exposes opt-in flags and finite nonnegative coefficient values in its Defense Coefficient Overrides group. Authored Laser balance is 12 base DPS, shield override6.00x, hull override0.15x:72 shield points/s or1.8 exposed hull/s while aligned. Construction remains250 Credits; its existing175-Credit tier adds10 base DPS and32px range, yielding22 DPS/288px. BeamRenderer remains visual-only.
 
-- **Global defaults remain authoritative fallbacks** in `DefaultDamageProfile.tres`: Kinetic shield/hull `0.50/1.00`, Energy `2.00/0.85`, Explosive `0.25/1.25`. Do not globally raise Energy to 6; future Energy Cryo/Stasis weapons should still inherit 2.00 shield unless their own weapon explicitly overrides it.
-- **A weapon may optionally REPLACE either defense coefficient**, independently, with an absolute final value. Example: Laser shield override **6.00x** means exactly 6.00x, **not** `Energy 2.00 × Laser 6.00` or `Energy 2.00 × extra 3.00`. An absent shield or hull override inherits the damage-type default; `0` is a valid explicit override and must not mean "unset". Prefer clear opt-in boolean flags + nonnegative finite values in Godot Inspector resources, or another equally unambiguous small typed representation.
-- **Laser Tower**: proposed editable initial balance **12 base DPS**, **6.00x effective shield coefficient**, **0.15x effective hull coefficient**. Thus a fully aligned continuous laser deals **72 shield points/s** to an ample shield, or **1.8 hull points/s** to exposed health. Keep Energy as its type, its 175-Credit Level 2 tier (+10 base DPS, +32px range), and its existing beam behavior. These are provisional playtest values; make them Inspector-editable rather than hard-coded in the resolver.
-- **Battle Tower**: expose **Shield Penetration = 5% by default**, visible in the existing placed-tower Inspector at Level 1 and every purchased tower level. This is a **weapon base stat**, *not* a Level 2/3 purchased-tier bonus. Keep existing 12 damage/shot and tier damage/rate/range progression. All other weapons/hits default to **0%** penetration unless they opt in.
-- **Future research, not this pass:** ballistic penetration increases through **permanent research**, not Battle Tower purchased levels. The pre-existing `TOWERS/Shared/Stats/Pipeline/04_PermanentResearch.cs` stays neutral until the profile/campaign progression owner and save semantics are built. Once active, research bonuses should apply to all eligible newly placed and already placed ballistic towers, survive level changes, and invalidate their cached final stats on research changes. Never store research on the tower tier or level configuration. See `TOWERS/README.md` for the pipeline ownership contract.
+BattleTowerConfig exposes ShieldPenetration=0.05 as a base weapon stat. It flows through the single eight-stage pipeline into cached TowerFinalStats, is clamped to finite0..1 at Stage 07, and is snapshotted in the guided projectile's DamageInfo. Battle's12 damage/shot and12→16→22 tier damage progression remain intact. Its200 construction and150/250 upgrade prices are unchanged. The default config references the existing Level2/Level3 assets explicitly; missing references in the prior HEAD were restored without editing tier contents. All other hit/stat constructors default to zero penetration. Passive towers still need no weapon capability or stats.
 
-### Math and ownership
+## Resolution math
 
-1. Extend the shared immutable, validated `DamageInfo` (or a small immutable companion) with optional per-hit **shield coefficient override**, **hull coefficient override**, and **shield penetration fraction** `0..1`, while keeping existing two-argument callers valid. Hit data carries unmodified **base damage** and final effective overrides; do **not** pre-multiply damage in Laser or BasicProjectile. Validate finite/nonnegative coefficients and finite bounded penetration before changing target state.
-2. `DamageResolver` chooses the explicit coefficient when present, otherwise `DamageResponseProfile.Coefficients(type)`. Resolve **penetration before ordinary shield-first absorption** if shield is present: direct-hull base portion `P = D × penetration`; shield-facing base portion `R = D - P`. Direct hull loss is `P × hullCoefficient`. Resolve `R` through existing shield-first *base-unit* absorption; any unspent base from `R` spills to hull using that same hull coefficient. Never apply the shield multiplier to health, double-count bypass damage, or give penetration bonus damage. With **no shield**, the entire `D × hullCoefficient` goes to health regardless of penetration.
-3. Existing `0` shield coefficient remains a **block** for the ordinary shield-facing portion when shield exists; explicitly penetrated damage can still bypass it. Shield and hull remain separate state. `Enemy.TakeDamage(float)` must retain its exact legacy 1:1 shield-first behavior, with **no** penetration or implicit typed coefficients.
-4. Give Laser's `LaserTowerConfig` Inspector-editable opt-in shield/hull overrides and pass them to the shared resolver through its current `Enemy.ApplyDamage(DamageInfo)` route; keep `BeamRenderer` visual-only. Give Battle's `BattleTowerConfig` the 5% base penetration, carry it through the **existing single eight-stage `TowerStatPipeline`** to a cached `TowerFinalStats`, and send it through `BasicProjectile` as part of its hit payload. Use an optional trailing stat/default if that best preserves existing constructor compatibility. Clamp penetration to `0..1` at safety stage. Do not attach it to Battle Level 2/3 assets and do not make passive towers claim weapon capabilities.
-5. Keep Inspector descriptions truthful: Battle clearly displays **Shield Penetration: 5%** (and the effective amount at later levels); Laser shows its effective **shield 6.00x / hull 0.15x** values and base DPS. Preserve existing upgrade cost, level, and next-tier preview logic. Rebuild cached stats on authored config changes, **not per physics tick**.
+For base damage D, effective hull coefficient H and penetration p:
 
-### Tests and completion criteria
+1. With shields present, split direct-hull base P=D×p from shield-facing base R=D−P.
+2. Direct hull damage is P×H. Shields absorb R in base units: consume min(R, shield/shieldCoefficient), then convert unspent base into hull damage using H.
+3. A zero shield coefficient blocks all ordinary shield-facing base without damaging the shield. Explicit bypass still damages hull.
+4. Without shields, the entire D×H damages hull regardless of penetration. Penetration redistributes the base amount and never grants extra base damage.
 
-- Shared resolver tests: inherited defaults unchanged, shield-only/hull-only override independence, explicit zero override vs absence, invalid/nonfinite rejection, penetrating shield-only/partial-break/full-break/no-shield cases, zero shield coefficient with penetrating vs nonpenetrating portions, repeat hits/death/kill isolation, no negative/nonfinite state.
-- **Numerical fixtures:** Battle 12 Kinetic against 100 shield/60 hull with 5% penetration leaves **94.3 shield / 59.4 hull**; without shield it still deals **12 hull**. Laser 12 Energy with overrides 6.00/0.15 against ample shields drains **72 shield/s**, against exposed hull deals **1.8 hull/s**; with 30 shield and one 12-base hit it leaves **0 shield / 58.95 hull** from a 60-hull target (5 base spent on shield, 7 base × 0.15 on hull). Use float tolerances for continuous DPS.
-- Update current hardcoded 20-DPS / 2x / 0.85x assumptions in `TESTS/LaserTowerChecks.cs` to the new authored balance, while keeping existing 30/60/120 Hz, beam visual isolation, shielding, retargeting, costs and upgrade tests. Extend `TESTS/DamageTypeChecks.cs`, `TESTS/TowerStatChecks.cs`, `TESTS/TowerUpgradeChecks.cs` and production HUD checks as needed.
-- Run actual Godot C# compilation and relevant headless integration tests (including `TESTS/EnemyIntegrationChecks.tscn` and menu flow); report precisely what passed/failed. Leave navigation, waves, economy, shield generator restoration, UI layout, enemy IDs, research, saving, armour and future Cryo/Stasis/DoT implementations untouched.
-- After implementation, update this README, `TOWERS/README.md`, the Battle/Laser README files, stat/projectile READMEs, and `TESTS/README.md` from **PLANNED** to accurate **IMPLEMENTED** behavior. Do not claim these mechanics exist before Codex completes and verifies them.
+Double intermediates prevent overflow; resulting shield/health remain finite and nonnegative. Shield and hull remain separate state. `Enemy.TakeDamage(float)` retains exact legacy1:1 shield-first behavior with no type coefficients or penetration. Hull damage alone drives the existing hull feedback/death/reward lifecycle; repeated hits/arrivals cannot double-pay.
+
+| Fixture (60 starting hull) | Resulting shield | Resulting hull |
+| --- | --- | --- |
+| Battle12,100 shield,5% penetration | 94.3 | 59.4 |
+| Battle12,no shield | 0 | 48 |
+| Laser12,100 shield,6.00/0.15 overrides | 28 | 60 |
+| Laser12,30 shield,6.00/0.15 overrides | 0 | 58.95 |
+| Laser12,no shield,6.00/0.15 overrides | 0 | 58.2 |
+
+## Inspector, ownership and scope
+
+The placed Battle Inspector displays `Shield Penetration: 5%` at Level1/2/3 and refreshes on instance config edits. Laser displays cached effective base DPS and its effective shield/hull coefficients. Upgrade previews use the same resolver as paid application. Config changes invalidate once; ordinary physics ticks reuse cached final stats.
+
+Permanent research is **not implemented**. Stage 04 remains neutral. Future ballistic research belongs to persistent progression, must affect eligible new/existing towers and invalidate their caches; it must not be stored on purchased tower tiers or level configs. Saving, armour, shield regeneration/UI, enemy-specific resistances, Cryo/Stasis/DoT and unrelated mechanics remain deferred.
+
+## Regression coverage
+
+DamageTypeChecks covers unchanged inherited defaults, independent/zero overrides, malformed hits/state, penetration partial/full/exact/no-shield cases, zero shield coefficient, overflow bounds, real guided Battle contact, hull feedback, target isolation and once-only deaths/rewards. LaserTowerChecks covers authored12 DPS,72 shield/s and1.8 hull/s at30/60/120Hz,30-shield spillover, override opt-out, visual independence, targeting/cleanup, construction and22-DPS upgrade parity. TowerStatChecks/TowerUpgradeChecks exercise safety clamps, eight stages, cache/input isolation, selected Inspector updates and unchanged5% penetration through purchased tiers.
+
+See TESTS/README.md for actual compilation/headless results and fixture isolation. Manual rendered beam quality is not asserted by headless tests.

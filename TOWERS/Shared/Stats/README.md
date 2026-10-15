@@ -20,3 +20,7 @@ Phase 4A: shared TowerConfig.ResolveStats/DescribeStats/DescribeChanges provide 
 
 
 Phase 4C-2: optional nullable BeamStats on TowerStatBlock/FinalStats carries genuine float DamagePerSecond. Existing seven-argument constructors remain valid with absent Beam. A shared base-block/tiers adapter snapshots purchased modifiers for both configs; Stage 02 applies BeamDps flat/percent/multiplier operations without integer rounding, Stage 07 clamps invalid/negative DPS, Stage 08 publishes it. Neutral stages propagate the optional capability unchanged. Laser attack/live Inspector/upgrade preview consume the same cached result; BeamStyle never enters this pipeline.
+
+## Phase 4C-3 penetration
+
+TowerStatBlock/FinalStats add an optional trailing ShieldPenetration float (default0), preserving old constructors. Battle's adapter supplies its 0.05 base; all eight existing stages propagate it. Stage 07 clamps negative/nonfinite values to 0 and values above 1 to1; Stage 08 publishes it. Paid Battle tiers do not modify it, and Stage 04 permanent research remains neutral. Config setters invalidate once and the selected Inspector reads the effective snapshot. Laser/passive types are not given fictitious projectile capability. Future permanent ballistic research must use the existing pipeline with cache invalidation, not purchased tier assets.

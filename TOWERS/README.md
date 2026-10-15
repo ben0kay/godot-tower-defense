@@ -10,7 +10,7 @@ Umbrella folder for **every player-buildable tower**, not just weapons: offensiv
 
 **Default playable roster:** Battle Tower and Laser Tower. The passive scene under `TESTS/Towers/` is a regression fixture, not a promised Repair/Solar tower or a default menu entry. Registering a valid additional definition creates its build choice without editing placement or HUD. Only 1×1 footprints are supported; other footprints fail registration.
 
-**Phase 4C-1/4C-2 implemented:** COMBAT/Damage owns typed base hits and a cached canonical shield/hull response profile. Battle bullets deliver Kinetic; legacy TakeDamage keeps 1:1 semantics. Laser Tower sustains Energy DPS through the same resolver, with a separate endpoint-only BeamRenderer and Inspector-editable copied BeamStyle. Its genuine float BeamStats capability uses the same eight stages and paid upgrades. Shared targeting/aiming are reused; delivery remains type-specific rather than introducing a universal weapon switch. Ranks/research/level modifiers/effects, selling, tower HP, shield visuals and multi-cell placement remain future work.
+**Phase 4C-1/4C-2 implemented (see completed4C-3 below for current balance):** COMBAT/Damage owns typed base hits and a cached canonical shield/hull response profile. Battle bullets deliver Kinetic; legacy TakeDamage keeps 1:1 semantics. Laser Tower sustains Energy DPS through the same resolver, with a separate endpoint-only BeamRenderer and Inspector-editable copied BeamStyle. Its genuine float BeamStats capability uses the same eight stages and paid upgrades. Shared targeting/aiming are reused; delivery remains type-specific rather than introducing a universal weapon switch. Ranks/research/level modifiers/effects, selling, tower HP, shield visuals and multi-cell placement remain future work.
 
 **Codex:** read `NOTES/CodePreferences.md`, this README, `tower_ideas.md`, `Shared/README.md`, `Shared/Stats/README.md`, `Shared/Upgrades/README.md`, `Placement/README.md` and `Offensive/BattleTower/README.md` before editing. Work against latest HEAD, preserve the newly implemented upgrade work, and run existing tests.
 
@@ -409,11 +409,13 @@ TOWERS/DefaultTowerCatalog.tres              # Add the real Laser definition
 
 **Finish condition:** adding a new tower should require authoring its definition/config/scene/art and registration—**no new tower-specific case in placement or HUD**. Do not implement 30 complete towers as part of this foundation pass.
 
-## Next implementation pass
+## Phase 4C-3 completed combat pass
 
-**Proposed bounded next combat pass — Phase 4C-3 (PLANNED, NOT IMPLEMENTED):** Follow the single Codex-ready specification in [`COMBAT/Damage/README.md`](../COMBAT/Damage/README.md), section **“PLANNED — Phase 4C-3: per-weapon defense overrides and ballistic shield penetration.”** It proposes **absolute per-weapon shield/hull coefficient overrides** (Laser effective 6.00x shield / 0.15x hull, provisional 12 base DPS) and **Battle Tower 5% baseline shield penetration** shown in the Inspector. Penetration improvement comes from **future permanent research**, *not* Battle Tower Level 2/3 purchases. Keep stage 04 neutral and defer research progression/saving; this one pass changes only combat delivery/resolution, minimal stats/Inspector display, tests and accurate documentation. The existing Phase 4C-1/4C-2 implementation notes below remain historical baseline, not the proposed new numbers.
+**Implemented:** See [`COMBAT/Damage/README.md`](../COMBAT/Damage/README.md) for the authoritative4C-3 math and authoring contract. DamageInfo supports independent absolute shield/hull overrides and0..1 penetration. Laser now uses 12 base DPS with effective 6.00x shield/0.15x hull responses, giving72 shield/s or1.8 exposed hull/s. Its175-Credit tier adds10 base DPS/32px, yielding22 DPS/288px. Global Energy remains2.00/0.85.
 
-**Phase 4A/4B/4C-1/4C-2 are complete.** Review Laser visuals in a live Godot window and tune Inspector resources before the next weapon pass. Preserve Battle Tower baseline and paid upgrades after each checkpoint. Do not start Missile Tower, ranks, profile research, level modifiers, active effects, selling or tower HP in these passes.
+Battle starts with 5% base shield penetration, visible in the placed Inspector at every tier and carried through the existing cached eight-stage pipeline into projectile payloads. Level2/Level3 still improve damage/rate/range without adding penetration. The default config's missing tier references were restored. New hits default to zero penetration; optional weapon overrides do not impose combat behavior on passive towers.
+
+Stage 04 remains neutral. Future permanent ballistic research and saving are deferred, alongside Missile Tower, ranks, level modifiers, active effects, selling and tower HP. Visual beam polish still requires a live-window review. See TESTS/README.md for4C-3 validation results.
 
 ## Current live Inspector files
 
@@ -443,7 +445,7 @@ Passive scenes need no pivot, projectile node, weapon stats, range ring or proce
 
 At the 4A checkpoint the real Godot headless integration scene passed catalog/mixed-type tests and all existing combat, stat, upgrade, economy, terrain, wave, feedback and navigation checks. After 4B it passed again, with 40 registered variants testing availability, canonical prices/icons, generated ID actions, focus, scrolling, rebinding and independent panels. `MenuTowerFlowChecks.tscn` separately exercises actual Boot profile-button → Main → Campaign → Level001 buttons, then paid Battle placement/upgrade using an injected memory-only profile (no save writes). The suite includes the existing 500-ship fixture; headless timings are not a rendered-FPS or visual-layout guarantee.
 
-## Implemented Phase 4C verification
+## Historical Phase 4C-1/4C-2 verification (superseded balance)
 
 4C-1 was committed/verified separately before any Laser code: direct C# compilation with Godot source generators and the actual Godot 4.7.2 headless integration scene passed, including DamageTypeChecks, opt-in shield waves and all old Battle/navigation/economy tests. Stage4C-2 then passed the full suite with LaserTowerChecks and the 500-ship fixture. Default Laser price 250 Credits, base20 DPS/256px; its175-Credit level 2 tier resolves 30 DPS/288px.20 Energy base DPS removes 40 shield or17 unshielded hull per second, within float tolerance. Battle's200 construction,150/250 upgrades,12 base hull hit, guided delivery and kill rewards remain unchanged.
 

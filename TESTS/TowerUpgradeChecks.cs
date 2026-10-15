@@ -26,6 +26,9 @@ public static class TowerUpgradeChecks
             Require(first.UpgradeLevel == 1 && first.NextUpgrade.Level == 2, "Placed towers begin at level 1");
             Require(!ReferenceEquals(first.UpgradeTiers[0], shared.UpgradeTiers[0]), "Tier Resources are isolated per instance");
             TowerFinalStats initial = first.FinalStats;
+            Label stats = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerStats");
+            for (int level = 1; level <= 3; level++)
+                Require(first.ResolveLevel(level).ShieldPenetration == 0.05f, "Purchased tiers never increase base penetration");
             TowerFinalStats preview = first.ResolveLevel(2);
             Require(preview.DamagePerShot == 16 && Mathf.IsEqualApprox(preview.ShotsPerSecond, 1.2f)
                 && preview.RangePixels == 288 && first.FinalStats == initial && first.UpgradeLevel == 1,
@@ -39,6 +42,7 @@ public static class TowerUpgradeChecks
                 wallet.GetBalance(wallet.CreditsResource) == 400, "Global upgrade rule prevents payment");
             placement.Settings.AllowUpgrades = true;
             placement.Call("SelectTower", first);
+            Require(stats.Text.Contains("Shield Penetration: 5%"), "Placed level1 Inspector shows penetration");
             hud.SetTowerBarOpen(true, true);
             await battle.ToSignal(battle.GetTree(), SceneTree.SignalName.ProcessFrame);
             await battle.ToSignal(battle.GetTree(), SceneTree.SignalName.ProcessFrame);
@@ -55,6 +59,8 @@ public static class TowerUpgradeChecks
             hud.EmitSignal(GameplayHUD.SignalName.TowerUpgradeRequested);
             Require(first.UpgradeLevel == 2 && first.FinalStats == preview &&
                 wallet.GetBalance(wallet.CreditsResource) == 250, "Actual HUD upgrade action pays once and matches preview");
+            Require(stats.Text.Contains("Shield Penetration: 5%") && first.FinalStats.ShieldPenetration == 0.05f,
+                "Level2 Inspector retains baseline penetration");
             Require(second.UpgradeLevel == 1 && second.FinalStats == initial && shared.DamagePerShot == 12,
                 "Upgrade leaves other towers and authored base unchanged");
             Require(!TowerUpgradeController.TryUpgrade(first, wallet, placement.Settings, 1, out _) &&
@@ -68,6 +74,8 @@ public static class TowerUpgradeChecks
             Require(first.UpgradeLevel == 3 && first.FinalStats == levelThree &&
                 first.FinalStats.DamagePerShot == 22 && Mathf.IsEqualApprox(first.FinalStats.ShotsPerSecond, 1.5f) &&
                 wallet.GetBalance(wallet.CreditsResource) == 0, "Second purchase accumulates tier improvements, not old final values");
+            Require(stats.Text.Contains("Shield Penetration: 5%") && first.FinalStats.ShieldPenetration == 0.05f,
+                "Level3 Inspector retains baseline penetration");
             Require(!button.Visible && info.Text.Contains("Maximum level"), "Maximum tier removes upgrade action");
             Require(!TowerUpgradeController.TryUpgrade(first, wallet, placement.Settings, 3, out _) &&
                 wallet.GetBalance(wallet.CreditsResource) == 0, "Maximum tier cannot spend again");

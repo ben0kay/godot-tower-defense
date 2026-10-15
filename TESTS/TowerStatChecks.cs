@@ -15,6 +15,14 @@ public static class TowerStatChecks
             baseline.DamagePerShot == defaults.DamagePerShot && baseline.ProjectileSpeed == defaults.ProjectileSpeed &&
             baseline.RotationSpeedDegrees == defaults.RotationSpeedDegrees && baseline.AimToleranceDegrees == defaults.AimToleranceDegrees &&
             baseline.TargetSearchInterval == defaults.TargetSearchInterval, "Valid final values equal authored base stats");
+        Require(baseline.ShieldPenetration == 0.05f && defaults.DescribeStats(baseline).Contains("Shield Penetration: 5%"),
+            "Battle base penetration enters cached stats and Inspector at level one");
+        foreach (float input in new[] { -1f, 2f, float.NaN, float.PositiveInfinity })
+        {
+            BattleTowerConfig penetration = defaults.CreateInstanceCopy(); penetration.ShieldPenetration = input;
+            float expected = input == 2 ? 1 : 0;
+            Require(penetration.ResolveStats(1).ShieldPenetration == expected, "Penetration safety clamps to finite0..1");
+        }
         Require(trace.Steps.Count == 8, "All eight stages execute");
         for (int i = 0; i < 8; i++)
         {
@@ -78,6 +86,10 @@ public static class TowerStatChecks
             Label details = battle.GetNode<Label>("UI/GameplayHUD/BottomArea/Inspector/Insets/Body/TowerStats");
             Require(details.Text.Contains($"Damage: {first.FinalStats.DamagePerShot}") && details.Text.Contains("Range: 400"),
                 "Selected Inspector displays updated final values");
+            first.Config.ShieldPenetration = 0.1f;
+            Require(first.FinalStats.ShieldPenetration == 0.1f && second.FinalStats.ShieldPenetration == 0.05f
+                && defaults.ShieldPenetration == 0.05f && details.Text.Contains("Shield Penetration: 10%"),
+                "Penetration edits refresh selected Inspector without changing other instances or source");
             placement.Call("SelectTower", Variant.From((GodotObject)null));
             BattleTowerConfig prior = first.Config;
             first.Config = (BattleTowerConfig)defaults.Duplicate(true);

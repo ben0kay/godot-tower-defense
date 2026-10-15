@@ -19,6 +19,8 @@ public partial class BattleTowerConfig : TowerConfig
     [Export(PropertyHint.Range, "0,10,0.1")] public float ShotsPerSecond { get => _shotsPerSecond; set => SetStat(ref _shotsPerSecond, value); }
     [Export(PropertyHint.Range, "1,100,1")] public int DamagePerShot { get => _damagePerShot; set => SetStat(ref _damagePerShot, value); }
     [Export(PropertyHint.Range, "50,3000,25")] public float ProjectileSpeed { get => _projectileSpeed; set => SetStat(ref _projectileSpeed, value); }
+    [ExportGroup("Shield Penetration")]
+    [Export(PropertyHint.Range, "0,1,0.01")] public float ShieldPenetration { get => _shieldPenetration; set => SetStat(ref _shieldPenetration, value); }
     [ExportGroup("Aiming")]
     [Export(PropertyHint.Range, "0,720,5")] public float RotationSpeedDegrees { get => _rotationSpeedDegrees; set => SetStat(ref _rotationSpeedDegrees, value); }
     [Export(PropertyHint.Range, "0,180,1")] public float AimToleranceDegrees { get => _aimToleranceDegrees; set => SetStat(ref _aimToleranceDegrees, value); }
@@ -29,6 +31,7 @@ public partial class BattleTowerConfig : TowerConfig
     [Export(PropertyHint.Range, "0.05,2,0.05")] public float TargetSearchInterval { get => _targetSearchInterval; set => SetStat(ref _targetSearchInterval, value); }
 
     #region Stat Change Notifications
+    private float _shieldPenetration = 0.05f;
     private float _rangePixels = 256f;
     private float _shotsPerSecond = 1f;
     private int _damagePerShot = 12;
@@ -57,13 +60,14 @@ public partial class BattleTowerConfig : TowerConfig
     // =========================================================
     // Weapon-specific detail belongs to the weapon config, not generic placement or HUD.
     public override string DescribeStats(TowerFinalStats final) =>
-        $"Barrels: 1\nRange: {final.RangePixels:0} px\nRate: {final.ShotsPerSecond:0.##} shots/s\nDamage: {final.DamagePerShot}\nTargeting: {TargetPriority}";
+        $"Barrels: 1\nRange: {final.RangePixels:0} px\nRate: {final.ShotsPerSecond:0.##} shots/s\nDamage: {final.DamagePerShot}\nShield Penetration: {final.ShieldPenetration * 100:0.##}%\nTargeting: {TargetPriority}";
 
     // =========================================================
     // Describe the same resolved snapshot used by upgrade application.
     public override string DescribeChanges(TowerFinalStats now, TowerFinalStats future)
     {
         string changes = "";
+        if (now.ShieldPenetration != future.ShieldPenetration) changes += $"Shield Penetration: {now.ShieldPenetration * 100:0.##}% → {future.ShieldPenetration * 100:0.##}%\n";
         if (now.DamagePerShot != future.DamagePerShot) changes += $"Damage: {now.DamagePerShot} → {future.DamagePerShot}\n";
         if (now.ShotsPerSecond != future.ShotsPerSecond) changes += $"Rate: {now.ShotsPerSecond:0.##} → {future.ShotsPerSecond:0.##} shots/s\n";
         if (now.RangePixels != future.RangePixels) changes += $"Range: {now.RangePixels:0} → {future.RangePixels:0} px\n";

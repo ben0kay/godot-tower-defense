@@ -5,4 +5,4 @@
 No rigid bodies, splash damage, armor model, pooling or elaborate VFX yet. Fired from the existing tower sprite center; separate rotating gun and muzzle art can follow later.
 
 
-Phase 4C-1: BasicProjectile delivers DamageInfo with default Kinetic type. Initialize can alternatively accept a typed payload; damage coefficients belong to COMBAT/Damage, never projectile delivery. Default12 base damage still deals12 to unshielded hull but6 to shield. Travel/contact/lifetime/rewards are unchanged.
+Phase 4C-3: BasicProjectile stores an immutable DamageInfo supplied by its weapon. Battle snapshots its final Kinetic damage and5% penetration at launch. Initialize(target,speed,float) remains compatible and defaults to Kinetic with zero penetration and no overrides. Contact forwards unmodified base units to Enemy.ApplyDamage; COMBAT/Damage owns all coefficient selection, bypass and base-unit shield spillover. Battle12 against100 shield/60 hull leaves94.3/59.4, while an unshielded target still loses12 hull. Delivery/travel/lifetime/reward behavior is unchanged.

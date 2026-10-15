@@ -28,16 +28,20 @@ public static class LaserTowerChecks
         placement.Call("TryPlace", cell);
         LaserTower tower = towers.GetChild<LaserTower>(towers.GetChildCount() - 1); tower.SetPhysicsProcess(false);
         Require(tower.TowerTypeId == "laser" && grid.IsOccupied(cell) && wallet.GetBalance(wallet.CreditsResource) == 750 &&
-            tower.FinalStats.Beam.Value.DamagePerSecond == 20, "Dynamic action places/pays the correct Energy tower");
+            tower.FinalStats.Beam.Value.DamagePerSecond == 12 && tower.FinalStats.ShieldPenetration == 0, "Dynamic action places/pays the correct Energy tower");
         Require(tower.Config != definition.DefaultConfig && tower.UpgradeTiers[0] != definition.DefaultConfig.UpgradeTiers[0], "Laser source/tier data is private");
         placement.Call("TryPlace", cell);
         Require(wallet.GetBalance(wallet.CreditsResource) == 750, "Repeat Laser occupancy cannot charge");
         Label details = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerStats");
         Label upgrade = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/UpgradeInfo");
-        Require(details.Text.Contains("DPS: 20") && !details.Text.Contains("shots/s") && upgrade.Text.Contains("DPS: 20 → 30"), "Inspector displays actual beam capability/preview");
+        Require(details.Text.Contains("DPS: 12") && details.Text.Contains("Shield: 6.00x / Hull: 0.15x") && !details.Text.Contains("shots/s") && upgrade.Text.Contains("DPS: 12 → 22"), "Inspector displays actual beam capability/preview");
+        tower.Config.HullCoefficient = 0.2f;
+        Require(details.Text.Contains("Hull: 0.20x") && ((LaserTowerConfig)definition.DefaultConfig).HullCoefficient == 0.15f,
+            "Selected Laser Inspector refreshes coefficients without mutating the shared source");
+        tower.Config.HullCoefficient = 0.15f;
         TowerFinalStats preview = tower.ResolveLevel(2); int revision = grid.NavigationRevision;
         hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/UpgradeButton").EmitSignal(Button.SignalName.Pressed);
-        Require(tower.UpgradeLevel == 2 && tower.FinalStats == preview && tower.FinalStats.Beam.Value.DamagePerSecond == 30 &&
+        Require(tower.UpgradeLevel == 2 && tower.FinalStats == preview && tower.FinalStats.Beam.Value.DamagePerSecond == 22 &&
             tower.FinalStats.RangePixels == 288 && wallet.GetBalance(wallet.CreditsResource) == 575 && grid.NavigationRevision == revision,
             "Laser175-Credit tier applies exact DPS/range preview without changing navigation");
         placement.Call("SelectTower", default(Variant)); placement.Call("CancelPlacement");
@@ -55,8 +59,8 @@ public static class LaserTowerChecks
             BeamRenderer beam = laser.GetNode<BeamRenderer>("BeamRenderer");
             int nodes = Count(main), projectiles = main.GetNode("World/Projectiles").GetChildCount();
             for (int i = 0; i < rate; i++) laser._PhysicsProcess(1.0 / rate);
-            Require(Mathf.Abs(target.CurrentShield - 60) < 0.003f && target.Health == 60 && beam.IsActive,
-                "20 base DPS removes40 shield per second at " + rate + "Hz");
+            Require(Mathf.Abs(target.CurrentShield - 28) < 0.003f && target.Health == 60 && beam.IsActive,
+                "12 base DPS removes72 shield per second at " + rate + "Hz");
             Require(Count(main) == nodes && main.GetNode("World/Projectiles").GetChildCount() == projectiles, "Beam attack creates no per-tick nodes/projectiles");
             Marker2D muzzle = laser.GetNode<Marker2D>("TurretPivot/Muzzle");
             Line2D core = beam.GetNode<Line2D>("Core");
@@ -72,12 +76,24 @@ public static class LaserTowerChecks
             laser.Enabled = true; target.GlobalPosition += new Vector2(1000, 0); laser._PhysicsProcess(0.01);
             Require(!beam.IsActive && target.CurrentShield == shield, "Out-of-range loses lock without damage");
             laser.Free(); target.Arrive();
+            Enemy exposed = spawns.Spawn(enemyScene, true); exposed.Movement.SetPhysicsProcess(false);
+            LaserTower hullLaser = Create(definition, towers, exposed.GlobalPosition + new Vector2(0, 64));
+            for (int i = 0; i < rate; i++) hullLaser._PhysicsProcess(1.0 / rate);
+            Require(Mathf.Abs(exposed.Health - 58.2f) < 0.003f, "Exposed hull DPS remains1.8 across " + rate + "Hz");
+            hullLaser.Free(); exposed.Arrive();
         }
         Enemy hull = spawns.Spawn(enemyScene, true); hull.Movement.SetPhysicsProcess(false);
         LaserTower attacker = Create(definition, towers, hull.GlobalPosition + new Vector2(0, 64));
         for (int i = 0; i < 60; i++) attacker._PhysicsProcess(1.0 / 60);
-        Require(Mathf.Abs(hull.Health - 43) < 0.003f, "20 Energy DPS applies17 unshielded hull damage per second");
+        Require(Mathf.Abs(hull.Health - 58.2f) < 0.003f, "12 Energy DPS applies1.8 unshielded hull damage per second");
         BeamRenderer renderer = attacker.GetNode<BeamRenderer>("BeamRenderer");
+        TowerFinalStats beforeEdit = attacker.FinalStats;
+        attacker.Config.HullCoefficient = 0.2f;
+        Require(!ReferenceEquals(beforeEdit, attacker.FinalStats), "Defense override edits invalidate once through Resource.Changed");
+        TowerFinalStats afterEdit = attacker.FinalStats;
+        attacker._PhysicsProcess(0.01);
+        Require(ReferenceEquals(afterEdit, attacker.FinalStats), "Active beam ticks reuse cached effective stats");
+        attacker.Config.HullCoefficient = 0.15f;
         float beforeHealth = hull.Health;
         attacker.GetNode<Node2D>("TurretPivot").Rotation = Mathf.Pi;
         attacker.Config.RotationSpeedDegrees = 0; attacker.Config.RotateWhileTracking = false; attacker.Config.AimToleranceDegrees = 1;
@@ -87,7 +103,7 @@ public static class LaserTowerChecks
         attacker._PhysicsProcess(0.1); Require(renderer.IsActive, "Restored alignment resumes sustained lock");
         attacker.Config.DamagePerSecond = 0;
         Require(!renderer.IsActive, "Zero-DPS input invalidation clears the beam immediately");
-        attacker.Config.DamagePerSecond = 20;
+        attacker.Config.DamagePerSecond = 12;
         attacker._PhysicsProcess(0.01); hull.Arrive();
         Require(!renderer.IsActive, "Target arrival clears visible beam immediately");
         attacker.Free();
@@ -95,7 +111,7 @@ public static class LaserTowerChecks
         broken.Movement.SetPhysicsProcess(false); broken.TakeDamage(70);
         LaserTower spill = Create(definition, towers, broken.GlobalPosition + new Vector2(0, 64));
         spill._PhysicsProcess(1);
-        Require(broken.CurrentShield == 0 && broken.Health == 55.75f, "Beam tick converts remaining base units on fractional shield break");
+        Require(broken.CurrentShield == 0 && Mathf.IsEqualApprox(broken.Health, 58.95f), "Beam tick converts remaining base units on fractional shield break");
         int credits = wallet.GetBalance(wallet.CreditsResource);
         spill.Config.DamagePerSecond = 10000; spill._PhysicsProcess(1); spill._PhysicsProcess(1);
         Require(!spill.GetNode<BeamRenderer>("BeamRenderer").IsActive && wallet.GetBalance(wallet.CreditsResource) == credits + 3,
@@ -133,9 +149,19 @@ public static class LaserTowerChecks
         LaserTowerConfig operations = ((LaserTowerConfig)definition.DefaultConfig).CreateInstanceCopy();
         operations.UpgradeTiers[0].Modifiers.Add(new TowerUpgradeModifier { Stat = TowerStatId.BeamDps, Operation = TowerStatOperation.AdditivePercent, Amount = 0.2f });
         operations.UpgradeTiers[0].Modifiers.Add(new TowerUpgradeModifier { Stat = TowerStatId.BeamDps, Operation = TowerStatOperation.Multiplier, Amount = 0.5f });
-        Require(Mathf.IsEqualApprox(operations.ResolveStats(2).Beam.Value.DamagePerSecond, 18), "Beam DPS uses shared flat/percent/multiplier stage arithmetic without integer rounding");
+        Require(Mathf.IsEqualApprox(operations.ResolveStats(2).Beam.Value.DamagePerSecond, 13.2f), "Beam DPS uses shared flat/percent/multiplier stage arithmetic without integer rounding");
         LaserTowerConfig invalid = ((LaserTowerConfig)definition.DefaultConfig).CreateInstanceCopy(); invalid.DamagePerSecond = float.NaN;
         Require(invalid.ResolveStats(1).Beam.Value.DamagePerSecond == 0, "Beam capability has finite safety clamps");
+        LaserTowerConfig inherited = ((LaserTowerConfig)definition.DefaultConfig).CreateInstanceCopy();
+        inherited.OverrideShieldCoefficient = false;
+        DamageInfo inheritedShield = inherited.CreateHit(12);
+        Require(inheritedShield.ShieldCoefficientOverride == null && inheritedShield.HullCoefficientOverride == 0.15f
+            && Mathf.IsEqualApprox(DamageResolver.Resolve(inheritedShield, 100, 60).Shield, 76), "Laser shield opt-out inherits Energy 2x independently");
+        inherited.OverrideHullCoefficient = false;
+        Require(Mathf.IsEqualApprox(DamageResolver.Resolve(inherited.CreateHit(12), 0, 60).Health, 49.8f),
+            "Laser hull opt-out inherits Energy0.85x");
+        inherited.OverrideShieldCoefficient = true; inherited.ShieldCoefficient = 0;
+        Require(DamageResolver.Resolve(inherited.CreateHit(12), 100, 60) == new DamageResult(100, 60), "Laser explicit zero remains an override");
         BeamStyle authored = GD.Load<BeamStyle>("res://TOWERS/Offensive/LaserTower/Beam/DefaultLaserBeamStyle.tres");
         Require(authored.CoreWidth == 3 && authored.PulseAmount == 0.06f, "Visual fixture edits preserve shared authored style");
         hud.GetBuildButton("battle").EmitSignal(Button.SignalName.Pressed); placement.Call("CancelPlacement"); hud.ClearInspection();

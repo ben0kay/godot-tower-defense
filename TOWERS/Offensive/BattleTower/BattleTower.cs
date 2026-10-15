@@ -71,7 +71,8 @@ public partial class BattleTower : TowerBase
             FinalStats.AimToleranceDegrees, Config.RotateWhileTracking, delta);
         if (!aligned || _shotTimer > 0f || FinalStats.ShotsPerSecond <= 0f) return;
         BasicProjectile bullet = new();
-        bullet.Initialize(_target, FinalStats.ProjectileSpeed, FinalStats.DamagePerShot);
+        bullet.Initialize(_target, FinalStats.ProjectileSpeed,
+            new DamageInfo(FinalStats.DamagePerShot, DamageType.Kinetic, shieldPenetration: FinalStats.ShieldPenetration));
         _projectiles.AddChild(bullet); bullet.GlobalPosition = GlobalPosition;
         _shotTimer = 1f / FinalStats.ShotsPerSecond;
     }

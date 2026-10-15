@@ -19,25 +19,30 @@ public static class DamageResolver
     public static DamageResult Resolve(DamageInfo hit, float shield, float health, DamageResponseProfile profile = null)
     {
         var coefficients = (profile ?? DefaultProfile).Coefficients(hit.Type);
-        return ResolveBase(hit.Amount, shield, health, coefficients.Shield, coefficients.Hull);
+        return ResolveBase(hit.Amount, shield, health, hit.ShieldCoefficientOverride ?? coefficients.Shield,
+            hit.HullCoefficientOverride ?? coefficients.Hull, hit.ShieldPenetration);
     }
     // =========================================================
     // Legacy callers explicitly use 1:1 behavior, independent of authored type coefficients.
     public static DamageResult ResolveLegacy(float amount, float shield, float health) => ResolveBase(amount, shield, health, 1, 1);
     // =========================================================
-    // Double intermediates prevent overflow; a zero shield coefficient blocks without bypass.
-    private static DamageResult ResolveBase(float amount, float shield, float health, float shieldScale, float hullScale)
+    // Double intermediates prevent overflow; zero shield response blocks only the ordinary portion.
+    private static DamageResult ResolveBase(float amount, float shield, float health, float shieldScale, float hullScale, float penetration = 0)
     {
         if (!float.IsFinite(amount) || amount < 0 || !float.IsFinite(shield) || shield < 0 || !float.IsFinite(health) || health < 0)
             throw new ArgumentOutOfRangeException(nameof(amount), "Damage/state must be finite and nonnegative.");
-        double remaining = amount, nextShield = shield;
+        double bypass = shield > 0 ? (double)amount * penetration : 0;
+        double remaining = amount - bypass, nextShield = shield;
         if (shield > 0)
         {
-            if (shieldScale == 0) return new(shield, health);
-            double consumed = Math.Min(remaining, (double)shield / shieldScale);
-            nextShield = Math.Max(0, shield - consumed * shieldScale);
-            remaining -= consumed;
+            if (shieldScale == 0) remaining = 0; // Ordinary damage is blocked; bypass still reaches hull.
+            else
+            {
+                double consumed = Math.Min(remaining, (double)shield / shieldScale);
+                nextShield = Math.Max(0, shield - consumed * shieldScale);
+                remaining -= consumed;
+            }
         }
-        return new((float)nextShield, (float)Math.Max(0, health - remaining * hullScale));
+        return new((float)nextShield, (float)Math.Max(0, health - (bypass + remaining) * hullScale));
     }
 }
