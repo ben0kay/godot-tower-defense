@@ -1,13 +1,11 @@
-# LOGISTICS — Shared transport and supply (FUTURE / NOT IMPLEMENTED)
+# LOGISTICS — Shared supply coordination (FUTURE / NOT IMPLEMENTED)
 
-Future top-level manager(s) for **moving physical supplies between buildings**, starting with [Ammunition/](Ammunition/README.md). This is not a replacement for the existing ECONOMY wallet or for a tower's own ammunition/magazine state.
+This category owns **what inventory must be transferred and when**, not the design or flight physics of each drone.
 
-Clear ownership:
-- ECONOMY defines resource identities, balances and payments.
-- TOWERS/Economy/AmmunitionFactory makes batches; AmmunitionDepot stores batches and owns drone capacity.
-- TOWERS/Shared/Ammunition tracks reserve and magazines already delivered to an individual tower.
-- LOGISTICS/Ammunition coordinates transfers, resupply requests, drone dispatch and flight lifecycle.
+- [Ammunition](Ammunition/README.md): Stage A automatic **factory small buffer → depot large storage** batch transfers (no drones required). Stage B depot stock → tower local reserves by drone once that feature is introduced.
+- [DRONES](../DRONES/README.md): separate reusable mobile-unit umbrella. Its [Transport](../DRONES/Transport/README.md) behavior handles flight and returns; future [Combat](../DRONES/Combat/README.md) drones may be launched by player abilities.
+- ECONOMY continues to own resource IDs/credits/payments; AmmunitionFactory/Depot each own their local stocks; tower ammunition state stays inside TOWERS/Shared/Ammunition.
 
-Aim for one shared active-job dispatcher and budgeted events, not every tower scanning every depot per physics frame. Keep space-flight visuals independent from inventory conservation. Future Idle/Empire use is possible, but do not prematurely generalize into a universal cross-genre logistics framework.
+Keep a single compact dispatch/transfer authority where needed, with scheduled/event-driven work rather than every building scanning all others per frame. No generalized logistics engine and no change to current gameplay until requested.
 
-**Reserved README-only folder; no logistics code exists.**
+**Documentation only; not implemented.**

@@ -10,9 +10,11 @@ Reserve this top-level folder for the future **PowerGridManager** and optional *
 4. All generators on a linked island contribute to the **merged** supply. An isolated Solar Generator remains local because its island is **not linked**, not because of a separate local/grid toggle.
 
 ## Buildings and usage
-- [Solar Generator](../TOWERS/Economy/SolarGenerator/README.md): cheap, modest, isolated outposts.
-- [Industrial Generator](../TOWERS/Economy/IndustrialGenerator/README.md): standard initial/main source in most maps.
-- [Fusion Reactor](../TOWERS/Economy/FusionReactor/README.md): very large, expensive endgame output.
+
+All three generator types use one common implementation and documented home under [PowerGenerators](../TOWERS/Economy/PowerGenerators/README.md); they remain distinct build choices.
+- [Solar Generator](../TOWERS/Economy/PowerGenerators/README.md): cheap, modest, isolated outposts.
+- [Industrial Generator](../TOWERS/Economy/PowerGenerators/README.md): standard initial/main source in most maps.
+- [Fusion Reactor](../TOWERS/Economy/PowerGenerators/README.md): very large, expensive endgame output.
 - [Power Relay](../TOWERS/Utility/PowerRelay/README.md): manual inter-island link.
 - [Consumer capability](../TOWERS/Shared/Power/README.md): optional baseline IdlePowerDraw/ActivePowerDraw in non-level tower type config, with research changing effective draw later.
 - **Power Priority:** each placed electricity consumer has an Inspector slider 0–100 (default 50). When output is insufficient, give full power to higher-priority buildings before lower ones (with stable tie ordering and brief anti-flicker protection). Production may stop to preserve defensive towers.
