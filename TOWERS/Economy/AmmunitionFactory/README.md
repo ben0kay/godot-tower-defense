@@ -16,6 +16,6 @@ Use authored settings for duration/batch/buffer maxima and **per-instance state*
 
 Future purchased upgrades/research may improve production speed, batch volume and buffer; changes must not overwrite base authored source data. Use existing ECONOMY identities/transactions when inputs are eventually introduced, not a second global wallet.
 
-See [Economy design](../README.md), [Depot](../AmmunitionDepot/README.md), [LOGISTICS](../../../LOGISTICS/Ammunition/README.md).
+See [Economy design](../README.md), [Depot](../AmmunitionDepot/README.md), [LOGISTICS](../Logistics/Ammunition/README.md).
 
 **Documentation only — no factory code, scenes or gameplay yet.**

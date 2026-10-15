@@ -14,7 +14,7 @@ They are **three generator TYPES**, not purchased upgrade levels of one building
 Actual balance values, costs, work times, artwork, footprints, potential fuels and durability are **not chosen**. The first power pass should not require a fuel production chain.
 
 ## Common generator design
-- A placed generator registers its output once with the [POWER network](../../../POWER/README.md) corresponding to its **connected terrain island**. No tower-to-generator cables, supply radii or explicit tower subscriptions within one island.
+- A placed generator registers its output once with the [POWER network](../Power/README.md) corresponding to its **connected terrain island**. No tower-to-generator cables, supply radii or explicit tower subscriptions within one island.
 - Manually paired [Power Relays](../../Utility/PowerRelay/README.md) join islands and their supply/demand pools. An unlinked Solar island stays independent. A generator automatically shares its output across any deliberately relay-joined network, without extra local/grid switches.
 - Prospective per-generator tunables: production amount/rate, construction cost, optional build/upgrade work duration, durability, operating status; future research output/efficiency modifiers. Keep **generator source settings** separate from current running state and network-derived totals.
 - If the tower catalog exposes three build choices, each should have a **distinct stable ID and resource/config**, but reuse the same generator class and network registration; never hardcode generator names in POWER's accounting logic.

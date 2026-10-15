@@ -1,7 +1,7 @@
 # POWER — Shared electricity networks (FUTURE / NOT IMPLEMENTED)
 
 ## Single authority
-Reserve this top-level folder for the future **PowerGridManager** and optional **PowerMasterConfig**. This system owns network membership, generation/demand and priority allocation, not generator artwork or weapon combat. Do not create those classes or change runtime gameplay until a dedicated pass is approved.
+Reserve this Economy-owned folder for the future **PowerGridManager** and optional **PowerMasterConfig**. This system owns network membership, generation/demand and priority allocation, not generator artwork or weapon combat. Do not create those classes or change runtime gameplay until a dedicated pass is approved.
 
 ## Simple island-grid rules
 1. An **edge-connected group of eligible terrain tiles is one power grid** (prefer four-directional neighbours, no diagonal-only joins). Buildings on that landmass automatically share electricity, with no cables, radius, per-tower assignment or transmission links.
@@ -11,12 +11,12 @@ Reserve this top-level folder for the future **PowerGridManager** and optional *
 
 ## Buildings and usage
 
-All three generator types use one common implementation and documented home under [PowerGenerators](../TOWERS/Economy/PowerGenerators/README.md); they remain distinct build choices.
-- [Solar Generator](../TOWERS/Economy/PowerGenerators/README.md): cheap, modest, isolated outposts.
-- [Industrial Generator](../TOWERS/Economy/PowerGenerators/README.md): standard initial/main source in most maps.
-- [Fusion Reactor](../TOWERS/Economy/PowerGenerators/README.md): very large, expensive endgame output.
-- [Power Relay](../TOWERS/Utility/PowerRelay/README.md): manual inter-island link.
-- [Consumer capability](../TOWERS/Shared/Power/README.md): optional baseline IdlePowerDraw/ActivePowerDraw in non-level tower type config, with research changing effective draw later.
+All three generator types use one common implementation and documented home under [PowerGenerators](../PowerGenerators/README.md); they remain distinct build choices.
+- [Solar Generator](../PowerGenerators/README.md): cheap, modest, isolated outposts.
+- [Industrial Generator](../PowerGenerators/README.md): standard initial/main source in most maps.
+- [Fusion Reactor](../PowerGenerators/README.md): very large, expensive endgame output.
+- [Power Relay](../../Utility/PowerRelay/README.md): manual inter-island link.
+- [Consumer capability](../../Shared/Power/README.md): optional baseline IdlePowerDraw/ActivePowerDraw in non-level tower type config, with research changing effective draw later.
 - **Power Priority:** each placed electricity consumer has an Inspector slider 0–100 (default 50). When output is insufficient, give full power to higher-priority buildings before lower ones (with stable tie ordering and brief anti-flicker protection). Production may stop to preserve defensive towers.
 
 ## Implementation constraints
