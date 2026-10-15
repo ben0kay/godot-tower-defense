@@ -9,6 +9,7 @@ public partial class LevelDebugController : Node
     [Export] public PackedScene EnemyScene { get; set; }
     [Export] public bool PortalOnly { get; set; } = true;
     private SpawnManager _spawns;
+    private int _nextEnemyIndex;
 
     // =========================================================
     // Deferred lookup allows the live world's grid/services to finish their startup first.
@@ -24,11 +25,21 @@ public partial class LevelDebugController : Node
     }
 
     // =========================================================
-    // One spawn per real key press; rapid repeated presses are intentionally supported.
+    // F2 cycles catalog entries in Inspector order; only a successful spawn advances the index.
     public override void _UnhandledKeyInput(InputEvent input)
     {
         if (!Enabled || _spawns == null || input is not InputEventKey key || !key.Pressed || key.Echo
             || key.Keycode != SpawnKey) return;
-        _spawns.Spawn(EnemyScene, PortalOnly); GetViewport().SetInputAsHandled();
+
+        var scenes = _spawns.Catalog?.Scenes;
+        if (scenes != null && scenes.Count > 0)
+        {
+            int index = _nextEnemyIndex % scenes.Count;
+            if (_spawns.Spawn(scenes[index], PortalOnly) != null)
+                _nextEnemyIndex = (index + 1) % scenes.Count;
+        }
+        else if (EnemyScene != null) _spawns.Spawn(EnemyScene, PortalOnly);
+
+        GetViewport().SetInputAsHandled();
     }
 }
