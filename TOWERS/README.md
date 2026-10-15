@@ -115,3 +115,7 @@ Shared spatial targeting and area queries are implemented behind the world Enemy
 - Future save/load should persist source data (type, position, purchased level, XP/rank inputs, health/shield/ammo, construction/reload progress, as needed), then rebuild derived final stats. Do not serialize `FinalStats` as a replacement for actual state.
 - Other separate future decisions: selling, footprints larger than 1×1, support/production tower mechanics, line-of-sight, special rank abilities and player research/active effects.
 - Read `NOTES/CodePreferences.md` plus each feature's current README before working. Follow compact C#, labeled rows, comment separators, realistic Godot/compile tests and precise documentation. Never claim tests ran if they did not.
+
+## Reserved future infrastructure folders — README-only
+
+The [Construction](Shared/Construction/README.md), [Ammunition](Shared/Ammunition/README.md) and [Power](Shared/Power/README.md) folders document optional per-tower capabilities. [Economy infrastructure](Economy/README.md) covers production, depots and generators; [Power Relay](Utility/PowerRelay/README.md) is a utility building. World-level network/delivery services are described under [POWER](../POWER/README.md) and [LOGISTICS](../LOGISTICS/README.md). **All are future plans, not implemented or permission to refactor TD today.**

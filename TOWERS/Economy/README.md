@@ -59,3 +59,13 @@ Make relevant quantities explicit and separately configurable so a later researc
 6. Only afterwards: research modifiers, additional energy storage, deeper supply logistics and visual polish.
 
 **Current priority remains polishing Tower Defense.** Do not create infrastructure nodes, scenes, stats, UI or directories from these notes until a specific feature pass is requested.
+
+## Dedicated future building folders (README-only)
+
+- [Ammunition Factory](AmmunitionFactory/README.md) — production batches.
+- [Ammunition Depot](AmmunitionDepot/README.md) — large storage and drone dispatch.
+- [Solar Generator](SolarGenerator/README.md) — small isolated-island supply.
+- [Industrial Generator](IndustrialGenerator/README.md) — everyday starting/main generator.
+- [Fusion Reactor](FusionReactor/README.md) — high-output endgame power.
+
+The existing [SolarTower](SolarTower/README.md) remains a possible **hybrid solar/laser concept**, not a second dedicated Solar Generator. Reconcile their eventual catalog identities before implementing either. [POWER](../../POWER/README.md) owns terrain-island grids; [LOGISTICS/Ammunition](../../LOGISTICS/Ammunition/README.md) owns inter-building deliveries. No gameplay is implemented by these new docs.
