@@ -1,5 +1,7 @@
 # Headless gameplay checks
 
+**PLANNED — Phase 4D (documentation only):** Codex will add instant radial AoE and Blaster Cannon checks for per-weapon falloff, independent blast recipients, primary hit-once, shield/hull damage, projectile-target loss, stat pipeline/Inspector and existing regression suite. No tests or gameplay have been added yet; see `COMBAT/AreaDamage/README.md` and `TOWERS/Offensive/BlasterCannon/README.md`. Timed shockwave tests belong to Phase 4E.
+
 Build C# first, then run the Godot .NET executable:
 
 ```sh
