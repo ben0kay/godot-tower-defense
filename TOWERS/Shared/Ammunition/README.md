@@ -9,6 +9,6 @@ Per-level authored values in each type's complete *Levels.cs rows: AmmunitionCap
 If empty, an attack gracefully stops until it has supply; preserve current combat timing, targeting and attribution. The first pass can use a starting stock/debug refill; do not implement factories, drones or a grid in this pass.
 
 ## Later integration
-[LOGISTICS/Ammunition](../../Economy/Logistics/Ammunition/README.md) handles requests/deliveries; [Ammunition Depot](../../Economy/AmmunitionDepot/README.md) stores remote supply. An accepted delivery is the only way logistics adds reserve ammo to a tower.
+[LOGISTICS/Ammunition](../../Economy/Ammunition/Shared/Logistics/README.md) handles requests/deliveries; [Ammunition Depot](../../Economy/Ammunition/AmmunitionDepot/README.md) stores remote supply. An accepted delivery is the only way logistics adds reserve ammo to a tower.
 
 **Planned only. Test depletion, reload, partial refills, upgrade capacities, interruption, saves and no duplicated rounds.**
