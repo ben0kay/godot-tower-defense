@@ -36,14 +36,20 @@ public partial class TowerPlacementController : Node2D
     // One placement ghost; the world and HUD continue to own their separate responsibilities.
     public override void _Ready()
     {
+        SetProcess(false);
+        SetProcessUnhandledInput(false);
+        if (Catalog == null)
+        {
+            Catalog = GD.Load<TowerCatalog>("res://TOWERS/DefaultTowerCatalog.tres");
+            if (Catalog == null)
+                throw new InvalidOperationException("Tower placement could not load res://TOWERS/DefaultTowerCatalog.tres. Check the resource/import errors above.");
+            GD.PushWarning("TowerPlacement had no Catalog resource; loaded DefaultTowerCatalog automatically.");
+        }
         _economy = GetNode<EconomyManager>("../Economy");
-        _economy.BalanceChanged += OnBalanceChanged;
         _grid = GetNode<WorldGrid>("../World/Grid");
         _spawns = GetNode<SpawnManager>("../World/EnemySystems/Spawning");
         _towers = GetNode<Node2D>("../World/Towers");
         _hud = GetNode<GameplayHUD>("../UI/GameplayHUD");
-        _hud.TowerChoiceRequested += OnTowerChoiceRequested;
-        _hud.TowerUpgradeRequested += OnUpgradeRequested;
         Catalog.Rebuild();
         _hud.BindCatalog(Catalog);
         foreach (TowerDefinition definition in Catalog.Definitions)
@@ -55,7 +61,10 @@ public partial class TowerPlacementController : Node2D
             Modulate = new Color(0.45f, 1f, 0.73f, 0.66f)
         };
         AddChild(_ghost);
-        SetProcess(false);
+        _economy.BalanceChanged += OnBalanceChanged;
+        _hud.TowerChoiceRequested += OnTowerChoiceRequested;
+        _hud.TowerUpgradeRequested += OnUpgradeRequested;
+        SetProcessUnhandledInput(true);
     }
 
     // =========================================================

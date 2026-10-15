@@ -18,9 +18,16 @@ public partial class EnemyIntegrationChecks : Node
         try
         {
             _battle = GD.Load<PackedScene>("res://Main.tscn").Instantiate<Node2D>();
+            // Preserve the authored binding check, then exercise missing-export recovery in the full gameplay suite.
+            TowerPlacementController placement = _battle.GetNode<TowerPlacementController>("TowerPlacement");
+            Check(placement.Catalog != null, "Main scene retains its authored tower catalog");
+            placement.Catalog = null;
             AddChild(_battle);
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            Check(placement.Catalog != null && _battle.GetNode<GameplayHUD>("UI/GameplayHUD").GetBuildButton("battle") != null
+                && _battle.GetNode<GameplayHUD>("UI/GameplayHUD").GetBuildButton("laser") != null,
+                "Missing catalog export recovers the default catalog and both build buttons on startup");
             DisableTicks(_battle);
             _grid = _battle.GetNode<WorldGrid>("World/Grid");
             _spawns = _battle.GetNode<SpawnManager>("World/EnemySystems/Spawning");
