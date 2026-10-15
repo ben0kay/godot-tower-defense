@@ -27,6 +27,8 @@ Umbrella folder for **every player-buildable tower**, not just weapons: offensiv
 | `Offensive/BattleTower/` and `Offensive/BattleTower/Upgrades/` | EXISTS | First working offensive type; Level2/Level3 assets |
 | `Offensive/LaserTower/` | EXISTS (4C-2) | Sustained Energy DPS, muzzle beam renderer and paid tier |
 | `Offensive/MissileTower/` | PLANNED | Future explosive weapon |
+| `Offensive/BlasterCannon/` | PLANNED Phase 4D; README now exists | New instant AoE projectile tower, owns falloff values |
+| `Shared/Weapons/Shockwaves/` | FUTURE Phase 4E; README only | Timed expanding edge-only wavefront delivery |
 | `COMBAT/Damage/` | EXISTS (4C-1) | Shared typed base damage and canonical shield/hull responses |
 | `Support/`, `Economy/`, `Utility/` | PLANNED | Passive and hybrid tower categories, never mandatory weapon logic |
 | `UI/GameplayHUD/` | EXISTS (dynamic catalog entries) | Replace build choice inputs with catalog data |
@@ -416,6 +418,16 @@ TOWERS/DefaultTowerCatalog.tres              # Add the real Laser definition
 Battle starts with 5% base shield penetration, visible in the placed Inspector at every tier and carried through the existing cached eight-stage pipeline into projectile payloads. Level2/Level3 still improve damage/rate/range without adding penetration. The default config's missing tier references were restored. New hits default to zero penetration; optional weapon overrides do not impose combat behavior on passive towers.
 
 Stage 04 remains neutral. Future permanent ballistic research and saving are deferred, alongside Missile Tower, ranks, level modifiers, active effects, selling and tower HP. Visual beam polish still requires a live-window review. See TESTS/README.md for4C-3 validation results.
+
+## Planned next pass — Phase 4D: reusable instant AoE + Blaster Cannon
+
+**Status: documentation ready; NOT IMPLEMENTED.** Start with [`COMBAT/AreaDamage/README.md`](../COMBAT/AreaDamage/README.md) (shared stateless target selection and linear distance-falloff contract), then follow [`Offensive/BlasterCannon/README.md`](Offensive/BlasterCannon/README.md) for the precise C# tower/projectile/catalog/stat pipeline/Inspector and test implementation. These are the authoritative Codex Phase 4D instructions.
+
+**Core design:** A single Blaster projectile detonates **once** and immediately damages each living enemy inside its blast radius via the current `Enemy.ApplyDamage(DamageInfo)` and existing shield/hull resolver. The Blaster itself supplies its **Inspector-editable radius and edge damage fraction** (provisional 80 px and 25% edge damage). Shared combat math must **never hardcode any falloff percentage**. Expose both as optional AoE effective stats through the **existing eight-stage pipeline** and include them in projectile launch snapshots. Existing paid tower tiers are independent from future falloff **permanent research**; Stage 04 stays neutral in 4D. Avoid global TowerId switches and preserve Battle/Laser contracts.
+
+**Do not confuse instant splash and expanding wavefront:** Blaster damage happens at impact even if its visual ring grows. [`Shared/Weapons/Shockwaves/README.md`](Shared/Weapons/Shockwaves/README.md) reserves **damage only when an expanding ring edge crosses an enemy** for later Phase 4E; do not implement a shockwave or timed per-frame full-disc damage in 4D.
+
+**Codex execution:** Read `NOTES/CodePreferences.md`, these 4D READMEs, `COMBAT/Damage/README.md`, `Shared/Stats/README.md`, `Shared/Projectiles/README.md` and the Battle/Laser baseline first. Implement the smallest one-pass C# feature, save/authored assets, production catalog registration and deterministic tests. Compile and run `TESTS/EnemyIntegrationChecks.tscn`, `TESTS/MenuTowerFlowChecks.tscn` and related tests, report actual results, then update all involved READMEs to completed facts (not assumptions). No research/saving, Shockwave Tower, Missile Tower or unrelated systems in 4D.
 
 ## Current live Inspector files
 
