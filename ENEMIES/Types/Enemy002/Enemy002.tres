@@ -2,8 +2,8 @@
 [ext_resource type="Script" path="res://ENEMIES/Shared/EnemyDefinition.cs" id="1"]
 [resource]
 script = ExtResource("1")
-EnemyId = "enemy002"
-DisplayName = "Enemy 002"
+EnemyId = "scout_mk1"
+DisplayName = "Swift Interceptor"
 MaxHealth = 30.0
 MaxShield = 40.0
 MoveSpeed = 160.0

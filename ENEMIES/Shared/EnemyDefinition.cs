@@ -5,8 +5,8 @@ using Godot;
 public partial class EnemyDefinition : Resource
 {
     [ExportGroup("Identity")]
-    [Export] public string EnemyId { get; set; } = "enemy001";
-    [Export] public string DisplayName { get; set; } = "Enemy 001";
+    [Export] public string EnemyId { get; set; } = "";
+    [Export] public string DisplayName { get; set; } = "Unnamed Enemy";
     [ExportGroup("Balance")]
     [Export(PropertyHint.Range, "1,10000,1")] public float MaxHealth { get; set; } = 60f;
     [Export(PropertyHint.Range, "0,10000,1")] public float MaxShield { get; set; } = 0f;

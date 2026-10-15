@@ -27,16 +27,16 @@ public static class WaveChecks
 
         manager.Configure(new[] { Wave(1, Batch(1, 0, 0, Enemy("missing"))) }, scenes);
         Require(manager.State == WaveManager.WaveState.PausedError && !manager.StartWave(), "Unknown IDs fail before spawning");
-        manager.Configure(new[] { Wave(1, Batch(1, -1, 0, Enemy("enemy001"))) }, scenes);
+        manager.Configure(new[] { Wave(1, Batch(1, -1, 0, Enemy("basic_mk1"))) }, scenes);
         Require(manager.State == WaveManager.WaveState.PausedError, "Invalid timings reject setup");
-        manager.Configure(new[] { Wave(1, Batch(1, 0, 0, Enemy("enemy001"))), Wave(1, Batch(1, 0, 0, Enemy("enemy001"))) }, scenes);
+        manager.Configure(new[] { Wave(1, Batch(1, 0, 0, Enemy("basic_mk1"))), Wave(1, Batch(1, 0, 0, Enemy("basic_mk1"))) }, scenes);
         Require(manager.State == WaveManager.WaveState.PausedError, "Duplicate wave numbers reject setup");
 
         manager.Configure(new[]
         {
-            Wave(1, Batch(10, 0.1, 2, Enemy("enemy001")), Batch(5, 0.3, 5, Enemy("enemy001")),
-                Batch(20, 0.2, 99, Enemy("enemy001"))),
-            Wave(2, Batch(1, 0, 0, Enemy("enemy001")))
+            Wave(1, Batch(10, 0.1, 2, Enemy("basic_mk1")), Batch(5, 0.3, 5, Enemy("basic_mk1")),
+                Batch(20, 0.2, 99, Enemy("basic_mk1"))),
+            Wave(2, Batch(1, 0, 0, Enemy("basic_mk1")))
         }, scenes);
         double time = 0; List<double> spawnTimes = new(); int previous = 0, completions = 0;
         void Changed()
@@ -55,7 +55,7 @@ public static class WaveChecks
             Math.Abs(spawnTimes[15] - 9.1) < 0.01, "Batch intervals and 2s/5s post-delays apply after successful final spawns");
         Require(manager.State == WaveManager.WaveState.WaitingForClear && manager.AliveCount == 35 &&
             manager.EnemiesRemaining == 35 && completions == 0, "Earlier batches overlap; final post-delay is ignored and living ships keep wave open");
-        Enemy debug = spawns.Spawn(scenes["enemy001"], true); debug.Movement.SetPhysicsProcess(false);
+        Enemy debug = spawns.Spawn(scenes["basic_mk1"], true); debug.Movement.SetPhysicsProcess(false);
         Enemy last = spawns.Registry.Living.First(s => s != debug);
         foreach (Enemy ship in spawns.Registry.Living.ToArray()) if (ship != debug && ship != last) ship.TakeDamage(10000);
         Require(manager.AliveCount == 1 && completions == 0, "Last owned ship keeps the wave open");
@@ -68,7 +68,7 @@ public static class WaveChecks
             button.Disabled, "Finite wave set completes once without restarting");
         manager.Changed -= Changed; manager.WaveCompleted -= Completed; debug.TakeDamage(10000);
 
-        manager.Configure(new[] { Wave(1, Batch(200, 0, 0, Enemy("enemy001"))) }, scenes);
+        manager.Configure(new[] { Wave(1, Batch(200, 0, 0, Enemy("basic_mk1"))) }, scenes);
         manager.StartWave();
         while (manager.PlannedRemaining > 0)
         {
@@ -87,15 +87,15 @@ public static class WaveChecks
         Require(ships.Zip(ships.Skip(1)).Any(pair => pair.First.GlobalPosition.IsEqualApprox(pair.Second.GlobalPosition)),
             "Wave sources are random rather than forced alternation");
         foreach (Enemy ship in ships) ship.TakeDamage(10000);
-        Enemy d1 = spawns.Spawn(scenes["enemy001"], true), d2 = spawns.Spawn(scenes["enemy001"], true);
+        Enemy d1 = spawns.Spawn(scenes["basic_mk1"], true), d2 = spawns.Spawn(scenes["basic_mk1"], true);
         Require(d1 != null && d2 != null && !d1.GlobalPosition.IsEqualApprox(d2.GlobalPosition), "F2 round-robin stays unchanged");
         d1.TakeDamage(10000); d2.TakeDamage(10000);
 
-        manager.Configure(new[] { Wave(1, Batch(1, 0, 0, Enemy("enemy001", portal: "Portals/NotRegistered"))) }, scenes);
+        manager.Configure(new[] { Wave(1, Batch(1, 0, 0, Enemy("basic_mk1", portal: "Portals/NotRegistered"))) }, scenes);
         manager.StartWave();
         Require(manager.State == WaveManager.WaveState.SpawnBlocked && manager.PlannedRemaining == 1 &&
             manager.AliveCount == 0, "Unavailable required portal blocks without fallback or dropping a ship");
-        manager.Configure(new[] { Wave(1, Batch(1, 0, 0, Enemy("enemy001", portal: "Portals/EnemyPortal2"))) }, scenes);
+        manager.Configure(new[] { Wave(1, Batch(1, 0, 0, Enemy("basic_mk1", portal: "Portals/EnemyPortal2"))) }, scenes);
         manager.StartWave();
         Require(manager.AliveCount == 1 && spawns.Registry.Living[0].GlobalPosition.IsEqualApprox(sources[1]),
             "Named permitted portal uses only its own exit");
@@ -113,12 +113,12 @@ public static class WaveChecks
         grid.Level.Impassable.SetCell(blockedCell, 0, new(0, 0)); grid.RebuildTerrain();
         for (int i = 0; i < 20; i++)
         {
-            Enemy safe = spawns.SpawnWave(scenes["enemy001"], rng);
+            Enemy safe = spawns.SpawnWave(scenes["basic_mk1"], rng);
             Require(safe != null && safe.GlobalPosition.IsEqualApprox(sources[0]),
                 "Random portal selection excludes a blocked exit");
             safe.TakeDamage(10000);
         }
-        Require(spawns.SpawnWave(scenes["enemy001"], rng, "Portals/EnemyPortal2") == null,
+        Require(spawns.SpawnWave(scenes["basic_mk1"], rng, "Portals/EnemyPortal2") == null,
             "Blocked named portal never falls back to a different source");
         if (oldSource < 0) grid.Level.Impassable.EraseCell(blockedCell);
         else grid.Level.Impassable.SetCell(blockedCell, oldSource, oldAtlas, oldAlternative);
@@ -126,7 +126,7 @@ public static class WaveChecks
 
         int max = spawns.Paths.Config.MaxActiveEnemies;
         spawns.Paths.Config.MaxActiveEnemies = 0;
-        manager.Configure(new[] { Wave(1, Batch(2, 0, 0, Enemy("enemy001"))) }, scenes);
+        manager.Configure(new[] { Wave(1, Batch(2, 0, 0, Enemy("basic_mk1"))) }, scenes);
         manager.StartWave();
         Require(manager.State == WaveManager.WaveState.SpawnBlocked && manager.PlannedRemaining == 2 && manager.EnemiesRemaining == 2,
             "Enemy cap never loses scheduled ships or completes a blocked wave");
@@ -141,7 +141,7 @@ public static class WaveChecks
         LevelConfig.MapEdge edges = grid.Level.Settings.AllowedEdges;
         grid.Level.Settings.SpawnMode = LevelConfig.SpawnSourceMode.MapEdges;
         grid.Level.Settings.AllowedEdges = LevelConfig.MapEdge.Left; grid.RebuildTerrain();
-        manager.Configure(new[] { Wave(1, Batch(1, 0, 0, Enemy("enemy001"))) }, scenes); manager.StartWave();
+        manager.Configure(new[] { Wave(1, Batch(1, 0, 0, Enemy("basic_mk1"))) }, scenes); manager.StartWave();
         Require(manager.AliveCount == 1 && grid.WorldToCell(spawns.Registry.Living[0].GlobalPosition).X == 0,
             "Wave spawning respects map-edge-only levels");
         spawns.Registry.Living[0].TakeDamage(10000);

@@ -52,7 +52,7 @@ public static class EnemyKillRewardChecks
                 "A zero-credit override pays nothing and leaves the shared type resource unchanged");
             Require(popup.AccumulatedReward == 3, "Zero rewards and arrivals do not change reward feedback");
 
-            waves.Configure(new[] { Wave(1, Batch(1, 0, 0, Enemy("enemy001"))) },
+            waves.Configure(new[] { Wave(1, Batch(1, 0, 0, Enemy("basic_mk1"))) },
                 WaveCatalog.LoadScenes());
             Require(waves.StartWave() && waves.AliveCount == 1, "Spawn a wave-owned enemy");
             Enemy waveEnemy = spawns.Registry.Living[0];

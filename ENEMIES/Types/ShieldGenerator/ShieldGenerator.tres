@@ -2,7 +2,7 @@
 [ext_resource type="Script" path="res://ENEMIES/Shared/EnemyDefinition.cs" id="1"]
 [resource]
 script = ExtResource("1")
-EnemyId = "shieldgenerator"
+EnemyId = "shield_emitter_mk1"
 DisplayName = "Shield Generator"
 MaxHealth = 100.0
 MaxShield = 80.0

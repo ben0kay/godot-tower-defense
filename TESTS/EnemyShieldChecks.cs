@@ -23,8 +23,8 @@ public static class EnemyShieldChecks
                 "Enemy001 has opt-in shield capacity while generic enemy types default to none");
 
             WaveBatch batch = Batch(6, 0, 0,
-                Enemy("enemy001", weight: 50),
-                Enemy("enemy001", weight: 50, shield: true));
+                Enemy("basic_mk1", weight: 50),
+                Enemy("basic_mk1", weight: 50, shield: true));
             RandomNumberGenerator random = new() { Seed = 123 };
             WaveEnemyEntry[] entries = WaveCatalog.Compose(batch, random);
             Require(entries.Count(e => e.SpawnWithShield) == 3 &&

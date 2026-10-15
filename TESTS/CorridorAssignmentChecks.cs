@@ -25,7 +25,7 @@ public static class CorridorAssignmentChecks
         config.CorridorVariationPercent = float.NaN; config.CorridorVariationStrength = float.PositiveInfinity; config.CorridorVariationSpacingCells = -1;
         Require(config.CorridorVariationPercent == 0 && config.CorridorVariationStrength == 0 && config.CorridorVariationSpacingCells == 2,
             "Malformed runtime controls clamp safely");
-        var batch = WaveBuilder.Batch(20, 0, 0, WaveBuilder.Enemy("enemy001", weight: 80), WaveBuilder.Enemy("enemy002", weight: 20));
+        var batch = WaveBuilder.Batch(20, 0, 0, WaveBuilder.Enemy("basic_mk1", weight: 80), WaveBuilder.Enemy("scout_mk1", weight: 20));
         RandomNumberGenerator before = new() { Seed = 123 }, after = new() { Seed = 123 };
         var expected = WaveCatalog.Compose(batch, before);
         for (uint i = 0; i < 100; i++) CorridorPreference.Selected(CorridorPreference.Seed(i, 12345), config);

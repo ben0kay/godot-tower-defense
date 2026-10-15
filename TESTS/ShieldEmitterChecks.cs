@@ -7,9 +7,9 @@ public static class ShieldEmitterChecks
     // Real registered generators operate only on eligible live recipients and never alter authored data.
     public static void Run(Node main, SpawnManager spawns)
     {
-        Enemy first = spawns.Spawn("shieldgenerator", true), second = spawns.Spawn("shieldgenerator", true);
-        Enemy ally = spawns.Spawn("enemy001", true), fast = spawns.Spawn("enemy002", true), outside = spawns.Spawn("enemy001", true);
-        Enemy zero = spawns.Spawn("enemy002", true);
+        Enemy first = spawns.Spawn("shield_emitter_mk1", true), second = spawns.Spawn("shield_emitter_mk1", true);
+        Enemy ally = spawns.Spawn("basic_mk1", true), fast = spawns.Spawn("scout_mk1", true), outside = spawns.Spawn("basic_mk1", true);
+        Enemy zero = spawns.Spawn("scout_mk1", true);
         Enemy[] ships = { first, second, ally, fast, outside, zero };
         foreach (Enemy ship in ships) ship.Movement.SetPhysicsProcess(false);
         Vector2 origin = ally.GlobalPosition;
@@ -66,14 +66,14 @@ public static class ShieldEmitterChecks
         Require(a.Pulses == pulses + 1 && ally.CurrentShield == preserved, "Source death stops future pulses without erasing allies' shields");
         int otherPulses = b.Pulses; second.Arrive(); b._PhysicsProcess(10);
         Require(b.Pulses == otherPulses && ally.CurrentShield == preserved, "Source arrival stops its schedule independently");
-        Enemy unloaded = spawns.Spawn("shieldgenerator", true); unloaded.Movement.SetPhysicsProcess(false);
+        Enemy unloaded = spawns.Spawn("shield_emitter_mk1", true); unloaded.Movement.SetPhysicsProcess(false);
         ShieldEmitter component = unloaded.GetNode<ShieldEmitter>("Abilities/ShieldEmitter");
         main.GetNode("World/Enemies").RemoveChild(unloaded);
         Require(!component.IsPhysicsProcessing(), "External source unload cleans its optional component");
         int stopped = component.Pulses; component._PhysicsProcess(10);
         Require(component.Pulses == stopped && ally.CurrentShield == preserved, "No pulse survives unload/restart");
         unloaded.Free();
-        Enemy queued = spawns.Spawn("shieldgenerator", true); queued.Movement.SetPhysicsProcess(false);
+        Enemy queued = spawns.Spawn("shield_emitter_mk1", true); queued.Movement.SetPhysicsProcess(false);
         ShieldEmitter queuedAbility = queued.GetNode<ShieldEmitter>("Abilities/ShieldEmitter");
         queued.QueueFree(); queuedAbility._PhysicsProcess(10);
         Require(queuedAbility.Pulses == 0 && !queuedAbility.IsPhysicsProcessing(), "Queued-for-deletion source cannot pulse");

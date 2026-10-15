@@ -69,7 +69,7 @@ public partial class CorridorNavigationChecks : Node
     {
         Vector2[] logical = f.Paths.Navigation.FindPath(f.Start, f.Goal);
         Require(logical.Length > 20, "Straight fixture has enough corridor for sustained variation");
-        Enemy ship = f.Spawns.Spawn("enemy001", true); ship.Movement.SetPhysicsProcess(false);
+        Enemy ship = f.Spawns.Spawn("basic_mk1", true); ship.Movement.SetPhysicsProcess(false);
         uint seed = ship.Movement.CorridorSeed;
         f.Config.EnablePathOffsets = true; f.Config.EnableCorridorVariation = false;
         ship.Movement.AcceptPath(logical, f.Grid.NavigationRevision);
@@ -83,7 +83,7 @@ public partial class CorridorNavigationChecks : Node
         Require(ship.Movement.UsesCorridorVariation && ship.Movement.CorridorSeed == seed && first.SequenceEqual(ship.Movement.Waypoints),
             "Forced repath retains per-ship selection/seed and coherent preferences");
         f.Config.CorridorVariationPercent = 0;
-        Enemy unselected = f.Spawns.Spawn("enemy001", true); unselected.Movement.SetPhysicsProcess(false);
+        Enemy unselected = f.Spawns.Spawn("basic_mk1", true); unselected.Movement.SetPhysicsProcess(false);
         unselected.Movement.AcceptPath(logical, f.Grid.NavigationRevision);
         Require(!unselected.Movement.UsesCorridorVariation && unselected.Movement.CorridorSamplingChecks == 0 && unselected.Movement.Waypoints.SequenceEqual(logical),
             "Live zero-percent spawn keeps exact ordinary route");
@@ -139,7 +139,7 @@ public partial class CorridorNavigationChecks : Node
         f.Config.CorridorVariationPercent = percent;
         List<Enemy> ships = new(population);
         for (int i = 0; i < population; i++)
-        { Enemy enemy = f.Spawns.Spawn("enemy001", true); Require(enemy != null, "N4 benchmark spawn failed"); enemy.Movement.SetPhysicsProcess(false); ships.Add(enemy); }
+        { Enemy enemy = f.Spawns.Spawn("basic_mk1", true); Require(enemy != null, "N4 benchmark spawn failed"); enemy.Movement.SetPhysicsProcess(false); ships.Add(enemy); }
         int selected = ships.Count(e => e.Movement.UsesCorridorVariation);
         Require(percent != 0 || selected == 0, "Zero percent stays ordinary"); Require(percent != 100 || selected == population, "100 percent selects every initialized ship");
         if (percent == 50) Require(selected > population * 0.35 && selected < population * 0.65, "Live 50 percent distribution is plausible");

@@ -77,7 +77,7 @@ public partial class EnemyIntegrationChecks : Node
             debug._UnhandledKeyInput(new InputEventKey { Keycode = Key.F2, Pressed = true, Echo = true });
             Check(_spawns.Registry.Living.Count == 1, "F2 ignores OS key repeat");
             Enemy first = _spawns.Registry.Living[0]; first.Movement.SetPhysicsProcess(false);
-            Check(first.Definition.EnemyId == "enemy001" && first.Health == 60, "Enemy001 resource identity and health");
+            Check(first.Definition.EnemyId == "basic_mk1" && first.Health == 60, "Enemy001 resource identity and health");
             DefenseBar bar = first.GetNode<DefenseBar>("DefenseBar");
             Check(!bar.Visible, "Full-health Enemy001 starts with no health bar");
             first.TakeDamage(12);

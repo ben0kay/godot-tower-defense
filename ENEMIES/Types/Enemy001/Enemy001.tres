@@ -4,4 +4,6 @@
 
 [resource]
 script = ExtResource("1")
+EnemyId = "basic_mk1"
+DisplayName = "Standard Drone"
 KillRewardCredits = 3

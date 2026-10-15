@@ -7,7 +7,7 @@ public partial class SpawnManager : Node
     [Export] public EnemyCatalog Catalog { get; set; }
     public EnemyRegistry Registry { get; private set; }
     public PathRequestManager Paths { get; private set; }
-    public string LastMessage { get; private set; } = "F2: spawn Enemy001 at a permitted Portal.";
+    public string LastMessage { get; private set; } = "F2: spawn next registered enemy at a permitted Portal.";
     private readonly RandomNumberGenerator _spawnRandom = new();
     private Node2D _ships;
     private int _sourceIndex, _cachedRevision = -1;
