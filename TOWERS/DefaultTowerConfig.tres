@@ -1,8 +1,6 @@
-[gd_resource type="Resource" script_class="TowerMasterConfig" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="TowerMasterConfig" format=3 uid="uid://cr8jyppnfrt3t"]
 
-[ext_resource type="Script" path="res://TOWERS/TowerMasterConfig.cs" id="1_config"]
+[ext_resource type="Script" uid="uid://gapkeu2mbt08" path="res://TOWERS/TowerMasterConfig.cs" id="1_config"]
 
 [resource]
 script = ExtResource("1_config")
-KillXpMultiplier = 10.0
-DamageXpMultiplier = 2.0
