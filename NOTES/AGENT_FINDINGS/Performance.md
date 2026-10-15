@@ -1,0 +1,18 @@
+Overall
+The navigation work is thoughtfully structured for a swarm: it shares a small pool of weighted A* grids, budgets path requests and route validation, updates tower occupancy incrementally, and avoids recalculating unaffected routes. I don’t see an obvious reason it won’t handle hundreds of enemies on the measured setup.
+
+The main gap is that the current performance evidence is enemy/navigation-focused, not a combined enemy-and-tower stress test. The existing 500-enemy fixture reports about 2.62 ms p95 / 3.80 ms max for path work and 3.83 ms max for movement plus test clearance checks. Those are useful headless measurements, but they don’t include rendered frame time or many active towers. See NavigationPerformance.md and PlacementPerformanceChecks.cs.
+
+Most important areas to watch
+Tower target selection scales with both tower count and enemy count. Each Battle Tower periodically scans the entire living-enemy list; the default search interval is 0.15 seconds. That makes acquisition work roughly O(towers × enemies). As an illustration, 500 towers and 500 enemies would mean around 1.7 million candidate checks per second at that interval, before other tower work. This is the clearest likely bottleneck as both populations grow. A spatial index or cell-based candidate query would be the first scaling improvement to investigate, while retaining the existing First/Closest scoring. See TowerTargeting.cs and BattleTower.cs.
+
+The path-request priority scan could become expensive during a large repath burst. The manager linearly searches the pending-request list to choose work, and it does that for each path calculation. The per-frame path count is capped, which helps, but if a lot of enemies need new routes at once, selection overhead grows with the queue size. It’s worth profiling under a worst-case “many towers placed / many routes invalidated” scenario before changing the queue design. See PathRequestManager.cs.
+
+Every active enemy still performs movement and safety work each physics tick. Swept clearance and corner checks are appropriate safeguards, but their total cost grows with enemy count; the existing 500-enemy measurement is encouraging. If this becomes a bottleneck, profile the clearance sampling and per-enemy physics callbacks together rather than relaxing safety checks without evidence. See EnemyMovement.cs and NavigationGrid.cs.
+
+Route changes create per-enemy route data. Rebuilding a route constructs waypoint arrays and cell-dependency dictionaries/lists. That’s not necessarily a problem at the current scale, but repeated mass repaths could create allocation and garbage-collection spikes. The existing fixture measures CPU work, not memory or GC behavior; check those when profiling large route-change bursts. See EnemyRoute.cs.
+
+Large immediate spawn bursts can spike even though pathfinding is budgeted. The performance notes report roughly 32 ms for synchronous creation of 500 enemy nodes. The wave scheduler already limits spawn attempts per frame, which is good; keep bulk/debug spawning from bypassing that pacing in normal gameplay. See WaveManager.cs and NavigationPerformance.md.
+
+Recommendation
+I’d prioritize a combined stress benchmark before making architectural changes: hundreds of moving enemies, a representative number of active Battle Towers, target acquisition and firing, plus a burst of placements that invalidates routes. Capture rendered frame-time percentiles and GC/allocation data as well as navigation timings. The navigation subsystem already has useful focused measurements; tower target scanning is the area I’d expect to reach a scaling limit first.
