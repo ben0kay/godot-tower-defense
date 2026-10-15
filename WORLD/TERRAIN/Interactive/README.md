@@ -7,7 +7,7 @@
 Use `WORLD/TERRAIN/Interactive/` for **terrain tiles with gameplay-specific interactions**, rather than classifying them only by art or material. The first two families are:
 
 1. **Foundation** — a buildable placement surface that has explicit construction/blocking rules, but no time-based tile effect.
-2. **Lava** — a passable, non-buildable hazard that deals **immediate damage when an enemy enters or crosses a lava cell**, not periodic damage while stationary.
+2. **Lava** — a passable, non-buildable hazard that deals **immediate damage on entering a connected Lava region, then damage at configurable intervals while the enemy remains on Lava**. Adjacent Lava cells are one continuous hazard, not fresh entry hits.
 
 Future Electrical, Cryogenic, Regeneration, Teleporter, Conveyor etc. can join as independently authored families sharing the smallest necessary manager/cell-access contract. Do not implement them in the Lava pass.
 
@@ -29,7 +29,7 @@ WORLD/TERRAIN/
     Foundation/
       README.md                      # placement-surface behavior; no repeated tick
     Lava/
-      README.md                      # entry-triggered terrain hazard
+      README.md                      # entry + periodic terrain hazard
       LavaTileConfig.cs              # per-type Godot Resource with tweakable damage
       DefaultLavaTileConfig.tres     # Inspector-authored baseline, future effect options
   TileSets/
@@ -71,40 +71,64 @@ Add `Terrain/Interactive` as its own paintable `TileMapLayer` with `InteractiveT
 - Use **only tiny, sparse molten flecks/streaks/bubbles**, subtle bright yellow highlights and limited dark accents. Avoid huge black crust patches, dominant dark-red/brown rock, thick cracked ground, or blotchy noisy textures.
 - Keep silhouette/texture legible at 64x64, seamless/visually coherent when adjacent Lava tiles are painted, suitable for a clean sci-fi/vector-ish battlefield. Start with one attractive placeholder atlas tile; fancier animation/shaders can come later. Avoid adding unnecessary per-cell particle nodes.
 
-### Damage semantics
+### Damage semantics — immediate entry + periodic damage
 
-- A living enemy takes **one immediate hit when entering each distinct painted Lava cell**, including entering across a cell boundary while moving quickly.
-- If an enemy crosses multiple Lava cells in a single physics tick, **apply each entered cell's hit**, in traversal order. Do not rely only on the enemy's final cell; no tunnelling through thin lava strips. Carefully handle diagonal/corner crossings and each movement subsegment in `EnemyMovement`.
-- **No repeated damage just for standing still** on lava, no global repeating tile timer, and no damage on every ordinary movement tick while the enemy remains in the *same* lava cell. Re-entering a previously exited lava cell is another entry and can damage again.
-- Decide and test spawn/teleport behavior explicitly: an enemy spawning/teleporting **onto** Lava should trigger at most one initial entry hit, rather than silently remaining immune or applying damage several times. Do not accidentally treat a long teleport as walking through every intervening cell unless intended.
-- Lava can damage enemy shields then hull, following the exact existing `Enemy.ApplyDamage(DamageInfo)` pipeline; dead/arrived/unloaded enemies must not be damaged again. If Lava kills an enemy, do not keep moving or applying more Lava hits in the same tick. Preserve existing death/reward logic and don't award tower XP for unattributed terrain damage.
-- Existing damage types are currently only `Kinetic`, `Energy`, `Explosive`. For the first Lava pass, use **Energy as an explicitly temporary damage-type setting** in `LavaTileConfig`; do not introduce a global Thermal/Burning type or modify the damage resolver without a separate design decision.
-- Expose configurable **DamagePerEntry** (for example, provisional `5` base points) and **DamageType** on one Inspector-editable `LavaTileConfig` resource. They are playtest defaults, not hardcoded global multipliers. Defer burning/DoT, tile-based timers, resistances, area multipliers and player damage.
+**This supersedes the earlier entry-only Lava design.** A connected group of adjacent Lava cells is **one continuous damaging area for an individual enemy**, even if the enemy traverses several Lava cells.
+
+1. **Enter Lava:** apply one immediate `DamageInfo` hit using the Lava config when the enemy first crosses from non-Lava into Lava (provided `DamageOnEntry=true`, the default).
+2. **Remain on Lava:** apply **`DamagePerTick` every `DamageIntervalSeconds` of continued Lava exposure**, including when the enemy stands completely still. The periodic timer is tracked **per affected enemy**, never once per tile.
+3. **Move between adjacent Lava cells:** retain the same exposure timer and **do not apply a new immediate entry hit**. Moving across several connected Lava cells in one physics tick must not multiply damage just because cell boundaries were crossed.
+4. **Leave Lava:** stop applying periodic damage, remove/stop the enemy's exposure state, and reset its timer. No lingering damage after exit.
+5. **Re-enter Lava:** apply a fresh immediate entry hit (when enabled), and restart the periodic timer from zero. A separate Lava region reached after crossing a normal tile is a new entry, even within one physics tick.
+6. **Fast crossings:** inspect the **swept movement segment**, not just its final cell, so a fast enemy passing through a Lava strip receives its entry hit even if it leaves in the same tick. Periodic ticks are based on actual time spent on Lava; do not falsely credit time spent outside the hazard. No tunnelling through narrow strips or duplicate corner/cell-edge entries.
+7. **Spawn or teleport onto Lava:** treat arrival on Lava as a single initial entry (and begin the periodic timer), but **do not** treat a teleport as travelling through all intervening Lava tiles. Explicitly test teleports and newly spawned stationary enemies.
+8. **Death/removal:** once an enemy dies, arrives or exits the tree, stop its Lava state and further damage immediately; do not continue moving/attacking it later in the same movement loop. Repeated Lava hits must not duplicate death/rewards.
+
+**Inspector-editable `LavaTileConfig.cs` and `DefaultLavaTileConfig.tres`:**
+
+| Setting | Proposed playtest default | Meaning |
+| --- | --- | --- |
+| `DamagePerTick` | `5` base points | Damage per immediate hit and every periodic tick |
+| `DamageIntervalSeconds` | `0.5` seconds | Interval between hits while continuously on Lava; must be finite and strictly positive |
+| `DamageOnEntry` | `true` | Whether entering/re-entering immediately damages the enemy |
+| `DamageType` | `Energy` | Temporary existing type until a deliberate Thermal/Burning design pass |
+
+These are **authored settings on the Lava config**, not constants in `InteractiveTileManager`, `Enemy` or the global damage resolver. Use the same `DamagePerTick` for entry and periodic hits for this first version. If `DamageOnEntry=false`, the first hit happens after the configured interval instead. Validate all settings and safely handle large physics deltas without silently dropping owed periodic ticks.
+
+**Example:** with `DamagePerTick=5`, `DamageIntervalSeconds=0.5`, `DamageOnEntry=true`, an enemy remaining continuously on Lava through the 2.0-second mark takes `5` on entry and `5` at each of 0.5, 1.0, 1.5 and 2.0 seconds: **25 base points total before shield/hull modifiers**. Walking from one Lava cell into another does not reset this sequence.
+
+Lava should use the existing `Enemy.ApplyDamage(new DamageInfo(...))` pipeline for shield/hull effects and kill rewards. **Environmental hits have no tower `DamageSource` and award no tower XP.** Current `DamageType` values are Kinetic, Energy and Explosive, so use Energy as a clearly provisional type; do not add Thermal damage, enemy resistances, burning status, or a second damage resolver during this pass.
 
 ## Efficient implementation contract
 
-The manager should read/categorize painted interactive cells **at level load and explicit terrain edits**, storing cheap per-cell type/config lookup. On actual enemy movement, inspect only the grid cells crossed by that enemy's movement segment. An ordinary non-interactive cell check should be O(1) or bounded to crossed cells; no per-tile tick, no list scan over all painted Lava tiles or all living enemies every frame.
+The manager should read/categorize painted Interactive terrain cells **at level load and explicit terrain edits**, storing a fast per-cell type/config lookup. **No one-node-per-tile, `Area2D`, physics shape, per-tile timer, or scanning all painted Lava tiles/enemies every frame.**
 
-Prefer a small, clear movement hook that consumes `oldWorldPosition -> newWorldPosition` for **each actual moved segment**, using `WorldGrid.WorldToCell` / consistent transforms. Include an entry-state mechanism to prevent duplicate hits for the same cell when subsegments/tick boundaries touch it. Trigger before or immediately after movement with safe re-entrancy: terrain damage can kill/unregister/QueueFree an enemy during the movement loop. Update the new spatial-index membership (if installed by the preceding pass) in a consistent order; do not introduce position/index desynchronization.
+- Use `EnemyMovement`'s actual `oldWorldPosition -> newWorldPosition` segments to discover **enter / still on / leave** transitions, including cells swept through between samples. Report transitions efficiently and without double-entering at grid-line/corner boundaries.
+- Maintain only a **per-enemy active-Lava exposure state** (a current-region flag and elapsed time or next tick time), with a shared manager updating **only active Lava occupants** each physics tick, including stationary ones. Avoid allocating new objects in every movement check; release states on exit, death, arrival and unload.
+- **Continuous adjacent cells:** do not reset entry or tick schedule when crossing from Lava to Lava. A non-Lava gap ends one exposure and entering another Lava cell begins the next. Handle multiple enter/exit transitions inside one long movement segment.
+- **Precise intervals:** interval timing must be independent of movement speed and reasonably consistent at 30/60/120 Hz. Account for sub-frame Lava occupancy when a fast enemy enters/exits during a tick; do not count the entire frame as on Lava after an end-of-frame entry. Handle large `delta` and multiple due hits safely.
+- Apply entry hits **once** and periodic hits **only while exposed** via existing typed `DamageInfo`. A hit can kill/unregister an enemy during a movement callback; stop subsequent movement and Lava ticks safely, and keep the ongoing shared enemy spatial-index membership consistent.
+- Repainting/changing a live tile should rebuild affected interaction lookup and reconcile active occupants without duplicate hits or stale damage. Keep the existing WorldGrid as sole authority for blocking, build permissions and navigation updates.
 
-Foundation is **passive static terrain metadata**: no entry/tick callback and no per-cell processing. The manager should be extensible without an elaborate generic effects framework or a new system duplicating `WorldGrid`'s occupancy/navigation authority.
+Foundation remains **passive static terrain metadata**: no entry/tick callback and no per-cell processing. Keep the first implementation small enough to extend later to Electrical or Cryogenic hazards without creating a generic effects engine.
 
 ## Tests / acceptance for Codex
 
 1. Editor palette exposes Foundation and Lava from `Terrain/Interactive` in **Level001 AND LevelTemplate**; visuals load; old painted foundation cells preserve their appearance and routing after explicit compatible migration.
-2. Foundation remains buildable with its current enemy-blocking semantics, and tower placement/occupancy/navigation continue to work; Lava is passable and non-buildable, even when over an ordinarily buildable Passable floor.
-3. Enemy enters Lava -> immediate configured damage once; remains within same cell -> no extra damage; exits and re-enters -> new hit; crosses 2+ Lava cells in one frame -> hits every entered cell; an adjacent normal cell -> no damage.
-4. Test diagonal and high-speed movement, partial/corner intersections, short segments, stationary enemies, spawn/teleport onto Lava and 30/60/120 Hz outcomes.
-5. Verify shield-first/hull response, death once, kill reward once, no tower XP, removal/unload safety and no other enemy movement regressions; adjust per-entry base value solely via the config resource.
-6. Validate unchanged First/Closest tower targeting and the new spatial-query optimization, existing 500-enemy repath/navigation checks, menu, wave spawning, tile category and placement fixtures. Do not overwrite in-flight combat optimization changes.
-7. Record actual build/headless test results; keep old tile art working; document any manual in-editor / rendered checks not run.
+2. Foundation retains current buildable/blocked semantics and working tower placement/occupancy/navigation. Lava is passable and nonbuildable, including over an otherwise buildable floor.
+3. **Immediate and periodic:** Lava entry damages immediately by `DamagePerTick` if enabled; remaining exposed for 0.5/1.0/1.5/2.0 seconds at default interval delivers exactly the expected ticks; disabled entry does not deal early damage. Changing `DamagePerTick`, `DamageIntervalSeconds` and `DamageType` in the config changes behavior without hardcoded manager values.
+4. **Continuous tiles:** crossing 2+ adjacent Lava cells, including in a single physics frame, does **not** reset cooldown or generate repeated entry hits; a stationary enemy continues to receive scheduled damage; moving onto ordinary terrain halts ticks; exit/re-entry resets timer and adds a fresh entry hit.
+5. **Swept movement:** very fast traversals across a Lava strip cannot miss their immediate entry hit; crossing a separate Lava region after normal ground in the same frame produces a new entry; test diagonal/corner boundaries, short movement segments, spawn/teleport directly onto Lava, and physics 30/60/120 Hz.
+6. Verify damage to shields then hull through the existing resolver, death/rewards once, **no tower XP**, no post-death hits, robust cleanup/unload, and no unrelated enemy movement regressions; test large delta and no silent lost periodic ticks.
+7. Preserve the newly completed tower/area spatial-query optimization, existing 500-enemy navigation/repath, menu, waves, terrain-category and placement suites. No overwrite of in-flight combat changes.
+8. Record actual C# build/headless test outcomes; preserve prior art and document rendered/editor manual checks that could not be run.
 
 ## Scope fence
 
-**This follow-up pass implements only Interactive terrain foundation + Lava entry damage, basic art and authoring**, not new enemy damage types, Cryo/Electric tiles, passive DOT, advanced shader animations, research, tower HP, routes that avoid lava, navigation cost weights or changes to the ongoing spatial-query performance pass.
+**This follow-up pass implements only Interactive terrain Foundation + Lava immediate-entry and while-standing periodic damage, basic art and authoring**, not new enemy damage types, Cryo/Electric tiles, lingering DoT after leaving Lava, advanced shader animations, research, tower HP, routes that avoid lava, navigation cost weights or changes to the ongoing spatial-query performance pass.
 
 When complete, update `WORLD/TERRAIN/README.md`, `WORLD/TERRAIN/Rules/README.md`, `WORLD/TERRAIN/TileSets/README.md`, `WORLD/TERRAIN/Tiles/README.md` and this file with **actual** implemented behavior instead of plans. Add/read `Foundation/README.md` and `Lava/README.md` for the first real tile types.
 
 ## Copy-ready Codex request
 
-> Once the tower targeting / AoE spatial optimization pass is merged, implement the **Interactive Terrain + Foundation/Lava** pass specified in `WORLD/TERRAIN/Interactive/README.md`. Preserve the current raised foundation tile's buildable/blocked semantics and migrate its authoring category safely. Add a new interactive TileMapLayer, editor palette and a vivid predominantly orange Lava 64x64 tile with only tiny molten flecks. Lava must be walkable/nonbuildable and deal one immediate `DamageInfo` hit per crossed/entered cell, including fast swept movement, but no repeated idle/tick damage. Use one efficient manager, no per-tile physics nodes, and the existing enemy damage/shield/death machinery. Include Inspector-configured base damage, thorough correctness/navigation/placement performance regression tests, documentation updates, real compilation and headless runs. Commit and push, report actual results.
+> Once the tower-targeting / AoE spatial optimization pass is merged, implement the **Interactive Terrain + Foundation/Lava** pass in `WORLD/TERRAIN/Interactive/README.md`. Preserve the current raised foundation tile's buildable/blocked semantics and migrate its editor category safely. Add an Interactive TileMapLayer/palette and a **predominantly bright orange 64x64 molten Lava tile with only tiny sparse flecks**. Lava must be passable/nonbuildable, apply **immediate damage on entering Lava** and then **periodic damage every configurable interval while still on Lava**, including when the enemy stands still. `LavaTileConfig.cs` owns `DamagePerTick`, `DamageIntervalSeconds`, `DamageOnEntry` and `DamageType` as Inspector-editable settings (provisional defaults 5, 0.5s, true, Energy). Adjacent Lava cells count as **one continuous hazard**, never multiple entry hits or timer resets. Exiting cancels exposure, re-entry resets it; fast swept crossings still apply an entry hit. Use **one efficient manager and per-active-enemy timers**, **no per-tile nodes or global enemy scans**. Route damage through existing `Enemy.ApplyDamage(DamageInfo)` with no tower XP and preserve the prior spatial-index optimization and navigation. Add the detailed tests, compile/run headless regressions, update documentation, commit and push with real results.
