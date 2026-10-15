@@ -19,7 +19,7 @@ public partial class CorridorNavigationChecks : Node
     public static async System.Threading.Tasks.Task Run(Node owner)
     {
         Fixture correctness = await Create(owner, false, 3);
-        try { Geometry(correctness); }
+        try { MovementPermissionChecks.Run(correctness.Main, correctness.Spawns, correctness.Start, correctness.Goal); Geometry(correctness); }
         finally { await Release(owner, correctness); }
         foreach (bool winding in new[] { false, true })
             foreach (int population in new[] { 100, 500 })

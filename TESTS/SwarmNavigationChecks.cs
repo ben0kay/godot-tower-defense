@@ -53,6 +53,13 @@ public static class SwarmNavigationChecks
             "Disabling diversity did not restore the ordinary shared grid");
         config.EnablePathDiversity = true; config.PathDiversityStrength = 0; config.CongestionInfluence = 0;
         Require(baseline.SequenceEqual(nav.FindPath(start, goal, 2, out _)), "Zero-strength weights changed ordinary shortest paths");
+        config.PathDiversityStrength = strength; config.CongestionInfluence = 2; nav.UpdateCongestion(10);
+        Vector2[] neutral = nav.FindPath(start, goal, NavigationGrid.NeutralProfile, out float neutralCost);
+        Require(neutral.SequenceEqual(baseline), "Neutral profile retains shortest alternative corridor under weighted master");
+        Require(Mathf.IsEqualApprox(neutralCost, nav.RouteCost(start, neutral, NavigationGrid.NeutralProfile)),
+            "Neutral alternative-goal scoring remains unweighted");
+        config.PathDiversityStrength = 0; config.CongestionInfluence = 0;
+
         GD.Print("PASS: disabling diversity and zero strength restore ordinary shortest paths");
         PackedScene scene = GD.Load<PackedScene>("res://ENEMIES/Types/Enemy001/Enemy001.tscn");
         Enemy crowd = spawns.Spawn(scene, true); crowd.Movement.SetPhysicsProcess(false);

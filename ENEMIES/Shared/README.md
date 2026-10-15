@@ -44,3 +44,7 @@ Active Shockwave emitters hold revision cursors in this same service. Movement r
 ## Interactive terrain integration
 
 Enemy initialization reports destination arrival to the world InteractiveTileManager. Direct position changes use teleport semantics; normal movement uses SetMovementPosition to retain spatial notifications while bypassing teleport re-entry. The per-world registry now emits EnemyUnregistered after authoritative list/index removal, allowing the single terrain manager to release exposure synchronously for death, arrival, external free and manual unregister. No spatial query algorithm, level stats, target priority or damage source semantics were replaced. Environmental hits use ApplyDamage with no tower source; existing shields/hull, kill Credits and finite damage-XP budget remain authoritative.
+
+## Movement variation permissions
+
+EnemyDefinition has Inspector **Movement Variation** permissions AllowCorridorVariation, AllowPathOffsets and AllowPathDiversity, default true. Set these independently per authored type; no ID/size whitelist is used. Permissions are captured at spawn, and global master controls remain authoritative. Corridor selection/seed persists across repaths, offsets may be disabled independently, and diversity-disallowed ships use the single shared unweighted profile. Existing type resources retain their defaults. See ENEMIES/Movement/README.md.

@@ -9,7 +9,9 @@ public partial class EnemyMovement : Node
     public int CorridorSamplingChecks => _route.CorridorSamples;
     public bool CorridorVariationApplied => _route.CorridorVariationApplied;
     public uint CorridorSeed { get; private set; }
-    public int RouteProfile { get; private set; }
+    public int RouteProfile => _allowDiversity ? _assignedProfile : NavigationGrid.NeutralProfile;
+    private int _assignedProfile;
+    private bool _allowOffsets, _allowDiversity;
     public Enemy Enemy { get; private set; }
     public float RemainingPathDistance => _replacementNeeded ? float.PositiveInfinity : _remainingDistance;
     public float LateralOffsetPixels { get; private set; }
@@ -39,9 +41,10 @@ public partial class EnemyMovement : Node
     // Stable per-spawn lateral preference; independent of weighted routing profile.
     public void Initialize(Enemy enemy, PathRequestManager paths)
     {
-        Enemy = enemy; _paths = paths; RouteProfile = paths.AssignProfile();
+        Enemy = enemy; _paths = paths; _assignedProfile = paths.AssignProfile();
+        _allowOffsets = enemy.Definition.AllowPathOffsets; _allowDiversity = enemy.Definition.AllowPathDiversity;
         CorridorSeed = paths.AssignCorridorSeed();
-        UsesCorridorVariation = CorridorPreference.Selected(CorridorSeed, paths.Config);
+        UsesCorridorVariation = enemy.Definition.AllowCorridorVariation && CorridorPreference.Selected(CorridorSeed, paths.Config);
         uint seed = unchecked((uint)GetInstanceId() * 2654435761u); seed ^= seed >> 16;
         LateralOffsetPixels = ((seed & 65535u) / 65535f * 2f - 1f) * Mathf.Max(0f, paths.Config.PathOffsetMaxPixels);
         _auditTimer = (seed % 997) / 997f * Mathf.Max(0f, paths.Config.RouteAuditIntervalSeconds);
@@ -79,7 +82,7 @@ public partial class EnemyMovement : Node
         _paths.UnregisterRoute(this);
         _next = 0; _dirtyCells.Clear(); _fullAudit = false; _blockedFrom = int.MaxValue;
         _stopped = false; _replacementNeeded = false;
-        float offset = _paths.Config.EnablePathOffsets ? Mathf.Clamp(LateralOffsetPixels,
+        float offset = _allowOffsets && _paths.Config.EnablePathOffsets ? Mathf.Clamp(LateralOffsetPixels,
             -Mathf.Max(0f, _paths.Config.PathOffsetMaxPixels), Mathf.Max(0f, _paths.Config.PathOffsetMaxPixels)) : 0f;
         if (UsesCorridorVariation && _paths.Config.EnableCorridorVariation && _paths.Config.CorridorVariationStrength > 0)
             _route.BuildCorridor(connected, Enemy.GlobalPosition, _paths.Navigation, Enemy.Definition.RadiusPixels,

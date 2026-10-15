@@ -11,7 +11,9 @@ public partial class NavigationGrid : Node
     public readonly List<Vector2I> Goals = new();
     [Export] public EnemyMasterConfig Config { get; set; }
     public int CostRevision { get; private set; }
-    public int SharedProfileCount => _profiles.Count;
+    public const int NeutralProfile = -1;
+    public int SharedProfileCount => _profiles.Count - 1;
+    public int TotalSharedProfileCount => _profiles.Count;
     private readonly List<Profile> _profiles = new();
     private readonly Dictionary<Vector2I, float> _crowd = new();
     private EnemyRegistry _registry;
@@ -22,6 +24,7 @@ public partial class NavigationGrid : Node
     {
         public AStarGrid2D AStar;
         public float[] BaseWeights;
+        public bool Neutral;
         public readonly List<Vector2I> CrowdCells = new();
         public int CrowdRevision = -1;
         public float Influence = -1f;
@@ -112,7 +115,7 @@ public partial class NavigationGrid : Node
         Refresh(); cost = float.PositiveInfinity; LastAStarMilliseconds = 0;
         Vector2I start = Grid.WorldToCell(position);
         if (Grid.BlocksEnemies(start) || Grid.BlocksEnemies(goal)) return System.Array.Empty<Vector2>();
-        Profile profile = _profiles[((profileId % _profiles.Count) + _profiles.Count) % _profiles.Count];
+        Profile profile = ResolveProfile(profileId);
         ApplyCrowd(profile);
         long calculationStarted = Stopwatch.GetTimestamp();
         Godot.Collections.Array<Vector2I> cells = profile.AStar.GetIdPath(start, goal);
@@ -130,12 +133,17 @@ public partial class NavigationGrid : Node
     }
 
     // =========================================================
+    // Reserved neutral ID never aliases weighted profile zero or receives congestion weights.
+    private Profile ResolveProfile(int id) => id == NeutralProfile ? _profiles[^1]
+        : _profiles[((id % SharedProfileCount) + SharedProfileCount) % SharedProfileCount];
+
+    // =========================================================
     // Re-score an earlier candidate against today's snapshot without another A* calculation.
     public float RouteCost(Vector2 position, Vector2[] route, int profileId)
     {
         if (route.Length == 0) return float.PositiveInfinity;
-        Profile profile = _profiles[((profileId % _profiles.Count) + _profiles.Count) % _profiles.Count];
-        float influence = Config.EnablePathDiversity ? Mathf.Max(0f, Config.CongestionInfluence) : 0f;
+        Profile profile = ResolveProfile(profileId);
+        float influence = !profile.Neutral && Config.EnablePathDiversity ? Mathf.Max(0f, Config.CongestionInfluence) : 0f;
         float cost = position.DistanceTo(route[0]) / Grid.Config.CellSize;
         for (int i = 1; i < route.Length; i++)
         {
@@ -157,9 +165,9 @@ public partial class NavigationGrid : Node
         foreach (Profile profile in _profiles) profile.AStar.Dispose();
         _profiles.Clear(); _settings = settings; CostRevision++; _revision = -1;
         int count = settings.Item1 ? settings.Item3 : 1;
-        for (int id = 0; id < count; id++)
+        for (int id = 0; id <= count; id++)
         {
-            Profile profile = new() { AStar = new AStarGrid2D(),
+            Profile profile = new() { Neutral = id == count, AStar = new AStarGrid2D(),
                 BaseWeights = new float[Grid.Config.WidthCells * Grid.Config.HeightCells] };
             profile.AStar.Region = new Rect2I(0, 0, Grid.Config.WidthCells, Grid.Config.HeightCells);
             profile.AStar.DiagonalMode = AStarGrid2D.DiagonalModeEnum.OnlyIfNoObstacles;
@@ -170,7 +178,7 @@ public partial class NavigationGrid : Node
             for (int y = 0; y < Grid.Config.HeightCells; y++)
                 for (int x = 0; x < Grid.Config.WidthCells; x++)
                 {
-                    float weight = 1f + (settings.Item1 ? settings.Item2 * Preference(x, y, id) : 0f);
+                    float weight = 1f + (settings.Item1 && !profile.Neutral ? settings.Item2 * Preference(x, y, id) : 0f);
                     profile.BaseWeights[y * Grid.Config.WidthCells + x] = weight;
                     profile.AStar.SetPointWeightScale(new(x, y), weight);
                 }
@@ -225,7 +233,7 @@ public partial class NavigationGrid : Node
     // Restore the previous sparse snapshot before applying a new one to this shared profile.
     private void ApplyCrowd(Profile profile)
     {
-        float influence = Config.EnablePathDiversity ? Mathf.Max(0f, Config.CongestionInfluence) : 0f;
+        float influence = !profile.Neutral && Config.EnablePathDiversity ? Mathf.Max(0f, Config.CongestionInfluence) : 0f;
         if (profile.CrowdRevision == _crowdRevision && profile.Influence == influence) return;
         foreach (Vector2I cell in profile.CrowdCells)
             profile.AStar.SetPointWeightScale(cell, profile.BaseWeights[cell.Y * Grid.Config.WidthCells + cell.X]);
