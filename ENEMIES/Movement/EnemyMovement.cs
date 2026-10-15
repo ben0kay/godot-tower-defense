@@ -227,7 +227,7 @@ public partial class EnemyMovement : Node
             _travelDirection = direction.Normalized();
             Enemy.Rotation = Mathf.LerpAngle(Enemy.Rotation, direction.Angle(),
                 1f - Mathf.Exp(-Mathf.Max(0f, Enemy.Definition.TurnSpeed) * (float)delta));
-            Enemy.GlobalPosition = nextPosition; Enemy.UpdateDefenseBarTransform(); travel -= distance;
+            Enemy.GlobalPosition = nextPosition; Enemy.Registry.UpdatePosition(Enemy); Enemy.UpdateDefenseBarTransform(); travel -= distance;
             if (nextPosition == target) _next++; else break;
         }
         UpdateDistance();

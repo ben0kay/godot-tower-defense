@@ -1,5 +1,6 @@
 // Reusable target queries: First compares remaining route distance, Closest compares tower distance.
 using Godot;
+using System;
 
 public static class TowerTargeting
 {
@@ -9,16 +10,32 @@ public static class TowerTargeting
     // Search only living enemies in firing range; stale/failed paths cannot win First.
     public static Enemy Find(EnemyRegistry registry, Vector2 position, float range, Priority priority)
     {
-        Enemy best = null; float score = float.PositiveInfinity;
-        foreach (Enemy enemy in registry.Living)
+        if (!float.IsFinite(range) || range < 0) throw new ArgumentOutOfRangeException(nameof(range));
+        TargetVisitor visitor = new() { Position = position, RangeSquared = range * range, Mode = priority,
+            Score = float.PositiveInfinity, Order = ulong.MaxValue };
+        // Preserve the old float-distance inclusive boundary; narrow scoring still uses its exact comparison.
+        float queryRange = float.IsFinite(MathF.BitIncrement(range)) ? MathF.BitIncrement(range) : range;
+        registry.VisitEnemiesInRadius(position, queryRange, ref visitor);
+        return visitor.Best;
+    }
+
+    private struct TargetVisitor : EnemySpatialIndex.INeighborVisitor
+    {
+        public Vector2 Position;
+        public float RangeSquared, Score;
+        public Priority Mode;
+        public ulong Order;
+        public Enemy Best;
+        // =========================================================
+        // Strict finite best-score selection plus the original earlier-living-entry tie-break.
+        public void Accept(EnemySpatialIndex.Neighbor nearby)
         {
-            if (!enemy.IsAlive) continue;
-            float distance = position.DistanceSquaredTo(enemy.GlobalPosition);
-            if (distance > range * range) continue;
-            float candidate = priority == Priority.First ? enemy.RemainingPathDistance : distance;
-            if (candidate < score) { score = candidate; best = enemy; }
+            float distance = Position.DistanceSquaredTo(nearby.Position);
+            if (distance > RangeSquared) return;
+            float candidate = Mode == Priority.First ? nearby.Enemy.RemainingPathDistance : distance;
+            if (candidate < Score || (Best != null && candidate == Score && nearby.Order < Order))
+            { Score = candidate; Best = nearby.Enemy; Order = nearby.Order; }
         }
-        return best;
     }
 
     // =========================================================

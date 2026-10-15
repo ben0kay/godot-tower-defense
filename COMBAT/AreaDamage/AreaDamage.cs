@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 public static class AreaDamage
 {
+    // Main-thread scratch only; lists are cleared before pooling, retaining no world/enemy references.
+    private static readonly Stack<List<(Enemy Enemy, DamageInfo Hit)>> HitBuffers = new();
     // =========================================================
     // Validate every supplied area value before any recipient can be mutated.
     public static void Validate(float radius, float edgeFraction)
@@ -27,31 +29,44 @@ public static class AreaDamage
     }
 
     // =========================================================
-    // One scan per impact, then dispatch each snapshotted hit once despite kill/removal callbacks.
+    // One nearby query per impact, then dispatch each snapshotted hit once despite kill/removal callbacks.
     // EnemyRegistry guarantees uniqueness. The return value counts eligible dispatched hits, including zero damage.
     public static int ApplyInstant(Vector2 impact, float radius, DamageInfo source, float edgeFraction, EnemyRegistry registry)
     {
         Validate(radius, edgeFraction);
         if (!float.IsFinite(impact.X) || !float.IsFinite(impact.Y)) throw new ArgumentOutOfRangeException(nameof(impact));
         if (!GodotObject.IsInstanceValid(registry)) throw new ArgumentNullException(nameof(registry));
-        List<(Enemy Enemy, DamageInfo Hit)> recipients = new();
-        double radiusSquared = (double)radius * radius;
-        foreach (Enemy enemy in registry.Living)
+        var candidates = registry.RentQueryBuffer();
+        var recipients = HitBuffers.Count > 0 ? HitBuffers.Pop() : new List<(Enemy Enemy, DamageInfo Hit)>();
+        try
         {
-            if (!Eligible(enemy, registry)) continue;
-            Vector2 position = enemy.GlobalPosition;
-            double dx = (double)position.X - impact.X, dy = (double)position.Y - impact.Y;
-            double squared = dx * dx + dy * dy;
-            if (!double.IsFinite(squared) || squared > radiusSquared) continue;
-            recipients.Add((enemy, AtDistance(source, (float)Math.Sqrt(squared), radius, edgeFraction)));
+            registry.GetNeighborsInRadius(impact, radius, candidates);
+            candidates.Sort(static (a, b) => a.Order.CompareTo(b.Order));
+            recipients.EnsureCapacity(candidates.Count);
+            double radiusSquared = (double)radius * radius;
+            foreach (var nearby in candidates)
+            {
+                Enemy enemy = nearby.Enemy;
+                if (!Eligible(enemy, registry)) continue;
+                Vector2 position = nearby.Position;
+                double dx = (double)position.X - impact.X, dy = (double)position.Y - impact.Y;
+                double squared = dx * dx + dy * dy;
+                if (!double.IsFinite(squared) || squared > radiusSquared) continue;
+                recipients.Add((enemy, AtDistance(source, (float)Math.Sqrt(squared), radius, edgeFraction)));
+            }
+            int applied = 0;
+            foreach (var recipient in recipients)
+            {
+                if (!Eligible(recipient.Enemy, registry)) continue;
+                recipient.Enemy.ApplyDamage(recipient.Hit); applied++;
+            }
+            return applied;
         }
-        int applied = 0;
-        foreach (var recipient in recipients)
+        finally
         {
-            if (!Eligible(recipient.Enemy, registry)) continue;
-            recipient.Enemy.ApplyDamage(recipient.Hit); applied++;
+            recipients.Clear(); HitBuffers.Push(recipients);
+            registry.ReturnQueryBuffer(candidates);
         }
-        return applied;
     }
 
     // =========================================================

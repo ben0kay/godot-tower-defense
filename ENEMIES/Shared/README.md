@@ -1,6 +1,6 @@
 # Shared enemies
 
-`EnemyDefinition` is the Inspector-editable per-type resource. `Enemy` owns health, alive/dead/arrived state and removal. `EnemyRegistry` is a per-world list of living enemies shared by targeting and placement; no scene-tree rescans. Ships use lightweight Node2D roots with one movement helper and Sprite2D.
+`EnemyDefinition` is the Inspector-editable per-type resource. `Enemy` owns health, alive/dead/arrived state and removal. `EnemyRegistry` owns authoritative per-world living membership plus the shared `EnemySpatialIndex` used by targeting, instant areas and timed wavefronts; no scene-tree rescans. Ships use lightweight Node2D roots with one movement helper and Sprite2D.
 
 Arrival counts in the debug HUD and removes the ship. CitadelDamage is applied by CitadelSession; Armor is reserved for later mitigation. Death removes registry membership immediately before QueueFree, so additional bullets cannot damage a dead enemy.
 
@@ -28,3 +28,11 @@ E2A: EnemyCatalog validates an Inspector scene list once, derives canonical IDs 
 E2B adds only optional Initialized notification after registry/movement setup, a read-only Registry accessor and RestoreShield(amount). The latter rejects invalid/nonpositive amounts/dead recipients/zero capacity and clamps finite additions at MaxShield without touching hull feedback or definitions. ShieldEmitter owns pulse behavior; ordinary Enemy001/Enemy002 have no ability node/manager. Kill/arrival/unload behavior and typed COMBAT damage remain unchanged.
 
 Phase 4D adds constant-time registry membership/uniqueness with a HashSet mirrored alongside the existing ordered living list. Contains lets snapshotted impacts skip enemies removed by earlier kill callbacks without another list scan. Enemy lifecycle/rewards and existing list consumers are unchanged.
+
+## Spatial queries (implemented)
+
+`GetEnemiesInRadius(center, radius, List<Enemy>)` clears/fills caller storage with exact inclusive center-distance matches, in unspecified order and without a cap. Zero means exact center. Negative/nonfinite radius or center throws before modifying results. Nonfinite enemy positions are skipped. Living/Contains remain compatible; registration is unique and death/arrival/free removes both point and swept memberships immediately. World exit clears membership, history and buffer pools.
+
+EnemyRegistry exposes Inspector `SpatialCellSize` (128px default, set before first registration/query). The hash uses floored world coordinates and recycled buckets; point memberships change only across cell boundaries. Enemy transform notifications cover normal/direct repositioning, and the existing movement path explicitly synchronizes position. No global movement scan or periodic rebuild is needed. Native transform reads are cached into position/order snapshots for combat callers.
+
+Active Shockwave emitters hold revision cursors in this same service. Movement records conservatively index their retained swept envelopes; queries reject outside/behind-front cells and return each enemy once with the correct previous/current samples. Only the existing wave solver decides a hit. New spawns use their current sampled position. Histories are retired amortized as cursors advance and released at completion/unload. Exceptional envelopes larger than64 cells use conservative overflow candidates; no speed assumption or silent truncation is imposed. Registration order preserves targeting ties and mutation-sensitive damage order. See TOWERS/Offensive/Shared/README.md and TESTS/SpatialQueryBenchmarks.md for measured overhead and limitations.

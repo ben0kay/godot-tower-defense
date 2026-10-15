@@ -32,9 +32,18 @@ public partial class Enemy : Node2D
         _defenseBar = GetNodeOrNull<DefenseBar>("DefenseBar");
         _defenseBar?.SetHealth(Health, Definition.MaxHealth);
         Movement = GetNode<EnemyMovement>("Movement");
+        SetNotifyLocalTransform(true); SetNotifyTransform(true);
         _registry.Register(this);
         Movement.Initialize(this, paths);
         Initialized?.Invoke(this);
+    }
+
+    // =========================================================
+    // Keep proximity buckets current for movement and direct position assignments, with no polling scan.
+    public override void _Notification(int what)
+    {
+        if ((what == NotificationLocalTransformChanged || what == NotificationTransformChanged) && IsAlive
+            && GodotObject.IsInstanceValid(_registry)) _registry.UpdatePosition(this);
     }
 
     // =========================================================

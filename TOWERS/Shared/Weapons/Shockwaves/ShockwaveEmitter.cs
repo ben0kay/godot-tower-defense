@@ -12,7 +12,8 @@ public partial class ShockwaveEmitter : Node2D
     private DamageInfo _hit;
     private float _maximum, _speed, _edge;
     private bool _initialized, _finished;
-    private readonly Dictionary<ulong, Vector2> _positions = new();
+    private ulong _queryCursor;
+    private readonly List<EnemySpatialIndex.Sweep> _candidates = new();
     private readonly HashSet<ulong> _damaged = new();
     private readonly List<(Enemy Enemy, DamageInfo Hit)> _recipients = new();
     public float PreviousRadius { get; private set; }
@@ -31,9 +32,7 @@ public partial class ShockwaveEmitter : Node2D
         if (!GodotObject.IsInstanceValid(registry) || !origin.IsFinite()) throw new ArgumentException("Invalid wave source.");
         if (!float.IsFinite(expansionSpeed) || expansionSpeed <= 0) throw new ArgumentOutOfRangeException(nameof(expansionSpeed));
         _registry = registry; _origin = origin; _hit = hit; _maximum = maximumRadius; _speed = expansionSpeed; _edge = edgeFraction;
-        _initialized = true; _positions.EnsureCapacity(registry.Living.Count);
-        foreach (Enemy enemy in registry.Living)
-            if (Eligible(enemy) && enemy.GlobalPosition.IsFinite()) _positions[enemy.GetInstanceId()] = enemy.GlobalPosition;
+        _initialized = true; _queryCursor = registry.BeginWaveQuery();
         _effects = effects; _style = style == null ? null : (ShockwaveStyle)style.Duplicate(true);
     }
 
@@ -47,7 +46,7 @@ public partial class ShockwaveEmitter : Node2D
     }
 
     // =========================================================
-    // Scan once, stage crossings, then dispatch after enumeration so deaths/removals cannot corrupt it.
+    // Query nearby swept bounds, stage crossings, then dispatch after enumeration so deaths/removals cannot corrupt it.
     public override void _PhysicsProcess(double delta)
     {
         if (!_initialized || _finished || !IsInsideTree() || IsQueuedForDeletion() || !double.IsFinite(delta) || delta <= 0) return;
@@ -59,15 +58,14 @@ public partial class ShockwaveEmitter : Node2D
         // The final tick can end mid-delta: sample enemy motion only up to the front's expiration time.
         double activeFraction = _speed * delta > 0 ? Math.Clamp(advance / (_speed * delta), 0, 1) : 0;
         _recipients.Clear();
-        foreach (Enemy enemy in _registry.Living)
+        _registry.GetWaveCandidates(_queryCursor, _origin, PreviousRadius, CurrentRadius, _candidates);
+        foreach (var candidate in _candidates)
         {
+            Enemy enemy = candidate.Enemy;
             if (!Eligible(enemy)) continue;
             ulong id = enemy.GetInstanceId();
             if (_damaged.Contains(id)) continue;
-            Vector2 end = enemy.GlobalPosition;
-            if (!end.IsFinite()) { _positions.Remove(id); continue; }
-            Vector2 start = _positions.TryGetValue(id, out Vector2 old) ? old : end;
-            _positions[id] = end;
+            Vector2 start = candidate.Start, end = candidate.End;
             Vector2 activeEnd = start.Lerp(end, (float)activeFraction);
             Vector2 relativeStart = start - _origin, relativeEnd = activeEnd - _origin;
             if (!relativeStart.IsFinite() || !relativeEnd.IsFinite()
@@ -132,7 +130,8 @@ public partial class ShockwaveEmitter : Node2D
         if (_finished) return;
         _finished = true;
         if (GodotObject.IsInstanceValid(Visual) && !Visual.IsQueuedForDeletion()) Visual.Complete();
-        _positions.Clear(); _damaged.Clear(); _recipients.Clear(); SetPhysicsProcess(false); QueueFree();
+        if (GodotObject.IsInstanceValid(_registry) && _queryCursor != 0) _registry.EndWaveQuery(_queryCursor);
+        _queryCursor = 0; _candidates.Clear(); _damaged.Clear(); _recipients.Clear(); SetPhysicsProcess(false); QueueFree();
     }
 
     // =========================================================
