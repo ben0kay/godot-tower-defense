@@ -23,7 +23,7 @@ public static class AreaDamage
         double scale = distance > radius ? 0 : radius == 0 ? 1
             : 1 - (1 - (double)edgeFraction) * Math.Clamp((double)distance / radius, 0, 1);
         return new DamageInfo((float)(source.Amount * scale), source.Type, source.ShieldCoefficientOverride,
-            source.HullCoefficientOverride, source.ShieldPenetration);
+            source.HullCoefficientOverride, source.ShieldPenetration, source.Source);
     }
 
     // =========================================================

@@ -1,2 +1,2 @@
-// Stage 01 carries the baseline; Stage 02 substitutes one complete purchased level.
-public readonly record struct TowerStatContext(TowerStatBlock BaseStats, TowerStatBlock? SelectedLevel = null);
+// Immutable inputs: baseline, complete selected purchased level and the current earned rank row.
+public readonly record struct TowerStatContext(TowerStatBlock BaseStats, TowerStatBlock? SelectedLevel = null, TowerRankDefinition? Rank = null);

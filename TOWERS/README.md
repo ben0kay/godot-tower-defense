@@ -8,7 +8,7 @@ All actual level-dependent combat values and credit prices now live in one typed
 
 Battle retains 200/150/250-Credit prices and 12/16/22 damage, 1/1.2/1.5 shots/sec, 256/288/320px range and 5% penetration. Laser retains 250/175-Credit prices and 12/22 DPS at 256/288px with 6x shield/.15x hull overrides. Blaster retains 300/200-Credit prices and 60/75 damage at 80/96px radius with 25% edge retention. Every row includes its complete aiming/search/speed/response values where applicable.
 
-Config .tres resources now hold non-level identity/target/tracking policy; scenes/styles retain art and presentation. Runtime configs privately copy rows and ResourceCost recipes. ConstructionCosts forwards to row 1; purchases use later row recipes through the existing atomic wallet. The shared eight stages, per-instance UpgradeLevel, cached FinalStats, HUD selection/purchases/previews/max-level and weapon delivery remain. See Shared/Stats/Pipeline/README.md. Ranks/research/map modifiers/effects remain neutral future stages after the selected row. No research, saving, new towers or unrelated mechanics were added.
+Config .tres resources now hold non-level identity/target/tracking policy; scenes/styles retain art and presentation. Runtime configs privately copy rows and ResourceCost recipes. ConstructionCosts forwards to row 1; purchases use later row recipes through the existing atomic wallet. The shared eight stages, per-instance UpgradeLevel, cached FinalStats, HUD selection/purchases/previews/max-level and weapon delivery remain. See Shared/Stats/Pipeline/README.md. Stage03 earned ranks are active; research/map modifiers/effects remain neutral future stages after the selected row. No research, saving, new towers or unrelated mechanics were added.
 
 The historical phase notes below describe earlier milestones; this explicit-level contract supersedes their former numeric Inspector/resource authoring instructions.
 
@@ -20,7 +20,7 @@ The historical phase notes below describe earlier milestones; this explicit-leve
 
 **Default playable roster:** Battle Tower, Laser Tower, Blaster Cannon and the purple Shockwave Tower. The passive scene under `TESTS/Towers/` is a regression fixture, not a promised Repair/Solar tower or a default menu entry. Registering a valid additional definition creates its build choice without editing placement or HUD. Only 1×1 footprints are supported; other footprints fail registration.
 
-**Phase 4C-1/4C-2 implemented (see completed4C-3 below for current balance):** COMBAT/Damage owns typed base hits and a cached canonical shield/hull response profile. Battle bullets deliver Kinetic; legacy TakeDamage keeps 1:1 semantics. Laser Tower sustains Energy DPS through the same resolver, with a separate endpoint-only BeamRenderer and Inspector-editable copied BeamStyle. Its genuine float BeamStats capability uses the same eight stages and paid upgrades. Shared targeting/aiming are reused; delivery remains type-specific rather than introducing a universal weapon switch. Ranks/research/level modifiers/effects, selling, tower HP, shield visuals and multi-cell placement remain future work.
+**Phase 4C-1/4C-2 implemented (see completed4C-3 below for current balance):** COMBAT/Damage owns typed base hits and a cached canonical shield/hull response profile. Battle bullets deliver Kinetic; legacy TakeDamage keeps 1:1 semantics. Laser Tower sustains Energy DPS through the same resolver, with a separate endpoint-only BeamRenderer and Inspector-editable copied BeamStyle. Its genuine float BeamStats capability uses the same eight stages and paid upgrades. Shared targeting/aiming are reused; delivery remains type-specific rather than introducing a universal weapon switch. Research/level modifiers/effects, selling, tower HP, shield visuals and multi-cell placement remain future work.
 
 **Codex:** read `NOTES/CodePreferences.md`, this README, `tower_ideas.md`, `Shared/README.md`, `Shared/Stats/README.md`, `Shared/Upgrades/README.md`, `Placement/README.md` and `Offensive/BattleTower/README.md` before editing. Work against latest HEAD, preserve the newly implemented upgrade work, and run existing tests.
 
@@ -94,7 +94,7 @@ Every tower **can optionally support upgrades**, including future support/econom
 
 ### Required stat pipeline
 
-Purchased tower upgrades are only one source of progression. Future kill-based tower ranks, permanent player research, level rules and active abilities must coexist without overwriting one another:
+Purchased tower upgrades are only one source of progression. Earned XP-based tower ranks, permanent player research, level rules and active abilities must coexist without overwriting one another:
 
 **Base stats → Tower upgrade tier → Tower rank → Permanent player research → Level modifiers → Active buffs/debuffs → Safety clamps → Final stats**
 
@@ -102,7 +102,7 @@ Purchased tower upgrades are only one source of progression. Future kill-based t
 | --- | --- | --- |
 | Base stats | Shared tower definition; immutable authored inputs | Complete Level 1 values before progression. |
 | Tower upgrade tier | This placed tower; purchased progression | Select the purchased level’s complete absolute snapshot. |
-| Tower rank | This placed tower; earned progression separate from purchased tier | Rank up after configured kill-count milestones; apply rank bonuses. Kill attribution/thresholds are future work. |
+| Tower rank | This placed tower; earned progression separate from purchased tier | Advance Standard→Veteran→Enhanced→Superior→Legendary through actual damage/kill XP; apply the current row’s total bonuses. |
 | Permanent player research | Persistent player/profile progression, outside individual towers and levels | Research unlocked through the future research center **follows the player across every level**, survives level restart/change and is restored on save/load. Apply only to eligible tower types/capabilities. |
 | Level modifiers | Current level/session, declared separately in level settings | Mission-wide conditions such as reduced range or improved production; replace them when changing maps. They are not temporary-effect entries or permanent research. |
 | Active buffs/debuffs | Runtime effect instances on eligible towers | Enemy abilities, player abilities and other active effects with their own source, duration/removal and stacking policy. |
@@ -111,11 +111,11 @@ Purchased tower upgrades are only one source of progression. Future kill-based t
 
 A research center is a gameplay interface/source of unlocks, **not the owner of permanent research state**. Deleting the center or unloading a map must not erase research. Use a player/profile progression service when that system is implemented; no particular save-folder/service implementation is assumed to exist today.
 
-Tower tier and tower rank remain separate: buying level 2 does not erase earned rank, and ranking up does not silently buy an upgrade. Per-tower kill counts must be attributed to the responsible tower once, not inferred from the global enemy registry's total. Tower progression lasts with that instance; carrying towers across maps is a separate future decision.
+Tower tier and tower rank remain separate: buying level 2 does not erase earned rank, and ranking up does not silently buy an upgrade. Damage/kill XP is attributed to the attacking tower through DamageInfo.Source, never inferred from registry totals. Tower progression lasts with that instance; carrying towers across maps is a separate future decision.
 
 ### Modifier rules and final-stat calculation (future stages only; purchased levels select snapshots)
 
-- Keep **stored inputs** (base definition, purchased tier, rank/kills, player research, current level rules, active effect instances) distinct from **calculated final stats**.
+- Keep **stored inputs** (base definition, purchased tier, rank/XP, player research, current level rules, active effect instances) distinct from **calculated final stats**.
 - Every modifier needs an explicit stat/capability, stable source identity, operation and applicable scope. For temporary effects, also define duration/removal and whether another application refreshes, replaces or stacks.
 - Use clear operations: flat additions (+5 damage), additive percentage bonuses (+20% range), and explicit multipliers (×0.5 fire rate). Do not treat these as interchangeable.
 - Recommended initial arithmetic **within each stage**: `output = (input + sum(flat additions)) × (1 + sum(additive percentage bonuses)) × product(explicit multipliers)`. Percentages are relative to that stage's incoming value after flat additions, not ambiguously to original base stats.
@@ -145,7 +145,7 @@ TOWERS/
 │   │       ├── TowerStatPipeline.cs         # EXISTS: one explicit coordinator
 │   │       ├── 01_BaseStats.cs              # ACTIVE
 │   │       ├── 02_TowerUpgrades.cs          # ACTIVE: selected full level snapshot
-│   │       ├── 03_TowerRanks.cs             # NEUTRAL (future)
+│   │       ├── 03_TowerRanks.cs             # ACTIVE: current named rank totals
 │   │       ├── 04_PermanentResearch.cs      # NEUTRAL (future)
 │   │       ├── 05_LevelModifiers.cs         # NEUTRAL (future)
 │   │       ├── 06_ActiveEffects.cs          # NEUTRAL (future)
@@ -200,7 +200,7 @@ Each file owns **the rules for applying its stage**, not the source data, level 
 | --- | --- | --- |
 | `01_BaseStats.cs` | Tower type’s C# Level 1 row | Establish the complete original snapshot. |
 | `02_TowerUpgrades.cs` | Selected *Levels.cs row and placed UpgradeLevel | Substitute one complete purchased snapshot; payment handled elsewhere. |
-| `03_TowerRanks.cs` | `TOWERS/Shared/Ranks/` and this tower's attributed kill count / earned rank | Adds kill-based progression independently of purchased tiers; rank milestones and attribution are separate logic. |
+| `03_TowerRanks.cs` | `TOWERS/Shared/Ranks/` and this tower's attributed combat XP / earned rank | Applies the current XP-earned rank totals independently of purchased levels. |
 | `04_PermanentResearch.cs` | Future **player/profile-owned** `PROGRESSION/Research/` state | Applies eligible permanent unlocks across levels and after reload; never owned or reset by a level, tower or research-center building. |
 | `05_LevelModifiers.cs` | **Current** `LEVELS/` level's authored rule set, supplied through level/session context | Applies that map's conditions only; changing maps replaces these inputs, leaving research untouched. |
 | `06_ActiveEffects.cs` | `TOWERS/Shared/Modifiers/` active runtime effects, e.g. enemy slow, aura, player ability | Applies stack/refresh/expire rules from the effect owners; no level-specific conditions in this collection. |
@@ -259,7 +259,7 @@ These playtest values are defined only in Offensive/BattleTower/BattleTowerLevel
 | --- | --- |
 | 01 Base Stats | **ACTIVE** |
 | 02 Purchased Tower Upgrades | **ACTIVE** |
-| 03 Tower Ranks | **NEUTRAL / FUTURE** |
+| 03 Tower Ranks | **ACTIVE — NAMED XP RANKS** |
 | 04 Permanent Research | **NEUTRAL / FUTURE** |
 | 05 Level Modifiers | **NEUTRAL / FUTURE** |
 | 06 Active Effects | **NEUTRAL / FUTURE** |
@@ -480,3 +480,11 @@ FEEDBACK/Shockwave owns reusable ShockwaveEffect/Style, with Inspector colour/wi
 TOWERS/Shared/Weapons/Shockwaves/ShockwaveEmitter owns one real moving damage front per emission: previous/current radius, swept relative enemy motion, encounter-distance falloff, per-emission hit-once IDs, mutation-safe dispatch and bounded lifetime. It calls Enemy.ApplyDamage through the shared typed defenses, never repeats instant full-disc damage. The shared effect follows exact gameplay radius and remains damage-free.
 
 The registered purple ShockwaveTower has complete independent C# levels: build350 /40 Energy /200px /250px/s /4s /25% edge /0 penetration; upgrade225 /55 /240px /300px/s /3.5s /25% /0. Its exposed cached ShockwaveStats uses the existing eight-stage pipeline, real Inspector/previews/economy and max-level behavior. Default inherited Energy defenses remain2x shield/.85x hull. The tower pulses without a target/aim loop, and emitted fronts keep their own launch inputs after upgrades/source removal. Art and travelling ring are purple-themed. See Offensive/ShockwaveTower/README.md for full ownership/cadence details and TESTS/README.md for actual checks. No permanent research, saving, armour, Missile Tower or unrelated mechanics were added.
+
+## Earned Tower Ranks and Experience — implemented
+
+Standard0 → Veteran100 → Enhanced300 → Superior700 → Legendary1500 total XP, with marginal requirements100/200/400/800. Each real offensive tower has its own compact *Ranks.cs file directly beside *Levels.cs; every row is an explicit current-rank total. Initial bonuses are0/2/4/6/8% damage and0/1/2/3/4% range, with future HP metadata inactive. Level and Rank remain independent; upgrades preserve XP/rank.
+
+TowerMasterConfig has shared Inspector KillXpMultiplier10 and DamageXpMultiplier2. DamageSource carries one weak owner through Battle bullets, Laser beam ticks, Blaster splash/falloff and purple Shockwave emissions. Enemy derives bounded XP from existing KillRewardCredits and actual shield/hull loss, capped by starting durability even under restoration. Only the lethal hit's live source gets kill XP; manual/debug kills and arrivals do not grant tower XP. The existing Credits wallet remains unchanged.
+
+Stage02 still selects the entire purchased level row. Active Stage03 then applies only the current rank's total bonuses. Projectiles keep integer nearest/ties-to-even rounding; beam/wave damage remains fractional. No prior ranks are accumulated. Promotions alone rebuild the cache; ordinary XP events update the existing bottom-right Rank/XP/bar/bonuses display via coalesced events, preserving all level/upgrade controls. Legendary shows MAX RANK. Shared/Ranks/README.md is authoritative and supersedes historical kill-count/rank-deferred notes above. Research, saving, tower HP and unique abilities remain deferred.

@@ -4,6 +4,6 @@ public readonly record struct WeaponDamageStats(DamageType Type, bool OverrideSh
 {
     // =========================================================
     // Preserve optional absolute overrides and penetration in the shared damage resolver.
-    public DamageInfo CreateHit(float amount, float penetration) => new(amount, Type,
-        OverrideShield ? ShieldCoefficient : null, OverrideHull ? HullCoefficient : null, penetration);
+    public DamageInfo CreateHit(float amount, float penetration, DamageSource source = null) => new(amount, Type,
+        OverrideShield ? ShieldCoefficient : null, OverrideHull ? HullCoefficient : null, penetration, source);
 }

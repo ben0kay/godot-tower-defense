@@ -7,6 +7,7 @@ public partial class TowerConfig : Resource
     [ExportGroup("Identity")]
     [Export] public string DisplayName { get; set; } = "Tower";
     [Export] public string Description { get; set; } = "";
+    public virtual System.Collections.Generic.IReadOnlyList<TowerRankDefinition> Ranks => TowerRankController.StandardOnly;
     // Runtime copies of the tower's C# rows; empty for passive test-only configs.
     public System.Collections.Generic.List<TowerLevel> Levels { get; protected set; } = new();
     private Godot.Collections.Array<ResourceCost> _passiveCosts = new();

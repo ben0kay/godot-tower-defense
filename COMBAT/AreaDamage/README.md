@@ -5,7 +5,7 @@
 ## API and math
 
 - `Validate(radius, edgeFraction)` rejects nonfinite/negative radius and nonfinite/out-of-range edge retention before mutation.
-- `AtDistance(sourceHit, distance, radius, edgeFraction)` returns a new `DamageInfo` with a scaled amount and the unchanged type, optional absolute shield/hull overrides and penetration. Distance must be finite/nonnegative. Outside distance returns a zero-amount payload.
+- `AtDistance(sourceHit, distance, radius, edgeFraction)` returns a new `DamageInfo` with a scaled amount and the unchanged type, optional absolute shield/hull overrides, penetration and optional DamageSource. Distance must be finite/nonnegative. Outside distance returns a zero-amount payload.
 - `ApplyInstant(impactWorldPosition, radius, sourceHit, edgeFraction, enemyRegistry)` dispatches one hit to every eligible enemy center at inclusive distance `<= radius`. The return value counts dispatched recipients, including valid zero-amount edge hits. Invalid impact coordinates or registry reject before mutation.
 
 For radius r > 0, base damage D, center distance d and weapon-supplied edge fraction e:
@@ -40,3 +40,5 @@ Temporary recipient storage is local to the impact, making nested impacts indepe
 ## Phase4E — expanding delivery implemented separately
 
 Instant blast damage remains a full-disc event at contact. ShockwaveEmitter under TOWERS/Shared/Weapons/Shockwaves instead advances a swept moving front, tracks per-emission hit-once IDs and applies damage only on encounter. It reuses AtDistance at contact radius but never repeatedly invokes ApplyInstant. FEEDBACK/Shockwave draws both modes with weapon-specific styles; width/glow/fade do not affect recipient geometry. See the emitter README and ShockwaveChecks for implementation/tests. Research, saving, armour and Missile Tower remain deferred.
+
+Tower XP attribution is carried in DamageInfo.Source and preserved by AtDistance. Each affected enemy independently bounds XP by its spawn-time damage budget; raw AoE amount is never directly converted to XP. A promotion during recipient dispatch does not change the already snapshotted attack, nor does the cosmetic effect grant XP. Existing instant/wave timing and defense math remain unchanged.

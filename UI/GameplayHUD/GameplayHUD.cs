@@ -31,7 +31,9 @@ public partial class GameplayHUD : Control
     private Button _startWave, _upgradeButton;
     private Label _upgradeInfo;
     private CreditGainIndicator _creditGain;
-    private ProgressBar _healthBar;
+    private ProgressBar _healthBar, _experienceBar;
+    private VBoxContainer _rankSection;
+    private Label _rankLabel, _experienceText, _rankBonuses;
     private Tween _citadelBarTween, _citadelFlashTween, _wavePulseTween;
     private int _targetCredits, _previousCitadelHealth = -1, _previousCitadelMax, _previousWave;
     private double _displayCredits, _creditStart, _creditElapsed;
@@ -66,6 +68,11 @@ public partial class GameplayHUD : Control
         _towerCategory = GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerCategory");
         _towerStats = GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerStats");
         _towerNotes = GetNode<Label>("BottomArea/Inspector/Insets/Body/Notes");
+        _rankSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/RankSection");
+        _rankLabel = _rankSection.GetNode<Label>("Rank");
+        _experienceText = _rankSection.GetNode<Label>("ExperienceText");
+        _rankBonuses = _rankSection.GetNode<Label>("RankBonuses");
+        _experienceBar = _rankSection.GetNode<ProgressBar>("ExperienceBar");
 
         _startWave = GetNode<Button>("TopBar/Status/StartWave");
         _startWave.Pressed += () => EmitSignal(SignalName.WaveStartRequested);
@@ -156,11 +163,31 @@ public partial class GameplayHUD : Control
     public void ShowTowerDetails(string name, string category, string stats, string notes = "")
     {
         SetUpgradeDetails("", "", false);
+        _rankSection.Hide();
         _towerName.Text = name;
         _towerCategory.Text = category;
         _towerStats.Text = stats;
         _towerNotes.Text = notes;
         _inspector.Show();
+    }
+
+    // =========================================================
+    // Event-driven presentation: fractional progress within the current rank, with total XP also visible.
+    public void SetRankDetails(TowerBase tower)
+    {
+        if (!GodotObject.IsInstanceValid(tower) || tower.AuthoredConfig == null) { _rankSection.Hide(); return; }
+        TowerRankDefinition current = tower.CurrentRank;
+        TowerRankDefinition? next = tower.NextRank;
+        double total = tower.RankProgress.TotalXp;
+        _rankLabel.Text = $"Rank: {current.Rank}";
+        _rankBonuses.Text = $"Rank bonuses: Damage +{current.DamageBonus * 100:0.##}% / Range +{current.RangeBonus * 100:0.##}%";
+        _experienceBar.MinValue = 0;
+        _experienceBar.MaxValue = next.HasValue ? next.Value.TotalXp - current.TotalXp : 1;
+        _experienceBar.Value = next.HasValue ? total - current.TotalXp : 1;
+        _experienceText.Text = next.HasValue
+            ? $"{total - current.TotalXp:0.##} / {next.Value.TotalXp - current.TotalXp:0.##} XP to {next.Value.Rank}\nTotal XP: {total:0.##}"
+            : $"MAX RANK\nTotal XP: {total:0.##}";
+        _rankSection.Show();
     }
 
     // =========================================================
@@ -421,7 +448,10 @@ public partial class GameplayHUD : Control
         Label[] primary = { _wave, _credits, _core, _towerName };
         foreach (Label label in primary) label.AddThemeColorOverride("font_color", Config.TextColor);
 
-        Label[] muted = { _towerCategory, _towerStats, _towerNotes,
+        _experienceBar.AddThemeStyleboxOverride("fill", new StyleBoxFlat { BgColor = Config.AccentColor });
+        _experienceBar.AddThemeStyleboxOverride("background", new StyleBoxFlat { BgColor = Config.ButtonColor });
+        _rankLabel.AddThemeColorOverride("font_color", Config.AccentColor);
+        Label[] muted = { _towerCategory, _towerStats, _towerNotes, _experienceText, _rankBonuses,
             GetNode<Label>("BottomArea/TraySlot/TowerBar/Insets/Tray/Header/Hint") };
         foreach (Label label in muted) label.AddThemeColorOverride("font_color", Config.MutedTextColor);
 

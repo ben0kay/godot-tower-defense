@@ -15,6 +15,9 @@ public partial class Enemy : Node2D
     public EnemyRegistry Registry => _registry;
     private EnemyRegistry _registry;
     private DefenseBar _defenseBar;
+    private double _initialDurability, _damageConsumed, _damageXpPool, _killXp;
+    private int _xpCredits;
+    private bool _xpRulesCaptured;
 
     // =========================================================
     // Called by SpawnManager after adding the scene, using world-scoped services.
@@ -23,6 +26,9 @@ public partial class Enemy : Node2D
         _registry = registry; Health = Mathf.Max(1f, Definition.MaxHealth); IsAlive = true;
         CurrentShield = spawnWithShield && float.IsFinite(Definition.MaxShield)
             ? Mathf.Max(0f, Definition.MaxShield) : 0f;
+        _initialDurability = (double)Health + CurrentShield;
+        _damageConsumed = 0; _damageXpPool = 0; _killXp = 0; _xpRulesCaptured = false;
+        _xpCredits = Math.Max(0, Definition.KillRewardCredits);
         _defenseBar = GetNodeOrNull<DefenseBar>("DefenseBar");
         _defenseBar?.SetHealth(Health, Definition.MaxHealth);
         Movement = GetNode<EnemyMovement>("Movement");
@@ -43,19 +49,38 @@ public partial class Enemy : Node2D
     // Typed attacks supply base units; the global resolver owns all defense-layer math.
     public void ApplyDamage(DamageInfo hit)
     {
-        if (!IsAlive || hit.Amount == 0) return;
-        CommitDamage(DamageResolver.Resolve(hit, CurrentShield, Health));
+        if (!IsAlive || !IsInsideTree() || IsQueuedForDeletion() || hit.Amount == 0
+            || !GodotObject.IsInstanceValid(_registry) || !_registry.IsInsideTree() || !_registry.Contains(this)) return;
+        CommitDamage(DamageResolver.Resolve(hit, CurrentShield, Health), hit.Source);
     }
 
     // =========================================================
     // One lifecycle path updates hull feedback and publishes a kill at most once.
-    private void CommitDamage(DamageResult result)
+    private void CommitDamage(DamageResult result, DamageSource source = null)
     {
         float oldHealth = Health;
+        double actual = Math.Max(0, (double)Health - result.Health) + Math.Max(0, (double)CurrentShield - result.Shield);
+        double eligible = Math.Min(actual, Math.Max(0, _initialDurability - _damageConsumed));
+        _damageConsumed += eligible; // Unattributed damage also consumes the finite budget; healing cannot refill it.
+        double xp = 0;
+        if (actual > 0 && source != null && source.TryGetRules(out TowerMasterConfig rules))
+        {
+            if (!_xpRulesCaptured)
+            {
+                _damageXpPool = _xpCredits * TowerRankController.SafeMultiplier(rules.DamageXpMultiplier);
+                _killXp = _xpCredits * TowerRankController.SafeMultiplier(rules.KillXpMultiplier);
+                _xpRulesCaptured = true;
+            }
+            if (_initialDurability > 0 && double.IsFinite(_initialDurability)) xp = _damageXpPool * (eligible / _initialDurability);
+            if (oldHealth > 0 && result.Health <= 0) xp += _killXp;
+        }
         CurrentShield = result.Shield; Health = result.Health;
-        if (Health == oldHealth) return;
-        _defenseBar?.SetHealth(Health, Definition.MaxHealth);
-        if (Health <= 0f) Finish(false);
+        if (Health != oldHealth)
+        {
+            _defenseBar?.SetHealth(Health, Definition.MaxHealth);
+            if (Health <= 0f) Finish(false);
+        }
+        if (xp > 0) source?.Credit(xp);
     }
 
     // =========================================================

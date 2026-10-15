@@ -65,6 +65,7 @@ public partial class EnemyIntegrationChecks : Node
             AreaDamageChecks.Run(_battle, _spawns);
             await BlasterCannonChecks.Run(_battle, _spawns);
             await ShockwaveChecks.Run(_battle, _spawns);
+            await TowerRankChecks.Run(_battle, _spawns);
             EnemyKillRewardChecks.Run(_battle, _spawns);
             DeathExplosionChecks.Run(_battle, _spawns, feedback);
             CitadelHealthChecks.Run(_battle, _spawns);

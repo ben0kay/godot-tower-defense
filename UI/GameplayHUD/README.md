@@ -28,3 +28,5 @@ Phase 4C-2 registers real Laser Tower beside Battle Tower; its generated entry/I
 ## Top-bar polish
 
 Credits use `Credits: 250 (+10)` inline, with a quick pulse/glow on repeated rewards and amber `(-200)` feedback for successful spending. The displayed balance counts smoothly to the already-committed wallet amount. Citadel HP text flashes and its bar eases on damage; newly advanced wave numbers briefly brighten and pulse. All values and animation durations are Inspector-editable under `UI/DefaultUIConfig.tres`; see `TopBar/README.md`. No combat or economy balance rules have been changed.
+
+The placed-tower Inspector now includes the current named earned Rank, fractional within-rank/total XP, next-rank progress bar and active Damage/Range bonuses. Legendary shows MAX RANK. Selection events refresh only the current tower; XP-only updates are coalesced through a deferred callback and do not reset upgrade details or recalculate combat stats. Promotions and paid upgrades use the same ranked cache/preview pipeline. Build previews hide the rank section. See Inspector/README.md and TOWERS/Shared/Ranks/README.md.

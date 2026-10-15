@@ -4,6 +4,7 @@ using Godot;
 [GlobalClass]
 public partial class ShockwaveTowerConfig : TowerConfig
 {
+    public override System.Collections.Generic.IReadOnlyList<TowerRankDefinition> Ranks => ShockwaveTowerRanks.Rows;
     [ExportGroup("Effects")]
     [Export] public ShockwaveStyle WaveStyle { get; set; }
 
@@ -31,7 +32,7 @@ public partial class ShockwaveTowerConfig : TowerConfig
 
     // =========================================================
     // The selected cached capability supplies float base damage and independent defense/penetration inputs.
-    public DamageInfo CreateHit(TowerFinalStats stats) => stats.Weapon.Value.CreateHit(stats.Shockwave.Value.DamagePerWave, stats.ShieldPenetration);
+    public DamageInfo CreateHit(TowerFinalStats stats, DamageSource source = null) => stats.Weapon.Value.CreateHit(stats.Shockwave.Value.DamagePerWave, stats.ShieldPenetration, source);
 
     // =========================================================
     // The Inspector reports wave timing/range/falloff, never a projectile speed or fictitious fire rate.

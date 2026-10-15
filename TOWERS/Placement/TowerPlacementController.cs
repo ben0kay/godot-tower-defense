@@ -75,7 +75,8 @@ public partial class TowerPlacementController : Node2D
         { _hud.TowerChoiceRequested -= OnTowerChoiceRequested; _hud.TowerUpgradeRequested -= OnUpgradeRequested; }
         if (GodotObject.IsInstanceValid(_economy)) _economy.BalanceChanged -= OnBalanceChanged;
         if (GodotObject.IsInstanceValid(_buildDefinition?.DefaultConfig)) _buildDefinition.DefaultConfig.Changed -= OnPreviewConfigChanged;
-        if (GodotObject.IsInstanceValid(_selected)) _selected.StatsChanged -= OnSelectedStatsChanged;
+        if (GodotObject.IsInstanceValid(_selected))
+        { _selected.StatsChanged -= OnSelectedStatsChanged; _selected.ExperienceChanged -= OnSelectedExperienceChanged; }
     }
     #endregion
 
@@ -215,7 +216,7 @@ public partial class TowerPlacementController : Node2D
             if (!created.AcceptsConfig(_buildDefinition.DefaultConfig) || !created.ValidateScene())
             { created.Free(); return false; }
             tower = created;
-            tower.InitializeDefinition(_buildDefinition);
+            tower.InitializeDefinition(_buildDefinition, Settings);
             if (!_grid.TryOccupy(cell)) { tower.Free(); tower = null; return false; }
             occupied = true;
             _towers.AddChild(tower);
@@ -248,17 +249,19 @@ public partial class TowerPlacementController : Node2D
     // A selected placed tower shares the existing HUD Inspector with build previews.
     private void SelectTower(TowerBase tower)
     {
-        if (_selected == tower) return;
+        if (_selected == tower && (tower == null || _hud.IsInspectionVisible)) return;
         if (GodotObject.IsInstanceValid(_selected))
-        { _selected.StatsChanged -= OnSelectedStatsChanged; _selected.SetSelected(false); }
+        { _selected.StatsChanged -= OnSelectedStatsChanged; _selected.ExperienceChanged -= OnSelectedExperienceChanged; _selected.SetSelected(false); }
         _selected = tower;
         if (GodotObject.IsInstanceValid(_selected))
         {
             _selected.StatsChanged += OnSelectedStatsChanged;
+            _selected.ExperienceChanged += OnSelectedExperienceChanged;
             _selected.SetSelected(true);
             _hud.ShowTowerDetails(_selected.AuthoredConfig.DisplayName, (_selected.Definition?.Category.ToString() ?? "Tower") + " / Placed",
                 DescribeTower($"Grid cell: {_selected.GridCell.X}, {_selected.GridCell.Y}"),
                 _selected.AuthoredConfig.Description + "\nConstruction paid.");
+            _hud.SetRankDetails(_selected);
         }
         RefreshUpgradePreview();
         QueueRedraw();
@@ -272,8 +275,27 @@ public partial class TowerPlacementController : Node2D
         if (_hud.IsInspectionVisible) _hud.ShowTowerDetails(_selected.AuthoredConfig.DisplayName, (_selected.Definition?.Category.ToString() ?? "Tower") + " / Placed",
             DescribeTower($"Grid cell: {_selected.GridCell.X}, {_selected.GridCell.Y}"),
             _selected.AuthoredConfig.Description + "\nConstruction paid.");
-        if (_hud.IsInspectionVisible) RefreshUpgradePreview();
+        if (_hud.IsInspectionVisible) { _hud.SetRankDetails(_selected); RefreshUpgradePreview(); }
         QueueRedraw();
+    }
+
+    // =========================================================
+    // XP ticks update only the rank section; they do not resolve stats or erase the paid upgrade preview.
+    private bool _rankRefreshQueued;
+    // =========================================================
+    // Schedule only for a visible selected tower; one pending callback handles all awards in this frame.
+    private void OnSelectedExperienceChanged()
+    {
+        if (_rankRefreshQueued || !_hud.IsInspectionVisible || !GodotObject.IsInstanceValid(_selected)) return;
+        _rankRefreshQueued = true; CallDeferred(MethodName.RefreshSelectedExperience);
+    }
+
+    // =========================================================
+    // Coalesce an AoE's many XP awards into one display refresh; there is no per-frame progression poll.
+    private void RefreshSelectedExperience()
+    {
+        _rankRefreshQueued = false;
+        if (_hud.IsInspectionVisible && GodotObject.IsInstanceValid(_selected)) _hud.SetRankDetails(_selected);
     }
 
     // =========================================================

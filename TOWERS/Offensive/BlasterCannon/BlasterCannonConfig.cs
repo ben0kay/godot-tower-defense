@@ -4,6 +4,7 @@ using Godot;
 [GlobalClass]
 public partial class BlasterCannonConfig : TowerConfig
 {
+    public override System.Collections.Generic.IReadOnlyList<TowerRankDefinition> Ranks => BlasterCannonRanks.Rows;
     // =========================================================
     // C# tables are the sole authored source of combat values and construction/upgrade prices.
     public BlasterCannonConfig()
@@ -53,7 +54,7 @@ public partial class BlasterCannonConfig : TowerConfig
 
     // =========================================================
     // Launch payload takes every damage input from the selected cached level.
-    public DamageInfo CreateHit(TowerFinalStats final) => final.Weapon.Value.CreateHit(final.DamagePerShot, final.ShieldPenetration);
+    public DamageInfo CreateHit(TowerFinalStats final, DamageSource source = null) => final.Weapon.Value.CreateHit(final.DamagePerShot, final.ShieldPenetration, source);
 
     // =========================================================
     // Weapon-specific detail belongs to the weapon config, not generic placement or HUD.

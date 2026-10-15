@@ -72,7 +72,7 @@ public partial class BattleTower : TowerBase
         if (!aligned || _shotTimer > 0f || FinalStats.ShotsPerSecond <= 0f) return;
         BasicProjectile bullet = new();
         bullet.Initialize(_target, FinalStats.ProjectileSpeed,
-            new DamageInfo(FinalStats.DamagePerShot, DamageType.Kinetic, shieldPenetration: FinalStats.ShieldPenetration));
+            new DamageInfo(FinalStats.DamagePerShot, DamageType.Kinetic, shieldPenetration: FinalStats.ShieldPenetration, source: DamageSource));
         _projectiles.AddChild(bullet); bullet.GlobalPosition = GlobalPosition;
         _shotTimer = 1f / FinalStats.ShotsPerSecond;
     }
@@ -81,7 +81,7 @@ public partial class BattleTower : TowerBase
     #region Stat Resolution
     // =========================================================
     // Both paid application and preview resolve the same source/context with a different tier.
-    public override TowerFinalStats ResolveLevel(int level) => TowerStatPipeline.Resolve(Config, level);
+    public override TowerFinalStats ResolveLevel(int level) => ResolveRankedLevel(level);
 
     // =========================================================
     // Explicit rebuild is also available for future input changes that do not emit Resource.Changed.

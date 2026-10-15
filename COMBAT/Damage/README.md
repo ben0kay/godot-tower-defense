@@ -52,3 +52,7 @@ See TESTS/README.md for actual compilation/headless results and fixture isolatio
 ## Phase 4D area consumer
 
 AreaDamage.AtDistance creates a scaled base DamageInfo preserving its type, independent nullable overrides and penetration. The instant helper calls Enemy.ApplyDamage once per snapshotted recipient, so existing shield-first base absorption, bypass, hull feedback and kill/reward isolation remain authoritative here. Blaster defaults to Explosive 0.25/1.25 and zero penetration; optional weapon overrides are launch-snapshotted. No direct-hit bonus or second coefficient application was added. AreaDamageChecks and BlasterCannonChecks exercise both inherited and explicit responses, including zero shield response with penetrating damage.
+
+## Optional owner attribution
+
+DamageInfo additionally carries an optional DamageSource token. It does not affect DamageResolver coefficients, penetration or raw damage math. Production weapon hits supply their originating tower's cached weak token; AreaDamage falloff preserves it for every recipient. Enemy commits actual shield/hull loss and a guarded kill, then credits bounded combat XP through that source. Existing unattributed constructors/TakeDamage keep their old combat/Credits behavior and grant no tower XP. See COMBAT/Attribution/README.md and TOWERS/Shared/Ranks/README.md for budget/lifetime rules.

@@ -4,6 +4,7 @@ using Godot;
 [GlobalClass]
 public partial class LaserTowerConfig : TowerConfig
 {
+    public override System.Collections.Generic.IReadOnlyList<TowerRankDefinition> Ranks => LaserTowerRanks.Rows;
     // =========================================================
     // C# tables are the sole authored source of combat values and construction/upgrade prices.
     public LaserTowerConfig()
@@ -41,7 +42,7 @@ public partial class LaserTowerConfig : TowerConfig
 
     // =========================================================
     // Active beams use their cached selected-level response, including penetration.
-    public DamageInfo CreateHit(float amount, TowerFinalStats final) => final.Weapon.Value.CreateHit(amount, final.ShieldPenetration);
+    public DamageInfo CreateHit(float amount, TowerFinalStats final, DamageSource source = null) => final.Weapon.Value.CreateHit(amount, final.ShieldPenetration, source);
 
     // =========================================================
     // Default-level tooling uses the same final snapshot as gameplay.

@@ -47,7 +47,7 @@ public partial class LaserTower : TowerBase
     protected override void ApplyConfig(TowerConfig config) => Config = (LaserTowerConfig)config;
     // =========================================================
     // Both purchase and preview use the one shared stat pipeline.
-    public override TowerFinalStats ResolveLevel(int level) => Config.ResolveStats(level);
+    public override TowerFinalStats ResolveLevel(int level) => ResolveRankedLevel(level);
     // =========================================================
     // Numeric input changes rebuild once and immediately shut down zero-DPS attacks.
     public void RebuildStats()
@@ -91,7 +91,7 @@ public partial class LaserTower : TowerBase
         if (!aligned) { ClearBeam(); return; }
         Enemy locked = _target;
         double amount = FinalStats.Beam.Value.DamagePerSecond * delta;
-        locked.ApplyDamage(Config.CreateHit((float)System.Math.Min(float.MaxValue, amount), FinalStats));
+        locked.ApplyDamage(Config.CreateHit((float)System.Math.Min(float.MaxValue, amount), FinalStats, DamageSource));
         // Removal callbacks may clear/change the lock; never apply this tick to a replacement enemy.
         if (locked != _target || !TowerTargeting.Valid(locked, GlobalPosition, FinalStats.RangePixels))
         { ClearBeam(); return; }

@@ -55,3 +55,9 @@ The headless run cannot verify artistic quality; the projectile and flash need a
 ## Phase4E visual migration
 
 Effects/BlasterShockwaveStyle.tres now owns the orange plasma ring/glow, .22s expansion and fade. DefaultBlasterCannonConfig references it through ImpactStyle. Config copies isolate the style; SplashProjectile snapshots it at launch and passes it to the shared ShockwaveEffect after instant damage. Style duration/radius/colour edits cannot delay or repeat AoE. Shared feedback contains no hardcoded Blaster colours. The separate purple Shockwave Tower uses the same visual in externally driven mode, with damage timing owned by ShockwaveEmitter. The former BlastFlash script/UID were removed.
+
+## Earned Rank and Experience
+
+`BlasterCannonRanks.cs` sits beside `BlasterCannonLevels.cs` and defines all five named ranks in compact explicit rows: Standard0, Veteran100, Enhanced300, Superior700 and Legendary1500 total XP. The selected rank's total bonuses are0/2/4/6/8% damage and0/1/2/3/4% range; future HP columns are inactive. Rank XP is independent of purchased level/prices and is preserved by upgrades. Stage03 modifies the selected complete Level snapshot, never accumulates earlier Rank bonuses. Integer projectile damage retains nearest/ties-to-even rounding; float beams/waves retain fractional damage.
+
+Attacks carry the tower's weak DamageSource. Actual shield/hull loss earns a bounded share of XP derived from each enemy's KillRewardCredits; the lethal source receives kill XP. Shared TowerMasterConfig multipliers default to2× damage pool and10× kill reward. Debug/manual kills and arrivals grant no tower XP. Already-fired payloads retain combat values/source after promotion or upgrade; removed source towers do not receive XP. The bottom-right selected Inspector shows Rank, within-rank/total XP, progress bar, active bonuses and MAX RANK automatically through events. See TOWERS/Shared/Ranks/README.md for exact rules and regression results.

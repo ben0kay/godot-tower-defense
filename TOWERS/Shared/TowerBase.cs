@@ -13,6 +13,14 @@ public abstract partial class TowerBase : Node2D
     public int UpgradeLevel { get; private set; } = 1;
     public TowerFinalStats FinalStats { get; protected set; }
     public event Action StatsChanged;
+    public event Action ExperienceChanged;
+    public TowerRankProgress RankProgress { get; } = new();
+    public TowerRankDefinition CurrentRank => RankProgress.Current(AuthoredConfig.Ranks);
+    public TowerRankDefinition? NextRank => RankProgress.Next(AuthoredConfig.Ranks);
+    private TowerMasterConfig _experienceRules;
+    private DamageSource _damageSource;
+    public TowerMasterConfig ExperienceRules => _experienceRules ?? TowerRankController.DefaultRules;
+    public DamageSource DamageSource => _damageSource ??= new DamageSource(this);
     public abstract System.Collections.Generic.List<TowerLevel> Levels { get; }
     public TowerLevel NextUpgrade => Levels != null && UpgradeLevel < Levels.Count
         ? Levels[UpgradeLevel] : null;
@@ -27,11 +35,11 @@ public abstract partial class TowerBase : Node2D
 
     // =========================================================
     // Apply a private source copy before Ready; definition remains shared authored metadata.
-    public void InitializeDefinition(TowerDefinition definition)
+    public void InitializeDefinition(TowerDefinition definition, TowerMasterConfig rules = null)
     {
         if (definition == null || !AcceptsConfig(definition.DefaultConfig))
             throw new InvalidOperationException("Tower/config mismatch.");
-        Definition = definition;
+        Definition = definition; _experienceRules = rules;
         ApplyConfig(definition.DefaultConfig.CreateInstanceCopy());
     }
 
@@ -55,6 +63,20 @@ public abstract partial class TowerBase : Node2D
     // =========================================================
     // Publish once after committed changes; wallet/controller retain payment ownership.
     internal void NotifyStatsChanged() => StatsChanged?.Invoke();
+
+    // =========================================================
+    // Both live stats and purchased-level previews retain this instance's currently earned rank.
+    protected TowerFinalStats ResolveRankedLevel(int level) => TowerStatPipeline.Resolve(AuthoredConfig, level, rank: CurrentRank);
+
+    // =========================================================
+    // XP-only changes publish progress, while promotions rebuild effective stats exactly once.
+    internal void ReceiveExperience(double amount)
+    {
+        double before = RankProgress.TotalXp;
+        bool promoted = RankProgress.Add(amount, AuthoredConfig.Ranks);
+        if (promoted) { FinalStats = ResolveLevel(UpgradeLevel); NotifyStatsChanged(); }
+        if (RankProgress.TotalXp != before) ExperienceChanged?.Invoke();
+    }
 
     // =========================================================
     // Commit pre-resolved data silently so observers see a fully paid upgrade, never partial state.

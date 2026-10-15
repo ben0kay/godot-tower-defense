@@ -63,7 +63,7 @@ public partial class ShockwaveTower : TowerBase
         if (wave.DamagePerWave <= 0) { _cooldown = System.Math.Max(0, _cooldown); return; }
         if (_cooldown > 1e-8) return;
         ShockwaveEmitter emission = new();
-        emission.Initialize(_registry, GlobalPosition, Config.CreateHit(FinalStats), FinalStats.RangePixels,
+        emission.Initialize(_registry, GlobalPosition, Config.CreateHit(FinalStats, DamageSource), FinalStats.RangePixels,
             wave.ExpansionSpeedPixelsPerSecond, wave.EdgeDamageFraction, _effects, Config.WaveStyle);
         _delivery.AddChild(emission);
         _cooldown = _cooldown > -wave.IntervalSeconds ? _cooldown + wave.IntervalSeconds : wave.IntervalSeconds;
@@ -71,7 +71,7 @@ public partial class ShockwaveTower : TowerBase
 
     // =========================================================
     // Purchases and previews select independent complete C# rows through the shared pipeline.
-    public override TowerFinalStats ResolveLevel(int level) => Config.ResolveStats(level);
+    public override TowerFinalStats ResolveLevel(int level) => ResolveRankedLevel(level);
     // =========================================================
     // Explicit input changes invalidate once, while normal wave/weapon ticks read the cached result.
     public void RebuildStats() { FinalStats = Config == null ? null : ResolveLevel(UpgradeLevel); NotifyStatsChanged(); }

@@ -1,0 +1,9 @@
+# Lightweight damage attribution
+
+DamageSource is one weak owner token created lazily per TowerBase, not per hit. DamageInfo optionally carries that token; null remains the default for debug/manual/unattributed callers. Battle snapshots it in guided bullets, Laser supplies it on beam ticks, Blaster snapshots it in SplashProjectile, and ShockwaveEmitter retains it in its emitted payload. AreaDamage.AtDistance copies the token unchanged alongside damage type/overrides/penetration, so every splash/wave recipient credits the correct attacker.
+
+Enemy.ApplyDamage commits shared-resolver results and calculates actual shield+hull loss. Eligible damage consumes a fixed spawn-durability budget, even for unattributed hits, preventing shield restoration/healing farms. The enemy snapshots XP multipliers on its first actual attributed hit and derives pools from existing KillRewardCredits. It publishes the combined damage/kill XP award only after target health/lifecycle commits. The lethal source receives kill XP; no persistent last-attacker guess or EnemyKilled scan is used. Source.Credit rechecks weak owner/native/tree/queue state, so queued/freed/unloaded towers never receive stale credit.
+
+There are no scene-tree attribution searches, per-frame scans, per-hit source allocations, extra physics Nodes or enemy-specific authored XP amounts. Registry kill events and the sole Credits wallet are unchanged. An attack from an absent owner may still damage enemies, but awards no tower XP. Raw TakeDamage and arrivals never infer a tower owner.
+
+Future weapons opt in by passing their tower's cached DamageSource into DamageInfo or the typed CreateHit adapter. Shared resolution/payload forwarding preserves it automatically. See TOWERS/Shared/Ranks/README.md for budget policy, fractional XP, rank tables and Inspector behavior.

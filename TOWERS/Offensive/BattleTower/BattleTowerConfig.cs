@@ -4,6 +4,7 @@ using Godot;
 [GlobalClass]
 public partial class BattleTowerConfig : TowerConfig
 {
+    public override System.Collections.Generic.IReadOnlyList<TowerRankDefinition> Ranks => BattleTowerRanks.Rows;
     // =========================================================
     // C# tables are the sole authored source of combat values and construction/upgrade prices.
     public BattleTowerConfig()

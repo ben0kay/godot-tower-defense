@@ -45,6 +45,32 @@ layout_mode = 2
 text = "CATEGORY"
 theme_override_font_sizes/font_size = 12
 
+[node name="RankSection" type="VBoxContainer" parent="Insets/Body"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="Rank" type="Label" parent="Insets/Body/RankSection"]
+layout_mode = 2
+text = "Rank: Standard"
+theme_override_font_sizes/font_size = 13
+
+[node name="ExperienceBar" type="ProgressBar" parent="Insets/Body/RankSection"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 8)
+mouse_filter = 2
+show_percentage = false
+
+[node name="ExperienceText" type="Label" parent="Insets/Body/RankSection"]
+layout_mode = 2
+text = "0 / 100 XP to Veteran"
+theme_override_font_sizes/font_size = 11
+
+[node name="RankBonuses" type="Label" parent="Insets/Body/RankSection"]
+layout_mode = 2
+text = "Rank bonuses: Damage +0% / Range +0%"
+theme_override_font_sizes/font_size = 11
+
 [node name="TowerStats" type="Label" parent="Insets/Body"]
 layout_mode = 2
 text = "Prototype stats"

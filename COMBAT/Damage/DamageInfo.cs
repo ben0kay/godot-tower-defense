@@ -2,6 +2,7 @@
 using System;
 public readonly record struct DamageInfo
 {
+    public DamageSource Source { get; }
     public float Amount { get; }
     public DamageType Type { get; }
     public float? ShieldCoefficientOverride { get; }
@@ -10,7 +11,7 @@ public readonly record struct DamageInfo
     // =========================================================
     // Reject malformed payloads before any target state changes; zero is a valid no-op.
     public DamageInfo(float amount, DamageType type, float? shieldCoefficientOverride = null,
-        float? hullCoefficientOverride = null, float shieldPenetration = 0)
+        float? hullCoefficientOverride = null, float shieldPenetration = 0, DamageSource source = null)
     {
         if (!float.IsFinite(amount) || amount < 0) throw new ArgumentOutOfRangeException(nameof(amount));
         if (!Enum.IsDefined(type)) throw new ArgumentOutOfRangeException(nameof(type));
@@ -18,7 +19,7 @@ public readonly record struct DamageInfo
         ValidateCoefficient(hullCoefficientOverride, nameof(hullCoefficientOverride));
         if (!float.IsFinite(shieldPenetration) || shieldPenetration < 0 || shieldPenetration > 1)
             throw new ArgumentOutOfRangeException(nameof(shieldPenetration));
-        Amount = amount; Type = type;
+        Source = source; Amount = amount; Type = type;
         ShieldCoefficientOverride = shieldCoefficientOverride; HullCoefficientOverride = hullCoefficientOverride;
         ShieldPenetration = shieldPenetration;
     }

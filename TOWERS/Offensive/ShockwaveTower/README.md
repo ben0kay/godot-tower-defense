@@ -13,7 +13,7 @@ Edit `ShockwaveTowerLevels.cs`: one complete independent typed row per level, no
 
 Each row also explicitly declares independent shield/hull override flags/coefficients, initially disabled: inherit Energy2x shield/.85x hull. At Level1, exposed center/half/edge hull damage is34/21.25/8.5. At half range,25 base damage removes50 shield points; fractional breaks and penetration remain owned by COMBAT/Damage.
 
-The existing eight stages publish cached RangePixels plus optional ShockwaveStats/WeaponDamageStats and penetration. There is no fictitious projectile/target/aim data in authored wave rows. Max radius, damage, speed, interval and edge fraction remain eligible for future modifiers after selected-level substitution. Stage07 clamps damage/radius >=0, speed >=1px/s, interval >=.05s and edge/penetration0–1. Research, ranks, map effects and saving remain deferred.
+The existing eight stages publish cached RangePixels plus optional ShockwaveStats/WeaponDamageStats and penetration. There is no fictitious projectile/target/aim data in authored wave rows. Max radius, damage, speed, interval and edge fraction remain eligible for future modifiers after selected-level substitution. Stage07 clamps damage/radius >=0, speed >=1px/s, interval >=.05s and edge/penetration0–1. Research, map effects and saving remain deferred; earned ranks are implemented.
 
 ## Emission and presentation
 
@@ -26,3 +26,9 @@ The vector platform/core and shared visual ring are purple/lilac. Edit `Effects/
 ## Verification
 
 ShockwaveChecks runs inside EnemyIntegrationChecks: real350/225-credit transactions, independent complete levels, max level, stat/Inspector/preview parity, cache/style isolation, emitted launch snapshots, periodic30/60/120Hz cadence, no hitch bursts, timed contact, one hit per emission, overlap, swept moving targets, terminal ticks, falloff, shields/overrides/penetration, unload/mutation safety and500 enemies. Existing Battle/Laser/Blaster, menu, navigation and placement-performance suites remain active. Headless checks cannot judge final live-window visual quality; purple procedural/vector presentation needs normal playtest review.
+
+## Earned Rank and Experience
+
+`ShockwaveTowerRanks.cs` sits beside `ShockwaveTowerLevels.cs` and defines all five named ranks in compact explicit rows: Standard0, Veteran100, Enhanced300, Superior700 and Legendary1500 total XP. The selected rank's total bonuses are0/2/4/6/8% damage and0/1/2/3/4% range; future HP columns are inactive. Rank XP is independent of purchased level/prices and is preserved by upgrades. Stage03 modifies the selected complete Level snapshot, never accumulates earlier Rank bonuses. Integer projectile damage retains nearest/ties-to-even rounding; float beams/waves retain fractional damage.
+
+Attacks carry the tower's weak DamageSource. Actual shield/hull loss earns a bounded share of XP derived from each enemy's KillRewardCredits; the lethal source receives kill XP. Shared TowerMasterConfig multipliers default to2× damage pool and10× kill reward. Debug/manual kills and arrivals grant no tower XP. Already-fired payloads retain combat values/source after promotion or upgrade; removed source towers do not receive XP. The bottom-right selected Inspector shows Rank, within-rank/total XP, progress bar, active bonuses and MAX RANK automatically through events. See TOWERS/Shared/Ranks/README.md for exact rules and regression results.
