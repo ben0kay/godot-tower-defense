@@ -1,6 +1,6 @@
-# Enemy001 — basic test ship
+# Enemy001 asset — Standard Drone (`basic_mk1`)
 
-`Enemy001.tscn` uses Shared/Enemy.cs, a Sprite2D and Movement/EnemyMovement.cs. `Artwork/enemy001.svg` is a replaceable small top-down placeholder facing right.
+The numbered asset filename remains for development history. **EnemyId** is `basic_mk1` and **DisplayName** is `Standard Drone`, independently of wave order. `Enemy001.tscn` uses Shared/Enemy.cs, a Sprite2D and Movement/EnemyMovement.cs. `Artwork/enemy001.svg` is a replaceable small top-down placeholder facing right.
 
 Select `Enemy001.tres` in Godot's FileSystem to edit DisplayName, EnemyId, MaxHealth (60), MoveSpeed (100 px/s), RadiusPixels (12) and TurnSpeed. CitadelDamage is active on arrival; Armor remains inactive. The current cell-center navigation supports small ships; keep radius below half a cell (32px with the default grid). Larger ship clearance/navigation will need a separate pass.
 
@@ -20,7 +20,7 @@ Killed Enemy001 ships now produce an automatically sized **orange flash followed
 
 ## Shield capacity (opt-in wave behavior)
 
-`Enemy001.tres` sets **Balance / Max Shield = 100** for testing. This is *capacity only*: standard Level001 wave entries and F2/debug enemies **still start at 0 shield**. To give this same enemy shields in a wave, author `Enemy("enemy001", shield: true)` in `LEVELS/Level001/Level001Waves.cs` (or mix weighted shielded/unshielded entries). A shielded ship absorbs damage before hull HP, with overflow passed to health; the current health bar still displays hull only. No passive recharge/blue shield bar yet.
+The saved `Enemy001.tres` has **MaxShield = 0** (it inherits the default). The integration suite temporarily sets its capacity to 100 for opt-in shield tests; ordinary Level001 waves and F2/debug spawns start without shields. A `shield: true` wave flag can only give starting shields to a type with nonzero MaxShield. To give this same enemy shields in a wave, author `Enemy("basic_mk1", shield: true)` in `LEVELS/Level001/Level001Waves.cs` (or mix weighted shielded/unshielded entries). A shielded ship absorbs damage before hull HP, with overflow passed to health; the current health bar still displays hull only. No passive recharge/blue shield bar yet.
 
 ## E2 preservation
-Enemy001 scene/art/base balance/F2 defaults are unchanged. DefaultEnemyCatalog registers its existing EnemyDefinition.EnemyId. It has no ability node, but its 100 shield capacity can receive restoration from a registered ShieldGenerator. Ordinary starting shield remains 0 unless wave shield:true is authored. Typed shield/hull damage,3-Credit kills,1 Citadel arrival damage and shared navigation remain active.
+Enemy001 scene/art/base balance/F2 defaults are unchanged. DefaultEnemyCatalog registers its existing EnemyDefinition.EnemyId. It has no ability node, and cannot receive shield restoration unless its MaxShield is raised above zero. Ordinary starting shield remains 0 unless wave shield:true is authored. Typed shield/hull damage,3-Credit kills,1 Citadel arrival damage and shared navigation remain active.

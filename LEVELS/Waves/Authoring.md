@@ -1,13 +1,13 @@
 # C# wave authoring
 
-`LEVELS/Level001/Level001Waves.cs` contains **three currently authored Enemy001-only test waves**. This is a content choice, not a restriction of the wave system: the validated catalog already includes **Enemy001, Enemy002 and ShieldGenerator**. Edit counts, enemy IDs, intervals and delays there. `WaveCatalog` maps `LevelConfig.WaveSetId = "level001"` to this file; empty IDs disable waves and unknown IDs raise setup errors.
+`LEVELS/Level001/Level001Waves.cs` contains **three currently authored Enemy001-only test waves**. This is a content choice, not a restriction of the wave system: the validated catalog already includes **Enemy001, Enemy002 and ShieldGenerator**. Edit counts, internal enemy IDs, intervals and delays there. Filenames remain `Enemy001.tscn`/`Enemy002.tscn` for development history; stable IDs are `basic_mk1`, `scout_mk1`, `shield_emitter_mk1`. `WaveCatalog` maps `LevelConfig.WaveSetId = "level001"` to this file; empty IDs disable waves and unknown IDs raise setup errors.
 
 Use static WaveBuilder helpers:
 
     Wave(1,
-        Batch(count: 10, interval: 0.1, after: 2, Enemy("enemy001")),
-        Batch(count: 5, interval: 0.3, after: 5, Enemy("enemy001")),
-        Batch(count: 20, interval: 0.2, after: 0, Enemy("enemy001")))
+        Batch(count: 10, interval: 0.1, after: 2, Enemy("basic_mk1")),
+        Batch(count: 5, interval: 0.3, after: 5, Enemy("basic_mk1")),
+        Batch(count: 20, interval: 0.2, after: 0, Enemy("basic_mk1")))
 
 Count is the total ships in a batch. The first spawn is immediate. Interval follows a successful spawn, and After begins after the batch's final successful spawn. Final-batch After is ignored. Earlier batches keep moving while later ones spawn. Completing a wave requires both zero planned spawns and zero owned live ships; Next Wave remains manual.
 
@@ -22,13 +22,13 @@ Global spawn attempt limit, retry interval and deterministic RNG seed live in EN
 `WaveBuilder.Enemy` has a trailing optional `shield: false` parameter. An omitted flag keeps every ship unshielded, even if its type has nonzero MaxShield. Turn it on for a whole weighted entry with `shield: true`:
 
 ```csharp
-// Four ordinary and one shielded Enemy001 in a five-ship batch:
+// Four unshielded and one shielded Swift Interceptor in a five-ship batch:
 Batch(count: 5, interval: 0.2, after: 0,
-    Enemy("enemy001", weight: 80),
-    Enemy("enemy001", weight: 20, shield: true))
+    Enemy("scout_mk1", weight: 80),
+    Enemy("scout_mk1", weight: 20, shield: true))
 ```
 
-`MaxShield` is configured once on `ENEMIES/Types/Enemy001/Enemy001.tres` (**100 SP** for Enemy001). Shielded spawns begin full; unshielded spawns begin at zero, including F2. Exact weighted quotas/shuffle remain unchanged; two entries can share the same EnemyId with different shield flags. Existing Level001 authored waves have **not** been changed, so nothing spawns shielded until you explicitly edit an entry. **ShieldEmitter restoration is already implemented** on ShieldGenerator; generic passive shield regeneration, shield visuals, stealth and boss wave modifiers remain future work.
+`Enemy001.tres` currently has **0 saved shield capacity**; the integration suite temporarily sets it to 100 for its shield fixtures. For a real shielded wave use a type with nonzero saved `MaxShield`, such as `scout_mk1` (40 SP), or author a positive MaxShield for your chosen enemy. Shielded spawns begin full; unshielded spawns begin at zero, including F2. Exact weighted quotas/shuffle remain unchanged; two entries can share the same EnemyId with different shield flags. Existing Level001 authored waves have **not** been changed, so nothing spawns shielded until you explicitly edit an entry. **ShieldEmitter restoration is already implemented** on ShieldGenerator; generic passive shield regeneration, shield visuals, stealth and boss wave modifiers remain future work.
 
 
 ## Mixed types and ShieldGenerator (implemented)
@@ -36,8 +36,8 @@ Batch(count: 5, interval: 0.2, after: 0,
 ```csharp
 // Example only: change Level001Waves.cs if you want this batch in the game.
 Batch(count: 20, interval: 0.2, after: 0,
-    Enemy("enemy001", weight: 75),
-    Enemy("enemy002", weight: 25, portal: "Portals/EnemyPortal2", shield: true))
+    Enemy("basic_mk1", weight: 75),
+    Enemy("scout_mk1", weight: 25, portal: "Portals/EnemyPortal2", shield: true))
 ```
 
-The example uses **15 Enemy001 and 5 Enemy002** in exact shuffled proportions; the Enemy002 entries require the named registered portal and begin with their 40 shield points. `Enemy("shieldgenerator")` also works and spawns a support ship with a separate `ShieldEmitter` component, which restores nearby eligible ships' shields even when those ships started unshielded. No general `flags:` API exists. Runtime catalog edits require a catalog `Rebuild()` and wave reconfiguration. Enemy death-spawning and attacks on towers are future E3 mechanics.
+The example uses **15 Enemy001 and 5 Enemy002** in exact shuffled proportions; the Enemy002 entries require the named registered portal and begin with their 40 shield points. `Enemy("shield_emitter_mk1")` also works and spawns a support ship with a separate `ShieldEmitter` component, which restores nearby eligible ships' shields even when those ships started unshielded. No general `flags:` API exists. Runtime catalog edits require a catalog `Rebuild()` and wave reconfiguration. Enemy death-spawning and attacks on towers are future E3 mechanics.

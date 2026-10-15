@@ -1,5 +1,7 @@
 # WAVES — Hand-Authored Enemy Waves
 
+> **Identity convention:** The actual wave/catalog IDs are `basic_mk1` (asset Enemy001), `scout_mk1` (asset Enemy002) and `shield_emitter_mk1` (asset ShieldGenerator). Display names are independent. Numbered filenames do not determine spawn/wave order. Any old identifiers mentioned in historical prose below refer to those development asset names.
+
 > **Current status (October 2026):** Finite manual waves are implemented. Level001's **three authored waves still use Enemy001 only**, but the validated enemy catalog already registers **Enemy001, Enemy002 and ShieldGenerator** for mixed waves. Exact weighted quotas, random eligible portals, per-entry required portals, opt-in full starting shields, enemy kill rewards, Citadel arrival damage, wave-owned completion and the HUD Start/Next controls are active. **Enemy003, general elite/stealth wave modifiers, wave-completion bonuses and wave persistence are future work.** Sections below distinguish existing APIs from future ideas.
 
 ## Implemented Phase 1 playtest
@@ -59,20 +61,20 @@ public static class Level001Waves
     [
         Wave(1,
             Batch(count: 10, interval: 0.1f, after: 2f,
-                Enemy("enemy001", weight: 100)),
+                Enemy("basic_mk1", weight: 100)),
 
             Batch(count: 5, interval: 0.3f, after: 5f,
-                Enemy("enemy002", weight: 100)),
+                Enemy("scout_mk1", weight: 100)),
 
             Batch(count: 20, interval: 0.2f, after: 0f,
-                Enemy("enemy001", weight: 80),
-                Enemy("enemy002", weight: 20))
+                Enemy("basic_mk1", weight: 80),
+                Enemy("scout_mk1", weight: 20))
         ),
 
         Wave(2,
             Batch(count: 20, interval: 0.15f, after: 3f,
-                Enemy("enemy001", weight: 70),
-                Enemy("enemy002", weight: 30))
+                Enemy("basic_mk1", weight: 70),
+                Enemy("scout_mk1", weight: 30))
         )
     ];
 }
@@ -82,7 +84,7 @@ Optional shielded support ships and explicit entrance selectors already use this
 
 ```csharp
 Batch(count: 1, interval: 0, after: 0,
-    Enemy("shieldgenerator", portal: "Portals/EnemyPortal2", shield: true))
+    Enemy("shield_emitter_mk1", portal: "Portals/EnemyPortal2", shield: true))
 ```
 
 Here `shield: true` fills the individual ship's existing `MaxShield` at spawn; the separately implemented `ShieldEmitter` component can later restore nearby allies' shields. **General `EnemySpawnFlags`, `flags:`, Elite and stealth modifiers do not exist.** Do not copy older hypothetical `EnemySpawnFlags.Shielded | EnemySpawnFlags.Elite` examples as compiled C#.
@@ -97,7 +99,7 @@ Use canonical lowercase `EnemyDefinition.EnemyId` values. `ENEMIES/DefaultEnemyC
 - **Default for portal-based waves: `RandomEligiblePortal`.** Pick uniformly from the enabled, reachable portal instances whose `SpawnExit` has sufficient radius clearance for the chosen enemy. Two equally eligible portals mean *approximately* 50/50 across many spawns, **not exact alternation or fixed quotas**. Pick for **each actual spawn**, not once per batch or wave. Use a repeatable RNG seed for tests if desired.
 - Never choose blocked, invalid, missing, unregistered or unreachable portal exits. Do not place an enemy through terrain. Reuse the current `SpawnManager` navigation/clearance checks; validate sources against **that enemy's radius**.
 - **MapEdges-only levels** must continue to work without portal nodes; choose among eligible configured edge entries. For `Both` levels, define/document a safe default that prefers random eligible portals when available but respects configured edge permissions; an explicit `RandomAllowedSource` policy can later include edges as well. Do not hardcode `Level001` or switch edge-only maps to portal spawning.
-- **Implemented per-entry required portal:** `Enemy("enemy002", portal: "Portals/EnemyPortal2")` uses that registered, permitted level-root-relative portal and never falls back to another when blocked. **Not implemented:** batch-wide portal defaults, inherited selection policies, or a separate typed `PortalSelection` policy.
+- **Implemented per-entry required portal:** `Enemy("scout_mk1", portal: "Portals/EnemyPortal2")` uses that registered, permitted level-root-relative portal and never falls back to another when blocked. **Not implemented:** batch-wide portal defaults, inherited selection policies, or a separate typed `PortalSelection` policy.
 - **Future optional policies:** `RandomAmong(portalIds)`, weighted portals (70/30), an explicit `MapEdge(side)` selector and batch-wide portal overrides. Add only when needed; existing default wave source selection already supports configured map edges.
 - **Forced portal unavailable?** Do NOT silently move a boss to a different portal. Pause/retry and report the invalid or blocked required source; provide an explicit author-configured fallback only if desired later.
 - **Implemented:** `SpawnManager.Spawn(scene, portalOnly)` keeps F2's round-robin source choice; `SpawnManager.SpawnWave(...)` handles wave requests, independent random source choice and optional required portal. Do not merge these behaviors.

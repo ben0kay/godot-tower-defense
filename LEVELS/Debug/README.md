@@ -6,10 +6,10 @@ Level001 owns `Debug` -> `HUD` -> `Info`. The parent uses `LevelDebugController`
 
 Each actual F2 press spawns the next scene registered in `ENEMIES/DefaultEnemyCatalog.tres`, using **the array's Inspector order**. With the current catalog, the order is:
 
-1. Enemy001
-2. Enemy002
-3. ShieldGenerator
-4. Enemy001 again, repeating
+1. Enemy001 asset — `basic_mk1` / Standard Drone
+2. Enemy002 asset — `scout_mk1` / Swift Interceptor
+3. ShieldGenerator asset — `shield_emitter_mk1` / Shield Generator
+4. Enemy001 asset again, repeating
 
 New enemy types participate automatically when you add their scenes to the catalog. The debug controller uses the production `SpawnManager.Spawn(scene, PortalOnly)` method, so normal collision/clearance, navigation, portal rules and active-enemy limits still apply.
 
@@ -22,3 +22,5 @@ The per-level `EnemyScene` export is retained as a **fallback only if the catalo
 The HUD shows living/killed/arrived ships, queued paths and source failures, alongside the grid/camera diagnostics. Set `Debug.Enabled = false` or remove the Debug parent to remove these level debug controls/readout. F6 map-only viewing hides the HUD and disables spawning because world services are absent. Use F5 for a gameplay test.
 
 Debug only calls the production SpawnManager; navigation, enemy state and weapons remain normal gameplay services outside Debug. Future level-specific debug controls belong under this same parent. WorldGrid owns its optional grid/hover drawing via WorldMasterConfig.
+
+F2 cycles **catalog scene order**, not the internal `EnemyId`, display name or intended wave order. Changing an enemy's gameplay ID does not alter the F2 sequence.
