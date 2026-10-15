@@ -24,7 +24,7 @@ public static class TowerUpgradeChecks
         try
         {
             Require(first.UpgradeLevel == 1 && first.NextUpgrade.Level == 2, "Placed towers begin at level 1");
-            Require(!ReferenceEquals(first.UpgradeTiers[0], shared.UpgradeTiers[0]), "Tier Resources are isolated per instance");
+            Require(!ReferenceEquals(first.Levels[0], shared.Levels[0]), "Tier Resources are isolated per instance");
             TowerFinalStats initial = first.FinalStats;
             Label stats = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerStats");
             for (int level = 1; level <= 3; level++)
@@ -32,7 +32,7 @@ public static class TowerUpgradeChecks
             TowerFinalStats preview = first.ResolveLevel(2);
             Require(preview.DamagePerShot == 16 && Mathf.IsEqualApprox(preview.ShotsPerSecond, 1.2f)
                 && preview.RangePixels == 288 && first.FinalStats == initial && first.UpgradeLevel == 1,
-                "Next-tier preview applies operations without changing live stats or progression");
+                "Next-tier preview selects a full snapshot without changing live stats or progression");
             wallet.Initialize(new LevelConfig { StartingCredits = 149 });
             Require(!TowerUpgradeController.TryUpgrade(first, wallet, placement.Settings, 1, out _) &&
                 first.UpgradeLevel == 1 && wallet.GetBalance(wallet.CreditsResource) == 149, "Unaffordable upgrade never changes level or funds");
@@ -73,7 +73,7 @@ public static class TowerUpgradeChecks
             hud.EmitSignal(GameplayHUD.SignalName.TowerUpgradeRequested);
             Require(first.UpgradeLevel == 3 && first.FinalStats == levelThree &&
                 first.FinalStats.DamagePerShot == 22 && Mathf.IsEqualApprox(first.FinalStats.ShotsPerSecond, 1.5f) &&
-                wallet.GetBalance(wallet.CreditsResource) == 0, "Second purchase accumulates tier improvements, not old final values");
+                wallet.GetBalance(wallet.CreditsResource) == 0, "Second purchase selects the complete level3 snapshot");
             Require(stats.Text.Contains("Shield Penetration: 5%") && first.FinalStats.ShieldPenetration == 0.05f,
                 "Level3 Inspector retains baseline penetration");
             Require(!button.Visible && info.Text.Contains("Maximum level"), "Maximum tier removes upgrade action");
@@ -89,11 +89,11 @@ public static class TowerUpgradeChecks
             wallet.Grant(alloy, 1);
             Require(TowerUpgradeController.TryUpgrade(second, wallet, placement.Settings, 1, out _) &&
                 wallet.GetBalance(wallet.CreditsResource) == 50 && wallet.GetBalance(alloy) == 0, "Multi-resource upgrades pay atomically");
-            Require(shared.UpgradeTiers[0].Costs.Count == 1, "Runtime recipe edits do not mutate saved tier defaults");
+            Require(shared.Levels[1].Costs.Count == 1, "Runtime recipe edits do not mutate saved tier defaults");
             Require(grid.NavigationRevision == revision, "Upgrading never changes occupancy/navigation revision");
 
             BattleTowerConfig invalid = shared.CreateInstanceCopy();
-            invalid.UpgradeTiers[0].Level = 3;
+            invalid.Levels[1].Level = 3;
             try { TowerStatPipeline.Resolve(invalid, 2); throw new InvalidOperationException("Invalid tier chain accepted."); }
             catch (ArgumentException) { }
             BattleTower malformed = scene.Instantiate<BattleTower>();
@@ -108,20 +108,20 @@ public static class TowerUpgradeChecks
                     "Invalid upgrade profile rejects payment while baseline tower still works");
             }
             finally { malformed.Free(); }
-            invalid = shared.CreateInstanceCopy();
-            invalid.UpgradeTiers[0].Modifiers.Add(new TowerUpgradeModifier { Stat = TowerStatId.Range,
-                Operation = TowerStatOperation.Multiplier, Amount = float.NaN });
-            try { TowerStatPipeline.Resolve(invalid, 2); throw new InvalidOperationException("Invalid modifier accepted."); }
-            catch (ArgumentException) { }
+            BattleTowerConfig independent = shared.CreateInstanceCopy();
+            TowerFinalStats thirdBefore = independent.ResolveStats(3);
+            independent.SetLevelStats(2, independent.Levels[1].Stats with {
+                DamagePerShot = 999, RangePixels = 900, ShotsPerSecond = 8,
+                ProjectileSpeed = 2000, ShieldPenetration = 0.8f });
+            Require(independent.ResolveStats(2).DamagePerShot == 999 && independent.ResolveStats(3) == thirdBefore,
+                "Changing every level2 combat value leaves level3 entirely independent");
             var context = new TowerStatContext(new TowerStatBlock(100, 1, 10, 600, 180, 12, .15f),
-                System.Collections.Immutable.ImmutableArray.Create(
-                    new TowerStatModifier(TowerStatId.Range, TowerStatOperation.Flat, 10, "one"),
-                    new TowerStatModifier(TowerStatId.Range, TowerStatOperation.AdditivePercent, .2f, "one"),
-                    new TowerStatModifier(TowerStatId.Range, TowerStatOperation.AdditivePercent, .2f, "two"),
-                    new TowerStatModifier(TowerStatId.Range, TowerStatOperation.Multiplier, .5f, "three")));
-            Require(Mathf.IsEqualApprox(TowerStatPipeline.Resolve(context).RangePixels, 77),
-                "Stage arithmetic combines flat, additive percentages and explicit multipliers");
-            GD.Print("PASS: paid tower tiers, real HUD action, preview parity, atomic costs, isolation and modifier arithmetic");
+                new TowerStatBlock(350, 2, 28, 800, 240, 8, .1f, ShieldPenetration: .2f));
+            TowerStatTrace trace = new();
+            Require(TowerStatPipeline.Resolve(context, trace).RangePixels == 350 &&
+                trace.Steps[0].Stats.RangePixels == 100 && trace.Steps[1].Stats.RangePixels == 350,
+                "Stage02 substitutes the complete selected row before the remaining six stages");
+            GD.Print("PASS: paid tower tiers, real HUD action, preview parity, atomic costs, isolation and explicit level independence");
         }
         finally
         {

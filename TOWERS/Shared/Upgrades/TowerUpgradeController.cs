@@ -5,19 +5,15 @@ using System;
 public static class TowerUpgradeController
 {
     // =========================================================
-    // Validate all tiers/operations before resolving or paying; duplicate/missing level steps fail.
-    public static void Validate(Godot.Collections.Array<TowerUpgradeTier> tiers)
+    // Validate complete consecutive rows before resolving or paying; missing level steps fail.
+    public static void Validate(System.Collections.Generic.IReadOnlyList<TowerLevel> levels)
     {
-        if (tiers == null) throw new ArgumentException("Upgrade tiers are missing.");
-        for (int i = 0; i < tiers.Count; i++)
+        if (levels == null) throw new ArgumentException("Tower levels are missing.");
+        for (int i = 0; i < levels.Count; i++)
         {
-            TowerUpgradeTier tier = tiers[i];
-            if (tier == null || tier.Level != i + 2 || tier.Costs == null || tier.Modifiers == null)
-                throw new ArgumentException("Upgrade tiers must form consecutive levels starting at 2.");
-            foreach (TowerUpgradeModifier modifier in tier.Modifiers)
-                if (modifier == null || !Enum.IsDefined(modifier.Stat) || !Enum.IsDefined(modifier.Operation)
-                    || !float.IsFinite(modifier.Amount) || (modifier.Operation == TowerStatOperation.Multiplier && modifier.Amount < 0))
-                    throw new ArgumentException("Upgrade contains an invalid stat operation.");
+            TowerLevel level = levels[i];
+            if (level == null || level.Level != i + 1 || level.Costs == null)
+                throw new ArgumentException("Tower levels must form consecutive complete rows starting at 1.");
         }
     }
 
@@ -30,11 +26,11 @@ public static class TowerUpgradeController
         if (!GodotObject.IsInstanceValid(tower) || !tower.IsInsideTree() || wallet == null || rules?.AllowUpgrades != true)
         { failure = "Upgrades are unavailable."; return false; }
         if (tower.UpgradeLevel != expectedLevel) { failure = "Tower level changed; select the current upgrade."; return false; }
-        TowerUpgradeTier next;
+        TowerLevel next;
         TowerFinalStats preview;
         try
         {
-            Validate(tower.UpgradeTiers); next = tower.NextUpgrade;
+            Validate(tower.Levels); next = tower.NextUpgrade;
             if (next == null) { failure = "Maximum level reached."; return false; }
             preview = tower.ResolveLevel(expectedLevel + 1);
         }

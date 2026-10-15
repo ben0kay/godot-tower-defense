@@ -30,7 +30,7 @@ public static class BlasterCannonChecks
         BlasterCannon tower = towers.GetChild<BlasterCannon>(towers.GetChildCount() - 1); tower.SetPhysicsProcess(false);
         Require(tower.TowerTypeId == "blaster_cannon" && grid.IsOccupied(cell) && wallet.GetBalance(wallet.CreditsResource) == 700,
             "Catalog action places a1x1 Blaster and pays300");
-        Require(tower.Config != definition.DefaultConfig && tower.UpgradeTiers[0] != definition.DefaultConfig.UpgradeTiers[0], "Blaster config and nested tiers are private");
+        Require(tower.Config != definition.DefaultConfig && tower.Levels[0] != definition.DefaultConfig.Levels[0], "Blaster config and nested tiers are private");
         Require(tower.FinalStats.Area == new AreaBlastStats(80, 0.25f) && tower.FinalStats.DamagePerShot == 60
             && tower.FinalStats.ShieldPenetration == 0 && tower.Config.DamageType == DamageType.Explosive, "Authored baseline is60/80px/25% with zero penetration");
         placement.Call("TryPlace", cell); Require(wallet.GetBalance(wallet.CreditsResource) == 700, "Repeated occupancy does not charge Blaster again");
@@ -44,7 +44,7 @@ public static class BlasterCannonChecks
             && tower.FinalStats.Area == new AreaBlastStats(96, 0.25f) && wallet.GetBalance(wallet.CreditsResource) == 500
             && grid.NavigationRevision == revision, "Paid200 tier matches preview and never changes falloff or occupancy");
         TowerFinalStats cached = tower.FinalStats;
-        tower.Config.EdgeDamageFraction = 0.75f;
+        tower.Config.SetLevelStats(2, tower.Config.Levels[1].Stats with { Area = new(96, 0.75f) });
         Require(!ReferenceEquals(cached, tower.FinalStats) && details.Text.Contains("Edge damage: 75%"), "Falloff config edit rebuilds selected cache/Inspector immediately");
         Require(tower.FinalStats.DamagePerShot == cached.DamagePerShot && tower.FinalStats.Area.Value.RadiusPixels == cached.Area.Value.RadiusPixels
             && ((BlasterCannonConfig)definition.DefaultConfig).EdgeDamageFraction == 0.25f, "Falloff tuning leaves center/radius/authored source unchanged");
@@ -81,13 +81,12 @@ public static class BlasterCannonChecks
             Area: new AreaBlastStats(80, 0.25f))), trace);
         Require(trace.Steps.Count == 8 && trace.Steps.All(s => s.Stats.Area == new AreaBlastStats(80, 0.25f)), "All eight neutral stages preserve area capability");
         BlasterCannonConfig modifier = authored.CreateInstanceCopy();
-        modifier.UpgradeTiers[0].Modifiers.Add(new TowerUpgradeModifier { Stat = TowerStatId.AreaRadius, Operation = TowerStatOperation.AdditivePercent, Amount = 0.25f });
-        modifier.UpgradeTiers[0].Modifiers.Add(new TowerUpgradeModifier { Stat = TowerStatId.AreaRadius, Operation = TowerStatOperation.Multiplier, Amount = 0.5f });
-        modifier.UpgradeTiers[0].Modifiers.Add(new TowerUpgradeModifier { Stat = TowerStatId.AreaEdgeFraction, Operation = TowerStatOperation.Flat, Amount = 0.1f });
-        modifier.UpgradeTiers[0].Modifiers.Add(new TowerUpgradeModifier { Stat = TowerStatId.AreaEdgeFraction, Operation = TowerStatOperation.AdditivePercent, Amount = 0.2f });
-        modifier.UpgradeTiers[0].Modifiers.Add(new TowerUpgradeModifier { Stat = TowerStatId.AreaEdgeFraction, Operation = TowerStatOperation.Multiplier, Amount = 0.5f });
-        Near(modifier.ResolveStats(2).Area.Value.RadiusPixels, 60, "Area radius uses flat/percent/multiplier operations");
-        Near(modifier.ResolveStats(2).Area.Value.EdgeDamageFraction, 0.21f, "Edge stat supports typed operations without changing authored paid tiers");
+        TowerFinalStats second = modifier.ResolveStats(2);
+        modifier.BlastRadiusPixels = 500; modifier.EdgeDamageFraction = 0.9f;
+        Require(modifier.ResolveStats(2) == second, "Blaster level2 is independent of level1 area values");
+        modifier.SetLevelStats(2, modifier.Levels[1].Stats with { Area = new(60, 0.21f) });
+        Near(modifier.ResolveStats(2).Area.Value.RadiusPixels, 60, "Area radius selects the absolute row value");
+        Near(modifier.ResolveStats(2).Area.Value.EdgeDamageFraction, 0.21f, "Edge retention selects the absolute row value");
         foreach (float input in new[] { -1f, float.NaN, float.PositiveInfinity })
         {
             BlasterCannonConfig invalid = authored.CreateInstanceCopy(); invalid.BlastRadiusPixels = input; invalid.EdgeDamageFraction = input;

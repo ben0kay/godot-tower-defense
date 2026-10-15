@@ -1,19 +1,6 @@
-[gd_resource type="Resource" script_class="LaserTowerConfig" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="LaserTowerConfig" format=3]
+
 [ext_resource type="Script" path="res://TOWERS/Offensive/LaserTower/LaserTowerConfig.cs" id="1"]
-[ext_resource type="Script" path="res://ECONOMY/Transactions/ResourceCost.cs" id="2"]
-[ext_resource type="Resource" path="res://ECONOMY/Resources/Credits.tres" id="3"]
-[ext_resource type="Resource" path="res://TOWERS/Offensive/LaserTower/Upgrades/Level2.tres" id="4"]
-[ext_resource type="Script" path="res://TOWERS/Shared/Upgrades/TowerUpgradeTier.cs" id="5"]
-[sub_resource type="Resource" id="price"]
-script = ExtResource("2")
-Resource = ExtResource("3")
-Amount = 250
+
 [resource]
 script = ExtResource("1")
-ConstructionCosts = Array[ExtResource("2")]([SubResource("price")])
-UpgradeTiers = Array[ExtResource("5")]([ExtResource("4")])
-DamagePerSecond = 12.0
-OverrideShieldCoefficient = true
-ShieldCoefficient = 6.0
-OverrideHullCoefficient = true
-HullCoefficient = 0.15

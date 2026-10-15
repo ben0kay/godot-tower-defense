@@ -6,7 +6,7 @@ public partial class BattleTower : TowerBase
     #region Settings and State
     private BattleTowerConfig _config;
     private bool _initialized;
-    public override Godot.Collections.Array<TowerUpgradeTier> UpgradeTiers => Config?.UpgradeTiers;
+    public override System.Collections.Generic.List<TowerLevel> Levels => Config?.Levels;
     [Export] public BattleTowerConfig Config
     {
         get => _config;

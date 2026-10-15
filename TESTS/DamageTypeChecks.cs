@@ -12,14 +12,14 @@ public static class DamageTypeChecks
         Check(DamageType.Energy, 20, 100, 60, 60, 60);
         Check(DamageType.Energy, 15, 30, 60, 0, 60);
         Check(DamageType.Kinetic, 12, 0, 60, 0, 48);
-        Check(DamageType.Kinetic, 12, 100, 60, 94, 60);
+        Check(DamageType.Kinetic, 12, 100, 60, 100 - 12 * profile.KineticShield, 60);
         Check(DamageType.Explosive, 20, 100, 60, 95, 60);
         Check(DamageType.Explosive, 20, 0, 60, 0, 35);
         Check(DamageType.Energy, 20, 0, 60, 0, 43);
         Check(DamageType.Energy, 0, 30, 60, 30, 60);
-        CheckHit(new(12, DamageType.Kinetic, shieldPenetration: 0.05f), 100, 60, 94.3f, 59.4f);
-        CheckHit(new(12, DamageType.Kinetic, shieldPenetration: 0.05f), 3, 60, 0, 54);
-        CheckHit(new(12, DamageType.Kinetic, shieldPenetration: 0.05f), 5.7f, 60, 0, 59.4f);
+        CheckHit(new(12, DamageType.Kinetic, shieldPenetration: 0.05f), 100, 60, 100 - 11.4f * profile.KineticShield, 59.4f);
+        CheckHit(new(12, DamageType.Kinetic, shieldPenetration: 0.05f), 6 * profile.KineticShield, 60, 0, 54);
+        CheckHit(new(12, DamageType.Kinetic, shieldPenetration: 0.05f), 11.4f * profile.KineticShield, 60, 0, 59.4f);
         CheckHit(new(12, DamageType.Kinetic, shieldPenetration: 0.05f), 0, 60, 0, 48);
         CheckHit(new(12, DamageType.Kinetic, shieldPenetration: 1), 100, 60, 100, 48);
         CheckHit(new(12, DamageType.Kinetic, shieldPenetration: 1), 0, 60, 0, 48);
@@ -30,7 +30,7 @@ public static class DamageTypeChecks
         CheckHit(new(20, DamageType.Energy, hullCoefficientOverride: 0.15f), 30, 60, 0, 59.25f);
         CheckHit(new(12, DamageType.Kinetic, 0, shieldPenetration: 0.05f), 100, 60, 100, 59.4f);
         CheckHit(new(12, DamageType.Kinetic, 0), 100, 60, 100, 60);
-        CheckHit(new(12, DamageType.Kinetic, hullCoefficientOverride: 0, shieldPenetration: 0.05f), 100, 60, 94.3f, 60);
+        CheckHit(new(12, DamageType.Kinetic, hullCoefficientOverride: 0, shieldPenetration: 0.05f), 100, 60, 100 - 11.4f * profile.KineticShield, 60);
         CheckHit(new(12, DamageType.Energy, hullCoefficientOverride: 0), 0, 60, 0, 60);
         foreach (float invalid in new[] { -1f, float.NaN, float.NegativeInfinity, float.PositiveInfinity })
         {
@@ -88,7 +88,7 @@ public static class DamageTypeChecks
         Require(bullets.GetChildCount() == 1, "Production Battle fires one guided projectile at the shielded target");
         battle.Config.ShieldPenetration = 0.75f; // A shot already in flight retains its original final payload.
         bullets.GetChild<BasicProjectile>(0)._PhysicsProcess(1);
-        Require(Mathf.IsEqualApprox(shielded.CurrentShield, 94.3f) && Mathf.IsEqualApprox(shielded.Health, 59.4f)
+        Require(Mathf.IsEqualApprox(shielded.CurrentShield, 100 - 11.4f * profile.KineticShield) && Mathf.IsEqualApprox(shielded.Health, 59.4f)
             && shielded.GetNode<DefenseBar>("DefenseBar").Visible && untouched.Health == 60 && untouched.CurrentShield == 0,
             "Real Battle projectile snapshots5% penetration, hull feedback and target isolation");
         battle.Free();

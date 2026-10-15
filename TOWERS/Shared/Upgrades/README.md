@@ -1,20 +1,13 @@
-# Purchased tower upgrades — Phase 3B
+# Purchased levels and atomic upgrades
 
-TowerUpgradeTier is shared Inspector data: consecutive target Level (2, 3, ...), DisplayName, Array<ResourceCost> Costs and Array<TowerUpgradeModifier> Modifiers. TowerUpgradeModifier selects a typed stat, operation and Amount. Flat adds a value; AdditivePercent uses fractions (.2 = +20%); Multiplier uses direct factors (1.2 = ×1.2).
+`TowerLevel` is a plain C# runtime row: target Level, display name, complete TowerStatBlock and ordinary Array<ResourceCost> recipe. Every real tower's `*Levels.cs` table supplies Level 1 construction and each subsequent upgrade price alongside all actual combat values. There are no level-specific .tres assets, stat-operation resources or cumulative purchased bonuses.
 
-TowerBase owns per-instance UpgradeLevel, final snapshot and change event, without any targeting/firing loop. BattleTower supplies its Config/tiers to the shared resolver. Empty tier lists mean no available upgrades; the same helpers can support future typed support/production stats without adding weapon behavior.
+TowerBase starts at UpgradeLevel 1. NextUpgrade selects Levels[UpgradeLevel] because the list includes construction row 1. The last row is the maximum level; an empty passive fixture or single construction row has no upgrades. Adding the next consecutive row needs no controller change.
 
-Stage 02_TowerUpgrades resolves every purchased tier's operations together: (base + sum(flat)) × (1 + sum(percent)) × product(multiplier), per stat. Damage rounds to nearest integer, ties to even, and clamps to the nonnegative integer range. Other safety clamps apply at Stage 07. It never modifies Config or charges money. Later rank/research/level/effect stages remain neutral.
+TowerUpgradeController validates consecutive rows, resolves the next snapshot without altering the tower, and calls the existing EconomyManager.TryPurchase. Its guarded callback silently commits the expected next level/snapshot; payment completes before StatsChanged is published. Failed/stale/disabled/unaffordable/max-level requests cannot spend. HUD same-frame repeat guards remain intact. Multi-resource recipes retain atomic all-or-nothing deductions.
 
-TowerUpgradeController validates consecutive levels and finite typed operations, resolves the preview, then uses the existing EconomyManager.TryPurchase. The callback silently commits the precomputed level/snapshot; payment is then deducted and StatsChanged published. Invalid/stale/max-tier/disabled/unaffordable requests never charge. Expected current levels reject duplicate tier requests; the HUD controller also ignores repeated action signals within the same frame.
+CreateInstanceCopy clones row objects and every mutable ResourceCost, preserving shared ResourceDefinition identities. Purchasing never mutates another tower, static authored rows, target lock, aim, cooldown or navigation. SetLevelStats replaces one absolute runtime row and invalidates caches; direct recipe edits use the existing explicit refresh path.
 
-TowerConfig.CreateInstanceCopy explicitly copies external tier assets and nested costs/modifiers; BattleTowerConfig retains its typed override. Godot Duplicate(true) alone retains external .tres references inside these arrays. Stable resource identities remain shared; mutable amounts and modifiers do not. Base values stay unchanged. Existing aim, target and shot cooldown remain intact; upgrades do not touch occupancy/navigation.
+The selected Inspector displays current effective stats and next-row differences/cost from the same resolver as application. Price/identity/target policy stay outside combat math. Ranks, permanent research, map conditions and temporary effects remain future neutral stages after selected-level substitution.
 
-Preview/apply use the same pipeline and current source inputs. The Inspector shows actual final-stat changes, price and insufficient-resource/max-level status; wallet/stat events refresh it without polling. Close/Ctrl behavior remains independent. Resource editing in the saved tier .tres is permanent; runtime edits to nested tier data are per-instance and require RebuildStats() to refresh the snapshot.
-
-TESTS/TowerUpgradeChecks exercises production HUD purchases, preview parity, level progression, multi-resource atomic payments, missing funds, disabled rules, stale/same-frame requests, max tier, external resource isolation, arithmetic, repeated rebuilds, layout bounds and unchanged navigation.
-
-Phase 4A/4B placement/Inspector use the selected TowerBase's private config, tiers and resolver rather than the build choice's Battle defaults. No-upgrade passive fixtures show a safe disabled state with no combat snapshot. Per-type configs describe real preview differences; payment/math remain unchanged.
-
-
-Laser Tower now demonstrates capability-specific BeamDps modifiers through the same stage 02 and paid transaction. Its level 2 tier costs 175 Credits and adds 10 DPS/32px range. Preview/application share the resolver, source/tier copies remain isolated and no navigation state changes.
+TowerUpgradeChecks drives real HUD purchases, expected-level/repeat guards, insufficient/secondary-resource cases, maximum level, preview parity, row independence, copies, layout and unchanged navigation. Weapon-specific integration suites retain beam/penetration/AoE coverage.

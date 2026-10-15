@@ -1,0 +1,29 @@
+// Authoritative absolute stats and credit prices. Row 1 builds; later rows buy that level.
+using System.Collections.Generic;
+
+public static class BlasterCannonLevels
+{
+    private readonly record struct Row(int Level, int Credits, int Damage, float Rate, float Range, float Speed, float Turn, float Aim, float Search, float Penetration, float Radius, float Edge, DamageType Type, bool ShieldOverride, float Shield, bool HullOverride, float Hull)
+    {
+        // =========================================================
+        // Adapt only this weapon's capabilities into the common eight-stage working snapshot.
+        public TowerLevel Create() => new(Level, Credits, new(Range, Rate, Damage, Speed, Turn, Aim, Search, ShieldPenetration: Penetration, Area: new(Radius, Edge), Weapon: new(Type, ShieldOverride, Shield, HullOverride, Hull)));
+    }
+
+    // Level | Cost | Damage | Rate | RangePx | SpeedPxS | TurnDegS | AimDeg | SearchS | Pen | RadiusPx | EdgeFrac | Type | ShieldOn | Shield | HullOn | Hull
+    // Cost is Credits; Pen/EdgeFrac are fractions. Level 1 builds; other rows are upgrade prices.
+    private static readonly Row[] Rows =
+    {
+        new(1, 300, 60, 0.5f, 256, 500, 180, 12, 0.15f, 0, 80, 0.25f, DamageType.Explosive, false, 1, false, 1),
+        new(2, 200, 75, 0.5f, 256, 500, 180, 12, 0.15f, 0, 96, 0.25f, DamageType.Explosive, false, 1, false, 1),
+    };
+
+    // =========================================================
+    // Each config receives independent runtime rows and recipes; defaults stay in this file alone.
+    public static List<TowerLevel> Create()
+    {
+        var levels = new List<TowerLevel>(Rows.Length);
+        foreach (Row row in Rows) levels.Add(row.Create());
+        return levels;
+    }
+}

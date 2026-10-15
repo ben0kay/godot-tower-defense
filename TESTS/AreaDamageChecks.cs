@@ -79,7 +79,7 @@ public static class AreaDamageChecks
             (new DamageInfo(20, DamageType.Explosive), 3f, 0f, 50f),
             (new DamageInfo(20, DamageType.Explosive), 0f, 0f, 35f),
             (new DamageInfo(12, DamageType.Energy, 6, 0.15f), 30f, 0f, 58.95f),
-            (new DamageInfo(12, DamageType.Kinetic, shieldPenetration: 0.05f), 100f, 94.3f, 59.4f),
+            (new DamageInfo(12, DamageType.Kinetic, shieldPenetration: 0.05f), 100f, 100 - 11.4f * DamageResolver.DefaultProfile.KineticShield, 59.4f),
             (new DamageInfo(12, DamageType.Kinetic, 0, 2, 0.5f), 100f, 100f, 48f) })
         {
             Enemy enemy = Spawn(spawns, center, sample.Item2 > 0);

@@ -15,15 +15,15 @@ A real 1x1 offensive tower registered as `blaster_cannon` in `TOWERS/DefaultTowe
 | Projectile speed | 500 px/sec |
 | Target range | 256 px |
 | Shield penetration | 0% |
-| Level 2 purchase | 200 Credits: +15 base damage, +16 px blast radius |
+| Level 2 purchase | 200 Credits: 75 base damage, 96 px blast radius |
 
-Level 2 resolves 75 base damage / 96 px radius / unchanged 25% edge retention. Type defaults inherit Explosive 0.25x shield / 1.25x hull. Independent opt-in coefficient overrides on BlasterCannonConfig can replace either response; zero is explicit. Existing shield penetration behavior is supported and launch-snapshotted. These defaults are editable playtest balance, not resolver constants.
+Level 2 resolves 75 base damage / 96 px radius / unchanged 25% edge retention. Type defaults inherit Explosive 0.25x shield / 1.25x hull. Independent opt-in coefficient overrides in each complete level row can replace either response; zero is explicit. Existing shield penetration behavior is supported and launch-snapshotted. These defaults are editable playtest balance, not resolver constants.
 
-Edit `DefaultBlasterCannonConfig.tres` for newly placed towers. Each placed tower receives private config and nested cost/tier copies; Remote Inspector edits affect only that instance. Radius and edge retention have their own Area Blast Inspector group. The selected gameplay Inspector shows actual cached base damage, radius, edge percentage, penetration, type, rate and range. Upgrade preview shows 60 → 75 damage, 80 → 96 px radius and the 200-Credit price; purchase uses the existing atomic wallet transaction.
+Edit `BlasterCannonLevels.cs` for all numeric balance and credit prices. Its complete typed rows include aiming/search, penetration, damage response and area stats. Changing row 1 never changes row 2. Add another consecutive row to extend levels. DefaultBlasterCannonConfig.tres retains only non-level identity, target priority and tracking policy; scene/style resources retain visual settings. Placed towers receive private row/recipe copies. SetLevelStats replaces any absolute runtime row and invalidates its cache; Level 1 C# accessors edit row 1 only. The selected gameplay Inspector shows actual cached base damage, radius, edge percentage, penetration, type, rate and range. Upgrade preview shows 60 → 75 damage, 80 → 96 px radius and the 200-Credit price; purchase uses the existing atomic wallet transaction.
 
 ## Stats and future research ownership
 
-`AreaBlastStats` is an optional immutable capability on the existing TowerStatBlock/FinalStats. Blaster's type-aware adapter enters the same eight stages as Battle/Laser. Typed `AreaRadius` and `AreaEdgeFraction` IDs append to existing stat IDs without renumbering them. Stage 02 uses normal flat/additive-percent/multiplier operations; Stage 07 bounds radius to finite nonnegative values and edge retention to finite 0..1; Stage 08 publishes the capability. Numeric config edits emit Changed and rebuild the selected cache/Inspector once; ordinary physics ticks read cached stats.
+`AreaBlastStats` is an optional immutable capability on the existing TowerStatBlock/FinalStats. Blaster's type-aware adapter enters the same eight stages as Battle/Laser. Stage 02 selects the complete row with no cumulative math; Stage 07 bounds radius to finite nonnegative values and edge retention to finite 0..1; Stage 08 publishes the capability. Numeric config edits emit Changed and rebuild the selected cache/Inspector once; ordinary physics ticks read cached stats.
 
 Stage 04 permanent research remains neutral. Future Blaster research can raise edge retention through this capability and invalidate eligible new/existing tower caches when persistence is implemented. **The authored purchased tier never raises falloff retention.** There is no research manager, fake progression or save data in this pass. Battle and Laser have no artificial AoE capability; passive towers still need no weapon fields or combat snapshot.
 
@@ -39,7 +39,8 @@ At impact the projectile dispatches one `AreaDamage.ApplyInstant` call. Enemy ce
 
 - `BlasterCannon.cs`, `BlasterCannonConfig.cs`: weapon behavior and Inspector inputs.
 - `BlasterCannon.tscn`, `Artwork/blaster_cannon.svg`: pivot scene and replaceable vector art.
-- `DefaultBlasterCannonConfig.tres`, `BlasterCannonDefinition.tres`, `Upgrades/Level2.tres`: canonical price/stats, catalog identity and paid tier.
+- `BlasterCannonLevels.cs`: all actual stats and construction/upgrade prices, one row per level.
+- `DefaultBlasterCannonConfig.tres`, `BlasterCannonDefinition.tres`: non-level policy/identity and registration.
 - `TOWERS/Shared/Projectiles/SplashProjectile.cs`: reusable travel/last-known-point/one-shot delivery.
 - `TOWERS/Shared/Stats/AreaBlastStats.cs`: optional capability in the existing pipeline.
 - `COMBAT/AreaDamage/AreaDamage.cs`: stateless recipient selection and weapon-input falloff.

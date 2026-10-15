@@ -1,41 +1,20 @@
-// Single explicit coordinator for all eight stat stages; purchased tiers are active; ranks/research/conditions/effects remain neutral.
+// Single explicit coordinator for all eight stat stages; explicit purchased levels are active; ranks/research/conditions/effects remain neutral.
 using System;
-using System.Collections.Immutable;
 
 public static class TowerStatPipeline
 {
     // =========================================================
-    // Copy current authored inputs once; priority, tracking policy, identity and costs stay outside.
-    public static TowerFinalStats Resolve(BattleTowerConfig config, TowerStatTrace trace = null)
-        => Resolve(config, 1, trace);
+    // Battle callers and tooling retain the shared coordinator entry point.
+    public static TowerFinalStats Resolve(BattleTowerConfig config, TowerStatTrace trace = null) => Resolve(config, 1, trace);
 
     // =========================================================
-    // Snapshot only the purchased tier operations; later stages stay neutral.
-    public static TowerFinalStats Resolve(BattleTowerConfig config, int level, TowerStatTrace trace = null)
+    // Select exactly one row; resolving level 3 never reads level 2's combat values.
+    public static TowerFinalStats Resolve(TowerConfig config, int level, TowerStatTrace trace = null)
     {
         if (config == null) throw new ArgumentNullException(nameof(config));
-        return Resolve(new TowerStatBlock(config.RangePixels, config.ShotsPerSecond, config.DamagePerShot,
-            config.ProjectileSpeed, config.RotationSpeedDegrees, config.AimToleranceDegrees, config.TargetSearchInterval, ShieldPenetration: config.ShieldPenetration),
-            config.UpgradeTiers, level, trace);
-    }
-
-    // =========================================================
-    // Shared authored input adapter keeps tier snapshotting identical across weapon capabilities.
-    public static TowerFinalStats Resolve(TowerStatBlock baseStats, Godot.Collections.Array<TowerUpgradeTier> tiers,
-        int level, TowerStatTrace trace = null)
-    {
-        if (level < 1) throw new ArgumentOutOfRangeException(nameof(level));
-        var modifiers = ImmutableArray.CreateBuilder<TowerStatModifier>();
-        if (level > 1)
-        {
-            TowerUpgradeController.Validate(tiers);
-            if (level > tiers.Count + 1) throw new ArgumentOutOfRangeException(nameof(level));
-            for (int i = 0; i < level - 1; i++)
-                foreach (TowerUpgradeModifier entry in tiers[i].Modifiers)
-                    modifiers.Add(new TowerStatModifier(entry.Stat, entry.Operation, entry.Amount, $"tier:{i + 2}"));
-        }
-        TowerStatContext context = new(baseStats, modifiers.ToImmutable());
-        return Resolve(context, trace);
+        if (level < 1 || level > config.Levels.Count) throw new ArgumentOutOfRangeException(nameof(level));
+        if (level > 1) TowerUpgradeController.Validate(config.Levels);
+        return Resolve(new TowerStatContext(config.Levels[0].Stats, config.Levels[level - 1].Stats), trace);
     }
 
     // =========================================================

@@ -1,35 +1,25 @@
-# Battle Tower — first automatic weapon
+# Battle Tower — explicit levels and guided Kinetic fire
 
-F5 -> Ctrl -> BATTLE -> place on buildable terrain. Press F2 repeatedly to cycle the enemy catalog through the configured spawn sources. Towers fire at enemies within range. First targets the shortest remaining path to the Citadel; Closest targets nearest to the tower. Defaults: range 256px, 1 shot/s, 12 damage, bullet speed 600px/s, search every 0.15s. Enemy001 takes five baseline hits to kill.
+Ctrl → Battle Tower → place on route-safe terrain. First targets the shortest remaining path; Closest targets nearest. Shared turret aiming rotates the child visual toward the target, leaving the grid root fixed. Fire requires a living in-range aligned lock and elapsed cooldown; zero rate disables firing. Guided shots still originate at the center and retain launch-time damage/penetration.
 
-## Inspector tuning
+## Level data
 
-- Select `DefaultBattleTowerConfig.tres` to change defaults for newly built towers, or select DefaultTowerCatalog.tres, expand its Battle definition and DefaultConfig.
-- Open BattleTower.tscn, select its root and expand Config to view the same defaults.
-- Each placed tower receives a separate Config copy. During play, switch Scene to Remote, expand Battlefield/World/Towers, select a BattleTower and expand Config to tune only that tower's range, fire rate, damage, projectile speed and targeting. Runtime edits are temporary; edit the saved resource for permanent defaults.
-- Fire rate zero disables shooting. ConstructionCosts is the authoritative shared resource recipe; the default costs 200 Credits. Successful placement pays through Main/Economy.
+**Edit `BattleTowerLevels.cs`**, the sole authored source of all level-dependent numbers and credit prices. Each labeled typed row is complete; adding Level 4 means adding another consecutive row. Changing Level 2 never changes Level 3.
 
-The one-piece SVG is unchanged; bullets fire from its center. The child TurretPivot rotates the one-piece art, leaving placement and selection fixed. No line-of-sight/terrain-blocked bullets or saving yet. Tower placement prevents sealing currently usable entries or trapping existing ships. Click a tower to inspect active stats and its range ring.
+| Level | Build/upgrade price | Damage | Shots/s | Range | Projectile speed | Turn | Aim | Search | Penetration |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 200 | 12 | 1 | 256px | 600px/s | 180°/s | 12° | .15s | 5% |
+| 2 | 150 | 16 | 1.2 | 288px | 600px/s | 180°/s | 12° | .15s | 5% |
+| 3 | 250 | 22 | 1.5 | 320px | 600px/s | 180°/s | 12° | .15s | 5% |
 
+DefaultBattleTowerConfig.tres retains Inspector identity, target priority and RotateWhileTracking; scene/definition retain artwork and registration. Combat stats/prices are no longer numeric .tres exports. Each placed tower gets private runtime rows/recipes. C# Level 1 convenience accessors edit row 1 only; use SetLevelStats(level, snapshot) for another row.
 
-## Phase 1 aiming
-The reusable opt-in `TOWERS/Shared/Weapons/TurretAiming.cs` follows the current target along the shortest angle, accounting for the SVG barrel pointing up. A tower fires only when its living in-range target is within aim tolerance and its cooldown has elapsed. It keeps its last orientation when no target is available.
+## Purchases and cached stats
 
-Tune **Aiming** in DefaultBattleTowerConfig.tres: RotationSpeedDegrees (180), AimToleranceDegrees (12), RotateWhileTracking (true). Zero speed holds orientation; disabling tracking also holds orientation, with aimed-fire gating still enforced. Newly placed towers retain individual resource copies. Shots still originate at the tower center; no muzzle or idle rotation is added.
+Select a placed tower to see its level, actual stats, next-row differences, price and Upgrade button. Level 3 displays Maximum level reached. Build/upgrade payments use the existing shared wallet and ResourceCost recipe; terrain, occupancy, route-safety and affordability failures never charge. Starting funds remain in level configs. The Inspector and range ring read the same cached FinalStats used by combat.
 
-## Construction economy
-Set Construction / Construction Costs in DefaultBattleTowerConfig.tres. Each entry expands to Resource and Amount; the default is 200 Credits. Starting funds live in each level config (Level001 starts with 1,000). Terrain/connectivity and affordability failures charge nothing. The preview shows required costs and insufficient-resource feedback. Paid upgrades are implemented; selling is still future work.
+The eight-stage pipeline selects the complete purchased row at Stage 02. Later rank/research/map/effect stages remain neutral. Config changes or purchases invalidate once; physics never resolves per tick. Upgrading preserves targeting, aim, cooldown and navigation.
 
-## Effective stat pipeline (Phase 3A)
-BattleTower now reads cached FinalStats from the shared eight-stage resolver. Existing numeric Config fields are still editable: Remote Inspector or C# property changes emit Changed and rebuild immediately. Config replacement also rebuilds; RebuildStats() supports future explicit invalidation. The selected Inspector/range ring uses the same final values. Purchased upgrades are active; ranks, research, level conditions and effects remain neutral, so valid base balance stays unchanged. Prices, priority and tracking policy remain outside the numeric pipeline. See TOWERS/Shared/Stats/README.md.
+Kinetic damage and 5% penetration retain the shared defense resolver contract: 12 base against 100 shield/60 hull leaves 97.15 shield/59.4 hull, or deals 12 to exposed hull. Fired bullets preserve their launch snapshot. No research, saving, selling, armour, new artwork or weapon mechanics were introduced.
 
-## Phase 3B upgrades
-Select a placed tower after exiting build mode to see its current level and next-tier differences/price. Upgrade to level 2 for 150 Credits, then level 3 for 250; defaults become 16/22 damage, 1.2/1.5 shots/sec and 288/320px range. Edit Upgrades/Level2.tres and Level3.tres for permanent balance changes. The resolver applies cumulative operations without altering base Config, other towers, aim/cooldown or navigation. External tier Resources are explicitly copied per instance; nested runtime edits require RebuildStats().
-
-## Phase 4A catalog migration
-BattleTowerDefinition.tres references the existing scene/art and canonical config; DefaultTowerCatalog.tres registers it. BattleTower implements shared config/selection/placement contracts while retaining its existing local targeting, cooldown, rotation and guided projectile loop. TowerConfig supplies identity/cost/tiers, BattleTowerConfig retains all weapon fields, change notifications and the same eight-stage input adapter. Level2/Level3 costs and calculations are unchanged. No weapon-family extraction was performed.
-
-
-Phase 4C-3: guided bullets carry Kinetic base damage plus the cached ShieldPenetration stat (default5%). At12 damage against100 shield/60 hull the result is94.3 shield/59.4 hull; an exposed target still loses12 hull. The Inspector shows `Shield Penetration: 5%` at every purchased tier. Edit Shield Penetration on the private/live or authored BattleTowerConfig; values pass through the same eight stages and safety clamp to finite0..1. Fired bullets snapshot the stat at launch. Numeric changes rebuild and refresh the selected Inspector once, without per-frame resolution.
-
-Penetration is a base weapon stat, never a Level2/Level3 bonus. Both tier references are explicitly present in the default config, restoring references absent from the previous HEAD. Tier values, price, timing, targeting and reward behavior are unchanged. Permanent research remains future work; Stage 04 stays neutral. Legacy TakeDamage remains1:1 shield-first. See COMBAT/Damage/README.md and TESTS/README.md for the completed contract and validation.
+TowerStatChecks asserts exact stats/prices and level independence; TowerUpgradeChecks drives real HUD purchases/preview/max-level/atomic costs; DamageTypeChecks retains real projectile penetration coverage. See TESTS/README.md for actual compilation and headless results.

@@ -294,9 +294,9 @@ public partial class TowerPlacementController : Node2D
         _displayedUpgradeLevel = _selected.UpgradeLevel;
         try
         {
-            TowerUpgradeController.Validate(_selected.UpgradeTiers);
-            TowerUpgradeTier next = _selected.NextUpgrade;
-            if (next == null) { _hud.SetUpgradeDetails(_selected.UpgradeTiers.Count == 0 ? "No upgrades available." : "Maximum level reached.", "", false); return; }
+            TowerUpgradeController.Validate(_selected.Levels);
+            TowerLevel next = _selected.NextUpgrade;
+            if (next == null) { _hud.SetUpgradeDetails(_selected.Levels.Count <= 1 ? "No upgrades available." : "Maximum level reached.", "", false); return; }
             TowerFinalStats now = _selected.FinalStats, future = _selected.ResolveLevel(_selected.UpgradeLevel + 1);
             string changes = $"NEXT: LEVEL {next.Level} — {next.DisplayName}\n";
             changes += _selected.AuthoredConfig.DescribeChanges(now, future);

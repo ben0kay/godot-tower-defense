@@ -8,7 +8,7 @@ This top-level folder owns currency/resource identities, current balances and at
 - Transactions/ResourceCost.cs is the shared typed Inspector-editable cost entry for construction and future upgrades.
 - Wallet/EconomyManager.cs is one Main/Economy session node, seeded from the active level's StartingCredits.
 - LEVELS/LevelConfig.cs exposes **Starting Resources / Starting Credits**. Level001Config.tres starts at **1,000**; the empty template/default starts at **0**. Duplicate the level settings resource for each map.
-- BattleTowerConfig.ConstructionCosts replaces BuildCost. DefaultBattleTowerConfig.tres requires **200 Credits**, as requested; optional extra resource entries use the same transaction.
+- BattleTowerConfig.ConstructionCosts replaces BuildCost. BattleTowerLevels.cs row 1 requires **200 Credits**; optional extra resource entries use the same transaction.
 - TowerPlacementController retains terrain/occupancy and navigation connectivity checks. It creates the tower through TryPurchase; a failed build rolls back scene/occupancy and charges nothing. Repeated occupied-cell clicks cannot charge twice.
 - BalanceChanged pushes the real credit balance to GameplayHUD.SetCredits on initialization and changes. No polling or fake HUD balance.
 

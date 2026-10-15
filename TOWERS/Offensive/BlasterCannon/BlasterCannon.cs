@@ -6,7 +6,7 @@ public partial class BlasterCannon : TowerBase
     #region Settings and State
     private BlasterCannonConfig _config;
     private bool _initialized;
-    public override Godot.Collections.Array<TowerUpgradeTier> UpgradeTiers => Config?.UpgradeTiers;
+    public override System.Collections.Generic.List<TowerLevel> Levels => Config?.Levels;
     [Export] public BlasterCannonConfig Config
     {
         get => _config;

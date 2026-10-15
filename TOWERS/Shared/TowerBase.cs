@@ -13,9 +13,9 @@ public abstract partial class TowerBase : Node2D
     public int UpgradeLevel { get; private set; } = 1;
     public TowerFinalStats FinalStats { get; protected set; }
     public event Action StatsChanged;
-    public abstract Godot.Collections.Array<TowerUpgradeTier> UpgradeTiers { get; }
-    public TowerUpgradeTier NextUpgrade => UpgradeTiers != null && UpgradeLevel - 1 < UpgradeTiers.Count
-        ? UpgradeTiers[UpgradeLevel - 1] : null;
+    public abstract System.Collections.Generic.List<TowerLevel> Levels { get; }
+    public TowerLevel NextUpgrade => Levels != null && UpgradeLevel < Levels.Count
+        ? Levels[UpgradeLevel] : null;
 
     // =========================================================
     // The type owns config compatibility; generic placement never assumes weapon node names.

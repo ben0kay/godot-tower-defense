@@ -2,6 +2,16 @@
 
 Umbrella folder for **every player-buildable tower**, not just weapons: offensive defenses, support, economy/production and utility. The UI can call all of them *towers*. A tower's primary role determines its folder, **not** its only possible capability: for example, `Economy/SolarTower/` may eventually gain a weak defensive laser upgrade.
 
+## Explicit C# tower levels (implemented)
+
+All actual level-dependent combat values and credit prices now live in one typed table per tower: `Offensive/BattleTower/BattleTowerLevels.cs`, `Offensive/LaserTower/LaserTowerLevels.cs`, `Offensive/BlasterCannon/BlasterCannonLevels.cs`. Each labeled line is a complete absolute level. Stage 02 selects that row; there are no cumulative purchased bonuses, percentage increases or level-specific upgrade resources. Changing Level 2 cannot change Level 3. Add another consecutive row to extend a tower.
+
+Battle retains 200/150/250-Credit prices and 12/16/22 damage, 1/1.2/1.5 shots/sec, 256/288/320px range and 5% penetration. Laser retains 250/175-Credit prices and 12/22 DPS at 256/288px with 6x shield/.15x hull overrides. Blaster retains 300/200-Credit prices and 60/75 damage at 80/96px radius with 25% edge retention. Every row includes its complete aiming/search/speed/response values where applicable.
+
+Config .tres resources now hold non-level identity/target/tracking policy; scenes/styles retain art and presentation. Runtime configs privately copy rows and ResourceCost recipes. ConstructionCosts forwards to row 1; purchases use later row recipes through the existing atomic wallet. The shared eight stages, per-instance UpgradeLevel, cached FinalStats, HUD selection/purchases/previews/max-level and weapon delivery remain. See Shared/Stats/Pipeline/README.md. Ranks/research/map modifiers/effects remain neutral future stages after the selected row. No research, saving, new towers or unrelated mechanics were added.
+
+The historical phase notes below describe earlier milestones; this explicit-level contract supersedes their former numeric Inspector/resource authoring instructions.
+
 ## Current implementation (October 2026)
 
 **Implemented today:** 1×1 Battle Tower placement/selection; terrain and connectivity validation; First/Closest target search, turret rotation, guided projectiles and enemy damage; atomic 200-Credit construction; per-instance Config copies; eight-stage cached stats (Phase 3A); and **Phase 3B paid upgrades**. Battle Tower upgrades level 1→2 (150 Credits) and 2→3 (250 Credits), with the selected Inspector showing real next-tier stat differences, cost and an Upgrade button. `TowerBase`, `Shared/Upgrades/`, `Shared/Stats/` and `TowerUpgradeChecks` exist.
@@ -20,11 +30,11 @@ Umbrella folder for **every player-buildable tower**, not just weapons: offensiv
 | --- | --- | --- |
 | `Shared/TowerBase.cs` | EXISTS | Lightweight per-instance levels/stats/event; minimal extension in Phase 4 |
 | `Shared/Stats/` and `Shared/Stats/Pipeline/` | EXISTS | Eight ordered stages; Base, Upgrades, Safety and Final active |
-| `Shared/Upgrades/` | EXISTS | Paid tiers, stat operations, validation, atomic wallet purchase |
+| `Shared/Upgrades/` | EXISTS | Complete runtime rows, validation, atomic wallet purchase |
 | `Shared/Targeting/`, `Shared/Weapons/`, `Shared/Projectiles/` | EXISTS | Common target query, turret aiming and guided projectile |
 | `Shared/TowerDefinition.cs` and `Shared/TowerCatalog.cs` | EXISTS (Phase 4A) | Type metadata, scene/config registry, dynamic build choices |
 | `Placement/TowerPlacementController.cs` | EXISTS (generic TowerBase) | Generalize placement/selection/ghost, keep grid/economy ownership |
-| `Offensive/BattleTower/` and `Offensive/BattleTower/Upgrades/` | EXISTS | First working offensive type; Level2/Level3 assets |
+| `Offensive/BattleTower/` and `Offensive/BattleTower/Upgrades/` | EXISTS | First working offensive type; Complete BattleTowerLevels.cs rows |
 | `Offensive/LaserTower/` | EXISTS (4C-2) | Sustained Energy DPS, muzzle beam renderer and paid tier |
 | `Offensive/MissileTower/` | PLANNED | Future explosive weapon |
 | `Offensive/BlasterCannon/` | IMPLEMENTED Phase 4D | Instant AoE projectile tower; owns radius and falloff values |
@@ -34,14 +44,14 @@ Umbrella folder for **every player-buildable tower**, not just weapons: offensiv
 | `UI/GameplayHUD/` | EXISTS (dynamic catalog entries) | Replace build choice inputs with catalog data |
 | `ECONOMY/` | EXISTS | The **only** wallet, ResourceCost and purchase authority |
 
-The current `BattleTowerConfig.ConstructionCosts` and `DefaultBattleTowerConfig.tres` own construction price/base stats, with external `Level2.tres`/`Level3.tres` for per-type upgrades. Phase 4 must not create a second conflicting catalog price. Keep source data Inspector-editable. No other gameplay service belongs under `TOWERS/`.
+Each tower's *Levels.cs table owns prices and combat values. ConstructionCosts is a runtime view of its Level 1 ResourceCost recipe; definitions and HUD do not own alternate prices.
 
 ## Phase 1 — Battle Tower rotation (already implemented)
 
 **Already implemented:** `BattleTower.cs` uses `Shared/Weapons/TurretAiming.cs` with a rotating visual `TurretPivot`, Inspector settings and aim tolerance. The following notes document the intended behavior; **Codex must not implement a duplicate rotation system.** Weapon behavior remains optional for non-offensive towers. Never require a weapon or targeting loop on Repair, Radar, Solar or other passive towers.
 
 - Preserve existing `TowerTargeting` (First/Closest), range checks, staggered searches, `ShotsPerSecond`, damage and projectile speed.
-- Add Inspector-exported **`RotationSpeedDegrees`** (initially **180 degrees/sec**), **`AimToleranceDegrees`** (initially **12 degrees**) and `RotateWhileTracking` (default true). Optionally provide an idle-rotation policy, default disabled.
+- Aiming values (initially 180°/s turn and 12° tolerance) are explicit in each level row; RotateWhileTracking remains an Inspector policy.
 - Once a target is acquired, turn toward its current position using shortest-angle interpolation **capped by configured degrees/sec × delta**. Do not teleport/snap orientation, and don't waste targeting searches on every physics frame just to rotate.
 - **Only fire when the target is alive/in range and the barrel is within the aim tolerance**, in addition to its existing cooldown. Keep the existing guided test projectile behavior for now; real ballistic/muzzle visuals can follow.
 - **Current artwork is ONE sprite containing both base and barrel.** Rotating the whole image is acceptable *for this prototype*, but rotate a visual `TurretPivot` / child sprite rather than rotating the tower's placement root, grid identity, or range effect. The SVG's barrel points **upwards at rest**, so explicitly account for this artwork's local forward direction when calculating target angles.
@@ -57,7 +67,7 @@ BattleTower (root: fixed grid/world position)
 ```
 
 - Keep the current **center-spawned** bullets initially if a muzzle marker is not ready; no recoil, multi-barrel art, line of sight, or new enemy combat behaviors needed for this pass.
-- Configure defaults in `Offensive/BattleTower/DefaultBattleTowerConfig.tres`. Every placed Battle Tower already receives a separate duplicated Config for individual tuning; retain that behavior.
+- Configure numeric defaults in BattleTowerLevels.cs and non-level policy in DefaultBattleTowerConfig.tres; every placed tower retains private runtime inputs.
 
 **Acceptance:** F5 → Ctrl → build Battle Tower → F2 spawns Enemy001 → tower visibly and smoothly turns toward moving targets at the set speed; fires only after achieving its allowed aim; retains existing targeting/damage/cooldown and scene Inspector controls. No C# compile errors or unintentional sprite/grid rotations.
 
@@ -65,7 +75,7 @@ BattleTower (root: fixed grid/world position)
 
 The standalone **ECONOMY/** folder now owns the session wallet and shared transactions. Read **ECONOMY/README.md** for its current API and boundaries. TOWERS/Economy continues to describe producer tower types, not player balances.
 
-BattleTowerConfig.ConstructionCosts is an Inspector-editable Array<ResourceCost>. The shared entry lives at ECONOMY/Transactions/ResourceCost.cs and references ResourceDefinition plus Amount. DefaultBattleTowerConfig.tres requires **200 Credits**; BuildCost has been retired to avoid competing prices/double charges. Optional additional resources and future upgrades reuse this same entry type.
+BattleTowerConfig.ConstructionCosts forwards to the Level 1 C# row recipe (200 Credits). ResourceCost still references a ResourceDefinition plus Amount; multi-resource transactions remain supported.
 
 LevelConfig exposes Starting Resources / Starting Credits. Level001 starts at **1,000**, configurable in Level001Config.tres; default/template starts at zero. One Main/Economy wallet initializes each session, clears balances on level initialization and updates the HUD through BalanceChanged events.
 
@@ -77,7 +87,7 @@ Prices are deeply duplicated with each placed tower's config. The build preview 
 
 Every tower **can optionally support upgrades**, including future support/economy types. Zero upgrade tiers is valid, and passive towers must not inherit targeting, projectile data or weapon loops.
 
-**Already implemented:** `TowerBase` owns purchased `UpgradeLevel` and effective stats; `TowerUpgradeTier`/`TowerUpgradeModifier` hold Inspector-editable levels, typed stat operations and `ResourceCost` entries; `TowerUpgradeController.TryUpgrade` validates the tier, resolves next-level stats, pays atomically with `EconomyManager.TryPurchase`, and publishes state after payment. Battle Tower copies nested tier resources per placed instance. The selected Inspector displays price, live/next stats, affordability and max-tier state.
+**Already implemented:** TowerBase owns purchased UpgradeLevel and cached stats. TowerLevel contains a complete snapshot/recipe; TowerUpgradeController validates consecutive rows, resolves the next row, pays atomically, then publishes StatsChanged. The selected Inspector displays actual differences, cost and maximum-level state.
 
 **Future:** activate rank, research, level rule and active-effect stat stages only with real owners; support type-specific stats (repair strength/production output) without giving a Solar Tower fictitious damage/fire rate. The existing Upgrade button and stats pipeline should be reused for new tower types. Optional upgrade-unlocked behaviors may require dedicated typed capability data later; do not implement a giant monolithic weapon-specific array or a second stat pipeline.
 
@@ -89,8 +99,8 @@ Purchased tower upgrades are only one source of progression. Future kill-based t
 
 | Stage | Owner and lifetime | Responsibility |
 | --- | --- | --- |
-| Base stats | Shared tower definition; immutable authored inputs | Original weapon/support/production values before progression. |
-| Tower upgrade tier | This placed tower; purchased progression | Apply the current tier's explicit improvements or unlocked capabilities. |
+| Base stats | Shared tower definition; immutable authored inputs | Complete Level 1 values before progression. |
+| Tower upgrade tier | This placed tower; purchased progression | Select the purchased level’s complete absolute snapshot. |
 | Tower rank | This placed tower; earned progression separate from purchased tier | Rank up after configured kill-count milestones; apply rank bonuses. Kill attribution/thresholds are future work. |
 | Permanent player research | Persistent player/profile progression, outside individual towers and levels | Research unlocked through the future research center **follows the player across every level**, survives level restart/change and is restored on save/load. Apply only to eligible tower types/capabilities. |
 | Level modifiers | Current level/session, declared separately in level settings | Mission-wide conditions such as reduced range or improved production; replace them when changing maps. They are not temporary-effect entries or permanent research. |
@@ -102,7 +112,7 @@ A research center is a gameplay interface/source of unlocks, **not the owner of 
 
 Tower tier and tower rank remain separate: buying level 2 does not erase earned rank, and ranking up does not silently buy an upgrade. Per-tower kill counts must be attributed to the responsible tower once, not inferred from the global enemy registry's total. Tower progression lasts with that instance; carrying towers across maps is a separate future decision.
 
-### Modifier rules and final-stat calculation
+### Modifier rules and final-stat calculation (future stages only; purchased levels select snapshots)
 
 - Keep **stored inputs** (base definition, purchased tier, rank/kills, player research, current level rules, active effect instances) distinct from **calculated final stats**.
 - Every modifier needs an explicit stat/capability, stable source identity, operation and applicable scope. For temporary effects, also define duration/removal and whether another application refreshes, replaces or stacks.
@@ -128,13 +138,12 @@ TOWERS/
 │   ├── Stats/
 │   │   ├── TowerStatBlock.cs               # EXISTS: typed numeric inputs
 │   │   ├── TowerStatContext.cs             # EXISTS: read-only resolution context
-│   │   ├── TowerStatModifier.cs            # EXISTS: stat/operation/amount
 │   │   ├── TowerFinalStats.cs               # EXISTS: immutable result
 │   │   ├── TowerStatTrace.cs                # EXISTS: optional debug trace
 │   │   └── Pipeline/
 │   │       ├── TowerStatPipeline.cs         # EXISTS: one explicit coordinator
 │   │       ├── 01_BaseStats.cs              # ACTIVE
-│   │       ├── 02_TowerUpgrades.cs          # ACTIVE: cumulative purchased tiers
+│   │       ├── 02_TowerUpgrades.cs          # ACTIVE: selected full level snapshot
 │   │       ├── 03_TowerRanks.cs             # NEUTRAL (future)
 │   │       ├── 04_PermanentResearch.cs      # NEUTRAL (future)
 │   │       ├── 05_LevelModifiers.cs         # NEUTRAL (future)
@@ -142,17 +151,16 @@ TOWERS/
 │   │       ├── 07_SafetyClamps.cs           # ACTIVE
 │   │       └── 08_FinalStats.cs             # ACTIVE
 │   ├── Upgrades/
-│   │   ├── TowerUpgradeTier.cs             # EXISTS
-│   │   ├── TowerUpgradeModifier.cs         # EXISTS
+│   │   ├── TowerLevel.cs             # EXISTS
 │   │   └── TowerUpgradeController.cs       # EXISTS
 │   ├── Targeting/                          # EXISTS
 │   ├── Weapons/                            # EXISTS
 │   └── Projectiles/                        # EXISTS
 ├── Offensive/BattleTower/
 │   ├── BattleTower.cs                      # EXISTS: cached FinalStats consumer
-│   ├── BattleTowerConfig.cs                # EXISTS: config/tiers/copy
+│   ├── BattleTowerConfig.cs                # EXISTS: non-level config/row copies
 │   ├── DefaultBattleTowerConfig.tres
-│   └── Upgrades/Level2.tres, Level3.tres
+│   └── BattleTowerLevels.cs
 └── Placement/TowerPlacementController.cs   # EXISTS: currently Battle-only
 
 LEVELS/                                    # Future level modifier ownership
@@ -189,8 +197,8 @@ Each file owns **the rules for applying its stage**, not the source data, level 
 
 | File / stage | Data originates from | Lifetime and expected role |
 | --- | --- | --- |
-| `01_BaseStats.cs` | Tower type's immutable authored base definition / `.tres` (initially existing `BattleTowerConfig`) | Establish original stats for the specific placed instance, without upgrades or bonuses. |
-| `02_TowerUpgrades.cs` | `TOWERS/Shared/Upgrades/` and `Offensive/BattleTower/Upgrades/` etc. | Applies the current **purchased** tier for this tower instance only; payment handled elsewhere. |
+| `01_BaseStats.cs` | Tower type’s C# Level 1 row | Establish the complete original snapshot. |
+| `02_TowerUpgrades.cs` | Selected *Levels.cs row and placed UpgradeLevel | Substitute one complete purchased snapshot; payment handled elsewhere. |
 | `03_TowerRanks.cs` | `TOWERS/Shared/Ranks/` and this tower's attributed kill count / earned rank | Adds kill-based progression independently of purchased tiers; rank milestones and attribution are separate logic. |
 | `04_PermanentResearch.cs` | Future **player/profile-owned** `PROGRESSION/Research/` state | Applies eligible permanent unlocks across levels and after reload; never owned or reset by a level, tower or research-center building. |
 | `05_LevelModifiers.cs` | **Current** `LEVELS/` level's authored rule set, supplied through level/session context | Applies that map's conditions only; changing maps replaces these inputs, leaving research untouched. |
@@ -200,7 +208,7 @@ Each file owns **the rules for applying its stage**, not the source data, level 
 
 `TowerStatContext` should expose the minimum read-only inputs needed to resolve a specific tower (tower definition/base stats, purchased tier, earned rank, eligible persistent research snapshot, active level rules, active effects and relevant capability metadata). Gather these from the proper owners **before** resolution; do not let stages search arbitrary scene nodes or load `Level001` directly. Future research unlocks use the existing/current profile state; new towers must immediately resolve against that state and their active level.
 
-**Distinguish two kinds of modifier concepts:** `TowerStatModifier.cs` is the small reusable **math operation** (target stat, flat/percent/multiplier) shared by stages, while `TOWERS/Shared/Modifiers/` owns the **runtime temporary-effect lifecycle** (source identity, durations, refresh/stack/remove). Level conditions and permanent research can reuse the same math operation without being misclassified as temporary buffs.
+Future modifier math and runtime effect lifecycles remain separate responsibilities. Purchased levels use complete snapshots and no modifier operations; do not introduce a generic modifier/effect engine until a real later feature needs it.
 
 #### Debugging and intermediate values — essential for balancing
 
@@ -223,7 +231,7 @@ A `TowerStatTrace` can store a **stage-name + copied stat snapshot** after each 
 - **One authoritative `TowerFinalStats` per placed instance**, computed from source inputs and cached. The Battle Tower runtime already reads the cached `FinalStats` for damage, range, fire rate, aiming and projectile speed; do not regress it to direct Config reads. The authored Config remains the source input. Aim speed/turning, repair rate or economy output should follow the same pattern as capabilities are introduced.
 - Mark final stats **dirty** on relevant events: tier purchase, individual rank gain, research change/load, level-rule replacement, new effect, expired/removed effect. Recalculate on change or the next safe access, **not on every physics frame**; avoid per-frame allocations or scanning all research/levels for every tower. Research invalidation should target eligible towers when possible.
 - The **same resolver** should calculate both the currently applied result and a proposed upgrade preview; for preview only the hypothetical tier changes, while current rank, research, level rules and temporary effects stay identical. Preview must never spend Credits or mutate the placed tower.
-- Apply flat/additive-percent/explicit-multiplier operations using the existing Phase 3 arithmetic rules **within each stage**, in the fixed stage order. Identical inputs and seed-free stat calculations must produce identical outputs; never add upgrades to the old final cache or reverse expired debuffs by subtracting/dividing previous results.
+- Future modifier stages may use the documented arithmetic in their fixed order. Purchased levels replace the full snapshot at Stage 02; never add upgrades to the old final cache.
 - On save/load, restore authoritative progression inputs (purchased tier, earned rank and profile research), then resolve final stats. Do not serialize the derived final result as a substitute for those inputs. Level rules should be **replaced** when switching levels; persistent research must survive. Do not implement the future profile-save system just to implement Battle Tower Phase 3.
 - Keep existing `ECONOMY/Wallet/EconomyManager`/`ResourceCost` as the **only** authoritative payment service and existing `TowerPlacementController` as the placement owner. A stat-stage file must never charge resources, attribute kills, schedule timed effects, own a research-center UI, or directly alter enemy navigation.
 - Match project style: brief header comments, `// =========================================================` comments above methods, sensible `#region` groups, compact code and README files in newly created folders. Avoid empty services and excessive abstraction; neutral stage methods can remain lightweight until their feature is built.
@@ -236,7 +244,7 @@ This phase added the eight ordered files, typed `TowerStatContext`/`TowerStatBlo
 
 ### Phase 3B — Paid upgrades (COMPLETED)
 
-`TowerBase`, shared upgrade data, transaction control, Inspector preview/button and Stage 02 tier modifiers are implemented. Each placed tower's mutable Config/tier Resources are copied without changing shared `.tres` inputs. Levels start at 1, purchased tiers apply cumulatively, the resolver rebuilds without compounding into old final values, and payments are atomic.
+TowerBase, absolute C# level rows, transaction control, Inspector preview/button and Stage 02 snapshot selection are implemented. Placed rows/recipes are private; Levels start at 1 and purchases are atomic. No previous-level stats are added to the selected row.
 
 | Battle Tower level | Damage/shot | Shots/sec | Range | Price |
 | --- | ---: | ---: | ---: | --- |
@@ -244,7 +252,7 @@ This phase added the eight ordered files, typed `TowerStatContext`/`TowerStatBlo
 | Level 2 | 16 | 1.2 | 288px | Upgrade: 150 Credits |
 | Level 3 | 22 | 1.5 | 320px | Upgrade: 250 Credits |
 
-These are editable **playtest values**, defined in `Offensive/BattleTower/Upgrades/Level2.tres` and `Level3.tres`; no Alloy cost is currently part of the default Level 3 upgrade. `TESTS/TowerUpgradeChecks.cs` covers payment, secondary-resource cases, tier progression, max level, preview parity, resource isolation, invalid and duplicate requests and Inspector behavior.
+These playtest values are defined only in Offensive/BattleTower/BattleTowerLevels.cs. TowerUpgradeChecks covers payment, secondary resources, progression, maximum level, independence, preview parity, copies and invalid/duplicate requests.
 
 | Pipeline stage | Current runtime status |
 | --- | --- |
@@ -413,9 +421,9 @@ TOWERS/DefaultTowerCatalog.tres              # Add the real Laser definition
 
 ## Phase 4C-3 completed combat pass
 
-**Implemented:** See [`COMBAT/Damage/README.md`](../COMBAT/Damage/README.md) for the authoritative4C-3 math and authoring contract. DamageInfo supports independent absolute shield/hull overrides and0..1 penetration. Laser now uses 12 base DPS with effective 6.00x shield/0.15x hull responses, giving72 shield/s or1.8 exposed hull/s. Its175-Credit tier adds10 base DPS/32px, yielding22 DPS/288px. Global Energy remains2.00/0.85.
+**Implemented:** See [`COMBAT/Damage/README.md`](../COMBAT/Damage/README.md) for the authoritative4C-3 math and authoring contract. DamageInfo supports independent absolute shield/hull overrides and0..1 penetration. Laser now uses 12 base DPS with effective 6.00x shield/0.15x hull responses, giving72 shield/s or1.8 exposed hull/s. Its175-Credit Level2 row directly selects22 DPS/288px. Global Energy remains2.00/0.85.
 
-Battle starts with 5% base shield penetration, visible in the placed Inspector at every tier and carried through the existing cached eight-stage pipeline into projectile payloads. Level2/Level3 still improve damage/rate/range without adding penetration. The default config's missing tier references were restored. New hits default to zero penetration; optional weapon overrides do not impose combat behavior on passive towers.
+Battle starts with 5% base shield penetration, visible in the placed Inspector at every tier and carried through the existing cached eight-stage pipeline into projectile payloads. Level2/Level3 still improve damage/rate/range without adding penetration. The later explicit-level migration replaces those historical tier resources with complete C# rows. New hits default to zero penetration; optional weapon overrides do not impose combat behavior on passive towers.
 
 Stage 04 remains neutral. Future permanent ballistic research and saving are deferred, alongside Missile Tower, ranks, level modifiers, active effects, selling and tower HP. Visual beam polish still requires a live-window review. See TESTS/README.md for4C-3 validation results.
 
@@ -423,7 +431,7 @@ Stage 04 remains neutral. Future permanent ballistic research and saving are def
 
 `COMBAT/AreaDamage/AreaDamage.cs` performs one mutation-safe registry scan per impact, scales base DamageInfo by weapon-supplied linear distance falloff, and forwards each eligible center hit once through the unchanged defense resolver. Inclusive edge and zero-radius exact-center behavior are documented in [`COMBAT/AreaDamage/README.md`](../COMBAT/AreaDamage/README.md). There is no shared hardcoded falloff, direct-plus-splash duplicate or per-frame area scan.
 
-[`Offensive/BlasterCannon/README.md`](Offensive/BlasterCannon/README.md) describes the registered `blaster_cannon`: 300 Credits, Explosive 60 base damage, 80 px radius, 25% edge retention, 0.5 shots/sec, 500 px/sec projectile, 256 px range and zero penetration. Its 200-Credit Level 2 adds 15 base damage and 16 px radius; edge retention stays 25%. Optional immutable AreaBlastStats flows through the existing eight stages, typed upgrade IDs, safety clamps, cached selected Inspector and real next-tier previews. Stage 04 remains neutral for future falloff research.
+[`Offensive/BlasterCannon/README.md`](Offensive/BlasterCannon/README.md) describes the registered `blaster_cannon`: 300 Credits, Explosive 60 base damage, 80 px radius, 25% edge retention, 0.5 shots/sec, 500 px/sec projectile, 256 px range and zero penetration. Its 200-Credit Level 2 adds 15 base damage and 16 px radius; edge retention stays 25%. Optional immutable AreaBlastStats flows through the existing eight stages, complete selected level snapshots, safety clamps, cached selected Inspector and real next-tier previews. Stage 04 remains neutral for future falloff research.
 
 SplashProjectile snapshots damage/type/defense overrides/penetration/radius/edge at launch and detonates once at the target or last-known point, even when the target disappears or leaves firing range. BlastFlash under FEEDBACK/AreaBlast is purely visual. No generic placement/HUD changes or Battle/BasicProjectile behavior changes are required. Tests and actual validation are recorded in TESTS/README.md.
 
@@ -431,8 +439,8 @@ SplashProjectile snapshots damage/type/defense overrides/penetration/radius/edge
 
 ## Current live Inspector files
 
-- `Offensive/BattleTower/DefaultBattleTowerConfig.tres`: name/description, ConstructionCosts (200 Credits), aiming, range, shots/sec, damage, projectile speed, target priority and target search interval.
-- `Offensive/BlasterCannon/DefaultBlasterCannonConfig.tres`: 300-Credit recipe, Explosive base hit, area radius/edge fraction, penetration, response overrides and aiming; Upgrades/Level2.tres owns the 200-Credit tier.
+- `Offensive/BattleTower/DefaultBattleTowerConfig.tres`: identity, target priority and tracking policy; BattleTowerLevels.cs owns all combat numbers and prices.
+- `Offensive/LaserTower/DefaultLaserTowerConfig.tres` and `Offensive/BlasterCannon/DefaultBlasterCannonConfig.tres`: non-level identity/target/tracking policy; their *Levels.cs files own all complete levels/prices.
 - `DefaultTowerConfig.tres`: shared placement/selection preview flags; `AllowUpgrades` is **active**, while selling/refund settings remain future work.
 - `FEEDBACK/DefenseBars/DefaultDefenseBarConfig.tres`: reusable health bar appearance when towers become damageable.
 
@@ -440,19 +448,19 @@ SplashProjectile snapshots damage/type/defense overrides/penetration/radius/edge
 
 
 ## Implemented Phase 3A verification
-All eight stage files and the single coordinator exist. TowerFinalStats is a separate immutable instance snapshot; source Config remains Inspector-editable and numeric changes automatically rebuild. Resource replacement/exit remove old subscriptions. StatsChanged refreshes selected Inspector values/range rings; combat ticks consume cached results. Safety bounds and optional traces are documented in Shared/Stats/README.md. TowerStatChecks validates stage order, baseline parity, clamps, cache/input isolation, per-tower independence, live tuning and disabled/re-enabled firing. That statement describes the earlier 3A-only milestone; tier purchasing and the Upgrade button were subsequently implemented in Phase 3B. Rank/research/condition/effect gameplay remains future work.
+All eight stage files and the single coordinator exist. TowerFinalStats is a separate immutable instance snapshot; identity/policy Config remains Inspector-editable and SetLevelStats changes automatically rebuild. Resource replacement/exit remove old subscriptions. StatsChanged refreshes selected Inspector values/range rings; combat ticks consume cached results. Safety bounds and optional traces are documented in Shared/Stats/README.md. TowerStatChecks validates stage order, baseline parity, clamps, cache/input isolation, per-tower independence, live tuning and disabled/re-enabled firing. That statement describes the earlier 3A-only milestone; tier purchasing and the Upgrade button were subsequently implemented in Phase 3B. Rank/research/condition/effect gameplay remains future work.
 
 
 ## Implemented Phase 3B verification
-BattleTower uses shared TowerBase UpgradeLevel (starting at 1) and the existing eight-stage resolver. Editable Level2/Level3 tiers cost 150/250 Credits and produce 16/22 damage, 1.2/1.5 shots/sec and 288/320px range at current base balance. These are playtest values, not finalized balance. Tier/modifier/cost Resources are explicitly copied per instance; base Config remains unchanged.
+BattleTower uses UpgradeLevel starting at 1 and complete rows in BattleTowerLevels.cs. Levels 2/3 cost 150/250 Credits and directly select 16/22 damage, 1.2/1.5 shots/sec and 288/320px range. Each instance owns copies of rows/recipes.
 
 The selected Inspector displays current level, actual next-tier stat differences, price, affordability and max-tier status. Purchases use EconomyManager.TryPurchase, do not change navigation/occupancy or reset cooldown/aim, and notify UI after payment commits. Build previews/prototype towers have no upgrade action. The larger Inspector grows upward while the Ctrl tray retains its configured height.
 
-TowerUpgradeChecks covers paid HUD actions, stale/same-frame duplicate protection, global AllowUpgrades, insufficient/secondary-resource costs, max tier, source isolation, preview parity, deterministic stage arithmetic, no compounding and layout/independent panels. No rank, research, level/effect gameplay, selling or visual tower upgrade artwork was added.
+TowerUpgradeChecks covers paid HUD actions, stale/same-frame duplicate protection, global AllowUpgrades, insufficient/secondary-resource costs, max tier, source isolation, preview parity, deterministic snapshot selection, no compounding and layout/independent panels. No rank, research, level/effect gameplay, selling or visual tower upgrade artwork was added.
 
 ## Implemented Phase 4A/4B verification and authoring
 
-`DefaultTowerCatalog.tres` references BattleTowerDefinition, LaserTowerDefinition and BlasterCannonDefinition. Add a tower by authoring a compatible `TowerBase` scene/script, typed `TowerConfig`, icon and `TowerDefinition` (ID/category/scene/config/icon/1×1 footprint), then adding the definition to the catalog's Definitions array. Expand DefaultConfig to edit its name, description, construction costs and tiers. Definitions do not independently override prices or names. Rebuild the catalog and rebind the HUD after runtime registration/availability edits; ordinary frames do neither. Available=false hides the build entry and rejects placement; asset/config validation still applies to registered entries. Empty catalogs display a safe message.
+`DefaultTowerCatalog.tres` references BattleTowerDefinition, LaserTowerDefinition and BlasterCannonDefinition. Add a tower by authoring a compatible `TowerBase` scene/script, typed `TowerConfig`, icon and `TowerDefinition` (ID/category/scene/config/icon/1×1 footprint), then adding the definition to the catalog's Definitions array. Expand DefaultConfig to edit identity and non-level policy; edit its *Levels.cs table for all numeric combat stats and prices. Definitions do not independently override prices or names. Rebuild the catalog and rebind the HUD after runtime registration/availability edits; ordinary frames do neither. Available=false hides the build entry and rejects placement; asset/config validation still applies to registered entries. Empty catalogs display a safe message.
 
 Passive scenes need no pivot, projectile node, weapon stats, range ring or processing. `TowerConfig.ResolveStats`/`DescribeStats`/`DescribeChanges` are type-aware adapters; Battle keeps the unchanged eight numerical stages and real upgrade preview. Future passive progression with actual capability stats can supply its own typed data when that consumer exists; the passive fixture deliberately has no upgrades or combat snapshot.
 

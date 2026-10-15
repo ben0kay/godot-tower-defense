@@ -1,3 +1,5 @@
-# Laser purchased tier
+# Level data moved to C#
 
-Level2.tres costs 175 Credits and adds 10 BeamDps plus32px range. The shared stage 02 arithmetic and existing atomic TowerUpgradeController resolve/pay this tier; current defaults become30 base DPS/288px. Prices and modifiers are provisional, Inspector-editable and copied per instance. No rank/research/effects are active.
+Edit [`../LaserTowerLevels.cs`](../LaserTowerLevels.cs). It contains one complete typed row per level, including its construction/upgrade credit price. The old level-specific .tres assets and cumulative modifiers have been removed. Add another consecutive row to extend the maximum level; no controller changes are needed.
+
+The existing shared wallet still handles ResourceCost recipes and atomic deductions. See the parent README and TOWERS/Shared/Upgrades/README.md for current behavior.

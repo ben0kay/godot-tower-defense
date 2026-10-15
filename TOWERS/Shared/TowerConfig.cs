@@ -1,4 +1,4 @@
-// Shared authored identity, recipes and optional progression; weapon values stay on typed configs.
+// Shared Inspector identity and private runtime copies of explicit C# level rows.
 using Godot;
 
 [GlobalClass]
@@ -7,23 +7,32 @@ public partial class TowerConfig : Resource
     [ExportGroup("Identity")]
     [Export] public string DisplayName { get; set; } = "Tower";
     [Export] public string Description { get; set; } = "";
-    [ExportGroup("Construction")]
-    [Export] public Godot.Collections.Array<ResourceCost> ConstructionCosts { get; set; } = new();
-    [ExportGroup("Upgrades")]
-    [Export] public Godot.Collections.Array<TowerUpgradeTier> UpgradeTiers { get; set; } = new();
+    // Runtime copies of the tower's C# rows; empty for passive test-only configs.
+    public System.Collections.Generic.List<TowerLevel> Levels { get; protected set; } = new();
+    private Godot.Collections.Array<ResourceCost> _passiveCosts = new();
+    public Godot.Collections.Array<ResourceCost> ConstructionCosts
+    {
+        get => Levels.Count == 0 ? _passiveCosts : Levels[0].Costs;
+        set { if (Levels.Count == 0) _passiveCosts = value; else Levels[0].Costs = value; }
+    }
 
     // =========================================================
-    // Explicitly copy external mutable tier/cost resources rather than sharing array entries.
+    // Absolute per-instance tuning replaces a single row and invalidates listeners once.
+    public void SetLevelStats(int level, TowerStatBlock stats)
+    {
+        if (level < 1 || level > Levels.Count) throw new System.ArgumentOutOfRangeException(nameof(level));
+        if (Levels[level - 1].Stats == stats) return;
+        Levels[level - 1].Stats = stats; EmitChanged();
+    }
+
+    // =========================================================
+    // Copy absolute rows and mutable recipes rather than sharing placed-instance inputs.
     public virtual TowerConfig CreateInstanceCopy()
     {
         TowerConfig copy = (TowerConfig)Duplicate(true);
-        copy.ConstructionCosts = TowerUpgradeTier.CopyCosts(ConstructionCosts);
-        if (UpgradeTiers == null) copy.UpgradeTiers = null;
-        else
-        {
-            copy.UpgradeTiers = new();
-            foreach (TowerUpgradeTier tier in UpgradeTiers) copy.UpgradeTiers.Add(tier?.CreateInstanceCopy());
-        }
+        copy._passiveCosts = TowerLevel.CopyCosts(_passiveCosts);
+        copy.Levels = new();
+        foreach (TowerLevel level in Levels) copy.Levels.Add(level?.CreateInstanceCopy());
         return copy;
     }
 
@@ -38,4 +47,26 @@ public partial class TowerConfig : Resource
     // =========================================================
     // Types describe changes from their own resolver; no duplicated preview arithmetic.
     public virtual string DescribeChanges(TowerFinalStats now, TowerFinalStats future) => "";
+    // =========================================================
+    // Optional response changes are described from final snapshots, with the same fallback profile.
+    protected static string DescribeWeaponChanges(TowerFinalStats now, TowerFinalStats future)
+    {
+        if (now.Weapon == future.Weapon) return "";
+        string changes = "";
+        if (now.Weapon?.Type != future.Weapon?.Type)
+            changes += $"Damage type: {now.Weapon?.Type} → {future.Weapon?.Type}\n";
+        if (now.Weapon.HasValue && future.Weapon.HasValue)
+        {
+            WeaponDamageStats a = now.Weapon.Value, b = future.Weapon.Value;
+            var oldDefaults = DamageResolver.DefaultProfile.Coefficients(a.Type);
+            var newDefaults = DamageResolver.DefaultProfile.Coefficients(b.Type);
+            float oldShield = a.OverrideShield ? a.ShieldCoefficient : oldDefaults.Shield;
+            float newShield = b.OverrideShield ? b.ShieldCoefficient : newDefaults.Shield;
+            float oldHull = a.OverrideHull ? a.HullCoefficient : oldDefaults.Hull;
+            float newHull = b.OverrideHull ? b.HullCoefficient : newDefaults.Hull;
+            if (oldShield != newShield) changes += $"Shield: {oldShield:0.00}x → {newShield:0.00}x\n";
+            if (oldHull != newHull) changes += $"Hull: {oldHull:0.00}x → {newHull:0.00}x\n";
+        }
+        return changes;
+    }
 }

@@ -1,25 +1,20 @@
-# Ordered stat stages
+# Ordered stat stages — explicit purchased levels
 
-TowerStatPipeline.cs is the single coordinator. Each stage is an ordinary static C# helper, not a Godot Node or service. Numbered filenames provide visible order without numeric C# type names.
+`TowerStatPipeline.cs` remains the single eight-stage coordinator. Each stage is a plain static C# helper, not a Node or service.
 
 | File | Current behavior |
 | --- | --- |
-| 01_BaseStats.cs | Copy the resolution context's authored snapshot |
-| 02_TowerUpgrades.cs | Active; cumulative purchased tier operations |
-| 03_TowerRanks.cs | Neutral; kill milestones later |
-| 04_PermanentResearch.cs | Neutral; persistent player research later |
-| 05_LevelModifiers.cs | Neutral; current-map conditions later |
-| 06_ActiveEffects.cs | Neutral; runtime buffs/debuffs later |
-| 07_SafetyClamps.cs | Safe finite values and supported zero-rate firing |
-| 08_FinalStats.cs | Fresh immutable final snapshot |
+| 01_BaseStats.cs | Copy the tower's complete Level 1 snapshot |
+| 02_TowerUpgrades.cs | Replace with the selected level's complete absolute snapshot |
+| 03_TowerRanks.cs | Neutral; earned ranks deferred |
+| 04_PermanentResearch.cs | Neutral; persistent research deferred |
+| 05_LevelModifiers.cs | Neutral; map conditions deferred |
+| 06_ActiveEffects.cs | Neutral; temporary effects deferred |
+| 07_SafetyClamps.cs | Finite bounds, optional beam/area clamps, supported zero-rate firing |
+| 08_FinalStats.cs | Publish an immutable cached snapshot, including weapon response |
 
-Future stages receive their own read-only inputs through TowerStatContext and return a new TowerStatBlock. Keep stage arithmetic/order explicit, rebuild from original inputs and use this same resolver for upgrade previews. Stage files must not spend money, own progression saves, attribute kills or schedule timed effects.
+Stage 02 does **no additive, percentage or cumulative upgrade arithmetic**. Level 3 reads row 3 directly, regardless of row 2's damage, rate, range, speed, aiming or penetration. Every type authors its own compact typed table: `BattleTowerLevels.cs`, `LaserTowerLevels.cs`, `BlasterCannonLevels.cs`. Construction/upgrade prices are outside combat math and enter the existing wallet as ResourceCost recipes.
 
+`TowerStatContext(BaseStats, SelectedLevel)` carries immutable values. Optional BeamStats, AreaBlastStats and WeaponDamageStats preserve the capabilities present on that weapon; passive fixtures need no combat snapshot. Stage 02 selects all of them together. Ranks/research/map/effect stages can later modify the selected row in their existing order; no such systems or generic modifier engine are implemented now.
 
-Optional BeamStats now propagates through all eight stages. Stage 02 applies TowerStatId.BeamDps with existing arithmetic, Stage 07 clamps DPS, Stage 08 includes the immutable capability. Original Battle fields/adapter/constructors and neutral future stages remain supported; no parallel Laser pipeline exists.
-
-## Phase 4D optional area capability
-
-AreaBlastStats(RadiusPixels, EdgeDamageFraction) appends as an optional nullable Area value on TowerStatBlock/FinalStats, preserving old constructor defaults and leaving Battle/Laser/passive capabilities unchanged. Blaster supplies it through the single coordinator. AreaRadius and AreaEdgeFraction append to TowerStatId without renumbering existing IDs. Stage 02 applies existing flat/percent/multiplier arithmetic; Stage 07 clamps radius to finite nonnegative pixels and edge retention to finite 0..1; Stage 08 publishes both. All eight stages remain in the same order.
-
-Blaster's authored paid tier adds damage/radius only. Edge retention is a weapon input ready for future permanent research, with Stage 04 still neutral. Config changes invalidate cached stats and selected Inspector details; launched projectiles retain their own immutable snapshot. BlasterCannonChecks covers stage propagation/operations/safety, source isolation, no tick-based cache rebuilding and paid preview parity.
+Preview and paid application call the same resolver. Resolve on Ready, config replacement/Changed or explicit RebuildStats, never each physics tick. `SetLevelStats(level, snapshot)` replaces one runtime row and emits Changed only when values differ. `TowerStatTrace` records all eight intermediate values on request. Stages never spend money, own saves, schedule effects or scan scene nodes.

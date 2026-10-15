@@ -1,3 +1,5 @@
-# Blaster Cannon paid tier
+# Level data moved to C#
 
-Level2.tres costs 200 Credits and adds 15 base damage plus 16 px blast radius via the existing typed modifier/wallet pipeline. With the default source it resolves 75 damage / 96 px radius / unchanged 25% edge retention. The asset does not grant permanent research or change falloff. Source tiers/costs are privately copied for placed towers; preview and paid application resolve the same final stats.
+Edit [`../BlasterCannonLevels.cs`](../BlasterCannonLevels.cs). It contains one complete typed row per level, including its construction/upgrade credit price. The old level-specific .tres assets and cumulative modifiers have been removed. Add another consecutive row to extend the maximum level; no controller changes are needed.
+
+The existing shared wallet still handles ResourceCost recipes and atomic deductions. See the parent README and TOWERS/Shared/Upgrades/README.md for current behavior.

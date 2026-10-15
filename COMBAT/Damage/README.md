@@ -8,15 +8,15 @@
 
 | Type | Shield coefficient | Hull coefficient |
 | --- | --- | --- |
-| Kinetic | 0.50 | 1.00 |
+| Kinetic | 0.25 | 1.00 |
 | Energy | 2.00 | 0.85 |
 | Explosive | 0.25 | 1.25 |
 
 Per-hit overrides **replace**, rather than multiply, the respective fallback. Laser's 6.00x override is exactly 6.00x, independent of Energy's 2.00x fallback. Disabling either Laser opt-in flag independently restores that type default. Future Energy Cryo/Stasis weapons retain the Energy defaults unless they author their own overrides.
 
-LaserTowerConfig exposes opt-in flags and finite nonnegative coefficient values in its Defense Coefficient Overrides group. Authored Laser balance is 12 base DPS, shield override6.00x, hull override0.15x:72 shield points/s or1.8 exposed hull/s while aligned. Construction remains250 Credits; its existing175-Credit tier adds10 base DPS and32px range, yielding22 DPS/288px. BeamRenderer remains visual-only.
+LaserTowerLevels.cs contains per-level opt-in flags and finite nonnegative coefficient values; the selected snapshot owns the beam response. Authored Laser balance is 12 base DPS, shield override6.00x, hull override0.15x:72 shield points/s or1.8 exposed hull/s while aligned. Construction remains250 Credits; its existing175-Credit tier adds10 base DPS and32px range, yielding22 DPS/288px. BeamRenderer remains visual-only.
 
-BattleTowerConfig exposes ShieldPenetration=0.05 as a base weapon stat. It flows through the single eight-stage pipeline into cached TowerFinalStats, is clamped to finite0..1 at Stage 07, and is snapshotted in the guided projectile's DamageInfo. Battle's12 damage/shot and12→16→22 tier damage progression remain intact. Its200 construction and150/250 upgrade prices are unchanged. The default config references the existing Level2/Level3 assets explicitly; missing references in the prior HEAD were restored without editing tier contents. All other hit/stat constructors default to zero penetration. Passive towers still need no weapon capability or stats.
+BattleTowerLevels.cs explicitly includes ShieldPenetration=0.05 in every authored row. It flows through the single eight-stage pipeline into cached TowerFinalStats, is clamped to finite0..1 at Stage 07, and is snapshotted in the guided projectile's DamageInfo. Battle's12 damage/shot and12→16→22 tier damage progression remain intact. Its200 construction and150/250 upgrade prices are unchanged. All purchased levels are now complete C# snapshots; obsolete level-specific upgrade assets/references have been removed. All other hit/stat constructors default to zero penetration. Passive towers still need no weapon capability or stats.
 
 ## Resolution math
 
@@ -31,7 +31,7 @@ Double intermediates prevent overflow; resulting shield/health remain finite and
 
 | Fixture (60 starting hull) | Resulting shield | Resulting hull |
 | --- | --- | --- |
-| Battle12,100 shield,5% penetration | 94.3 | 59.4 |
+| Battle12,100 shield,5% penetration | 97.15 | 59.4 |
 | Battle12,no shield | 0 | 48 |
 | Laser12,100 shield,6.00/0.15 overrides | 28 | 60 |
 | Laser12,30 shield,6.00/0.15 overrides | 0 | 58.95 |

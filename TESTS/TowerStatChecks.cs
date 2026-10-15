@@ -8,6 +8,7 @@ public static class TowerStatChecks
     // Assert baseline parity, all eight stages, safe input handling and independent live caches.
     public static void Run(Node battle)
     {
+        ExplicitLevels();
         BattleTowerConfig defaults = GD.Load<BattleTowerConfig>("res://TOWERS/Offensive/BattleTower/DefaultBattleTowerConfig.tres");
         TowerStatTrace trace = new();
         TowerFinalStats baseline = TowerStatPipeline.Resolve(defaults, trace);
@@ -102,6 +103,56 @@ public static class TowerStatChecks
         }
         finally { first.Free(); second.Free(); }
         GD.Print("PASS: eight-stage tower pipeline, baseline parity, clamps, immutable caches, Inspector edits and instance independence");
+    }
+
+    // =========================================================
+    // Assert full migration parity independently of the production row adapters.
+    private static void ExplicitLevels()
+    {
+        BattleTowerConfig battle = new(); LaserTowerConfig laser = new(); BlasterCannonConfig blaster = new();
+        TowerFinalStats[] battleExpected = {
+            new(256, 1, 12, 600, 180, 12, .15f, ShieldPenetration: .05f),
+            new(288, 1.2f, 16, 600, 180, 12, .15f, ShieldPenetration: .05f),
+            new(320, 1.5f, 22, 600, 180, 12, .15f, ShieldPenetration: .05f) };
+        TowerFinalStats[] laserExpected = {
+            new(256, 0, 0, 1, 180, 12, .15f, new BeamStats(12), Weapon: new(DamageType.Energy, true, 6, true, .15f)),
+            new(288, 0, 0, 1, 180, 12, .15f, new BeamStats(22), Weapon: new(DamageType.Energy, true, 6, true, .15f)) };
+        TowerFinalStats[] blasterExpected = {
+            new(256, .5f, 60, 500, 180, 12, .15f, Area: new(80, .25f), Weapon: new(DamageType.Explosive, false, 1, false, 1)),
+            new(256, .5f, 75, 500, 180, 12, .15f, Area: new(96, .25f), Weapon: new(DamageType.Explosive, false, 1, false, 1)) };
+        CheckRows(battle, battleExpected, new[] { 200, 150, 250 });
+        CheckRows(laser, laserExpected, new[] { 250, 175 });
+        CheckRows(blaster, blasterExpected, new[] { 300, 200 });
+        TowerFinalStats last = battle.ResolveStats(3);
+        battle.SetLevelStats(2, battle.Levels[1].Stats with { RangePixels = 700, DamagePerShot = 999,
+            ShotsPerSecond = 7, ProjectileSpeed = 1500, RotationSpeedDegrees = 300,
+            AimToleranceDegrees = 80, TargetSearchInterval = .8f, ShieldPenetration = .9f });
+        Require(battle.ResolveStats(3) == last, "Level3 ignores every level2 combat field");
+        TowerLevel fourth = new(4, 400, battle.Levels[2].Stats with { DamagePerShot = 30, RangePixels = 400 });
+        battle.Levels.Add(fourth);
+        Require(battle.ResolveStats(4).DamagePerShot == 30 && battle.Levels[3].Costs[0].Amount == 400,
+            "Adding another complete row requires no progression-code changes");
+        Require(new BattleTowerConfig().ResolveStats(2).DamagePerShot == 16, "Runtime rows never alter C# defaults");
+        foreach (int level in new[] { 0, 5 })
+        {
+            try { battle.ResolveStats(level); throw new InvalidOperationException("Out-of-range level accepted."); }
+            catch (ArgumentOutOfRangeException) { }
+        }
+        GD.Print("PASS: exact complete Battle1–3/Laser1–2/Blaster1–2 stats and costs, row independence and append-only expansion");
+    }
+
+    // =========================================================
+    // Compare all fields, then ensure each level uses its ordinary shared Credits recipe.
+    private static void CheckRows(TowerConfig config, TowerFinalStats[] expected, int[] costs)
+    {
+        Require(config.Levels.Count == expected.Length, "Migrated level count is exact");
+        for (int i = 0; i < expected.Length; i++)
+        {
+            Require(config.ResolveStats(i + 1) == expected[i], $"Exact complete {config.DisplayName} level{i + 1} stats");
+            Require(config.Levels[i].Level == i + 1 && config.Levels[i].Costs.Count == 1 &&
+                config.Levels[i].Costs[0].Resource.ResourceId == "credits" && config.Levels[i].Costs[0].Amount == costs[i],
+                "Construction and purchase rows retain their exact shared-resource prices");
+        }
     }
 
     // =========================================================

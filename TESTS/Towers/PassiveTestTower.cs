@@ -5,7 +5,7 @@ public partial class PassiveTestTower : TowerBase
 {
     [Export] public TowerConfig Config { get; set; }
     public override TowerConfig AuthoredConfig => Config;
-    public override Godot.Collections.Array<TowerUpgradeTier> UpgradeTiers => Config.UpgradeTiers;
+    public override System.Collections.Generic.List<TowerLevel> Levels => Config.Levels;
     // =========================================================
     // Passive fixture deliberately accepts only the shared non-weapon config.
     public override bool AcceptsConfig(TowerConfig config) => config != null && config.GetType() == typeof(TowerConfig);

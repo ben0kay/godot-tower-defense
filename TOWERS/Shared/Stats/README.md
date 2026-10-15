@@ -1,32 +1,13 @@
-# Tower stats — Phase 3A
+# Tower stats — complete explicit levels
 
-BattleTowerConfig is the editable authored input. TowerStatPipeline copies its resolvable combat values into a read-only TowerStatContext/TowerStatBlock and resolves all eight stages into an immutable TowerFinalStats snapshot. Identity, construction prices, targeting priority and RotateWhileTracking remain policy/metadata on Config.
+Author combat values and credit prices in each tower's `*Levels.cs` file. Its labeled, strongly typed rows contain actual values at that level, including aiming/search interval, penetration, optional beam DPS or area radius/edge retention, and applicable shield/hull response overrides. There are no purchased modifier resources or duplicate numeric Inspector defaults.
 
-Open Pipeline/TowerStatPipeline.cs to see the actual execution order. The numbered files each contain one stage. BaseStats, purchased TowerUpgrades, SafetyClamps and FinalStats are active; ranks, permanent research, level rules and active effects are neutral. Paid tiers reuse the existing wallet; no future managers or fake saved progression are required.
+TowerConfig holds private runtime row/recipe copies. Its C# Level 1 convenience accessors forward directly to row 1; they are not separate sources and do not affect other levels. For any level use `config.SetLevelStats(level, config.Levels[level - 1].Stats with { ... })`. This replaces an absolute snapshot and emits Changed once. Direct low-level row edits require RebuildStats; use CreateInstanceCopy rather than Godot Duplicate for copying runtime rows/recipes.
 
-BattleTower builds its cache on Ready and Config.Changed. Combat reads FinalStats for range, rate, damage, projectile speed, aiming and search interval. BattleTowerConfig numeric setters emit Changed only when a value differs, so runtime C# edits and Remote Inspector tuning rebuild immediately. Replacing the Config unsubscribes the old resource; leaving the scene unsubscribes too. RebuildStats() is the explicit entry point for future input invalidation.
+The single [pipeline](Pipeline/README.md) retains all eight stages. Stage 01 establishes Level 1; Stage 02 substitutes the selected full row; Stages 03–06 remain neutral. Stage 07 retains finite safety bounds: nonnegative range/rate/damage/rotation/DPS/radius, projectile speed >= 1, search interval >= .05s, aim 0–180°, penetration/edge retention 0–1. Damage responses retain DamageResolver's independent override validation and fallback policy. Stage 08 publishes immutable TowerFinalStats.
 
-Selected tower details and range rings read the same final cache; StatsChanged refreshes displayed values. Build previews use the same resolver without spending/mutating anything. Resolution is not performed each physics tick.
+BeamStats and AreaBlastStats remain optional; WeaponDamageStats carries damage type/independent override flags/coefficients on weapons that use them. Laser beams and Blaster launch payloads read the selected cached response, not the Level 1 config. Battle keeps Kinetic guided delivery and 5% penetration at every authored level.
 
-TowerStatModifier carries typed operation/source data in immutable resolution snapshots; Stage 02 consumes purchased tier modifiers. It owns no timers or manager. Future context inputs/stages should be activated only when their owning features exist. Permanent research belongs to persistent player progression, level rules to LEVELS and timed effects to their instance sources.
+Ready, Config.Changed/replacement and successful purchases rebuild the cache; normal physics/beam ticks reuse FinalStats. StatsChanged refreshes the selected gameplay Inspector/range ring. Upgrade previews use the same resolver as the paid snapshot. Target priority, tracking policy, artwork and visual style stay outside numerical resolution. Passive fixtures still need no combat values or attack loop.
 
-TowerStatTrace is opt-in and records immutable snapshots for debugging. Calling Resolve(config, trace) clears/reuses that trace. Ordinary runtime resolution supplies no trace; normal combat allocates no pipeline snapshots.
-
-The current safety rules preserve all valid baseline values. NaN/infinity resolve to minima: range/rate/rotation/damage >= 0, projectile speed >= 1 (matching BasicProjectile), search interval >= 0.05 seconds, aim tolerance within 0–180 degrees. Zero fire rate disables shooting. No arbitrary balance upper limits are introduced. Inputs are never clamped in place.
-
-TESTS/TowerStatChecks.cs covers baseline parity, numbered order, neutral stages, deterministic results, trace reuse, clamps, immutable snapshots, independent towers, numeric Resource changes/replacement, unsubscribe on exit, no tick-based rebuilding, live zero-rate gating and updated Inspector values. Existing combat, economy, wave, terrain and navigation tests remain active.
-
-Phase 4A: shared TowerConfig.ResolveStats/DescribeStats/DescribeChanges provide type-aware input/presentation adapters. BattleTowerConfig retains its numeric exports and unchanged Battle input adapter into TowerStatContext; none of the eight stages were rewritten. Passive types may have no combat snapshot or weapon fields. TowerDefinition references canonical Config inputs; catalog/HUD do not duplicate math or prices.
-
-
-Phase 4C-2: optional nullable BeamStats on TowerStatBlock/FinalStats carries genuine float DamagePerSecond. Existing seven-argument constructors remain valid with absent Beam. A shared base-block/tiers adapter snapshots purchased modifiers for both configs; Stage 02 applies BeamDps flat/percent/multiplier operations without integer rounding, Stage 07 clamps invalid/negative DPS, Stage 08 publishes it. Neutral stages propagate the optional capability unchanged. Laser attack/live Inspector/upgrade preview consume the same cached result; BeamStyle never enters this pipeline.
-
-## Phase 4C-3 penetration
-
-TowerStatBlock/FinalStats add an optional trailing ShieldPenetration float (default0), preserving old constructors. Battle's adapter supplies its 0.05 base; all eight existing stages propagate it. Stage 07 clamps negative/nonfinite values to 0 and values above 1 to1; Stage 08 publishes it. Paid Battle tiers do not modify it, and Stage 04 permanent research remains neutral. Config setters invalidate once and the selected Inspector reads the effective snapshot. Laser/passive types are not given fictitious projectile capability. Future permanent ballistic research must use the existing pipeline with cache invalidation, not purchased tier assets.
-
-## Phase 4D optional area capability
-
-AreaBlastStats(RadiusPixels, EdgeDamageFraction) appends as an optional nullable Area value on TowerStatBlock/FinalStats, preserving old constructor defaults and leaving Battle/Laser/passive capabilities unchanged. Blaster supplies it through the single coordinator. AreaRadius and AreaEdgeFraction append to TowerStatId without renumbering existing IDs. Stage 02 applies existing flat/percent/multiplier arithmetic; Stage 07 clamps radius to finite nonnegative pixels and edge retention to finite 0..1; Stage 08 publishes both. All eight stages remain in the same order.
-
-Blaster's authored paid tier adds damage/radius only. Edge retention is a weapon input ready for future permanent research, with Stage 04 still neutral. Config changes invalidate cached stats and selected Inspector details; launched projectiles retain their own immutable snapshot. BlasterCannonChecks covers stage propagation/operations/safety, source isolation, no tick-based cache rebuilding and paid preview parity.
+TowerStatChecks compares every field and price at Battle 1–3, Laser 1–2 and Blaster 1–2; checks Stage 02 substitution, level independence, append-only expansion, bounds, immutable caches and no per-tick rebuild. TowerUpgradeChecks/LaserTowerChecks/BlasterCannonChecks cover real purchases, Inspector parity and combat. See TESTS/README.md for execution results.

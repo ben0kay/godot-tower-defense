@@ -25,7 +25,7 @@ public partial class LaserTower : TowerBase
     }
     public override TowerConfig AuthoredConfig => Config;
     public override float? InspectionRange => FinalStats?.RangePixels;
-    public override Godot.Collections.Array<TowerUpgradeTier> UpgradeTiers => Config?.UpgradeTiers;
+    public override System.Collections.Generic.List<TowerLevel> Levels => Config?.Levels;
     private EnemyRegistry _registry;
     private Enemy _target;
     private Node2D _pivot;
@@ -91,7 +91,7 @@ public partial class LaserTower : TowerBase
         if (!aligned) { ClearBeam(); return; }
         Enemy locked = _target;
         double amount = FinalStats.Beam.Value.DamagePerSecond * delta;
-        locked.ApplyDamage(Config.CreateHit((float)System.Math.Min(float.MaxValue, amount)));
+        locked.ApplyDamage(Config.CreateHit((float)System.Math.Min(float.MaxValue, amount), FinalStats));
         // Removal callbacks may clear/change the lock; never apply this tick to a replacement enemy.
         if (locked != _target || !TowerTargeting.Valid(locked, GlobalPosition, FinalStats.RangePixels))
         { ClearBeam(); return; }

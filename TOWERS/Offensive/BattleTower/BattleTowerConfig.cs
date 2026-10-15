@@ -1,60 +1,39 @@
-// Editable single-barrel starter turret stats for automatic targeting and firing.
-// The shared DefaultBattleTowerConfig.tres is editable in the Godot Inspector.
+// Non-level Inspector policy and presentation; all level defaults live in BattleTowerLevels.cs.
 using Godot;
-using System.Collections.Generic;
 
 [GlobalClass]
 public partial class BattleTowerConfig : TowerConfig
 {
     // =========================================================
-    // Preserve the existing Battle identity when authored resources omit default-valued fields.
+    // C# tables are the sole authored source of combat values and construction/upgrade prices.
     public BattleTowerConfig()
     {
         DisplayName = "Battle Tower";
         Description = "Versatile baseline turret: one barrel and balanced range/fire rate.";
+        Levels = BattleTowerLevels.Create();
     }
 
-    [ExportGroup("Combat")]
-    [Export(PropertyHint.Range, "32,1024,16")] public float RangePixels { get => _rangePixels; set => SetStat(ref _rangePixels, value); }
-    [Export(PropertyHint.Range, "0,10,0.1")] public float ShotsPerSecond { get => _shotsPerSecond; set => SetStat(ref _shotsPerSecond, value); }
-    [Export(PropertyHint.Range, "1,100,1")] public int DamagePerShot { get => _damagePerShot; set => SetStat(ref _damagePerShot, value); }
-    [Export(PropertyHint.Range, "50,3000,25")] public float ProjectileSpeed { get => _projectileSpeed; set => SetStat(ref _projectileSpeed, value); }
-    [ExportGroup("Shield Penetration")]
-    [Export(PropertyHint.Range, "0,1,0.01")] public float ShieldPenetration { get => _shieldPenetration; set => SetStat(ref _shieldPenetration, value); }
     [ExportGroup("Aiming")]
-    [Export(PropertyHint.Range, "0,720,5")] public float RotationSpeedDegrees { get => _rotationSpeedDegrees; set => SetStat(ref _rotationSpeedDegrees, value); }
-    [Export(PropertyHint.Range, "0,180,1")] public float AimToleranceDegrees { get => _aimToleranceDegrees; set => SetStat(ref _aimToleranceDegrees, value); }
     [Export] public bool RotateWhileTracking { get; set; } = true;
-
     [ExportGroup("Targeting")]
     [Export] public TowerTargeting.Priority TargetPriority { get; set; } = TowerTargeting.Priority.First;
-    [Export(PropertyHint.Range, "0.05,2,0.05")] public float TargetSearchInterval { get => _targetSearchInterval; set => SetStat(ref _targetSearchInterval, value); }
 
-    #region Stat Change Notifications
-    private float _shieldPenetration = 0.05f;
-    private float _rangePixels = 256f;
-    private float _shotsPerSecond = 1f;
-    private int _damagePerShot = 12;
-    private float _projectileSpeed = 600f;
-    private float _rotationSpeedDegrees = 180f;
-    private float _aimToleranceDegrees = 12f;
-    private float _targetSearchInterval = 0.15f;
-
-    // =========================================================
-    // Inspector and C# edits invalidate listening instances without per-frame polling.
-    private void SetStat<T>(ref T field, T value)
-    {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return;
-        field = value; EmitChanged();
-    }
-    #endregion
+    // Level-one C# tuning accessors forward directly to its snapshot; they are not Inspector sources.
+    public float RangePixels { get => Levels[0].Stats.RangePixels; set => SetLevelStats(1, Levels[0].Stats with { RangePixels = value }); }
+    public float ShotsPerSecond { get => Levels[0].Stats.ShotsPerSecond; set => SetLevelStats(1, Levels[0].Stats with { ShotsPerSecond = value }); }
+    public int DamagePerShot { get => Levels[0].Stats.DamagePerShot; set => SetLevelStats(1, Levels[0].Stats with { DamagePerShot = value }); }
+    public float ProjectileSpeed { get => Levels[0].Stats.ProjectileSpeed; set => SetLevelStats(1, Levels[0].Stats with { ProjectileSpeed = value }); }
+    public float ShieldPenetration { get => Levels[0].Stats.ShieldPenetration; set => SetLevelStats(1, Levels[0].Stats with { ShieldPenetration = value }); }
+    public float RotationSpeedDegrees { get => Levels[0].Stats.RotationSpeedDegrees; set => SetLevelStats(1, Levels[0].Stats with { RotationSpeedDegrees = value }); }
+    public float AimToleranceDegrees { get => Levels[0].Stats.AimToleranceDegrees; set => SetLevelStats(1, Levels[0].Stats with { AimToleranceDegrees = value }); }
+    public float TargetSearchInterval { get => Levels[0].Stats.TargetSearchInterval; set => SetLevelStats(1, Levels[0].Stats with { TargetSearchInterval = value }); }
 
     // =========================================================
-    // Copy external tier assets explicitly; Duplicate(true) alone retains these array references.
+    // Explicitly clone runtime rows/recipes while keeping authored defaults separate.
     public override BattleTowerConfig CreateInstanceCopy() => (BattleTowerConfig)base.CreateInstanceCopy();
 
     // =========================================================
-    // Keep the existing eight-stage Battle adapter and exact tier arithmetic.
+    // Every weapon selects its full row through the same eight stages.
     public override TowerFinalStats ResolveStats(int level) => TowerStatPipeline.Resolve(this, level);
 
     // =========================================================

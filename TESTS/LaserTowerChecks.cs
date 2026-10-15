@@ -29,7 +29,7 @@ public static class LaserTowerChecks
         LaserTower tower = towers.GetChild<LaserTower>(towers.GetChildCount() - 1); tower.SetPhysicsProcess(false);
         Require(tower.TowerTypeId == "laser" && grid.IsOccupied(cell) && wallet.GetBalance(wallet.CreditsResource) == 750 &&
             tower.FinalStats.Beam.Value.DamagePerSecond == 12 && tower.FinalStats.ShieldPenetration == 0, "Dynamic action places/pays the correct Energy tower");
-        Require(tower.Config != definition.DefaultConfig && tower.UpgradeTiers[0] != definition.DefaultConfig.UpgradeTiers[0], "Laser source/tier data is private");
+        Require(tower.Config != definition.DefaultConfig && tower.Levels[0] != definition.DefaultConfig.Levels[0], "Laser source/tier data is private");
         placement.Call("TryPlace", cell);
         Require(wallet.GetBalance(wallet.CreditsResource) == 750, "Repeat Laser occupancy cannot charge");
         Label details = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerStats");
@@ -147,9 +147,30 @@ public static class LaserTowerChecks
         Require(!unloaded.IsActive && !unloaded.Visible, "Tower unload clears renderer state/subscriptions");
         chooser.Free();
         LaserTowerConfig operations = ((LaserTowerConfig)definition.DefaultConfig).CreateInstanceCopy();
-        operations.UpgradeTiers[0].Modifiers.Add(new TowerUpgradeModifier { Stat = TowerStatId.BeamDps, Operation = TowerStatOperation.AdditivePercent, Amount = 0.2f });
-        operations.UpgradeTiers[0].Modifiers.Add(new TowerUpgradeModifier { Stat = TowerStatId.BeamDps, Operation = TowerStatOperation.Multiplier, Amount = 0.5f });
-        Require(Mathf.IsEqualApprox(operations.ResolveStats(2).Beam.Value.DamagePerSecond, 13.2f), "Beam DPS uses shared flat/percent/multiplier stage arithmetic without integer rounding");
+        TowerFinalStats upgraded = operations.ResolveStats(2);
+        operations.DamagePerSecond = 999; operations.HullCoefficient = 4; operations.ShieldPenetration = 0.5f;
+        Require(operations.ResolveStats(2) == upgraded, "Laser level2 DPS/response/penetration are independent of level1");
+        operations.SetLevelStats(2, operations.Levels[1].Stats with {
+            Beam = new BeamStats(13.2f), ShieldPenetration = 0.4f,
+            Weapon = new(DamageType.Energy, true, 3, true, 2) });
+        TowerFinalStats customBeam = operations.ResolveStats(2);
+        Require(customBeam.Beam.Value.DamagePerSecond == 13.2f &&
+            operations.CreateHit(10, customBeam).ShieldPenetration == 0.4f &&
+            operations.CreateHit(10, customBeam).HullCoefficientOverride == 2,
+            "Selected beam row preserves fractional DPS, response overrides and penetration");
+        Require(operations.DescribeChanges(upgraded, customBeam).Contains("Hull: 0.15x → 2.00x") &&
+            operations.DescribeChanges(upgraded, customBeam).Contains("Shield Penetration: 0% → 40%") &&
+            operations.DescribeStats(customBeam).Contains("Hull: 2.00x"),
+            "Weapon response and penetration previews describe the selected final snapshot");
+        Enemy upgradedTarget = spawns.Spawn(enemyScene, true); upgradedTarget.Movement.SetPhysicsProcess(false);
+        LaserTower upgradedAttacker = Create(definition, towers, upgradedTarget.GlobalPosition + new Vector2(0, 64));
+        upgradedAttacker.Config.SetLevelStats(2, operations.Levels[1].Stats);
+        Require(TowerUpgradeController.TryUpgrade(upgradedAttacker, wallet, placement.Settings, 1, out _) &&
+            upgradedAttacker.NextUpgrade == null, "Laser buys its last complete row and detects maximum level");
+        upgradedAttacker._PhysicsProcess(1);
+        Require(Mathf.IsEqualApprox(upgradedTarget.Health, 33.6f),
+            "Real upgraded beam reads row2 DPS/response rather than row1 numeric accessors");
+        upgradedAttacker.Free(); upgradedTarget.Arrive();
         LaserTowerConfig invalid = ((LaserTowerConfig)definition.DefaultConfig).CreateInstanceCopy(); invalid.DamagePerSecond = float.NaN;
         Require(invalid.ResolveStats(1).Beam.Value.DamagePerSecond == 0, "Beam capability has finite safety clamps");
         LaserTowerConfig inherited = ((LaserTowerConfig)definition.DefaultConfig).CreateInstanceCopy();
