@@ -17,6 +17,6 @@ Ranks/ provides five named, XP-earned ranks independent of Level purchases. Ever
 
 - [Construction](Construction/README.md): time-based build/upgrade state, with existing placement and wallet authority preserved.
 - [Ammunition](Ammunition/README.md): optional per-tower reserve, magazine and reload state.
-- [Power](Power/README.md): optional per-building draw, operational status and Inspector priority; the shared network belongs to [POWER](../../POWER/README.md).
+- [Power](Power/README.md): optional per-building draw, operational status and Inspector priority; the shared network belongs to [POWER](../Economy/Power/README.md).
 
 Do not introduce mandatory processing or requirements to TowerBase before implementation.

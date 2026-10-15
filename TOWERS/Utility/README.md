@@ -8,4 +8,4 @@ No implementation yet.
 
 ## Reserved future utility building
 
-[Power Relay](PowerRelay/README.md) will let the player manually pair two structures across empty space to join their separate terrain-island electricity grids. Network logic belongs to [POWER](../../POWER/README.md), not the relay's tower scene. Documentation only; no relay is registered or implemented.
+[Power Relay](PowerRelay/README.md) will let the player manually pair two structures across empty space to join their separate terrain-island electricity grids. Network logic belongs to [POWER](../Economy/Power/README.md), not the relay's tower scene. Documentation only; no relay is registered or implemented.

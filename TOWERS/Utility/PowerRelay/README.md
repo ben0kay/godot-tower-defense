@@ -7,6 +7,6 @@ The connection merges both islands' shared electricity grids. All generators and
 
 Start with one peer per relay for simplicity. Link range limits (if any), exact validation and Inspector connection UI will be decided at implementation. Removing/destroying a relay/link splits the grids if no alternate relay path remains. Show an optional subtle link effect or network overlay, not permanent clutter.
 
-Grid region detection and connectivity belong in [POWER](../../../POWER/README.md); building selection/placement stays with TOWERS. Relays are non-offensive utility structures, with no required ammo or targeting.
+Grid region detection and connectivity belong in [POWER](../../Economy/Power/README.md); building selection/placement stays with TOWERS. Relays are non-offensive utility structures, with no required ammo or targeting.
 
 **Planning only. Tests later: connection, disconnection, destruction, alternate links, isolation, save/load and performance.**

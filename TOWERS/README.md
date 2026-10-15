@@ -118,7 +118,7 @@ Shared spatial targeting and area queries are implemented behind the world Enemy
 
 ## Reserved future infrastructure folders — README-only
 
-The [Construction](Shared/Construction/README.md), [Ammunition](Shared/Ammunition/README.md) and [Power](Shared/Power/README.md) folders document optional per-tower capabilities. [Economy infrastructure](Economy/README.md) covers production, depots and generators; [Power Relay](Utility/PowerRelay/README.md) is a utility building. World-level network/delivery services are described under [POWER](../POWER/README.md) and [LOGISTICS](../LOGISTICS/README.md). **All are future plans, not implemented or permission to refactor TD today.**
+The [Construction](Shared/Construction/README.md), [Ammunition](Shared/Ammunition/README.md) and [Power](Shared/Power/README.md) folders document optional per-tower capabilities. [Economy infrastructure](Economy/README.md) covers production, depots and generators; [Power Relay](Utility/PowerRelay/README.md) is a utility building. Economy-owned network and delivery services are described under [POWER](Economy/Power/README.md) and [LOGISTICS](Economy/Logistics/README.md). **All are future plans, not implemented or permission to refactor TD today.**
 
 ## Future shared generator and drone umbrellas — README-only
 
