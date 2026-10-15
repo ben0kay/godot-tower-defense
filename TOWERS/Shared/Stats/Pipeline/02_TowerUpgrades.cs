@@ -18,6 +18,9 @@ public static class TowerUpgradesStage
             RotationSpeedDegrees = Resolve(stats.RotationSpeedDegrees, TowerStatId.RotationSpeed, context),
             AimToleranceDegrees = Resolve(stats.AimToleranceDegrees, TowerStatId.AimTolerance, context),
             TargetSearchInterval = Resolve(stats.TargetSearchInterval, TowerStatId.SearchInterval, context),
+            Area = stats.Area.HasValue ? new AreaBlastStats(
+                Resolve(stats.Area.Value.RadiusPixels, TowerStatId.AreaRadius, context),
+                Resolve(stats.Area.Value.EdgeDamageFraction, TowerStatId.AreaEdgeFraction, context)) : null,
             Beam = stats.Beam.HasValue ? new BeamStats(Resolve(stats.Beam.Value.DamagePerSecond, TowerStatId.BeamDps, context)) : null
         };
     }

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="TowerDefinition" load_steps=5 format=3]
+[ext_resource type="Script" path="res://TOWERS/Shared/TowerDefinition.cs" id="1"]
+[ext_resource type="PackedScene" path="res://TOWERS/Offensive/BlasterCannon/BlasterCannon.tscn" id="2"]
+[ext_resource type="Resource" path="res://TOWERS/Offensive/BlasterCannon/DefaultBlasterCannonConfig.tres" id="3"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BlasterCannon/Artwork/blaster_cannon.svg" id="4"]
+[resource]
+script = ExtResource("1")
+TowerId = "blaster_cannon"
+Scene = ExtResource("2")
+DefaultConfig = ExtResource("3")
+Icon = ExtResource("4")

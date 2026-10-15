@@ -1,6 +1,6 @@
 # Headless gameplay checks
 
-**PLANNED — Phase 4D (documentation only):** Codex will add instant radial AoE and Blaster Cannon checks for per-weapon falloff, independent blast recipients, primary hit-once, shield/hull damage, projectile-target loss, stat pipeline/Inspector and existing regression suite. No tests or gameplay have been added yet; see `COMBAT/AreaDamage/README.md` and `TOWERS/Offensive/BlasterCannon/README.md`. Timed shockwave tests belong to Phase 4E.
+**Phase 4D implemented:** AreaDamageChecks and BlasterCannonChecks run in EnemyIntegrationChecks; shared instant AoE and the registered Blaster Cannon are production code. See the completed Phase 4D section below. Wavefront shockwave tests remain future Phase 4E.
 
 Build C# first, then run the Godot .NET executable:
 
@@ -121,3 +121,24 @@ The default Battle config had lost its Level2/Level3 references before this pass
 - Direct headless `Main.tscn` startup: passed. `git diff --check`: passed.
 
 These checks do not assert rendered beam appearance or hardware-independent FPS. Permanent research/stage 04, saving, armour and future tower mechanics remain deferred.
+
+## Phase 4D — shared instant area damage and Blaster Cannon
+
+`AreaDamageChecks` and `BlasterCannonChecks` run after the existing typed-damage/Laser checks in EnemyIntegrationChecks. Pure falloff and actual enemy fixtures cover center/half/edge/outside, inclusive enemy centers, zero-radius exact-center policy, 0/25/75/100% edge retention, invalid/nonfinite settings, extreme finite amounts, preserved type/overrides/penetration, inherited Explosive shield/hull/spillover, unique registration and recipient snapshots. A kill callback kills, frees, queues and unregisters later candidates to verify application-time validity/membership checks and once-only rewards.
+
+The Blaster fixture exercises the real catalog/build-bar action, route-safe 300-Credit placement, private config/tiers, repeated occupancy rejection, selected AoE Inspector values, 200-Credit Level 2 purchase/preview parity (75 damage / 96 px / unchanged 25% edge), all eight stat stages, typed AoE operations, finite clamps and event-driven cache/Inspector updates. Fired projectiles are tested at 30/60/120 Hz: no travel-time damage, one instantaneous impact, primary/half/edge hit once, outside untouched, launch snapshots after source damage/radius/falloff/override/penetration edits, and visual expiry without extra damage. Separate production-shot fixtures test explicit zero shield override + hull override + penetration together and edited falloff in newly fired attacks. Target death/free/arrival retains the last-known point; leaving tower firing range does not cancel impact; timeout and unload cannot cause late damage.
+
+One isolated blast also hits 500 living recipients without creating any scene nodes in shared combat. A sample run measured about 1.3–1.8 ms for that impact in this container; this is not a rendered-FPS or hardware-independent performance guarantee. EnemyRegistry now mirrors membership in a HashSet for constant-time uniqueness and removal rechecks; existing living-list consumers, lifecycle and rewards remain unchanged. The existing 500-ship navigation and placement fixtures still run separately.
+
+### Actual Phase 4D validation
+
+- C# compilation passed with Roslyn 4.11, .NET 8 reference assemblies, Godot 4.7.2 API and Godot source generators, with no compiler errors/warnings.
+- `TESTS/EnemyIntegrationChecks.tscn` passed: new shared-area/Blaster checks plus existing Battle 5% penetration, Laser 12-DPS/6.00x/0.15x behavior, paid upgrades, UI/HUD, shield emitter, waves, economy, feedback, terrain/navigation and 500-enemy fixtures.
+- `TESTS/MenuTowerFlowChecks.tscn` passed Boot → Main → Campaign → Level001, Blaster catalog availability and existing paid Battle construction/upgrade using a memory-only profile.
+- `TESTS/CorridorNavigationChecks.tscn` passed enabled N4 geometry, dynamic repathing and 100/500-ship 0/50/100% variation benchmarks.
+- `TESTS/PlacementPerformanceChecks.tscn` passed its 100/500-ship placement fixtures.
+- Direct headless Main.tscn startup and `git diff --check` passed.
+
+The ordinary `dotnet build --no-restore` route remains blocked before compilation by the environment's missing compatible NuGet.Protocol dependency; the successful compile above uses the actual Godot source generators directly and its resulting assembly was run by Godot. Live-window visual review of the new vector cannon/projectile/flash is outstanding; headless checks establish combat/timing and visual independence, not artistic quality.
+
+No permanent research, saving, Missile Tower, armour or timed shockwave runtime was implemented. Stage 04 and the Phase 4E shockwave design remain deferred.

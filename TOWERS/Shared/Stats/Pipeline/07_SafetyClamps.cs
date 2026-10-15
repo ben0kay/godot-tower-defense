@@ -15,6 +15,8 @@ public static class SafetyClampsStage
         RotationSpeedDegrees = FiniteMinimum(stats.RotationSpeedDegrees, 0),
         AimToleranceDegrees = Mathf.Min(180, FiniteMinimum(stats.AimToleranceDegrees, 0)),
         TargetSearchInterval = FiniteMinimum(stats.TargetSearchInterval, 0.05f),
+        Area = stats.Area.HasValue ? new AreaBlastStats(FiniteMinimum(stats.Area.Value.RadiusPixels, 0),
+            Mathf.Min(1, FiniteMinimum(stats.Area.Value.EdgeDamageFraction, 0))) : null,
         Beam = stats.Beam.HasValue ? new BeamStats(FiniteMinimum(stats.Beam.Value.DamagePerSecond, 0)) : null
     };
 

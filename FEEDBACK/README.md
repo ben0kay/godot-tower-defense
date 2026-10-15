@@ -13,3 +13,7 @@ Keep feedback separate from combat simulation. Health values come from owners: b
 ## Shared DeathExplosion (implemented)
 
 `DeathExplosion/` owns a reusable, **one-shot `GpuParticles2D`** orange flash + smoky grey/orange burst, with soft SVG particle artwork. This is an independent world effect, not a child of an enemy or tower being freed. `World/Effects` is the shared canvas layer for effects. `DeathExplosion.Spawn(layer, worldPosition, visualSizePixels, multiplier)` works for enemy kills now and future destroyed towers. The effect scales automatically from the source `Sprite2D.GetRect()` and the lengths of its global transform axes; per-type `DeathExplosionMultiplier=1.0` is an **optional** override. Edit `DeathExplosion/DefaultDeathExplosionConfig.tres` for shared scale, duration, particle count and active-effect cap; edit particle materials/colors in `DeathExplosion.tscn`. The feedback master config can disable effects. Arrival/removal without death does not explode, and effects self-delete after finishing. See `DeathExplosion/README.md`.
+
+## Instant blast visual (Phase 4D)
+
+AreaBlast/BlastFlash.cs is the small post-impact cosmetic ring used by SplashProjectile. Combat completes first through COMBAT/AreaDamage; the flash owns no damage or wavefront logic and self-deletes after its short animation. Enemy DeathExplosion remains a separate kill-only visual.

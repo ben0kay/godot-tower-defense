@@ -6,6 +6,7 @@ using System.Collections.Generic;
 public partial class EnemyRegistry : Node
 {
     private readonly List<Enemy> _living = new();
+    private readonly HashSet<Enemy> _members = new();
     public IReadOnlyList<Enemy> Living => _living;
     public int KilledCount { get; private set; }
     public int ArrivedCount { get; private set; }
@@ -14,11 +15,15 @@ public partial class EnemyRegistry : Node
 
     // =========================================================
     // Register once; enemies unregister immediately on death or arrival.
-    public void Register(Enemy enemy) { if (!_living.Contains(enemy)) _living.Add(enemy); }
+    public void Register(Enemy enemy) { if (_members.Add(enemy)) _living.Add(enemy); }
 
     // =========================================================
     // Exit-tree cleanup is idempotent and does not count an outcome twice.
-    public void Unregister(Enemy enemy) => _living.Remove(enemy);
+    public void Unregister(Enemy enemy) { if (_members.Remove(enemy)) _living.Remove(enemy); }
+
+    // =========================================================
+    // Snapshot-based attacks recheck removal in constant time without rescanning the living list.
+    public bool Contains(Enemy enemy) => _members.Contains(enemy);
 
     // =========================================================
     // Emit kill-only notifications after an enemy leaves the living registry.

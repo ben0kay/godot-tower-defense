@@ -8,7 +8,7 @@ Umbrella folder for **every player-buildable tower**, not just weapons: offensiv
 
 **Phase 4A/4B implemented:** `TowerConfig`, `TowerDefinition`, `TowerCatalog` and `TowerPresentation` are the shared foundation. `TowerBase` additionally owns stable type identity, definition, grid anchor/footprint, config compatibility/application, placement/selection hooks and optional range inspection. Placement indexes `TowerBase` and resolves catalog IDs without Battle-specific branches or scene-node assumptions. The HUD creates available catalog entries in a horizontal scrolling tray, using `UIButtonFactory`. Construction identity/prices stay on the canonical Config, referenced by definitions; no second price or stat list exists.
 
-**Default playable roster:** Battle Tower and Laser Tower. The passive scene under `TESTS/Towers/` is a regression fixture, not a promised Repair/Solar tower or a default menu entry. Registering a valid additional definition creates its build choice without editing placement or HUD. Only 1×1 footprints are supported; other footprints fail registration.
+**Default playable roster:** Battle Tower, Laser Tower and Blaster Cannon. The passive scene under `TESTS/Towers/` is a regression fixture, not a promised Repair/Solar tower or a default menu entry. Registering a valid additional definition creates its build choice without editing placement or HUD. Only 1×1 footprints are supported; other footprints fail registration.
 
 **Phase 4C-1/4C-2 implemented (see completed4C-3 below for current balance):** COMBAT/Damage owns typed base hits and a cached canonical shield/hull response profile. Battle bullets deliver Kinetic; legacy TakeDamage keeps 1:1 semantics. Laser Tower sustains Energy DPS through the same resolver, with a separate endpoint-only BeamRenderer and Inspector-editable copied BeamStyle. Its genuine float BeamStats capability uses the same eight stages and paid upgrades. Shared targeting/aiming are reused; delivery remains type-specific rather than introducing a universal weapon switch. Ranks/research/level modifiers/effects, selling, tower HP, shield visuals and multi-cell placement remain future work.
 
@@ -27,7 +27,7 @@ Umbrella folder for **every player-buildable tower**, not just weapons: offensiv
 | `Offensive/BattleTower/` and `Offensive/BattleTower/Upgrades/` | EXISTS | First working offensive type; Level2/Level3 assets |
 | `Offensive/LaserTower/` | EXISTS (4C-2) | Sustained Energy DPS, muzzle beam renderer and paid tier |
 | `Offensive/MissileTower/` | PLANNED | Future explosive weapon |
-| `Offensive/BlasterCannon/` | PLANNED Phase 4D; README now exists | New instant AoE projectile tower, owns falloff values |
+| `Offensive/BlasterCannon/` | IMPLEMENTED Phase 4D | Instant AoE projectile tower; owns radius and falloff values |
 | `Shared/Weapons/Shockwaves/` | FUTURE Phase 4E; README only | Timed expanding edge-only wavefront delivery |
 | `COMBAT/Damage/` | EXISTS (4C-1) | Shared typed base damage and canonical shield/hull responses |
 | `Support/`, `Economy/`, `Utility/` | PLANNED | Passive and hybrid tower categories, never mandatory weapon logic |
@@ -419,19 +419,20 @@ Battle starts with 5% base shield penetration, visible in the placed Inspector a
 
 Stage 04 remains neutral. Future permanent ballistic research and saving are deferred, alongside Missile Tower, ranks, level modifiers, active effects, selling and tower HP. Visual beam polish still requires a live-window review. See TESTS/README.md for4C-3 validation results.
 
-## Planned next pass — Phase 4D: reusable instant AoE + Blaster Cannon
+## Phase 4D completed — shared instant AoE + Blaster Cannon
 
-**Status: documentation ready; NOT IMPLEMENTED.** Start with [`COMBAT/AreaDamage/README.md`](../COMBAT/AreaDamage/README.md) (shared stateless target selection and linear distance-falloff contract), then follow [`Offensive/BlasterCannon/README.md`](Offensive/BlasterCannon/README.md) for the precise C# tower/projectile/catalog/stat pipeline/Inspector and test implementation. These are the authoritative Codex Phase 4D instructions.
+`COMBAT/AreaDamage/AreaDamage.cs` performs one mutation-safe registry scan per impact, scales base DamageInfo by weapon-supplied linear distance falloff, and forwards each eligible center hit once through the unchanged defense resolver. Inclusive edge and zero-radius exact-center behavior are documented in [`COMBAT/AreaDamage/README.md`](../COMBAT/AreaDamage/README.md). There is no shared hardcoded falloff, direct-plus-splash duplicate or per-frame area scan.
 
-**Core design:** A single Blaster projectile detonates **once** and immediately damages each living enemy inside its blast radius via the current `Enemy.ApplyDamage(DamageInfo)` and existing shield/hull resolver. The Blaster itself supplies its **Inspector-editable radius and edge damage fraction** (provisional 80 px and 25% edge damage). Shared combat math must **never hardcode any falloff percentage**. Expose both as optional AoE effective stats through the **existing eight-stage pipeline** and include them in projectile launch snapshots. Existing paid tower tiers are independent from future falloff **permanent research**; Stage 04 stays neutral in 4D. Avoid global TowerId switches and preserve Battle/Laser contracts.
+[`Offensive/BlasterCannon/README.md`](Offensive/BlasterCannon/README.md) describes the registered `blaster_cannon`: 300 Credits, Explosive 60 base damage, 80 px radius, 25% edge retention, 0.5 shots/sec, 500 px/sec projectile, 256 px range and zero penetration. Its 200-Credit Level 2 adds 15 base damage and 16 px radius; edge retention stays 25%. Optional immutable AreaBlastStats flows through the existing eight stages, typed upgrade IDs, safety clamps, cached selected Inspector and real next-tier previews. Stage 04 remains neutral for future falloff research.
 
-**Do not confuse instant splash and expanding wavefront:** Blaster damage happens at impact even if its visual ring grows. [`Shared/Weapons/Shockwaves/README.md`](Shared/Weapons/Shockwaves/README.md) reserves **damage only when an expanding ring edge crosses an enemy** for later Phase 4E; do not implement a shockwave or timed per-frame full-disc damage in 4D.
+SplashProjectile snapshots damage/type/defense overrides/penetration/radius/edge at launch and detonates once at the target or last-known point, even when the target disappears or leaves firing range. BlastFlash under FEEDBACK/AreaBlast is purely visual. No generic placement/HUD changes or Battle/BasicProjectile behavior changes are required. Tests and actual validation are recorded in TESTS/README.md.
 
-**Codex execution:** Read `NOTES/CodePreferences.md`, these 4D READMEs, `COMBAT/Damage/README.md`, `Shared/Stats/README.md`, `Shared/Projectiles/README.md` and the Battle/Laser baseline first. Implement the smallest one-pass C# feature, save/authored assets, production catalog registration and deterministic tests. Compile and run `TESTS/EnemyIntegrationChecks.tscn`, `TESTS/MenuTowerFlowChecks.tscn` and related tests, report actual results, then update all involved READMEs to completed facts (not assumptions). No research/saving, Shockwave Tower, Missile Tower or unrelated systems in 4D.
+[`Shared/Weapons/Shockwaves/README.md`](Shared/Weapons/Shockwaves/README.md) remains the future Phase 4E contract: damage occurs only when an advancing wavefront crosses an enemy. No shockwave runtime, permanent research, saving, Missile Tower or armour is implemented in 4D.
 
 ## Current live Inspector files
 
 - `Offensive/BattleTower/DefaultBattleTowerConfig.tres`: name/description, ConstructionCosts (200 Credits), aiming, range, shots/sec, damage, projectile speed, target priority and target search interval.
+- `Offensive/BlasterCannon/DefaultBlasterCannonConfig.tres`: 300-Credit recipe, Explosive base hit, area radius/edge fraction, penetration, response overrides and aiming; Upgrades/Level2.tres owns the 200-Credit tier.
 - `DefaultTowerConfig.tres`: shared placement/selection preview flags; `AllowUpgrades` is **active**, while selling/refund settings remain future work.
 - `FEEDBACK/DefenseBars/DefaultDefenseBarConfig.tres`: reusable health bar appearance when towers become damageable.
 
@@ -451,7 +452,7 @@ TowerUpgradeChecks covers paid HUD actions, stale/same-frame duplicate protectio
 
 ## Implemented Phase 4A/4B verification and authoring
 
-`DefaultTowerCatalog.tres` references BattleTowerDefinition and LaserTowerDefinition. Add a tower by authoring a compatible `TowerBase` scene/script, typed `TowerConfig`, icon and `TowerDefinition` (ID/category/scene/config/icon/1×1 footprint), then adding the definition to the catalog's Definitions array. Expand DefaultConfig to edit its name, description, construction costs and tiers. Definitions do not independently override prices or names. Rebuild the catalog and rebind the HUD after runtime registration/availability edits; ordinary frames do neither. Available=false hides the build entry and rejects placement; asset/config validation still applies to registered entries. Empty catalogs display a safe message.
+`DefaultTowerCatalog.tres` references BattleTowerDefinition, LaserTowerDefinition and BlasterCannonDefinition. Add a tower by authoring a compatible `TowerBase` scene/script, typed `TowerConfig`, icon and `TowerDefinition` (ID/category/scene/config/icon/1×1 footprint), then adding the definition to the catalog's Definitions array. Expand DefaultConfig to edit its name, description, construction costs and tiers. Definitions do not independently override prices or names. Rebuild the catalog and rebind the HUD after runtime registration/availability edits; ordinary frames do neither. Available=false hides the build entry and rejects placement; asset/config validation still applies to registered entries. Empty catalogs display a safe message.
 
 Passive scenes need no pivot, projectile node, weapon stats, range ring or processing. `TowerConfig.ResolveStats`/`DescribeStats`/`DescribeChanges` are type-aware adapters; Battle keeps the unchanged eight numerical stages and real upgrade preview. Future passive progression with actual capability stats can supply its own typed data when that consumer exists; the passive fixture deliberately has no upgrades or combat snapshot.
 

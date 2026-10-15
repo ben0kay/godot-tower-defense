@@ -1,72 +1,52 @@
-# Blaster Cannon — Phase 4D (PLANNED; not implemented yet)
+# Blaster Cannon — Phase 4D implemented
 
-## Goal
+A real 1x1 offensive tower registered as `blaster_cannon` in `TOWERS/DefaultTowerCatalog.tres`. Ctrl → Blaster Cannon → place on route-safe buildable terrain. Generic placement, wallet, dynamic build bar and selected Inspector service it without tower-ID branches.
 
-Add a real **1x1, catalog-registered offensive Blaster Cannon**. It rotates/aims and fires a visible projectile. On impact, it performs **one immediate circular AoE hit** at the impact world position, dealing damage to all living enemy centers within its configurable radius. It is a different tower from the future Missile Tower. Keep its targeting, weapon config, projectile travel and visuals separate from the reusable math in `COMBAT/AreaDamage/`.
+## Authored playtest values
 
-**Do not implement a shockwave as the Blaster attack.** Its blast damage is instantaneous; any expanding ring, flash or particle animation is presentation only. A true expanding wavefront is reserved for Phase 4E.
+| Stat | Default |
+| --- | ---: |
+| Construction | 300 Credits |
+| Damage type | Explosive |
+| Base damage per shot | 60 |
+| Blast radius | 80 px |
+| Edge damage fraction | 0.25 (25%) |
+| Fire rate | 0.5 shots/sec |
+| Projectile speed | 500 px/sec |
+| Target range | 256 px |
+| Shield penetration | 0% |
+| Level 2 purchase | 200 Credits: +15 base damage, +16 px blast radius |
 
-## Proposed authored playtest defaults (Inspector-editable; not final balancing)
+Level 2 resolves 75 base damage / 96 px radius / unchanged 25% edge retention. Type defaults inherit Explosive 0.25x shield / 1.25x hull. Independent opt-in coefficient overrides on BlasterCannonConfig can replace either response; zero is explicit. Existing shield penetration behavior is supported and launch-snapshotted. These defaults are editable playtest balance, not resolver constants.
 
-| Source stat | Initial proposal | Meaning |
-| --- | ---: | --- |
-| Damage type | Explosive | Reuses global Explosive shield 0.25x / hull 1.25x defaults |
-| Base damage per shot | 60 | Base damage *before* falloff and `DamageResolver` |
-| Blast radius | 80 px | Enemies with center distance <= radius can be hit |
-| **Edge damage fraction** | **0.25 (25%)** | Damage remaining at exactly the outer radius; **Blaster-owned**, NOT hardcoded globally |
-| Shots per second | 0.5 | One shot every 2 seconds when able |
-| Projectile speed | 500 px/s | Lightweight visible blast projectile |
-| Tower range | 256 px | Range for acquiring/firing, not for damage after impact |
-| Shield penetration | 0% | Separate from falloff; editable/upgrade-ready if needed later |
-| Construction cost | 300 Credits | Provisional and owned only by this tower's config |
+Edit `DefaultBlasterCannonConfig.tres` for newly placed towers. Each placed tower receives private config and nested cost/tier copies; Remote Inspector edits affect only that instance. Radius and edge retention have their own Area Blast Inspector group. The selected gameplay Inspector shows actual cached base damage, radius, edge percentage, penetration, type, rate and range. Upgrade preview shows 60 → 75 damage, 80 → 96 px radius and the 200-Credit price; purchase uses the existing atomic wallet transaction.
 
-Example before shield/hull defense: a 60-damage explosion with `e=0.25` deals **60** at center, **37.5** halfway through radius, **15** at the edge. The shared AoE helper accepts `0.25` as input; it must have **no default 25% (or other weapon balance constant) baked into its code**.
+## Stats and future research ownership
 
-## Research and paid upgrades are different
+`AreaBlastStats` is an optional immutable capability on the existing TowerStatBlock/FinalStats. Blaster's type-aware adapter enters the same eight stages as Battle/Laser. Typed `AreaRadius` and `AreaEdgeFraction` IDs append to existing stat IDs without renumbering them. Stage 02 uses normal flat/additive-percent/multiplier operations; Stage 07 bounds radius to finite nonnegative values and edge retention to finite 0..1; Stage 08 publishes the capability. Numeric config edits emit Changed and rebuild the selected cache/Inspector once; ordinary physics ticks read cached stats.
 
-- **Falloff/edge damage fraction is a Blaster weapon stat**, exported in `BlasterCannonConfig.cs` and copied through the **existing eight-stage stat pipeline** to its immutable `TowerFinalStats`. Prefer a small **optional AoE capability** (e.g. `AreaBlastStats` with `RadiusPixels` and `EdgeDamageFraction`), so passive towers and Laser/Battle do not gain fake AoE fields. Add typed stat IDs and Stage 02 handling only for capabilities that exist. Stage 07 bounds `EdgeDamageFraction` to 0..1 and radius to finite nonnegative pixels; Stage 08 publishes both. It must be editable in the Godot Inspector, visible in the selected tower Inspector, and snapshotted at **projectile launch** with base damage and other hit modifiers.
-- **Future permanent research can improve Blaster's falloff**, e.g. raising edge retention from 25% to 40% or 60%. This modifier should apply to eligible new/existing Blaster Cannons through **Stage 04 Permanent Research** once that real persistence system exists. **Keep Stage 04 neutral in 4D**; do not attach falloff research to Level 2/3 purchased tower tiers or create pretend save/progression state.
-- It is fine to add one **normal paid Level 2 tower upgrade** to prove HUD/preview/purchase integration, such as +15 base damage and +16 px blast radius for 200 Credits (provisional). Do **not** increase edge retention via that tier. Use the existing ResourceCost wallet and canonical catalog price/recipe, not a new payment system. `TowerConfig.DescribeStats/DescribeChanges` should display actual AoE damage, radius, edge damage percent and current/next-tier numbers.
+Stage 04 permanent research remains neutral. Future Blaster research can raise edge retention through this capability and invalidate eligible new/existing tower caches when persistence is implemented. **The authored purchased tier never raises falloff retention.** There is no research manager, fake progression or save data in this pass. Battle and Laser have no artificial AoE capability; passive towers still need no weapon fields or combat snapshot.
 
-## Proposed file layout — Codex creates actual gameplay files during Phase 4D
+## Instant-impact delivery
 
-```text
-TOWERS/Offensive/BlasterCannon/
-  README.md                        # this planned source of truth
-  BlasterCannon.cs                 # type-specific firing/aiming logic
-  BlasterCannonConfig.cs           # Inspector source values and actual prices
-  DefaultBlasterCannonConfig.tres  # canonical playtest values
-  BlasterCannon.tscn               # tower scene and pivot, simple placeholder art
-  BlasterCannonDefinition.tres     # stable catalog ID: blaster_cannon
-  Upgrades/Level2.tres             # optional simple paid tier
-TOWERS/Shared/Projectiles/
-  SplashProjectile.cs              # reusable impact delivery; calls shared instant AoE
-TOWERS/Shared/Stats/
-  AreaBlastStats.cs                # optional immutable blast capability if practical
-COMBAT/AreaDamage/
-  AreaDamage.cs                    # reusable one-time radial selection and base falloff
-```
+The fixed placement root never rotates; TurretPivot holds the up-facing placeholder cannon. Shared TowerTargeting and TurretAiming provide staggered First/Closest searches and alignment gating. Firing uses the cached rate/cooldown and creates a lightweight visible SplashProjectile.
 
-Keep `TowerBase`, `TowerTargeting`, `TurretAiming`, `TowerCatalog`, `TowerPlacementController` and `GameplayHUD` generic. Register Blaster in `TOWERS/DefaultTowerCatalog.tres` with its own art/scene/config and existing dynamic build UI. All new C# scripts should follow `NOTES/CodePreferences.md`: short script headers, `// =========================================================` separators above methods, optional regions, concise reusable code, stable Inspector export groups, no overengineering.
+Each projectile snapshots base hit/type/overrides/penetration plus radius/edge retention at launch, keeping no mutable tower/config reference. It tracks a living target's position; death/arrival/external free captures the last valid target point and leaves the projectile traveling toward it. Scene unload cancels delivery and releases subscriptions; timeout expires without an impact. A target leaving firing range after launch does not cancel the shot. Contact is the actual destination point.
 
-## Projectile and impact contract
+At impact the projectile dispatches one `AreaDamage.ApplyInstant` call. Enemy centers at distance <= radius are included; the primary receives only the area hit, with no additional direct damage. For 60 base / 80 px / 25% edge, center/half/edge base damage is 60 / 37.5 / 15 **before** shield/hull defenses. The helper owns math/selection, the projectile owns travel/timing, and `FEEDBACK/AreaBlast/BlastFlash.cs` owns the optional post-impact visual under World/Effects. Its ring animation never repeats or delays damage.
 
-Reuse Battle's firing/aiming patterns without modifying `BasicProjectile` behavior. Prefer a small new `SplashProjectile` supporting a configured target, speed, last-known impact position, area payload and **one** explosion on impact. If the original target dies/leaves mid-flight, keep traveling to the last-known position and still detonate once; do not disappear or switch to arbitrary targets. Clean up safely if the scene unloads or projectile times out. Whether the target is still alive or already gone, one impact produces one shared AoE event. **No separate direct-hit + splash double damage** to the primary target. No per-frame registry scan while projectiles travel.
+## Implemented files
 
-A projectile snapshots effective base damage, blast radius, edge fraction, damage type, shield/hull overrides and penetration when fired; upgrading/config editing a tower after firing must not alter a projectile already in flight. Pass appropriately scaled **base** `DamageInfo` to each recipient through `Enemy.ApplyDamage`, preserving enemy shield/hull/death/rewards as they exist.
+- `BlasterCannon.cs`, `BlasterCannonConfig.cs`: weapon behavior and Inspector inputs.
+- `BlasterCannon.tscn`, `Artwork/blaster_cannon.svg`: pivot scene and replaceable vector art.
+- `DefaultBlasterCannonConfig.tres`, `BlasterCannonDefinition.tres`, `Upgrades/Level2.tres`: canonical price/stats, catalog identity and paid tier.
+- `TOWERS/Shared/Projectiles/SplashProjectile.cs`: reusable travel/last-known-point/one-shot delivery.
+- `TOWERS/Shared/Stats/AreaBlastStats.cs`: optional capability in the existing pipeline.
+- `COMBAT/AreaDamage/AreaDamage.cs`: stateless recipient selection and weapon-input falloff.
+- `FEEDBACK/AreaBlast/BlastFlash.cs`: damage-independent cosmetic flash.
 
-Add a minimal separate impact visual under the world effects layer if useful, but visual radius/timing must not perform damage. `FEEDBACK/DeathExplosion/` is an **enemy-death visual** only and is not an AoE delivery mechanism.
+## Verification and scope
 
-## Required Phase 4D regression checks
+`AreaDamageChecks` and `BlasterCannonChecks` run in the full headless integration suite: real catalog/action/payment/selection and private data; paid preview parity; cache/Inspector invalidation; 30/60/120 Hz travel/contact; one hit per primary/nearby/edge enemy; outside exclusion; target death/free/arrival; launch snapshots after source edits; coefficient overrides/penetration; edited falloff in newly fired attacks; range-after-launch; timeout/unload cleanup; visual independence and 500-recipient impact behavior. Existing Battle/Laser, upgrades, shield emitter, waves, economy, navigation and menu suites remain active. See TESTS/README.md for actual results.
 
-1. Full catalog/scene/config validation; dynamic build bar entry; real buy, route-safe placement, selection/Inspector, private config/tier copies, simple Level 2 preview and payment; no Battle/Laser changes.
-2. Actual fired projectile reaches a point and detonates **once**, not while still traveling; primary target hit once, nearby enemies hit once, outside enemy untouched; target dies mid-flight or is removed safely; no extra kill credits; no effects after unload.
-3. Changing only the Blaster's edge retention (e.g. 0.25 to 0.75) changes outer damage and its Inspector/cache without changing center damage, radius, inherited Explosive multipliers or any other tower. Include 0%, 100%, halfway, exact radius and falloff input validation.
-4. Test Explosive shields/hull, shield-break spillover, optional per-hit coefficient overrides and zero-penetration baseline; verify use of existing `DamageResolver` exactly once per affected enemy.
-5. Verify existing Battle 5% penetration, Laser 6.00/0.15 overrides and 12-DPS beam, paid upgrades, waves/shield generator, economy, navigation, 500-enemy integration fixture, and headless menus are unchanged. Area queries must execute only on impact; make 30/60/120 Hz movement/impact tests tolerant and deterministic.
-
-Run real C# compilation and the existing headless tests, including `TESTS/EnemyIntegrationChecks.tscn` and `TESTS/MenuTowerFlowChecks.tscn`; report actual passes/failures and any visual limitations. After working implementation, update related READMEs from PLANNED to IMPLEMENTED with the **actual** chosen values and file paths.
-
-## Scope fence
-
-**Phase 4D = reusable instant AoE foundation + first functioning Blaster Cannon.** Do not implement timed wavefront shockwaves (Phase 4E), future research or persistence, Missile Tower, armor, tower health, terrain impacts, complex projectile pooling, line of sight, damage-over-time, crits or a generic weapon framework.
+The headless run cannot verify artistic quality; the projectile and flash need a live-window visual review. No timed damage wavefront, terrain impacts, line of sight, pooling framework, Missile Tower, armour, permanent research or saving was added. Future Phase 4E remains defined separately in `TOWERS/Shared/Weapons/Shockwaves/README.md`.

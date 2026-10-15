@@ -33,7 +33,7 @@ public partial class MenuTowerFlowChecks : Node
             WorldGrid grid = battlefield.GetNode<WorldGrid>("World/Grid");
             SpawnManager spawns = battlefield.GetNode<SpawnManager>("World/EnemySystems/Spawning");
             EconomyManager wallet = battlefield.GetNode<EconomyManager>("Economy");
-            Require(hud.GetBuildButton("battle") != null && wallet.GetBalance(wallet.CreditsResource) == 1000,
+            Require(hud.GetBuildButton("battle") != null && hud.GetBuildButton("blaster_cannon") != null && wallet.GetBalance(wallet.CreditsResource) == 1000,
                 "Campaign launch initializes default catalog and level wallet");
             hud.GetBuildButton("battle").EmitSignal(Button.SignalName.Pressed);
             bool placed = false;

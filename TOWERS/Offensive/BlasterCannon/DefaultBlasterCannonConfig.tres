@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="BlasterCannonConfig" load_steps=6 format=3]
+[ext_resource type="Script" path="res://TOWERS/Offensive/BlasterCannon/BlasterCannonConfig.cs" id="1"]
+[ext_resource type="Script" path="res://ECONOMY/Transactions/ResourceCost.cs" id="2"]
+[ext_resource type="Resource" path="res://ECONOMY/Resources/Credits.tres" id="3"]
+[ext_resource type="Resource" path="res://TOWERS/Offensive/BlasterCannon/Upgrades/Level2.tres" id="4"]
+[ext_resource type="Script" path="res://TOWERS/Shared/Upgrades/TowerUpgradeTier.cs" id="5"]
+[sub_resource type="Resource" id="price"]
+script = ExtResource("2")
+Resource = ExtResource("3")
+Amount = 300
+[resource]
+script = ExtResource("1")
+ConstructionCosts = Array[ExtResource("2")]([SubResource("price")])
+UpgradeTiers = Array[ExtResource("5")]([ExtResource("4")])
+DamagePerShot = 60
+BlastRadiusPixels = 80.0
+EdgeDamageFraction = 0.25
+ShotsPerSecond = 0.5
+ProjectileSpeed = 500.0
+RangePixels = 256.0
+ShieldPenetration = 0.0
+DamageType = 2

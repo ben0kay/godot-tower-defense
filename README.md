@@ -1,6 +1,6 @@
 # Godot Tower Defense — C#/.NET
 
-A 2D top-down sci-fi tower-defense game in Godot 4.7.x. An editable Level001 map, enemy spawning and A* routing, finite manual waves, Battle Tower combat, wallet/kill credits, Citadel HP and the eight-stage tower-stat foundation are implemented.
+A 2D top-down sci-fi tower-defense game in Godot 4.7.x. An editable Level001 map, enemy spawning and A* routing, finite manual waves, Battle/Laser/Blaster combat, shared instant area damage, wallet/kill credits, Citadel HP and the eight-stage tower-stat foundation are implemented.
 
 ## Launch
 
@@ -11,8 +11,8 @@ For rapid map or combat testing, open `Main.tscn` and press **F6** (Run Current 
 ## Game controls
 
 - WASD/arrows: move camera; middle mouse: pan; mouse wheel: zoom.
-- Ctrl: toggle tower build tray. Choose Battle, left-click valid cells to place, right-click/Escape to cancel; select towers to inspect them.
-- F2: spawn Enemy001 through the level's debug system.
+- Ctrl: toggle tower build tray. Choose Battle, Laser or Blaster Cannon, left-click valid cells to place, right-click/Escape to cancel; select towers to inspect them.
+- F2: cycle the enemy catalog through the level's debug system.
 - Start/Next Wave: use the top-right wave button.
 
 ## Configuration and structure

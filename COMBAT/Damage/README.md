@@ -48,3 +48,7 @@ Permanent research is **not implemented**. Stage 04 remains neutral. Future ball
 DamageTypeChecks covers unchanged inherited defaults, independent/zero overrides, malformed hits/state, penetration partial/full/exact/no-shield cases, zero shield coefficient, overflow bounds, real guided Battle contact, hull feedback, target isolation and once-only deaths/rewards. LaserTowerChecks covers authored12 DPS,72 shield/s and1.8 hull/s at30/60/120Hz,30-shield spillover, override opt-out, visual independence, targeting/cleanup, construction and22-DPS upgrade parity. TowerStatChecks/TowerUpgradeChecks exercise safety clamps, eight stages, cache/input isolation, selected Inspector updates and unchanged5% penetration through purchased tiers.
 
 See TESTS/README.md for actual compilation/headless results and fixture isolation. Manual rendered beam quality is not asserted by headless tests.
+
+## Phase 4D area consumer
+
+AreaDamage.AtDistance creates a scaled base DamageInfo preserving its type, independent nullable overrides and penetration. The instant helper calls Enemy.ApplyDamage once per snapshotted recipient, so existing shield-first base absorption, bypass, hull feedback and kill/reward isolation remain authoritative here. Blaster defaults to Explosive 0.25/1.25 and zero penetration; optional weapon overrides are launch-snapshotted. No direct-hit bonus or second coefficient application was added. AreaDamageChecks and BlasterCannonChecks exercise both inherited and explicit responses, including zero shield response with penetrating damage.

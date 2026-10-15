@@ -26,3 +26,5 @@ E2A: EnemyCatalog validates an Inspector scene list once, derives canonical IDs 
 
 
 E2B adds only optional Initialized notification after registry/movement setup, a read-only Registry accessor and RestoreShield(amount). The latter rejects invalid/nonpositive amounts/dead recipients/zero capacity and clamps finite additions at MaxShield without touching hull feedback or definitions. ShieldEmitter owns pulse behavior; ordinary Enemy001/Enemy002 have no ability node/manager. Kill/arrival/unload behavior and typed COMBAT damage remain unchanged.
+
+Phase 4D adds constant-time registry membership/uniqueness with a HashSet mirrored alongside the existing ordered living list. Contains lets snapshotted impacts skip enemies removed by earlier kill callbacks without another list scan. Enemy lifecycle/rewards and existing list consumers are unchanged.

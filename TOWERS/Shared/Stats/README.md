@@ -24,3 +24,9 @@ Phase 4C-2: optional nullable BeamStats on TowerStatBlock/FinalStats carries gen
 ## Phase 4C-3 penetration
 
 TowerStatBlock/FinalStats add an optional trailing ShieldPenetration float (default0), preserving old constructors. Battle's adapter supplies its 0.05 base; all eight existing stages propagate it. Stage 07 clamps negative/nonfinite values to 0 and values above 1 to1; Stage 08 publishes it. Paid Battle tiers do not modify it, and Stage 04 permanent research remains neutral. Config setters invalidate once and the selected Inspector reads the effective snapshot. Laser/passive types are not given fictitious projectile capability. Future permanent ballistic research must use the existing pipeline with cache invalidation, not purchased tier assets.
+
+## Phase 4D optional area capability
+
+AreaBlastStats(RadiusPixels, EdgeDamageFraction) appends as an optional nullable Area value on TowerStatBlock/FinalStats, preserving old constructor defaults and leaving Battle/Laser/passive capabilities unchanged. Blaster supplies it through the single coordinator. AreaRadius and AreaEdgeFraction append to TowerStatId without renumbering existing IDs. Stage 02 applies existing flat/percent/multiplier arithmetic; Stage 07 clamps radius to finite nonnegative pixels and edge retention to finite 0..1; Stage 08 publishes both. All eight stages remain in the same order.
+
+Blaster's authored paid tier adds damage/radius only. Edge retention is a weapon input ready for future permanent research, with Stage 04 still neutral. Config changes invalidate cached stats and selected Inspector details; launched projectiles retain their own immutable snapshot. BlasterCannonChecks covers stage propagation/operations/safety, source isolation, no tick-based cache rebuilding and paid preview parity.
