@@ -20,10 +20,10 @@ Player-placeable income, production, storage and power-generating structures. Bu
 ## Future ammunition production loop
 
 1. Each Ammo Factory begins producing batches **automatically**, with no manual Start button or prerequisite depot; production is timer-based.
-2. Every completed batch enters the **factory's own small buffer**. The factory automatically transfers completed batches into any eligible Ammo Depot with enough free capacity. Initial factory-to-depot transfer is **logical/instant**, without drones or conveyors.
-3. **If no depot exists, or all compatible depots lack capacity, production continues until the factory's internal buffer fills.** Then production pauses. It resumes automatically when batches can transfer out and free space becomes available; completed ammunition is never deleted.
-4. For a simple first pass, require enough buffer space to fit an entire next batch before starting that batch, and enough depot space for an entire transfer batch. This avoids overflow or half-created batches; partial transfers, depot selection and exact dispatch order can be refined later.
-5. The Ammo Depot stores ammunition and sends it to depleted offensive towers using [Transport Drones](../../DRONES/Transport/README.md), coordinated by [Ammunition Logistics](Ammunition/Shared/Logistics/README.md). **Factory → depot uses automatic batches; depot → tower uses physical drones.**
+2. Every completed batch enters the **factory's own small buffer**. The factory-owned **transport drone** carries buffered ammunition to an eligible Ammo Depot with reserved free capacity; ammunition arrives only when that drone unloads.
+3. **If no depot exists, or all compatible depots lack capacity, production continues until the factory's internal buffer fills.** Then production pauses. It resumes when a delivery drone loads some buffered ammunition and frees space; completed ammunition is never deleted.
+4. For the first gameplay pass, require enough buffer room for a whole next batch, and reserve enough depot room before dispatching a drone carrying a whole transfer batch. This avoids overflow or half-created batches; partial transfers, depot selection and exact dispatch order can be refined later.
+5. The Ammo Depot stores ammunition and sends it to depleted offensive towers using [Transport Drones](../../DRONES/Transport/README.md), coordinated by [Ammunition Logistics](Ammunition/Shared/Logistics/README.md). **Both factory → depot and depot → tower use visible drones carrying finite cargo.**
 6. The first production pass can manufacture automatically without requiring raw material inputs; costs/input recipes, electricity draw, research boosts and ammo types can be added separately when required. No free ammunition can appear from an unrelated reload operation.
 
 Future researchable controls include factory production time, batch size, buffer capacity, depot storage, drone slot count, drone speed and payload size; preserve per-instance state and authored level rows separately.
@@ -41,6 +41,6 @@ Every contiguous terrain landmass automatically shares one grid; disconnected is
 - `DRONES/`: drone flight/behaviours; transport first, combat/player ability maybe later.
 - `TOWERS/Economy/Power/`: individual generators plus shared island grid, relay joining, generation/demand/priorities.
 
-**Best isolated first implementation pass later:** basic **factory timer → finite buffer → automatic depot transfer → pause/resume**. This can be tested without drone spawning, electricity, research, ammunition-consuming towers or a cross-genre economy. It should reuse existing placement/transactions but **nothing here is implemented or an instruction to start coding immediately**.
+**Completed isolated foundation:** [AmmoProduction.cs](Ammunition/AmmunitionFactory/AmmoProduction.cs), [AmmoStorage.cs](Ammunition/AmmunitionDepot/AmmoStorage.cs), [AmmoInventory.cs](../Shared/Ammunition/AmmoInventory.cs) and [AmmunitionMasterConfig.cs](../Shared/Ammunition/AmmunitionMasterConfig.cs) exist and are covered by committed (not yet executed) foundation tests. They are **not connected to live scenes**. Codex must build factory/depot scenes, flying drones on both legs, tower ammunition consumption and integration as documented in [NOTES/WORK.md](../../NOTES/WORK.md).
 
 Keep Tower Defense independently playable; do not implement all subsystems just because their planning folders now exist.
