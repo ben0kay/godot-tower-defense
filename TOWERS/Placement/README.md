@@ -13,3 +13,5 @@ Ctrl opens the tray or closes it and immediately cancels active placement. Left-
 If the exported Catalog is null at runtime, placement loads `res://TOWERS/DefaultTowerCatalog.tres` and reports the recovery once. An explicitly assigned custom catalog is preserved. If the default resource also fails to load, startup reports its exact path; preview processing and world input stay disabled, avoiding cascading null-reference errors. Wallet/HUD subscriptions are connected only after catalog validation and ghost creation succeed. The authored Main scene still assigns its catalog normally.
 
 Ctrl/Escape shortcuts are now scoped bindings in the shared CONTROLS/GameInput router. Placement Escape has priority over Pause: one press cancels placement only; another opens Pause. RMB remains local; Ctrl closes the tray and cancels placement as before.
+
+Ammunition Factory/Depot now use this same catalog, 1×1 route-safe occupancy, wallet transaction and selection flow as weapons. Their runtime inventory/production/slot information is supplied by optional RuntimeChanged/DescribeRuntime; a selected-only coalesced label refresh does not rebuild combat stats or previews.

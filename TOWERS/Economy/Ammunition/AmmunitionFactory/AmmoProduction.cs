@@ -1,4 +1,4 @@
-// Standalone batch-production state, deliberately not wired to a factory scene or the game loop yet.
+// Reusable batch-production state, advanced by each placed AmmunitionFactory.
 using System;
 
 public sealed class AmmoProduction
@@ -12,7 +12,7 @@ public sealed class AmmoProduction
     #endregion
 
     // =========================================================
-    // Values are supplied by a future factory config; a depot is never a production prerequisite.
+    // Values are supplied by the factory config; a depot is never a production prerequisite.
     public AmmoProduction(int batchAmount, double secondsPerBatch, int bufferCapacity, int initialBufferedAmmo = 0)
     {
         if (batchAmount <= 0 || batchAmount > bufferCapacity) throw new ArgumentOutOfRangeException(nameof(batchAmount));
@@ -23,7 +23,7 @@ public sealed class AmmoProduction
     }
 
     // =========================================================
-    // The future factory node calls Advance(delta); only THIS method manufactures rounds.
+    // The factory node calls Advance(delta); only THIS method manufactures rounds.
     // Finish whole batches, pause when another batch cannot fit and never bank paused time.
     // Returns newly produced ROUNDS (not number of batches).
     public int Advance(double deltaSeconds)

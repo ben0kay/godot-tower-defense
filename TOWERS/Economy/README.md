@@ -17,12 +17,12 @@ Player-placeable income, production, storage and power-generating structures. Bu
 - [PowerGenerators](Power/Shared/README.md): **one common power generator family** with three distinct types: Solar (low/islands), Industrial (standard starting generator), Fusion (endgame).
 - [SolarTower](SolarTower/README.md): older possible energy/defensive-laser hybrid; not the dedicated Solar Generator.
 
-## Future ammunition production loop
+## Implemented ammunition production loop
 
 1. Each Ammo Factory begins producing batches **automatically**, with no manual Start button or prerequisite depot; production is timer-based.
 2. Every completed batch enters the **factory's own small buffer**. The factory-owned **transport drone** carries buffered ammunition to an eligible Ammo Depot with reserved free capacity; ammunition arrives only when that drone unloads.
 3. **If no depot exists, or all compatible depots lack capacity, production continues until the factory's internal buffer fills.** Then production pauses. It resumes when a delivery drone loads some buffered ammunition and frees space; completed ammunition is never deleted.
-4. For the first gameplay pass, require enough buffer room for a whole next batch, and reserve enough depot room before dispatching a drone carrying a whole transfer batch. This avoids overflow or half-created batches; partial transfers, depot selection and exact dispatch order can be refined later.
+4. For the first gameplay pass, require enough buffer room for a whole next batch, and reserve depot room before dispatch. Whole batches are preferred when possible; partial shipments use remaining payload/space safely. Nearest eligible depots and round-robin requests are deterministic.
 5. The Ammo Depot stores ammunition and sends it to depleted offensive towers using [Transport Drones](../../DRONES/Transport/README.md), coordinated by [Ammunition Logistics](Ammunition/Shared/Logistics/README.md). **Both factory → depot and depot → tower use visible drones carrying finite cargo.**
 6. The first production pass can manufacture automatically without requiring raw material inputs; costs/input recipes, electricity draw, research boosts and ammo types can be added separately when required. No free ammunition can appear from an unrelated reload operation.
 
@@ -41,6 +41,4 @@ Every contiguous terrain landmass automatically shares one grid; disconnected is
 - `DRONES/`: drone flight/behaviours; transport first, combat/player ability maybe later.
 - `TOWERS/Economy/Power/`: individual generators plus shared island grid, relay joining, generation/demand/priorities.
 
-**Completed isolated foundation:** [AmmoProduction.cs](Ammunition/AmmunitionFactory/AmmoProduction.cs), [AmmoStorage.cs](Ammunition/AmmunitionDepot/AmmoStorage.cs), [AmmoInventory.cs](../Shared/Ammunition/AmmoInventory.cs) and [AmmunitionMasterConfig.cs](../Shared/Ammunition/AmmunitionMasterConfig.cs) exist and are covered by committed (not yet executed) foundation tests. They are **not connected to live scenes**. Codex must build factory/depot scenes, flying drones on both legs, tower ammunition consumption and integration as documented in [NOTES/WORK.md](../../NOTES/WORK.md).
-
-Keep Tower Defense independently playable; do not implement all subsystems just because their planning folders now exist.
+**Completed gameplay loop:** the existing AmmoProduction/AmmoStorage/AmmoInventory helpers now power real catalog-registered Factory/Depot buildings, consuming offensive towers and visible two-leg drone deliveries. Inspector status and conservation/lifecycle regression tests are implemented. See [WORK](../../NOTES/WORK.md) and [verification](../../TESTS/Economy/Ammunition.md).

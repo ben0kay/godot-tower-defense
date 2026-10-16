@@ -4,6 +4,8 @@ using Godot;
 [GlobalClass]
 public partial class TowerConfig : Resource
 {
+    [ExportGroup("Starting Ammunition")]
+    [Export(PropertyHint.Range, "0,1,0.01")] public float InitialAmmoFraction { get; set; } = 1f;
     [ExportGroup("Identity")]
     [Export] public string DisplayName { get; set; } = "Tower";
     [Export] public string Description { get; set; } = "";

@@ -111,15 +111,15 @@ public static class TowerStatChecks
     {
         BattleTowerConfig battle = new(); LaserTowerConfig laser = new(); BlasterCannonConfig blaster = new();
         TowerFinalStats[] battleExpected = {
-            new(256, 1, 12, 600, 180, 12, .15f, ShieldPenetration: .05f),
-            new(288, 1.2f, 16, 600, 180, 12, .15f, ShieldPenetration: .05f),
-            new(320, 1.5f, 22, 600, 180, 12, .15f, ShieldPenetration: .05f) };
+            new(256, 1, 12, 600, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
+            new(288, 1.2f, 16, 600, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
+            new(320, 1.5f, 22, 600, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)) };
         TowerFinalStats[] laserExpected = {
-            new(256, 0, 0, 1, 180, 12, .15f, new BeamStats(12), Weapon: new(DamageType.Energy, true, 6, true, .15f)),
-            new(288, 0, 0, 1, 180, 12, .15f, new BeamStats(22), Weapon: new(DamageType.Energy, true, 6, true, .15f)) };
+            new(256, 0, 0, 1, 180, 12, .15f, new BeamStats(12), Weapon: new(DamageType.Energy, true, 6, true, .15f), Ammunition: new(1000, 0, 2)),
+            new(288, 0, 0, 1, 180, 12, .15f, new BeamStats(22), Weapon: new(DamageType.Energy, true, 6, true, .15f), Ammunition: new(1000, 0, 2)) };
         TowerFinalStats[] blasterExpected = {
-            new(256, .5f, 60, 500, 180, 12, .15f, Area: new(80, .25f), Weapon: new(DamageType.Explosive, false, 1, false, 1)),
-            new(256, .5f, 75, 500, 180, 12, .15f, Area: new(96, .25f), Weapon: new(DamageType.Explosive, false, 1, false, 1)) };
+            new(256, .5f, 60, 500, 180, 12, .15f, Area: new(80, .25f), Weapon: new(DamageType.Explosive, false, 1, false, 1), Ammunition: new(600, 3)),
+            new(256, .5f, 75, 500, 180, 12, .15f, Area: new(96, .25f), Weapon: new(DamageType.Explosive, false, 1, false, 1), Ammunition: new(600, 3)) };
         CheckRows(battle, battleExpected, new[] { 200, 150, 250 });
         CheckRows(laser, laserExpected, new[] { 250, 175 });
         CheckRows(blaster, blasterExpected, new[] { 300, 200 });

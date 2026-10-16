@@ -50,3 +50,7 @@ The eventual concept is **one persistent sci-fi campaign / empire** with three c
 6. **Avoid a late three-game merge.** If the larger vision is pursued, build one modest end-to-end connection at a time: resource production → tower inventory → TD deployment → mission results; add research and Shooter integration afterward. The TD implementation should not be rewritten wholesale to achieve this.
 
 **Bottom line:** Treat this repository as the complete Tower Defense game **today**, with the *option* to become the Tower Defense module within a broader multi-genre game **later**. This vision must not block or complicate current TD work.
+
+## Ammunition supply
+
+All four offensive weapons consume finite local reserves. Build an Ammunition Factory (200 Credits) and Depot (150 Credits) from the Ctrl tray: factories manufacture automatically, visible drones carry stock to depots, then depot drones supply towers at/below10%. New weapons start full by default; their config InitialAmmoFraction permits quicker low/empty testing. See `TOWERS/Economy/Ammunition/README.md` and `TESTS/Economy/Ammunition.md`. Magazines, power, inputs, research and campaign saving remain deferred.

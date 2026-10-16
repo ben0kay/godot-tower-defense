@@ -1,0 +1,9 @@
+[gd_scene load_steps=4 format=3]
+[ext_resource type="Script" path="res://TOWERS/Economy/Ammunition/AmmunitionFactory/AmmunitionFactory.cs" id="1"]
+[ext_resource type="Resource" path="res://TOWERS/Economy/Ammunition/AmmunitionFactory/DefaultAmmunitionFactoryConfig.tres" id="2"]
+[ext_resource type="Texture2D" path="res://TOWERS/Economy/Ammunition/AmmunitionFactory/Artwork/factory.svg" id="3"]
+[node name="AmmunitionFactory" type="Node2D"]
+script = ExtResource("1")
+Config = ExtResource("2")
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("3")

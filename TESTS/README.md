@@ -226,9 +226,10 @@ Run `RoutePreviewChecks.tscn` for the F3 debug controls, ALL portals, 1–50 pat
 
 Run `CheckpointChecks.tscn` for freely placed required regions, portal attribution, all permission combinations, swept entry at30/60/120Hz, blocked retry, staged F3 plans, thin/wide passages and500-enemy bounded scheduling. See `Navigation/Checkpoints.md` for outcomes and known upstream integration limitations.
 
-## Ammunition foundation (added, not yet run)
+## Ammunition supply loop
 
-`TESTS/Economy/AmmoFoundationChecks.cs` has been added to `EnemyIntegrationChecks.cs`. The tests cover finite inventory, all-or-nothing transfers, production batches/buffer pause and resume, depot stock and the global 10% trigger. They do **not** test live towers, scenes or drones, which Codex must implement next. The foundation authoring environment lacked Godot/.NET and could not execute the suite; Codex should run `dotnet build` and the headless integration test after pulling these files. See [WORK.md](../NOTES/WORK.md).
+The original `Economy/AmmoFoundationChecks.cs` helpers have now been executed and are reused by the live feature. Run `res://TESTS/Economy/AmmunitionLoopChecks.tscn` for the real purchased Factory→drone→Depot→drone→consuming tower loop, automatic physics/pause, stock conservation and failure handling. Focused helper files keep weapon, flight safety and world fixture checks separate. See [Economy/Ammunition.md](Economy/Ammunition.md) for actual results and known SDK/map limitations.
+
 ## Chained checkpoints and design diagram
 
 Completed: ordered and uniformly branching checkpoint graphs, full-chain F3 previews, and a shared above-tile editor circle/connection overlay. See [Navigation/CheckpointChains.md](Navigation/CheckpointChains.md) for authoring behavior, regression coverage, actual results and existing environment/map limitations.

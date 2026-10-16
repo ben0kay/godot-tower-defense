@@ -1,22 +1,12 @@
-> **FOUNDATION IMPLEMENTED:** Factory [AmmoProduction.cs](AmmunitionFactory/AmmoProduction.cs) (timed batches and small bounded buffer) and Depot [AmmoStorage.cs](AmmunitionDepot/AmmoStorage.cs) (finite depot inventory) now exist as **unwired C# helpers**. The shared [AmmoInventory](../../Shared/Ammunition/AmmoInventory.cs) handles transfers. **Codex next:** build actual selectable Factory/Depot scenes, connect their lifecycles to these helpers, add visible drones for **BOTH legs** and shared dispatcher, integrate consuming towers. See [WORK.md](../../../NOTES/WORK.md).
+# Ammunition buildings — implemented
 
-# Economy / Ammunition — FUTURE / NOT IMPLEMENTED
+The current playable loop is **Factory → visible transport drone → Depot → visible transport drone → consuming tower**. Both buildings are catalog-registered Economy structures, purchasable through the existing build tray, wallet and 1×1 navigation-safe placement.
 
-This section collects **ammunition-producing and storage buildings** and their common delivery coordination, like Offensive/ collects its tower types.
+- [AmmunitionFactory](AmmunitionFactory/README.md): automatic whole-batch production into its own finite buffer; pauses when another batch cannot fit.
+- [AmmunitionDepot](AmmunitionDepot/README.md): large local storage, incoming reserved capacity and home-based refill drones.
+- [Shared/Logistics](Shared/Logistics/README.md): budgeted requests, nearest eligible endpoints, physical cargo and reservations.
+- [Tower-local ammo](../../Shared/Ammunition/README.md): complete explicit level values and weapon consumption, separate from producer/storage behavior.
 
-## Building folders
+Factory production does not require a depot, materials, power or activation. Transfers require real flights; a missing/full depot leaves produced stock buffered. Drones return home before their source slot can be reused. Credits remain in ECONOMY's one wallet; ammunition is not a second currency balance.
 
-- [AmmunitionFactory/](AmmunitionFactory/README.md): automatically makes batches, keeps a small internal buffer and pauses when full.
-- [AmmunitionDepot/](AmmunitionDepot/README.md): receives produced batches, stores large amounts and eventually launches resupply drones.
-- [Shared/](Shared/README.md): shared inventory-transfer coordination, including [Logistics/](Shared/Logistics/README.md).
-
-## Planned loop
-
-1. Factory produces automatically with no depot needed.
-2. Full batches collect in its limited internal buffer; **factory-owned transport drones physically carry stock to an available depot**. No instant transfer.
-3. Without available storage/drones, the factory fills its buffer and pauses until a drone loads buffered stock and frees room.
-4. Another drone transports depot stock to low-ammo towers: [transport drones](../../../DRONES/Transport/README.md) to refill towers running low.
-
-**Separate tower consumption:** individual offensive towers hold/use/reload their own ammunition through [TOWERS/Shared/Ammunition](../../Shared/Ammunition/README.md). That remains outside Economy because it is the consumer-side capability. [DRONES](../../../DRONES/README.md) is an independent umbrella for mobile units, including future combat drones.
-
-**All above is planning only; no gameplay code or scene changes are authorized by these README folders.**
+All additional balance is provisional. No permanent research, magazines, power, inputs, saving or combat drones are implemented here. See [WORK](../../../NOTES/WORK.md) and [verification](../../../TESTS/Economy/Ammunition.md).

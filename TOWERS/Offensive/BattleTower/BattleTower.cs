@@ -70,6 +70,7 @@ public partial class BattleTower : TowerBase
         bool aligned = TurretAiming.Track(_turret, _target.GlobalPosition, FinalStats.RotationSpeedDegrees,
             FinalStats.AimToleranceDegrees, Config.RotateWhileTracking, delta);
         if (!aligned || _shotTimer > 0f || FinalStats.ShotsPerSecond <= 0f) return;
+        if (Ammunition?.TryFire() == false) return;
         BasicProjectile bullet = new();
         bullet.Initialize(_target, FinalStats.ProjectileSpeed,
             new DamageInfo(FinalStats.DamagePerShot, DamageType.Kinetic, shieldPenetration: FinalStats.ShieldPenetration, source: DamageSource));

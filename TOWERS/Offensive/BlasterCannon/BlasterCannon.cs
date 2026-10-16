@@ -71,6 +71,7 @@ public partial class BlasterCannon : TowerBase
         bool aligned = TurretAiming.Track(_turret, _target.GlobalPosition, FinalStats.RotationSpeedDegrees,
             FinalStats.AimToleranceDegrees, Config.RotateWhileTracking, delta);
         if (!aligned || _shotTimer > 0f || FinalStats.ShotsPerSecond <= 0f) return;
+        if (Ammunition?.TryFire() == false) return;
         DamageInfo hit = Config.CreateHit(FinalStats, DamageSource);
         SplashProjectile bullet = new();
         bullet.Initialize(_target, _registry, _target.GlobalPosition, FinalStats.ProjectileSpeed,

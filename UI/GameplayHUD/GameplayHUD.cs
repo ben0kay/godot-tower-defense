@@ -33,7 +33,7 @@ public partial class GameplayHUD : Control
     private Control _traySlot;
     private Label _wave, _credits, _core, _towerName, _towerCategory, _towerStats, _towerNotes;
     private Button _startWave, _upgradeButton;
-    private Label _upgradeInfo;
+    private Label _upgradeInfo, _runtimeStats;
     private CreditGainIndicator _creditGain;
     private ProgressBar _healthBar, _experienceBar;
     private VBoxContainer _rankSection;
@@ -73,6 +73,9 @@ public partial class GameplayHUD : Control
         _towerName = GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerName");
         _towerCategory = GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerCategory");
         _towerStats = GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerStats");
+        _runtimeStats = UIButtonFactory.Label("", 13, Config);
+        _runtimeStats.Name = "RuntimeStats"; _runtimeStats.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        _towerStats.AddSibling(_runtimeStats); _runtimeStats.Hide();
         _towerNotes = GetNode<Label>("BottomArea/Inspector/Insets/Body/Notes");
         _rankSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/RankSection");
         _rankLabel = _rankSection.GetNode<Label>("Rank");
@@ -169,6 +172,7 @@ public partial class GameplayHUD : Control
     // Placement supplies actual instance details and build previews to the independent Inspector.
     public void ShowTowerDetails(string name, string category, string stats, string notes = "")
     {
+        SetRuntimeDetails("");
         SetUpgradeDetails("", "", false);
         _rankSection.Hide();
         _towerName.Text = name;
@@ -177,6 +181,10 @@ public partial class GameplayHUD : Control
         _towerNotes.Text = notes;
         _inspector.Show();
     }
+
+    // =========================================================
+    // Update inventory/status only; leave numeric stats, rank progress and upgrade previews untouched.
+    public void SetRuntimeDetails(string text) { _runtimeStats.Text = text; _runtimeStats.Visible = text.Length > 0; }
 
     // =========================================================
     // Event-driven presentation: fractional progress within the current rank, with total XP also visible.
