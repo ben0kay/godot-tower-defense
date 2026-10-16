@@ -48,3 +48,7 @@ Enemy initialization reports destination arrival to the world InteractiveTileMan
 ## Movement variation permissions
 
 EnemyDefinition has Inspector **Movement Variation** permissions AllowCorridorVariation, AllowPathOffsets and AllowPathDiversity, default true. Set these independently per authored type; no ID/size whitelist is used. Permissions are captured at spawn, and global master controls remain authoritative. Corridor selection/seed persists across repaths, offsets may be disabled independently, and diversity-disallowed ships use the single shared unweighted profile. Existing type resources retain their defaults. See ENEMIES/Movement/README.md.
+
+## Planned inherited shared enemy scene (GE1–GE3; NOT IMPLEMENTED)
+
+See [GENERIC_ENEMY_SCENE_PASS.md](GENERIC_ENEMY_SCENE_PASS.md). Keep per-type `.tscn` scenes for readability but derive their shared `Sprite`, `Movement` and `DefenseBar` children from one `Shared/GenericEnemy.tscn`. Type-specific SVG, Definition and optional ability children remain in inherited type scenes. Preserve the existing catalog/spawn behavior and regressions; no scene migration has happened yet.

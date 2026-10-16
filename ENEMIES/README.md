@@ -18,6 +18,10 @@ This top-level folder owns **enemy gameplay mechanics** in the Godot 4 C#/.NET s
 
 See **[enemypathing.md](enemypathing.md)** for the standalone Phase N4 implementation plan: Inspector master toggle, percentage of individual enemies assigned the new corridor-aware refinement, safe randomized routes within walkable boundaries, stable repathing, 0%/100% behavior and performance/regression requirements. This is **not implemented yet** and is independent of the completed E2A/E2B enemy catalog/ShieldEmitter and existing shared path diversity.
 
+## Planned: inherited common enemy scene (GE1–GE3; NOT IMPLEMENTED)
+
+[Shared/GENERIC_ENEMY_SCENE_PASS.md](Shared/GENERIC_ENEMY_SCENE_PASS.md) describes consolidating the repeated `Sprite`, `Movement` and `DefenseBar` nodes into one reusable inherited base scene, while keeping separate editable enemy scenes, individual Definition/SVG overrides and optional ShieldEmitter/DeathSpawn children. This is a **scene-authoring refactor**, not replacement of EnemyCatalog or a new generic enemy runtime. No work implemented yet.
+
 ## Enemy architecture — multi-type roster and modular abilities (E2A/E2B implemented; E3 later)
 
 **Design goal:** Support many enemy types—fast scouts, heavy tanks, generators, carriers, electrical ships, attackers, healers, stealth units, bosses and hybrids—without growing `Enemy.cs` into a giant switch on IDs or writing a full replacement AI/spawn/health script for each one. An enemy may have **zero, one or several independent optional abilities**. Keep ordinary enemies lightweight: speed, HP, shield *capacity*, Citadel damage, reward and navigation radius are already `EnemyDefinition` data.
