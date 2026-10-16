@@ -22,7 +22,7 @@ Settings = ExtResource("7_config")
 [node name="Checkpoints" type="Node" parent="." unique_id=1625000831]
 
 [node name="CheckPoint5a" parent="Checkpoints" unique_id=1092744985 instance=ExtResource("3_lnxuk")]
-position = Vector2(3910, 4513)
+position = Vector2(3916, 4516)
 NextCheckpoints = Array[NodePath]([NodePath("../CheckPoint5b"), NodePath("../CheckPoint5c")])
 
 [node name="CheckPoint1a" parent="Checkpoints" unique_id=1522397489 instance=ExtResource("3_lnxuk")]
