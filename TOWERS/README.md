@@ -30,6 +30,8 @@ This README is an up-to-date overview and forward plan. Completed phase-by-phase
 | `DefaultTowerCatalog.tres`, `Shared/TowerDefinition.cs`, `Placement/` | Tower registration and placement |
 | `TowerMasterConfig.cs`, `DefaultTowerConfig.tres` | Global tower policies / XP multipliers, not per-level combat stats |
 
+**Planned Codex pass:** [Generic rectangular tower footprints](Placement/MULTI_CELL_FOOTPRINT_PASS.md) — real Ammunition Factory **3×2** and Ammunition Depot **2×2**; not yet implemented. Existing 1×1 towers remain unchanged.
+
 Detailed existing behavior belongs in [Shared/Stats/README.md](Shared/Stats/README.md), [Pipeline/README.md](Shared/Stats/Pipeline/README.md), [Shared/Upgrades/README.md](Shared/Upgrades/README.md), [Shared/Ranks/README.md](Shared/Ranks/README.md), [Placement/README.md](Placement/README.md), [COMBAT/Damage/README.md](../COMBAT/Damage/README.md), and the individual tower READMEs.
 
 ## Existing stat pipeline — preserve its stage ownership
