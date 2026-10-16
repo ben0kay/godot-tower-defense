@@ -25,3 +25,34 @@ If no sampled target is clearance-valid/reachable, the enemy waits/retries; it n
 F3 reuses the same targets, query adapter, refinement builders and analytic entry clipping; both preview legs share the same sample preferences. It remains a route plan, not an enemy timing prediction. Weighted preferences can still choose downstream detours **after** visiting the required area; this is not a global detour limit or designer centerline.
 
 Existing Level001/002 maps, waves and portals are not automatically linked or repositioned. Place/link only where you want this new routing requirement. See `TESTS/Checkpoints.md` for verification.
+
+## Chains and random branches — implemented
+
+Each checkpoint now exposes **Next Checkpoints**, an Inspector array of NodePaths relative to that checkpoint:
+
+| Array contents | After entering this area |
+| --- | --- |
+| Empty | Continue to Citadel |
+| One checkpoint | Visit it next |
+| Several checkpoints | Choose exactly one with equal probability |
+
+Example naming: Portal2 → Checkpoint2A; 2A lists2B/2C/2D;2C lists2E/2F. Those names are labels, not code requirements. Under one RouteCheckpoints group a link often reads `../Checkpoint2B`. Different branches may merge into the same later checkpoint. Duplicate entries are rejected, rather than secretly increasing a branch's probability.
+
+The reachable network is validated/snapshotted when an enemy spawns: missing links, duplicate branches, cycles (including self-links) and networks exceeding256 nodes are invalid. Invalid required networks safely wait and expose RouteStatus/editor/F3 diagnostics. Each physical entry makes one deterministic uniform choice from an independent hash stream using the enemy's existing stable seed and completed-checkpoint count. No wave/spawn RNG calls are added. The chosen destination remains fixed through blocked routes/repaths; an unreachable chosen branch waits/retries and never rerolls or skips to Citadel. Profile/offset/corridor preferences persist across every stage.
+
+Existing enemies retain captured outgoing links if you edit the graph during a run. New spawns/new previews capture edited links. Removing an unfinished selected destination makes the enemy wait. `CheckpointCompleted` now means the whole chosen chain is complete; `CompletedCheckpointCount` counts physical area visits. Already-overlapping areas can advance without invented movement, but cycles cannot loop. Existing single-checkpoint and unassigned behavior remains supported.
+
+F3 samples full chains with the same selection helper. It labels each sample's checkpoint sequence and marks every entry. A neutral example can select a different chain, so branching plans do not show misleading percentage comparisons across different chains. First targeting still reports physical current-leg distance, as in the original checkpoint pass.
+
+## Above-tile editor diagram
+
+Level001, Level002 and LevelTemplate now include `Debug/CheckpointOverlay`, a shared `[Tool]` CheckpointDesignOverlay. Its **absolute ZIndex4090** draws circles/labels/arrows above tiles, independent of marker placement in the scene tree. Standalone RouteCheckpoint.tscn also has absolute ZIndex4000 as a fallback when no overlay exists. No tile data, placed checkpoint coordinates or portal links are changed by adding the owner.
+
+- Circles have faint fills and bright outlines, labelled with node names.
+- Arrows connect each portal's SpawnExit to its first checkpoint and every checkpoint to all Next Checkpoints.
+- Portal groups use stable color families; shared/unlinked nodes remain readable.
+- Broken links/cycles show authoring warnings. Lines are **relationships**, not navigation paths through walls.
+- A single editor scan throttled to0.15s detects moved/resized/renamed markers and link/topology edits, rebuilding cached drawing only on changes. No checkpoint-specific processing loops or physics areas are added.
+- Hide the diagram with the owner's **Show In Editor** option. In normal gameplay it is hidden and has no processing; F3 optionally shows it alongside actual sampled paths and closes it with the panel.
+
+For another level, instance/copy a Node2D under its Debug group, attach `WORLD/ROUTING/CheckpointDesignOverlay.cs`, and leave LevelPath `../..` (relative to that owner). The template's Debug group is design-only; it does not add gameplay input services.

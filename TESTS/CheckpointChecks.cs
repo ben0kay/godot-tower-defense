@@ -172,6 +172,8 @@ public partial class CheckpointChecks : Node
                 }
             }
             other.Free();
+            second.CheckpointPath = new NodePath("");
+            CheckpointChainChecks.Run(main, grid, spawns, checkpoint);
             GD.Print("PASS: required checkpoint matrix16, exact portal attribution, physical/swept entry, persistent preferences, blocked retry, no-link parity, preview stages and bounded target cache");
             main.QueueFree(); await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame); main = null;
             config.Dispose(); config = null; settings.Dispose(); settings = null; GetTree().Quit();

@@ -3,4 +3,6 @@
 [ext_resource type="Script" path="res://WORLD/ROUTING/RouteCheckpoint/RouteCheckpoint.cs" id="1"]
 
 [node name="RouteCheckpoint" type="Node2D"]
+z_index = 4000
+z_as_relative = false
 script = ExtResource("1")

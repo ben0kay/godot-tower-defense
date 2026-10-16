@@ -14,6 +14,8 @@
 [ext_resource type="PackedScene" path="res://ENEMIES/Types/Enemy001/Enemy001.tscn" id="11_enemy"]
 [ext_resource type="Script" uid="uid://cvogctvds5c0a" path="res://WORLD/GRID/GridDebugOverlay.cs" id="12_info"]
 
+[ext_resource type="Script" path="res://WORLD/ROUTING/CheckpointDesignOverlay.cs" id="checkpoint_overlay"]
+
 [node name="Level002" type="Node2D" unique_id=1426546349]
 script = ExtResource("6_root")
 Settings = ExtResource("7_config")
@@ -93,3 +95,8 @@ offset_bottom = 185.0
 theme_override_colors/font_color = Color(0.68, 0.91, 0.96, 0.86)
 theme_override_font_sizes/font_size = 14
 script = ExtResource("12_info")
+
+[node name="CheckpointOverlay" type="Node2D" parent="Debug"]
+z_index = 4090
+z_as_relative = false
+script = ExtResource("checkpoint_overlay")

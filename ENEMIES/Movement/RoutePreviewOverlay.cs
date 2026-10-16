@@ -11,6 +11,7 @@ public partial class RoutePreviewOverlay : Node2D
     public bool IsOpen => _canvas?.Visible == true;
     public int MaxCalculationsPerFrame { get; set; } = 1;
     public double MaxMillisecondsPerFrame { get; set; } = 1;
+    private CheckpointDesignOverlay _designOverlay;
     private SpawnManager _spawns;
     private NavigationGrid _nav, _previewNav;
     private EnemyMasterConfig _previewSettings;
@@ -36,6 +37,7 @@ public partial class RoutePreviewOverlay : Node2D
     // Only levels with enabled debug/services construct the panel; map-only scenes remain inert.
     public void Initialize(SpawnManager spawns)
     {
+        _designOverlay = GetParent().GetNodeOrNull<CheckpointDesignOverlay>("CheckpointOverlay");
         _spawns = spawns; _nav = spawns.Paths.Navigation; ZIndex = 90;
         _canvas = new CanvasLayer { Name = "PreviewUI", Layer = 20, Visible = false }; AddChild(_canvas);
         PanelContainer panel = new() { Name = "Panel", Position = new(16, 190), Size = new(420, 490) };
@@ -116,7 +118,7 @@ public partial class RoutePreviewOverlay : Node2D
     // F3 hides both panel and paths; reopen starts clean and reflects current registered sources.
     public void Toggle()
     {
-        bool open = !IsOpen; _canvas.Visible = open; Visible = open; SetPhysicsProcess(open);
+        bool open = !IsOpen; _designOverlay?.SetRuntimeVisible(open); _canvas.Visible = open; Visible = open; SetPhysicsProcess(open);
         Clear("Choose inputs and click Simulate Paths. No enemies spawn.");
         if (open) RefreshChoices();
     }
@@ -184,7 +186,7 @@ public partial class RoutePreviewOverlay : Node2D
     public override void _PhysicsProcess(double delta)
     {
         if (Job == null) return;
-        if (_inputStamp != InputStamp()) { Clear("Map/settings/enemy/portal changed. Simulate Paths to refresh."); return; }
+        if (_plans.Any(p => !p.Job.NetworkUnchanged) || _inputStamp != InputStamp()) { Clear("Map/settings/enemy/portal changed. Simulate Paths to refresh."); return; }
         if (Job.Complete && _planIndex == _plans.Count - 1) return;
         RoutePreviewJob previous = Job;
         int before = Job.Results.Count + Job.Failed + (Job.Neutral.Length > 0 ? 1 : 0);
@@ -243,14 +245,16 @@ public partial class RoutePreviewOverlay : Node2D
             int unique = job.Results.Count(r => r.DuplicateOf == 0);
             string portalColor = PortalColor(plan.ColorIndex).ToHtml(false);
             text.AppendLine($"[color=#{portalColor}]{plan.Portal} · {job.Results.Count}/{(int)_count.Value} paths · {unique} unique · {job.Failed} failed[/color]");
-            if (job.RequiresCheckpoint) text.AppendLine("Required checkpoint → Citadel (two planned stages)");
-            if (job.Neutral.Length > 0) text.AppendLine($"{(job.RequiresCheckpoint ? "Neutral staged baseline" : "Neutral shortest")}: {job.NeutralLength:0} px");
+            if (job.RequiresCheckpoint) text.AppendLine("Required checkpoint chain → Citadel");
+            if (job.HasBranches) text.AppendLine("Branch choices vary by sample; distances are not compared across different chains.");
+            if (job.Neutral.Length > 0) text.AppendLine($"{(job.HasBranches ? "Neutral example chain" : job.RequiresCheckpoint ? "Neutral staged baseline" : "Neutral shortest")}: {job.NeutralLength:0} px");
             if (job.Results.Count == 0) text.AppendLine(job.Message);
             foreach (RoutePreviewJob.Result r in job.Results)
             {
-                string extra = job.NeutralLength > 0 ? $" ({(r.Length / job.NeutralLength - 1) * 100:+0.0;-0.0;0.0}% distance)" : "";
+                string extra = job.NeutralLength > 0 && !job.HasBranches ? $" ({(r.Length / job.NeutralLength - 1) * 100:+0.0;-0.0;0.0}% distance)" : "";
+                string chain = r.CheckpointNames?.Length > 0 ? " · " + string.Join(" → ", r.CheckpointNames) : "";
                 string duplicate = r.DuplicateOf > 0 ? $" · same as #{r.DuplicateOf}" : "";
-                text.AppendLine($"[color=#{SampleColor(plan.ColorIndex, r.Sample).ToHtml(false)}]#{r.Sample} · {(r.Profile < 0 ? "neutral" : "profile " + r.Profile)} · {r.Length:0}px{extra}{duplicate}[/color]");
+                text.AppendLine($"[color=#{SampleColor(plan.ColorIndex, r.Sample).ToHtml(false)}]#{r.Sample} · {(r.Profile < 0 ? "neutral" : "profile " + r.Profile)} · {r.Length:0}px{extra}{duplicate}{chain}[/color]");
             }
         }
         text.Append("Portal SpawnExit → Citadel. Spawn spread/timing not simulated.");
@@ -268,16 +272,9 @@ public partial class RoutePreviewOverlay : Node2D
         {
             if (_comparison.ButtonPressed && plan.Job.Neutral.Length > 0) DrawRoute(plan.Start, plan.Job.Neutral, Colors.White, 4);
             foreach (RoutePreviewJob.Result result in plan.Job.Results) DrawRoute(plan.Start, result.Points, SampleColor(plan.ColorIndex, result.Sample), 2);
-            RouteCheckpoint checkpoint = plan.Job.Checkpoint;
-            if (GodotObject.IsInstanceValid(checkpoint))
-            {
-                Vector2[] ring = new Vector2[65];
-                for (int i = 0; i < ring.Length; i++) ring[i] = ToLocal(checkpoint.GlobalPosition + Vector2.FromAngle(i * Mathf.Tau / 64) * checkpoint.RadiusPixels);
-                DrawPolyline(ring, PortalColor(plan.ColorIndex), 2, true);
-                DrawString(ThemeDB.FallbackFont, ToLocal(checkpoint.GlobalPosition), "CHECKPOINT", fontSize: 16);
-                foreach (var result in plan.Job.Results)
-                    if (result.CheckpointEntry.HasValue) DrawCircle(ToLocal(result.CheckpointEntry.Value), 4, PortalColor(plan.ColorIndex));
-            }
+            foreach (var result in plan.Job.Results)
+                if (result.CheckpointEntries != null)
+                    foreach (Vector2 entry in result.CheckpointEntries) DrawCircle(ToLocal(entry), 4, PortalColor(plan.ColorIndex));
             DrawCircle(ToLocal(plan.Start), 7, PortalColor(plan.ColorIndex));
             DrawString(ThemeDB.FallbackFont, ToLocal(plan.Start) + new Vector2(10, -10), plan.Portal, fontSize: 16);
         }

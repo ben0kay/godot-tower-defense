@@ -6,6 +6,25 @@ using System.Collections.Generic;
 [Tool]
 public partial class RouteCheckpoint : Node2D
 {
+    [Export] public Godot.Collections.Array<NodePath> NextCheckpoints { get; set; } = new();
+    internal bool DrawnByDesignOverlay { get; set; }
+    public int DesignStamp
+    {
+        get
+        {
+            HashCode hash = new(); hash.Add(GeometryStamp); hash.Add(Name.ToString());
+            if (NextCheckpoints != null) foreach (NodePath path in NextCheckpoints) hash.Add(path?.ToString());
+            return hash.ToHashCode();
+        }
+    }
+    // =========================================================
+    // Editor warns about cycles/broken links; runtime captures the same validated link snapshot.
+    public override string[] _GetConfigurationWarnings()
+    {
+        if (!IsInsideTree()) return System.Array.Empty<string>();
+        string error = CheckpointNetwork.Capture(this).Error;
+        return error.Length == 0 ? System.Array.Empty<string>() : new[] { error };
+    }
     private float _radius = 128;
     [Export(PropertyHint.Range, "1,4096,1,or_greater")]
     public float RadiusPixels
@@ -65,9 +84,10 @@ public partial class RouteCheckpoint : Node2D
     // Editor visualization only; F3 draws its own runtime checkpoint circles and labels.
     public override void _Draw()
     {
-        if (!Engine.IsEditorHint()) return;
+        if (!Engine.IsEditorHint() || DrawnByDesignOverlay) return;
         Vector2[] ring = new Vector2[65];
         for (int i = 0; i < ring.Length; i++) ring[i] = ToLocal(GlobalPosition + Vector2.FromAngle(i * Mathf.Tau / 64) * RadiusPixels);
+        DrawColoredPolygon(ring, new Color(0.75f, 0.4f, 1, 0.06f));
         DrawPolyline(ring, new Color(0.75f, 0.4f, 1, 0.9f), 2, true);
         DrawCircle(Vector2.Zero, 5, new Color(0.75f, 0.4f, 1));
     }

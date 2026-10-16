@@ -7,7 +7,7 @@ using System.Linq;
 
 public sealed class RoutePreviewJob
 {
-    public sealed record Result(int Sample, int Profile, Vector2[] Points, float Length, int DuplicateOf, Vector2? CheckpointEntry = null);
+    public sealed record Result(int Sample, int Profile, Vector2[] Points, float Length, int DuplicateOf, Vector2? CheckpointEntry = null, Vector2[] CheckpointEntries = null, string[] CheckpointNames = null);
     public readonly List<Result> Results = new();
     public Vector2[] Neutral { get; private set; } = Array.Empty<Vector2>();
     public float NeutralLength { get; private set; }
@@ -25,11 +25,16 @@ public sealed class RoutePreviewJob
     private readonly int _count, _revision, _costRevision, _settings, _crowdRevision;
     private readonly RouteCheckpoint _checkpoint;
     private readonly bool _required;
-    private readonly int _checkpointStamp;
-    private readonly Vector2[] _checkpointTargets;
+    private readonly CheckpointNetwork _network;
+    private RouteCheckpoint _activeCheckpoint;
+    private Vector2[] _checkpointTargets;
+    private int _completed;
+    private readonly List<Vector2> _prefix = new(), _entries = new();
+    private readonly List<string> _names = new();
+    public bool HasBranches => _network?.HasBranches == true;
+    public bool NetworkUnchanged => _network == null || _network.Unchanged();
     private bool _searchingCheckpoint, _checkpointFailed;
     private Vector2 _legStart;
-    private Vector2[] _firstLeg = Array.Empty<Vector2>();
     public RouteCheckpoint Checkpoint => _checkpoint;
     public bool RequiresCheckpoint => _required;
     private int _sample = -1, _goal;
@@ -41,7 +46,7 @@ public sealed class RoutePreviewJob
     public RoutePreviewJob(NavigationGrid nav, EnemyDefinition enemy, Vector2 start, int count, bool refined, RouteCheckpoint checkpoint = null, bool requiresCheckpoint = false)
     {
         _checkpoint = checkpoint; _required = requiresCheckpoint || checkpoint != null;
-        _checkpointStamp = GodotObject.IsInstanceValid(checkpoint) ? checkpoint.GeometryStamp : 0;
+        _network = _required ? CheckpointNetwork.Capture(checkpoint) : null;
         _nav = nav; _config = nav.Config; nav.Refresh(); _start = start; _radius = enemy.RadiusPixels;
         _refined = refined; _offsets = enemy.AllowPathOffsets; _corridors = enemy.AllowCorridorVariation;
         _diversity = enemy.AllowPathDiversity; _count = Mathf.Clamp(count, 1, 50);
@@ -53,7 +58,7 @@ public sealed class RoutePreviewJob
         { Cancel("No valid Citadel goals or portal clearance."); return; }
         if (_required)
         {
-            if (!GodotObject.IsInstanceValid(checkpoint)) { Cancel("Required checkpoint link is missing/invalid."); return; }
+            if (_network.Error.Length > 0) { Cancel(_network.Error); return; }
             _checkpointTargets = checkpoint.Targets(nav, _radius);
             if (_checkpointTargets.Length == 0 && !checkpoint.Contains(start))
             { Cancel("Required checkpoint has no clearance-valid sampled targets. Move/enlarge the circle."); return; }
@@ -67,7 +72,7 @@ public sealed class RoutePreviewJob
     {
         LastCalculations = 0;
         if (Complete) return;
-        if (_required && (!GodotObject.IsInstanceValid(_checkpoint) || _checkpoint.GeometryStamp != _checkpointStamp))
+        if (!NetworkUnchanged)
         { Cancel("Checkpoint changed. Simulate Paths again."); return; }
         if (_nav.Revision != _revision || _nav.CostRevision != _costRevision || SettingsHash(_config) != _settings
             || (_config.CongestionInfluence > 0 && _nav.CongestionRevision != _crowdRevision))
@@ -78,6 +83,12 @@ public sealed class RoutePreviewJob
             int profile = _sample < 0 || !_diversity || !_config.EnablePathDiversity ? NavigationGrid.NeutralProfile
                 : _sample % Mathf.Clamp(_config.RouteProfileCount, 1, 16);
             int targets = _searchingCheckpoint ? _checkpointTargets.Length : _goals.Length;
+            if (targets == 0)
+            {
+                _checkpointFailed = true; FinishSample(profile, Array.Empty<Vector2>()); NextSample();
+                if (maxMilliseconds > 0 && Stopwatch.GetElapsedTime(started).TotalMilliseconds >= maxMilliseconds) break;
+                continue;
+            }
             Vector2[] route = _searchingCheckpoint
                 ? CheckpointRoute.Find(_nav, _legStart, _checkpointTargets[_goal++], profile, _radius, out float cost, true)
                 : _nav.FindPreviewPath(_legStart, _goals[_goal++], profile, out cost);
@@ -87,20 +98,14 @@ public sealed class RoutePreviewJob
             {
                 if (_searchingCheckpoint && _best.Length > 0)
                 {
-                    _firstLeg = CheckpointRoute.ToEntry(_checkpoint, _start, Refine(_best, _start));
-                    _legStart = _firstLeg[^1]; _searchingCheckpoint = false;
+                    Vector2[] leg = CheckpointRoute.ToEntry(_activeCheckpoint, _legStart, Refine(_best, _legStart));
+                    _prefix.AddRange(leg); _legStart = leg[^1]; ReachedCheckpoint();
+                    ConsumeOverlaps();
                 }
                 else
                 {
                     if (_searchingCheckpoint && _best.Length == 0) _checkpointFailed = true;
-                    FinishSample(profile);
-                    if (++_sample == _count)
-                    {
-                        Complete = true;
-                        Message = _checkpointFailed ? $"Required checkpoint unreachable for some samples: {Results.Count}/{_count} routes; {Failed} failed."
-                            : $"{Results.Count}/{_count} routes; {Failed} failed. Plans, not traffic predictions.";
-                    }
-                    ResetStage();
+                    FinishSample(profile, _best); NextSample();
                 }
                 _goal = 0; _best = Array.Empty<Vector2>(); _bestCost = float.PositiveInfinity;
             }
@@ -110,19 +115,18 @@ public sealed class RoutePreviewJob
 
     // =========================================================
     // Refine only through production builders, using stable preview-only seed/offset samples.
-    private void FinishSample(int profile)
+    private void FinishSample(int profile, Vector2[] points)
     {
-        Vector2[] points = _best;
         if (points.Length > 0)
         {
             points = Refine(points, _legStart);
-            if (_firstLeg.Length > 0) points = _firstLeg.Concat(points).ToArray();
+            if (_prefix.Count > 0) points = _prefix.Concat(points).ToArray();
         }
         if (_sample < 0) { Neutral = points; NeutralLength = Length(points); return; }
         if (!Safe(points, _start)) { Failed++; return; }
         int duplicate = Results.FindIndex(r => r.Points.SequenceEqual(points));
         Results.Add(new(_sample + 1, profile, points, Length(points), duplicate < 0 ? 0 : Results[duplicate].Sample,
-            _firstLeg.Length > 0 ? _firstLeg[^1] : _required ? _start : null));
+            _entries.Count > 0 ? _entries[0] : null, _entries.ToArray(), _names.ToArray()));
     }
 
     // =========================================================
@@ -138,7 +142,7 @@ public sealed class RoutePreviewJob
         uint seed = CorridorPreference.Seed((uint)_sample, _config.RoutePreferenceSeed);
         float offset = _offsets && _config.EnablePathOffsets
             ? ((CorridorPreference.Hash(seed ^ 0x1781u) & 65535u) / 65535f * 2 - 1) * Mathf.Max(0, _config.PathOffsetMaxPixels) : 0;
-        Vector2 forward = _firstLeg.Length > 1 ? (_firstLeg[^1] - _firstLeg[^2]).Normalized() : Vector2.Zero;
+        Vector2 forward = _prefix.Count > 1 ? (_prefix[^1] - _prefix[^2]).Normalized() : Vector2.Zero;
         EnemyRoute route = new();
         if (_corridors && CorridorPreference.Selected(seed, _config) && _config.CorridorVariationStrength > 0)
             route.BuildCorridor(points, origin, _nav, _radius, offset, seed, _config, forward);
@@ -150,8 +154,42 @@ public sealed class RoutePreviewJob
     // A checkpoint already containing the actual spawn needs no first leg, just like a real initialized ship.
     private void ResetStage()
     {
-        _legStart = _start; _firstLeg = Array.Empty<Vector2>();
-        _searchingCheckpoint = _required && GodotObject.IsInstanceValid(_checkpoint) && !_checkpoint.Contains(_start);
+        _legStart = _start; _prefix.Clear(); _entries.Clear(); _names.Clear(); _completed = 0;
+        _activeCheckpoint = _required ? _checkpoint : null;
+        ConsumeOverlaps();
+    }
+
+    // =========================================================
+    // Mirror physical entry choices with preview-only per-sample seeds; never use live assignment/RNG state.
+    private void ReachedCheckpoint()
+    {
+        _entries.Add(_legStart); _names.Add(_activeCheckpoint.Name.ToString());
+        uint seed = CorridorPreference.Seed((uint)Mathf.Max(0, _sample), _config.RoutePreferenceSeed);
+        _activeCheckpoint = _network.Next(_activeCheckpoint, seed, _completed++, out string error);
+        if (error.Length > 0) { Cancel(error); return; }
+    }
+
+    // =========================================================
+    // Overlapping circles require no invented movement; the validated acyclic graph bounds this loop.
+    private void ConsumeOverlaps()
+    {
+        while (GodotObject.IsInstanceValid(_activeCheckpoint) && _activeCheckpoint.Contains(_legStart) && _completed < CheckpointNetwork.MaximumNodes)
+            ReachedCheckpoint();
+        _searchingCheckpoint = GodotObject.IsInstanceValid(_activeCheckpoint);
+        _checkpointTargets = _searchingCheckpoint ? _activeCheckpoint.Targets(_nav, _radius) : Array.Empty<Vector2>();
+    }
+
+    // =========================================================
+    // Every sample plans a fresh chain, while retries/goal comparisons within that sample never reroll it.
+    private void NextSample()
+    {
+        if (++_sample == _count)
+        {
+            Complete = true;
+            Message = _checkpointFailed ? $"Required checkpoint unreachable for some samples: {Results.Count}/{_count} routes; {Failed} failed."
+                : $"{Results.Count}/{_count} routes; {Failed} failed. Plans, not traffic predictions.";
+        }
+        else ResetStage();
     }
 
     // =========================================================

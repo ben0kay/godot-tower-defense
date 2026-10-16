@@ -132,3 +132,7 @@ This order helps debug each feature separately. Combining them in one Codex chan
 A clear, reproducible **route-preview debug mode** plus **optional portal-associated checkpoint regions**, with self-contained small reusable files, Inspector authoring, tests, and brief updates to `ENEMIES/Movement/README.md` and `WORLD/PORTALS/EnemyPortal/README.md`. Do **not** refactor the entire enemy navigation system or alter existing Level001/Level002 art/waves just to add the feature.
 
 **Route preview and required checkpoints are implemented and tested.** See `TESTS/RoutePreview.md` for actual verification and known upstream issues.
+
+## Implemented extension: checkpoint graphs
+
+`NextCheckpoints` now supports chains and nested uniform branches. Empty means Citadel. Links, rather than names, define the graph; use names such as Checkpoint2A/2B/2C for portal-family readability. Validated per-enemy snapshots preserve choices across repaths without consuming wave RNG. The shared editor-only design overlay draws circles and all connections above tiles; F3 shows it alongside complete-chain previews. See `TESTS/CheckpointChains.md` for verification and known limitations.

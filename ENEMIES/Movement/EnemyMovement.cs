@@ -9,12 +9,16 @@ public partial class EnemyMovement : Node
     public bool RequiresCheckpoint { get; private set; }
     public bool CheckpointCompleted { get; private set; }
     public bool HeadingToCheckpoint => RequiresCheckpoint && !CheckpointCompleted;
-    public int DestinationRevision => HeadingToCheckpoint ? (GodotObject.IsInstanceValid(Checkpoint) ? Checkpoint.GeometryStamp : int.MinValue) : 0;
+    public int DestinationRevision => HeadingToCheckpoint
+        ? System.HashCode.Combine(_destinationSerial, GodotObject.IsInstanceValid(Checkpoint) ? Checkpoint.GeometryStamp : int.MinValue) : 0;
     public string RouteStatus { get; private set; } = "Citadel";
-    private int _checkpointStamp;
+    private int _checkpointStamp, _destinationSerial;
+    public int CompletedCheckpointCount { get; private set; }
+    private CheckpointNetwork _checkpointNetwork;
+    private string _checkpointError = "";
     // =========================================================
     // Radius-aware target snapshots are shared by checkpoint geometry, never recomputed per enemy tick.
-    public Vector2[] CheckpointTargets() => GodotObject.IsInstanceValid(Checkpoint)
+    public Vector2[] CheckpointTargets() => _checkpointError.Length == 0 && GodotObject.IsInstanceValid(Checkpoint)
         ? Checkpoint.Targets(_paths.Navigation, Enemy.Definition.RadiusPixels) : System.Array.Empty<Vector2>();
 
     public bool UsesCorridorVariation { get; private set; }
@@ -55,17 +59,20 @@ public partial class EnemyMovement : Node
     {
         Enemy = enemy; _paths = paths;
         Checkpoint = checkpoint; RequiresCheckpoint = requiresCheckpoint || checkpoint != null;
-        CheckpointCompleted = false; _checkpointStamp = DestinationRevision;
-        if (HeadingToCheckpoint && GodotObject.IsInstanceValid(Checkpoint) && Checkpoint.Contains(enemy.GlobalPosition)
-            && paths.Navigation.HasClearance(enemy.GlobalPosition, enemy.Definition.RadiusPixels)) CheckpointCompleted = true;
-        RouteStatus = HeadingToCheckpoint ? "Routing to required checkpoint" : "Citadel"; _assignedProfile = paths.AssignProfile();
+        CheckpointCompleted = false; CompletedCheckpointCount = 0; _destinationSerial = 0;
+        _checkpointNetwork = RequiresCheckpoint ? CheckpointNetwork.Capture(checkpoint) : null;
+        _checkpointError = _checkpointNetwork?.Error ?? ""; _checkpointStamp = DestinationRevision;
+        RouteStatus = HeadingToCheckpoint ? "Routing through required checkpoints" : "Citadel"; _assignedProfile = paths.AssignProfile();
         _allowOffsets = enemy.Definition.AllowPathOffsets; _allowDiversity = enemy.Definition.AllowPathDiversity;
         CorridorSeed = paths.AssignCorridorSeed();
         UsesCorridorVariation = enemy.Definition.AllowCorridorVariation && CorridorPreference.Selected(CorridorSeed, paths.Config);
         uint seed = unchecked((uint)GetInstanceId() * 2654435761u); seed ^= seed >> 16;
         LateralOffsetPixels = ((seed & 65535u) / 65535f * 2f - 1f) * Mathf.Max(0f, paths.Config.PathOffsetMaxPixels);
         _auditTimer = (seed % 997) / 997f * Mathf.Max(0f, paths.Config.RouteAuditIntervalSeconds);
-        SetPhysicsProcess(true); RequestRoute(float.PositiveInfinity);
+        SetPhysicsProcess(true);
+        if (HeadingToCheckpoint && _checkpointError.Length == 0 && GodotObject.IsInstanceValid(Checkpoint)
+            && Checkpoint.Contains(enemy.GlobalPosition) && paths.Navigation.HasClearance(enemy.GlobalPosition, enemy.Definition.RadiusPixels)) CompleteCheckpoint();
+        else RequestRoute(float.PositiveInfinity);
     }
 
     // =========================================================
@@ -82,9 +89,9 @@ public partial class EnemyMovement : Node
     public void AcceptPath(Vector2[] route, int revision)
     {
         _waiting = false;
-        if (HeadingToCheckpoint && (!GodotObject.IsInstanceValid(Checkpoint) || route.Length > 0 && !Checkpoint.Contains(route[^1])))
+        if (HeadingToCheckpoint && (_checkpointError.Length > 0 || !GodotObject.IsInstanceValid(Checkpoint) || route.Length > 0 && !Checkpoint.Contains(route[^1])))
             route = System.Array.Empty<Vector2>();
-        RouteStatus = HeadingToCheckpoint ? (route.Length == 0 ? "Required checkpoint unavailable: waiting/retrying" : "Routing to required checkpoint") : "Citadel";
+        RouteStatus = _checkpointError.Length > 0 ? _checkpointError : HeadingToCheckpoint ? (route.Length == 0 ? "Required checkpoint unavailable: waiting/retrying" : "Routing to required checkpoint") : "Citadel";
         _retry = Mathf.Max(0.1f, _paths.Config.FailedPathRetrySeconds);
         if (route.Length == 0)
         {
@@ -115,8 +122,13 @@ public partial class EnemyMovement : Node
     // Only physical entry completes a stage. Drop the old chain before requesting the Citadel leg.
     private void CompleteCheckpoint()
     {
-        CheckpointCompleted = true; RouteStatus = "Checkpoint complete; routing to Citadel";
-        _checkpointStamp = 0; _paths.UnregisterRoute(this);
+        CompletedCheckpointCount++;
+        RouteCheckpoint next = _checkpointNetwork.Next(Checkpoint, CorridorSeed, CompletedCheckpointCount - 1, out string error);
+        _checkpointError = error; CheckpointCompleted = next == null && error.Length == 0;
+        if (!CheckpointCompleted) Checkpoint = next;
+        _destinationSerial++; _checkpointStamp = DestinationRevision;
+        RouteStatus = error.Length > 0 ? error : CheckpointCompleted ? "Checkpoint chain complete; routing to Citadel" : "Routing to next required checkpoint";
+        _paths.UnregisterRoute(this);
         _route.Build(System.Array.Empty<Vector2>(), Enemy.GlobalPosition, _paths.Navigation, Enemy.Definition.RadiusPixels, 0);
         _next = 0; _blockedFrom = int.MaxValue; _dirtyCells.Clear(); _fullAudit = false; UpdateDistance();
         RequestRoute(0, true);
@@ -176,7 +188,7 @@ public partial class EnemyMovement : Node
     // =========================================================
     // Remove dependency references when enemies die, arrive or the level unloads.
     public override void _ExitTree()
-    { if (GodotObject.IsInstanceValid(_paths)) _paths.UnregisterRoute(this); Checkpoint = null; }
+    { if (GodotObject.IsInstanceValid(_paths)) _paths.UnregisterRoute(this); Checkpoint = null; _checkpointNetwork = null; }
     #endregion
 
     #region Validation
@@ -231,7 +243,7 @@ public partial class EnemyMovement : Node
         if (!Enemy.IsAlive) return;
         if (HeadingToCheckpoint)
         {
-            if (GodotObject.IsInstanceValid(Checkpoint) && Checkpoint.Contains(Enemy.GlobalPosition)
+            if (_checkpointError.Length == 0 && GodotObject.IsInstanceValid(Checkpoint) && Checkpoint.Contains(Enemy.GlobalPosition)
                 && _paths.Navigation.HasClearance(Enemy.GlobalPosition, Enemy.Definition.RadiusPixels))
             { CompleteCheckpoint(); return; }
             if (_checkpointStamp != DestinationRevision)
@@ -269,7 +281,7 @@ public partial class EnemyMovement : Node
             if (!_paths.Navigation.SegmentClear(Enemy.GlobalPosition, nextPosition, Enemy.Definition.RadiusPixels))
             { RequestRoute(0f, true); return; }
             float entry = 0;
-            bool reachesCheckpoint = HeadingToCheckpoint && GodotObject.IsInstanceValid(Checkpoint)
+            bool reachesCheckpoint = HeadingToCheckpoint && _checkpointError.Length == 0 && GodotObject.IsInstanceValid(Checkpoint)
                 && Checkpoint.Entry(Enemy.GlobalPosition, nextPosition, out entry);
             if (reachesCheckpoint) nextPosition = Enemy.GlobalPosition.Lerp(nextPosition, entry);
             Vector2 direction = target - Enemy.GlobalPosition;

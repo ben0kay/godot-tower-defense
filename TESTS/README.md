@@ -212,3 +212,6 @@ Run `CheckpointChecks.tscn` for freely placed required regions, portal attributi
 ## Ammunition foundation (added, not yet run)
 
 `TESTS/AmmoFoundationChecks.cs` has been added to `EnemyIntegrationChecks.cs`. The tests cover finite inventory, all-or-nothing transfers, production batches/buffer pause and resume, depot stock and the global 10% trigger. They do **not** test live towers, scenes or drones, which Codex must implement next. The foundation authoring environment lacked Godot/.NET and could not execute the suite; Codex should run `dotnet build` and the headless integration test after pulling these files. See [WORK.md](../NOTES/WORK.md).
+## Chained checkpoints and design diagram
+
+Completed: ordered and uniformly branching checkpoint graphs, full-chain F3 previews, and a shared above-tile editor circle/connection overlay. See [CheckpointChains.md](CheckpointChains.md) for authoring behavior, regression coverage, actual results and existing environment/map limitations.

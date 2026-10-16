@@ -44,3 +44,7 @@ Headless CPU totals, distributed over bounded preview steps, including private-g
 | Level002, ALL with 500 live enemies | 5 portals × 50 | 1,020 | 1,494.24 ms |
 
 Live path queues/calculation counters remain unchanged during these runs. Weighted grid preparation happens on Simulate; no private grids are constructed per sample. Legend/draw caches update when a sample finishes, rather than after every goal query. Large batches still have noticeable total debug work and can overrun the soft limit on individual searches; they are deliberately spread across frames.
+
+## Chained checkpoints and design diagram
+
+Completed: ordered and uniformly branching checkpoint graphs, full-chain F3 previews, and a shared above-tile editor circle/connection overlay. See [CheckpointChains.md](CheckpointChains.md) for authoring behavior, regression coverage, actual results and existing environment/map limitations.

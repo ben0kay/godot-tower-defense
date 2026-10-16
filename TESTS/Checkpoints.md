@@ -32,3 +32,7 @@ Standard SDK/MSBuild remains blocked by the container's missing NuGet.Protocol d
 The focused open-map500-ship fixture recorded50.19ms for spawning and241.48ms **total** initial path-work CPU across5,000 budgeted goal queries. This map/radius produced10 cached candidates per ship. These are headless cumulative timings, not one physics frame, rendered FPS or a speedup comparison; concurrent suites influence timings. Count limits stay strict and the time limit remains soft by one indivisible query/refinement. More candidate targets add search work, deliberately scheduled over frames.
 
 Marker geometry is a required region, not a global path-detour bound. Bounded deterministic samples can miss a very narrow portion of a large circle; F3/live diagnostics report the unavailable target rather than claiming a direct bypass. Move/enlarge/reposition the marker in that case. First targeting retains physical current-leg distance; the downstream Citadel route is selected only upon actual entry. A brief wait at the stage boundary is possible while the next bounded request is serviced.
+
+## Chained checkpoints and design diagram
+
+Completed: ordered and uniformly branching checkpoint graphs, full-chain F3 previews, and a shared above-tile editor circle/connection overlay. See [CheckpointChains.md](CheckpointChains.md) for authoring behavior, regression coverage, actual results and existing environment/map limitations.

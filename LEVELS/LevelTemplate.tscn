@@ -11,6 +11,8 @@
 [ext_resource type="PackedScene" path="res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn" id="5_portal"]
 [ext_resource type="PackedScene" path="res://WORLD/OBJECTIVES/Citadel/Citadel.tscn" id="6_citadel"]
 
+[ext_resource type="Script" path="res://WORLD/ROUTING/CheckpointDesignOverlay.cs" id="checkpoint_overlay"]
+
 [node name="LevelTemplate" type="Node2D" unique_id=864740696]
 script = ExtResource("3_root")
 Settings = ExtResource("4_config")
@@ -49,3 +51,10 @@ tile_set = ExtResource("2_decorations")
 
 [node name="Citadel" parent="Objectives" instance=ExtResource("6_citadel")]
 position = Vector2(3872, 2528)
+
+[node name="Debug" type="Node" parent="."]
+
+[node name="CheckpointOverlay" type="Node2D" parent="Debug"]
+z_index = 4090
+z_as_relative = false
+script = ExtResource("checkpoint_overlay")
