@@ -116,17 +116,92 @@ An ordinary scout should not get empty ability controllers or per-frame AI nodes
 
 **E2B acceptance:** ordinary Enemy001 still runs unchanged with no ability node. A ShieldGenerator enemy with the component periodically replenishes only eligible allies within radius, obeys caps and intervals, can be combined with other optional children later, and stops affecting the world when removed. Add two-emitter/recipient-isolation, range, cap, no-ability-zero-cost and cleanup tests.
 
-### Phase E3A — DeathSpawn ability and children owned by their parent wave (LATER)
+### Phase E3A — DeathSpawn: reusable on-death release ability (REFINED PLAN; NOT IMPLEMENTED)
 
-**Scope:** A killed carrier can release several smaller enemies at its **death position**. This is not ordinary portal spawning and must not use `WaveManager` timing for each child.
+**Purpose / example.** A large **Transporter** can die and release **six independently moving Enemy001-sized drones** at or near its *actual death position*, with a tiny offset per drone and **0.12 seconds between releases**. The parent still dies normally. This is an **optional passive, on-kill ability**, not a unique enemy subclass, ordinary portal spawn, general death-explosion VFX, or an always-running enemy ability manager.
 
-1. `DeathSpawnConfig` defines registered **child EnemyId**, finite **child count**, spawn/scatter radius, optional inheritance of starting shields and safe bounds/depth limits. Resolve child scenes through `EnemyCatalog`, not a hardcoded new script or scene path per carrier.
-2. Expose a **safe at-world-position spawn path** through `SpawnManager` (or a small subordinate spawner), reusing enemy-count caps, `Enemy.Initialize`, clearance, route connectivity, level ownership, bounded attempts and registry registration. Find positions within a validated region near the dead parent's location; never teleport children into blocked terrain, permanently trap them, silently overrun `MaxActiveEnemies`, or fall back to an unrelated Portal without an explicit rule.
-3. Trigger **only once on a true kill**, not arrival, scene unload, duplicate `TakeDamage` or repeated `QueueFree`. Preserve the mother's one-time reward/death feedback and each child's normal individual state/reward unless a future rule explicitly overrides it. Configurable positive child counts must be finite and capped; avoid uncontrolled recursive children-of-children chains or a huge synchronous creation spike.
-4. **Critical wave ownership contract:** If a wave-owned mother dies, successful spawned children become **owned by the same active wave before the parent is removed from that wave's `_owned` set**. Register children and their `Removed` handlers synchronously before `WaveManager.OnEnemyRemoved(parent)` can declare the wave complete. Children should contribute to `AliveCount`, but *not* mutate `PlannedRemaining` (which represents already-authored scheduled spawns). An F2/unowned parent spawns unowned children; they must not block unrelated wave completion. On wave cancellation/unload, subscriptions are safely released. This requires a deliberate, tested lifecycle hook or spawn notification—**not** a late deferred callback after wave completion.
-5. Define what happens on a partially successful spawn (some valid positions but cap or clearance rejects others): record only actually created children; skip remaining safely or adopt an explicitly documented bounded retry rule. Do not leave half-initialized nodes. A killed mother must always be removed even if no children can spawn.
+This refines the original E3A plan based on the desired transporter behavior and the now-implemented **portal checkpoint chains, branch routing and per-enemy movement permissions**. E3A remains a future feature: none of the suggested files or settings below exists yet.
 
-**E3A acceptance:** death produces registered, individually navigable children near the correct position; no duplicate generation; no path/limit violations; no premature wave completion; ordinary kill rewards and arrival/death events remain once-only. Add test cases for kill versus arrival, F2 versus wave ownership, empty spots, blocked terrain, spawn cap, cancellation, nested-spawn safeguards and simultaneous deaths.
+#### Authoring: reusable opt-in ability
+
+- Add `ENEMIES/Abilities/DeathSpawn/DeathSpawn.cs`, `DeathSpawnConfig.cs`, a sample `DefaultDeathSpawnConfig.tres` if useful, and its `README.md`. Attach a small optional `DeathSpawn` Node under `Transporter/Abilities`, analogous to the existing `ShieldEmitter`. Ordinary enemies **have no DeathSpawn node and no extra processing**.
+- The ability gets its host from an explicit reference or nearest `Enemy` ancestor, subscribes to the **kill-specific lifecycle** and disposes/unsubscribes correctly on arrival, death and level unload. The component does **not** have a running per-physics-frame timer while the transporter is alive.
+- Use a typed, Inspector-editable `DeathSpawnConfig` resource. `ChildEnemyId` is a **stable catalog identity string**, **not a scene filename** and not a special `if (EnemyId == ...)` in `Enemy.cs`. Resolve through existing `EnemyCatalog.Find`, validate on setup, and fail visibly for unknown IDs (never silently substitute Enemy001).
+- No new mandatory base ability hierarchy or centralized ability update pass. Allow a future boss/splitter to reuse the same component with different parameters; support zero, one or several *other* abilities on the same parent.
+
+**Proposed transporter settings (editable defaults for the example, not hardcoded engine-wide):**
+
+| Field / suggested config | Example | Rule |
+| --- | --- | --- |
+| `ChildEnemyId` | `basic_mk1` | Actual registered ID for asset `ENEMIES/Types/Enemy001`; NOT `enemy001` |
+| `ChildCount` | `6` | Positive, validated, capped; one transport can have a different count |
+| `SpawnIntervalSeconds` | `0.12` | Release **one at a time**, not all six on the death frame |
+| `ScatterRadiusPixels` | `48` | Validate each candidate at the child's actual collision radius |
+| `SpawnPattern` | `RadialScatter` | Deterministic dispersed positions near the captured death point, with controlled jitter |
+| `SpawnWithShield` | `false` | Whether children start with their own capacity filled; never copy parent's remaining shield points |
+| `InheritCheckpointProgress` | `true` | Continue the parent's remaining authored checkpoint chain; see below |
+| `MaxSpawnGenerations` | `1` | Parent generation 0 may create children generation 1; no grandchildren by default |
+| `MaxPositionAttemptsPerChild` | `8` | Bounded validation attempts; no repeated unbounded searches |
+
+These names are the *intended resource contract*, not required exact implementation spellings. Avoid adding fields to every `EnemyDefinition` when they belong to this one optional ability.
+
+#### Trigger and visual release sequence
+
+1. Trigger **only from a true hull kill** (`Enemy.Finish(false)`), never from Citadel arrival, level exit, duplicate damage, `QueueFree`, a shield-only hit, or the `DeathExplosion` feedback alone. A zero-health parent may enter this event only once.
+2. At death, capture a **small immutable release job**: parent's world position, child catalog ID/scene, finite count, interval, independent scatter seed, wave ownership identity (if any), remaining checkpoint plan, inherited shield policy and generation. Do this **synchronously before the parent's `Removed` event**. Do not leave the job on the dying parent Node: `QueueFree` deletes it.
+3. Allow the usual parent death explosion, one-time kill Credits/XP and removal to happen as before. The visual puff belongs to `FEEDBACK/DeathExplosion/` and stays independent of this gameplay ability. An optional small release flash is polish, not a first-pass requirement.
+4. A small, world-owned **death-release scheduler/queue** (under `ENEMIES/Spawning/` or a subordinate service) processes active jobs. First child is eligible on the **next permitted physics tick**, then one approximately every `SpawnIntervalSeconds` of *unpaused game time*. With six children and 0.12s spacing, the final release is roughly 0.60s after the first. Pausing the game pauses this sequence.
+5. Apply a shared per-frame child-creation budget (e.g., at most 2 release attempts per frame initially), including zero-interval and simultaneous-death scenarios. Never do six synchronous scene creations/A* requests in the parent's kill callback and never run a timer/physics callback on every living enemy with the ability. A release job owns just its countdown and next index while active.
+6. Scatter is chosen from the **captured death location**, with varied small offsets, e.g. well-spaced deterministic angles + modest seeded jitter. Use an **independent seed/sequence** so release does not advance `WaveManager`'s authored wave RNG, portal selection RNG, route-profile assignment stream or global random state. Do not spawn all children at the exact same point unless the valid-space fallback leaves no safe alternative.
+
+#### At-position spawning, safety and limits
+
+- Add a focused **`SpawnManager` at-world-position spawn API** shared with the release queue; reuse registered child `PackedScene`, `Enemy.Initialize`, existing `EnemyRegistry`, spawn count caps, world ownership and navigation connectivity checks. Child spawning must NOT pick a Portal/MapEdge or consume a wave-scheduled entry.
+- Validate each candidate against the **child definition's** `RadiusPixels`, map boundaries, solid walls, occupied tower cells, allowed navigation clearance and reachability to its **actual required next checkpoint/Citadel destination**. Existing shared nav requires radius **below half the 64px navigation cell**; a visually large parent may use large artwork but must fit those navigation limits unless a separate large-unit change is approved.
+- In narrow corridors or near obstacles, attempt a bounded set of alternative positions at or inside the scatter radius, optionally trying a nearer-to-center placement. **Never** clip into a wall or teleport a rejected child to an unrelated portal; never leave half-initialized nodes.
+- **Partial creation policy, first implementation:** attempt each planned child once with bounded local candidate probes; if no safe position is available or `MaxActiveEnemies` is reached, **skip that child and retire its reservation**. Continue remaining scheduled children; record actual successful count. No infinite retry or frozen wave. Parent death cannot be undone by failed spawning.
+- Standard child HP, shield *capacity*, movement speed, death reward, XP attribution, normal arrival/Citadel damage and other optional abilities remain owned by **the child type**. The transporter receives only its own death reward once; children earn their own rewards if subsequently killed. No free XP for merely releasing them.
+- Use **`MaxSpawnGenerations=1`** for the first pass, even if the chosen child type also has DeathSpawn; prevent recursive cascade and cap-breaking loops. Subsequent generations are explicit, separately tested future behavior.
+
+#### Checkpoint route inheritance (important for current Level002 routing)
+
+Transporters spawned from portals can now be routed through **required checkpoint areas and branch/merge chains**. On death, their children should by default continue the **remaining required route**, not reset to the starting checkpoint or bypass the whole chain.
+
+- Snapshot at parent death whether it is **heading to a particular checkpoint**, which checkpoint is next, how many required areas are already completed, and its captured validated checkpoint-network/branch plan as needed for consistent remaining routing. A parent whose checkpoint chain is complete gives its children **direct Citadel routing**.
+- On child creation, apply the inherited **destination/remaining checkpoint state before its initial route request**, through one small explicit initialization path or immutable handoff object. **Do not** mutate `EnemyMovement` private state from an ability, infer progress from current proximity, or reroll a parent's already chosen next checkpoint.
+- Each child still gets its **own movement profile, corridor seed, path offsets, movement permission flags and valid path** according to the child's `EnemyDefinition`, current global settings and real spawn position. Only the *remaining destination obligations* are inherited, not the parent's exact physical waypoints or per-instance pathing seed.
+- If `InheritCheckpointProgress=false`, define the behavior deliberately (for example, direct-to-Citadel routing) and document it; **never accidentally restart completed checkpoints**. Children of portal-less parents simply navigate to the Citadel.
+- Keep safe path invalidation, tower placement, stage completion by **physical checkpoint entry**, clearance, and reliable error/wait behavior for broken required links.
+
+#### Staggered release transaction: wave ownership MUST be reserved before parent removal
+
+This is the key change from the earlier E3A plan. `WaveManager` currently considers a wave finished when `PlannedRemaining == 0` and its `_owned` set is empty. Merely scheduling a delayed child would let a wave **finish prematurely** when its final transporter dies.
+
+1. Add a narrow **pre-removal kill handoff** (kill-specific event/callback or explicit service transaction) fired **exactly once before `Enemy.Removed`**. It should synchronously determine whether the parent is wave-owned and register a bounded release job/reservation *while the parent is still recognized as owned*. Do **not** rely on a late deferred `Removed` callback or general `EnemyKilled` listener ordering.
+2. The parent wave **reserves up to the configured child count as pending death releases immediately**. Add a `PendingDeathSpawns` count (or equivalent job reservation ownership) to `WaveManager`. The completion condition becomes **no scheduled wave spawns, no owned living enemies, and no pending reserved child releases**.
+3. A successful child is added to the parent's `_owned` wave set and subscribed to `Removed` **before** its pending reservation is retired. A failed/skipped child retires its reservation too. Never let the count temporarily reach zero between these operations while completing a wave; make the ownership transfer one deliberate synchronous operation.
+4. `PlannedRemaining` continues to mean *authored wave entries only*: offspring **do not** increase it. UI/debug should distinguish **scheduled / alive / pending release** so the wave cannot incorrectly show zero remaining during a stagger.
+5. An **F2/unowned parent produces unowned children**, which do not block an unrelated active wave. A wave can be reconfigured/canceled or its level unloaded while jobs exist: cancel those jobs, release reservations/subscriptions, and do not leak timers, references or pending counts.
+6. The death queue must handle multiple mothers dying together, the global active-enemy cap, all children rejected by clearance, and any queued jobs cancelled on exit. No indefinite pending jobs or permanently blocked next-wave button.
+
+#### Architecture/performance boundaries
+
+- Suggested responsibilities: `DeathSpawn` (optional host event + config), `DeathSpawnConfig` (authoring), **one world-owned death-release queue** (staggered timing + budget), `SpawnManager` (valid at-position instantiation), `WaveManager` (reservation and wave ownership), and `EnemyMovement` (small explicit inherited checkpoint-route handoff). No transporter-specific switch in shared systems.
+- Only dying transporters enqueue work; ordinary enemies get **zero ability nodes, manager registration and per-frame overhead**. Active release queues process only pending jobs. Don't create one Godot timer/tween/coroutine per child.
+- Resolve/catalog-validate config without repeated scene instantiation each tick; the shared release API should reuse existing navigation service. Avoid one-off per-child A* grids, unbounded searches, per-frame scans of all enemies, and synchronous mass spawn bursts.
+- DeathSpawn is **not** `FEEDBACK/DeathExplosion`: every enemy's death puff is presentation, but creating live offspring is an optional gameplay ability.
+
+**E3A acceptance/regressions:**
+
+- Example transporter killed near its route releases **six `basic_mk1`** drones, each with a small validated offset and roughly 0.12s between first/next eligible releases. One-time activation, correct parent explosion/kill reward, and independent child rewards/paths.
+- Killing vs arrival vs unload, shield-only damage, two same-frame kills, cap reached, all spawn positions blocked, narrow one-cell corridors, different hull radii, multiple simultaneous jobs, zero interval, pause/resume and no spawns after scene exit.
+- A final wave-owned transporter dies with zero other wave enemies: **wave remains pending through the stagger** and only completes when all successfully created children die/arrive and all reservations are cleared. Pending skips never hold it open forever.
+- F2/unowned carrier children do not affect an unrelated wave. `PlannedRemaining` and original authored batch/wave RNG remain unchanged.
+- Parent died before checkpoint 1, midway through a branched chain, or after the final checkpoint: offspring start at the **correct inherited remaining stage**; their own diverse profiles/offset/corridor permissions remain intact.
+- Recursive child type with DeathSpawn does **not** create grandchildren with the first-pass generation cap.
+- Existing `EnemyIntegrationChecks`, wave ownership, ShieldEmitter, enemy registry, XP/rewards, damage, death-puff, Citadel and navigation suites continue passing. Measure peak release cost and number of spawns per frame; only report tests actually executed.
+
+**Implementation scope:** First deliver the generic DeathSpawn component/queue/ownership handshake and one transporter test fixture or real carrier scene. Do not build E3B enemy weapons, a universal ability engine or unrelated tower durability during E3A. Update `ENEMIES/Abilities/README.md`, `ENEMIES/Spawning/README.md`, `LEVELS/Waves/README.md` and tests *when the code actually lands*. **This section is a plan only, not an implementation.**
 
 ### Phase E3B — Enemies attack player towers (LATER; requires tower durability)
 
