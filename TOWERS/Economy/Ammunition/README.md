@@ -1,6 +1,6 @@
 # Ammunition buildings — implemented
 
-The current playable loop is **Factory → visible transport drone → Depot → visible transport drone → consuming tower**. Both buildings are catalog-registered Economy structures, purchasable through the existing build tray, wallet and 1×1 navigation-safe placement.
+The current playable loop is **Factory → visible transport drone → Depot → visible transport drone → consuming tower**. Both buildings are catalog-registered Economy structures, purchasable through the existing build tray, wallet and rectangular navigation-safe placement (Factory 3×2, Depot 2×2). Shipments remain 1,000 rounds and storage 10,000; see `TESTS/Towers/Footprints.md` for footprint verification.
 
 - [AmmunitionFactory](AmmunitionFactory/README.md): automatic whole-batch production into its own finite buffer; pauses when another batch cannot fit.
 - [AmmunitionDepot](AmmunitionDepot/README.md): large local storage, incoming reserved capacity and home-based refill drones.

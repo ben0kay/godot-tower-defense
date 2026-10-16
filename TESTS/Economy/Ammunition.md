@@ -52,3 +52,7 @@ Graphical desktop appearance has not been manually inspected. The code supplies 
 Pull/build, launch either battlefield, press Ctrl and purchase Ammunition Factory, Ammunition Depot and Battle Tower (550 total Credits). Place the buildings nearby to see flights quickly. The factory produces automatically and the depot starts empty. Select buildings/towers to inspect stock, slots and resupply.
 
 Battle starts with1000 rounds; for a faster preview, edit its DefaultBattleTowerConfig.tres **Starting Ammunition → Initial Ammo Fraction** to0.1 before placement. It will start at100 and request supply immediately; every actual projectile launch still costs1. Cargo moves only on physical arrival. Pause stops production and drones. No magazines, reloads, power, inputs, research, saving or combat drones are included.
+
+## Multi-cell building verification
+
+Factory purchases now use 3×2 and Depot 2×2 full-footprint validation. The real loop asserts complete building centers and drone departure at the Factory center; subsequent arrival/return, 1,000-round shipments, 10,000 Depot storage, consumption, reservations and conservation checks remain active. See [footprint verification](../Towers/Footprints.md).

@@ -10,3 +10,4 @@ Category = 2
 Scene = ExtResource("2")
 DefaultConfig = ExtResource("3")
 Icon = ExtResource("4")
+Footprint = Vector2i(2, 2)

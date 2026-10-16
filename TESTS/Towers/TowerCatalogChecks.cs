@@ -24,7 +24,7 @@ public static class TowerCatalogChecks
         Require(catalog.Find("test-passive") == passive && catalog.Find("missing") == null, "Catalog ID lookup is authoritative");
         Invalid(new TowerCatalog { Definitions = new() { battle, battle } });
         foreach (TowerDefinition invalid in new[] {
-            new TowerDefinition { TowerId = "" }, new TowerDefinition { TowerId = "bad", Footprint = new Vector2I(2, 2) },
+            new TowerDefinition { TowerId = "" }, new TowerDefinition { TowerId = "bad", Footprint = new Vector2I(0, 2) },
             new TowerDefinition { TowerId = "bad", Scene = battle.Scene, DefaultConfig = passive.DefaultConfig },
             new TowerDefinition { TowerId = "bad", Scene = passive.Scene, DefaultConfig = null } })
             Invalid(new TowerCatalog { Definitions = new() { invalid } });

@@ -18,6 +18,7 @@ public partial class TowerPlacementController : Node2D
     private TowerDefinition _buildDefinition;
     private EconomyManager _economy;
     private bool _affordable, _previewDirty;
+    private string _previewFailure;
     private WorldGrid _grid;
     private GameplayHUD _hud;
     private SpawnManager _spawns;
@@ -28,6 +29,7 @@ public partial class TowerPlacementController : Node2D
     private GameInput _input;
     public bool IsPlacing => _placing;
     private bool _placing, _previewVisible, _previewValid;
+    private readonly Dictionary<TowerBase, Action> _placementExits = new();
     private TowerBase _selected;
     private int _displayedUpgradeLevel;
     private ulong _lastUpgradeFrame = ulong.MaxValue;
@@ -77,6 +79,8 @@ public partial class TowerPlacementController : Node2D
     // Avoid subscriptions retaining scenes that are no longer alive.
     public override void _ExitTree()
     {
+        foreach (var pair in _placementExits) if (GodotObject.IsInstanceValid(pair.Key)) pair.Key.TreeExiting -= pair.Value;
+        _placementExits.Clear();
         if (GodotObject.IsInstanceValid(_input)) _input.Unbind(this);
         if (GodotObject.IsInstanceValid(_hud))
         { _hud.TowerBarClosed -= CancelPlacement; _hud.TowerChoiceRequested -= OnTowerChoiceRequested; _hud.TowerUpgradeRequested -= OnUpgradeRequested; }
@@ -118,16 +122,23 @@ public partial class TowerPlacementController : Node2D
     public override void _Process(double delta) => UpdatePreview();
 
     // =========================================================
-    // One cell-based preview, green on buildable free cells and red on invalid terrain.
+    // Cursor preview performs only cheap full-footprint terrain/occupancy checks; route safety is click-only.
     private void UpdatePreview()
     {
         Vector2I cell = _grid.WorldToCell(GetGlobalMousePosition());
-        bool visible = _placing && !IsOverUi() && _grid.IsInsideMap(cell);
-        bool valid = visible && _affordable && _grid.PlacementFailure(cell).Length == 0;
-        if (!_previewDirty && _previewVisible == visible && _previewValid == valid && (!visible || cell == _hoverCell))
+        RefreshPreview(cell, _placing && !IsOverUi() && _grid.IsInsideMap(cell));
+    }
+
+    // =========================================================
+    // Cell-based presentation shares full-rectangle validation and can be verified without a desktop mouse.
+    private void RefreshPreview(Vector2I cell, bool visible)
+    {
+        string failure = _grid.PlacementFailure(cell, _buildDefinition.Footprint);
+        bool valid = visible && _affordable && failure.Length == 0;
+        if (!_previewDirty && _previewVisible == visible && _previewValid == valid && _previewFailure == failure && (!visible || cell == _hoverCell))
             return;
 
-        _previewDirty = false;
+        _previewDirty = false; _previewFailure = failure;
         _previewVisible = visible;
         _previewValid = valid;
         _hoverCell = cell;
@@ -137,8 +148,10 @@ public partial class TowerPlacementController : Node2D
             if (_selected == null)
                 _hud.ShowTowerDetails(_buildDefinition.DisplayName, _buildDefinition.Category + " / Build Preview", DescribeTower(),
                     valid ? "Left-click to build. Right-click / Esc cancels."
-                        : _grid.PlacementFailure(cell).Length > 0 ? _grid.PlacementFailure(cell) : "Insufficient resources.");
-            _ghost.GlobalPosition = _grid.CellToWorldCenter(cell);
+                        : failure.Length > 0 ? failure : "Insufficient resources.");
+            _ghost.GlobalPosition = _grid.FootprintCenter(cell, _buildDefinition.Footprint);
+            Vector2 pixels = (Vector2)_buildDefinition.Footprint * _grid.Config.CellSize;
+            if (_ghost.Texture != null) _ghost.Scale = pixels / _ghost.Texture.GetSize();
             _ghost.Modulate = valid ? new Color(0.45f, 1f, 0.73f, 0.66f)
                 : new Color(1f, 0.35f, 0.31f, 0.56f);
         }
@@ -185,26 +198,33 @@ public partial class TowerPlacementController : Node2D
     }
 
     // =========================================================
-    // Spawn a configured firing tower centered on a valid, unoccupied grid cell.
+    // Validate the entire proposed building before the single authoritative purchase transaction.
     private void TryPlace(Vector2I cell)
     {
-        if (_buildDefinition == null || !_buildDefinition.Available || _buildDefinition.Footprint != Vector2I.One || _grid.PlacementFailure(cell).Length != 0) return;
-        string failure = _spawns.PlacementFailure(cell);
+        if (_buildDefinition == null || !_buildDefinition.Available) return;
+        string failure = _spawns.PlacementFailure(cell, _buildDefinition.Footprint);
         if (failure.Length != 0)
         {
-            _hud.ShowTowerDetails(_buildDefinition.DisplayName, "Placement rejected", DescribeTower(), failure);
+            ShowPlacementFailure(failure);
             return;
         }
         TowerBase tower = null;
         if (!_economy.TryPurchase(_buildDefinition.DefaultConfig.ConstructionCosts, () => CommitTower(cell, out tower)))
         {
-            _hud.ShowTowerDetails(_buildDefinition.DisplayName, "Placement rejected", DescribeTower(),
-                _economy.CanAfford(_buildDefinition.DefaultConfig.ConstructionCosts) ? "Tower creation failed; no resources charged."
-                    : "Insufficient resources.");
+            ShowPlacementFailure(_economy.CanAfford(_buildDefinition.DefaultConfig.ConstructionCosts)
+                ? "Tower creation failed; no resources charged." : "Insufficient resources.");
             return;
         }
         SelectTower(tower);
         UpdatePreview();
+    }
+
+    // =========================================================
+    // Failed repeated builds must preserve the selected tower's rank/runtime and paid upgrade preview.
+    private void ShowPlacementFailure(string failure)
+    {
+        if (GodotObject.IsInstanceValid(_selected)) _hud.SetUpgradeError(failure);
+        else _hud.ShowTowerDetails(_buildDefinition.DisplayName, "Placement rejected", DescribeTower(), failure);
     }
 
     // =========================================================
@@ -222,23 +242,44 @@ public partial class TowerPlacementController : Node2D
             { created.Free(); return false; }
             tower = created;
             tower.InitializeDefinition(_buildDefinition, Settings);
-            if (!_grid.TryOccupy(cell)) { tower.Free(); tower = null; return false; }
+            if (!_grid.TryOccupy(cell, _buildDefinition.Footprint)) { tower.Free(); tower = null; return false; }
             occupied = true;
             _towers.AddChild(tower);
-            tower.SetPlacement(cell, _grid.CellToWorldCenter(cell));
+            tower.SetPlacement(cell, _grid.FootprintCenter(cell, _buildDefinition.Footprint));
             if (tower.GetParent() != _towers) throw new InvalidOperationException("Tower did not enter the world.");
-            _placedTowers.Add(cell, tower);
+            Vector2I footprint = _buildDefinition.Footprint;
+            for (int y = 0; y < footprint.Y; y++) for (int x = 0; x < footprint.X; x++)
+                _placedTowers.Add(cell + new Vector2I(x, y), tower);
+            TowerBase placed = tower;
+            Action exit = () => RemovePlacement(placed, cell, footprint);
+            _placementExits.Add(placed, exit); placed.TreeExiting += exit;
             return true;
         }
         catch (Exception exception)
         {
-            _placedTowers.Remove(cell);
+            if (tower != null) RemovePlacement(tower, cell, _buildDefinition.Footprint);
             if (GodotObject.IsInstanceValid(tower)) tower.Free();
-            if (occupied) _grid.ReleaseOccupancy(cell);
+            if (occupied) _grid.ReleaseOccupancy(cell, _buildDefinition.Footprint);
             tower = null;
             GD.PushWarning("Tower creation rolled back: " + exception.Message);
             return false;
         }
+    }
+
+    // =========================================================
+    // Indexed any-cell selection and exact claim release also cover external removal and failed creation.
+    public TowerBase TowerAt(Vector2I cell) => _placedTowers.GetValueOrDefault(cell);
+    private void RemovePlacement(TowerBase tower, Vector2I anchor, Vector2I footprint)
+    {
+        for (int y = 0; y < footprint.Y; y++) for (int x = 0; x < footprint.X; x++)
+        {
+            Vector2I cell = anchor + new Vector2I(x, y);
+            if (_placedTowers.TryGetValue(cell, out TowerBase owner) && owner == tower) _placedTowers.Remove(cell);
+        }
+        if (_placementExits.Remove(tower, out Action exit) && GodotObject.IsInstanceValid(tower)) tower.TreeExiting -= exit;
+        if (_selected == tower) { SelectTower(null); _hud.ClearInspection(); }
+        if (GodotObject.IsInstanceValid(_grid)) _grid.ReleaseOccupancy(anchor, footprint);
+        _previewDirty = true;
     }
 
     // =========================================================
@@ -382,14 +423,15 @@ public partial class TowerPlacementController : Node2D
     {
         TowerConfig config = _selected?.AuthoredConfig ?? _buildDefinition.DefaultConfig;
         TowerFinalStats final = _selected == null ? config.ResolveStats(1) : _selected.FinalStats;
-        string stats = "Footprint: 1 x 1\n" +
+        Vector2I footprint = _selected?.Footprint ?? _buildDefinition.Footprint;
+        string stats = $"Footprint: {footprint.X} x {footprint.Y}\n" +
             (_selected == null ? "" : $"Tower level: {_selected.UpgradeLevel}\n") +
             $"Cost: {TowerPresentation.DescribeResourceCosts(config.ConstructionCosts)}\n" + config.DescribeStats(final) + (final?.Ammunition is AmmunitionStats ammo ? "\n" + ammo.Describe() : "");
         return extra.Length == 0 ? stats : stats + "\n" + extra;
     }
 
     // =========================================================
-    // Draw only the active preview cell and selected tower's weapon range.
+    // Draw the full preview rectangle and optional selected weapon range; grid transforms stay authoritative.
     public override void _Draw()
     {
         if (GodotObject.IsInstanceValid(_selected) && _selected.InspectionRange.HasValue && Settings.ShowSelectionRange)
@@ -398,12 +440,13 @@ public partial class TowerPlacementController : Node2D
 
         if (!_previewVisible || !Settings.ShowPlacementPreview) return;
         float size = _grid.Config.CellSize;
-        Vector2 upperLeft = ToLocal(_grid.CellToWorldCenter(_hoverCell)) - Vector2.One * size * 0.5f;
-        Rect2 rect = new(upperLeft, Vector2.One * size);
+        DrawSetTransformMatrix(GlobalTransform.AffineInverse() * _grid.GlobalTransform);
+        Rect2 rect = new((Vector2)_hoverCell * size, (Vector2)_buildDefinition.Footprint * size);
         Color color = _previewValid ? new Color(0.3f, 0.95f, 0.65f, 0.85f)
             : new Color(1f, 0.35f, 0.30f, 0.9f);
         DrawRect(rect, new Color(color.R, color.G, color.B, 0.12f));
         DrawRect(rect, color, filled: false, width: 2f);
+        DrawSetTransformMatrix(Transform2D.Identity);
     }
     #endregion
 }

@@ -44,6 +44,8 @@ public partial class WorldGrid : Node2D
     private bool[] _buildable, _terrainBlocked, _occupied, _reserved, _painted;
     public int NavigationRevision { get; private set; }
     public event Action<Vector2I?, bool> NavigationChanged;
+    public event Action<Rect2I, bool> NavigationBatchChanged;
+    private readonly Dictionary<Vector2I, Vector2I> _claims = new();
     public WorldLevel Level { get; private set; }
     public InteractiveTileManager InteractiveTiles { get; internal set; }
     public event Action TerrainRebuilt;
@@ -159,24 +161,59 @@ public partial class WorldGrid : Node2D
     }
 
     // =========================================================
-    // Commit occupancy once; navigation revision changes only for new obstacles.
-    public bool TryOccupy(Vector2I cell)
+    // Reject bounds before addition/iteration, then validate every tile and its underlying foundation category.
+    public string PlacementFailure(Vector2I anchor, Vector2I footprint)
     {
-        if (PlacementFailure(cell).Length != 0) return false;
-        _occupied[Index(cell)] = true;
-        if (!_terrainBlocked[Index(cell)])
-        { NavigationRevision++; NavigationChanged?.Invoke(cell, _occupied[Index(cell)]); }
-        return true;
+        if (!TowerDefinition.ValidFootprint(footprint)) return "Invalid building footprint.";
+        if (!IsInsideMap(anchor) || footprint.X > Config.WidthCells - anchor.X || footprint.Y > Config.HeightCells - anchor.Y)
+            return "Building footprint extends outside the map.";
+        bool blocked = TerrainBlocksEnemies(anchor);
+        for (int y = 0; y < footprint.Y; y++) for (int x = 0; x < footprint.X; x++)
+        {
+            Vector2I cell = anchor + new Vector2I(x, y);
+            string failure = PlacementFailure(cell); if (failure.Length != 0) return failure;
+            if (TerrainBlocksEnemies(cell) != blocked) return "Building requires a uniform passable or impassable foundation.";
+        }
+        return "";
     }
 
     // =========================================================
-    // Removal is ready for future selling/destruction mechanics.
-    public void ReleaseOccupancy(Vector2I cell)
+    // The clicked cell is the top-left anchor; one scene origin spans the full rectangle, including grid transforms.
+    public Vector2 FootprintCenter(Vector2I anchor, Vector2I footprint) =>
+        ToGlobal(((Vector2)anchor + (Vector2)footprint * 0.5f) * Config.CellSize);
+
+    // =========================================================
+    // Full validation precedes all mutation; callbacks see complete occupancy and a single navigation revision.
+    public bool TryOccupy(Vector2I cell) => TryOccupy(cell, Vector2I.One);
+    public bool TryOccupy(Vector2I anchor, Vector2I footprint)
     {
-        if (!IsOccupied(cell)) return;
-        _occupied[Index(cell)] = false;
-        if (!_terrainBlocked[Index(cell)])
-        { NavigationRevision++; NavigationChanged?.Invoke(cell, _occupied[Index(cell)]); }
+        if (PlacementFailure(anchor, footprint).Length != 0) return false;
+        _claims.Add(anchor, footprint);
+        SetOccupancy(anchor, footprint, true); return true;
+    }
+
+    // =========================================================
+    // Only the original exact claim can be released; partial rectangles never free a neighbouring building.
+    public void ReleaseOccupancy(Vector2I cell) => ReleaseOccupancy(cell, Vector2I.One);
+    public void ReleaseOccupancy(Vector2I anchor, Vector2I footprint)
+    {
+        if (!_claims.TryGetValue(anchor, out Vector2I claimed) || claimed != footprint) return;
+        _claims.Remove(anchor); SetOccupancy(anchor, footprint, false);
+    }
+    // =========================================================
+    // Stage all tiles before publishing; existing terrain blockage never generates navigation work.
+    private void SetOccupancy(Vector2I anchor, Vector2I footprint, bool occupied)
+    {
+        bool navigationChanged = false;
+        for (int y = 0; y < footprint.Y; y++) for (int x = 0; x < footprint.X; x++)
+        {
+            int index = Index(anchor + new Vector2I(x, y)); _occupied[index] = occupied;
+            navigationChanged |= !_terrainBlocked[index];
+        }
+        if (!navigationChanged) return;
+        NavigationRevision++;
+        if (footprint == Vector2I.One) NavigationChanged?.Invoke(anchor, occupied);
+        else NavigationBatchChanged?.Invoke(new Rect2I(anchor, footprint), occupied);
     }
     #endregion
 

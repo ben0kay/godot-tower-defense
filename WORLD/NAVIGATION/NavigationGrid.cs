@@ -45,7 +45,7 @@ public partial class NavigationGrid : Node
         Grid = GetNode<WorldGrid>("../../Grid");
         _registry = GetNode<EnemyRegistry>("../Registry");
         Refresh();
-        Grid.NavigationChanged += OnGridChanged;
+        Grid.NavigationChanged += OnGridChanged; Grid.NavigationBatchChanged += OnGridBatchChanged;
     }
 
     // =========================================================
@@ -107,6 +107,22 @@ public partial class NavigationGrid : Node
         _solid[changed.Value.Y * Grid.Config.WidthCells + changed.Value.X] = blocked;
         IncrementalCellUpdates++; _revision = Revision;
         RefreshGoals();
+        LastGridUpdateMilliseconds = Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+    }
+
+    // =========================================================
+    // Apply the accepted rectangle incrementally once; the grid already contains its complete final occupancy.
+    private void OnGridBatchChanged(Rect2I rectangle, bool blocked)
+    {
+        if (_revision < 0) return;
+        long started = Stopwatch.GetTimestamp();
+        for (int y = rectangle.Position.Y; y < rectangle.End.Y; y++) for (int x = rectangle.Position.X; x < rectangle.End.X; x++)
+        {
+            Vector2I cell = new(x, y); if (Grid.TerrainBlocksEnemies(cell)) continue;
+            foreach (Profile profile in _profiles) profile.AStar.SetPointSolid(cell, blocked);
+            _solid[y * Grid.Config.WidthCells + x] = blocked; IncrementalCellUpdates++;
+        }
+        _revision = Revision; RefreshGoals();
         LastGridUpdateMilliseconds = Stopwatch.GetElapsedTime(started).TotalMilliseconds;
     }
 
@@ -280,7 +296,12 @@ public partial class NavigationGrid : Node
 
     // =========================================================
     // Circle-vs-cell clearance protects continuous movement and placement near ships.
-    public bool HasClearance(Vector2 position, float radius, Vector2I? extraBlock = null)
+    public bool HasClearance(Vector2 position, float radius, Vector2I? extraBlock = null) =>
+        HasClearance(position, radius, extraBlock.HasValue ? new Rect2I(extraBlock.Value, Vector2I.One) : default);
+
+    // =========================================================
+    // Rectangle proposal checks only tiles intersecting the enemy circle, never every footprint tile per enemy.
+    public bool HasClearance(Vector2 position, float radius, Rect2I proposal)
     {
         Vector2 local = Grid.ToLocal(position);
         float size = Grid.Config.CellSize;
@@ -290,7 +311,7 @@ public partial class NavigationGrid : Node
             for (int x = min.X; x <= max.X; x++)
             {
                 Vector2I cell = new(x, y);
-                if (!Grid.BlocksEnemies(cell) && cell != extraBlock) continue;
+                if (!Grid.BlocksEnemies(cell) && !proposal.HasPoint(cell)) continue;
                 Vector2 closest = new(Mathf.Clamp(local.X, x * size, (x + 1) * size),
                     Mathf.Clamp(local.Y, y * size, (y + 1) * size));
                 if (local.DistanceSquaredTo(closest) <= radius * radius) return false;
@@ -328,8 +349,15 @@ public partial class NavigationGrid : Node
 
     // =========================================================
     // Flood from all valid goals with a candidate tower cell temporarily excluded.
-    public bool[] ReachableWithout(Vector2I? blocked = null)
+    public bool[] ReachableWithout(Vector2I? blocked = null) =>
+        ReachableWithout(blocked.HasValue ? new Rect2I(blocked.Value, Vector2I.One) : default);
+
+    public int PlacementFloodCount { get; private set; }
+    // =========================================================
+    // One scratch-buffer flood excludes the complete proposal, with no live A* or occupancy mutation.
+    public bool[] ReachableWithout(Rect2I proposal)
     {
+        PlacementFloodCount++;
         Refresh();
         int width = Grid.Config.WidthCells, count = width * Grid.Config.HeightCells;
         if (_floodVisited == null || _floodVisited.Length != count)
@@ -337,13 +365,12 @@ public partial class NavigationGrid : Node
         System.Array.Clear(_floodVisited);
         int head = 0, tail = 0;
         foreach (Vector2I goal in Goals)
-            if (goal != blocked)
+            if (!proposal.HasPoint(goal))
             {
                 int index = goal.Y * width + goal.X;
                 if (_floodVisited[index]) continue;
                 _floodVisited[index] = true; _floodQueue[tail++] = index;
             }
-        int blockedIndex = blocked.HasValue ? blocked.Value.Y * width + blocked.Value.X : -1;
         while (head < tail)
         {
             int index = _floodQueue[head++], x = index % width;
@@ -356,7 +383,7 @@ public partial class NavigationGrid : Node
         // diagonal also has walkable cardinal links. This avoids redundant diagonal tests.
         void Visit(int index)
         {
-            if (_floodVisited[index] || _solid[index] || index == blockedIndex) return;
+            if (_floodVisited[index] || _solid[index] || proposal.HasPoint(new Vector2I(index % width, index / width))) return;
             _floodVisited[index] = true; _floodQueue[tail++] = index;
         }
         return _floodVisited;
@@ -369,5 +396,5 @@ public partial class NavigationGrid : Node
 
     // =========================================================
     // Release the native pathfinding resource with the world.
-    public override void _ExitTree() { if (GodotObject.IsInstanceValid(Grid)) Grid.NavigationChanged -= OnGridChanged; foreach (Profile profile in _profiles) profile.AStar.Dispose(); }
+    public override void _ExitTree() { if (GodotObject.IsInstanceValid(Grid)) { Grid.NavigationChanged -= OnGridChanged; Grid.NavigationBatchChanged -= OnGridBatchChanged; } foreach (Profile profile in _profiles) profile.AStar.Dispose(); }
 }

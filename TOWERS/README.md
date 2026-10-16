@@ -12,7 +12,7 @@ This README is an up-to-date overview and forward plan. Completed phase-by-phase
 - **Purchased levels:** `Offensive/<Tower>/*Levels.cs` contains one **complete, absolute row per level**, with construction price in Level 1 and upgrade price in later rows. Level 3 never accumulates the stat values from Level 2. Never restore cumulative purchased-level modifiers or scattered per-level `.tres` values.
 - **Earned ranks:** `*Ranks.cs` beside `*Levels.cs` defines Standard → Veteran → Enhanced → Superior → Legendary, based on XP from actual shield/hull damage and kills. Rank bonuses are independent of purchased levels; the bottom-right Inspector shows Rank, XP and bonuses. See [Shared/Ranks/README.md](Shared/Ranks/README.md).
 - **Foundation:** `Shared/TowerBase.cs`, `Shared/TowerConfig.cs`, `Shared/Upgrades/` and `Shared/Stats/Pipeline/` own per-instance progression, independent config copies, payments/previews and cached effective stats.
-- **Catalog and placement:** `Shared/TowerDefinition.cs`, `Shared/TowerCatalog.cs` and `Placement/` supply generic registered build choices, 1×1 placement, occupancy/navigation checks, selection and an existing Inspector. `ECONOMY/Wallet/` is the one wallet/payment authority.
+- **Catalog and placement:** `Shared/TowerDefinition.cs`, `Shared/TowerCatalog.cs` and `Placement/` supply generic registered build choices, rectangular placement, atomic occupancy/navigation checks, selection and an existing Inspector. `ECONOMY/Wallet/` is the one wallet/payment authority.
 - **Combat:** Battle fires guided Kinetic projectiles; Laser delivers Energy beam DPS; Blaster deals instant area damage; Shockwave uses a travelling wavefront. Shared combat and damage attribution live under `COMBAT/`.
 - **Ammunition:** optional explicit per-level reserves/consumption, full configurable starting stock, factory production, depot storage and visible cargo drones on both legs are implemented. See [Shared/Ammunition](Shared/Ammunition/README.md) and [Economy/Ammunition](Economy/Ammunition/README.md).
 - **Not currently implemented:** tower HP or tower shields, timed construction/upgrades, magazines/reloading, accuracy simulation, power consumption, maintenance/wear, selling or multi-cell placement.
@@ -30,7 +30,7 @@ This README is an up-to-date overview and forward plan. Completed phase-by-phase
 | `DefaultTowerCatalog.tres`, `Shared/TowerDefinition.cs`, `Placement/` | Tower registration and placement |
 | `TowerMasterConfig.cs`, `DefaultTowerConfig.tres` | Global tower policies / XP multipliers, not per-level combat stats |
 
-**Planned Codex pass:** [Generic rectangular tower footprints](Placement/MULTI_CELL_FOOTPRINT_PASS.md) — real Ammunition Factory **3×2** and Ammunition Depot **2×2**; not yet implemented. Existing 1×1 towers remain unchanged.
+**Completed F1–F5:** [Generic rectangular tower footprints](Placement/MULTI_CELL_FOOTPRINT_PASS.md) — Ammunition Factory **3×2**, Depot **2×2**, existing offensive towers **1×1**. Whole rectangles require uniform buildable PASSABLE or IMPASSABLE foundations; mixed terrain rejects. Wall occupancy performs no navigation work, while passable footprints use combined route safety and incremental batches. [Verification](../TESTS/Towers/Footprints.md).
 
 Detailed existing behavior belongs in [Shared/Stats/README.md](Shared/Stats/README.md), [Pipeline/README.md](Shared/Stats/Pipeline/README.md), [Shared/Upgrades/README.md](Shared/Upgrades/README.md), [Shared/Ranks/README.md](Shared/Ranks/README.md), [Placement/README.md](Placement/README.md), [COMBAT/Damage/README.md](../COMBAT/Damage/README.md), and the individual tower READMEs.
 
@@ -116,7 +116,7 @@ Shared spatial targeting and area queries are implemented behind the world Enemy
 - Keep one authoritative economy and one placement/navigation owner. Construction time must not bypass payment rollback or path validation.
 - Favor cached per-tower state, event-driven updates and budgeted/staggered operations; avoid one scene-tree search, resupply route solve or stat recalculation for **every** tower **every** frame. Target 500+ enemies without unnecessary per-frame allocation.
 - Future save/load should persist source data (type, position, purchased level, XP/rank inputs, health/shield/ammo, construction/reload progress, as needed), then rebuild derived final stats. Do not serialize `FinalStats` as a replacement for actual state.
-- Other separate future decisions: selling, footprints larger than 1×1, support/production tower mechanics, line-of-sight, special rank abilities and player research/active effects.
+- Other separate future decisions: selling, rotated/irregular footprints, additional support/production tower mechanics, line-of-sight, special rank abilities and player research/active effects.
 - Read `NOTES/CodePreferences.md` plus each feature's current README before working. Follow compact C#, labeled rows, comment separators, realistic Godot/compile tests and precise documentation. Never claim tests ran if they did not.
 
 ## Reserved future infrastructure folders — README-only

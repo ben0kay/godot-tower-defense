@@ -43,13 +43,13 @@ public partial class PathRequestManager : Node
     public override void _Ready()
     {
         Navigation = GetNode<NavigationGrid>("../Navigation");
-        Navigation.Grid.NavigationChanged += OnGridChanged;
+        Navigation.Grid.NavigationChanged += OnGridChanged; Navigation.Grid.NavigationBatchChanged += OnGridBatchChanged;
     }
 
     // =========================================================
     // Disconnect world-scoped subscriptions on unload.
     public override void _ExitTree()
-    { if (GodotObject.IsInstanceValid(Navigation?.Grid)) Navigation.Grid.NavigationChanged -= OnGridChanged; }
+    { if (GodotObject.IsInstanceValid(Navigation?.Grid)) { Navigation.Grid.NavigationChanged -= OnGridChanged; Navigation.Grid.NavigationBatchChanged -= OnGridBatchChanged; } }
 
     // =========================================================
     // Profiles are balanced independently from offset randomization.
@@ -90,6 +90,14 @@ public partial class PathRequestManager : Node
                 foreach (EnemyMovement movement in watchers) movement.MarkChangedCell(cell);
         }
         else foreach (Enemy enemy in GetNode<EnemyRegistry>("../Registry").Living) enemy.Movement.MarkChangedCell(null);
+    }
+    // =========================================================
+    // Visit only indexed routes touching new blockers; existing queue deduplication schedules each ship once.
+    private void OnGridBatchChanged(Rect2I rectangle, bool blocked)
+    {
+        if (!blocked) return;
+        for (int y = rectangle.Position.Y; y < rectangle.End.Y; y++) for (int x = rectangle.Position.X; x < rectangle.End.X; x++)
+        { Vector2I cell = new(x, y); if (!Navigation.Grid.TerrainBlocksEnemies(cell)) OnGridChanged(cell, true); }
     }
     #endregion
 

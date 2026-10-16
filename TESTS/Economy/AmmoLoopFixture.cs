@@ -41,7 +41,7 @@ internal sealed class AmmoLoopFixture : IDisposable
         int before = Towers.GetChildCount();
         foreach (Vector2I cell in grid.Level.Passable.GetUsedCells())
         {
-            if (grid.PlacementFailure(cell).Length != 0 || Spawns.PlacementFailure(cell).Length != 0) continue;
+            if (grid.PlacementFailure(cell, Placement.Catalog.Find(id).Footprint).Length != 0 || Spawns.PlacementFailure(cell, Placement.Catalog.Find(id).Footprint).Length != 0) continue;
             Placement.Call("TryPlace", cell);
             if (Towers.GetChildCount() == before) continue;
             T tower = Towers.GetChild<T>(Towers.GetChildCount() - 1); Disable(tower); return tower;

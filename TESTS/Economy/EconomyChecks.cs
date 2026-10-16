@@ -80,10 +80,14 @@ public static class EconomyChecks
             "Unaffordable build creates nothing and keeps its funds");
         tower.Free(); grid.ReleaseOccupancy(cell);
         wallet.Initialize(new LevelConfig { StartingCredits = 400 });
-        // Simulate a stale placement index: the dictionary insertion fails after occupancy succeeds.
+        // Removal now cleans the index. Explicitly inject stale state to retain the late-failure regression.
+        var index = (System.Collections.Generic.Dictionary<Vector2I, TowerBase>)typeof(TowerPlacementController)
+            .GetField("_placedTowers", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(placement);
+        index.Add(cell, tower);
         placement.Call("TryPlace", cell);
         Require(wallet.GetBalance(credits) == 400 && !grid.IsOccupied(cell) && towers.GetChildCount() == 0,
             "Failure after occupancy rolls back world state and keeps the entire payment");
+        index.Remove(cell);
         TowerConfig savedConfig = definition.DefaultConfig;
         definition.DefaultConfig = (BattleTowerConfig)savedConfig.Duplicate(true);
         definition.DefaultConfig.ConstructionCosts.Add(new ResourceCost { Resource = alloy, Amount = 2 });

@@ -213,23 +213,29 @@ public partial class SpawnManager : Node
 
     // =========================================================
     // Keep timing independent of early rejection paths.
-    public string PlacementFailure(Vector2I cell)
+    public string PlacementFailure(Vector2I cell) => PlacementFailure(cell, Vector2I.One);
+    public string PlacementFailure(Vector2I cell, Vector2I footprint)
     {
         long started = System.Diagnostics.Stopwatch.GetTimestamp();
-        try { return ValidatePlacement(cell); }
+        try { return ValidatePlacement(cell, footprint); }
         finally { LastPlacementValidationMilliseconds = System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds; }
     }
 
     // =========================================================
     // Full connectivity is still checked before commit, using reusable flood-fill scratch space.
-    private string ValidatePlacement(Vector2I cell)
+    private string ValidatePlacement(Vector2I cell, Vector2I footprint)
     {
-        RefreshSources(); NavigationGrid nav = Paths.Navigation;
+        NavigationGrid nav = Paths.Navigation;
+        string failure = nav.Grid.PlacementFailure(cell, footprint); if (failure.Length != 0) return failure;
+        // Existing solid foundations introduce no obstacle, flood, clearance scan or route work.
+        if (footprint != Vector2I.One && nav.Grid.TerrainBlocksEnemies(cell)) return "";
+        Rect2I proposal = new(cell, footprint);
+        RefreshSources();
         foreach (Enemy enemy in Registry.Living)
-            if (!nav.HasClearance(enemy.GlobalPosition, enemy.Definition.RadiusPixels, cell))
+            if (!nav.HasClearance(enemy.GlobalPosition, enemy.Definition.RadiusPixels, proposal))
                 return "An enemy is too close to this cell.";
         if (nav.Grid.BlocksEnemies(cell)) return "";
-        bool[] after = nav.ReachableWithout(cell);
+        bool[] after = nav.ReachableWithout(proposal);
         foreach (Vector2 position in _entries)
         {
             Vector2I source = nav.Grid.WorldToCell(position);

@@ -1,6 +1,6 @@
 # Ammunition Factory — implemented
 
-A passive Economy building registered as `ammo_factory`; default price **200 Credits**, 1×1 footprint. Its scene, simple vector artwork and canonical config use the normal catalog/placement/selection/payment infrastructure. It has no targeting, damage or mandatory combat stats.
+A passive Economy building registered as `ammo_factory`; default price **200 Credits**, 3×2 footprint. Its scene, simple vector artwork and canonical config use the normal catalog/placement/selection/payment infrastructure. It has no targeting, damage or mandatory combat stats.
 
 `AmmunitionFactory.cs` owns and advances the existing `AmmoProduction`. Defaults in `DefaultAmmunitionFactoryConfig.tres` / `AmmunitionFactoryConfig.cs`: **100 ammo every 2 seconds**, **1,000-round buffer**, **1,000-round ShipmentAmount**, **one home drone**, **1,000-round payload**, **220px/s**. All are editable provisional values. Production parameters are captured when building the placed instance; transport settings are read for subsequent dispatches. Existing stock/progress is never reset by a display refresh.
 
@@ -8,8 +8,6 @@ With no depot, production fills the small buffer and pauses when another whole b
 
 Select the factory to see current/max buffered stock, producing/full status and busy drone slots. Building stock is independent of Credits and other instances. Production/material recipes, power, purchased building levels and research remain future work. See [tests](../../../../TESTS/Economy/Ammunition.md).
 
-## Requested physical footprint (PLANNED — not yet coded)
+## Physical footprint — implemented
 
-**Factory: 3×2 cells (6 tiles).** Codex must update `AmmunitionFactoryDefinition.tres`, size/center the actual scene artwork and keep existing 1,000-round factory-drone shipments intact. See the [generic rectangular footprint pass](../../../Placement/MULTI_CELL_FOOTPRINT_PASS.md). Until implemented, the current building still uses the original 1×1 footprint.
-
-**Foundation rule for the upcoming 3×2 version:** all six buildable cells must be the same terrain category — **all PASSABLE or all IMPASSABLE**. A mix is structurally invalid and must be rejected without spending Credits or affecting navigation. [Codex footprint brief](../../../Placement/MULTI_CELL_FOOTPRINT_PASS.md).
+**3×2 cells (6 tiles)**, top-left clicked anchor, one root/artwork centered across the rectangle. Every occupied tile selects the same building. All cells must be buildable, free/unreserved and share the same PASSABLE or IMPASSABLE category. Mixed terrain rejects atomically; all-solid foundations cause no navigation work; passable foundations use one combined route check and incremental batched occupancy. Removal/rollback frees the whole claim only. Catalog icons remain 64px; scene artwork fits the larger footprint. Drone origins/returns use the centered root. Ammunition balance is unchanged. See [the completed footprint pass](../../../Placement/MULTI_CELL_FOOTPRINT_PASS.md) and [tests](../../../../TESTS/Towers/Footprints.md).

@@ -32,6 +32,11 @@ public partial class AmmunitionLoopChecks : Node
                 Require(incoming.Source == factory && incoming.Destination == depot && incoming.Cargo.Amount == 1000 && depot.Inventory.Amount == 0,
                     "Factory launches visible loaded drone; depot receives nothing at dispatch");
                 Require(f.Logistics.ReservedSpace(depot) == 1000 && f.Logistics.BusySlots(factory) == 1, "Capacity and source slot reserved");
+                WorldGrid grid = f.Main.GetNode<WorldGrid>("World/Grid");
+                Require(factory.Footprint == new Vector2I(3, 2) && depot.Footprint == new Vector2I(2, 2)
+                    && incoming.Drone.GlobalPosition.IsEqualApprox(factory.GlobalPosition)
+                    && factory.GlobalPosition.IsEqualApprox(grid.FootprintCenter(factory.GridCell, factory.Footprint))
+                    && depot.GlobalPosition.IsEqualApprox(grid.FootprintCenter(depot.GridCell, depot.Footprint)), "Multi-cell endpoints and drone home use whole-building centers");
                 Vector2 start = incoming.Drone.GlobalPosition; incoming.Drone._PhysicsProcess(.001);
                 Require(incoming.Drone.GlobalPosition != start && depot.Inventory.Amount == 0, "Drone actually travels before unloading");
                 factory._PhysicsProcess(2); Require(factory.Inventory.Amount == 100 && !factory.Production.IsPaused, "Loading frees production buffer and resumes it");
@@ -64,7 +69,7 @@ public partial class AmmunitionLoopChecks : Node
                 Require(second.Hud.GetBuildButton("ammo_factory") != null && second.Hud.GetBuildButton("ammo_depot") != null && second.Logistics != null,
                     "Both levels expose buildable ammunition pipeline");
             GD.Print("PASS: purchased factory/depot/Battle, production pause/resume, both visible physical legs, 900 real shots, 10% demand, arrival-only refill, Inspector and conservation");
-            GetTree().Quit(0);
+            await SubsystemBattlefield.DrainFreedFixtures(this); GetTree().Quit(0);
         }
         catch (Exception error) { GD.PushError(error.ToString()); GetTree().Quit(1); }
     }

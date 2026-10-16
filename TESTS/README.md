@@ -247,3 +247,7 @@ Direct Roslyn compilation passed. From their new paths, PauseControlsChecks, Men
 ## Mission Debrief R1
 
 See [Results verification](UI/Results.md) for real outcome races, both launchers, paused UI, Retry/Next/Menu/Exit and known build/integration limits. Subsystem fixtures remove the new session/results before mutating waves/HP so their original assertions remain meaningful; the dedicated R1 runners keep production orchestration intact.
+
+## Rectangular footprints F1–F5
+
+[Footprint verification](Towers/Footprints.md) covers atomic rectangular occupancy, homogeneous terrain rules, generic paid placement, any-cell selection, full centers/previews, rollback, six-cell navigation batches and 500-enemy budgets. Run `res://TESTS/Towers/FootprintChecks.tscn`; the ammunition suite also tests the real larger endpoints and centered drone home positions.

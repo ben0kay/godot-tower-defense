@@ -20,11 +20,15 @@ public partial class TowerDefinition : Resource
     public string Description => DefaultConfig?.Description ?? "";
 
     // =========================================================
+    // Bound authored data before multiplication/iteration; actual map bounds are checked at placement.
+    public static bool ValidFootprint(Vector2I size) => size.X > 0 && size.Y > 0 && size.X <= 1024 && size.Y <= 1024;
+
+    // =========================================================
     // Validate registration once; temporary scene inspection never enters the tree or runs combat.
     public void Validate()
     {
         if (string.IsNullOrWhiteSpace(TowerId) || TowerId != TowerId.Trim()) throw new InvalidOperationException("Tower ID must be nonblank and trimmed.");
-        if (!Enum.IsDefined(Category) || Footprint != Vector2I.One) throw new InvalidOperationException("Only valid categories and 1 x 1 towers are supported.");
+        if (!Enum.IsDefined(Category) || !ValidFootprint(Footprint)) throw new InvalidOperationException("Footprint must have positive dimensions, each at most 1024 cells, and a valid category.");
         if (Scene == null || DefaultConfig == null) throw new InvalidOperationException("Tower scene/config is missing: " + TowerId);
         if (DefaultConfig.ConstructionCosts == null) throw new InvalidOperationException("Construction recipe is missing: " + TowerId);
         foreach (ResourceCost cost in DefaultConfig.ConstructionCosts)
