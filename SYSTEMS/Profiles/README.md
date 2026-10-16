@@ -13,3 +13,7 @@ Godot `user://Profiles/profiles.json`: one versioned JSON index of local profile
 ## Acceptance
 
 After F5: create a profile, choose Campaign, quit and relaunch; the existing name remains listed. Create two profiles and switch between them without losing either. Test invalid/duplicate names and an unreadable index with/without backup. `Main.tscn` remains directly runnable for gameplay tests without a selected profile.
+
+## Planned profile-wide progression (NOT IMPLEMENTED)
+
+The selected profile GUID will own separate persistent Player XP/level and research-point/unlock state in [the P1–P5 progression brief](../Progression/PLAYER_XP_RESEARCH_FOUNDATION_PASS.md). Current `PlayerProfile` / `ProfileStore` still store **identity only**. Do not confuse Player XP with per-tower Rank XP or invent campaign Save/Load.
