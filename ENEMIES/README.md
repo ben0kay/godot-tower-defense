@@ -18,9 +18,9 @@ This top-level folder owns **enemy gameplay mechanics** in the Godot 4 C#/.NET s
 
 See **[enemypathing.md](enemypathing.md)** for the standalone Phase N4 implementation plan: Inspector master toggle, percentage of individual enemies assigned the new corridor-aware refinement, safe randomized routes within walkable boundaries, stable repathing, 0%/100% behavior and performance/regression requirements. This is **not implemented yet** and is independent of the completed E2A/E2B enemy catalog/ShieldEmitter and existing shared path diversity.
 
-## Planned: inherited common enemy scene (GE1–GE3; NOT IMPLEMENTED)
+## Shared inherited enemy scene (GE1–GE3 implemented)
 
-[Shared/GENERIC_ENEMY_SCENE_PASS.md](Shared/GENERIC_ENEMY_SCENE_PASS.md) describes consolidating the repeated `Sprite`, `Movement` and `DefenseBar` nodes into one reusable inherited base scene, while keeping separate editable enemy scenes, individual Definition/SVG overrides and optional ShieldEmitter/DeathSpawn children. This is a **scene-authoring refactor**, not replacement of EnemyCatalog or a new generic enemy runtime. No work implemented yet.
+[Shared/GENERIC_ENEMY_SCENE_PASS.md](Shared/GENERIC_ENEMY_SCENE_PASS.md) records the completed migration to `Shared/GenericEnemy.tscn`. All five type scenes inherit `Sprite`, `Movement` and `DefenseBar`, retaining their own Definition/SVG overrides and optional ShieldEmitter/DeathSpawn children. Catalog paths, spawning and runtime scripts are unchanged. Edit shared child defaults in the parent; avoid per-type overrides unless intentional. See `TESTS/Enemies/GenericEnemy.md` for tests and limitations.
 
 ## Enemy architecture — multi-type roster and modular abilities (E2A/E2B implemented; E3 later)
 

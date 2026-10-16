@@ -52,3 +52,11 @@ EnemyDefinition has Inspector **Movement Variation** permissions AllowCorridorVa
 ## Planned inherited shared enemy scene (GE1–GE3; NOT IMPLEMENTED)
 
 See [GENERIC_ENEMY_SCENE_PASS.md](GENERIC_ENEMY_SCENE_PASS.md). Keep per-type `.tscn` scenes for readability but derive their shared `Sprite`, `Movement` and `DefenseBar` children from one `Shared/GenericEnemy.tscn`. Type-specific SVG, Definition and optional ability children remain in inherited type scenes. Preserve the existing catalog/spawn behavior and regressions; no scene migration has happened yet.
+
+## GenericEnemy scene (GE1–GE3)
+
+`GenericEnemy.tscn` is the authoring parent for all five enemy scenes. It owns Enemy.cs on a Node2D root and exactly `Sprite` (Sprite2D), `Movement` (EnemyMovement.cs) and `DefenseBar` (shared feedback scene). The parent has no Definition, artwork, ability nodes or extra processing. Instantiate a registered type scene through the existing catalog, not this incomplete authoring template.
+
+Open each type's `.tscn` normally in Godot: its inherited common nodes remain Inspector-editable. Change common transforms/settings in GenericEnemy so they propagate to all types; a deliberate child property override stops inheritance for that property (use Inspector Revert to restore it). All current types inherit the bar transform unchanged. Bar drawing/style remains owned by `FEEDBACK/DefenseBars/`. Each type overrides only root Definition and Sprite texture, and adds its actual optional Abilities children. New types should use **New Inherited Scene** from GenericEnemy, assign their Definition/SVG, then register that individual scene in the existing EnemyCatalog.
+
+No runtime scripts, node counts, balance, scene paths, wave IDs or spawn lifecycle changed. See `TESTS/Enemies/GenericEnemy.md` for propagation, gameplay and 100/500-instance measurements.

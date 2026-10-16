@@ -24,3 +24,7 @@ The saved `Enemy001.tres` has **MaxShield = 0** (it inherits the default). The i
 
 ## E2 preservation
 Enemy001 scene/art/base balance/F2 defaults are unchanged. DefaultEnemyCatalog registers its existing EnemyDefinition.EnemyId. It has no ability node, and cannot receive shield restoration unless its MaxShield is raised above zero. Ordinary starting shield remains 0 unless wave shield:true is authored. Typed shield/hull damage,3-Credit kills,1 Citadel arrival damage and shared navigation remain active.
+
+## Shared scene inheritance (GE1–GE3)
+
+This type's `.tscn` inherits `ENEMIES/Shared/GenericEnemy.tscn`. Its own Definition and SVG remain independently editable; Sprite, Movement and DefenseBar defaults come from the parent. Edit common settings there, or deliberately override an inherited property here and use Inspector Revert to resume inheritance. Only ShieldGenerator and Transporter add their respective optional ability children. Catalog registration, stable IDs and gameplay values are unchanged.

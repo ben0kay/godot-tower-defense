@@ -7,3 +7,7 @@ The scene reuses Enemy.cs, EnemyMovement, DefenseBar and an optional Abilities/D
 Registered at the end of DefaultEnemyCatalog so F2 can cycle to it and waves can author `WaveBuilder.Enemy("transporter_mk1")`. Existing level wave compositions remain unchanged. For testing, run a battlefield, cycle F2 to Transporter and kill it with towers; parent death feedback happens normally and the drones emerge locally over time. A wave-owned final carrier cannot prematurely trigger victory.
 
 See `ENEMIES/Abilities/DeathSpawn/README.md` and `TESTS/Enemies/DeathSpawn.md` for configuration, safe skip/cap behavior and actual verification. No enemy weapons or tower durability were added.
+
+## Shared scene inheritance (GE1–GE3)
+
+This type's `.tscn` inherits `ENEMIES/Shared/GenericEnemy.tscn`. Its own Definition and SVG remain independently editable; Sprite, Movement and DefenseBar defaults come from the parent. Edit common settings there, or deliberately override an inherited property here and use Inspector Revert to resume inheritance. Only ShieldGenerator and Transporter add their respective optional ability children. Catalog registration, stable IDs and gameplay values are unchanged.

@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://ENEMIES/Shared/Enemy.cs" id="1_enemy"]
+[ext_resource type="Script" path="res://ENEMIES/Movement/EnemyMovement.cs" id="2_movement"]
+[ext_resource type="PackedScene" path="res://FEEDBACK/DefenseBars/DefenseBar.tscn" id="3_bar"]
+
+[node name="GenericEnemy" type="Node2D"]
+script = ExtResource("1_enemy")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+
+[node name="Movement" type="Node" parent="."]
+script = ExtResource("2_movement")
+
+[node name="DefenseBar" parent="." instance=ExtResource("3_bar")]

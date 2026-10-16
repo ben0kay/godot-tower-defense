@@ -20,3 +20,7 @@ Artwork uses a new broad, twin-fin, plated silhouette with amber exhaust and cya
 ## Spawning / editing
 
 The existing `DefaultEnemyCatalog.tres` includes `Enemy004.tscn`. Press **F2** to cycle through catalog scenes, with Enemy004 appended after ShieldGenerator. Alternatively call `SpawnManager.Spawn("medium_mk1")` or author `Enemy("medium_mk1")` in a wave. **Level001's authored waves remain basic-only** until explicitly edited; catalog order never dictates progression. Edit `Enemy004.tres` in Godot Inspector to change balance/ID/name; keep IDs stable if referenced by authored waves.
+
+## Shared scene inheritance (GE1–GE3)
+
+This type's `.tscn` inherits `ENEMIES/Shared/GenericEnemy.tscn`. Its own Definition and SVG remain independently editable; Sprite, Movement and DefenseBar defaults come from the parent. Edit common settings there, or deliberately override an inherited property here and use Inspector Revert to resume inheritance. Only ShieldGenerator and Transporter add their respective optional ability children. Catalog registration, stable IDs and gameplay values are unchanged.

@@ -16,7 +16,7 @@
 
 | Status | Pass / work | Authoritative notes and next action | Dependencies / caveats |
 | --- | --- | --- | --- |
-| [ ] | **GE1–GE3 — Generic inherited enemy scene** | [New brief](../ENEMIES/Shared/GENERIC_ENEMY_SCENE_PASS.md): one shared basic scene; migrate five per-type inherited scenes; regression tests. | Preserve catalog scene paths, ShieldEmitter and Transporter DeathSpawn; separate editable enemy scenes stay. |
+| [x] | **GE1–GE3 — Generic inherited enemy scene** | [Completed pass](../ENEMIES/Shared/GENERIC_ENEMY_SCENE_PASS.md): shared parent and five inherited scenes; propagation/gameplay tests and benchmarks. | Preserve catalog scene paths, ShieldEmitter and Transporter DeathSpawn; separate editable enemy scenes stay. |
 | [ ] | **P1–P5 — Player/global XP + Research Foundation** | [Detailed phased Codex pass](../SYSTEMS/Progression/PLAYER_XP_RESEARCH_FOUNDATION_PASS.md): persistent per-profile XP/RP, signed mission scoring + ETA, Campaign Levels/Research, hex-origin graph and real Citadel Master I. | Extends Results R3/R4; **do not implement XP twice** or confuse player XP with tower Rank XP. Campaign save/load remains separate. |
 | [ ] | **C1–C4 — Timed construction & upgrades** | [Detailed phased Codex pass](../TOWERS/Shared/Construction/TIMED_CONSTRUCTION_PASS.md): work states/durations, capability gating, timed upgrades/Inspector, stage SVGs + optional sparks/VFX. | Preserve 1×1/2×2/3×2 footprints, wallet, ammo delivery, existing levels and rank XP. |
 | [ ] | **R2 — Mission Results visual polish** | [Results remaining passes](../UI/Menus/Results/README.md): layout, transitions, skippable count-up, sounds and viewport testing. | R0/R1 outcome/results behavior already complete. Optional independent polish pass. |
@@ -71,7 +71,7 @@ These are real gaps or explicitly proposed systems, but **need a dedicated scope
 
 ## E. Suggested sequencing when returning
 
-1. **Small independent refactor:** GE1–GE3 inherited enemy scenes. No rebalancing.
+1. **Completed independent refactor:** GE1–GE3 inherited enemy scenes. No rebalancing; see `TESTS/Enemies/GenericEnemy.md` for verification limits.
 2. **Campaign loop:** P1–P5 progression. Fold in the necessary Results R3 telemetry/R4 reward work once, then optionally do independent R2 polish.
 3. **Building lifecycle:** C1–C4 timed construction and visual stages.
 4. **Combat escalation:** first design/implement Tower HP/shields/damage/destruction; then E3B enemy attacks.
