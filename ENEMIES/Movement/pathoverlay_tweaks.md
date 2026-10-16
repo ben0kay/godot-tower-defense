@@ -1,6 +1,6 @@
 # Enemy Movement — Route Preview Overlay and Portal Checkpoint Areas
 
-> **STATUS: ROUTE PREVIEW AND REQUIRED CHECKPOINT AREAS IMPLEMENTED.** F3 opens the debug route panel. The first-pass direct portal-to-Citadel overlay is implemented; checkpoint nodes/stages and checkpoint-aware previews are now implemented. See WORLD/ROUTING/RouteCheckpoint/README.md for authoring and TESTS/Checkpoints.md for actual tests and bounded-sampling limitations. Read the latest GitHub commit, `NOTES/CodePreferences.md`, `ENEMIES/Movement/README.md`, `WORLD/NAVIGATION/README.md`, `WORLD/PORTALS/EnemyPortal/README.md` and the relevant scripts before implementing. Preserve existing movement, combat, terrain, wave, and placement behavior.
+> **STATUS: ROUTE PREVIEW AND REQUIRED CHECKPOINT AREAS IMPLEMENTED.** F3 opens the debug route panel. The first-pass direct portal-to-Citadel overlay is implemented; checkpoint nodes/stages and checkpoint-aware previews are now implemented. See WORLD/ROUTING/RouteCheckpoint/README.md for authoring and TESTS/Navigation/Checkpoints.md for actual tests and bounded-sampling limitations. Read the latest GitHub commit, `NOTES/CodePreferences.md`, `ENEMIES/Movement/README.md`, `WORLD/NAVIGATION/README.md`, `WORLD/PORTALS/EnemyPortal/README.md` and the relevant scripts before implementing. Preserve existing movement, combat, terrain, wave, and placement behavior.
 
 ## Why this is needed
 
@@ -125,14 +125,14 @@ This order helps debug each feature separately. Combining them in one Codex chan
 - Preview produces stable, accurate routes from a chosen portal with repeated settings; it never affects subsequent enemy profile assignments, wave RNG, spawns, Credits, rank XP or other gameplay.
 - Preview supports **1-cell and 3-cell corridors**, small and medium ship radii, disconnected destinations and zero possible routes. Never draw unsafe connectors across impassable tiles.
 - Performance: no per-checkpoint physics nodes; no per-frame route regeneration, per-enemy A* grids, unbounded radius target searches or separate duplicate pathfinding implementations. Reuse centralized path budgets and viewport-limited debug drawing.
-- Run Godot .NET compile and relevant `TESTS/MovementPermissionChecks.cs`, corridor, navigation, wave, portal-spawn, placement, interactive terrain and full integration suites; report actual results. Document new exported fields and how to place/link a checkpoint in the editor.
+- Run Godot .NET compile and relevant `TESTS/Navigation/MovementPermissionChecks.cs`, corridor, navigation, wave, portal-spawn, placement, interactive terrain and full integration suites; report actual results. Document new exported fields and how to place/link a checkpoint in the editor.
 
 ## What Codex should deliver when requested
 
 A clear, reproducible **route-preview debug mode** plus **optional portal-associated checkpoint regions**, with self-contained small reusable files, Inspector authoring, tests, and brief updates to `ENEMIES/Movement/README.md` and `WORLD/PORTALS/EnemyPortal/README.md`. Do **not** refactor the entire enemy navigation system or alter existing Level001/Level002 art/waves just to add the feature.
 
-**Route preview and required checkpoints are implemented and tested.** See `TESTS/RoutePreview.md` for actual verification and known upstream issues.
+**Route preview and required checkpoints are implemented and tested.** See `TESTS/Navigation/RoutePreview.md` for actual verification and known upstream issues.
 
 ## Implemented extension: checkpoint graphs
 
-`NextCheckpoints` now supports chains and nested uniform branches. Empty means Citadel. Links, rather than names, define the graph; use names such as Checkpoint2A/2B/2C for portal-family readability. Validated per-enemy snapshots preserve choices across repaths without consuming wave RNG. The shared editor-only design overlay draws circles and all connections above tiles; F3 shows it alongside complete-chain previews. See `TESTS/CheckpointChains.md` for verification and known limitations.
+`NextCheckpoints` now supports chains and nested uniform branches. Empty means Citadel. Links, rather than names, define the graph; use names such as Checkpoint2A/2B/2C for portal-family readability. Validated per-enemy snapshots preserve choices across repaths without consuming wave RNG. The shared editor-only design overlay draws circles and all connections above tiles; F3 shows it alongside complete-chain previews. See `TESTS/Navigation/CheckpointChains.md` for verification and known limitations.

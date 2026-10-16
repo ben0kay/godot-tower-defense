@@ -28,7 +28,7 @@ For rapid map or combat testing, open `Main.tscn` (Level001) or `MainLevel002.ts
 - `LEVELS/Level001/`: editable terrain, portal/objective configuration and finite waves.
 - `WORLD/`, `ENEMIES/`, `TOWERS/`, `ECONOMY/`: reusable gameplay systems.
 
-Use feature READMEs for detailed implementation and development plans, especially `TOWERS/README.md`, `LEVELS/README.md`, `UI/Menus/README.md`, `SYSTEMS/Saving/README.md` and `NOTES/CodePreferences.md`. Run `TESTS/EnemyIntegrationChecks.tscn` in the Godot .NET headless runner for gameplay regression checks.
+Use feature READMEs for detailed implementation and development plans, especially `TOWERS/README.md`, `LEVELS/README.md`, `UI/Menus/README.md`, `SYSTEMS/Saving/README.md` and `NOTES/CodePreferences.md`. Run `TESTS/Integration/EnemyIntegrationChecks.tscn` in the Godot .NET headless runner for gameplay regression checks.
 
 ## Long-term vision — optional multi-genre game (planning only)
 

@@ -7,4 +7,4 @@ BattleTower staggers acquisition by instance ID and checks periodically (default
 
 Laser Tower also staggers periodic First/Closest searches and validates cached range/alive state between them. Periodic search may replace an existing valid beam lock with the current best candidate; invalid lock hides immediately, and removal/unload subscriptions clear visuals before the next tick.
 
-See `TESTS/SpatialQueryChecks.cs` for brute-force parity and `TESTS/SpatialQueryBenchmarks.md` for paired sparse/dense timing, maintenance, candidate and allocation results.
+See `TESTS/Combat/SpatialQueryChecks.cs` for brute-force parity and `TESTS/Performance/SpatialQueryBenchmarks.md` for paired sparse/dense timing, maintenance, candidate and allocation results.

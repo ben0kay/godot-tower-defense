@@ -1,4 +1,4 @@
 [gd_scene load_steps=2 format=3]
-[ext_resource type="Script" path="res://TESTS/PlacementPerformanceChecks.cs" id="1"]
+[ext_resource type="Script" path="res://TESTS/Performance/PlacementPerformanceChecks.cs" id="1"]
 [node name="PlacementPerformanceChecks" type="Node"]
 script = ExtResource("1")

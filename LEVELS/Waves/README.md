@@ -14,7 +14,7 @@ SpawnManager.SpawnWave uses uniform random eligible portals for each ship, prese
 
 WaveManager uses one countdown and no per-ship timers. Composition is prepared once per batch using exact largest-remainder quotas and seeded shuffle. Positive intervals run from successful spawns; final post-delay is ignored. Overshot frame time is discarded rather than producing catch-up bursts; zero-interval batches remain attempt-bounded. Waiting/ready/completed states have no scheduler ticks. Cancellation/reconfiguration unsubscribes owned ships; unloading Main removes all services.
 
-TESTS/WaveChecks.cs exercises timing, 2s/5s pauses, exact 80/20 quotas as pure data, manual progression, ownership, once-only death/arrival completion, random two-portal traffic, F2 round-robin, blocked/required sources, map-edge levels, caps/retries and lag/zero-interval limits. Existing HUD, credits, tower and 500-enemy regression checks remain in place.
+TESTS/Integration/WaveChecks.cs exercises timing, 2s/5s pauses, exact 80/20 quotas as pure data, manual progression, ownership, once-only death/arrival completion, random two-portal traffic, F2 round-robin, blocked/required sources, map-edge levels, caps/retries and lag/zero-interval limits. Existing HUD, credits, tower and 500-enemy regression checks remain in place.
 
 ## Implemented design and future wave features
 
@@ -218,7 +218,7 @@ Existing: immutable `WaveDefinition`/`WaveBatch`/`WaveEnemyEntry`, `WaveBuilder`
 
 ### Phase 2 — Registered mixed enemy types and spawn options (PARTIALLY COMPLETED)
 
-**Implemented:** enemy catalog with Enemy001, Enemy002 and ShieldGenerator; validated mixed-type spawning (see `TESTS/EnemyCatalogChecks.cs`); explicit per-entry portal selection; optional full starting shield; ShieldGenerator's independent aura ability.
+**Implemented:** enemy catalog with Enemy001, Enemy002 and ShieldGenerator; validated mixed-type spawning (see `TESTS/Integration/EnemyCatalogChecks.cs`); explicit per-entry portal selection; optional full starting shield; ShieldGenerator's independent aura ability.
 
 **Future:** Enemy003 or other types as authored, enabling mixed types in Level001's *default* wave content, extra portal strategies, Elite/stealth/speed modifiers and advanced boss mechanics. These are **content/features**, not reasons to rebuild the scheduler.
 
@@ -230,7 +230,7 @@ Optional completed-wave Credits bonuses, automatic next waves/pre-wave countdown
 
 - A 10-ship 0.1s batch spawns 10 (not 11); first occurs at start, post-delay begins after final spawn.
 - Correct **2s then 5s** inter-batch pauses, with no requirement to kill previous batch's enemies before next batch begins.
-- **Implemented:** a pure 80/20 composition fixture yields 16/4 with repeatable shuffle. `TESTS/EnemyCatalogChecks.cs` additionally executes a real 75/25 Enemy001/Enemy002 (6/2) wave with owned completion, shield/portal/reward tests.
+- **Implemented:** a pure 80/20 composition fixture yields 16/4 with repeatable shuffle. `TESTS/Integration/EnemyCatalogChecks.cs` additionally executes a real 75/25 Enemy001/Enemy002 (6/2) wave with owned completion, shield/portal/reward tests.
 - **Random eligible portals** receive approximately balanced traffic over many spawns with two valid sources; sequences are not forcibly alternating. F2 remains round-robin.
 - A forced boss portal spawns only from its named permitted exit or reports blocked/error; never silently switches to another.
 - Enemy cap/blocked exit delays or errors safely, without dropping planned enemies or finishing prematurely.
@@ -244,7 +244,7 @@ Optional completed-wave Credits bonuses, automatic next waves/pre-wave countdown
 
 ## Optional full spawn shields (implemented)
 
-Each `WaveEnemyEntry` now includes `SpawnWithShield` (default `false`) and `WaveBuilder.Enemy(..., shield: true)` can request full shields on that entry. `WaveManager` forwards it to `SpawnManager.SpawnWave`; `Enemy.Initialize` sets the **individual** ship's `CurrentShield` to its type's `MaxShield` only when requested. Default wave/F2 spawns are still unshielded. Mixed entries sharing the same `EnemyId` remain distinct through the exact-quota shuffle; `TESTS/EnemyShieldChecks.cs` covers this, shield-first hits, damage overflow and no shared-definition mutation. Level001 wave contents are unchanged. **Ability-driven ShieldEmitter restoration is implemented**, but generic passive shield regeneration, dedicated shield visuals and a broad spawn-modifier engine are not.
+Each `WaveEnemyEntry` now includes `SpawnWithShield` (default `false`) and `WaveBuilder.Enemy(..., shield: true)` can request full shields on that entry. `WaveManager` forwards it to `SpawnManager.SpawnWave`; `Enemy.Initialize` sets the **individual** ship's `CurrentShield` to its type's `MaxShield` only when requested. Default wave/F2 spawns are still unshielded. Mixed entries sharing the same `EnemyId` remain distinct through the exact-quota shuffle; `TESTS/Combat/EnemyShieldChecks.cs` covers this, shield-first hits, damage overflow and no shared-definition mutation. Level001 wave contents are unchanged. **Ability-driven ShieldEmitter restoration is implemented**, but generic passive shield regeneration, dedicated shield visuals and a broad spawn-modifier engine are not.
 
 
 ## E2A/E2B enemy registration (IMPLEMENTED)

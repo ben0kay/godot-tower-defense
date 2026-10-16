@@ -35,7 +35,7 @@ Candidate snapshots use cached position/registration order and dispatch follows 
 
 ## Regression coverage and status
 
-`TESTS/AreaDamageChecks.cs` exercises center/half/edge/outside geometry, zero radius, 0/25/75/100% retention, invalid inputs, finite extreme amounts, unique recipients, mutation during a kill callback, queued/freed/unregistered targets, isolated rewards and 500 recipients. Defense fixtures cover Explosive shield-only, hull-only and break spillover plus absolute overrides and penetration. `BlasterCannonChecks` exercises actual fired delivery, launch snapshots, falloff tuning, paid construction/upgrades, caches/Inspector, rates and cleanup. See `TESTS/README.md` for actual build/headless results.
+`TESTS/Combat/AreaDamageChecks.cs` exercises center/half/edge/outside geometry, zero radius, 0/25/75/100% retention, invalid inputs, finite extreme amounts, unique recipients, mutation during a kill callback, queued/freed/unregistered targets, isolated rewards and 500 recipients. Defense fixtures cover Explosive shield-only, hull-only and break spillover plus absolute overrides and penetration. `BlasterCannonChecks` exercises actual fired delivery, launch snapshots, falloff tuning, paid construction/upgrades, caches/Inspector, rates and cleanup. See `TESTS/README.md` for actual build/headless results.
 
 ## Phase4E — expanding delivery implemented separately
 
@@ -43,4 +43,4 @@ Instant blast damage remains a full-disc event at contact. ShockwaveEmitter unde
 
 Tower XP attribution is carried in DamageInfo.Source and preserved by AtDistance. Each affected enemy independently bounds XP by its spawn-time damage budget; raw AoE amount is never directly converted to XP. A promotion during recipient dispatch does not change the already snapshotted attack, nor does the cosmetic effect grant XP. Existing instant/wave timing and defense math remain unchanged.
 
-SpatialQueryChecks adds sparse blast oracle comparisons for shield/hull overrides/penetration and a nested blast/moving-recipient snapshot regression. SpatialQueryBenchmarks measures eight simultaneous impacts alongside targeting and moving waves; see TESTS/SpatialQueryBenchmarks.md.
+SpatialQueryChecks adds sparse blast oracle comparisons for shield/hull overrides/penetration and a nested blast/moving-recipient snapshot regression. SpatialQueryBenchmarks measures eight simultaneous impacts alongside targeting and moving waves; see TESTS/Performance/SpatialQueryBenchmarks.md.

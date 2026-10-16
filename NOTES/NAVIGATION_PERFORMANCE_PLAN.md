@@ -78,7 +78,7 @@ Tower placement/removal now emits a cell change: NavigationGrid updates that one
 
 EnemyMasterConfig adds soft path-work/validation millisecond budgets, a validation count limit, fair oldest-request service, optional staggered three-second audits, and EnablePathOffsets/PathOffsetMaxPixels (default true/8px). Audits do not calculate A* for valid routes. One stable lateral bias per ship is applied to interior waypoints with corner bisectors and clearance-tested tapering; no extra A* or per-frame jitter. Local separation remains inactive.
 
-Placement connectivity is preserved using reusable flat flood-fill storage. Level Debug shows separate placement, grid, native A*, total path-work and validation timings. TESTS/RepathMovementChecks.cs covers 500 affected ships, unaffected movement, budgets, fairness, offsets, audits and safety. TESTS/PlacementPerformanceChecks.tscn measures identical 100/500-ship fixtures; TESTS/NavigationPerformance.md records before/after results. Time budgets are soft: a single native search/path assignment cannot be interrupted, and rendered 60 FPS still requires hardware testing.
+Placement connectivity is preserved using reusable flat flood-fill storage. Level Debug shows separate placement, grid, native A*, total path-work and validation timings. TESTS/Navigation/RepathMovementChecks.cs covers 500 affected ships, unaffected movement, budgets, fairness, offsets, audits and safety. TESTS/Performance/PlacementPerformanceChecks.tscn measures identical 100/500-ship fixtures; TESTS/Performance/NavigationPerformance.md records before/after results. Time budgets are soft: a single native search/path assignment cannot be interrupted, and rendered 60 FPS still requires hardware testing.
 
 ## Moving replacement-path handoffs
 

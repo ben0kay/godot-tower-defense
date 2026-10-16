@@ -7,7 +7,7 @@ Same-machine paired baselines against main `e9c9c07`, using its original targeti
 Compile the project, then run:
 
 ```sh
-godot --headless --path . TESTS/SpatialQueryBenchmarks.tscn
+godot --headless --path . TESTS/Performance/SpatialQueryBenchmarks.tscn
 ```
 
 Godot4.7.2 Mono, .NET8.0.31, direct Roslyn4.11 compile with the Godot source generator/API, same container and compiler options for both paths. Each pair rebuilds the same deterministic positions, routes, centers and inputs. Sparse enemies span4096×4096px, dense enemies span128×128px. Cell size128px; circle ranges256px for targeting and120px for impacts. Every living enemy moves0.75/0.25px per simulated tick. Original fixtures disable spatial transform notifications; indexed fixtures include point/motion maintenance. Production navigation/physics ticks and cosmetic death explosions are disabled during this isolated benchmark.

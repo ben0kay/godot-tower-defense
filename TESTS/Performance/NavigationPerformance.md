@@ -22,8 +22,8 @@ These are headless CPU measurements, not a rendered 60 FPS benchmark or a guaran
 Run after a normal Godot C# build:
 
 ```sh
-godot --headless --path . TESTS/PlacementPerformanceChecks.tscn
-godot --headless --path . TESTS/EnemyIntegrationChecks.tscn
+godot --headless --path . TESTS/Performance/PlacementPerformanceChecks.tscn
+godot --headless --path . TESTS/Integration/EnemyIntegrationChecks.tscn
 ```
 
 Run timing fixtures separately from other heavy tests for a meaningful comparison. Timing diagnostics in Level001's Debug HUD show placement validation, last grid update, native A* queries/time, total path work and validation work. Lifetime path/validation peaks remain visible between the HUD's throttled refreshes; restart the playtest to reset them.

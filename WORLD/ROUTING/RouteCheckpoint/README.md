@@ -24,7 +24,7 @@ If no sampled target is clearance-valid/reachable, the enemy waits/retries; it n
 
 F3 reuses the same targets, query adapter, refinement builders and analytic entry clipping; both preview legs share the same sample preferences. It remains a route plan, not an enemy timing prediction. Weighted preferences can still choose downstream detours **after** visiting the required area; this is not a global detour limit or designer centerline.
 
-Existing Level001/002 maps, waves and portals are not automatically linked or repositioned. Place/link only where you want this new routing requirement. See `TESTS/Checkpoints.md` for verification.
+Existing Level001/002 maps, waves and portals are not automatically linked or repositioned. Place/link only where you want this new routing requirement. See `TESTS/Navigation/Checkpoints.md` for verification.
 
 ## Chains and random branches — implemented
 

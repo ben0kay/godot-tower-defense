@@ -26,4 +26,4 @@ Camera WASD/arrows/middle-mouse/wheel remain in CameraController. Pausing clears
 
 Both `Main.tscn` and `MainLevel002.tscn` instance `UI/Menus/Pause/PauseMenu.tscn` once. Direct F6 play needs no selected profile. Pause uses real SceneTree pause, layer100 above HUD/debug UI, and `MenuNavigation` for unpaused scene transitions. Save/Load/Options remain disabled placeholders.
 
-Run `TESTS/PauseControlsChecks.tscn` and `TESTS/MenuTowerFlowChecks.tscn` after compiling. See `TESTS/PauseControls.md` for actual results and desktop-only verification limits. No controls settings or rebinding UI is implemented yet.
+Run `TESTS/UI/PauseControlsChecks.tscn` and `TESTS/UI/MenuTowerFlowChecks.tscn` after compiling. See `TESTS/UI/PauseControls.md` for actual results and desktop-only verification limits. No controls settings or rebinding UI is implemented yet.

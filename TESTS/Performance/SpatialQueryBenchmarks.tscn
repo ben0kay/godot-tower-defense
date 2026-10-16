@@ -1,4 +1,4 @@
 [gd_scene load_steps=2 format=3]
-[ext_resource type="Script" path="res://TESTS/SpatialQueryBenchmarks.cs" id="1"]
+[ext_resource type="Script" path="res://TESTS/Performance/SpatialQueryBenchmarks.cs" id="1"]
 [node name="SpatialQueryBenchmarks" type="Node"]
 script = ExtResource("1")

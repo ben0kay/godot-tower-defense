@@ -55,7 +55,7 @@ Decorations may cover floor, obstacles or empty space without affecting gameplay
 
 ### Migration and diagnostics
 
-Level001's prior Ground/Walls painting was recorded through Godot before conversion. It had 102 dirt-floor cells, 74 raised-platform cells, no decorations and no overlaps. All 176 effective tiles retain their exact coordinates, source/atlas/alternative IDs and gameplay values. No painted map, Portal/Citadel position, background, marker or level settings was reset. Layer unique IDs and existing resource UIDs are retained; the original category migration is recorded in TESTS/TerrainMigration.md. The subsequent Interactive migration moves Foundation into its own layer with identical rules/art; both scenes now have four palettes.
+Level001's prior Ground/Walls painting was recorded through Godot before conversion. It had 102 dirt-floor cells, 74 raised-platform cells, no decorations and no overlaps. All 176 effective tiles retain their exact coordinates, source/atlas/alternative IDs and gameplay values. No painted map, Portal/Citadel position, background, marker or level settings was reset. Layer unique IDs and existing resource UIDs are retained; the original category migration is recorded in TESTS/Terrain/TerrainMigration.md. The subsequent Interactive migration moves Foundation into its own layer with identical rules/art; both scenes now have four palettes.
 
 WorldLevel exposes Passable, Impassable, Interactive and Decorations. WorldGrid caches Passable then Interactive then Impassable on load/explicit rebuild and never reads cosmetic tiles into gameplay caches. It reports overlapping gameplay cells, category mismatches and missing tiles, and rejects null/wrong-size gameplay TileSets or missing/non-Boolean metadata. Decorations requires the correct tile size but no gameplay metadata. These checks do not scan each frame.
 
@@ -63,7 +63,7 @@ SpawnManager reports missing registered exits, blocked/unreachable Portal SpawnE
 
 ### Verification
 
-TESTS/TerrainCategoryChecks.cs covers category-filtered palettes, all four movement/build combinations, empty space, decals over empty/floor/solid cells, overlap precedence, tower occupancy and Portal/Citadel reservations. Existing F2, random waves, paid placement, combat and navigation fixtures use the new layer API and continue checking blocked routes safely. TESTS/TerrainMigration.md records the map-preservation verification.
+TESTS/Terrain/TerrainCategoryChecks.cs covers category-filtered palettes, all four movement/build combinations, empty space, decals over empty/floor/solid cells, overlap precedence, tower occupancy and Portal/Citadel reservations. Existing F2, random waves, paid placement, combat and navigation fixtures use the new layer API and continue checking blocked routes safely. TESTS/Terrain/TerrainMigration.md records the map-preservation verification.
 
 This was one cleanup pass; no procedural generation, art overhaul, new pathfinding algorithm or economy changes were introduced.
 
@@ -73,4 +73,4 @@ Each level's `LevelConfig` now provides **Destination / Citadel Max Health**. Se
 
 ## Interactive Terrain
 
-Terrain/Interactive now exposes raised Foundation (source0 atlas1,0) and Lava (source1 atlas0,0). The74 saved Level001 platforms migrated without changing art/buildability/blocking; Template exposes the same palette. Lava is passable/nonbuildable and uses World/InteractiveTiles.LavaConfig for immediate entry plus periodic exposure damage. No Lava was arbitrarily painted into the current playable map. Use WorldGrid.RebuildTerrain after runtime edits; hazard-only changes avoid unnecessary navigation rebuilds. See WORLD/TERRAIN/Interactive/README.md and TESTS/InteractiveTerrainMigration.md.
+Terrain/Interactive now exposes raised Foundation (source0 atlas1,0) and Lava (source1 atlas0,0). The74 saved Level001 platforms migrated without changing art/buildability/blocking; Template exposes the same palette. Lava is passable/nonbuildable and uses World/InteractiveTiles.LavaConfig for immediate entry plus periodic exposure damage. No Lava was arbitrarily painted into the current playable map. Use WorldGrid.RebuildTerrain after runtime edits; hazard-only changes avoid unnecessary navigation rebuilds. See WORLD/TERRAIN/Interactive/README.md and TESTS/Terrain/InteractiveTerrainMigration.md.

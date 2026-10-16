@@ -8,4 +8,4 @@ Escape is routed by the CONTROLS/GameInput Autoload: cancel active placement fir
 
 Quit uses MenuNavigation.Open, which unpauses for a scene transition and restores pause on load failure. Errors are shown in a dialog. Exiting the overlay's scene unregisters its bindings and cannot leave the next screen paused. Direct F6 level play needs no profile: quitting goes to Main, whose existing profile guard redirects safely to Boot.
 
-Verification: `TESTS/PauseControlsChecks.tscn`, `TESTS/MenuTowerFlowChecks.tscn`; results and manual desktop checks in `TESTS/PauseControls.md`. No new save format, world serialization or options implementation is included.
+Verification: `TESTS/UI/PauseControlsChecks.tscn`, `TESTS/UI/MenuTowerFlowChecks.tscn`; results and manual desktop checks in `TESTS/UI/PauseControls.md`. No new save format, world serialization or options implementation is included.

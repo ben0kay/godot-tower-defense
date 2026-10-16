@@ -4,9 +4,9 @@ Measured on 2026-10-14 in the execution container using Godot4.7.2 Mono, .NET8.0
 
 ## Commands and outcome
 
-- `Godot --headless --path . TESTS/EnemyIntegrationChecks.tscn`: passed, including catalog/abilities, waves/shields/rewards, tower gameplay/stat/upgrades, SwarmNavigationChecks, RepathMovementChecks and SmoothRepathChecks.
-- `Godot --headless --path . TESTS/CorridorNavigationChecks.tscn`: passed all12 straight/winding ×100/500 ×0/50/100% cases, plus focused correctness.
-- `Godot --headless --path . TESTS/PlacementPerformanceChecks.tscn`: passed. Validation/grid/next-physics maximums were1.64/0.54/1.57ms at100 ships and0.73/0.07/1.47ms at500.
+- `Godot --headless --path . TESTS/Integration/EnemyIntegrationChecks.tscn`: passed, including catalog/abilities, waves/shields/rewards, tower gameplay/stat/upgrades, SwarmNavigationChecks, RepathMovementChecks and SmoothRepathChecks.
+- `Godot --headless --path . TESTS/Navigation/CorridorNavigationChecks.tscn`: passed all12 straight/winding ×100/500 ×0/50/100% cases, plus focused correctness.
+- `Godot --headless --path . TESTS/Performance/PlacementPerformanceChecks.tscn`: passed. Validation/grid/next-physics maximums were1.64/0.54/1.57ms at100 ships and0.73/0.07/1.47ms at500.
 
 Existing authored SVG UID warnings resolve through text paths; no engine errors occurred. Standard editor SDK/MSBuild was unavailable here.
 

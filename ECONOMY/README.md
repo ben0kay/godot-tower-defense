@@ -28,7 +28,7 @@ F5 → Ctrl → Battle → place a valid tower: 200 credits are deducted, the to
 
 ## Verification and future scope
 
-TESTS/EconomyChecks.cs runs inside EnemyIntegrationChecks.tscn, covering distinct level starts/reset, duplicate and multi-resource payments, invalid recipes/overflow, reentry protection, HUD events, actual purchases, instance isolation, double clicks, insufficient funds and pre/post-occupancy rollback. The existing navigation tests also confirm sealing a required route charges nothing.
+TESTS/Economy/EconomyChecks.cs runs inside EnemyIntegrationChecks.tscn, covering distinct level starts/reset, duplicate and multi-resource payments, invalid recipes/overflow, reentry protection, HUD events, actual purchases, instance isolation, double clicks, insufficient funds and pre/post-occupancy rollback. The existing navigation tests also confirm sealing a required route charges nothing.
 
 **Kill rewards are implemented:** `EnemyDefinition.KillRewardCredits` sets the amount per enemy type; `Enemy001.tres` sets **3 Credits**. `EnemyRegistry.EnemyKilled` emits only on a real kill and the session wallet grants credits through `Grant`, which pushes the updated balance to the HUD. F2 and wave kills both qualify; Citadel arrivals do not. Awards obey the wallet's max balance, and repeated hits after death cannot pay twice.
 

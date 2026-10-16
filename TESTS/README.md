@@ -1,11 +1,28 @@
 # Headless gameplay checks
 
+Tests are grouped by system. Scripts, scenes and `.uid` sidecars stay together; gameplay scenes do not launch these runners automatically. This organization pass changes paths only, not assertions or fixture behavior.
+
+| Folder | Contents |
+| --- | --- |
+| [Combat](Combat/README.md) | Damage, shields, AoE, wavefronts and query correctness |
+| [Towers](Towers/README.md) | Tower stats/ranks/upgrades, weapons and passive fixture |
+| [Navigation](Navigation/README.md) | Corridors, repathing, permissions, checkpoints and F3 |
+| [Terrain](Terrain/README.md) | Terrain categories, interactive hazards and migration reports |
+| [UI](UI/README.md) | HUD, menu flow, build tray and Pause/controls |
+| [Economy](Economy/README.md) | Wallet, kill rewards and ammunition foundations |
+| [Integration](Integration/README.md) | Main suite and enemy/level/wave/objective checks |
+| [Performance](Performance/README.md) | Benchmarks and recorded timings |
+| [Shared](Shared/README.md) | Test-only reference implementations |
+
+Only `.tscn` runners are launched directly; most static check classes are called by those suites. For example: `godot --headless --path . res://TESTS/Integration/EnemyIntegrationChecks.tscn`. Existing known failures remain documented below; moving files does not repair or suppress them.
+
+
 **Phase 4D implemented:** AreaDamageChecks and BlasterCannonChecks run in EnemyIntegrationChecks; shared instant AoE and the registered Blaster Cannon are production code. See the completed Phase 4D section below. Phase4E ShockwaveChecks now covers the separate timed wavefront, shared styles and purple Shockwave Tower.
 
 Build C# first, then run the Godot .NET executable:
 
 ```sh
-godot --headless --path . TESTS/EnemyIntegrationChecks.tscn
+godot --headless --path . TESTS/Integration/EnemyIntegrationChecks.tscn
 ```
 
 Checks instantiate production Main/Level001 and test F2/repeat behavior, portal navigation with swept clearance, 100-ship path budget, First/Closest/range, configured bullet damage/cooldown/death, selective revision validation, map-edge permissions, actual placement route rejection, and occupancy removal. Terrain changes are confined to the in-memory test instance and never saved over Level001. Manual physics ticks keep checks deterministic. These are correctness checks, not a performance benchmark.
@@ -19,10 +36,10 @@ The integration scene now invokes RepathMovementChecks: one tower must produce o
 For the dedicated reproducible CPU fixture:
 
 ```sh
-godot --headless --path . TESTS/PlacementPerformanceChecks.tscn
+godot --headless --path . TESTS/Performance/PlacementPerformanceChecks.tscn
 ```
 
-It creates open in-memory terrain, measures five placements with 100 and 500 ships, and reports maximum placement-validation, grid-update and following physics-frame times. It does not save designer terrain or benchmark rendering. See NavigationPerformance.md for recorded before/after values and limitations.
+It creates open in-memory terrain, measures five placements with 100 and 500 ships, and reports maximum placement-validation, grid-update and following physics-frame times. It does not save designer terrain or benchmark rendering. See Performance/NavigationPerformance.md for recorded before/after values and limitations.
 
 SmoothRepathChecks also runs in the integration scene. It deliberately delays replacement processing, checks continued safe-prefix movement and stopping before the wall, verifies a near-wall elbow handoff without center retreat, and tests forward handoffs with offsets from both fresh and old snapshots. Targeting fixtures now use clear test space so the handoff safety checks do not accept synthetic routes originating inside painted walls.
 ## Defense bar regression checks
@@ -49,14 +66,14 @@ WaveChecks runs against Main's WaveManager/SpawnManager. It asserts immediate fi
 `DeathExplosionChecks` runs once in the Main scene integration suite. It tests that a killed Enemy001 creates exactly one shared puff, actual Sprite2D scale changes explosion size, optional per-enemy multiplier overrides the result, and arriving ships or repeated damage never trigger explosions. It checks active-effect cleanup and turns GPU particles off for the mass-kill navigation/wave suites. The test validates spawn/sizing logic; the rendered orange/grey smoke still needs an F5 visual check in Godot .NET.
 
 ## Terrain authoring cleanup
-TerrainCategoryChecks verifies the three filtered palettes, independent movement/build permissions, empty/decorative space, decals over floor/solid cells, overlap fallback and object reservations. Fixtures use WorldLevel.Passable/Impassable. TerrainMigration.md records the exact before/after comparison of all 176 existing authored tiles.
+TerrainCategoryChecks verifies the three filtered palettes, independent movement/build permissions, empty/decorative space, decals over floor/solid cells, overlap fallback and object reservations. Fixtures use WorldLevel.Passable/Impassable. Terrain/TerrainMigration.md records the exact before/after comparison of all 176 existing authored tiles.
 
 ## Tower stat pipeline
 TowerStatChecks verifies all eight stage calls/order, neutral baseline parity, deterministic resolution, safe finite bounds, source/cache independence, numeric Resource change notifications, Config replacement/exit cleanup, unchanged cached values across combat ticks, live zero-rate gating/re-enabling, and selected Inspector updates. Existing aiming, damage/cooldown, payment and range targeting checks continue to exercise the production BattleTower.
 
 ## Citadel durability and per-level settings
 
-`TESTS/CitadelHealthChecks.cs` runs in the existing Main-scene integration suite. It checks the level-specific initial maximum, real Enemy001 arrivals and configured CitadelDamage, instantaneous health HUD/bar updates, duplicate-arrival prevention, killed-enemy exclusion, zero clamping, once-per-destruction event, and reset without modifying any saved level Resource. `HudTowerChecks` now expects a live objective on startup and restores the authoritative display after synthetic status setter tests. Defeat/menu flow is intentionally not part of this pass.
+`TESTS/Integration/CitadelHealthChecks.cs` runs in the existing Main-scene integration suite. It checks the level-specific initial maximum, real Enemy001 arrivals and configured CitadelDamage, instantaneous health HUD/bar updates, duplicate-arrival prevention, killed-enemy exclusion, zero clamping, once-per-destruction event, and reset without modifying any saved level Resource. `HudTowerChecks` now expects a live objective on startup and restores the authoritative display after synthetic status setter tests. Defeat/menu flow is intentionally not part of this pass.
 
 ## Purchased tier regressions
 TowerUpgradeChecks drives actual HUD upgrade actions and validates levels 1→2→3, preview/apply parity, shared/base/other-instance isolation, atomic credit/material prices, insufficient funds, disabled rules, stale and same-frame repeat requests, max tier, invalid row chains, complete Stage02 substitution, unchanged navigation and no repeated compounding. It waits for GUI layout to verify Inspector screen bounds and tray height/independence.
@@ -69,11 +86,11 @@ TowerUpgradeChecks drives actual HUD upgrade actions and validates levels 1→2�
 
 EnemyIntegrationChecks now runs TowerCatalogChecks (validation, mixed paid placement/selection, passive capability absence, config isolation and independent Battle progression) and TowerBuildBarChecks (40 registrations, availability, canonical prices/icons, generated actions, focus, scrolling, empty/rebound catalogs and independent panels). TESTS/Towers/PassiveTestTower is a test-only nonweapon scene, excluded from the default catalog. Existing economy failure-after-occupancy rollback, route sealing, combat, stat/upgrades and 500-ship checks are retained.
 
-Run `Godot --headless --path . TESTS/MenuTowerFlowChecks.tscn` separately to exercise real Boot profile selection → Main → Campaign → Level001 buttons, dynamic Battle entry, construction and paid upgrade. The fixture injects a memory-only ProfileStore list in that standalone process; it does not read or write user profiles. Existing EnemyIntegrationChecks loads Main.tscn directly without a save/profile dependency. Headless tests validate behavior and bounds, not rendered appearance or hardware FPS.
+Run `Godot --headless --path . TESTS/UI/MenuTowerFlowChecks.tscn` separately to exercise real Boot profile selection → Main → Campaign → Level001 buttons, dynamic Battle entry, construction and paid upgrade. The fixture injects a memory-only ProfileStore list in that standalone process; it does not read or write user profiles. Existing EnemyIntegrationChecks loads Main.tscn directly without a save/profile dependency. Headless tests validate behavior and bounds, not rendered appearance or hardware FPS.
 
 ## Enemy shields — optional wave spawn flag
 
-`TESTS/EnemyShieldChecks.cs` runs after `WaveChecks` in `EnemyIntegrationChecks`. It checks the shared `MaxShield` default and Enemy001's authored capacity, exact weighted composition of same-ID entries with distinct shield flags, real WaveManager → SpawnManager flag propagation, full and zero starting shields, shield-first damage, exact shield break, overflow into hull, existing hull DefenseBar updates, unaffected debug/F2 spawning and per-instance independence. Test-created ships are removed and the original level wave set restored without changing authored files. Shield rendering and regeneration are not part of this pass.
+`TESTS/Combat/EnemyShieldChecks.cs` runs after `WaveChecks` in `EnemyIntegrationChecks`. It checks the shared `MaxShield` default and Enemy001's authored capacity, exact weighted composition of same-ID entries with distinct shield flags, real WaveManager → SpawnManager flag propagation, full and zero starting shields, shield-first damage, exact shield break, overflow into hull, existing hull DefenseBar updates, unaffected debug/F2 spawning and per-instance independence. Test-created ships are removed and the original level wave set restored without changing authored files. Shield rendering and regeneration are not part of this pass.
 
 
 DamageTypeChecks covers typed coefficients, exact shield break,20/30/4.25 base spillover, zero absorption blocking, invalid payloads/profiles, overflow safety, isolated enemy state, legacy behavior and idempotent kill/arrival rewards. The independent 4C-1 checkpoint runs before Laser implementation.
@@ -92,7 +109,7 @@ PortalSpawnChecks now verifies independent0.5/3 portal sizes, visual scale/cente
 
 ## Phase N4 navigation regression
 
-`CorridorAssignmentChecks` runs inside EnemyIntegrationChecks: deterministic percentage boundaries/distribution, config clamping and unchanged seeded wave composition. Run `Godot --headless --path . TESTS/CorridorNavigationChecks.tscn` separately for stable forced-repath preferences, exact disabled/unselected waypoint parity with zero sampling, upper/lower/center spread in three-cell corridors, narrow/open/radius clearance, endpoint/detour/physical-distance checks, swept-corner regression and safe progress through dynamic tower blocks. Its runtime terrain/config copies never modify authored resources.
+`CorridorAssignmentChecks` runs inside EnemyIntegrationChecks: deterministic percentage boundaries/distribution, config clamping and unchanged seeded wave composition. Run `Godot --headless --path . TESTS/Navigation/CorridorNavigationChecks.tscn` separately for stable forced-repath preferences, exact disabled/unselected waypoint parity with zero sampling, upper/lower/center spread in three-cell corridors, narrow/open/radius clearance, endpoint/detour/physical-distance checks, swept-corner regression and safe progress through dynamic tower blocks. Its runtime terrain/config copies never modify authored resources.
 
 The fixture exercises straight and winding corridors at 100/500 ships and 0/50/100% selection, records assignment and movement CPU timings, enforces the existing request-count budget, checks no unnecessary A* during unchanged movement, and waits for blocked-route repaths to settle safely. Existing EnemyIntegrationChecks (including SwarmNavigationChecks, RepathMovementChecks and SmoothRepathChecks) and standalone PlacementPerformanceChecks remain required. Results, commands and manual playtest limitations are recorded in CorridorPerformance.md.
 
@@ -115,9 +132,9 @@ The default Battle config had lost its Level2/Level3 references before this pass
 ### Actual validation
 
 - C# compilation: passed using Roslyn 4.11 with .NET 8 reference assemblies, Godot 4.7.2 API and Godot source generators; no compiler errors or warnings. The ordinary `dotnet build --no-restore` command could not initialize because this environment's SDK is missing a compatible `NuGet.Protocol` dependency; that standard build route is not claimed as passing.
-- Godot 4.7.2 headless `TESTS/EnemyIntegrationChecks.tscn`: passed, including all new combat fixtures and existing stats, paid upgrades, HUD, economy, waves, shield emitter, feedback, navigation and 500-ship fixtures.
-- Godot headless `TESTS/MenuTowerFlowChecks.tscn`: passed actual Boot → Main → Campaign → Level001 button flow plus paid Battle construction/upgrade using a memory-only profile.
-- Godot headless `TESTS/CorridorNavigationChecks.tscn`: passed enabled N4 straight/winding geometry, dynamic tower repathing and 100/500-ship 0/50/100% benchmarks.
+- Godot 4.7.2 headless `TESTS/Integration/EnemyIntegrationChecks.tscn`: passed, including all new combat fixtures and existing stats, paid upgrades, HUD, economy, waves, shield emitter, feedback, navigation and 500-ship fixtures.
+- Godot headless `TESTS/UI/MenuTowerFlowChecks.tscn`: passed actual Boot → Main → Campaign → Level001 button flow plus paid Battle construction/upgrade using a memory-only profile.
+- Godot headless `TESTS/Navigation/CorridorNavigationChecks.tscn`: passed enabled N4 straight/winding geometry, dynamic tower repathing and 100/500-ship 0/50/100% benchmarks.
 - Direct headless `Main.tscn` startup: passed. `git diff --check`: passed.
 
 These checks do not assert rendered beam appearance or hardware-independent FPS. Permanent research/stage 04, saving, armour and future tower mechanics remain deferred.
@@ -133,10 +150,10 @@ One isolated blast also hits 500 living recipients without creating any scene no
 ### Actual Phase 4D validation
 
 - C# compilation passed with Roslyn 4.11, .NET 8 reference assemblies, Godot 4.7.2 API and Godot source generators, with no compiler errors/warnings.
-- `TESTS/EnemyIntegrationChecks.tscn` passed: new shared-area/Blaster checks plus existing Battle 5% penetration, Laser 12-DPS/6.00x/0.15x behavior, paid upgrades, UI/HUD, shield emitter, waves, economy, feedback, terrain/navigation and 500-enemy fixtures.
-- `TESTS/MenuTowerFlowChecks.tscn` passed Boot → Main → Campaign → Level001, Blaster catalog availability and existing paid Battle construction/upgrade using a memory-only profile.
-- `TESTS/CorridorNavigationChecks.tscn` passed enabled N4 geometry, dynamic repathing and 100/500-ship 0/50/100% variation benchmarks.
-- `TESTS/PlacementPerformanceChecks.tscn` passed its 100/500-ship placement fixtures.
+- `TESTS/Integration/EnemyIntegrationChecks.tscn` passed: new shared-area/Blaster checks plus existing Battle 5% penetration, Laser 12-DPS/6.00x/0.15x behavior, paid upgrades, UI/HUD, shield emitter, waves, economy, feedback, terrain/navigation and 500-enemy fixtures.
+- `TESTS/UI/MenuTowerFlowChecks.tscn` passed Boot → Main → Campaign → Level001, Blaster catalog availability and existing paid Battle construction/upgrade using a memory-only profile.
+- `TESTS/Navigation/CorridorNavigationChecks.tscn` passed enabled N4 geometry, dynamic repathing and 100/500-ship 0/50/100% variation benchmarks.
+- `TESTS/Performance/PlacementPerformanceChecks.tscn` passed its 100/500-ship placement fixtures.
 - Direct headless Main.tscn startup and `git diff --check` passed.
 
 The ordinary `dotnet build --no-restore` route remains blocked before compilation by the environment's missing compatible NuGet.Protocol dependency; the successful compile above uses the actual Godot source generators directly and its resulting assembly was run by Godot. Live-window visual review of the new vector cannon/projectile/flash is outstanding; headless checks establish combat/timing and visual independence, not artistic quality.
@@ -175,7 +192,7 @@ Validation: direct Roslyn compilation against .NET8/GodotSharp with Godot source
 
 SpatialQueryChecks now runs in EnemyIntegrationChecks: 0/1/500/1,000-enemy exact circle parity, inclusive/zero/negative/extreme geometry, invalid parameter policy, movement/duplicate registration/removal, isolated-world teardown, First/Closest ties and invalid routes. Sparse blast damage matches brute-force defense/falloff outputs, including nested impacts and movement after recipient snapshot. Test-only BruteForceShockwave retains the original emitter for 30/60/120Hz comparisons with teleports, late spawns, multiple writes, slow overlapping cursors and terminal overshoot. Existing weapon/XP/placement/menu/navigation checks remain enabled.
 
-Run `godot --headless --path . TESTS/SpatialQueryBenchmarks.tscn` for the paired 500/1,000-enemy × 50/100/200-acquisition sparse/dense combat-query benchmark; see [full results](SpatialQueryBenchmarks.md). It reports movement maintenance, targeting, eight impacts, eight independent waves, average/p95/max, examined candidates and managed bytes. This is a forced acquisition-burst fixture with zero damage amounts to isolate delivery, not a rendered gameplay FPS measurement.
+Run `godot --headless --path . TESTS/Performance/SpatialQueryBenchmarks.tscn` for the paired 500/1,000-enemy × 50/100/200-acquisition sparse/dense combat-query benchmark; see [full results](Performance/SpatialQueryBenchmarks.md). It reports movement maintenance, targeting, eight impacts, eight independent waves, average/p95/max, examined candidates and managed bytes. This is a forced acquisition-burst fixture with zero damage amounts to isolate delivery, not a rendered gameplay FPS measurement.
 
 ## Enemy004 medium ship
 
@@ -183,7 +200,7 @@ Run `godot --headless --path . TESTS/SpatialQueryBenchmarks.tscn` for the paired
 
 ## Interactive Terrain — Foundation/Lava (2026-10-15)
 
-InteractiveTerrainChecks runs in EnemyIntegrationChecks against real scenes, palettes, WorldGrid, EnemyMovement, LavaTileConfig, registry/spatial index and typed combat. Both Level001/Template expose64px Foundation/Lava art. The migration record in InteractiveTerrainMigration.md verifies all176 effective saved cells unchanged, with74 Foundation cells moved verbatim before removing the old Impassable palette entry.
+InteractiveTerrainChecks runs in EnemyIntegrationChecks against real scenes, palettes, WorldGrid, EnemyMovement, LavaTileConfig, registry/spatial index and typed combat. Both Level001/Template expose64px Foundation/Lava art. The migration record in Terrain/InteractiveTerrainMigration.md verifies all176 effective saved cells unchanged, with74 Foundation cells moved verbatim before removing the old Impassable palette entry.
 
 Coverage includes buildable/solid Foundation and occupancy; passable/nonbuildable Lava over floor; structural/reservation precedence; hazard-only edits avoiding navigation revision; stationary AND moving exposure30/60/120Hz; entry/disabled-entry/periodic/exit/re-entry; contiguous/gapped/fast/diagonal/corner/edge/tiny-segment sweeps; partial-frame timing; direct teleport versus fresh initialized stationary spawn; live repaint/config edits; multiple owed ticks and zero-amount huge deltas; Energy shields/break spillover/hull; environmental kill Credits/no tower XP with a real tower witness; immediate death/arrival/free/manual unregister cleanup; lethal actual movement; successful-but-dead spawn wave completion; independent-world unload and removal during a Lava-kill callback. A500-occupant/2000-hit burst asserts exact damage without per-tile nodes. This is a correctness/stress timing, not a rendered FPS claim.
 
@@ -203,19 +220,25 @@ Resumed verification after rebasing onto3c1c759: direct C# compilation and Enemy
 
 ## Route preview
 
-Run `RoutePreviewChecks.tscn` for the F3 debug controls, ALL portals, 1–50 paths per portal, private diversity settings up to 16 weighted profiles, and bounded deterministic planning on both campaign levels, including 500-ship isolation. See `RoutePreview.md` for usage, timings and the independently reproduced upstream Level002 map-test failure.
+Run `RoutePreviewChecks.tscn` for the F3 debug controls, ALL portals, 1–50 paths per portal, private diversity settings up to 16 weighted profiles, and bounded deterministic planning on both campaign levels, including 500-ship isolation. See `Navigation/RoutePreview.md` for usage, timings and the independently reproduced upstream Level002 map-test failure.
 
 ## Required portal checkpoints
 
-Run `CheckpointChecks.tscn` for freely placed required regions, portal attribution, all permission combinations, swept entry at30/60/120Hz, blocked retry, staged F3 plans, thin/wide passages and500-enemy bounded scheduling. See `Checkpoints.md` for outcomes and known upstream integration limitations.
+Run `CheckpointChecks.tscn` for freely placed required regions, portal attribution, all permission combinations, swept entry at30/60/120Hz, blocked retry, staged F3 plans, thin/wide passages and500-enemy bounded scheduling. See `Navigation/Checkpoints.md` for outcomes and known upstream integration limitations.
 
 ## Ammunition foundation (added, not yet run)
 
-`TESTS/AmmoFoundationChecks.cs` has been added to `EnemyIntegrationChecks.cs`. The tests cover finite inventory, all-or-nothing transfers, production batches/buffer pause and resume, depot stock and the global 10% trigger. They do **not** test live towers, scenes or drones, which Codex must implement next. The foundation authoring environment lacked Godot/.NET and could not execute the suite; Codex should run `dotnet build` and the headless integration test after pulling these files. See [WORK.md](../NOTES/WORK.md).
+`TESTS/Economy/AmmoFoundationChecks.cs` has been added to `EnemyIntegrationChecks.cs`. The tests cover finite inventory, all-or-nothing transfers, production batches/buffer pause and resume, depot stock and the global 10% trigger. They do **not** test live towers, scenes or drones, which Codex must implement next. The foundation authoring environment lacked Godot/.NET and could not execute the suite; Codex should run `dotnet build` and the headless integration test after pulling these files. See [WORK.md](../NOTES/WORK.md).
 ## Chained checkpoints and design diagram
 
-Completed: ordered and uniformly branching checkpoint graphs, full-chain F3 previews, and a shared above-tile editor circle/connection overlay. See [CheckpointChains.md](CheckpointChains.md) for authoring behavior, regression coverage, actual results and existing environment/map limitations.
+Completed: ordered and uniformly branching checkpoint graphs, full-chain F3 previews, and a shared above-tile editor circle/connection overlay. See [Navigation/CheckpointChains.md](Navigation/CheckpointChains.md) for authoring behavior, regression coverage, actual results and existing environment/map limitations.
 
 ## Shared controls and Pause
 
-`PauseControlsChecks.tscn` exercises actual keyboard propagation across Boot/Main/Campaign and both levels: placement-first Escape, pause/resume, Ctrl blocking, modal priority, frozen timers, F11 routing/restoration rules, disabled placeholders and scene-binding cleanup. `MenuTowerFlowChecks` now routes Ctrl through GameInput. See [PauseControls.md](PauseControls.md) for actual results and headless/SDK/full-integration limitations.
+`PauseControlsChecks.tscn` exercises actual keyboard propagation across Boot/Main/Campaign and both levels: placement-first Escape, pause/resume, Ctrl blocking, modal priority, frozen timers, F11 routing/restoration rules, disabled placeholders and scene-binding cleanup. `MenuTowerFlowChecks` now routes Ctrl through GameInput. See [UI/PauseControls.md](UI/PauseControls.md) for actual results and headless/SDK/full-integration limitations.
+
+## Folder cleanup verification — 2026-10-16
+
+Moved 100 root-level test scripts/scenes/UID sidecars/reports into the system folders above. Existing fixture paths remain under Towers. All moved C# files were compared against their originals: only literal file-path replacements changed; assertions and fixture logic are unchanged. UID contents are identical. Relocated scene dependencies resolve and no old test-file paths remain in repository text files.
+
+Direct Roslyn compilation passed. From their new paths, PauseControlsChecks, MenuTowerFlowChecks, RoutePreviewChecks, CheckpointChecks, CorridorNavigationChecks, PlacementPerformanceChecks and SpatialQueryBenchmarks exited0. The unmodified integration runner launches from Integration but still exits1 at the existing Level002 painted-tile-count assertion; this cleanup neither changes nor suppresses it. The standard SDK build limitation documented in UI/PauseControls.md remains; no test script splitting or gameplay C# changes were made.

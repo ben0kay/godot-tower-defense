@@ -107,7 +107,7 @@ These are planning priorities, **not** permission to implement everything in one
 
 ## Architecture, performance and future-proofing
 
-Shared spatial targeting and area queries are implemented behind the world EnemyRegistry. Battle/Laser/Blaster acquisition uses nearby circular candidates; Blaster impacts use the same service, and timed Shockwaves query motion-aware swept bounds while retaining their original crossing solver. See `Offensive/Shared/README.md` for the completed optimization and `../TESTS/SpatialQueryBenchmarks.md` for measured sparse/dense gains, maintenance overhead and limitations.
+Shared spatial targeting and area queries are implemented behind the world EnemyRegistry. Battle/Laser/Blaster acquisition uses nearby circular candidates; Blaster impacts use the same service, and timed Shockwaves query motion-aware swept bounds while retaining their original crossing solver. See `Offensive/Shared/README.md` for the completed optimization and `../TESTS/Performance/SpatialQueryBenchmarks.md` for measured sparse/dense gains, maintenance overhead and limitations.
 
 - Optional capabilities: a Solar Tower may produce electricity, a Repair Tower may restore HP, a Laser may have no magazine, and a passive economic structure may have no weapon at all. Do not put mandatory attack/ammo/physics loops in `TowerBase`.
 - Keep one authoritative economy and one placement/navigation owner. Construction time must not bypass payment rollback or path validation.
