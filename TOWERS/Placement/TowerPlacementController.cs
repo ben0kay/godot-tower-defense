@@ -23,6 +23,7 @@ public partial class TowerPlacementController : Node2D
     private GameplayHUD _hud;
     private SpawnManager _spawns;
     private Node2D _towers;
+    private ConstructionWorkManager _construction;
     private Sprite2D _ghost;
     private readonly Dictionary<Vector2I, TowerBase> _placedTowers = new();
     private Vector2I _hoverCell = new(int.MinValue, int.MinValue);
@@ -53,6 +54,7 @@ public partial class TowerPlacementController : Node2D
         _grid = GetNode<WorldGrid>("../World/Grid");
         _spawns = GetNode<SpawnManager>("../World/EnemySystems/Spawning");
         _towers = GetNode<Node2D>("../World/Towers");
+        _construction = GetNode<ConstructionWorkManager>("../World/ConstructionWork");
         _hud = GetNode<GameplayHUD>("../UI/GameplayHUD");
         Catalog.Rebuild();
         _hud.BindCatalog(Catalog);
@@ -87,7 +89,7 @@ public partial class TowerPlacementController : Node2D
         if (GodotObject.IsInstanceValid(_economy)) _economy.BalanceChanged -= OnBalanceChanged;
         if (GodotObject.IsInstanceValid(_buildDefinition?.DefaultConfig)) _buildDefinition.DefaultConfig.Changed -= OnPreviewConfigChanged;
         if (GodotObject.IsInstanceValid(_selected))
-        { _selected.StatsChanged -= OnSelectedStatsChanged; _selected.ExperienceChanged -= OnSelectedExperienceChanged; _selected.RuntimeChanged -= OnSelectedRuntimeChanged; }
+        { _selected.StatsChanged -= OnSelectedStatsChanged; _selected.ExperienceChanged -= OnSelectedExperienceChanged; _selected.RuntimeChanged -= OnSelectedRuntimeChanged; _selected.WorkCompleted -= OnSelectedWorkCompleted; }
     }
     #endregion
 
@@ -238,12 +240,16 @@ public partial class TowerPlacementController : Node2D
             if (_buildDefinition.Scene == null) return false;
             Node instance = _buildDefinition.Scene.Instantiate();
             if (instance is not TowerBase created) { instance.Free(); return false; }
+            tower = created; // Track ownership before any preflight can throw.
             if (!created.AcceptsConfig(_buildDefinition.DefaultConfig) || !created.ValidateScene())
-            { created.Free(); return false; }
-            tower = created;
+            { created.Free(); tower = null; return false; }
             tower.InitializeDefinition(_buildDefinition, Settings);
+            TowerUpgradeController.Validate(tower.Levels); TowerConfig.ValidateWorkSeconds(tower.AuthoredConfig.BuildSeconds);
+            if (tower.Levels.Count > 0) tower.ResolveLevel(1); // Fail invalid inputs before occupancy/Ready/payment.
             if (!_grid.TryOccupy(cell, _buildDefinition.Footprint)) { tower.Free(); tower = null; return false; }
             occupied = true;
+            tower.StartConstruction(_construction);
+            tower.Position = _towers.ToLocal(_grid.FootprintCenter(cell, _buildDefinition.Footprint));
             _towers.AddChild(tower);
             tower.SetPlacement(cell, _grid.FootprintCenter(cell, _buildDefinition.Footprint));
             if (tower.GetParent() != _towers) throw new InvalidOperationException("Tower did not enter the world.");
@@ -257,6 +263,7 @@ public partial class TowerPlacementController : Node2D
         }
         catch (Exception exception)
         {
+            if (GodotObject.IsInstanceValid(tower)) tower.CancelConstruction();
             if (tower != null) RemovePlacement(tower, cell, _buildDefinition.Footprint);
             if (GodotObject.IsInstanceValid(tower)) tower.Free();
             if (occupied) _grid.ReleaseOccupancy(cell, _buildDefinition.Footprint);
@@ -297,17 +304,17 @@ public partial class TowerPlacementController : Node2D
     {
         if (_selected == tower && (tower == null || _hud.IsInspectionVisible)) return;
         if (GodotObject.IsInstanceValid(_selected))
-        { _selected.StatsChanged -= OnSelectedStatsChanged; _selected.ExperienceChanged -= OnSelectedExperienceChanged; _selected.RuntimeChanged -= OnSelectedRuntimeChanged; _selected.SetSelected(false); }
+        { _selected.StatsChanged -= OnSelectedStatsChanged; _selected.ExperienceChanged -= OnSelectedExperienceChanged; _selected.RuntimeChanged -= OnSelectedRuntimeChanged; _selected.WorkCompleted -= OnSelectedWorkCompleted; _selected.SetSelected(false); }
         _selected = tower;
         if (GodotObject.IsInstanceValid(_selected))
         {
             _selected.StatsChanged += OnSelectedStatsChanged;
-            _selected.ExperienceChanged += OnSelectedExperienceChanged; _selected.RuntimeChanged += OnSelectedRuntimeChanged;
+            _selected.ExperienceChanged += OnSelectedExperienceChanged; _selected.RuntimeChanged += OnSelectedRuntimeChanged; _selected.WorkCompleted += OnSelectedWorkCompleted;
             _selected.SetSelected(true);
             _hud.ShowTowerDetails(_selected.AuthoredConfig.DisplayName, (_selected.Definition?.Category.ToString() ?? "Tower") + " / Placed",
                 DescribeTower($"Grid cell: {_selected.GridCell.X}, {_selected.GridCell.Y}"),
                 _selected.AuthoredConfig.Description + "\nConstruction paid.");
-            _hud.SetRankDetails(_selected); _hud.SetRuntimeDetails(_selected.DescribeRuntime());
+            _hud.SetRankDetails(_selected); _hud.SetRuntimeDetails(_selected.DescribeRuntimeWithWork());
         }
         RefreshUpgradePreview();
         QueueRedraw();
@@ -321,8 +328,16 @@ public partial class TowerPlacementController : Node2D
         if (_hud.IsInspectionVisible) _hud.ShowTowerDetails(_selected.AuthoredConfig.DisplayName, (_selected.Definition?.Category.ToString() ?? "Tower") + " / Placed",
             DescribeTower($"Grid cell: {_selected.GridCell.X}, {_selected.GridCell.Y}"),
             _selected.AuthoredConfig.Description + "\nConstruction paid.");
-        if (_hud.IsInspectionVisible) { _hud.SetRankDetails(_selected); _hud.SetRuntimeDetails(_selected.DescribeRuntime()); RefreshUpgradePreview(); }
+        if (_hud.IsInspectionVisible) { _hud.SetRankDetails(_selected); _hud.SetRuntimeDetails(_selected.DescribeRuntimeWithWork()); RefreshUpgradePreview(); }
         QueueRedraw();
+    }
+
+    // =========================================================
+    // Initial construction changes only runtime status and purchase availability, never full combat stats.
+    private void OnSelectedWorkCompleted()
+    {
+        OnSelectedRuntimeChanged();
+        if (_hud.IsInspectionVisible) RefreshUpgradePreview();
     }
 
     // =========================================================
@@ -334,7 +349,7 @@ public partial class TowerPlacementController : Node2D
         _runtimeRefreshQueued = true; Callable.From(() =>
         {
             _runtimeRefreshQueued = false;
-            if (GodotObject.IsInstanceValid(_selected) && _hud.IsInspectionVisible) _hud.SetRuntimeDetails(_selected.DescribeRuntime());
+            if (GodotObject.IsInstanceValid(_selected) && _hud.IsInspectionVisible) _hud.SetRuntimeDetails(_selected.DescribeRuntimeWithWork());
         }).CallDeferred();
     }
 
@@ -383,9 +398,10 @@ public partial class TowerPlacementController : Node2D
             changes += _selected.AuthoredConfig.DescribeChanges(now, future);
             if (now?.Ammunition != future?.Ammunition && future?.Ammunition is AmmunitionStats ammo)
                 changes += ammo.ChangesFrom(now?.Ammunition);
-            bool enabled = Settings.AllowUpgrades && _economy.CanAfford(next.Costs);
+            bool enabled = !_selected.IsBusy && Settings.AllowUpgrades && _economy.CanAfford(next.Costs);
             changes += "Price: " + TowerPresentation.DescribeResourceCosts(next.Costs);
-            if (!Settings.AllowUpgrades) changes += "\nUpgrades disabled.";
+            if (_selected.IsBusy) changes += "\nAvailable after construction.";
+            else if (!Settings.AllowUpgrades) changes += "\nUpgrades disabled.";
             else if (!enabled) changes += "\nInsufficient resources.";
             _hud.SetUpgradeDetails(changes, $"UPGRADE TO LEVEL {next.Level}", enabled);
         }

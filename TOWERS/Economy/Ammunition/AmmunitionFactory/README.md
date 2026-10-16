@@ -11,3 +11,7 @@ Select the factory to see current/max buffered stock, producing/full status and 
 ## Physical footprint — implemented
 
 **3×2 cells (6 tiles)**, top-left clicked anchor, one root/artwork centered across the rectangle. Every occupied tile selects the same building. All cells must be buildable, free/unreserved and share the same PASSABLE or IMPASSABLE category. Mixed terrain rejects atomically; all-solid foundations cause no navigation work; passable foundations use one combined route check and incremental batched occupancy. Removal/rollback frees the whole claim only. Catalog icons remain 64px; scene artwork fits the larger footprint. Drone origins/returns use the centered root. Ammunition balance is unchanged. See [the completed footprint pass](../../../Placement/MULTI_CELL_FOOTPRINT_PASS.md) and [tests](../../../../TESTS/Towers/Footprints.md).
+
+## Initial construction (C1/C2)
+
+Paid placement takes **8 seconds**, editable as `ConstructionSeconds` in the existing default config resource. The entire footprint is occupied/selectable immediately. No production, dispatch, destination reservations or deliveries occur through an unfinished building; completion registers it with existing logistics exactly once. Factory100/2s and1000-round shipments, Depot10000 capacity and drone rules are unchanged. Direct scene fixtures remain operational. Stage art, particles and full progress UI remain C3/C4 work; see `TOWERS/Shared/Construction/README.md`.

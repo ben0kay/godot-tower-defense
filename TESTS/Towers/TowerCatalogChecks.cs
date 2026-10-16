@@ -41,7 +41,7 @@ public static class TowerCatalogChecks
         wallet.Initialize(new LevelConfig { StartingCredits = 1000 });
         hud.GetBuildButton(passive.TowerId).EmitSignal(Button.SignalName.Pressed);
         Vector2I first = Cell(grid, spawns);
-        placement.Call("TryPlace", first);
+        placement.Call("TryPlace", first); ConstructionTestClock.FinishInitial(main);
         TowerBase p = towers.GetChild<TowerBase>(towers.GetChildCount() - 1);
         Require(p is PassiveTestTower && p.TowerTypeId == passive.TowerId && p.GridCell == first && p.Footprint == Vector2I.One,
             "Generic placement uses registered scene/type/anchor");
@@ -51,11 +51,11 @@ public static class TowerCatalogChecks
             p.AuthoredConfig.ConstructionCosts[0] != passive.DefaultConfig.ConstructionCosts[0], "Passive recipe paid with private config/cost data");
         Require(hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerName").Text == "Passive fixture" &&
             !hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/UpgradeButton").Visible, "Actual passive selection has safe no-upgrades Inspector");
-        placement.Call("TryPlace", first);
+        placement.Call("TryPlace", first); ConstructionTestClock.FinishInitial(main);
         Require(wallet.GetBalance(wallet.CreditsResource) == 925, "Repeat passive placement never charges");
         hud.EmitSignal(GameplayHUD.SignalName.TowerChoiceRequested, "battle");
         Vector2I second = Cell(grid, spawns);
-        placement.Call("TryPlace", second);
+        placement.Call("TryPlace", second); ConstructionTestClock.FinishInitial(main);
         BattleTower b = towers.GetChild<BattleTower>(towers.GetChildCount() - 1); b.SetPhysicsProcess(false);
         Require(wallet.GetBalance(wallet.CreditsResource) == 725 && b.FinalStats.DamagePerShot == 30, "Battle still pays 200 and resolves baseline");
         Require(TowerUpgradeController.TryUpgrade(b, wallet, placement.Settings, 1, out _) &&
@@ -67,7 +67,7 @@ public static class TowerCatalogChecks
         passive.Available = false;
         hud.EmitSignal(GameplayHUD.SignalName.TowerChoiceRequested, passive.TowerId);
         Vector2I unused = Cell(grid, spawns);
-        placement.Call("TryPlace", unused);
+        placement.Call("TryPlace", unused); ConstructionTestClock.FinishInitial(main);
         // Unavailable choice cancels build mode; direct placement must also reject the unavailable type.
         Require(wallet.GetBalance(wallet.CreditsResource) == 575 && !grid.IsOccupied(unused), "Unavailable registration cannot be built");
         passive.Available = true;

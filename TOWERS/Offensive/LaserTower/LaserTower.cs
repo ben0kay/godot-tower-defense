@@ -70,12 +70,13 @@ public partial class LaserTower : TowerBase
         _registry = GetNodeOrNull<EnemyRegistry>("../../EnemySystems/Registry");
         _ready = true; if (Config != null) Config.Changed += RebuildStats; RebuildStats();
         _searchTimer = (GetInstanceId() % 97) / 97f * (FinalStats?.TargetSearchInterval ?? 0.15f);
-        SetProcess(false); SetPhysicsProcess(_registry != null);
+        SetProcess(false); SetOperationalPhysicsProcess(_registry != null);
     }
     // =========================================================
     // Periodically choose First/Closest; aligned valid lock deals float base DPS times physics delta.
     public override void _PhysicsProcess(double delta)
     {
+        if (!IsOperational) return;
         if (!Enabled || FinalStats == null || _registry == null || !double.IsFinite(delta) || delta <= 0)
         { ClearBeam(); return; }
         _searchTimer -= (float)delta;
@@ -121,6 +122,7 @@ public partial class LaserTower : TowerBase
     // Scene unload removes all subscriptions and stale presentation state.
     public override void _ExitTree()
     {
+        base._ExitTree();
         SetTarget(null);
         if (GodotObject.IsInstanceValid(_config)) _config.Changed -= RebuildStats;
         _ready = false;

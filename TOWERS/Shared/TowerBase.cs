@@ -79,7 +79,7 @@ public abstract partial class TowerBase : Node2D
         if (Ammunition != null) { Ammunition.Synchronize(stats); return; }
         Ammunition = new TowerAmmunition(stats, AuthoredConfig.InitialAmmoFraction);
         Ammunition.Changed += NotifyRuntimeChanged;
-        GetNodeOrNull<AmmunitionLogistics>("../../AmmunitionLogistics")?.RegisterConsumer(this);
+        if (IsOperational) GetNodeOrNull<AmmunitionLogistics>("../../AmmunitionLogistics")?.RegisterConsumer(this);
     }
 
     // =========================================================
@@ -100,8 +100,87 @@ public abstract partial class TowerBase : Node2D
     // Commit pre-resolved data silently so observers see a fully paid upgrade, never partial state.
     internal bool CommitUpgrade(int expectedLevel, TowerFinalStats final)
     {
-        if (!IsInsideTree() || UpgradeLevel != expectedLevel || final == null) return false;
+        if (!IsInsideTree() || IsBusy || UpgradeLevel != expectedLevel || final == null) return false;
         UpgradeLevel++; FinalStats = final;
         return true;
     }
+
+    #region Construction
+    public TowerWorkPhase WorkPhase { get; private set; } = TowerWorkPhase.Operational;
+    public double ElapsedWorkSeconds { get; private set; }
+    public double WorkSeconds { get; private set; }
+    public double RemainingWorkSeconds => System.Math.Max(0, WorkSeconds - ElapsedWorkSeconds);
+    public double WorkProgress => WorkSeconds <= 0 ? 1 : System.Math.Clamp(ElapsedWorkSeconds / WorkSeconds, 0, 1);
+    public bool IsOperational => WorkPhase != TowerWorkPhase.Constructing;
+    public bool IsBusy => WorkPhase != TowerWorkPhase.Operational;
+    public event Action WorkStarted;
+    public event Action WorkProgressChanged;
+    public event Action WorkCompleted;
+    private ConstructionWorkManager _construction;
+    private bool _operationalPhysics;
+    private double _lastWorkNotice;
+    public TowerWorkState CaptureWorkState() => new(WorkPhase, ElapsedWorkSeconds, WorkSeconds, 0);
+
+    // =========================================================
+    // Paid placement calls this before AddChild/Ready; direct scene instances remain operational by default.
+    internal void StartConstruction(ConstructionWorkManager manager)
+    {
+        if (IsInsideTree() || IsBusy) throw new InvalidOperationException("Construction must start before placement.");
+        double seconds = AuthoredConfig.BuildSeconds;
+        TowerConfig.ValidateWorkSeconds(seconds);
+        if (seconds > 0 && (!GodotObject.IsInstanceValid(manager) || !manager.IsInsideTree() || manager.IsQueuedForDeletion()))
+            throw new InvalidOperationException("Construction requires a live world manager.");
+        WorkSeconds = seconds; ElapsedWorkSeconds = 0; _lastWorkNotice = 0;
+        if (seconds == 0) return; // Zero-duration compatibility has no inactive tick or job.
+        WorkPhase = TowerWorkPhase.Constructing; _construction = manager;
+        manager.Register(this); WorkStarted?.Invoke();
+    }
+
+    // =========================================================
+    // Ready records normal capability processing once; unfinished structures have no weapon/production ticks.
+    protected void SetOperationalPhysicsProcess(bool enabled)
+    { _operationalPhysics = enabled; SetPhysicsProcess(enabled && IsOperational); }
+
+    // =========================================================
+    // Exact boundary tolerance prevents an extra physics frame after sums such as120 increments of1/60.
+    internal void AdvanceConstruction(ConstructionWorkManager manager, double delta)
+    {
+        if (_construction != manager || WorkPhase != TowerWorkPhase.Constructing) return;
+        double remaining = RemainingWorkSeconds;
+        if (delta >= remaining || remaining - delta <= 1e-9)
+        {
+            ElapsedWorkSeconds = WorkSeconds; WorkPhase = TowerWorkPhase.Operational;
+            _construction = null; manager.Unregister(this);
+            SetPhysicsProcess(_operationalPhysics); OnBecameOperational();
+            // State and capabilities are coherent before subscribers run; a callback may free this building.
+            WorkCompleted?.Invoke();
+            return;
+        }
+        ElapsedWorkSeconds += delta;
+        if (ElapsedWorkSeconds - _lastWorkNotice >= .1 - 1e-9)
+        { _lastWorkNotice = ElapsedWorkSeconds; WorkProgressChanged?.Invoke(); }
+    }
+
+    // =========================================================
+    // Activation publishes existing ammunition stock without refilling, stat rebuild or navigation mutation.
+    protected virtual void OnBecameOperational()
+    {
+        if (Ammunition != null) GetNodeOrNull<AmmunitionLogistics>("../../AmmunitionLogistics")?.RegisterConsumer(this);
+    }
+
+    // =========================================================
+    // Minimal C2 status reuses the runtime label; C3 will add selected progress and timed paid upgrades.
+    public string DescribeRuntimeWithWork() => (IsOperational ? "" : $"CONSTRUCTING ({WorkSeconds:0.##}s build)\n") + DescribeRuntime();
+
+    // =========================================================
+    // Manager shutdown/rollback stops the clock without turning an unfinished site into a working building.
+    internal void DetachConstruction(ConstructionWorkManager manager)
+    { if (_construction == manager) _construction = null; }
+    internal void CancelConstruction()
+    {
+        ConstructionWorkManager manager = _construction; _construction = null;
+        if (GodotObject.IsInstanceValid(manager)) manager.Unregister(this);
+    }
+    public override void _ExitTree() => CancelConstruction();
+    #endregion
 }

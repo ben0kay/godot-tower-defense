@@ -36,7 +36,7 @@ public partial class AmmunitionLogistics : Node2D
     }
     public int BusySlots(AmmoBuilding source) => _busy.GetValueOrDefault(source);
     public int ReservedSpace(TowerBase destination) => _reserved.GetValueOrDefault(destination);
-    private static bool Live(Node node) => GodotObject.IsInstanceValid(node) && node.IsInsideTree() && !node.IsQueuedForDeletion();
+    private static bool Live(TowerBase node) => GodotObject.IsInstanceValid(node) && node.IsInsideTree() && !node.IsQueuedForDeletion() && node.IsOperational;
     private static AmmoInventory Inventory(TowerBase owner) => owner is AmmoBuilding building ? building.Inventory : owner.Ammunition?.Inventory;
 
     // =========================================================
@@ -49,13 +49,14 @@ public partial class AmmunitionLogistics : Node2D
     }
     public void RegisterBuilding(AmmoBuilding building)
     {
+        if (_shutdown || !Live(building)) return;
         Watch(building);
         if (building is AmmunitionFactory factory && !_factories.Contains(factory)) _factories.Add(factory);
         if (building is AmmunitionDepot depot && !_depots.Contains(depot)) _depots.Add(depot);
     }
     public void RegisterConsumer(TowerBase tower)
     {
-        if (tower.Ammunition == null || _stockHooks.ContainsKey(tower)) return;
+        if (_shutdown || !Live(tower) || tower.Ammunition == null || _stockHooks.ContainsKey(tower)) return;
         Watch(tower); Action changed = () => UpdateRequest(tower);
         _stockHooks.Add(tower, changed); tower.Ammunition.Inventory.Changed += changed;
         UpdateRequest(tower);
@@ -135,6 +136,7 @@ public partial class AmmunitionLogistics : Node2D
     // Loading removes physical stock exactly once; cargo also serves as the source-stock reservation.
     private void Launch(AmmoBuilding source, TowerBase destination)
     {
+        if (!Live(source) || !Live(destination)) return;
         AmmoInventory target = Inventory(destination);
         int freeRoom = target.FreeSpace - ReservedSpace(destination);
         int amount;

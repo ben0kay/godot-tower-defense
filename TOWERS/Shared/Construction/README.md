@@ -1,88 +1,38 @@
-# Construction and upgrades — FUTURE / NOT IMPLEMENTED
+# Shared construction — C1/C2 implemented; C3/C4 planned
 
-> **Codex implementation plan:** [TIMED_CONSTRUCTION_PASS.md](TIMED_CONSTRUCTION_PASS.md) — **C1 state/timers → C2 placement/operational gating → C3 timed upgrades/Inspector → C4 SVG stages/optional VFX and regressions**. This README describes the design; the implementation plan sets concrete first-pass defaults. **No construction gameplay has been implemented yet.**
+Paid placements now occupy their complete footprint immediately, take authored time to build, and become operational once. Payment still uses the existing atomic wallet callback; invalid construction setup, scene/index failures and failed placement roll back cells, nodes and work before payment. Construction completion does not alter occupancy or navigation. Directly instantiated scenes remain operational unless placement explicitly starts construction.
 
-## Gameplay design
+## Source values
 
-Building and paid upgrading eventually take time rather than completing instantly. Each tower's existing absolute *Levels.cs row would define its own `WorkSeconds`: Level 1 for initial construction and later rows for that individual upgrade. Never compound purchased-level stats.
+Each offensive `*Levels.cs` has one complete row per level, now including `WorkSeconds` beside Cost. Level1 supplies initial build time; later rows already author independent upgrade durations for C3. **Paid upgrades remain instantaneous for now**, and are unavailable during initial construction. Passive configs keep empty Levels and use Inspector `ConstructionSeconds` in their existing default `.tres`; no artificial weapon stats were introduced. Generic/test types default to0 seconds. Negative/nonfinite durations are rejected, copies stay independent, and no duration is compounded.
 
-The placed tower owns its current work phase and progress; authored row values remain immutable. The current Inspector should show a progress indicator and status. Decide, with tests, when the grid cell is occupied, whether unfinished/upgrading structures can fire or take damage, when materials/credits are charged, and how cancel/refund, pause, interruption, and checkpoint saving work. Preserve the existing `WorldGrid` placement/path-validation and `ECONOMY/Wallet` atomic purchase/rollback guarantees.
+| Building | Initial build seconds | Later authored upgrade seconds (C3 deferred) |
+| --- | ---: | --- |
+| Battle | 3 | 4,5 |
+| Laser | 4 | 5 |
+| Blaster | 5 | 6 |
+| Shockwave | 5 | 6 |
+| Sniper | 4 | 5,6 |
+| Machine Gun | 4 | 5,6 |
+| Ammunition Factory | 8 | No purchased levels |
+| Ammunition Depot | 5 | No purchased levels |
 
-## Visual construction stages
+These positive values are provisional playtest defaults. No combat values/prices changed.
 
-Timed construction is intended to support **visible build stages**, not just an invisible timer.
+## Runtime ownership and performance
 
-Possible first-pass approach:
-- each constructible building/tower can provide **multiple authored art stages**
-- e.g. **Stage 0 = foundation / scaffold**, **Stage 1 = partially built**, **Stage 2 = nearly complete**, **Stage 3 = finished**
-- the game swaps stage visuals based on normalized construction progress thresholds
+`TowerBase` owns WorkPhase, elapsed/total/remaining time, normalized WorkProgress, IsBusy/IsOperational, and WorkStarted/WorkProgressChanged/WorkCompleted events. `TowerWorkState` is a source-only snapshot contract for future saving; no save/restore flow is implemented. Upgrading is a reserved phase; C3 will wire its pending target/application.
 
-For now, the simplest content pipeline is likely:
-- **multiple SVG files** (or exported PNGs) per tower/building, one for each construction stage
-- later, a building could instead use layered visuals or a more procedural approach if desired
+One `ConstructionWorkManager` in each playable World advances only active jobs. The manager stops physics processing when empty. Reusable double-buffered queues plus versioned membership handle simultaneous completions, removal and callback-created work without per-frame snapshot allocations; new jobs start advancing next tick. Unpaused game time only; fractional tick sums complete at the exact boundary with a small numerical tolerance. Progress notifications are throttled to approximately10Hz; completion is immediate. No construction nodes or polling are added per idle building.
 
-Examples:
-- `BattleTower_stage0.svg`
-- `BattleTower_stage1.svg`
-- `BattleTower_stage2.svg`
-- `BattleTower_stage3.svg`
+Weapon and Factory processing is disabled during construction, with a shared operational guard protecting explicit ticks. Finished weapons regain their normal processing without stat rebuild, ammo refill, XP award or cooldown reset. Unfinished buildings/consumers stay outside logistics registration and demand searches. Operational checks also protect dispatch and arrival; completion registers the existing stock once. Factory remains100 rounds/2s,1000-round shipments; Depot remains10000 capacity. Existing drones/logistics remain the sole delivery authority.
 
-The system should not hardcode exactly four stages forever. Prefer a simple authored list/array of stage visuals and thresholds so different structures can use different counts later if needed.
+The current Inspector reuses its runtime label for **CONSTRUCTING (Ns build)**, showing total authored duration, and disables upgrade purchase until completion. It refreshes on completion rather than polling. **There is no progress bar/countdown or staged art yet.** The regular finished artwork remains visible during C1/C2.
 
-## Construction feedback / effects
+## C3/C4 remaining
 
-Construction should also support optional visual feedback while work is in progress, for example:
-- spark particles
-- welding flashes
-- smoke / dust puffs
-- subtle glow pulses
-- light machinery/build effects
-- future drone/build-beam effects if desired
+- **C3:** timed paid upgrades retaining old-tier operation, ranked completion, selected-only progress bar/time remaining and event-driven updates. No full Inspector/stat rebuild each tick.
+- **C4:** optional threshold-based SVG stage swaps, stable stage sprite/overlay, shared texture resources, optional globally budgeted/offscreen-aware sparks and completion effects. Battle1×1 and Factory3×2 need real stage examples; preserve live turret hierarchy during upgrades. Missing art/VFX must not change gameplay.
+- Refund/selling, builder drones, damage/repair, research and campaign saving remain deferred.
 
-These effects are **supporting feedback only** and should not be required for the construction system to function. The construction logic must work even if a structure has no special particles assigned.
-
-A good first implementation would allow:
-- an optional looping "under construction" effect while work is active
-- an optional one-shot "construction complete" effect when finished
-- clean stop/restart behaviour on cancel, interruption, removal or upgrade completion
-
-## Ownership and implementation
-
-This directory is reserved for an optional shared construction state/controller. Do not make every `TowerBase` instance tick a construction node; track active work only. Per-type upgrade values belong beside their existing level rows, not in a separate modifier tree. No speculative scene/node classes yet.
-
-The construction system should be able to answer:
-- current construction state
-- total work seconds
-- elapsed work seconds
-- normalized progress
-- current visual stage index
-- whether gameplay functionality is locked until completion
-
-A tower/building should be able to expose:
-- optional authored construction-stage visuals
-- optional construction VFX
-- optional completion VFX
-
-## Suggested first gameplay rules
-
-These are not final, but are a sensible first implementation target:
-- the building footprint becomes occupied immediately once placement succeeds
-- cost is paid immediately on valid placement / upgrade start
-- a structure under initial construction is not yet operational
-- an upgrading structure keeps clear defined behaviour (to be decided: either remains active until completion, or is temporarily disabled)
-- final authored stats/behaviour only apply when the timed work completes
-
-## Future verification
-
-Construction and upgrade timers, occupancy, blocking, costs/cancellations, multiple levels, interruption, pause, disposal, Inspector and save restoration.
-
-Additional visual verification should cover:
-- correct stage visual at different construction progress values
-- correct fallback if a structure has missing stage assets
-- construction particles/effects starting and stopping correctly
-- completed structure switching cleanly to its final operational visual
-- upgrade-stage visuals behaving consistently if upgrade timing is later enabled
-
-Related: [TOWERS roadmap](../../README.md), [Placement](../../Placement/README.md).
-
-**Documentation-only reservation. No implementation has been made.**
+See [TIMED_CONSTRUCTION_PASS.md](TIMED_CONSTRUCTION_PASS.md) for the accepted refinements and checklist, and `TESTS/Towers/Construction.md` for actual execution and benchmarks.

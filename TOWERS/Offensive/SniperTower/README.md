@@ -11,3 +11,7 @@ Implemented via the shared `TOWERS/Shared/Weapons/MultiBarrel/ProjectileTurretBa
 Ranks: Standard 0, Veteran 1,000, Enhanced 3,000, Superior 7,000, Legendary 15,000 total XP with the existing rank damage/range percentages. Ammo: 600 local capacity, 1 round per bullet; normal physical logistics can resupply it.
 
 Balance is provisional. Level 1 one-shots unshielded 60-HP Enemy001; its strength is long range/high per-hit damage, counterbalanced by slow cooldown and price. No headshot/crit mechanic, physics raycast, lead prediction, line-of-sight, overpenetration or special targeting behavior has been added.
+
+## Initial construction (C1/C2)
+
+Paid placement occupies its footprint immediately and takes **4 seconds**, authored in the Level1 WorkSeconds column of this tower's `*Levels.cs`. It cannot acquire targets/fire/consume ammunition or request deliveries until complete. Completion preserves stats, level, rank and stock. Direct scene fixtures remain operational by default. Current final artwork stays visible; stage SVGs/VFX (C4), timed upgrades and a full Inspector progress display (C3) remain deferred. Upgrades are blocked while constructing, then still apply instantly. See `TOWERS/Shared/Construction/README.md`.

@@ -36,3 +36,7 @@ Attacks carry the tower's weak DamageSource. Actual shield/hull loss earns a bou
 ## Live ammunition supply
 
 Current complete ShockwaveTowerLevels.cs rows include 400 reserve / 5 per emitted pulse (not each wavefront recipient). Defaults are provisional except Battle1000/1. InitialAmmoFraction starts full by default; empty reserves stop unpaid attacks, and paid levels/ranks never refill them. The existing Inspector displays current ammo/delivery state and changed next-level ammo values. Factory/depot drones deliver physical cargo only on arrival. See `TOWERS/Shared/Ammunition/README.md` and `TESTS/Economy/Ammunition.md`.
+
+## Initial construction (C1/C2)
+
+Paid placement occupies its footprint immediately and takes **5 seconds**, authored in the Level1 WorkSeconds column of this tower's `*Levels.cs`. It cannot acquire targets/fire/consume ammunition or request deliveries until complete. Completion preserves stats, level, rank and stock. Direct scene fixtures remain operational by default. Current final artwork stays visible; stage SVGs/VFX (C4), timed upgrades and a full Inspector progress display (C3) remain deferred. Upgrades are blocked while constructing, then still apply instantly. See `TOWERS/Shared/Construction/README.md`.

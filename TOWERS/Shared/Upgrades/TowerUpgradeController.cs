@@ -12,6 +12,7 @@ public static class TowerUpgradeController
         for (int i = 0; i < levels.Count; i++)
         {
             TowerLevel level = levels[i];
+            if (level != null) TowerConfig.ValidateWorkSeconds(level.WorkSeconds);
             if (level == null || level.Level != i + 1 || level.Costs == null)
                 throw new ArgumentException("Tower levels must form consecutive complete rows starting at 1.");
         }
@@ -25,6 +26,7 @@ public static class TowerUpgradeController
         failure = "";
         if (!GodotObject.IsInstanceValid(tower) || !tower.IsInsideTree() || wallet == null || rules?.AllowUpgrades != true)
         { failure = "Upgrades are unavailable."; return false; }
+        if (tower.IsBusy) { failure = "Building is under construction."; return false; }
         if (tower.UpgradeLevel != expectedLevel) { failure = "Tower level changed; select the current upgrade."; return false; }
         TowerLevel next;
         TowerFinalStats preview;

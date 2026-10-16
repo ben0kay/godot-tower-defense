@@ -1,6 +1,6 @@
 # Purchased levels and atomic upgrades
 
-`TowerLevel` is a plain C# runtime row: target Level, display name, complete TowerStatBlock and ordinary Array<ResourceCost> recipe. Every real tower's `*Levels.cs` table supplies Level 1 construction and each subsequent upgrade price alongside all actual combat values. There are no level-specific .tres assets, stat-operation resources or cumulative purchased bonuses.
+`TowerLevel` is a plain C# runtime row: target Level, display name, independent WorkSeconds, complete TowerStatBlock and ordinary Array<ResourceCost> recipe. Every real tower's `*Levels.cs` table supplies Level 1 construction and each subsequent upgrade price alongside all actual combat values. There are no level-specific .tres assets, stat-operation resources or cumulative purchased bonuses.
 
 TowerBase starts at UpgradeLevel 1. NextUpgrade selects Levels[UpgradeLevel] because the list includes construction row 1. The last row is the maximum level; an empty passive fixture or single construction row has no upgrades. Adding the next consecutive row needs no controller change.
 
@@ -16,4 +16,4 @@ Paid upgrade resolution now retains the placed tower's selected named Rank. Comm
 
 ## Planned timed upgrades — NOT IMPLEMENTED
 
-[Construction C1–C4 implementation pass](../Construction/TIMED_CONSTRUCTION_PASS.md) will add explicit `WorkSeconds` per level, deferred paid upgrade application, and Inspector progress. **Current upgrades still commit immediately** until that pass is implemented. During a timed upgrade, the proposed first-pass rule keeps the old tier operational and applies the next absolute row only when work completes; preserve existing wallet, rank XP and multi-resource safeguards.
+[Construction C1/C2](../Construction/README.md) now supplies explicit `WorkSeconds` per level and timed initial placement. Upgrades are blocked while constructing; **current upgrades still commit immediately after construction**. C3 will add deferred paid upgrade application and Inspector progress. During a timed upgrade, the proposed first-pass rule keeps the old tier operational and applies the next absolute row only when work completes; preserve existing wallet, rank XP and multi-resource safeguards.

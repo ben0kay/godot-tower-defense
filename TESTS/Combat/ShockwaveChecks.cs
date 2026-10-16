@@ -221,7 +221,7 @@ public static class ShockwaveChecks
         wallet.Initialize(new LevelConfig { StartingCredits = 1000 });
         hud.GetBuildButton("shockwave").EmitSignal(Button.SignalName.Pressed);
         Vector2I cell = grid.Level.Passable.GetUsedCells().First(c => grid.PlacementFailure(c).Length == 0 && spawns.PlacementFailure(c).Length == 0);
-        placement.Call("TryPlace", cell);
+        placement.Call("TryPlace", cell); ConstructionTestClock.FinishInitial(main);
         Node towers = main.GetNode("World/Towers");
         ShockwaveTower tower = towers.GetChild<ShockwaveTower>(towers.GetChildCount() - 1); tower.SetPhysicsProcess(false);
         try
@@ -235,7 +235,7 @@ public static class ShockwaveChecks
             Label details = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerStats"), preview = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/UpgradeInfo");
             Require(details.Text.Contains("Damage per wave: 40") && details.Text.Contains("Expansion speed: 250") && details.Text.Contains("Interval: 4")
                 && details.Text.Contains("Edge damage: 25%") && preview.Text.Contains("40 → 44") && preview.Text.Contains("4 → 3.9"), "Inspector shows actual wave stats and complete paid preview");
-            placement.Call("TryPlace", cell); Require(wallet.GetBalance(wallet.CreditsResource) == 650, "Occupied placement never double-charges");
+            placement.Call("TryPlace", cell); ConstructionTestClock.FinishInitial(main); Require(wallet.GetBalance(wallet.CreditsResource) == 650, "Occupied placement never double-charges");
             TowerFinalStats cached = tower.FinalStats, upgraded = tower.ResolveLevel(2);
             tower.Config.WaveStyle.RingWidth = 7; tower.Config.WaveStyle.ExpansionDuration = .01f;
             Require(ReferenceEquals(cached, tower.FinalStats), "Style tuning never invalidates combat stats");

@@ -4,6 +4,15 @@ using Godot;
 [GlobalClass]
 public partial class TowerConfig : Resource
 {
+    [ExportGroup("Passive Construction (no level rows)")]
+    [Export(PropertyHint.Range, "0,300,0.1,or_greater")] public double ConstructionSeconds { get; set; }
+    public double BuildSeconds => Levels.Count == 0 ? ConstructionSeconds : Levels[0].WorkSeconds;
+
+    // =========================================================
+    // Durations are source values, not combat modifiers; passive types need no fake level rows.
+    public static void ValidateWorkSeconds(double seconds)
+    { if (!double.IsFinite(seconds) || seconds < 0) throw new System.ArgumentOutOfRangeException(nameof(seconds), "Work duration must be finite and nonnegative."); }
+
     [ExportGroup("Starting Ammunition")]
     [Export(PropertyHint.Range, "0,1,0.01")] public float InitialAmmoFraction { get; set; } = 1f;
     [ExportGroup("Identity")]

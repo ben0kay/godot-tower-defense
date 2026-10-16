@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://WORLD/GRID/WorldGrid.cs" id="1_script"]
 [ext_resource type="Resource" path="res://WORLD/DefaultWorldConfig.tres" id="2_config"]
@@ -17,6 +17,8 @@
 
 [ext_resource type="Resource" path="res://TOWERS/Shared/Ammunition/DefaultAmmunitionConfig.tres" id="12_ammo_config"]
 [ext_resource type="PackedScene" path="res://DRONES/Transport/TransportDrone.tscn" id="13_drone"]
+
+[ext_resource type="Script" path="res://TOWERS/Shared/Construction/ConstructionWorkManager.cs" id="14_work"]
 
 [node name="World" type="Node2D"]
 
@@ -64,3 +66,6 @@ z_index = 8
 script = ExtResource("11_ammo")
 Config = ExtResource("12_ammo_config")
 DroneScene = ExtResource("13_drone")
+
+[node name="ConstructionWork" type="Node" parent="."]
+script = ExtResource("14_work")

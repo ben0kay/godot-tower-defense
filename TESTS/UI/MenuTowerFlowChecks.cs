@@ -57,6 +57,7 @@ public partial class MenuTowerFlowChecks : Node
             foreach (Vector2I cell in grid.Level.Passable.GetUsedCells())
                 if (grid.PlacementFailure(cell).Length == 0 && spawns.PlacementFailure(cell).Length == 0)
                 { placement.Call("TryPlace", cell); placed = true; break; }
+            ConstructionTestClock.FinishInitial(battlefield);
             Require(placed && wallet.GetBalance(wallet.CreditsResource) == 800, "Menu-launched Battle placement pays 200");
             hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/UpgradeButton").EmitSignal(Button.SignalName.Pressed);
             BattleTower tower = battlefield.GetNode("World/Towers").GetChild<BattleTower>(0);
@@ -64,6 +65,7 @@ public partial class MenuTowerFlowChecks : Node
                 "Menu-launched paid Upgrade action uses the same pipeline and wallet");
             hud.SetTowerBarOpen(false, true);
             Require(hud.IsInspectionVisible, "Closing the tray preserves placed-tower inspection");
+            await SubsystemBattlefield.DrainFreedFixtures(this);
             GD.Print("PASS: Boot → Main → Campaign → Level001 real button flow, catalog build and paid Battle upgrade (no save writes)");
             GetTree().Quit(0);
         }

@@ -26,14 +26,14 @@ public static class BlasterCannonChecks
         wallet.Initialize(new LevelConfig { StartingCredits = 1000 });
         hud.GetBuildButton("blaster_cannon").EmitSignal(Button.SignalName.Pressed);
         Vector2I cell = grid.Level.Passable.GetUsedCells().First(c => grid.PlacementFailure(c).Length == 0 && spawns.PlacementFailure(c).Length == 0);
-        placement.Call("TryPlace", cell);
+        placement.Call("TryPlace", cell); ConstructionTestClock.FinishInitial(main);
         BlasterCannon tower = towers.GetChild<BlasterCannon>(towers.GetChildCount() - 1); tower.SetPhysicsProcess(false);
         Require(tower.TowerTypeId == "blaster_cannon" && grid.IsOccupied(cell) && wallet.GetBalance(wallet.CreditsResource) == 700,
             "Catalog action places a1x1 Blaster and pays300");
         Require(tower.Config != definition.DefaultConfig && tower.Levels[0] != definition.DefaultConfig.Levels[0], "Blaster config and nested tiers are private");
         Require(tower.FinalStats.Area == new AreaBlastStats(80, 0.25f) && tower.FinalStats.DamagePerShot == 60
             && tower.FinalStats.ShieldPenetration == 0 && tower.Config.DamageType == DamageType.Explosive, "Authored baseline is60/80px/25% with zero penetration");
-        placement.Call("TryPlace", cell); Require(wallet.GetBalance(wallet.CreditsResource) == 700, "Repeated occupancy does not charge Blaster again");
+        placement.Call("TryPlace", cell); ConstructionTestClock.FinishInitial(main); Require(wallet.GetBalance(wallet.CreditsResource) == 700, "Repeated occupancy does not charge Blaster again");
         Label details = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerStats");
         Label upgrade = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/UpgradeInfo");
         Require(details.Text.Contains("Base damage: 60") && details.Text.Contains("Blast radius: 80") && details.Text.Contains("Edge damage: 25%")

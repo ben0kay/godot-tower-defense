@@ -25,12 +25,12 @@ public static class LaserTowerChecks
             if (grid.PlacementFailure(candidate).Length == 0 && spawns.PlacementFailure(candidate).Length == 0)
             { cell = candidate; found = true; break; }
         Require(found, "Laser build cell is route-safe");
-        placement.Call("TryPlace", cell);
+        placement.Call("TryPlace", cell); ConstructionTestClock.FinishInitial(main);
         LaserTower tower = towers.GetChild<LaserTower>(towers.GetChildCount() - 1); tower.SetPhysicsProcess(false);
         Require(tower.TowerTypeId == "laser" && grid.IsOccupied(cell) && wallet.GetBalance(wallet.CreditsResource) == 750 &&
             tower.FinalStats.Beam.Value.DamagePerSecond == 12 && tower.FinalStats.ShieldPenetration == 0, "Dynamic action places/pays the correct Energy tower");
         Require(tower.Config != definition.DefaultConfig && tower.Levels[0] != definition.DefaultConfig.Levels[0], "Laser source/tier data is private");
-        placement.Call("TryPlace", cell);
+        placement.Call("TryPlace", cell); ConstructionTestClock.FinishInitial(main);
         Require(wallet.GetBalance(wallet.CreditsResource) == 750, "Repeat Laser occupancy cannot charge");
         Label details = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerStats");
         Label upgrade = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/UpgradeInfo");

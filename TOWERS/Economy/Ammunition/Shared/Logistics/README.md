@@ -24,3 +24,5 @@ At launch, source inventory transfers once into cargo. That removal is the sourc
 Conservation: initial stock + produced = current building/tower stock + cargo + fired/beam-consumed + explicit losses/discards. Test-only comparisons include cargo during flight. Return-state visuals retain an amber payload when surplus is aboard; empty returns are cyan/dark. Neither drone visuals nor arrival callbacks generate ammo.
 
 No magazines, saving, research, power/material inputs, combat drones or per-tower threshold sliders. [Tests/results](../../../../../TESTS/Economy/Ammunition.md).
+
+C2 construction: unfinished sources, depots and weapon consumers do not register with logistics. Existing stock registers once on completion; dispatch/arrival also verify operational endpoints. Construction does not generate, refill or reserve ammunition.

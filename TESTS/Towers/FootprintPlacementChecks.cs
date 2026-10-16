@@ -113,9 +113,11 @@ internal static class FootprintPlacementChecks
         live.Scene = malformed; f.NoBuild("ammo_factory", f.Anchor, new(3, 2)); live.Scene = original; malformed.Dispose();
         var index = (Dictionary<Vector2I, TowerBase>)typeof(TowerPlacementController).GetField("_placedTowers", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(f.World.Placement);
         PassiveTestTower sentinel = new(); Vector2I edge = f.Anchor + new Vector2I(2, 1); index.Add(edge, sentinel);
+        int jobs = f.World.Main.GetNode<ConstructionWorkManager>("World/ConstructionWork").ActiveCount;
         int before = f.Balance, nodes = f.World.Towers.GetChildCount(); f.Build("ammo_factory", f.Anchor);
         Require(f.Balance == before && f.World.Towers.GetChildCount() == nodes && f.Occupied(f.Anchor, new(3, 2)) == 0
-            && f.World.Placement.TowerAt(f.Anchor) == null && f.World.Placement.TowerAt(edge) == sentinel, "Late failure cleans only its own index entries/cells/node, with no charge");
+            && f.World.Placement.TowerAt(f.Anchor) == null && f.World.Placement.TowerAt(edge) == sentinel
+            && f.World.Main.GetNode<ConstructionWorkManager>("World/ConstructionWork").ActiveCount == jobs, "Late failure cleans only its own index entries/cells/node, with no charge");
         index.Remove(edge); sentinel.Free();
         f.World.Wallet.TrySpend(new() { new ResourceCost { Resource = f.World.Wallet.CreditsResource, Amount = f.Balance } });
         f.NoBuild("ammo_factory", f.Anchor, new(3, 2));

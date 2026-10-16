@@ -1,6 +1,6 @@
 # Timed Construction, Timed Upgrades and Visual Build Stages — Codex Implementation Pass
 
-> **STATUS: PLANNED / NOT IMPLEMENTED.** This file is the implementation brief for **C1–C4**. Complete stages sequentially, test each, and update this checklist **only after code really lands**. Follow `NOTES/CodePreferences.md` and the existing Godot 4 C# architecture. Documentation created 2026-10-16.
+> **STATUS: C1/C2 IMPLEMENTED; C3/C4 PLANNED.** This file is the implementation brief for **C1–C4**. Complete stages sequentially, test each, and update this checklist **only after code really lands**. Follow `NOTES/CodePreferences.md` and the existing Godot 4 C# architecture. Documentation created 2026-10-16.
 
 ## Goal
 
@@ -42,23 +42,31 @@ This is one shared, optional construction capability: a Battle Tower, passive Am
 - **Only active jobs tick.** Prefer one small world/level-owned `ConstructionWorkManager` tracking a set of constructing/upgrading towers, using one process/physics callback for active jobs, stopping the manager when empty. Avoid mandatory construction helper nodes and loops for each idle tower.
 - Full stage and completion notification must happen after coherent state transitions. Subscription/unsubscription must tolerate early failure, repeated removal and unloading.
 
+## Performance refinements (accepted)
+
+- **C1:** one active-job manager, no idle-tower traversal or per-building construction helper nodes. Reuse queue storage; defer callback-created jobs to the next tick, tolerate removal/reentrant callbacks and exact simultaneous completions without skipping jobs or allocating snapshot lists each frame. Test500 idle buildings plus100 active jobs, completion bursts and scene unload; report timer CPU separately from gameplay FPS.
+- **C1 / C3:** advance clocks accurately on physics time but publish progress at most around10Hz. The Inspector subscribes only to its selected building; no per-frame stat resolution or full Inspector rebuild. Completion publishes coherent state before callbacks.
+- **C2:** disable unfinished weapon/production physics processing at initialization; retain a cheap shared operational guard for explicit calls/future consumers. Keep unfinished sources/destinations out of logistics registration and request searches, with operational checks again at dispatch/arrival for safety. Activate/register exactly once at completion, without refilling stock or altering navigation.
+- **C4:** reuse loaded texture resources and a stable stage sprite/overlay, never load SVGs or allocate nodes on each progress tick. Change art only when thresholds are crossed; preserve existing turret hierarchy and keep old-tier artwork operating during upgrades.
+- **C4:** apply a shared visible-effect budget, suppress offscreen sparks where practical, and stop all construction effect processing when idle. Cosmetic budgets must never delay work completion or affect combat.
+
 ## C1 — Authorable work duration, state transitions and timer service
 
-- [ ] Add `WorkSeconds` to the plain `TowerLevel` row (Level1 = first build, Level2+ = duration of that purchased tier), preserve copy/validation. Extend each real offensive `*Levels.cs` in its existing one-row-per-level style, **without replacing the current stat/price data**.
-- [ ] Passive `AmmoFactoryConfig` and `AmmoDepotConfig` have no `TowerLevel` rows: expose a simple `ConstructionSeconds`/fallback on shared `TowerConfig` (or specific existing building configs) for types with empty `Levels`. Do not fabricate combat rows or run `ResolveLevel` for passive buildings.
-- [ ] Use modest **provisional, readily editable** positive build/upgrade times for real playable buildings, with zero-time compatibility for tests/fixtures and optional types. **No balance rework**; document actual chosen seconds. Validation rejects NaN, Infinity and negative seconds.
-- [ ] Implement per-instance work-state API and one sparse active-job scheduler. Correct exact-boundary completion, repeated completion idempotence, pause/resume and freeing before completion. Skip finished/removed nodes. Expose clean events for the Inspector and stage presenter.
-- [ ] Add focused headless tests for phases, 0/positive times, carry/precision, pause, scheduling many active works without iterating all idle towers, independent instances, invalid durations and cleanup.
+- [x] Add `WorkSeconds` to the plain `TowerLevel` row (Level1 = first build, Level2+ = duration of that purchased tier), preserve copy/validation. Extend each real offensive `*Levels.cs` in its existing one-row-per-level style, **without replacing the current stat/price data**.
+- [x] Passive `AmmoFactoryConfig` and `AmmoDepotConfig` have no `TowerLevel` rows: expose a simple `ConstructionSeconds`/fallback on shared `TowerConfig` (or specific existing building configs) for types with empty `Levels`. Do not fabricate combat rows or run `ResolveLevel` for passive buildings.
+- [x] Use modest **provisional, readily editable** positive build/upgrade times for real playable buildings, with zero-time compatibility for tests/fixtures and optional types. **No balance rework**; document actual chosen seconds. Validation rejects NaN, Infinity and negative seconds.
+- [x] Implement per-instance work-state API and one sparse active-job scheduler. Correct exact-boundary completion, repeated completion idempotence, pause/resume and freeing before completion. Skip finished/removed nodes. Expose clean events for the Inspector and stage presenter.
+- [x] Add focused headless tests for phases, 0/positive times, carry/precision, pause, scheduling many active works without iterating all idle towers, independent instances, invalid durations and cleanup.
 
 **C1 done:** deterministic work lifetime and per-row durations work without changing actual combat/economy yet.
 
 ## C2 — Timed initial placement and all capability gating
 
-- [ ] Wire `TowerPlacementController.CommitTower` to start the construction state **before** adding the tower to the live scene. Preserve the same single `EconomyManager.TryPurchase`, whole-footprint claim, one instance per building, and full rollback on any failed scene/preflight/index/work initialization.
-- [ ] No weapon targeting, projectiles, beams, splash or shockwaves while initial construction is incomplete. On exact completion, enable the normal behavior **once**, without target-cooldown or damage duplication. Preserve XP and purchased level=1; no instant rank promotions from mere construction.
-- [ ] Ensure Ammo Factory creates its valid internal helper if needed but **does not produce** until built. Depot cannot launch/receive legitimate shipments until operational; logistics must check both source and destination and cancel/avoid reservations/jobs for inactive endpoints. Tower ammo stock/capacity may be initialized privately, but unfinished weapon consumers should not attract delivery drones. On completion, resupply/production resumes through existing scheduling automatically.
-- [ ] Test an incomplete 3×2 Factory and 2×2 Depot: fully occupied/selected, no free production/stock shipments/reserved delivery slots, and normal supply pipeline after completion. Preserve **Factory 100 per 2 seconds, full 1,000 shipments, Depot 10,000 capacity** and established drone physics. No duplicate registration.
-- [ ] Preserve placed 1×1 offensive weapons, their current ammo and ranks, terrain structural rule, path checking and performance. **Completion causes no extra occupancy/repath**; removal during work releases every occupied cell exactly once. Headless tests for invalid placement/insufficient funds, rollback, all-IMPASSABLE versus all-PASSABLE navigation and direct scene instantiation without placement (test fixtures) behaving safely.
+- [x] Wire `TowerPlacementController.CommitTower` to start the construction state **before** adding the tower to the live scene. Preserve the same single `EconomyManager.TryPurchase`, whole-footprint claim, one instance per building, and full rollback on any failed scene/preflight/index/work initialization.
+- [x] No weapon targeting, projectiles, beams, splash or shockwaves while initial construction is incomplete. On exact completion, enable the normal behavior **once**, without target-cooldown or damage duplication. Preserve XP and purchased level=1; no instant rank promotions from mere construction.
+- [x] Ensure Ammo Factory creates its valid internal helper if needed but **does not produce** until built. Depot cannot launch/receive legitimate shipments until operational; logistics must check both source and destination and cancel/avoid reservations/jobs for inactive endpoints. Tower ammo stock/capacity may be initialized privately, but unfinished weapon consumers should not attract delivery drones. On completion, resupply/production resumes through existing scheduling automatically.
+- [x] Test an incomplete 3×2 Factory and 2×2 Depot: fully occupied/selected, no free production/stock shipments/reserved delivery slots, and normal supply pipeline after completion. Preserve **Factory 100 per 2 seconds, full 1,000 shipments, Depot 10,000 capacity** and established drone physics. No duplicate registration.
+- [x] Preserve placed 1×1 offensive weapons, their current ammo and ranks, terrain structural rule, path checking and performance. **Completion causes no extra occupancy/repath**; removal during work releases every occupied cell exactly once. Headless tests for invalid placement/insufficient funds, rollback, all-IMPASSABLE versus all-PASSABLE navigation and direct scene instantiation without placement (test fixtures) behaving safely.
 
 **C2 done:** every real catalog building starts as an occupied, non-operational construction site and activates normally on completion.
 
@@ -96,17 +104,17 @@ This is one shared, optional construction capability: a Battle Tower, passive Am
 - Optional animated cranes/robot builders, per-piece skeletal assembly, continuous geometry deformation and complex stage blending. The first pass can use simple SVG stage swaps + lightweight particles.
 - Major rebalancing of tower damage/range/ammo, multi-cell footprint dimensions, production batch size or drone shipment sizes.
 
-## Final acceptance checklist (Codex)
+## Full C1–C4 acceptance checklist (C3/C4 items remain pending)
 
-- [ ] Costs are charged **once at construction/upgrade start**, never at completion or stage-change.
-- [ ] Building occupies whole rectangle immediately; routing/terrain rules remain identical to the completed footprint pass.
-- [ ] New structures cannot operate until built; Factory/Depot logistics do not bypass this.
-- [ ] Timers advance only in unpaused game time; cleanup is safe on fail, deletion and scene unload.
+- [x] Costs are charged **once at construction/upgrade start**, never at completion or stage-change.
+- [x] Building occupies whole rectangle immediately; routing/terrain rules remain identical to the completed footprint pass.
+- [x] New structures cannot operate until built; Factory/Depot logistics do not bypass this.
+- [x] Timers advance only in unpaused game time; cleanup is safe on fail, deletion and scene unload.
 - [ ] Old tower level/stats remain active during timed upgrade; next level applies once on completion.
 - [ ] Inspector shows status + correct progress; base gameplay works without SVG/VFX assignments.
 - [ ] At least one 1×1 and one 3×2 construction demonstrate authored stage imagery and optional sparks/completion feedback.
-- [ ] No unrelated ammunition, rank, wallet, navigation, tower-level balance or Campaign/save changes.
-- [ ] Document verified tests and actual live-view limitations; update this status, `TOWERS/Shared/Construction/README.md`, `TOWERS/Shared/Upgrades/README.md`, `TOWERS/README.md` and relevant tower/Ammo READMEs **only for work actually completed**.
+- [x] No unrelated ammunition, rank, wallet, navigation, tower-level balance or Campaign/save changes.
+- [x] Document verified tests and actual live-view limitations; update this status, `TOWERS/Shared/Construction/README.md`, `TOWERS/Shared/Upgrades/README.md`, `TOWERS/README.md` and relevant tower/Ammo READMEs **only for work actually completed**.
 
 ### Suggested Codex request
 

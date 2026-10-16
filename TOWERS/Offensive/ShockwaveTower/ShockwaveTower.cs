@@ -48,13 +48,14 @@ public partial class ShockwaveTower : TowerBase
         _registry = GetNodeOrNull<EnemyRegistry>("../../EnemySystems/Registry");
         _delivery = GetNodeOrNull<Node2D>("../../Projectiles");
         _effects = GetNodeOrNull<Node2D>("../../Effects");
-        SetPhysicsProcess(_registry != null && _delivery != null);
+        SetOperationalPhysicsProcess(_registry != null && _delivery != null);
     }
 
     // =========================================================
     // Emit immediately, then periodically even without targets; do not burst missed intervals after a hitch.
     public override void _PhysicsProcess(double delta)
     {
+        if (!IsOperational) return;
         if (!Enabled || FinalStats?.Shockwave == null || !IsInsideTree() || IsQueuedForDeletion()
             || !double.IsFinite(delta) || delta <= 0 || !GodotObject.IsInstanceValid(_registry)
             || !GodotObject.IsInstanceValid(_delivery) || !_delivery.IsInsideTree()) return;
@@ -79,7 +80,8 @@ public partial class ShockwaveTower : TowerBase
     // =========================================================
     // Existing emissions remain independent; new attacks stop when the source leaves the world.
     public override void _ExitTree()
-    { if (GodotObject.IsInstanceValid(_config)) _config.Changed -= RebuildStats; _ready = false; }
+    {
+        base._ExitTree(); if (GodotObject.IsInstanceValid(_config)) _config.Changed -= RebuildStats; _ready = false; }
     // =========================================================
     // Preserve purple art while the generic selection state adds the established warm tint.
     public override void SetSelected(bool selected) => _sprite.Modulate = selected ? new Color(1f, .9f, .68f) : Colors.White;

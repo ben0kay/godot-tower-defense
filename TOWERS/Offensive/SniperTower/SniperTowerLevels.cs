@@ -3,20 +3,20 @@ using System.Collections.Generic;
 
 public static class SniperTowerLevels
 {
-    private readonly record struct Row(int Level, int Credits, int Damage, float Rate, float Range, float Speed, float Turn, int AmmoCapacity, int AmmoPerShot)
+    private readonly record struct Row(int Level, int Credits, double WorkSeconds, int Damage, float Rate, float Range, float Speed, float Turn, int AmmoCapacity, int AmmoPerShot)
     {
         // =========================================================
         // All levels share Kinetic damage/weapon behavior, with numeric snapshots replaced in full.
         public TowerLevel Create() => new(Level, Credits, new(Range, Rate, Damage, Speed, Turn, 8f, .18f,
-            ShieldPenetration: .15f, Ammunition: new(AmmoCapacity, AmmoPerShot)));
+            ShieldPenetration: .15f, Ammunition: new(AmmoCapacity, AmmoPerShot)), WorkSeconds);
     }
 
-    // Level | Cost | Damage | TotalShotsPerSecond | RangePx | ProjectilePxS | TurnDegS | AmmoCapacity | AmmoPerBullet
+    // Level | Cost | WorkSeconds | Damage | TotalShotsPerSecond | RangePx | ProjectilePxS | TurnDegS | AmmoCapacity | AmmoPerBullet
     private static readonly Row[] Rows =
     {
-        new(1, 325, 80, .35f, 448, 1300, 135, 600, 1),
-        new(2, 225, 88, .37f, 456, 1300, 135, 600, 1),
-        new(3, 325, 96, .40f, 464, 1300, 135, 600, 1),
+        new(1, 325, 4, 80, .35f, 448, 1300, 135, 600, 1),
+        new(2, 225, 5, 88, .37f, 456, 1300, 135, 600, 1),
+        new(3, 325, 6, 96, .40f, 464, 1300, 135, 600, 1),
     };
 
     // =========================================================

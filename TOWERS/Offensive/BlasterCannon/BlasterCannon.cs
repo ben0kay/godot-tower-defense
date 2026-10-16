@@ -54,12 +54,13 @@ public partial class BlasterCannon : TowerBase
         _projectiles = GetNodeOrNull<Node2D>("../../Projectiles");
         _effects = GetNodeOrNull<Node2D>("../../Effects");
         _searchTimer = (GetInstanceId() % 97) / 97f * (FinalStats?.TargetSearchInterval ?? 0.15f);
-        SetPhysicsProcess(_registry != null && _projectiles != null);
+        SetOperationalPhysicsProcess(_registry != null && _projectiles != null);
     }
     // =========================================================
     // Refresh First periodically to allow overtaking, checking cached range between searches.
     public override void _PhysicsProcess(double delta)
     {
+        if (!IsOperational) return;
         if (FinalStats?.Area == null || !double.IsFinite(delta) || delta <= 0 || !IsInsideTree()) return;
         _searchTimer -= (float)delta; _shotTimer = Mathf.Max(0f, _shotTimer - (float)delta);
         if (_searchTimer <= 0f)
@@ -98,6 +99,7 @@ public partial class BlasterCannon : TowerBase
     // Release Resource subscriptions when this placed tower leaves the world.
     public override void _ExitTree()
     {
+        base._ExitTree();
         if (GodotObject.IsInstanceValid(_config)) _config.Changed -= RebuildStats;
         _initialized = false;
     }

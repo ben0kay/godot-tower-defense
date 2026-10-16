@@ -71,7 +71,7 @@ public abstract partial class ProjectileTurretBase : TowerBase
         _registry = GetNodeOrNull<EnemyRegistry>("../../EnemySystems/Registry");
         _projectiles = GetNodeOrNull<Node2D>("../../Projectiles");
         _searchTimer = (GetInstanceId() % 97) / 97f * (FinalStats?.TargetSearchInterval ?? .15f);
-        SetPhysicsProcess(_registry != null && _projectiles != null);
+        SetOperationalPhysicsProcess(_registry != null && _projectiles != null);
     }
     #endregion
 
@@ -80,7 +80,7 @@ public abstract partial class ProjectileTurretBase : TowerBase
     // One target, one turret rotation, one cooldown; no per-barrel searches or running muzzle nodes.
     public override void _PhysicsProcess(double delta)
     {
-        if (Config == null || FinalStats == null || _registry == null || _projectiles == null
+        if (!IsOperational || Config == null || FinalStats == null || _registry == null || _projectiles == null
             || !double.IsFinite(delta) || delta <= 0) return;
         _searchTimer -= (float)delta;
         // Retain at most one small elapsed-frame overshoot: fractional attack rates should not round down to 60Hz ticks.
@@ -146,6 +146,7 @@ public abstract partial class ProjectileTurretBase : TowerBase
     // Release resource listeners when the placed tower leaves the battlefield.
     public override void _ExitTree()
     {
+        base._ExitTree();
         if (GodotObject.IsInstanceValid(_config)) _config.Changed -= RebuildStats;
         _initialized = false; _target = null; _muzzles.Clear(); _barrels = null;
     }

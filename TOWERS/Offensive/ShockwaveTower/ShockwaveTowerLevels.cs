@@ -3,21 +3,21 @@ using System.Collections.Generic;
 
 public static class ShockwaveTowerLevels
 {
-    private readonly record struct Row(int Level, int Cost, float Damage, float Radius, float Speed, float Interval,
+    private readonly record struct Row(int Level, int Cost, double WorkSeconds, float Damage, float Radius, float Speed, float Interval,
         float Edge, float Penetration, DamageType Type, bool ShieldOverride, float Shield, bool HullOverride, float Hull, int AmmoCapacity, int AmmoPerShot)
     {
         // =========================================================
         // Radius uses shared RangePixels; only this weapon's optional wave capability carries timing/damage.
         public TowerLevel Create() => new(Level, Cost, new(Radius, 0, 0, 1, 0, 0, .15f,
             ShieldPenetration: Penetration, Weapon: new(Type, ShieldOverride, Shield, HullOverride, Hull),
-            Shockwave: new(Damage, Speed, Interval, Edge), Ammunition: new(AmmoCapacity, AmmoPerShot)));
+            Shockwave: new(Damage, Speed, Interval, Edge), Ammunition: new(AmmoCapacity, AmmoPerShot)), WorkSeconds);
     }
 
-    // Level | Cost | Damage | RadiusPx | SpeedPxS | IntervalS | Edge | Penetration | Type | ShieldOverride | Shield | HullOverride | Hull | AmmoCapacity | AmmoPerShot
+    // Level | Cost | WorkSeconds | Damage | RadiusPx | SpeedPxS | IntervalS | Edge | Penetration | Type | ShieldOverride | Shield | HullOverride | Hull | AmmoCapacity | AmmoPerShot
     private static readonly Row[] Rows =
     {
-        new(1, 350, 40, 200, 250, 4.0f, .25f, 0, DamageType.Energy, false, 1, false, 1, 400, 5),
-        new(2, 225, 44, 208, 260, 3.9f, .25f, 0, DamageType.Energy, false, 1, false, 1, 400, 5),
+        new(1, 350, 5, 40, 200, 250, 4.0f, .25f, 0, DamageType.Energy, false, 1, false, 1, 400, 5),
+        new(2, 225, 6, 44, 208, 260, 3.9f, .25f, 0, DamageType.Energy, false, 1, false, 1, 400, 5),
     };
 
     // =========================================================

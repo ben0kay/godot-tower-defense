@@ -18,9 +18,10 @@ public abstract partial class AmmoBuilding : TowerBase
     {
         Inventory.Changed += NotifyRuntimeChanged;
         Logistics = GetNodeOrNull<AmmunitionLogistics>("../../AmmunitionLogistics");
-        Logistics?.RegisterBuilding(this); SetProcess(false);
+        if (IsOperational) Logistics?.RegisterBuilding(this); SetProcess(false);
     }
-    public override void _ExitTree() { if (Inventory != null) Inventory.Changed -= NotifyRuntimeChanged; }
+    protected override void OnBecameOperational() => Logistics?.RegisterBuilding(this);
+    public override void _ExitTree() { base._ExitTree(); if (Inventory != null) Inventory.Changed -= NotifyRuntimeChanged; }
 
     // =========================================================
     // Shared source-slot status supplements each building's own stock/production information.

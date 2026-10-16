@@ -3,20 +3,20 @@ using System.Collections.Generic;
 
 public static class MachineGunTowerLevels
 {
-    private readonly record struct Row(int Level, int Credits, int Damage, float Rate, float Range, float Speed, float Turn, int AmmoCapacity, int AmmoPerShot)
+    private readonly record struct Row(int Level, int Credits, double WorkSeconds, int Damage, float Rate, float Range, float Speed, float Turn, int AmmoCapacity, int AmmoPerShot)
     {
         // =========================================================
         // One bullet per sequential attack; the two muzzles never double total authored fire rate.
         public TowerLevel Create() => new(Level, Credits, new(Range, Rate, Damage, Speed, Turn, 12f, .12f,
-            ShieldPenetration: 0f, Ammunition: new(AmmoCapacity, AmmoPerShot)));
+            ShieldPenetration: 0f, Ammunition: new(AmmoCapacity, AmmoPerShot)), WorkSeconds);
     }
 
-    // Level | Cost | Damage | TotalBulletsPerSecond | RangePx | ProjectilePxS | TurnDegS | AmmoCapacity | AmmoPerBullet
+    // Level | Cost | WorkSeconds | Damage | TotalBulletsPerSecond | RangePx | ProjectilePxS | TurnDegS | AmmoCapacity | AmmoPerBullet
     private static readonly Row[] Rows =
     {
-        new(1, 300, 7, 12.0f, 208, 850, 240, 1200, 1),
-        new(2, 200, 8, 12.4f, 216, 850, 240, 1200, 1),
-        new(3, 300, 9, 12.8f, 224, 850, 240, 1200, 1),
+        new(1, 300, 4, 7, 12.0f, 208, 850, 240, 1200, 1),
+        new(2, 200, 5, 8, 12.4f, 216, 850, 240, 1200, 1),
+        new(3, 300, 6, 9, 12.8f, 224, 850, 240, 1200, 1),
     };
 
     // =========================================================

@@ -9,3 +9,5 @@ PassiveTestTower.tscn is a test-only nonweapon TowerBase scene with a simple squ
 ## Sniper/Machine Gun and barrel sequencing
 
 `MultiBarrelTowerChecks.cs` runs in the full `EnemyIntegrationChecks` suite. It validates catalog entries and production scenes, sniper barrel-origin lethal shot, machine-gun A→B→A muzzle alternation, total bullet cadence, simultaneous two-bullet volley, atomic ammo shortage behavior, private authored snapshots, rank XP and future N-muzzle selection. The new towers do not require any direct GameplayHUD code changes. Godot/.NET test execution still needs local verification.
+
+`ConstructionChecks.tscn` covers C1/C2 work clocks, pause/cleanup, both real paid launchers, all six weapons, production/logistics gates, structural navigation and500-idle/100-active benchmarks. Existing unrelated subsystem checks explicitly finish initial paid work through the real clock before asserting finished-building behavior. See [Construction.md](Construction.md).

@@ -3,6 +3,7 @@ using Godot;
 
 public sealed class TowerLevel
 {
+    public double WorkSeconds { get; set; }
     public int Level { get; set; }
     public string DisplayName { get; set; }
     public TowerStatBlock Stats { get; set; }
@@ -10,8 +11,9 @@ public sealed class TowerLevel
 
     // =========================================================
     // Convert the visible C# credit price to the shared wallet's ordinary resource-cost format once.
-    public TowerLevel(int level, int credits, TowerStatBlock stats)
+    public TowerLevel(int level, int credits, TowerStatBlock stats, double workSeconds = 0)
     {
+        TowerConfig.ValidateWorkSeconds(workSeconds); WorkSeconds = workSeconds;
         Level = level; DisplayName = $"Level {level}"; Stats = stats;
         Costs = new() { new ResourceCost { Resource = GD.Load<ResourceDefinition>("res://ECONOMY/Resources/Credits.tres"), Amount = credits } };
     }
@@ -22,7 +24,7 @@ public sealed class TowerLevel
 
     // =========================================================
     // Copies keep runtime row/recipe edits local; resource definitions retain their stable identities.
-    public TowerLevel CreateInstanceCopy() => new() { Level = Level, Stats = Stats, DisplayName = DisplayName, Costs = CopyCosts(Costs) };
+    public TowerLevel CreateInstanceCopy() => new() { Level = Level, WorkSeconds = WorkSeconds, Stats = Stats, DisplayName = DisplayName, Costs = CopyCosts(Costs) };
 
     // =========================================================
     // Reuse ordinary economy recipes, including multiple resources, without shared mutable entries.

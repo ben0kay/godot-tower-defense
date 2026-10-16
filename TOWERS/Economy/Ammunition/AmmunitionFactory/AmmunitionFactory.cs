@@ -25,16 +25,16 @@ public partial class AmmunitionFactory : AmmoBuilding
     public override void _Ready()
     {
         Production = new AmmoProduction(Config.BatchAmount, Config.ProductionSecondsPerBatch, Config.InternalBufferCapacity);
-        RegisterBuilding();
+        RegisterBuilding(); SetOperationalPhysicsProcess(true);
     }
 
     // =========================================================
     // No depot is required: the finite buffer naturally pauses/resumes the existing batch helper.
     public override void _PhysicsProcess(double delta)
     {
-        if (!double.IsFinite(delta) || delta <= 0 || Production == null) return;
+        if (!IsOperational || !double.IsFinite(delta) || delta <= 0 || Production == null) return;
         ProducedRounds += Production.Advance(delta);
     }
     public override string DescribeRuntime() => $"Buffered ammo: {Inventory.Amount:N0} / {Inventory.Capacity:N0}\n" +
-        (Production.IsPaused ? "Production paused — buffer full" : "Producing automatically") + "\n" + DroneStatus;
+        (!IsOperational ? "Production waiting for construction" : Production.IsPaused ? "Production paused — buffer full" : "Producing automatically") + "\n" + DroneStatus;
 }

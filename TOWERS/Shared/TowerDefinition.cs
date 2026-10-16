@@ -30,6 +30,7 @@ public partial class TowerDefinition : Resource
         if (string.IsNullOrWhiteSpace(TowerId) || TowerId != TowerId.Trim()) throw new InvalidOperationException("Tower ID must be nonblank and trimmed.");
         if (!Enum.IsDefined(Category) || !ValidFootprint(Footprint)) throw new InvalidOperationException("Footprint must have positive dimensions, each at most 1024 cells, and a valid category.");
         if (Scene == null || DefaultConfig == null) throw new InvalidOperationException("Tower scene/config is missing: " + TowerId);
+        TowerUpgradeController.Validate(DefaultConfig.Levels); TowerConfig.ValidateWorkSeconds(DefaultConfig.BuildSeconds);
         if (DefaultConfig.ConstructionCosts == null) throw new InvalidOperationException("Construction recipe is missing: " + TowerId);
         foreach (ResourceCost cost in DefaultConfig.ConstructionCosts)
             if (cost?.Resource == null || string.IsNullOrWhiteSpace(cost.Resource.ResourceId) || cost.Amount < 0)
