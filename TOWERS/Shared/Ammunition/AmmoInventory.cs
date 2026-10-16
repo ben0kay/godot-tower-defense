@@ -49,7 +49,7 @@ public sealed class AmmoInventory
 
     // =========================================================
     // Atomically move physical stock (source -> cargo -> destination) without duplication.
-    // This does NOT deliver instantly in gameplay: Codex invokes it on drone load/unload.
+    // This does NOT deliver instantly in gameplay: logistics invokes it on drone load/unload.
     public bool TryTransferTo(AmmoInventory destination, int rounds)
     {
         if (destination == null || ReferenceEquals(this, destination) || rounds <= 0

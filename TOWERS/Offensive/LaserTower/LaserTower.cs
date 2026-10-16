@@ -90,7 +90,9 @@ public partial class LaserTower : TowerBase
             FinalStats.AimToleranceDegrees, Config.RotateWhileTracking, delta);
         if (!aligned) { ClearBeam(); return; }
         Enemy locked = _target;
-        double amount = FinalStats.Beam.Value.DamagePerSecond * delta;
+        double funded = Ammunition?.FundBeamSeconds(delta) ?? delta;
+        if (funded <= 0) { ClearBeam(); return; }
+        double amount = FinalStats.Beam.Value.DamagePerSecond * funded;
         locked.ApplyDamage(Config.CreateHit((float)System.Math.Min(float.MaxValue, amount), FinalStats, DamageSource));
         // Removal callbacks may clear/change the lock; never apply this tick to a replacement enemy.
         if (locked != _target || !TowerTargeting.Valid(locked, GlobalPosition, FinalStats.RangePixels))

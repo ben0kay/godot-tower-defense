@@ -1,16 +1,22 @@
-> **FOUNDATION IMPLEMENTED:** [AmmoInventory.cs](AmmoInventory.cs) now provides finite local stock, `TryConsume`, `TryAdd`, `TryTransferTo`, `TrySetCapacity` and change events. [AmmunitionMasterConfig.cs](AmmunitionMasterConfig.cs) + [DefaultAmmunitionConfig.tres](DefaultAmmunitionConfig.tres) provide the editable global **10%** resupply rule. None is connected to live offensive towers yet. **Codex next:** add per-level authored capacity/ammo-per-shot, instantiate one inventory per placed tower, deduct at real firing events, connect Inspector and resupply requests without duplicating these helpers. [WORK.md](../../../NOTES/WORK.md) is the full work order.
+# Local tower ammunition — implemented
 
-# Local tower ammunition and reloading — FUTURE / NOT IMPLEMENTED
+`AmmoInventory` remains the finite stock/atomic transfer authority. `TowerAmmunition` adds one placed weapon's reserve, per-launch charging, paid beam-time credit, delivery status and consumption/discard counters. It is optional: passive buildings do not receive a weapon inventory.
 
-## Gameplay design
-Optional shared ammunition capability for offensive towers. A tower holds a local **reserve** and may optionally hold a separately loaded **magazine**. Firing consumes the defined units; reloading moves ammunition **from reserve into magazine**, never creates it. Towers without magazines must not be forced to reload, and buildings without weapons must not need this capability.
+`AmmunitionStats` is an optional immutable group in the existing eight-stage pipeline. Each offensive `*Levels.cs` row is the only authored capacity/consumption source; Stage02 selects the complete row, Stages03–06 preserve/allow future modifiers, Stage07 clamps and Stage08 publishes the cached group. No new cumulative modifiers or second pipeline exists.
 
-## Proposed parameters and state
-Per-level authored values in each type's complete *Levels.cs rows: AmmunitionCapacity, AmmunitionPerShot or per-activation/rate consumption, optional MagazineCapacity and ReloadSeconds. Ammo type, initial stock and weapon-specific consumption need deliberate definitions: rockets, bullets, laser energy cells, sustained beams and waves may differ. Store CurrentReserve, CurrentMagazine, reload timer and pending resupply as **per-instance runtime state** separate from maxima. No stacked purchased-level bonuses.
+| Weapon | Capacity, every current level | Consumption |
+| --- | --- | --- |
+| Battle Tower | 1,000 | 1 per projectile launch |
+| Laser Tower | 1,000 | 2 per second of actual aligned beam firing |
+| Blaster Cannon | 600 | 3 per projectile launch, not per impact/enemy |
+| Shockwave Tower | 400 | 5 per emitted pulse, not per affected enemy |
 
-If empty, an attack gracefully stops until it has supply; preserve current combat timing, targeting and attribution. The first pass can use a starting stock/debug refill; do not implement factories, drones or a grid in this pass.
+Defaults other than Battle1000/1 are provisional. Empty reserves prevent unpaid attacks; targeting/aiming/cooldowns and damage attribution are preserved. Laser prepays integer rounds, carries fractional paid ammo credit across frames/targets/pauses, and limits damage to the funded firing duration. An empty reserve may finish the already-paid fraction; there is no free beam tail or per-physics-tick charge. No magazines/reloads exist yet.
 
-## Later integration
-[LOGISTICS/Ammunition](../../Economy/Ammunition/Shared/Logistics/README.md) handles requests/deliveries; [Ammunition Depot](../../Economy/Ammunition/AmmunitionDepot/README.md) stores remote supply. An accepted delivery is the only way logistics adds reserve ammo to a tower.
+TowerConfig exports `InitialAmmoFraction` (0–1, full by default) for creation-time stock, rounded to nearest round. Authoring a low fraction is useful for quick testing. Rebuilds, promotions and upgrades never initialize again or refill: capacity growth preserves stock; shrink discards only excess and records `DiscardedRounds`. XP/rank persists independently.
 
-**Planned only. Test depletion, reload, partial refills, upgrade capacities, interruption, saves and no duplicated rounds.**
+The existing bottom-right Inspector shows capacity/consumption, current reserve and waiting/in-flight/out-of-ammo state. Changed next-level ammo values appear in ordinary upgrade previews. Inventory/status events coalesce into one selected-only runtime label update; shots do not recompute FinalStats/upgrade previews.
+
+`DefaultAmmunitionConfig.tres` supplies the shared 10% rule; changing its exported threshold refreshes registered demands. [Logistics](../../Economy/Ammunition/Shared/Logistics/README.md) loads real stock into drone cargo and unloads only on arrival. Delivery never calls TryAdd; only initial stock/factory production create rounds. Magazines, ammo types, per-tower threshold sliders, research and saving remain deferred.
+
+Tests: [ammunition verification](../../../TESTS/Economy/Ammunition.md).

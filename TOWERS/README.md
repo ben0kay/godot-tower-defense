@@ -1,20 +1,21 @@
 # TOWERS — Player-placeable structures
 
-This folder holds all buildable towers: offensive weapons, and future support, economy/production and utility structures. A tower's category describes its primary purpose; it does **not** require a weapon, ammo system, targeting loop or combat stats.
+This folder holds all buildable towers: offensive weapons, Ammunition Factory/Depot economy structures, and future support/utility structures. A tower's category describes its primary purpose; it does **not** require a weapon, ammo system, targeting loop or combat stats.
 
 This README is an up-to-date overview and forward plan. Completed phase-by-phase implementation notes have been removed because the feature-specific READMEs and actual code are authoritative.
 
-> **Important:** Everything under **Future tower operations** is a **planning note, NOT an implemented feature or authorization to build it immediately**. Current gameplay must stay unchanged until a separate implementation pass.
+> **Important:** Unimplemented items under **Tower operations** remain planning notes, not permission to build unrelated systems. Ammunition is explicitly marked completed. Current gameplay must stay unchanged until a separate implementation pass.
 
 ## Current implementation (October 2026)
 
-- **Playable:** Battle Tower, Laser Tower, Blaster Cannon, Shockwave Tower. All are registered through `DefaultTowerCatalog.tres`; other type folders may contain plans only.
+- **Playable:** Battle Tower, Laser Tower, Blaster Cannon, Shockwave Tower. Ammunition Factory and Ammunition Depot are also registered Economy buildings. All six types use `DefaultTowerCatalog.tres`; other type folders may contain plans only.
 - **Purchased levels:** `Offensive/<Tower>/*Levels.cs` contains one **complete, absolute row per level**, with construction price in Level 1 and upgrade price in later rows. Level 3 never accumulates the stat values from Level 2. Never restore cumulative purchased-level modifiers or scattered per-level `.tres` values.
 - **Earned ranks:** `*Ranks.cs` beside `*Levels.cs` defines Standard → Veteran → Enhanced → Superior → Legendary, based on XP from actual shield/hull damage and kills. Rank bonuses are independent of purchased levels; the bottom-right Inspector shows Rank, XP and bonuses. See [Shared/Ranks/README.md](Shared/Ranks/README.md).
 - **Foundation:** `Shared/TowerBase.cs`, `Shared/TowerConfig.cs`, `Shared/Upgrades/` and `Shared/Stats/Pipeline/` own per-instance progression, independent config copies, payments/previews and cached effective stats.
 - **Catalog and placement:** `Shared/TowerDefinition.cs`, `Shared/TowerCatalog.cs` and `Placement/` supply generic registered build choices, 1×1 placement, occupancy/navigation checks, selection and an existing Inspector. `ECONOMY/Wallet/` is the one wallet/payment authority.
 - **Combat:** Battle fires guided Kinetic projectiles; Laser delivers Energy beam DPS; Blaster deals instant area damage; Shockwave uses a travelling wavefront. Shared combat and damage attribution live under `COMBAT/`.
-- **Not currently implemented:** tower HP or tower shields, timed construction/upgrades, ammunition supplies/reloading, accuracy simulation, power consumption, maintenance/wear, selling or multi-cell placement.
+- **Ammunition:** optional explicit per-level reserves/consumption, full configurable starting stock, factory production, depot storage and visible cargo drones on both legs are implemented. See [Shared/Ammunition](Shared/Ammunition/README.md) and [Economy/Ammunition](Economy/Ammunition/README.md).
+- **Not currently implemented:** tower HP or tower shields, timed construction/upgrades, magazines/reloading, accuracy simulation, power consumption, maintenance/wear, selling or multi-cell placement.
 
 ### Where to find the code
 
@@ -48,11 +49,11 @@ Keep authored values, purchased level, rank/XP, future research, level rules and
 
 Permanent research must belong to future persistent player/profile state, **not** the research-center building or LevelConfig. Current-level modifiers disappear when switching maps. Buffs, debuffs and operational conditions belong to the affected runtime instance/source. Do not add a new stat pipeline or an unused generic modifier engine in advance.
 
-## Future tower operations — planned, not implemented
+## Tower operations — completed ammunition and future extensions
 
 **Direction:** More mechanical, infrastructure-driven tower defense. Towers should need time to build, survive damage, hold supplies and eventually depend on electricity and maintenance. Keep numeric progression in the compact one-row-per-level C# authoring style, but make systems optional by tower type.
 
-### A. Proposed explicit per-level parameters
+### A. Explicit per-level parameters and future additions
 
 These values may vary **independently** for Level 1, Level 2, Level 3, etc., just as Damage/Rate/Range do now. Field names and actual balance values are tentative.
 
@@ -61,8 +62,8 @@ These values may vary **independently** for Level 1, Level 2, Level 3, etc., jus
 | **Construction/upgrade time** (`WorkSeconds` suggested) | Level 1 specifies **build time**; each later row specifies how long that particular **upgrade** takes. Purchased upgrades will no longer finish instantly. |
 | **Maximum HP** (`MaxHealth`) | Structural durability of that tower at that level. Current HP is stored separately for each placed instance. |
 | **Maximum Shield** (`MaxShield`) | Maximum tower shield capacity, separately from HP. Current shield, shield recharge and damage rules are future operational behavior. |
-| **Ammunition Capacity** (`AmmunitionCapacity`) | Maximum **local reserve storage**, e.g. Battle Tower Level 1 might hold **1,000** units and later levels more. Generic optional capability for Battle, Laser and other suitable tower types—not a Battle-only field. |
-| **Ammunition per shot** (`AmmunitionPerShot`) | Units taken from available ammunition for each attack, usually **1** at first. Continuous/pulsed weapons will need a deliberately defined per-second or per-activation consumption model. |
+| **Ammunition Capacity** (`AmmunitionCapacity`) | Maximum **local reserve storage**, Implemented as AmmunitionStats.Capacity; Battle currently holds **1,000** at each authored level. Generic optional capability for Battle, Laser and other suitable tower types—not a Battle-only field. |
+| **Ammunition per shot** (`AmmunitionPerShot`) | Units taken from available ammunition for each attack, usually **1** at first. Implemented consumption: Battle1/launch, Laser2/firing-second, Blaster3/launch and Shockwave5/pulse. |
 | **Magazine size** (`MagazineCapacity`) | Optional additional value required for towers that use a magazine. Magazine rounds and total stored reserve are different quantities. |
 | **Reload time** (`ReloadSeconds`) | Delay when a magazine reloads **from its local reserve**. Towers without magazines must not be forced to reload. |
 | **Accuracy** | A level-dependent weapon handling value. Decide whether it means spread, leading/tracking, or hit probability *before* implementation; avoid meaningless per-tick miss rolls for continuous beams or area waves. |
@@ -75,9 +76,9 @@ These values may vary **independently** for Level 1, Level 2, Level 3, etc., jus
 
 Before coding delayed work, define (and test) when the grid cell is reserved/occupied; whether an unfinished or upgrading tower can aim, fire, be damaged, block paths or be targeted; when Credits/materials are charged; cancellation/refund rules; pause/interruption behavior; and future save/load restoration. Progress should be visible in the relevant build/placed-tower Inspector. Keep existing paid placement, occupancy and route-validation guarantees intact.
 
-#### Ammunition semantics to resolve during implementation
+#### Ammunition: completed first loop, future extensions
 
-Ammunition is a **shared optional tower capability**, not automatically ballistic bullets. Laser Towers might use energy cells/charge reserves; Blaster/Shockwave towers may consume supplies per activation. Ammunition **type**, initial stock, source, replenishment and eventual logistics are separate concerns from a level's maximum storage. Ammo should be consumed on the relevant attack attempt/firing event, not only on a hit. Empty magazines and empty reserves have distinct behaviors. Do not create factories, power grids or delivery drones in the initial ammunition pass unless separately requested.
+The shared optional reserve capability is implemented for all four weapons: Battle1/launch, Laser2/firing-second, Blaster3/launch and Shockwave5/pulse. Each complete C# level row owns capacity/consumption. New weapons start full unless InitialAmmoFraction is edited; promotions/upgrades preserve actual stock and never refill. Both factory→depot and depot→tower use visible drones with real cargo. Magazines, reload timers, differentiated ammo types, research and saving remain future work. See the ammunition READMEs for lifecycle/loss policies and verification.
 
 #### HP, shields and accuracy
 
@@ -98,10 +99,10 @@ The intent of "fixed" is **not increased by buying a tower level**; research and
 
 1. **Timed construction and upgrades** with work state and progress UI.
 2. **Tower HP and optional shields**, damage/repair foundations and Inspector readouts.
-3. **Generic local ammunition storage and consumption**, including empty-supply behavior.
+3. **Completed:** generic local ammunition storage/consumption and the first physical two-leg supply loop. Magazines/reloads remain future work.
 4. **Optional magazines/reload timers**, for applicable weapons only.
 5. **Accuracy mechanics**, selected by delivery type.
-6. **Later:** electricity generation/distribution/consumption, resupply logistics, permanent research efficiency and maintenance/wear.
+6. **Later:** electricity generation/distribution/consumption, expanded logistics, permanent research efficiency and maintenance/wear.
 
 These are planning priorities, **not** permission to implement everything in one large rewrite. Keep each pass narrow, reusable and tested.
 

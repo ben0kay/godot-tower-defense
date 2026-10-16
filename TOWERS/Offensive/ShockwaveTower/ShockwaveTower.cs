@@ -62,6 +62,7 @@ public partial class ShockwaveTower : TowerBase
         _cooldown -= delta;
         if (wave.DamagePerWave <= 0) { _cooldown = System.Math.Max(0, _cooldown); return; }
         if (_cooldown > 1e-8) return;
+        if (Ammunition?.TryFire() == false) return;
         ShockwaveEmitter emission = new();
         emission.Initialize(_registry, GlobalPosition, Config.CreateHit(FinalStats, DamageSource), FinalStats.RangePixels,
             wave.ExpansionSpeedPixelsPerSecond, wave.EdgeDamageFraction, _effects, Config.WaveStyle);

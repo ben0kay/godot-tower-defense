@@ -13,6 +13,10 @@ public abstract partial class TowerBase : Node2D
     public int UpgradeLevel { get; private set; } = 1;
     public TowerFinalStats FinalStats { get; protected set; }
     public event Action StatsChanged;
+    public event Action RuntimeChanged;
+    public TowerAmmunition Ammunition { get; private set; }
+    public virtual string DescribeRuntime() => Ammunition?.Describe() ?? "";
+    internal void NotifyRuntimeChanged() => RuntimeChanged?.Invoke();
     public event Action ExperienceChanged;
     public TowerRankProgress RankProgress { get; } = new();
     public TowerRankDefinition CurrentRank => RankProgress.Current(AuthoredConfig.Ranks);
@@ -62,7 +66,21 @@ public abstract partial class TowerBase : Node2D
 
     // =========================================================
     // Publish once after committed changes; wallet/controller retain payment ownership.
-    internal void NotifyStatsChanged() => StatsChanged?.Invoke();
+    internal void NotifyStatsChanged()
+    {
+        SynchronizeAmmunition(); StatsChanged?.Invoke();
+    }
+
+    // =========================================================
+    // Optional weapon reserves initialize once; passive buildings have no artificial ammo capability.
+    private void SynchronizeAmmunition()
+    {
+        if (FinalStats?.Ammunition is not AmmunitionStats stats) return;
+        if (Ammunition != null) { Ammunition.Synchronize(stats); return; }
+        Ammunition = new TowerAmmunition(stats, AuthoredConfig.InitialAmmoFraction);
+        Ammunition.Changed += NotifyRuntimeChanged;
+        GetNodeOrNull<AmmunitionLogistics>("../../AmmunitionLogistics")?.RegisterConsumer(this);
+    }
 
     // =========================================================
     // Both live stats and purchased-level previews retain this instance's currently earned rank.
