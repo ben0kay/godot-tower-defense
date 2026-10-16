@@ -9,10 +9,11 @@ public partial class AmmunitionFactoryConfig : TowerConfig
     [ExportGroup("Production")]
     [Export(PropertyHint.Range, "1,10000,1")] public int BatchAmount { get; set; } = 100;
     [Export(PropertyHint.Range, "0.05,120,0.05")] public float ProductionSecondsPerBatch { get; set; } = 2;
-    [Export(PropertyHint.Range, "1,100000,1")] public int InternalBufferCapacity { get; set; } = 400;
+    [Export(PropertyHint.Range, "1,100000,1")] public int InternalBufferCapacity { get; set; } = 1000;
     [ExportGroup("Transport")]
     [Export(PropertyHint.Range, "0,20,1")] public int DroneSlots { get; set; } = 1;
-    [Export(PropertyHint.Range, "1,10000,1")] public int DronePayload { get; set; } = 200;
+    [Export(PropertyHint.Range, "1,10000,1")] public int DronePayload { get; set; } = 1000;
+    [Export(PropertyHint.Range, "1,10000,1")] public int ShipmentAmount { get; set; } = 1000;
     [Export(PropertyHint.Range, "1,2000,1")] public float DroneSpeed { get; set; } = 220;
 
     // =========================================================
@@ -23,5 +24,5 @@ public partial class AmmunitionFactoryConfig : TowerConfig
         ConstructionCosts = new TowerLevel(1, 200, default).Costs;
     }
     public override string DescribeStats(TowerFinalStats final) =>
-        $"Production: {BatchAmount} ammo / {ProductionSecondsPerBatch:0.##}s\nBuffer: {InternalBufferCapacity}\nDrones: {DroneSlots} × {DronePayload} ammo at {DroneSpeed:0} px/s";
+        $"Production: {BatchAmount} ammo / {ProductionSecondsPerBatch:0.##}s\nBuffer: {InternalBufferCapacity}\nShipment: {ShipmentAmount:N0} ammo per trip\nDrones: {DroneSlots} × {DronePayload} ammo at {DroneSpeed:0} px/s";
 }

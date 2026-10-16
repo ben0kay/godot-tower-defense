@@ -21,21 +21,21 @@ public partial class AmmunitionLoopChecks : Node
                 Require(f.Wallet.GetBalance(f.Wallet.CreditsResource) == 800, "Factory construction pays 200 Credits");
                 Require(factory.FinalStats == null && factory.Ammunition == null, "Factory remains passive");
                 factory._PhysicsProcess(8); factory._PhysicsProcess(50);
-                Require(factory.Inventory.Amount == 400 && factory.Production.IsPaused && factory.ProducedRounds == 400 && f.Logistics.Jobs.Count == 0,
+                Require(factory.Inventory.Amount == 1000 && factory.Production.IsPaused && factory.ProducedRounds == 1000 && f.Logistics.Jobs.Count == 0,
                     "No depot: auto production fills finite buffer and pauses without lost batches");
                 AmmunitionDepot depot = f.Purchase<AmmunitionDepot>("ammo_depot");
                 BattleTower tower = f.Purchase<BattleTower>("battle");
                 Require(f.Wallet.GetBalance(f.Wallet.CreditsResource) == 450, "Depot/Battle use existing paid placement");
                 Require(tower.Ammunition.Inventory.Amount == 1000 && f.AccountedRounds() == 1000 + f.ProducedRounds(), "Explicit starting stock conservation");
                 f.Dispatch(); AmmoDeliveryJob incoming = f.Logistics.Jobs.Single();
-                Require(incoming.Source == factory && incoming.Destination == depot && incoming.Cargo.Amount == 200 && depot.Inventory.Amount == 0,
+                Require(incoming.Source == factory && incoming.Destination == depot && incoming.Cargo.Amount == 1000 && depot.Inventory.Amount == 0,
                     "Factory launches visible loaded drone; depot receives nothing at dispatch");
-                Require(f.Logistics.ReservedSpace(depot) == 200 && f.Logistics.BusySlots(factory) == 1, "Capacity and source slot reserved");
+                Require(f.Logistics.ReservedSpace(depot) == 1000 && f.Logistics.BusySlots(factory) == 1, "Capacity and source slot reserved");
                 Vector2 start = incoming.Drone.GlobalPosition; incoming.Drone._PhysicsProcess(.001);
                 Require(incoming.Drone.GlobalPosition != start && depot.Inventory.Amount == 0, "Drone actually travels before unloading");
-                factory._PhysicsProcess(2); Require(factory.Inventory.Amount == 300 && !factory.Production.IsPaused, "Loading frees production buffer and resumes it");
+                factory._PhysicsProcess(2); Require(factory.Inventory.Amount == 100 && !factory.Production.IsPaused, "Loading frees production buffer and resumes it");
                 f.Arrive(incoming);
-                Require(depot.Inventory.Amount == 200 && incoming.Cargo.Amount == 0 && incoming.Drone.Returning && f.Logistics.BusySlots(factory) == 1,
+                Require(depot.Inventory.Amount == 1000 && incoming.Cargo.Amount == 0 && incoming.Drone.Returning && f.Logistics.BusySlots(factory) == 1,
                     "Only arrival unloads once; source slot stays busy on return");
                 f.Return(incoming); Require(f.Logistics.BusySlots(factory) == 0, "Returning home releases factory slot");
                 tower.Config.TargetPriority = TowerTargeting.Priority.Closest;
@@ -44,14 +44,14 @@ public partial class AmmunitionLoopChecks : Node
                 Require(tower.Ammunition.Inventory.Amount == 100 && tower.Ammunition.ConsumedRounds == 900 && tower.Ammunition.ResupplyRequested,
                     "900 actual Battle launches reach global 10% threshold and one demand");
                 f.Dispatch(); AmmoDeliveryJob refill = f.Logistics.Jobs.Single(j => j.Destination == tower);
-                Require(refill.Source == depot && tower.Ammunition.Inventory.Amount == 100 && refill.Cargo.Amount == 200, "Depot loads physical stock, never refills at dispatch");
+                Require(refill.Source == depot && tower.Ammunition.Inventory.Amount == 100 && refill.Cargo.Amount == 250, "Depot loads physical stock, never refills at dispatch");
                 f.Dispatch(); Require(f.Logistics.Jobs.Count(j => j.Destination == tower) == 1, "No duplicate tower job during repeated dispatch");
-                f.Arrive(refill); Require(tower.Ammunition.Inventory.Amount == 300, "Tower refills only on drone arrival");
+                f.Arrive(refill); Require(tower.Ammunition.Inventory.Amount == 350, "Tower refills only on drone arrival");
                 f.Return(refill); Require(!tower.Ammunition.DeliveryInFlight && !tower.Ammunition.ResupplyRequested, "Request rearms after completed refill");
                 Require(f.AccountedRounds() == 1000 + f.ProducedRounds(), "Complete loop conserves produced, stored, consumed and carried ammo");
                 f.Placement.Call("SelectTower", tower); tower.Ammunition.Inventory.TryConsume(1);
                 await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-                Require(f.Hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/RuntimeStats").Text.Contains("299"), "Selected tower ammo updates by event");
+                Require(f.Hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/RuntimeStats").Text.Contains("349"), "Selected tower ammo updates by event");
                 f.Placement.Call("SelectTower", factory);
                 Require(f.Hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/RuntimeStats").Text.Contains("Buffered ammo"), "Factory Inspector shows runtime buffer");
                 f.Placement.Call("SelectTower", depot);
@@ -74,7 +74,7 @@ public partial class AmmunitionLoopChecks : Node
         using AmmoLoopFixture f = new(this);
         AmmunitionFactory factory = f.Add<AmmunitionFactory>("ammo_factory", new(2000, 2000), c =>
         { var a = (AmmunitionFactoryConfig)c; a.BatchAmount = 10; a.InternalBufferCapacity = 20;
-          a.ProductionSecondsPerBatch = .05f; a.DroneSpeed = 10000; a.DronePayload = 10; });
+          a.ProductionSecondsPerBatch = .05f; a.DroneSpeed = 10000; a.DronePayload = 10; a.ShipmentAmount = 10; });
         f.Add<AmmunitionDepot>("ammo_depot", new(2100, 2000), c =>
         { var d = (AmmunitionDepotConfig)c; d.StorageCapacity = 100; d.DroneSpeed = 10000; d.DronePayload = 10; });
         BattleTower tower = f.Add<BattleTower>("battle", new(2200, 2000), c =>

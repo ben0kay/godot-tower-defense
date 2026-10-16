@@ -13,12 +13,14 @@ public partial class AmmunitionFactory : AmmoBuilding
     public override int DronePayload => Math.Max(1, Config.DronePayload);
     public override float DroneSpeed => float.IsFinite(Config.DroneSpeed) ? Mathf.Max(1, Config.DroneSpeed) : 220;
     public override bool AcceptsConfig(TowerConfig config) => config is AmmunitionFactoryConfig c && c.BatchAmount > 0
-        && c.InternalBufferCapacity >= c.BatchAmount && float.IsFinite(c.ProductionSecondsPerBatch) && c.ProductionSecondsPerBatch > 0;
+        && c.InternalBufferCapacity >= c.BatchAmount && c.ShipmentAmount > 0 && c.ShipmentAmount <= c.InternalBufferCapacity
+        && c.DronePayload >= c.ShipmentAmount && float.IsFinite(c.ProductionSecondsPerBatch) && c.ProductionSecondsPerBatch > 0;
     protected override void ApplyConfig(TowerConfig config) => Config = (AmmunitionFactoryConfig)config;
 
     // =========================================================
     // Validate before payment and keep malformed production settings from creating a half-built factory.
     public override bool ValidateScene() => Config != null && Config.BatchAmount > 0 && Config.InternalBufferCapacity >= Config.BatchAmount
+        && Config.ShipmentAmount > 0 && Config.ShipmentAmount <= Config.InternalBufferCapacity && Config.DronePayload >= Config.ShipmentAmount
         && float.IsFinite(Config.ProductionSecondsPerBatch) && Config.ProductionSecondsPerBatch > 0;
     public override void _Ready()
     {

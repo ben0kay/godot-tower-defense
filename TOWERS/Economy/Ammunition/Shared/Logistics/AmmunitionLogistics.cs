@@ -103,11 +103,13 @@ public partial class AmmunitionLogistics : Node2D
     // Nearest eligible depot wins; equal-distance ties retain stable registration order.
     private void TryFactory(AmmunitionFactory factory)
     {
-        if (!Live(factory) || factory.Inventory.Amount == 0 || BusySlots(factory) >= factory.DroneSlots) return;
+        int shipment = factory.Config.ShipmentAmount;
+        if (!Live(factory) || shipment <= 0 || shipment > factory.DronePayload
+            || factory.Inventory.Amount < shipment || BusySlots(factory) >= factory.DroneSlots) return;
         AmmunitionDepot best = null; float distance = float.PositiveInfinity;
         foreach (AmmunitionDepot depot in _depots)
         {
-            if (!Live(depot) || depot.Inventory.FreeSpace - ReservedSpace(depot) <= 0) continue;
+            if (!Live(depot) || depot.Inventory.FreeSpace - ReservedSpace(depot) < shipment) continue;
             float candidate = factory.GlobalPosition.DistanceSquaredTo(depot.GlobalPosition);
             if (candidate < distance) { best = depot; distance = candidate; }
         }
@@ -133,9 +135,15 @@ public partial class AmmunitionLogistics : Node2D
     private void Launch(AmmoBuilding source, TowerBase destination)
     {
         AmmoInventory target = Inventory(destination);
-        int amount = Math.Min(source.DronePayload, Math.Min(source.Inventory.Amount, target.FreeSpace - ReservedSpace(destination)));
-        if (source is AmmunitionFactory factory && amount >= factory.Production.BatchAmount)
-            amount = amount / factory.Production.BatchAmount * factory.Production.BatchAmount;
+        int freeRoom = target.FreeSpace - ReservedSpace(destination);
+        int amount;
+        if (source is AmmunitionFactory factory)
+        {
+            // Factory shipments are ALWAYS one full configured load, never a premature or partial flight.
+            amount = factory.Config.ShipmentAmount;
+            if (amount <= 0 || amount > source.DronePayload || amount > source.Inventory.Amount || amount > freeRoom) return;
+        }
+        else amount = Math.Min(source.DronePayload, Math.Min(source.Inventory.Amount, freeRoom));
         if (amount <= 0) return;
         AmmoDeliveryJob job = new() { Source = source, Destination = destination, Cargo = new AmmoInventory(source.DronePayload), DestinationInventory = target };
         TransportDrone drone = DroneScene.Instantiate<TransportDrone>(); job.Drone = drone;

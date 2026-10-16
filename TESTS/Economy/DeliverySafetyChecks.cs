@@ -13,12 +13,34 @@ internal static class DeliverySafetyChecks
         {
             AmmunitionFactory a = f.Add<AmmunitionFactory>("ammo_factory", new(1800, 2000));
             AmmunitionFactory b = f.Add<AmmunitionFactory>("ammo_factory", new(2200, 2000));
-            AmmunitionDepot depot = f.Add<AmmunitionDepot>("ammo_depot", new(2000, 2000), c => ((AmmunitionDepotConfig)c).StorageCapacity = 150);
-            a._PhysicsProcess(8); b._PhysicsProcess(8); f.Dispatch();
-            Require(f.Logistics.Jobs.Count == 2 && f.Logistics.ReservedSpace(depot) == 150 && depot.Inventory.Amount == 0, "Multiple factories reserve finite incoming room");
+            AmmunitionDepot depot = f.Add<AmmunitionDepot>("ammo_depot", new(2000, 2000), c => ((AmmunitionDepotConfig)c).StorageCapacity = 2000);
+            a._PhysicsProcess(20); b._PhysicsProcess(20); f.Dispatch();
+            Require(f.Logistics.Jobs.Count == 2 && f.Logistics.ReservedSpace(depot) == 2000 && depot.Inventory.Amount == 0
+                && f.Logistics.Jobs.All(j => j.Cargo.Amount == 1000), "Two full factory shipments reserve exactly 2000 incoming rounds");
             foreach (AmmoDeliveryJob job in f.Logistics.Jobs.ToArray()) { f.Arrive(job); f.Return(job); }
+            a._PhysicsProcess(20); b._PhysicsProcess(20); f.Dispatch();
+            Require(depot.Inventory.Amount == 2000 && f.Logistics.Jobs.Count == 0 && f.AccountedRounds() == 4000,
+                "Full depot prevents further factory trips without stock duplication/loss");
+        }
+        // 900 buffered rounds must NOT launch early; insufficient destination space must NOT cause partial flights.
+        using (AmmoLoopFixture f = new(parent))
+        {
+            AmmunitionFactory factory = f.Add<AmmunitionFactory>("ammo_factory", new(1800, 2000));
+            AmmunitionDepot depot = f.Add<AmmunitionDepot>("ammo_depot", new(2000, 2000), c => ((AmmunitionDepotConfig)c).StorageCapacity = 1500);
+            Require(factory.Config.ShipmentAmount == 1000 && factory.Config.DronePayload == 1000
+                && factory.Inventory.Capacity == 1000 && depot.Inventory.Capacity == 1500,
+                "Configured shipment fits the factory buffer and drone");
+            factory._PhysicsProcess(18); f.Dispatch();
+            Require(factory.Inventory.Amount == 900 && f.Logistics.Jobs.Count == 0, "Factory holds stock under 1000; no early trip");
+            Require(depot.Inventory.TryAdd(600), "Preload depot to leave only 900 free");
+            factory._PhysicsProcess(2); f.Dispatch();
+            Require(factory.Inventory.Amount == 1000 && f.Logistics.Jobs.Count == 0,
+                "Factory holds complete 1000-round cargo when depot has fewer than 1000 unreserved slots");
+            AmmunitionDepot second = f.Add<AmmunitionDepot>("ammo_depot", new(2200, 2000));
             f.Dispatch();
-            Require(depot.Inventory.Amount == 150 && f.Logistics.Jobs.Count == 0 && f.AccountedRounds() == 800, "Full depot holds back factories without duplication/loss");
+            Require(f.Logistics.Jobs.Count == 1 && f.Logistics.Jobs[0].Destination == second
+                && f.Logistics.Jobs[0].Cargo.Amount == 1000 && f.Logistics.ReservedSpace(second) == 1000,
+                "Nearest depot without a full 1000 slots is skipped in favour of one with sufficient capacity");
         }
         using (AmmoLoopFixture f = new(parent))
         {
