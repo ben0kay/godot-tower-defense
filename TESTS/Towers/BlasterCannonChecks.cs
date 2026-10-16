@@ -37,18 +37,18 @@ public static class BlasterCannonChecks
         Label details = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerStats");
         Label upgrade = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/UpgradeInfo");
         Require(details.Text.Contains("Base damage: 60") && details.Text.Contains("Blast radius: 80") && details.Text.Contains("Edge damage: 25%")
-            && upgrade.Text.Contains("60 → 75") && upgrade.Text.Contains("80 → 96"), "Placed Inspector shows real AoE stats and next-tier preview");
+            && upgrade.Text.Contains("60 → 66") && upgrade.Text.Contains("80 → 88"), "Placed Inspector shows real AoE stats and next-tier preview");
         TowerFinalStats preview = tower.ResolveLevel(2); int revision = grid.NavigationRevision;
         hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/UpgradeButton").EmitSignal(Button.SignalName.Pressed);
-        Require(tower.UpgradeLevel == 2 && tower.FinalStats == preview && tower.FinalStats.DamagePerShot == 75
-            && tower.FinalStats.Area == new AreaBlastStats(96, 0.25f) && wallet.GetBalance(wallet.CreditsResource) == 500
+        Require(tower.UpgradeLevel == 2 && tower.FinalStats == preview && tower.FinalStats.DamagePerShot == 66
+            && tower.FinalStats.Area == new AreaBlastStats(88, 0.25f) && wallet.GetBalance(wallet.CreditsResource) == 500
             && grid.NavigationRevision == revision, "Paid200 tier matches preview and never changes falloff or occupancy");
         TowerFinalStats cached = tower.FinalStats;
-        tower.Config.SetLevelStats(2, tower.Config.Levels[1].Stats with { Area = new(96, 0.75f) });
+        tower.Config.SetLevelStats(2, tower.Config.Levels[1].Stats with { Area = new(88, 0.75f) });
         Require(!ReferenceEquals(cached, tower.FinalStats) && details.Text.Contains("Edge damage: 75%"), "Falloff config edit rebuilds selected cache/Inspector immediately");
         Require(tower.FinalStats.DamagePerShot == cached.DamagePerShot && tower.FinalStats.Area.Value.RadiusPixels == cached.Area.Value.RadiusPixels
             && ((BlasterCannonConfig)definition.DefaultConfig).EdgeDamageFraction == 0.25f, "Falloff tuning leaves center/radius/authored source unchanged");
-        Near(AreaDamage.AtDistance(tower.Config.CreateHit(tower.FinalStats), 96, 96, 0.75f).Amount, 56.25f, "Only weapon edge input changes the outer base amount");
+        Near(AreaDamage.AtDistance(tower.Config.CreateHit(tower.FinalStats), 88, 88, 0.75f).Amount, 49.5f, "Only weapon edge input changes the outer base amount");
         Require(DamageResolver.DefaultProfile.Coefficients(DamageType.Explosive) == (0.25f, 1.25f)
             && ((BattleTowerConfig)placement.Catalog.Find("battle").DefaultConfig).ResolveStats(1).ShieldPenetration == 0.05f
             && ((LaserTowerConfig)placement.Catalog.Find("laser").DefaultConfig).DamagePerSecond == 12, "Blaster tuning cannot change shared defaults, Battle or Laser");

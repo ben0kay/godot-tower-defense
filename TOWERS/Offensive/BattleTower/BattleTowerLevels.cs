@@ -14,9 +14,9 @@ public static class BattleTowerLevels
     // Cost is Credits; Pen/EdgeFrac are fractions. Level 1 builds; other rows are upgrade prices.
     private static readonly Row[] Rows =
     {
-        new(1, 200, 12, 1.0f, 256, 600, 180, 12, 0.15f, 0.05f, 1000, 1),
-        new(2, 150, 16, 1.2f, 288, 600, 180, 12, 0.15f, 0.05f, 1000, 1),
-        new(3, 250, 22, 1.5f, 320, 600, 180, 12, 0.15f, 0.05f, 1000, 1),
+        new(1, 200, 30, 1.0f, 256, 800, 180, 12, 0.15f, 0.05f, 1000, 1),
+        new(2, 150, 33, 1.05f, 264, 800, 180, 12, 0.15f, 0.05f, 1000, 1),
+        new(3, 250, 36, 1.1f, 272, 800, 180, 12, 0.15f, 0.05f, 1000, 1),
     };
 
     // =========================================================

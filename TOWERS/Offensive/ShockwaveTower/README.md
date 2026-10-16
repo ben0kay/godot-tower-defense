@@ -9,7 +9,7 @@ Edit `ShockwaveTowerLevels.cs`: one complete independent typed row per level, no
 | Level | Cost | Damage/wave | Max radius | Expansion speed | Interval | Edge retention | Penetration | Type |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
 | 1 | 350 Credits | 40 | 200px | 250px/s | 4s | 25% | 0% | Energy |
-| 2 | 225 Credits | 55 | 240px | 300px/s | 3.5s | 25% | 0% | Energy |
+| 2 | 225 Credits | 44 | 208px | 260px/s | 3.9s | 25% | 0% | Energy |
 
 Each row also explicitly declares independent shield/hull override flags/coefficients, initially disabled: inherit Energy2x shield/.85x hull. At Level1, exposed center/half/edge hull damage is34/21.25/8.5. At half range,25 base damage removes50 shield points; fractional breaks and penetration remain owned by COMBAT/Damage.
 
@@ -29,7 +29,7 @@ ShockwaveChecks runs inside EnemyIntegrationChecks: real350/225-credit transacti
 
 ## Earned Rank and Experience
 
-`ShockwaveTowerRanks.cs` sits beside `ShockwaveTowerLevels.cs` and defines all five named ranks in compact explicit rows: Standard0, Veteran100, Enhanced300, Superior700 and Legendary1500 total XP. The selected rank's total bonuses are0/2/4/6/8% damage and0/1/2/3/4% range; future HP columns are inactive. Rank XP is independent of purchased level/prices and is preserved by upgrades. Stage03 modifies the selected complete Level snapshot, never accumulates earlier Rank bonuses. Integer projectile damage retains nearest/ties-to-even rounding; float beams/waves retain fractional damage.
+`ShockwaveTowerRanks.cs` sits beside `ShockwaveTowerLevels.cs` and defines all five named ranks in compact explicit rows: Standard0, Veteran1000, Enhanced3000, Superior7000 and Legendary15000 total XP. The selected rank's total bonuses are0/2/4/6/8% damage and0/1/2/3/4% range; future HP columns are inactive. Rank XP is independent of purchased level/prices and is preserved by upgrades. Stage03 modifies the selected complete Level snapshot, never accumulates earlier Rank bonuses. Integer projectile damage retains nearest/ties-to-even rounding; float beams/waves retain fractional damage.
 
 Attacks carry the tower's weak DamageSource. Actual shield/hull loss earns a bounded share of XP derived from each enemy's KillRewardCredits; the lethal source receives kill XP. Shared TowerMasterConfig multipliers default to2× damage pool and10× kill reward. Debug/manual kills and arrivals grant no tower XP. Already-fired payloads retain combat values/source after promotion or upgrade; removed source towers do not receive XP. The bottom-right selected Inspector shows Rank, within-rank/total XP, progress bar, active bonuses and MAX RANK automatically through events. See TOWERS/Shared/Ranks/README.md for exact rules and regression results.
 

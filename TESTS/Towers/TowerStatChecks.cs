@@ -111,15 +111,15 @@ public static class TowerStatChecks
     {
         BattleTowerConfig battle = new(); LaserTowerConfig laser = new(); BlasterCannonConfig blaster = new();
         TowerFinalStats[] battleExpected = {
-            new(256, 1, 12, 600, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
-            new(288, 1.2f, 16, 600, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
-            new(320, 1.5f, 22, 600, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)) };
+            new(256, 1, 30, 800, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
+            new(264, 1.05f, 33, 800, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
+            new(272, 1.1f, 36, 800, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)) };
         TowerFinalStats[] laserExpected = {
             new(256, 0, 0, 1, 180, 12, .15f, new BeamStats(12), Weapon: new(DamageType.Energy, true, 6, true, .15f), Ammunition: new(1000, 0, 2)),
-            new(288, 0, 0, 1, 180, 12, .15f, new BeamStats(22), Weapon: new(DamageType.Energy, true, 6, true, .15f), Ammunition: new(1000, 0, 2)) };
+            new(264, 0, 0, 1, 180, 12, .15f, new BeamStats(14), Weapon: new(DamageType.Energy, true, 6, true, .15f), Ammunition: new(1000, 0, 2)) };
         TowerFinalStats[] blasterExpected = {
             new(256, .5f, 60, 500, 180, 12, .15f, Area: new(80, .25f), Weapon: new(DamageType.Explosive, false, 1, false, 1), Ammunition: new(600, 3)),
-            new(256, .5f, 75, 500, 180, 12, .15f, Area: new(96, .25f), Weapon: new(DamageType.Explosive, false, 1, false, 1), Ammunition: new(600, 3)) };
+            new(264, .5f, 66, 500, 180, 12, .15f, Area: new(88, .25f), Weapon: new(DamageType.Explosive, false, 1, false, 1), Ammunition: new(600, 3)) };
         CheckRows(battle, battleExpected, new[] { 200, 150, 250 });
         CheckRows(laser, laserExpected, new[] { 250, 175 });
         CheckRows(blaster, blasterExpected, new[] { 300, 200 });
@@ -132,7 +132,7 @@ public static class TowerStatChecks
         battle.Levels.Add(fourth);
         Require(battle.ResolveStats(4).DamagePerShot == 30 && battle.Levels[3].Costs[0].Amount == 400,
             "Adding another complete row requires no progression-code changes");
-        Require(new BattleTowerConfig().ResolveStats(2).DamagePerShot == 16, "Runtime rows never alter C# defaults");
+        Require(new BattleTowerConfig().ResolveStats(2).DamagePerShot == 33, "Runtime rows never alter C# defaults");
         foreach (int level in new[] { 0, 5 })
         {
             try { battle.ResolveStats(level); throw new InvalidOperationException("Out-of-range level accepted."); }

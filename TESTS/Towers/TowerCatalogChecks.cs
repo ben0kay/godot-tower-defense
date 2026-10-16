@@ -57,9 +57,9 @@ public static class TowerCatalogChecks
         Vector2I second = Cell(grid, spawns);
         placement.Call("TryPlace", second);
         BattleTower b = towers.GetChild<BattleTower>(towers.GetChildCount() - 1); b.SetPhysicsProcess(false);
-        Require(wallet.GetBalance(wallet.CreditsResource) == 725 && b.FinalStats.DamagePerShot == 12, "Battle still pays 200 and resolves baseline");
+        Require(wallet.GetBalance(wallet.CreditsResource) == 725 && b.FinalStats.DamagePerShot == 30, "Battle still pays 200 and resolves baseline");
         Require(TowerUpgradeController.TryUpgrade(b, wallet, placement.Settings, 1, out _) &&
-            b.UpgradeLevel == 2 && p.UpgradeLevel == 1 && b.FinalStats.DamagePerShot == 16 &&
+            b.UpgradeLevel == 2 && p.UpgradeLevel == 1 && b.FinalStats.DamagePerShot == 33 &&
             wallet.GetBalance(wallet.CreditsResource) == 575, "Mixed types retain independent progression and paid Battle upgrades");
         placement.Call("SelectTower", p);
         Require(hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerName").Text == passive.DisplayName,

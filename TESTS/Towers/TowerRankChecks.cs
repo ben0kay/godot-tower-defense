@@ -34,7 +34,7 @@ public static class TowerRankChecks
     // Exact named totals/increment doubling, explicit bonuses, multiple promotions and fractional summation.
     private static void Thresholds(Node main)
     {
-        double[] totals = { 0, 100, 300, 700, 1500 };
+        double[] totals = { 0, 1000, 3000, 7000, 15000 };
         foreach (var rows in new[] { BattleTowerRanks.Rows, LaserTowerRanks.Rows, BlasterCannonRanks.Rows, ShockwaveTowerRanks.Rows })
             for (int i = 0; i < 5; i++)
             {
@@ -47,24 +47,24 @@ public static class TowerRankChecks
         {
             TowerFinalStats cached = fractional.FinalStats; int stats = 0, xpEvents = 0;
             fractional.StatsChanged += () => stats++; fractional.ExperienceChanged += () => xpEvents++;
-            for (int i = 0; i < 999; i++) TowerRankController.AwardExperience(fractional, .1);
+            for (int i = 0; i < 9999; i++) TowerRankController.AwardExperience(fractional, .1);
             Require(fractional.CurrentRank.Rank == TowerRank.Standard && ReferenceEquals(cached, fractional.FinalStats), "Subthreshold fractional awards never rebuild stats");
             TowerRankController.AwardExperience(fractional, .1);
-            Near(fractional.RankProgress.TotalXp, 100, "Fractional summation reaches exact threshold");
-            Require(fractional.CurrentRank.Rank == TowerRank.Veteran && stats == 1 && xpEvents == 1000, "One promotion rebuild with event-driven XP updates");
-            TowerRankController.AwardExperience(fractional, 1400);
+            Near(fractional.RankProgress.TotalXp, 1000, "Fractional summation reaches exact threshold");
+            Require(fractional.CurrentRank.Rank == TowerRank.Veteran && stats == 1 && xpEvents == 10000, "One promotion rebuild with event-driven XP updates");
+            TowerRankController.AwardExperience(fractional, 14000);
             Require(fractional.CurrentRank.Rank == TowerRank.Legendary && fractional.NextRank == null && stats == 2, "One award traverses all remaining ranks with one rebuild");
-            Require(fractional.UpgradeLevel == 1 && fractional.FinalStats.DamagePerShot == 13, "Level1/Legendary applies only8% total with integer rounding");
+            Require(fractional.UpgradeLevel == 1 && fractional.FinalStats.DamagePerShot == 32, "Level1/Legendary applies only8% total with integer rounding");
             Near(fractional.FinalStats.RangePixels, 256 * 1.04, "Legendary total range bonus is4%, not cumulative10%");
             TowerRankController.AwardExperience(fractional, 500);
             Require(stats == 2 && fractional.RankProgress.TotalXp == 2000, "Maximum rank retains XP without repeated stat rebuilding");
             foreach (double bad in new[] { -1, 0, double.NaN, double.PositiveInfinity }) TowerRankController.AwardExperience(fractional, bad);
-            Near(fractional.RankProgress.TotalXp, 2000, "Malformed/nonpositive XP never changes progress");
+            Near(fractional.RankProgress.TotalXp, 15500, "Malformed/nonpositive XP never changes progress");
             TowerStatTrace trace = new();
             var final = TowerStatPipeline.Resolve(fractional.AuthoredConfig, 3, trace, fractional.CurrentRank);
-            Require(trace.Steps.Count == 8 && trace.Steps[1].Stats.DamagePerShot == 22 && trace.Steps[2].Stats.DamagePerShot == 24
-                && final.DamagePerShot == 24, "Stage02 selects22, Stage03 alone applies Legendary8%, later stages preserve result");
-            Require(fractional.AuthoredConfig.Levels[2].Stats.DamagePerShot == 22 && fractional.AuthoredConfig.Levels[2].Costs[0].Amount == 250,
+            Require(trace.Steps.Count == 8 && trace.Steps[1].Stats.DamagePerShot == 36 && trace.Steps[2].Stats.DamagePerShot == 39
+                && final.DamagePerShot == 39, "Stage02 selects36, Stage03 alone applies Legendary8%, later stages preserve result");
+            Require(fractional.AuthoredConfig.Levels[2].Stats.DamagePerShot == 36 && fractional.AuthoredConfig.Levels[2].Costs[0].Amount == 250,
                 "Rank progression never mutates explicit levels or price recipes");
             var custom = new TowerRankDefinition(TowerRank.Veteran, 50, .5f, .25f, 5);
             var laser = new LaserTowerConfig();
@@ -118,9 +118,9 @@ public static class TowerRankChecks
             TowerBase promoted = Create(main, "battle");
             try
             {
-                Enemy valuable = Enemy(main, spawns, credits: 150);
+                Enemy valuable = Enemy(main, spawns, credits: 1500);
                 valuable.ApplyDamage(new(10000, DamageType.Kinetic, source: promoted.DamageSource));
-                Require(promoted.CurrentRank.Rank == TowerRank.Legendary && promoted.RankProgress.TotalXp == 1800,
+                Require(promoted.CurrentRank.Rank == TowerRank.Legendary && promoted.RankProgress.TotalXp == 18000,
                     "A single actual lethal award can promote through all five named ranks");
             }
             finally { promoted.Free(); }
@@ -172,7 +172,7 @@ public static class TowerRankChecks
         battle._PhysicsProcess(1);
         BasicProjectile bullet = main.GetNode("World/Projectiles").GetChildren().OfType<BasicProjectile>().Single();
         Near(battle.RankProgress.TotalXp, 0, "Launching a guided projectile is not damage XP");
-        bullet._PhysicsProcess(.2); Near(battle.RankProgress.TotalXp, 1.2, "Production guided contact credits its Battle owner"); bullet.Free(); battle.Free(); Clear(main, spawns);
+        bullet._PhysicsProcess(.2); Near(battle.RankProgress.TotalXp, 3, "Production guided contact credits its Battle owner"); bullet.Free(); battle.Free(); Clear(main, spawns);
         LaserTower laser = (LaserTower)Create(main, "laser"); target = Enemy(main, spawns);
         laser.Config.TargetPriority = TowerTargeting.Priority.Closest; laser.Config.AimToleranceDegrees = 180;
         laser._PhysicsProcess(1); Near(laser.RankProgress.TotalXp, .18, "Continuous Laser credits actual1.8 hull, not12 raw base");
@@ -194,7 +194,7 @@ public static class TowerRankChecks
         battle.Config.TargetPriority = TowerTargeting.Priority.Closest; battle.Config.AimToleranceDegrees = 180; battle._PhysicsProcess(1);
         bullet = main.GetNode("World/Projectiles").GetChildren().OfType<BasicProjectile>().Single();
         battle.Free(); bullet._PhysicsProcess(.2);
-        Near(target.Health, 48, "Deleting owner does not cancel a fired projectile's combat");
+        Near(target.Health, 30, "Deleting owner does not cancel a fired projectile's combat");
         Near(battle.RankProgress.TotalXp, 0, "Weak source awards nothing to a freed tower"); Clear(main, spawns);
     }
 
@@ -207,34 +207,34 @@ public static class TowerRankChecks
         var wallet = main.GetNode<EconomyManager>("Economy"); wallet.Initialize(new LevelConfig { StartingCredits = 1000 });
         try
         {
-            TowerRankController.AwardExperience(tower, 100); TowerFinalStats next = tower.ResolveLevel(2);
+            TowerRankController.AwardExperience(tower, 1000); TowerFinalStats next = tower.ResolveLevel(2);
             Require(TowerUpgradeController.TryUpgrade(tower, wallet, placement.Settings, 1, out _) && tower.FinalStats == next,
                 "Paid next-level preview includes current Veteran bonuses");
-            Require(tower.UpgradeLevel == 2 && tower.RankProgress.TotalXp == 100 && tower.CurrentRank.Rank == TowerRank.Veteran,
+            Require(tower.UpgradeLevel == 2 && tower.RankProgress.TotalXp == 1000 && tower.CurrentRank.Rank == TowerRank.Veteran,
                 "Purchased level never resets rank or accumulated XP");
-            Near(tower.FinalStats.RangePixels, 288 * 1.01, "Rank applies after full purchased row selection");
-            TowerRankController.AwardExperience(tower, 200);
-            Require(TowerUpgradeController.TryUpgrade(tower, wallet, placement.Settings, 2, out _) && tower.FinalStats.DamagePerShot == 23,
-                "Level3 Enhanced rounds22×1.04 once");
-            Require(wallet.GetBalance(wallet.CreditsResource) == 600 && tower.RankProgress.TotalXp == 300,
-                "Existing150/250 credit purchases preserve all300 earned XP");
+            Near(tower.FinalStats.RangePixels, 264 * 1.01, "Rank applies after full purchased row selection");
+            TowerRankController.AwardExperience(tower, 2000);
+            Require(TowerUpgradeController.TryUpgrade(tower, wallet, placement.Settings, 2, out _) && tower.FinalStats.DamagePerShot == 37,
+                "Level3 Enhanced rounds36×1.04 once");
+            Require(wallet.GetBalance(wallet.CreditsResource) == 600 && tower.RankProgress.TotalXp == 3000,
+                "Existing150/250 credit purchases preserve all3000 earned XP");
             placement.Call("SelectTower", tower);
             var section = hud.GetNode<Control>("BottomArea/Inspector/Insets/Body/RankSection");
             var label = section.GetNode<Label>("Rank"); var text = section.GetNode<Label>("ExperienceText");
             var bar = section.GetNode<ProgressBar>("ExperienceBar"); var bonuses = section.GetNode<Label>("RankBonuses");
-            Require(section.Visible && label.Text == "Rank: Enhanced" && text.Text.Contains("0 / 400 XP to Superior")
+            Require(section.Visible && label.Text == "Rank: Enhanced" && text.Text.Contains("0 / 4000 XP to Superior")
                 && bonuses.Text.Contains("Damage +4%") && bonuses.Text.Contains("Range +2%"), "Placed bottom-right Inspector shows named rank, segment XP and active bonuses");
             TowerFinalStats cached = tower.FinalStats; string upgrade = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/UpgradeInfo").Text;
-            TowerRankController.AwardExperience(tower, 120);
+            TowerRankController.AwardExperience(tower, 1200);
             await main.ToSignal(main.GetTree(), SceneTree.SignalName.ProcessFrame);
             await main.ToSignal(main.GetTree(), SceneTree.SignalName.ProcessFrame);
-            Require(ReferenceEquals(cached, tower.FinalStats) && bar.Value == 120 && bar.MaxValue == 400
-                && text.Text.Contains("120 / 400 XP to Superior") && text.Text.Contains("Total XP: 420"), "XP events update actual progress without pipeline polling/rebuilds");
+            Require(ReferenceEquals(cached, tower.FinalStats) && bar.Value == 1200 && bar.MaxValue == 4000
+                && text.Text.Contains("1200 / 4000 XP to Superior") && text.Text.Contains("Total XP: 4200"), "XP events update actual progress without pipeline polling/rebuilds");
             Require(hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/UpgradeInfo").Text == upgrade, "XP updates preserve the existing upgrade panel");
-            TowerRankController.AwardExperience(tower, 1080);
+            TowerRankController.AwardExperience(tower, 10800);
             Require(label.Text == "Rank: Legendary" && text.Text.Contains("MAX RANK") && bar.Value == bar.MaxValue,
                 "Multiple promotions update MAX RANK display and full progress bar automatically");
-            Require(tower.UpgradeLevel == 3 && tower.FinalStats.DamagePerShot == 24 && tower.RankProgress.TotalXp == 1500,
+            Require(tower.UpgradeLevel == 3 && tower.FinalStats.DamagePerShot == 39 && tower.RankProgress.TotalXp == 15000,
                 "Level and earned rank stay independent at maximum");
             await main.ToSignal(main.GetTree(), SceneTree.SignalName.ProcessFrame);
             await main.ToSignal(main.GetTree(), SceneTree.SignalName.ProcessFrame);
@@ -242,12 +242,12 @@ public static class TowerRankChecks
             Require(panel.GetGlobalRect().Position.Y >= 0 && panel.GetGlobalRect().End.Y <= hud.Size.Y + 1,
                 "Rank section preserves onscreen Inspector layout");
             placement.Call("SelectTower", other);
-            Require(label.Text == "Rank: Standard" && text.Text.Contains("0 / 100 XP to Veteran"), "Selecting another tower shows its independent XP");
+            Require(label.Text == "Rank: Standard" && text.Text.Contains("0 / 1000 XP to Veteran"), "Selecting another tower shows its independent XP");
             TowerRankController.AwardExperience(tower, 50);
             Require(label.Text == "Rank: Standard", "Previously selected tower unsubscribes from Inspector updates");
             hud.ClearInspection(); TowerRankController.AwardExperience(other, 1.5);
             placement.Call("SelectTower", other);
-            Require(hud.IsInspectionVisible && text.Text.Contains("1.5 / 100 XP to Veteran"),
+            Require(hud.IsInspectionVisible && text.Text.Contains("1.5 / 1000 XP to Veteran"),
                 "Reopening the same closed selection displays XP earned while hidden");
             hud.GetBuildButton("battle").EmitSignal(Button.SignalName.Pressed);
             Require(!section.Visible, "Build preview never shows stale placed-tower rank data");

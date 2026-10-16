@@ -8,9 +8,9 @@ Ctrl → Battle Tower → place on route-safe terrain. First targets the shortes
 
 | Level | Build/upgrade price | Damage | Shots/s | Range | Projectile speed | Turn | Aim | Search | Penetration |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | 200 | 12 | 1 | 256px | 600px/s | 180°/s | 12° | .15s | 5% |
-| 2 | 150 | 16 | 1.2 | 288px | 600px/s | 180°/s | 12° | .15s | 5% |
-| 3 | 250 | 22 | 1.5 | 320px | 600px/s | 180°/s | 12° | .15s | 5% |
+| 1 | 200 | 30 | 1 | 256px | 800px/s | 180°/s | 12° | .15s | 5% |
+| 2 | 150 | 33 | 1.05 | 264px | 800px/s | 180°/s | 12° | .15s | 5% |
+| 3 | 250 | 36 | 1.1 | 272px | 800px/s | 180°/s | 12° | .15s | 5% |
 
 DefaultBattleTowerConfig.tres retains Inspector identity, target priority and RotateWhileTracking; scene/definition retain artwork and registration. Combat stats/prices are no longer numeric .tres exports. Each placed tower gets private runtime rows/recipes. C# Level 1 convenience accessors edit row 1 only; use SetLevelStats(level, snapshot) for another row.
 
@@ -20,13 +20,13 @@ Select a placed tower to see its level, actual stats, next-row differences, pric
 
 The eight-stage pipeline selects the complete purchased row at Stage 02. Stage03 applies the current earned rank; research/map/effect stages remain neutral. Config changes or purchases invalidate once; physics never resolves per tick. Upgrading preserves targeting, aim, cooldown and navigation.
 
-Kinetic damage and 5% penetration retain the shared defense resolver contract: 12 base against 100 shield/60 hull leaves 97.15 shield/59.4 hull, or deals 12 to exposed hull. Fired bullets preserve their launch snapshot. No research, saving, selling, armour, new artwork or weapon mechanics were introduced.
+Kinetic damage and 5% penetration retain the shared defense resolver contract: 30 base against 100 shield/60 hull leaves 92.875 shield/58.5 hull, or deals 30 to exposed hull. An unshielded 60-HP Enemy001 takes exactly two standard-rank level-one hits. Fired bullets preserve their launch snapshot. No research, saving, selling, armour, new artwork or weapon mechanics were introduced.
 
 TowerStatChecks asserts exact stats/prices and level independence; TowerUpgradeChecks drives real HUD purchases/preview/max-level/atomic costs; DamageTypeChecks retains real projectile penetration coverage. See TESTS/README.md for actual compilation and headless results.
 
 ## Earned Rank and Experience
 
-`BattleTowerRanks.cs` sits beside `BattleTowerLevels.cs` and defines all five named ranks in compact explicit rows: Standard0, Veteran100, Enhanced300, Superior700 and Legendary1500 total XP. The selected rank's total bonuses are0/2/4/6/8% damage and0/1/2/3/4% range; future HP columns are inactive. Rank XP is independent of purchased level/prices and is preserved by upgrades. Stage03 modifies the selected complete Level snapshot, never accumulates earlier Rank bonuses. Integer projectile damage retains nearest/ties-to-even rounding; float beams/waves retain fractional damage.
+`BattleTowerRanks.cs` sits beside `BattleTowerLevels.cs` and defines all five named ranks in compact explicit rows: Standard0, Veteran1000, Enhanced3000, Superior7000 and Legendary15000 total XP. The selected rank's total bonuses are0/2/4/6/8% damage and0/1/2/3/4% range; future HP columns are inactive. Rank XP is independent of purchased level/prices and is preserved by upgrades. Stage03 modifies the selected complete Level snapshot, never accumulates earlier Rank bonuses. Integer projectile damage retains nearest/ties-to-even rounding; float beams/waves retain fractional damage.
 
 Attacks carry the tower's weak DamageSource. Actual shield/hull loss earns a bounded share of XP derived from each enemy's KillRewardCredits; the lethal source receives kill XP. Shared TowerMasterConfig multipliers default to2× damage pool and10× kill reward. Debug/manual kills and arrivals grant no tower XP. Already-fired payloads retain combat values/source after promotion or upgrade; removed source towers do not receive XP. The bottom-right selected Inspector shows Rank, within-rank/total XP, progress bar, active bonuses and MAX RANK automatically through events. See TOWERS/Shared/Ranks/README.md for exact rules and regression results.
 

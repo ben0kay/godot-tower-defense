@@ -1,6 +1,6 @@
 # Laser Tower — sustained Energy beam (Phases 4C-2/4C-3)
 
-Ctrl → Laser Tower → place on route-safe terrain. LaserTowerDefinition registers `laser` in DefaultTowerCatalog; generic placement/HUD handle its 1×1 footprint, private config, prices, selection and upgrades without per-type branches. Initial price 250 Credits, range 256px and 12 base DPS are provisional playtest balance. Level2 costs 175 Credits and directly selects 22 DPS/288px. Battle Tower remains200 Credits with its existing150/250 upgrade prices.
+Ctrl → Laser Tower → place on route-safe terrain. LaserTowerDefinition registers `laser` in DefaultTowerCatalog; generic placement/HUD handle its 1×1 footprint, private config, prices, selection and upgrades without per-type branches. Initial price 250 Credits, range 256px and 12 base DPS are provisional playtest balance. Level2 costs 175 Credits and directly selects 14 DPS/264px. Battle Tower remains200 Credits with its existing150/250 upgrade prices.
 
 ## Combat and retargeting
 
@@ -24,7 +24,7 @@ LaserTowerChecks covers real build-bar placement/payment/selection, private conf
 
 ## Earned Rank and Experience
 
-`LaserTowerRanks.cs` sits beside `LaserTowerLevels.cs` and defines all five named ranks in compact explicit rows: Standard0, Veteran100, Enhanced300, Superior700 and Legendary1500 total XP. The selected rank's total bonuses are0/2/4/6/8% damage and0/1/2/3/4% range; future HP columns are inactive. Rank XP is independent of purchased level/prices and is preserved by upgrades. Stage03 modifies the selected complete Level snapshot, never accumulates earlier Rank bonuses. Integer projectile damage retains nearest/ties-to-even rounding; float beams/waves retain fractional damage.
+`LaserTowerRanks.cs` sits beside `LaserTowerLevels.cs` and defines all five named ranks in compact explicit rows: Standard0, Veteran1000, Enhanced3000, Superior7000 and Legendary15000 total XP. The selected rank's total bonuses are0/2/4/6/8% damage and0/1/2/3/4% range; future HP columns are inactive. Rank XP is independent of purchased level/prices and is preserved by upgrades. Stage03 modifies the selected complete Level snapshot, never accumulates earlier Rank bonuses. Integer projectile damage retains nearest/ties-to-even rounding; float beams/waves retain fractional damage.
 
 Attacks carry the tower's weak DamageSource. Actual shield/hull loss earns a bounded share of XP derived from each enemy's KillRewardCredits; the lethal source receives kill XP. Shared TowerMasterConfig multipliers default to2× damage pool and10× kill reward. Debug/manual kills and arrivals grant no tower XP. Already-fired payloads retain combat values/source after promotion or upgrade; removed source towers do not receive XP. The bottom-right selected Inspector shows Rank, within-rank/total XP, progress bar, active bonuses and MAX RANK automatically through events. See TOWERS/Shared/Ranks/README.md for exact rules and regression results.
 

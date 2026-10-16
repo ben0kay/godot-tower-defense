@@ -15,7 +15,7 @@ public static class LaserTowerLevels
     private static readonly Row[] Rows =
     {
         new(1, 250, 12, 256, 180, 12, 0.15f, 0, DamageType.Energy, true, 6, true, 0.15f, 1000, 2f),
-        new(2, 175, 22, 288, 180, 12, 0.15f, 0, DamageType.Energy, true, 6, true, 0.15f, 1000, 2f),
+        new(2, 175, 14, 264, 180, 12, 0.15f, 0, DamageType.Energy, true, 6, true, 0.15f, 1000, 2f),
     };
 
     // =========================================================

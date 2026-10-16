@@ -151,8 +151,8 @@ public partial class EnemyIntegrationChecks : Node
                 tower._PhysicsProcess(1.0 / 60);
                 foreach (BasicProjectile bullet in _battle.GetNode<Node2D>("World/Projectiles").GetChildren().OfType<BasicProjectile>().ToArray())
                 { bullet.SetPhysicsProcess(false); if (!bullet.IsQueuedForDeletion()) bullet._PhysicsProcess(1.0 / 60); }
-                if (i == 44) Check(target.Health == 48, "One configured 12-damage shot during first 0.75 seconds");
-                if (i == 89) Check(target.Health == 36, "One shot per second respects cooldown");
+                if (i == 44) Check(target.Health == 30, "One configured 30-damage shot during first 0.75 seconds");
+                if (i == 59) Check(target.Health == 30, "First shot deals half of Enemy001 hull before the second fires");
             }
             Check(!target.IsAlive && _spawns.Registry.KilledCount == killedBefore + 1, "Configured tower fires bullets and kills Enemy001");
             target.TakeDamage(1000);

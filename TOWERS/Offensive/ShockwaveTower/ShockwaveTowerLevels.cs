@@ -17,7 +17,7 @@ public static class ShockwaveTowerLevels
     private static readonly Row[] Rows =
     {
         new(1, 350, 40, 200, 250, 4.0f, .25f, 0, DamageType.Energy, false, 1, false, 1, 400, 5),
-        new(2, 225, 55, 240, 300, 3.5f, .25f, 0, DamageType.Energy, false, 1, false, 1, 400, 5),
+        new(2, 225, 44, 208, 260, 3.9f, .25f, 0, DamageType.Energy, false, 1, false, 1, 400, 5),
     };
 
     // =========================================================

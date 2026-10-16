@@ -60,7 +60,7 @@ public partial class MenuTowerFlowChecks : Node
             Require(placed && wallet.GetBalance(wallet.CreditsResource) == 800, "Menu-launched Battle placement pays 200");
             hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/UpgradeButton").EmitSignal(Button.SignalName.Pressed);
             BattleTower tower = battlefield.GetNode("World/Towers").GetChild<BattleTower>(0);
-            Require(tower.UpgradeLevel == 2 && tower.FinalStats.DamagePerShot == 16 && wallet.GetBalance(wallet.CreditsResource) == 650,
+            Require(tower.UpgradeLevel == 2 && tower.FinalStats.DamagePerShot == 33 && wallet.GetBalance(wallet.CreditsResource) == 650,
                 "Menu-launched paid Upgrade action uses the same pipeline and wallet");
             hud.SetTowerBarOpen(false, true);
             Require(hud.IsInspectionVisible, "Closing the tray preserves placed-tower inspection");
