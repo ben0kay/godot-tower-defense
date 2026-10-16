@@ -4,6 +4,7 @@ Tests are grouped by system. Scripts, scenes and `.uid` sidecars stay together; 
 
 | Folder | Contents |
 | --- | --- |
+| [Enemies](Enemies/README.md) | E3A Transporter/death-release ability, routing, reservations and stress |
 | [Combat](Combat/README.md) | Damage, shields, AoE, wavefronts and query correctness |
 | [Towers](Towers/README.md) | Tower stats/ranks/upgrades, weapons and passive fixture |
 | [Navigation](Navigation/README.md) | Corridors, repathing, permissions, checkpoints and F3 |
@@ -251,3 +252,7 @@ See [Results verification](UI/Results.md) for real outcome races, both launchers
 ## Rectangular footprints F1–F5
 
 [Footprint verification](Towers/Footprints.md) covers atomic rectangular occupancy, homogeneous terrain rules, generic paid placement, any-cell selection, full centers/previews, rollback, six-cell navigation batches and 500-enemy budgets. Run `res://TESTS/Towers/FootprintChecks.tscn`; the ammunition suite also tests the real larger endpoints and centered drone home positions.
+
+## DeathSpawn E3A
+
+Run `res://TESTS/Enemies/DeathSpawnChecks.tscn` for real Transporter release, final-wave/R1 ownership, checkpoint handoffs, generation/cap/position safety, frame clocks and500-active stress. See [verification](Enemies/DeathSpawn.md).

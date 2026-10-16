@@ -13,7 +13,10 @@ public partial class WaveManager : Node
     public int CompletedWaves { get; private set; }
     public int PlannedRemaining { get; private set; }
     public int AliveCount => _owned.Count;
-    public int EnemiesRemaining => PlannedRemaining + AliveCount;
+    public int PendingDeathSpawns { get; private set; }
+    public int EnemiesRemaining => PlannedRemaining + AliveCount + PendingDeathSpawns;
+    private int _ownershipEpoch;
+    private bool _acceptingSpawn;
     public bool CanStart => (State == WaveState.Ready || State == WaveState.Completed) && _waveIndex + 1 < _waves.Length;
     public string StatusMessage { get; private set; } = "";
     public event Action Changed;
@@ -36,6 +39,7 @@ public partial class WaveManager : Node
     {
         _spawns = GetNode<SpawnManager>("../World/EnemySystems/Spawning");
         _hud = GetNode<GameplayHUD>("../UI/GameplayHUD");
+        _spawns.WaveOwner = this; _spawns.WaveEnemyCreated += OnWaveCreating;
         _hud.WaveStartRequested += OnStartRequested;
         try
         {
@@ -50,6 +54,7 @@ public partial class WaveManager : Node
     public override void _ExitTree()
     {
         ReleaseOwnership();
+        if (GodotObject.IsInstanceValid(_spawns)) { _spawns.WaveEnemyCreated -= OnWaveCreating; _spawns.WaveOwner = null; }
         if (GodotObject.IsInstanceValid(_hud)) _hud.WaveStartRequested -= OnStartRequested;
     }
 
@@ -112,7 +117,10 @@ public partial class WaveManager : Node
                 _sequence = WaveCatalog.Compose(batch, _random);
             }
             WaveEnemyEntry entry = _sequence[_entryIndex];
-            Enemy ship = _spawns.SpawnWave(_scenes[entry.EnemyId], _random, entry.Portal, entry.SpawnWithShield);
+            Enemy ship;
+            _acceptingSpawn = true;
+            try { ship = _spawns.SpawnWave(_scenes[entry.EnemyId], _random, entry.Portal, entry.SpawnWithShield); }
+            finally { _acceptingSpawn = false; }
             if (ship == null)
             {
                 State = WaveState.SpawnBlocked; StatusMessage = _spawns.LastMessage;
@@ -120,7 +128,7 @@ public partial class WaveManager : Node
                 Publish(); return;
             }
             // Entry hazards can resolve a successfully spawned ship before ownership subscribes.
-            if (ship.IsAlive && !ship.IsQueuedForDeletion()) { _owned.Add(ship); ship.Removed += OnEnemyRemoved; }
+            // Ownership was attached before Initialize, including potential entry-hazard death/release.
             PlannedRemaining--; _entryIndex++;
             State = WaveState.Spawning; StatusMessage = "";
             if (_entryIndex == _sequence.Length)
@@ -139,6 +147,28 @@ public partial class WaveManager : Node
     }
 
     // =========================================================
+    // Authored ownership is installed before Initialize can kill an enemy on Lava; offspring attach explicitly.
+    private void OnWaveCreating(Enemy ship) { if (_acceptingSpawn) Own(ship); }
+    private void Own(Enemy ship) { if (_owned.Add(ship)) ship.Removed += OnEnemyRemoved; }
+    internal DeathSpawnReservation ReserveDeathChildren(Enemy parent, int count)
+    {
+        if (!_owned.Contains(parent) || count < 1 || count > 64) return null;
+        PendingDeathSpawns += count; Publish(); return new(this, _ownershipEpoch, count);
+    }
+    internal bool ReservationActive(DeathSpawnReservation reservation) => reservation.Epoch == _ownershipEpoch && reservation.Remaining > 0;
+    internal void AttachDeathChild(DeathSpawnReservation reservation, Enemy child)
+    {
+        if (!ReservationActive(reservation)) return;
+        Own(child); _spawns.NotifyWaveChild(child);
+    }
+    internal void DiscardDeathChild(Enemy child) => OnEnemyRemoved(child);
+    internal void RetireDeathChild(DeathSpawnReservation reservation)
+    {
+        if (!ReservationActive(reservation)) return;
+        reservation.Remaining--; PendingDeathSpawns--; Publish(); CompleteIfClear();
+    }
+
+    // =========================================================
     // Kill and arrival both resolve once; debug/F2 ships never subscribe to this wave.
     private void OnEnemyRemoved(Enemy ship)
     {
@@ -151,7 +181,7 @@ public partial class WaveManager : Node
     // No alive-count shortcut can drop scheduled ships or auto-start a later wave.
     private void CompleteIfClear()
     {
-        if (State != WaveState.WaitingForClear || PlannedRemaining != 0 || _owned.Count != 0) return;
+        if (State != WaveState.WaitingForClear || PlannedRemaining != 0 || _owned.Count != 0 || PendingDeathSpawns != 0) return;
         int completedNumber = CurrentWave; CompletedWaves++;
         State = _waveIndex + 1 < _waves.Length ? WaveState.Completed : WaveState.AllWavesComplete;
         SetPhysicsProcess(false); Publish(); WaveCompleted?.Invoke(completedNumber);
@@ -162,7 +192,9 @@ public partial class WaveManager : Node
     private void ReleaseOwnership()
     {
         foreach (Enemy ship in _owned) ship.Removed -= OnEnemyRemoved;
-        _owned.Clear(); SetPhysicsProcess(false);
+        _owned.Clear(); _ownershipEpoch++; PendingDeathSpawns = 0;
+        if (GodotObject.IsInstanceValid(_spawns?.DeathReleases)) _spawns.DeathReleases.CancelWave(this);
+        SetPhysicsProcess(false);
     }
 
     // =========================================================
@@ -187,7 +219,7 @@ public partial class WaveManager : Node
                 _ => $"{EnemiesRemaining} LEFT"
             };
             _hud.SetWaveControls(CurrentWave, TotalWaves, button, CanStart,
-                $"{State}: {PlannedRemaining} scheduled, {AliveCount} alive. {StatusMessage}");
+                $"{State}: {PlannedRemaining} scheduled, {AliveCount} alive, {PendingDeathSpawns} pending release. {StatusMessage}");
         }
         Changed?.Invoke();
     }

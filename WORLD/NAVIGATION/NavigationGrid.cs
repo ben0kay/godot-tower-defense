@@ -355,22 +355,30 @@ public partial class NavigationGrid : Node
     public int PlacementFloodCount { get; private set; }
     // =========================================================
     // One scratch-buffer flood excludes the complete proposal, with no live A* or occupancy mutation.
-    public bool[] ReachableWithout(Rect2I proposal)
+    public bool[] ReachableWithout(Rect2I proposal) { PlacementFloodCount++; return Flood(proposal, null); }
+
+    // =========================================================
+    // Death-release clearance validates connectivity to the inherited next checkpoint, not only the Citadel.
+    public bool[] ReachableTo(Vector2[] targets) => Flood(default, targets);
+    private bool[] Flood(Rect2I proposal, Vector2[] targets)
     {
-        PlacementFloodCount++;
         Refresh();
         int width = Grid.Config.WidthCells, count = width * Grid.Config.HeightCells;
         if (_floodVisited == null || _floodVisited.Length != count)
         { _floodVisited = new bool[count]; _floodQueue = new int[count]; }
         System.Array.Clear(_floodVisited);
         int head = 0, tail = 0;
-        foreach (Vector2I goal in Goals)
-            if (!proposal.HasPoint(goal))
+        int destinations = targets?.Length ?? Goals.Count;
+        for (int i = 0; i < destinations; i++)
+        {
+            Vector2I goal = targets == null ? Goals[i] : Grid.WorldToCell(targets[i]);
+            if (Grid.IsInsideMap(goal) && !Grid.BlocksEnemies(goal) && !proposal.HasPoint(goal))
             {
                 int index = goal.Y * width + goal.X;
                 if (_floodVisited[index]) continue;
                 _floodVisited[index] = true; _floodQueue[tail++] = index;
             }
+        }
         while (head < tail)
         {
             int index = _floodQueue[head++], x = index % width;

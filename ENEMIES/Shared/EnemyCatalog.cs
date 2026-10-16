@@ -7,6 +7,7 @@ public partial class EnemyCatalog : Resource
 {
     [Export] public Godot.Collections.Array<PackedScene> Scenes { get; set; } = new();
     private Dictionary<string, PackedScene> _scenes;
+    private Dictionary<string, EnemyDefinition> _definitions;
     private static EnemyCatalog _default;
     public static EnemyCatalog Default => _default ??= LoadDefault();
     // =========================================================
@@ -24,6 +25,7 @@ public partial class EnemyCatalog : Resource
         _scenes = null;
         if (Scenes == null) throw new ArgumentException("Enemy scenes are missing.");
         Dictionary<string, PackedScene> next = new(StringComparer.Ordinal);
+        Dictionary<string, EnemyDefinition> definitions = new(StringComparer.Ordinal);
         foreach (PackedScene scene in Scenes)
         {
             if (scene == null) throw new ArgumentException("Null enemy scene.");
@@ -34,10 +36,11 @@ public partial class EnemyCatalog : Resource
                     throw new ArgumentException("Enemy scene requires Enemy root, Definition and Movement.");
                 ValidateDefinition(enemy.Definition);
                 if (!next.TryAdd(enemy.Definition.EnemyId, scene)) throw new ArgumentException("Duplicate EnemyId: " + enemy.Definition.EnemyId);
+                definitions.Add(enemy.Definition.EnemyId, enemy.Definition);
             }
             finally { root.Free(); }
         }
-        _scenes = next;
+        _scenes = next; _definitions = definitions;
     }
     // =========================================================
     // World-independent balance/clearance validation; physical source fit stays with SpawnManager.
@@ -53,6 +56,10 @@ public partial class EnemyCatalog : Resource
     // Stable registered identity lookup; unknown IDs remain explicit setup errors.
     public PackedScene Find(string id)
     { if (_scenes == null) Rebuild(); return id != null && _scenes.TryGetValue(id, out var scene) ? scene : null; }
+    // =========================================================
+    // Cached authored clearance metadata avoids instantiating a temporary child for every position probe.
+    public EnemyDefinition DefinitionFor(string id)
+    { if (_scenes == null) Rebuild(); return id != null && _definitions.TryGetValue(id, out var definition) ? definition : null; }
     // =========================================================
     // Backwards-compatible wave adapter returns its own map without exposing mutable registry state.
     public Dictionary<string, PackedScene> ToSceneMap()

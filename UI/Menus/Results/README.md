@@ -38,7 +38,7 @@ Register its numeric ID and existing battlefield launcher in `PlayableLevelCatal
 
 - [ ] Add event-driven `LevelRunStats` under `LEVELS/Session/`: successful towers built, upgrades bought, Credits **earned**, Credits **spent**, elapsed *unpaused* mission time, waves survived and properly attributed enemy kills/breaches. Count only successful placements/transactions, not clicks, ghosts or failed purchases. Avoid full-scene/per-frame scans.
 - [ ] Add optional damage/tower-type/efficiency breakdown later when real damage or firing telemetry exists. Don't compute metrics from estimated final wallet balance or invent values.
-- [ ] Carefully count DeathSpawn transporter offspring in their wave (E3A) and avoid counting F2/unowned test enemies in official stats. `EnemyRegistry` currently reports global kills/arrivals only.
+- [x] E3A now reserves wave offspring and publishes their provenance before initialization. Official R1 counts include wave-child kills/breaches and exclude F2 descendants; victory waits through pending releases. Additional R3 statistics remain deferred.
 - [ ] Result snapshots must be immutable after ending the mission; events coming from deferred cleanup cannot keep incrementing displayed totals.
 
 ### R4 — Player XP, bonuses and persistence (FUTURE)

@@ -92,7 +92,7 @@ public partial class PauseControlsChecks : Node
             direct.GetNode<PauseMenu>("PauseMenu").QuitToMainMenu(); await Scene<BootScreen>();
             Require(!GetTree().Paused && _input.BindingCount == 0, "Profileless quit safely redirects to Boot");
             GD.Print("PASS: scoped Ctrl/Escape, placement priority, modal priority, pause/resume, disabled placeholders, both levels, scene cleanup and profileless return");
-            GetTree().Quit(0);
+            await SubsystemBattlefield.DrainFreedFixtures(this); GetTree().Quit(0);
         }
         catch (Exception error) { GD.PushError(error.ToString()); GetTree().Paused = false; GetTree().Quit(1); }
     }

@@ -55,13 +55,19 @@ public partial class EnemyMovement : Node
 
     // =========================================================
     // Stable per-spawn lateral preference; independent of weighted routing profile.
-    public void Initialize(Enemy enemy, PathRequestManager paths, RouteCheckpoint checkpoint = null, bool requiresCheckpoint = false)
+    public void Initialize(Enemy enemy, PathRequestManager paths, RouteCheckpoint checkpoint = null, bool requiresCheckpoint = false, EnemyRouteHandoff handoff = null)
     {
         Enemy = enemy; _paths = paths;
         Checkpoint = checkpoint; RequiresCheckpoint = requiresCheckpoint || checkpoint != null;
         CheckpointCompleted = false; CompletedCheckpointCount = 0; _destinationSerial = 0;
         _checkpointNetwork = RequiresCheckpoint ? CheckpointNetwork.Capture(checkpoint) : null;
-        _checkpointError = _checkpointNetwork?.Error ?? ""; _checkpointStamp = DestinationRevision;
+        _checkpointError = _checkpointNetwork?.Error ?? "";
+        if (handoff != null)
+        {
+            Checkpoint = handoff.Checkpoint; RequiresCheckpoint = handoff.Required; CheckpointCompleted = handoff.Complete;
+            CompletedCheckpointCount = handoff.CompletedCount; _checkpointNetwork = handoff.Network; _checkpointError = handoff.Error;
+        }
+        _checkpointStamp = DestinationRevision;
         RouteStatus = HeadingToCheckpoint ? "Routing through required checkpoints" : "Citadel"; _assignedProfile = paths.AssignProfile();
         _allowOffsets = enemy.Definition.AllowPathOffsets; _allowDiversity = enemy.Definition.AllowPathDiversity;
         CorridorSeed = paths.AssignCorridorSeed();
@@ -74,6 +80,11 @@ public partial class EnemyMovement : Node
             && Checkpoint.Contains(enemy.GlobalPosition) && paths.Navigation.HasClearance(enemy.GlobalPosition, enemy.Definition.RadiusPixels)) CompleteCheckpoint();
         else RequestRoute(float.PositiveInfinity);
     }
+
+    // =========================================================
+    // Capture only remaining destination obligations, never physical waypoints, movement permissions or path seeds.
+    public EnemyRouteHandoff CaptureRouteHandoff() => new(Checkpoint, RequiresCheckpoint, CheckpointCompleted,
+        CompletedCheckpointCount, _checkpointNetwork, _checkpointError);
 
     // =========================================================
     // Queue a replacement while retaining safe old movement; stop only on immediate danger.

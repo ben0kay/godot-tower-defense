@@ -11,6 +11,8 @@ public partial class Enemy : Node2D
     public EnemyMovement Movement { get; private set; }
     public float RemainingPathDistance => Movement?.RemainingPathDistance ?? float.PositiveInfinity;
     public event Action<Enemy> Removed;
+    public event Action<Enemy> KilledBeforeRemoval;
+    public int SpawnGeneration { get; private set; }
     public event Action<Enemy> Initialized;
     public EnemyRegistry Registry => _registry;
     private EnemyRegistry _registry;
@@ -24,9 +26,9 @@ public partial class Enemy : Node2D
 
     // =========================================================
     // Called by SpawnManager after adding the scene, using world-scoped services.
-    public void Initialize(EnemyRegistry registry, PathRequestManager paths, bool spawnWithShield = false, RouteCheckpoint checkpoint = null, bool requiresCheckpoint = false)
+    public void Initialize(EnemyRegistry registry, PathRequestManager paths, bool spawnWithShield = false, RouteCheckpoint checkpoint = null, bool requiresCheckpoint = false, EnemyRouteHandoff routeHandoff = null, int generation = 0)
     {
-        _registry = registry; Health = Mathf.Max(1f, Definition.MaxHealth); IsAlive = true;
+        SpawnGeneration = generation; _registry = registry; Health = Mathf.Max(1f, Definition.MaxHealth); IsAlive = true;
         CurrentShield = spawnWithShield && float.IsFinite(Definition.MaxShield)
             ? Mathf.Max(0f, Definition.MaxShield) : 0f;
         _initialDurability = (double)Health + CurrentShield;
@@ -37,7 +39,7 @@ public partial class Enemy : Node2D
         Movement = GetNode<EnemyMovement>("Movement");
         SetNotifyLocalTransform(true); SetNotifyTransform(true);
         _registry.Register(this);
-        Movement.Initialize(this, paths, checkpoint, requiresCheckpoint);
+        Movement.Initialize(this, paths, checkpoint, requiresCheckpoint, routeHandoff);
         Terrain = paths.Navigation.Grid.InteractiveTiles; _terrainPosition = GlobalPosition;
         Terrain?.Reposition(this);
         Initialized?.Invoke(this);
@@ -143,6 +145,7 @@ public partial class Enemy : Node2D
         IsAlive = false; Movement.SetPhysicsProcess(false);
         if (!arrived)
         {
+            KilledBeforeRemoval?.Invoke(this);
             Sprite2D visual = GetNodeOrNull<Sprite2D>("Sprite");
             float fallback = Mathf.Max(1f, Definition?.RadiusPixels * 2f ?? 32f);
             DeathExplosion.Spawn(GetNodeOrNull<Node2D>("../../Effects"), GlobalPosition,
@@ -155,5 +158,5 @@ public partial class Enemy : Node2D
     // =========================================================
     // Also clean up when the whole level is unloaded.
     public override void _ExitTree()
-    { IsAlive = false; _registry?.Unregister(this); Terrain = null; }
+    { bool unresolved = IsAlive; IsAlive = false; _registry?.Unregister(this); Terrain = null; if (unresolved) Removed?.Invoke(this); }
 }

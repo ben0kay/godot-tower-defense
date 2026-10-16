@@ -152,7 +152,7 @@ Implemented `WaveManager.WaveState` values:
 - Start the first ship immediately at the batch's start. `intervalSeconds` measures time between successful spawns. `afterSeconds` applies once following that batch's final successful spawn; **do not add the batch's interval again after its last spawn**.
 - At the end of the final batch, enter WaitingForClear, unless zero wave-owned enemies remain (complete immediately). No automatic Next Wave unless a future explicit `AutoStartWaves` option is on.
 - **Track exactly the enemies this WaveManager spawned**, not `EnemyRegistry.Living.Count`. Existing F2 debug spawns must NOT delay completion or be counted in the wave remaining total. Use returned Enemy references plus `Enemy.Removed` (currently called on kill *or* Citadel arrival); unsubscribe/clean up safely.
-- **Future death-spawn children:** adopt children into the parent's wave **before** removing that parent from wave ownership, so the wave cannot complete prematurely. This E3A enemy ability is not yet implemented.
+- **E3A death-spawn children implemented:** reserve pending releases before removing a wave-owned carrier. Attach each created child before retiring its slot; the wave waits for authored entries, live owned enemies and pending releases to all clear.
 - HUD counts should distinguish **scheduled but not yet spawned** from **wave-owned alive**. A useful `EnemiesRemaining` is planned-to-spawn + alive wave-owned. During a blocked spawn, do not decrement the planned count until an enemy is successfully instantiated. Never report a negative count.
 - On level reload, cancellation or leaving the scene, stop outstanding scheduling, clear signals/subscriptions and recreate clean state. Don't continue scheduling in background.
 - **Citadel health/damage is implemented** in the separate objective/session system. An arrival applies the ship's `CitadelDamage` once and resolves wave ownership once.
@@ -249,12 +249,16 @@ Each `WaveEnemyEntry` now includes `SpawnWithShield` (default `false`) and `Wave
 
 ## E2A/E2B enemy registration (IMPLEMENTED)
 
-`WaveCatalog.LoadScenes()` adapts `EnemyCatalog.Default` and `WaveManager` uses the actual `SpawnManager.Catalog` scene map. Register new enemy scenes in **`ENEMIES/DefaultEnemyCatalog.tres`** instead of a WaveCatalog dictionary. The IDs `enemy001`, `enemy002` and `shieldgenerator` already work; default Level001 waves are deliberately unchanged. Quotas, per-wave RNG, required portals, bounded retries, full starting-shield option and wave-owned completion work for registered enemies. `ShieldEmitter` restores *instance* shields without altering authored resources or wave ownership. E3 death-spawn/attack mechanics remain future work.
+`WaveCatalog.LoadScenes()` adapts `EnemyCatalog.Default` and `WaveManager` uses the actual `SpawnManager.Catalog` scene map. Register new enemy scenes in **`ENEMIES/DefaultEnemyCatalog.tres`** instead of a WaveCatalog dictionary. The IDs `enemy001`, `enemy002` and `shieldgenerator` already work; default Level001 waves are deliberately unchanged. Quotas, per-wave RNG, required portals, bounded retries, full starting-shield option and wave-owned completion work for registered enemies. `ShieldEmitter` restores *instance* shields without altering authored resources or wave ownership. E3A death-spawning is implemented separately; E3B enemy attacks remain future work.
 
 ## Environmental damage at spawn
 
-A valid spawn can be killed immediately by an Interactive Lava entry. The scheduler still consumes that planned spawn and advances the batch, but subscribes living ownership only for an alive, nonqueued ship. This prevents waiting forever on a death that occurred before ownership could subscribe; kill Credits and removal remain in Enemy. InteractiveTerrainChecks includes a lethal authored-portal Lava spawn and verifies wave completion.
+A valid spawn can be killed immediately by an Interactive Lava entry. The scheduler still consumes that planned spawn and advances the batch, and ownership is now attached through WaveEnemyCreated before Initialize. A killed entry removes that ownership normally and can reserve E3A offspring before removal; kill Credits and removal remain in Enemy. InteractiveTerrainChecks includes a lethal authored-portal Lava spawn and verifies wave completion.
 
 ## R1 results telemetry
 
 `CompletedWaves` resets on Configure and increments exactly when an owned authored wave fully clears. `LevelSessionController` consumes that telemetry and WaveCompleted/AllWavesComplete; WaveManager does not decide mission victory/defeat or own results UI.
+
+## E3A reserved releases
+
+`PendingDeathSpawns` joins EnemiesRemaining and the HUD tooltip's scheduled/alive/pending counts. `DeathSpawnReservation` is an epoch-bound finite ownership transfer, not an authored wave entry. Reserve while the killed parent is still in `_owned`; attach a child/provenance before Initialize, then retire the reserved slot, including skipped or spawn-entry-killed children. Completion additionally requires PendingDeathSpawns=0. Configure invalidates reservations/cancels only that wave's jobs; debug jobs never attach. Normal external removal resolves ownership without counting a kill. Wave RNG, batches, quotas and manual progression remain unchanged. See `ENEMIES/Abilities/DeathSpawn/README.md` and `TESTS/Enemies/DeathSpawn.md`.

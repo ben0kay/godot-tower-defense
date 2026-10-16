@@ -1,0 +1,26 @@
+[gd_scene load_steps=8 format=3]
+[ext_resource type="Script" path="res://ENEMIES/Shared/Enemy.cs" id="1"]
+[ext_resource type="Resource" path="res://ENEMIES/Types/Transporter/Transporter.tres" id="2"]
+[ext_resource type="Texture2D" path="res://ENEMIES/Types/Transporter/Artwork/transporter.svg" id="3"]
+[ext_resource type="Script" path="res://ENEMIES/Movement/EnemyMovement.cs" id="4"]
+[ext_resource type="PackedScene" path="res://FEEDBACK/DefenseBars/DefenseBar.tscn" id="5_defense"]
+
+[ext_resource type="Script" path="res://ENEMIES/Abilities/DeathSpawn/DeathSpawn.cs" id="6"]
+[ext_resource type="Resource" path="res://ENEMIES/Abilities/DeathSpawn/DefaultDeathSpawnConfig.tres" id="7"]
+
+[node name="Transporter" type="Node2D"]
+script = ExtResource("1")
+Definition = ExtResource("2")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("3")
+
+[node name="Movement" type="Node" parent="."]
+script = ExtResource("4")
+
+[node name="DefenseBar" parent="." instance=ExtResource("5_defense")]
+
+[node name="Abilities" type="Node" parent="."]
+[node name="DeathSpawn" type="Node" parent="Abilities"]
+script = ExtResource("6")
+Config = ExtResource("7")

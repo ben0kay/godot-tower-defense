@@ -43,6 +43,10 @@ public partial class EnemyMasterConfig : Resource
     [Export(PropertyHint.Range, "1,16,1")] public int MaxWaveSpawnAttemptsPerFrame { get; set; } = 2;
     [Export(PropertyHint.Range, "0.1,5,0.1")] public float WaveSpawnRetrySeconds { get; set; } = 0.5f;
     [Export] public int WaveRandomSeed { get; set; } = 12345;
+    [ExportGroup("Death Releases")]
+    [Export(PropertyHint.Range, "1,16,1")] public int MaxDeathSpawnAttemptsPerFrame { get; set; } = 2;
+    [Export(PropertyHint.Range, "1,4096,1")] public int MaxPendingDeathReleaseJobs { get; set; } = 1024;
+    [Export] public int DeathReleaseSeed { get; set; } = 6391;
     [ExportGroup("Safety")]
     [Export(PropertyHint.Range, "1,5000,1")] public int MaxActiveEnemies { get; set; } = 1000;
 }

@@ -5,6 +5,9 @@ using System.Collections.Generic;
 public partial class SpawnManager : Node
 {
     public event System.Action<Enemy> WaveEnemyCreated;
+    public DeathReleaseQueue DeathReleases { get; private set; }
+    internal WaveManager WaveOwner { get; set; }
+    internal void NotifyWaveChild(Enemy child) => WaveEnemyCreated?.Invoke(child);
     [Export] public EnemyCatalog Catalog { get; set; }
     public EnemyRegistry Registry { get; private set; }
     public PathRequestManager Paths { get; private set; }
@@ -28,6 +31,7 @@ public partial class SpawnManager : Node
         Paths = GetNode<PathRequestManager>("../Paths");
         _ships = GetNode<Node2D>("../../Enemies");
         Paths.Navigation.Grid.TerrainRebuilt += InvalidateSources;
+        DeathReleases = new DeathReleaseQueue { Name = "DeathReleases" }; AddChild(DeathReleases);
         RefreshSources();
     }
 
@@ -186,6 +190,49 @@ public partial class SpawnManager : Node
         WaveEnemyCreated?.Invoke(ship);
         ship.Initialize(Registry, Paths, spawnWithShield, chosenPortal?.ResolveCheckpoint(), chosenPortal?.RequiresCheckpoint == true); LastMessage = "Wave spawned " + ship.Definition.DisplayName;
         return ship;
+    }
+
+    // =========================================================
+    // Death children use captured positions, no portal/edge/wave RNG; one destination flood is shared by all probes.
+    internal Enemy SpawnDeathChild(DeathReleaseJob job)
+    {
+        if (Registry.Living.Count >= Paths.Config.MaxActiveEnemies) { LastMessage = "Death release skipped: active enemy limit."; return null; }
+        NavigationGrid nav = Paths.Navigation; float radius = job.Definition.RadiusPixels;
+        if (!float.IsFinite(radius) || radius <= 0 || radius >= nav.Grid.Config.CellSize * .5f)
+        { LastMessage = "Death release skipped: unsupported child radius."; return null; }
+        bool[] reachable;
+        if (job.Route is { Required: true, Complete: false } route)
+        {
+            if (route.Error.Length != 0 || !GodotObject.IsInstanceValid(route.Checkpoint))
+            { LastMessage = "Death release skipped: invalid required checkpoint."; return null; }
+            reachable = nav.ReachableTo(route.Checkpoint.Targets(nav, radius));
+        }
+        else { RefreshSources(); reachable = _reachable; }
+        Vector2? valid = null;
+        for (int attempt = 0; attempt < job.Attempts; attempt++)
+        {
+            uint hash = CorridorPreference.Hash(job.Seed ^ unchecked((uint)(job.Index * 37 + attempt + 1) * 0x85ebca6bu));
+            float jitter = (hash & 65535u) / 65535f;
+            float angle = Mathf.Tau * (job.Index + .15f + jitter * .5f) / job.Count;
+            float distance = job.Radius * (attempt == job.Attempts - 1 ? 0 : (0.55f + jitter * .45f) * (1f - (float)attempt / job.Attempts));
+            Vector2 position = job.Position + Vector2.FromAngle(angle) * distance;
+            if (nav.IsReachable(reachable, nav.Grid.WorldToCell(position)) && nav.HasClearance(position, radius)) { valid = position; break; }
+        }
+        if (!valid.HasValue) { LastMessage = "Death release skipped: no safe reachable local position."; return null; }
+        Enemy child = null;
+        try
+        {
+            child = job.Scene.Instantiate<Enemy>(); _ships.AddChild(child); child.GlobalPosition = valid.Value;
+            job.Reservation?.Attach(child);
+            child.Initialize(Registry, Paths, job.Shield, routeHandoff: job.Route, generation: job.Generation);
+            LastMessage = "Released " + child.Definition.DisplayName; return child;
+        }
+        catch (System.Exception error)
+        {
+            if (child != null) job.Reservation?.Discard(child);
+            if (GodotObject.IsInstanceValid(child)) child.Free();
+            LastMessage = "Death release creation failed: " + error.Message; GD.PushWarning(LastMessage); return null;
+        }
     }
 
     // =========================================================

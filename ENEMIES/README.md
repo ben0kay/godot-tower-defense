@@ -2,7 +2,7 @@
 
 This top-level folder owns **enemy gameplay mechanics** in the Godot 4 C#/.NET space tower-defense project. Enemy001 is the first working **basic test ship**, intentionally named `Enemy001` internally rather than `ScoutShip`. Its scene uses shared `Enemy.cs` and `EnemyMovement.cs` rather than a unique gameplay script. This is the baseline future types should reuse.
 
-**Newest type:** `Types/Enemy004/` adds the medium-sized **Bulwark Drone**: development asset `Enemy004.tscn`, stable ID `medium_mk1`, display name `Bulwark Drone`, 64×48 art, 160 HP, 75 px/s, 22px navigation radius, 7 Credits. Registered in the catalog for F2 and wave authoring; not added to Level001's actual waves. No special ability or new behavior is attached. See `Types/Enemy004/README.md`.
+**Newest plain type:** `Types/Enemy004/` adds the medium-sized **Bulwark Drone**: development asset `Enemy004.tscn`, stable ID `medium_mk1`, display name `Bulwark Drone`, 64×48 art, 160 HP, 75 px/s, 22px navigation radius, 7 Credits. Registered in the catalog for F2 and wave authoring; not added to Level001's actual waves. No special ability or new behavior is attached. See `Types/Enemy004/README.md`.
 
 **Enemy identity (current):** Numbered `ENEMIES/Types/Enemy001/`, `Enemy002/` and `ShieldGenerator/` asset names document development history **only**. Their saved definitions now use unique wave/catalog IDs `basic_mk1`, `scout_mk1`, `shield_emitter_mk1`, and player-facing names `Standard Drone`, `Swift Interceptor`, `Shield Generator`. `EnemyDefinition.EnemyId` and `.DisplayName` are separate; wave order is authored in `LEVELS/Level001/Level001Waves.cs`, not inferred from filenames or catalog order. New enemy definitions require an explicit unique ID. The previous IDs `enemy001`, `enemy002`, `shieldgenerator` are retired; update authored waves/tests using them. The F2 debug cycler still follows catalog **scene order**.
 
@@ -10,7 +10,9 @@ This top-level folder owns **enemy gameplay mechanics** in the Godot 4 C#/.NET s
 
 **E2A/E2B implemented:** DefaultEnemyCatalog registers Enemy001, weaker/faster Enemy002 and ShieldGenerator by canonical EnemyDefinition.EnemyId. WaveCatalog supplies level wave sets; scene lookup comes from the validated enemy catalog. Enemy002 uses 30 hull/160px/s/8px radius/2-Credit reward and 40 optional shield capacity. ShieldGenerator uses a real optional ShieldEmitter scene child; ordinary types have no ability nodes. E2A was compiled/headless-verified independently before E2B.
 
-**Current limitations:** no death-spawning (E3A), enemy weapons/electrical tower attacks or tower durability (E3B), armor mitigation, linked shields, shield UI, timed effects or universal ability manager. TOWERS Phase 4C typed combat and continuous Laser are already implemented and preserved. F2 cycles catalog scenes and starts each debug-spawned enemy unshielded; existing Level001 authored wave contents are unchanged. New registered IDs can be authored in waves or explicitly assigned to Debug/EnemyScene for playtesting.
+**E3A implemented:** `Types/Transporter/` registers `transporter_mk1`, a large slow vessel with optional DeathSpawn: six `basic_mk1` children near its death point, staggered at 0.12s, with wave reservations and remaining checkpoint inheritance. See `Abilities/DeathSpawn/README.md` and `TESTS/Enemies/DeathSpawn.md`.
+
+**Current limitations:** no enemy weapons/electrical tower attacks or tower durability (E3B), armor mitigation, linked shields, shield UI, timed effects or universal ability manager. TOWERS Phase 4C typed combat and continuous Laser are already implemented and preserved. F2 cycles catalog scenes and starts each debug-spawned enemy unshielded; existing Level001 authored wave contents are unchanged. New registered IDs can be authored in waves or explicitly assigned to Debug/EnemyScene for playtesting.
 
 ## Corridor-aware enemy path variation (PLANNED — Codex navigation pass N4)
 
@@ -20,7 +22,7 @@ See **[enemypathing.md](enemypathing.md)** for the standalone Phase N4 implement
 
 **Design goal:** Support many enemy types—fast scouts, heavy tanks, generators, carriers, electrical ships, attackers, healers, stealth units, bosses and hybrids—without growing `Enemy.cs` into a giant switch on IDs or writing a full replacement AI/spawn/health script for each one. An enemy may have **zero, one or several independent optional abilities**. Keep ordinary enemies lightweight: speed, HP, shield *capacity*, Citadel damage, reward and navigation radius are already `EnemyDefinition` data.
 
-**E2A/E2B are implemented; E3A/E3B remain separate future passes.** This section records the accepted contracts and future roadmap. Preserve all previously implemented wave, shield, navigation, tower, audio and UI features. Prefer compact C#, `[GlobalClass]` Inspector-editable Resources, exported scene references when appropriate, method separators and feature READMEs as described in `NOTES/CodePreferences.md`.
+**E2A/E2B/E3A are implemented; E3B remains a separate future pass.** This section records the accepted contracts and future roadmap. Preserve all previously implemented wave, shield, navigation, tower, audio and UI features. Prefer compact C#, `[GlobalClass]` Inspector-editable Resources, exported scene references when appropriate, method separators and feature READMEs as described in `NOTES/CodePreferences.md`.
 
 ### Actual existing code versus future components
 
@@ -35,7 +37,7 @@ See **[enemypathing.md](enemypathing.md)** for the standalone Phase N4 implement
 | Enemy scene/catalog registration by stable `EnemyId` | `Shared/EnemyCatalog.cs` (suggested) | **EXISTS E2A** |
 | Optional abilities + read-only authoring/instance-local state | `Abilities/` (suggested) | **EXISTS E2B** |
 | Shield-emitting ally support | `Abilities/ShieldEmitter/` | **IMPLEMENTED reference ability in E2B** |
-| Spawn several valid smaller enemies when killed | `Abilities/DeathSpawn/` | **LATER E3A** |
+| Spawn several valid smaller enemies when killed | `Abilities/DeathSpawn/` | **IMPLEMENTED E3A** |
 | Tower durability and tower-targeting enemy weapons | `TOWERS/` + `Abilities/Weapons/` | **LATER E3B** |
 | Repeating electrical damage pulse against towers | `Abilities/ElectricalPulse/` | **LATER E3B**, after tower HP |
 | Typed damage/shield/hull math | `COMBAT/Damage/` | **TOWERS Phase 4C-1 implemented**; reuse, don't duplicate |
@@ -61,7 +63,7 @@ ENEMIES/
 │   │   ├── ShieldEmitter.cs                # Optional child/component
 │   │   ├── ShieldEmitterConfig.cs          # Typed Inspector Resource
 │   │   └── README.md
-│   ├── DeathSpawn/                         # NEW LATER E3A
+│   ├── DeathSpawn/                         # IMPLEMENTED E3A
 │   ├── Weapons/                            # NEW LATER E3B
 │   └── ElectricalPulse/                    # NEW LATER E3B
 └── Types/
@@ -116,11 +118,11 @@ An ordinary scout should not get empty ability controllers or per-frame AI nodes
 
 **E2B acceptance:** ordinary Enemy001 still runs unchanged with no ability node. A ShieldGenerator enemy with the component periodically replenishes only eligible allies within radius, obeys caps and intervals, can be combined with other optional children later, and stops affecting the world when removed. Add two-emitter/recipient-isolation, range, cap, no-ability-zero-cost and cleanup tests.
 
-### Phase E3A — DeathSpawn: reusable on-death release ability (REFINED PLAN; NOT IMPLEMENTED)
+### Phase E3A — DeathSpawn: reusable on-death release ability (IMPLEMENTED / VERIFIED)
 
 **Purpose / example.** A large **Transporter** can die and release **six independently moving Enemy001-sized drones** at or near its *actual death position*, with a tiny offset per drone and **0.12 seconds between releases**. The parent still dies normally. This is an **optional passive, on-kill ability**, not a unique enemy subclass, ordinary portal spawn, general death-explosion VFX, or an always-running enemy ability manager.
 
-This refines the original E3A plan based on the desired transporter behavior and the now-implemented **portal checkpoint chains, branch routing and per-enemy movement permissions**. E3A remains a future feature: none of the suggested files or settings below exists yet.
+This refines the original E3A plan based on the desired transporter behavior and the now-implemented **portal checkpoint chains, branch routing and per-enemy movement permissions**. E3A is implemented with the contracts below. `Types/Transporter/Transporter.tscn` is the real catalog/F2 carrier; existing authored waves are unchanged. `Abilities/DeathSpawn/README.md` describes actual APIs/settings and `TESTS/Enemies/DeathSpawn.md` records verification and limits.
 
 #### Authoring: reusable opt-in ability
 
@@ -201,7 +203,7 @@ This is the key change from the earlier E3A plan. `WaveManager` currently consid
 - Recursive child type with DeathSpawn does **not** create grandchildren with the first-pass generation cap.
 - Existing `EnemyIntegrationChecks`, wave ownership, ShieldEmitter, enemy registry, XP/rewards, damage, death-puff, Citadel and navigation suites continue passing. Measure peak release cost and number of spawns per frame; only report tests actually executed.
 
-**Implementation scope:** First deliver the generic DeathSpawn component/queue/ownership handshake and one transporter test fixture or real carrier scene. Do not build E3B enemy weapons, a universal ability engine or unrelated tower durability during E3A. Update `ENEMIES/Abilities/README.md`, `ENEMIES/Spawning/README.md`, `LEVELS/Waves/README.md` and tests *when the code actually lands*. **This section is a plan only, not an implementation.**
+**Implemented scope:** Delivered the generic DeathSpawn component/queue/ownership handshake, a real catalog-registered Transporter scene and focused regression fixtures. Do not build E3B enemy weapons, a universal ability engine or unrelated tower durability during E3A. Update `ENEMIES/Abilities/README.md`, `ENEMIES/Spawning/README.md`, `LEVELS/Waves/README.md` and tests *when the code actually lands*. **E3A is implemented; E3B remains deferred.**
 
 ### Phase E3B — Enemies attack player towers (LATER; requires tower durability)
 
@@ -419,7 +421,7 @@ Current shared single-cell route clearance guarantees require radius smaller tha
 
 Enemy.Initialize publishes an optional Initialized callback after registry/movement setup. ShieldEmitter uses it plus Removed/ExitTree, with no mandatory ability hierarchy/list/controller. Enemy.RestoreShield safely changes only current shield points up to existing capacity; hull/DefenseBar/typed damage/rewards remain separate. Emitter configs/timers are private, pulses are staggered/bounded and no retroactive shield removal occurs. See Abilities/ShieldEmitter/README.md for exact eligibility/limits.
 
-EnemyCatalogChecks covers real two-type weighted waves/portal rules, Enemy002 valid movement/targeting, independent shields, distinct reward/arrival and invalid registration/oversized rejection. ShieldEmitterChecks covers two emitters, caps/range/intervals/self/eligibility, bounded queries, invalid config and death/arrival/unload/queued cleanup. The full Godot 4.7.2 headless regression suite passed at E2A and again at E2B, preserving Battle/Laser stats/upgrades, waves, damage, shields and the 500-ship fixture. Compilation uses Roslyn plus actual Godot source generators because the environment's ordinary editor SDK/MSBuild setup is incomplete. Live visual quality is not claimed. E3A/E3B were not implemented.
+EnemyCatalogChecks covers real two-type weighted waves/portal rules, Enemy002 valid movement/targeting, independent shields, distinct reward/arrival and invalid registration/oversized rejection. ShieldEmitterChecks covers two emitters, caps/range/intervals/self/eligibility, bounded queries, invalid config and death/arrival/unload/queued cleanup. The full Godot 4.7.2 headless regression suite passed at E2A and again at E2B, preserving Battle/Laser stats/upgrades, waves, damage, shields and the 500-ship fixture. Compilation uses Roslyn plus actual Godot source generators because the environment's ordinary editor SDK/MSBuild setup is incomplete. Live visual quality is not claimed. E3A is now implemented separately; E3B remains deferred.
 
 ## Phase N4 — corridor-aware individual variation
 

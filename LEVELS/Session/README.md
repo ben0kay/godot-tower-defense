@@ -16,4 +16,6 @@ The controller closes the build tray/cancels its ghost, transfers pause ownershi
 
 ## Scope and future work
 
-R1 does not track successful tower construction, elapsed unpaused time or Credits earned/spent: those nullable fields display `—`. It does not change Credits, waves, navigation, tower ranks, player progression or save schemas. R2 is presentation polish, R3 adds actual event-driven run statistics and future DeathSpawn ownership, R4 defines player XP/rewards/persistence separately from tower rank XP. See `UI/Menus/Results/README.md` for the full remaining checklist and `TESTS/UI/Results.md` for verification.
+R1 does not track successful tower construction, elapsed unpaused time or Credits earned/spent: those nullable fields display `—`. It does not change Credits, waves, navigation, tower ranks, player progression or save schemas. R2 is presentation polish, R3 adds actual event-driven run statistics and additional scoring inputs, R4 defines player XP/rewards/persistence separately from tower rank XP. See `UI/Menus/Results/README.md` for the full remaining checklist and `TESTS/UI/Results.md` for verification.
+
+E3A offspring now publish wave provenance before initialization through the same spawning event. R1 includes real wave-child kills/breaches, excludes F2 descendants, and cannot win while WaveManager has pending death releases. No new presentation/scoring/persistence layer was added.
