@@ -19,3 +19,7 @@ The controller closes the build tray/cancels its ghost, transfers pause ownershi
 R1 does not track successful tower construction, elapsed unpaused time or Credits earned/spent: those nullable fields display `—`. It does not change Credits, waves, navigation, tower ranks, player progression or save schemas. R2 is presentation polish, R3 adds actual event-driven run statistics and additional scoring inputs, R4 defines player XP/rewards/persistence separately from tower rank XP. See `UI/Menus/Results/README.md` for the full remaining checklist and `TESTS/UI/Results.md` for verification.
 
 E3A offspring now publish wave provenance before initialization through the same spawning event. R1 includes real wave-child kills/breaches, excludes F2 descendants, and cannot win while WaveManager has pending death releases. No new presentation/scoring/persistence layer was added.
+
+## Planned mission XP and time telemetry (NOT IMPLEMENTED)
+
+P1/P2 of [the Player XP/Research pass](../../SYSTEMS/Progression/PLAYER_XP_RESEARCH_FOUNDATION_PASS.md) add an authored XP baseline per level, optional target completion time, lightweight **unpaused mission duration**, deterministic bonuses/penalties, and exactly-once profile-wide XP awarding from the **existing** frozen mission outcome. Preserve wave provenance, E3A offspring and existing R1 arbitration. No reward logic belongs in the Results UI.

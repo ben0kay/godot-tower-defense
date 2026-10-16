@@ -13,3 +13,7 @@ The profile is identity and potentially profile-wide research/preferences. The *
 The campaign UI's Level001 gateway will later be replaced with `Levels` selection, Continue and Load Campaign screens; the current `UI/Menus/Campaign/` is deliberately simple.
 
 Future tests: multiple profiles and campaigns stay isolated, round-trip credits/health/tower positions and tiers, wave checkpoint parity, corruption fallback, invalid file/ID handling, clean new campaign, no temp residue, and persistence across application restarts.
+
+## Planned separate profile progression — NOT campaign saves
+
+[Player XP/Research P1–P5](../Progression/PLAYER_XP_RESEARCH_FOUNDATION_PASS.md) plans a **profile-GUID-owned progression record** for Player XP, earned RP and purchased permanent research, independently of still-unimplemented campaign slot, in-progress battlefield and Pause Save/Load mechanics. Do not treat these as the same persistent data or enable campaign Continue/Load just because research is saved. Future campaign/empire integration will require an explicit ownership/migration decision.

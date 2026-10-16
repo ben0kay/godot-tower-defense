@@ -52,3 +52,7 @@ Register its numeric ID and existing battlefield launcher in `PlayableLevelCatal
 The existing shared navy/teal layout and sequential reveals are preserved, with matching red failure accents. `PreviewOnReady` / `ShowPreview()` are explicit sample-only tools. There is no rewards calculation or persistence hidden in the UI.
 
 R1 has C# source-generator compilation and Godot .NET headless coverage. Ordinary SDK build and the monolithic integration suite have environment/preexisting blockers described in `TESTS/UI/Results.md`. Real desktop visual review remains R2; headless tests do not certify viewport polish.
+
+## Planned XP awarding extension (P1/P2; NOT IMPLEMENTED)
+
+See [the phased Player XP / Research implementation brief](../../../SYSTEMS/Progression/PLAYER_XP_RESEARCH_FOUNDATION_PASS.md). Replace the existing XP placeholder with **authored victory baseline + signed performance modifiers** (Citadel integrity, editable target mission completion time, breaches), a once-only persistent profile award, player level-ups and +1 RP per level. The calculator/store owns awards; LevelResults only reveals the frozen breakdown. This implements a small defined subset of existing R3/R4, without implying all optional presentation/scoring is finished.
