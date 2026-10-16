@@ -19,3 +19,7 @@ Ammunition Factory/Depot now use this same catalog, 1×1 route-safe occupancy, w
 ## Codex implementation pass — multi-cell rectangular footprints (PLANNED)
 
 **[MULTI_CELL_FOOTPRINT_PASS.md](MULTI_CELL_FOOTPRINT_PASS.md)** is the step-by-step coding and test brief. The **Ammunition Factory must become 3×2** (six tiles) and the **Ammunition Depot must become 2×2** (four tiles), while other towers remain 1×1. The pass covers atomic grid occupancy/rollback, combined navigation clearance, preview, any-tile selection, centered art and tests. The existing 1×1-only statements above describe the current implementation; **nothing has been coded for these new sizes yet**. Leave 1,000-round factory shipments and 10,000-round depot storage unchanged.
+
+### Critical terrain distinction for the upcoming footprint pass
+
+**Codex must preserve the current grid rule:** buildings may occupy buildable **IMPASSABLE** tiles (e.g. buildable walls) without changing enemy navigation, since that terrain already blocks enemies. Placement/removal there updates occupancy/selection only — **no navigation revision, path update or repath**. Buildings on buildable **PASSABLE foundation** tiles introduce new obstacles and therefore need route protection and navigation updates. For a **mixed 3×2/2×2 footprint**, all tiles become occupied, but **only previously passable tiles** change navigation. This is specified and tested explicitly in [MULTI_CELL_FOOTPRINT_PASS.md](MULTI_CELL_FOOTPRINT_PASS.md). No gameplay code has been changed for this clarification.

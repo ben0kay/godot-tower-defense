@@ -36,19 +36,41 @@ Use `Footprint.X` for width in cells and `Footprint.Y` for height. The clicked m
 
 Rectangular footprints have a fixed orientation this pass; no rotation, L-shapes or upgrade-time resizing.
 
+## CRITICAL — Preserve the existing IMPASSABLE vs PASSABLE terrain distinction
+
+**Do NOT treat every newly occupied building cell as a new enemy obstacle.** The existing implementation already handles this correctly for **1×1** towers in `WORLD/GRID/WorldGrid.cs`:
+
+- `PlacementFailure(cell)` checks `can_build` metadata, objective/portal reservations and existing tower occupancy; **terrain being IMPASSABLE does not automatically prohibit building**. The cell must still be marked buildable.
+- `BlocksEnemies(cell)` is already true if either `_terrainBlocked[cell]` **OR** `_occupied[cell]` is true.
+- `TryOccupy(cell)` and `ReleaseOccupancy(cell)` notify `NavigationChanged` and increase `NavigationRevision` **only when `!_terrainBlocked[cell]`**.
+- `SpawnManager.ValidatePlacement(cell)` already skips the connectivity flood when the candidate is blocked terrain (`nav.Grid.BlocksEnemies(cell)`), though its existing enemy-clearance check runs before that shortcut.
+
+**Required multi-cell behaviour:**
+
+| Terrain covered by the entire new building | Building occupancy/selection | Enemy navigation / route check |
+| --- | --- | --- |
+| **100% buildable IMPASSABLE cells** (walls/buildable rock etc.) | Mark **every footprint tile** occupied to prevent overlapping buildings; allow selecting by any tile | **ZERO newly blocked cells**. Do **not** bump navigation revision, notify `NavigationChanged`, modify A* walkability, recalculate routes, or perform a connectivity flood just because a building appeared. Existing solid terrain already blocks enemies. |
+| **100% buildable PASSABLE foundation cells** | Mark every tile occupied | Every covered tile becomes a **new obstacle**. Before purchase validate the **combined rectangle** for active enemy clearance and route connectivity; on commit notify/batch navigation changes for only these cells. |
+| **Mixed PASSABLE + IMPASSABLE footprint** | Mark **all** tiles occupied | Only the **previously passable** covered tiles can change navigation. Validate the new combined blocking effect; **ignore already-impassable cells for new-obstacle updates**. |
+| Any footprint containing `can_build=false`, reserved, already-occupied or out-of-bounds cells | Reject whole building | No mutation, no charge, no navigation updates |
+
+For example, a **3×2 Ammunition Factory** placed wholly on six buildable impassable tiles should **not trigger a single enemy repath or navigation revision**. A 3×2 factory on six passable foundation tiles should reserve all six as blockers and update navigation appropriately. If only two of six cells were passable, only those two are **new** blockers.
+
+**Codex guidance:** keep **building occupancy** separate from **terrain passability/new obstruction**. Reuse the existing `TerrainBlocksEnemies(cell)` / `BlocksEnemies(cell)` semantics and extend them to rectangles. Do not invent an always-blocks-nav flag per building, force all buildings to repath on placement, or run expensive path validation for an all-impassable footprint. No per-cell full-grid rebuilds; stage the whole footprint atomically and publish efficient batched change notifications only for changed passable cells. This distinction is fundamental and must have explicit tests.
+
 ## F1 — Definition and atomic multi-cell occupancy
 
 - [ ] Allow positive `Footprint.X` and `Footprint.Y` in `TowerDefinition.Validate`, with sensible rejection of zero/negative/overflow/clearly impossible sizes. All ordinary 1×1 definitions still validate.
 - [ ] Introduce generic full-rectangle grid validation, e.g. `WorldGrid.PlacementFailure(anchor, footprint)`; check **EVERY** cell against map boundaries, non-buildable tiles, existing occupancy, and reserved Citadel/portals. Preserve existing single-cell callers via wrappers/overloads.
 - [ ] Implement atomic `TryOccupy(anchor, footprint)` and `ReleaseOccupancy(anchor, footprint)`: validate entire rectangle **before modifying any cell**; one building claims/releases all its tiles or none. Rollback must never leave partially occupied cells or release neighbouring towers.
-- [ ] Update navigation for **all** changed cells, with one logically consistent completed footprint. Preserve incremental A* updates and avoid a full rebuild per cell. `NavigationChanged` currently accepts one `Vector2I?` cell; adapt notification/batching safely so listeners don't see half-committed rectangles and per-cell events don't cause wasteful repeated repaths.
+- [ ] Update navigation for **all and ONLY newly blocked/unblocked PASSABLE cells** after atomic occupancy of the full rectangle. **IMPASSABLE cells still gain/lose building occupancy but must cause NO navigation revision/event/A* edit**, exactly as in current 1×1 code. Preserve incremental A* updates, stage a consistent complete footprint before callbacks, and batch notifications so listeners don't observe partial placements or duplicate expensive repaths.
 
 ## F2 — Correct full-footprint navigation/path safety
 
 - [ ] Overload `SpawnManager.PlacementFailure` for `(anchor, footprint)`; route validation remains **before purchasing or occupying**, not after.
-- [ ] Add a single temporary **whole-rectangle blocker** to `NavigationGrid.ReachableWithout`, performing just **one flood fill** on the combined proposal. Checking 6 individual cells separately is NOT equivalent: together they may seal a route that none seals on its own. Reuse scratch buffers and preserve cardinal/corner-safe connectivity.
-- [ ] Check circle-vs-rectangle/cells clearance for **all active enemies**, including large-radius units partly touching any footprint cell; do not allow placing a building on or too close to an enemy.
-- [ ] Preserve reachability for presently usable spawn/portal entries, live enemies and Citadel approach goals; deny any placement sealing/trapping paths or overlapping reserved goal cells.
+- [ ] Add a single temporary **whole-rectangle proposal** to `NavigationGrid.ReachableWithout`, with **one flood fill only when some covered cells are currently PASSABLE**. Checking six newly passable blocks independently is NOT equivalent: together they may seal a route that none seals alone. Already-impassable terrain is already blocked and must not be counted as a new obstacle or trigger a flood by itself. Reuse scratch buffers and preserve cardinal/corner-safe connectivity.
+- [ ] For footprints introducing new obstacles on PASSABLE tiles, check active-enemy clearance against those newly blocked cells (including large-radius enemies clipping an edge); avoid a new enemy collision/repath pass solely for a footprint fully on already-IMPASSABLE terrain. Preserve the existing 1×1 safety checks where applicable.
+- [ ] Preserve reachability for presently usable spawn/portal entries, live enemies and Citadel approach goals **when passable cells become blocked**; deny placements sealing/trapping paths or overlapping reserved goal cells. **Skip route validation if every covered tile was already IMPASSABLE**: such placement cannot create a new route obstruction.
 - [ ] Keep expensive flood fills and active-enemy checks to click-time or deliberate revision-aware caches. **Do not run the complete route validation in the per-frame placement preview update.** Preserve 100/500+ enemy performance and budgeted path requests.
 
 ## F3 — Placement controller, preview, interaction, wallet
@@ -69,9 +91,9 @@ Rectangular footprints have a fixed orientation this pass; no rotation, L-shapes
 ## F5 — Focused tests and verification
 
 - [ ] Validate 1×1, 2×2, 3×2, 2×3 footprints; reject invalid zero/negative widths/heights. **Change existing test asserting that 2×2 is invalid** in `TESTS/Towers/TowerCatalogChecks.cs`.
-- [ ] Reject at right/bottom map edges, if one non-anchor cell is unbuildable, occupied or reserved, or if a whole rectangle (but not its individual cells) seals a route. Test near active enemy with nonzero radius.
+- [ ] Reject at right/bottom map edges, if one non-anchor cell is unbuildable, occupied or reserved, or if newly blocked PASSABLE cells across the rectangle (but not individually) seal a route. Test near active enemy with nonzero radius on previously passable cells.
 - [ ] Verify 4/6 occupied tiles on success, correct full center, all tiles selecting the same instance, one-time construction charge; on failure, **zero** leftover cells/index entries/nodes/charges.
-- [ ] Verify removal/rollback clears every occupied cell while neighbouring towers stay; navigation updates every blocked/unblocked tile without unnecessary full rebuilds.
+- [ ] Test a 3×2 building **entirely on valid IMPASSABLE cells**: six occupied/selectable cells but **zero navigation-revision changes, zero A* walkability changes and zero enemy repath triggers** on build/removal. Test six PASSABLE cells: six new blockers and appropriate navigation notification. Test mixed PASSABLE/IMPASSABLE cells: only originally passable tiles alter navigation. Removal/rollback clears every occupied cell without touching neighbours or unnecessarily rebuilding the full navigation grid.
 - [ ] In actual gameplay both real ammunition buildings place at their requested sizes, preserve drone flight origins, stock accounting and complete factory→depot→tower ammunition flow. Existing 1×1 tower, route preview, wallet, upgrade, menu and pause tests should continue to pass.
 - [ ] Add focused tests under `TESTS/Towers/` and/or `TESTS/Navigation/`; run the available C# build and headless Godot suites, especially `TESTS/Economy/AmmunitionLoopChecks.tscn`, and report genuine pass/fail/environment limits.
 - [ ] When implementation **actually works**, update this document's checklist, the [Placement README](README.md), `TOWERS/README.md`, and Factory/Depot READMEs to remove outdated "1×1 only" claims.
@@ -82,4 +104,4 @@ Rotated or irregular footprints, 3D, built-time resizing, construction timers, s
 
 ## Definition of done
 
-The build preview shows **Factory 3×2** and **Depot 2×2**; both are placeable, centered, charged once, occupy exactly 6/4 tiles, are selectable by clicking any tile, block navigation safely without sealing routes, and roll back cleanly on failed placement. Existing 1×1 towers and current ammunition gameplay remain functional.
+The build preview shows **Factory 3×2** and **Depot 2×2**; both are placeable, centered, charged once, occupy exactly 6/4 tiles, selectable by clicking any tile and roll back cleanly. **Buildings on already-IMPASSABLE buildable terrain never change enemy navigation; only newly blocked PASSABLE cells trigger route safety checks/navigation changes**. Existing 1×1 towers and current ammunition gameplay remain functional.
