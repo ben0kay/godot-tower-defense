@@ -37,6 +37,7 @@ internal static class DeliverySafetyChecks
             Require(factory.Inventory.Amount == 1000 && f.Logistics.Jobs.Count == 0,
                 "Factory holds complete 1000-round cargo when depot has fewer than 1000 unreserved slots");
             AmmunitionDepot second = f.Add<AmmunitionDepot>("ammo_depot", new(2200, 2000));
+            Require(second.Inventory.Capacity == 10000, "Unmodified depot defaults to 10000 storage");
             f.Dispatch();
             Require(f.Logistics.Jobs.Count == 1 && f.Logistics.Jobs[0].Destination == second
                 && f.Logistics.Jobs[0].Cargo.Amount == 1000 && f.Logistics.ReservedSpace(second) == 1000,

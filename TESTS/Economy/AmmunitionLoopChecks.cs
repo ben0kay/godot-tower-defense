@@ -25,7 +25,8 @@ public partial class AmmunitionLoopChecks : Node
                     "No depot: auto production fills finite buffer and pauses without lost batches");
                 AmmunitionDepot depot = f.Purchase<AmmunitionDepot>("ammo_depot");
                 BattleTower tower = f.Purchase<BattleTower>("battle");
-                Require(f.Wallet.GetBalance(f.Wallet.CreditsResource) == 450, "Depot/Battle use existing paid placement");
+                Require(f.Wallet.GetBalance(f.Wallet.CreditsResource) == 450 && depot.Inventory.Capacity == 10000,
+                    "Depot/Battle use existing paid placement; default depot holds 10000");
                 Require(tower.Ammunition.Inventory.Amount == 1000 && f.AccountedRounds() == 1000 + f.ProducedRounds(), "Explicit starting stock conservation");
                 f.Dispatch(); AmmoDeliveryJob incoming = f.Logistics.Jobs.Single();
                 Require(incoming.Source == factory && incoming.Destination == depot && incoming.Cargo.Amount == 1000 && depot.Inventory.Amount == 0,

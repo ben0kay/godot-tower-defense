@@ -12,12 +12,18 @@ The runner first executes the original AmmoFoundationChecks, independently of un
 
 - `AmmoLoopFixture`: production scenes, paid button/placement helpers, controlled explicit ticks and conservation accounting.
 - `WeaponAmmunitionChecks`: optional absolute per-level stats/independence, full/empty creation, shrink/growth policy, real Battle/Blaster launches and Shockwave emissions, empty shutdown/physical refill, paid Laser time at30/60/120Hz, no free beam tail, rank/paid-upgrade stock persistence and authoritative ammo upgrade preview.
-- `DeliverySafetyChecks`: multiple factories/depots, whole-batch preference plus partial shipments, reserved incoming capacity, full depot, scarce stock, distinct outstanding requests, retries, absent/full home, source/destination/drone removal, capacity change/surplus return, failed purchase and active-flight unload.
+- `DeliverySafetyChecks`: multiple factories/depots, **factory full-shipment gating (no 900-round early flights and no partial 1,000-round delivery into a depot with <1,000 free space)**, reserved incoming capacity, full depot, **unchanged partial depot→tower shipments**, scarce stock, distinct outstanding requests, retries, absent/full home, source/destination/drone removal, capacity change/surplus return, failed purchase and active-flight unload.
 - `AmmunitionLoopChecks`: purchases Factory200 / Depot150 / Battle200 through real HUD buttons, placement and wallet. Fills/pauses factory with no depot; dispatches a moving visible courier and verifies no stock at destination before arrival; verifies production resume and return-slot release. Fires900 actual Battle projectile launches to reach100/1000, dispatches one depot shipment, verifies arrival-only refill and event-driven selected tower/factory/depot Inspector status. Stock + cargo + consumed + losses/discards matches initial stock + production.
 
 A further automatic real-physics fixture enables the actual production/dispatch/drone callbacks (no explicit per-drone test ticks), pauses/resumes the real tree, and verifies both delivery legs and conservation. It runs with a one-check scheduling budget to verify fairness persists across intervals. Normal/default balance is not rewritten by any fixture.
 
-## Actual results
+## 2026-10-16 balance adjustment (new code and test expectations; execution still pending)
+
+- Factory defaults: **100 rounds / 2s**, **1,000 buffer**, **1,000 shipment threshold**, **1,000 factory-drone payload**. The factory waits for a full 1,000 before departure; the depot must have 1,000 unreserved free slots. No partial factory shipments.
+- Depot default capacity: **10,000 rounds**. Its depot→tower drones retain their original **250-round payload** and can still deliver partial stock.
+- The gameplay and safety tests have been updated for these new default values, and add regression checks for no premature or space-constrained partial factory flights. **These changed tests have not yet been executed by this update** (Godot/.NET not installed in the current environment). The historical results below apply to the prior implementation, not automatically to this new adjustment.
+
+## Actual results (original implementation, before this balance adjustment)
 
 - Direct Roslyn compilation with installed Godot4.7.2 assemblies/source generators: **passed**, no compiler diagnostics.
 - Original foundation helpers: **passed first**, before gameplay integration.

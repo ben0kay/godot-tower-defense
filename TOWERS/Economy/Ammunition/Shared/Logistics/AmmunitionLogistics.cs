@@ -103,8 +103,9 @@ public partial class AmmunitionLogistics : Node2D
     // Nearest eligible depot wins; equal-distance ties retain stable registration order.
     private void TryFactory(AmmunitionFactory factory)
     {
+        if (!Live(factory)) return;
         int shipment = factory.Config.ShipmentAmount;
-        if (!Live(factory) || shipment <= 0 || shipment > factory.DronePayload
+        if (shipment <= 0 || shipment > factory.DronePayload
             || factory.Inventory.Amount < shipment || BusySlots(factory) >= factory.DroneSlots) return;
         AmmunitionDepot best = null; float distance = float.PositiveInfinity;
         foreach (AmmunitionDepot depot in _depots)

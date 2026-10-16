@@ -28,11 +28,15 @@
 | Blaster, all current levels | 600 reserve; 3 per projectile launch |
 | Shockwave, all current levels | 400 reserve; 5 per emitted pulse |
 | Global threshold | Existing DefaultAmmunitionConfig.tres:10% |
-| Factory | 200 Credits;100 ammo/2s;400 buffer;1 drone;200 payload;220px/s |
-| Depot | 150 Credits;5000 storage;2 drones;250 payload;220px/s |
+| Factory | 200 Credits;100 ammo/2s;**1000 buffer; 1000 ShipmentAmount (full load to dispatch);**1 drone;1000 payload;220px/s |
+| Depot | 150 Credits;**10000 storage**;2 drones;250 payload;220px/s |
 | Dispatcher | 0.2s scheduling interval;8 alternating endpoint checks |
 
 Battle1000/1 and the10% rule follow the requested example. Other defaults are provisional tuning, not permanent balance. Production/storage settings initialize when placed; transport settings affect subsequent dispatch. Offensive level values remain in each *Levels.cs file only. Building noncombat settings live in their Inspector config resources.
+
+## Factory dispatch tuning (2026-10-16)
+
+**New defaults implemented in code, regression tests updated; current adjustment has not been re-run against Godot yet.** The factory produces 100 rounds every two seconds but waits until its configurable `ShipmentAmount` reaches **1,000** before launching. Every flight is an exact 1,000-round load from its finite 1,000-round buffer. If no depot can reserve 1,000 free slots, the factory holds the stock and pauses, rather than sending an early/partial drone. Depot storage is now 10,000. Depot-to-tower resupply remains as before (depot drone payload 250; global 10% demand). Edit `AmmunitionFactoryConfig.cs` / Godot Factory config and `AmmunitionDepotConfig.cs` / Depot config; no hardcoded scheduler threshold is necessary. See [tests](../TESTS/Economy/Ammunition.md).
 
 ## Ownership and safety
 
