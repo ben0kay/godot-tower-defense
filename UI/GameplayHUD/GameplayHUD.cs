@@ -24,6 +24,7 @@ public partial class GameplayHUD : Control
     // =========================================================
     // Closing the build tray also ends any active placement in its owning controller.
     [Signal] public delegate void TowerBarClosedEventHandler();
+    [Signal] public delegate void BuildCategoryChangedEventHandler();
 
     public bool IsInspectionVisible => _inspector?.Visible == true;
 
@@ -50,6 +51,10 @@ public partial class GameplayHUD : Control
     #endregion
 
     private readonly Dictionary<string, Button> _buildButtons = new();
+    private readonly Dictionary<string, TowerDefinition.TowerCategory> _buildCategories = new();
+    private readonly Dictionary<string, Button> _categoryButtons = new();
+    public TowerDefinition.TowerCategory? BuildCategory { get; private set; }
+    public Button GetBuildCategoryButton(string category) => _categoryButtons.GetValueOrDefault(category);
 
     #region Lifecycle
     // =========================================================
@@ -90,6 +95,7 @@ public partial class GameplayHUD : Control
         _upgradeInfo = GetNode<Label>("BottomArea/Inspector/Insets/Body/UpgradeInfo");
         _upgradeButton = GetNode<Button>("BottomArea/Inspector/Insets/Body/UpgradeButton");
         _upgradeButton.Pressed += () => EmitSignal(SignalName.TowerUpgradeRequested);
+        Resized += ApplyLayout;
         ApplyLayout();
         ApplyAppearance();
         GetNode<Button>("BottomArea/Inspector/Insets/Body/Heading/CloseButton").Pressed += ClearInspection;
@@ -143,7 +149,7 @@ public partial class GameplayHUD : Control
     {
         HBoxContainer entries = GetNode<HBoxContainer>("BottomArea/TraySlot/TowerBar/Insets/Tray/Scroll/Buttons");
         foreach (Node child in entries.GetChildren()) { entries.RemoveChild(child); child.QueueFree(); }
-        _buildButtons.Clear();
+        _buildButtons.Clear(); _buildCategories.Clear();
         foreach (TowerDefinition definition in catalog.Definitions)
         {
             if (!definition.Available) continue;
@@ -158,10 +164,52 @@ public partial class GameplayHUD : Control
             button.ExpandIcon = true;
             button.AddThemeConstantOverride("icon_max_width", 32);
             entries.AddChild(button);
-            _buildButtons.Add(id, button);
+            _buildButtons.Add(id, button); _buildCategories.Add(id, definition.Category);
         }
         if (_buildButtons.Count == 0)
             entries.AddChild(new Label { Text = "No towers available.", MouseFilter = MouseFilterEnum.Ignore });
+        RebuildCategories();
+    }
+
+    // =========================================================
+    // Rebuild only on catalog binding; categories/counts derive from the same available definitions as the tray.
+    private void RebuildCategories()
+    {
+        HBoxContainer row = GetNode<HBoxContainer>("BottomArea/TraySlot/TowerBar/Insets/Tray/CategoryScroll/Categories");
+        foreach (Node child in row.GetChildren()) { row.RemoveChild(child); child.QueueFree(); }
+        _categoryButtons.Clear();
+        AddCategory("All", null, _buildButtons.Count);
+        foreach (TowerDefinition.TowerCategory category in Enum.GetValues<TowerDefinition.TowerCategory>())
+        {
+            int count = 0; foreach (var value in _buildCategories.Values) if (value == category) count++;
+            if (count > 0) AddCategory(category.ToString(), category, count);
+        }
+        if (BuildCategory.HasValue && !_categoryButtons.ContainsKey(BuildCategory.Value.ToString()))
+        { BuildCategory = null; EmitSignal(SignalName.BuildCategoryChanged); }
+        FilterBuildButtons();
+        void AddCategory(string name, TowerDefinition.TowerCategory? category, int count)
+        {
+            Button tab = UIButtonFactory.Create($"{name} ({count})", () => SelectBuildCategory(category), UIButtonStyle.Compact, 26, Config);
+            tab.Name = name; tab.ToggleMode = true; tab.SizeFlagsHorizontal = SizeFlags.ShrinkBegin;
+            row.AddChild(tab); _categoryButtons.Add(name, tab);
+        }
+    }
+
+    // =========================================================
+    // Category changes retire only pending placement; existing placed-tower inspection stays independent.
+    public bool SelectBuildCategory(TowerDefinition.TowerCategory? category)
+    {
+        if (!_categoryButtons.ContainsKey(category?.ToString() ?? "All")) return false;
+        if (BuildCategory == category) { FilterBuildButtons(); return true; }
+        BuildCategory = category; EmitSignal(SignalName.BuildCategoryChanged); FilterBuildButtons(); return true;
+    }
+    // =========================================================
+    // Toggle visibility/focus states without rebuilding controls or polling the catalog.
+    private void FilterBuildButtons()
+    {
+        foreach (var entry in _buildButtons) entry.Value.Visible = !BuildCategory.HasValue || _buildCategories[entry.Key] == BuildCategory.Value;
+        foreach (var entry in _categoryButtons) entry.Value.SetPressedNoSignal(entry.Key == (BuildCategory?.ToString() ?? "All"));
+        GetNode<ScrollContainer>("BottomArea/TraySlot/TowerBar/Insets/Tray/Scroll").ScrollHorizontal = 0;
     }
 
     // =========================================================
@@ -175,6 +223,8 @@ public partial class GameplayHUD : Control
         SetRuntimeDetails("");
         SetUpgradeDetails("", "", false);
         _rankSection.Hide();
+        if (!IsInspectionVisible || _towerName.Text != name || _towerStats.Text != stats)
+            _inspector.GetNode<ScrollContainer>("Insets").ScrollVertical = 0;
         _towerName.Text = name;
         _towerCategory.Text = category;
         _towerStats.Text = stats;
@@ -411,7 +461,9 @@ public partial class GameplayHUD : Control
         Control slot = GetNode<Control>("BottomArea/TraySlot");
         slot.CustomMinimumSize = new Vector2(0, Config.BottomBarHeight);
         slot.SizeFlagsVertical = SizeFlags.ShrinkEnd;
-        _inspector.CustomMinimumSize = new Vector2(Config.InspectorWidth, 0f);
+        _inspector.CustomMinimumSize = new Vector2(Mathf.Min(Config.InspectorWidth, Mathf.Max(200, Size.X - Config.EdgeMargin * 2)),
+            Mathf.Min(Config.InspectorHeight, Mathf.Max(180, Size.Y - Config.TopBarHeight - Config.EdgeMargin * 3 - 40)));
+        _inspector.SizeFlagsVertical = SizeFlags.ShrinkEnd;
     }
 
     // =========================================================
@@ -450,8 +502,12 @@ public partial class GameplayHUD : Control
     private void ApplyAppearance()
     {
         _topBar.AddThemeStyleboxOverride("panel", MakePanel(Config.TopBarColor, Config.AccentColor));
-        _towerBar.AddThemeStyleboxOverride("panel", MakePanel(Config.PanelColor, Config.AccentColor));
-        _inspector.AddThemeStyleboxOverride("panel", MakePanel(Config.PanelColor, Config.AccentColor));
+        Color background = Config.PanelColor; background.A *= Mathf.Clamp(Config.BottomPanelOpacity, .5f, 1f);
+        _towerBar.AddThemeStyleboxOverride("panel", MakePanel(background, Config.AccentColor));
+        StyleBoxFlat inspection = MakePanel(background, Config.AccentColor);
+        inspection.ContentMarginLeft = inspection.ContentMarginRight = 12;
+        inspection.ContentMarginTop = inspection.ContentMarginBottom = 10;
+        _inspector.AddThemeStyleboxOverride("panel", inspection);
 
         _upgradeInfo.AddThemeColorOverride("font_color", Config.AccentColor);
         UIButtonFactory.Apply(_upgradeButton, UIButtonStyle.Action, Config);

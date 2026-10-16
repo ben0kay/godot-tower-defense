@@ -256,3 +256,7 @@ See [Results verification](UI/Results.md) for real outcome races, both launchers
 ## DeathSpawn E3A
 
 Run `res://TESTS/Enemies/DeathSpawnChecks.tscn` for real Transporter release, final-wave/R1 ownership, checkpoint handoffs, generation/cap/position safety, frame clocks and500-active stress. See [verification](Enemies/DeathSpawn.md).
+
+## Build HUD categories and compact Inspector
+
+Run `res://TESTS/UI/HudCategoryChecks.tscn` for catalog-driven tabs, filter memory/fallback, placement/inspection independence, bounded Inspector and background transparency. See [verification](UI/HudCategories.md).

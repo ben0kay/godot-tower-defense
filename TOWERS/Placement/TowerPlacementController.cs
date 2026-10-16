@@ -67,7 +67,7 @@ public partial class TowerPlacementController : Node2D
         AddChild(_ghost);
         _economy.BalanceChanged += OnBalanceChanged;
         _hud.TowerChoiceRequested += OnTowerChoiceRequested;
-        _hud.TowerBarClosed += CancelPlacement;
+        _hud.TowerBarClosed += CancelPlacement; _hud.BuildCategoryChanged += CancelPlacement;
         _hud.TowerUpgradeRequested += OnUpgradeRequested;
         SetProcessUnhandledInput(true);
         _input = GetNode<GameInput>("/root/GameInput");
@@ -83,7 +83,7 @@ public partial class TowerPlacementController : Node2D
         _placementExits.Clear();
         if (GodotObject.IsInstanceValid(_input)) _input.Unbind(this);
         if (GodotObject.IsInstanceValid(_hud))
-        { _hud.TowerBarClosed -= CancelPlacement; _hud.TowerChoiceRequested -= OnTowerChoiceRequested; _hud.TowerUpgradeRequested -= OnUpgradeRequested; }
+        { _hud.TowerBarClosed -= CancelPlacement; _hud.BuildCategoryChanged -= CancelPlacement; _hud.TowerChoiceRequested -= OnTowerChoiceRequested; _hud.TowerUpgradeRequested -= OnUpgradeRequested; }
         if (GodotObject.IsInstanceValid(_economy)) _economy.BalanceChanged -= OnBalanceChanged;
         if (GodotObject.IsInstanceValid(_buildDefinition?.DefaultConfig)) _buildDefinition.DefaultConfig.Changed -= OnPreviewConfigChanged;
         if (GodotObject.IsInstanceValid(_selected))

@@ -1,18 +1,18 @@
 [gd_scene format=3]
 
 [node name="Inspector" type="PanelContainer"]
-custom_minimum_size = Vector2(292, 0)
+custom_minimum_size = Vector2(392, 360)
+size_flags_vertical = 8
 mouse_filter = 0
 
-[node name="Insets" type="MarginContainer" parent="."]
+[node name="Insets" type="ScrollContainer" parent="."]
 layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 10
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 1
 
 [node name="Body" type="VBoxContainer" parent="Insets"]
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
 [node name="Heading" type="HBoxContainer" parent="Insets/Body"]
@@ -37,11 +37,13 @@ tooltip_text = "Close inspector"
 
 [node name="TowerName" type="Label" parent="Insets/Body"]
 layout_mode = 2
+autowrap_mode = 3
 text = "No tower selected"
 theme_override_font_sizes/font_size = 17
 
 [node name="TowerCategory" type="Label" parent="Insets/Body"]
 layout_mode = 2
+autowrap_mode = 3
 text = "CATEGORY"
 theme_override_font_sizes/font_size = 12
 
@@ -52,6 +54,7 @@ theme_override_constants/separation = 3
 
 [node name="Rank" type="Label" parent="Insets/Body/RankSection"]
 layout_mode = 2
+autowrap_mode = 3
 text = "Rank: Standard"
 theme_override_font_sizes/font_size = 13
 
@@ -63,29 +66,32 @@ show_percentage = false
 
 [node name="ExperienceText" type="Label" parent="Insets/Body/RankSection"]
 layout_mode = 2
+autowrap_mode = 3
 text = "0 / 100 XP to Veteran"
 theme_override_font_sizes/font_size = 11
 
 [node name="RankBonuses" type="Label" parent="Insets/Body/RankSection"]
 layout_mode = 2
+autowrap_mode = 3
 text = "Rank bonuses: Damage +0% / Range +0%"
 theme_override_font_sizes/font_size = 11
 
 [node name="TowerStats" type="Label" parent="Insets/Body"]
 layout_mode = 2
+autowrap_mode = 3
 text = "Prototype stats"
 theme_override_font_sizes/font_size = 13
 
 [node name="Notes" type="Label" parent="Insets/Body"]
 layout_mode = 2
 text = "Select a tower to preview."
-autowrap_mode = 2
+autowrap_mode = 3
 theme_override_font_sizes/font_size = 11
 
 [node name="UpgradeInfo" type="Label" parent="Insets/Body"]
 visible = false
 layout_mode = 2
-autowrap_mode = 2
+autowrap_mode = 3
 theme_override_font_sizes/font_size = 12
 
 [node name="UpgradeButton" type="Button" parent="Insets/Body"]

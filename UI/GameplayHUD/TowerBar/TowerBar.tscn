@@ -12,7 +12,7 @@ theme_override_constants/margin_bottom = 10
 
 [node name="Tray" type="VBoxContainer" parent="Insets"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 6
 
 [node name="Header" type="HBoxContainer" parent="Insets/Tray"]
 layout_mode = 2
@@ -31,6 +31,16 @@ size_flags_horizontal = 3
 layout_mode = 2
 text = "CTRL TO CLOSE"
 theme_override_font_sizes/font_size = 11
+
+[node name="CategoryScroll" type="ScrollContainer" parent="Insets/Tray"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+horizontal_scroll_mode = 1
+vertical_scroll_mode = 0
+
+[node name="Categories" type="HBoxContainer" parent="Insets/Tray/CategoryScroll"]
+layout_mode = 2
+theme_override_constants/separation = 6
 
 [node name="Scroll" type="ScrollContainer" parent="Insets/Tray"]
 custom_minimum_size = Vector2(0, 82)
