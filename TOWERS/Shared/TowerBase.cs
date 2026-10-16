@@ -97,16 +97,40 @@ public abstract partial class TowerBase : Node2D
     }
 
     // =========================================================
-    // Commit pre-resolved data silently so observers see a fully paid upgrade, never partial state.
-    internal bool CommitUpgrade(int expectedLevel, TowerFinalStats final)
+    // Wallet callback schedules a specific paid tier silently; public notifications happen only after payment.
+    internal bool BeginUpgrade(int expectedLevel, TowerLevel next, TowerFinalStats instant)
     {
-        if (!IsInsideTree() || IsBusy || UpgradeLevel != expectedLevel || final == null) return false;
-        UpgradeLevel++; FinalStats = final;
+        if (!IsInsideTree() || IsQueuedForDeletion() || IsBusy || UpgradeLevel != expectedLevel || NextUpgrade != next || instant == null) return false;
+        TowerConfig.ValidateWorkSeconds(next.WorkSeconds);
+        if (next.WorkSeconds == 0)
+        {
+            UpgradeLevel = next.Level; FinalStats = instant; WorkSeconds = ElapsedWorkSeconds = 0;
+            return true;
+        }
+        ConstructionWorkManager manager = GetNodeOrNull<ConstructionWorkManager>("../../ConstructionWork");
+        if (!GodotObject.IsInstanceValid(manager) || !manager.IsInsideTree() || manager.IsQueuedForDeletion()) return false;
+        try { manager.Register(this); } catch (InvalidOperationException) { return false; }
+        _construction = manager; WorkPhase = TowerWorkPhase.Upgrading; PendingUpgradeLevel = next.Level;
+        WorkSeconds = next.WorkSeconds; ElapsedWorkSeconds = _lastWorkNotice = 0;
         return true;
+    }
+
+    // =========================================================
+    // Observers see the paid wallet and coherent work state; zero-duration upgrades apply exactly once.
+    internal void PublishUpgradePurchase(bool instant)
+    {
+        if (!IsInsideTree() || IsQueuedForDeletion()) return;
+        if (WorkPhase == TowerWorkPhase.Upgrading) WorkStarted?.Invoke();
+        else if (instant)
+        {
+            NotifyStatsChanged();
+            if (GodotObject.IsInstanceValid(this) && IsInsideTree() && !IsQueuedForDeletion()) WorkCompleted?.Invoke();
+        }
     }
 
     #region Construction
     public TowerWorkPhase WorkPhase { get; private set; } = TowerWorkPhase.Operational;
+    public int PendingUpgradeLevel { get; private set; }
     public double ElapsedWorkSeconds { get; private set; }
     public double WorkSeconds { get; private set; }
     public double RemainingWorkSeconds => System.Math.Max(0, WorkSeconds - ElapsedWorkSeconds);
@@ -119,7 +143,7 @@ public abstract partial class TowerBase : Node2D
     private ConstructionWorkManager _construction;
     private bool _operationalPhysics;
     private double _lastWorkNotice;
-    public TowerWorkState CaptureWorkState() => new(WorkPhase, ElapsedWorkSeconds, WorkSeconds, 0);
+    public TowerWorkState CaptureWorkState() => new(WorkPhase, ElapsedWorkSeconds, WorkSeconds, PendingUpgradeLevel);
 
     // =========================================================
     // Paid placement calls this before AddChild/Ready; direct scene instances remain operational by default.
@@ -143,17 +167,22 @@ public abstract partial class TowerBase : Node2D
 
     // =========================================================
     // Exact boundary tolerance prevents an extra physics frame after sums such as120 increments of1/60.
-    internal void AdvanceConstruction(ConstructionWorkManager manager, double delta)
+    internal void AdvanceWork(ConstructionWorkManager manager, double delta)
     {
-        if (_construction != manager || WorkPhase != TowerWorkPhase.Constructing) return;
+        if (_construction != manager || !IsBusy) return;
         double remaining = RemainingWorkSeconds;
         if (delta >= remaining || remaining - delta <= 1e-9)
         {
-            ElapsedWorkSeconds = WorkSeconds; WorkPhase = TowerWorkPhase.Operational;
+            bool upgrading = WorkPhase == TowerWorkPhase.Upgrading;
+            // Resolve the purchased absolute tier now, using all rank promotions earned during work.
+            TowerFinalStats upgraded = upgrading ? ResolveLevel(PendingUpgradeLevel) : null;
+            if (upgrading) { UpgradeLevel = PendingUpgradeLevel; FinalStats = upgraded; }
+            ElapsedWorkSeconds = WorkSeconds; WorkPhase = TowerWorkPhase.Operational; PendingUpgradeLevel = 0;
             _construction = null; manager.Unregister(this);
-            SetPhysicsProcess(_operationalPhysics); OnBecameOperational();
-            // State and capabilities are coherent before subscribers run; a callback may free this building.
-            WorkCompleted?.Invoke();
+            if (upgrading) NotifyStatsChanged();
+            else { SetPhysicsProcess(_operationalPhysics); OnBecameOperational(); }
+            // A stat/inventory observer may have removed this building during activation.
+            if (GodotObject.IsInstanceValid(this) && IsInsideTree() && !IsQueuedForDeletion()) WorkCompleted?.Invoke();
             return;
         }
         ElapsedWorkSeconds += delta;
@@ -167,10 +196,6 @@ public abstract partial class TowerBase : Node2D
     {
         if (Ammunition != null) GetNodeOrNull<AmmunitionLogistics>("../../AmmunitionLogistics")?.RegisterConsumer(this);
     }
-
-    // =========================================================
-    // Minimal C2 status reuses the runtime label; C3 will add selected progress and timed paid upgrades.
-    public string DescribeRuntimeWithWork() => (IsOperational ? "" : $"CONSTRUCTING ({WorkSeconds:0.##}s build)\n") + DescribeRuntime();
 
     // =========================================================
     // Manager shutdown/rollback stops the clock without turning an unfinished site into a working building.

@@ -69,7 +69,7 @@ public partial class TowerPlacementController : Node2D
         AddChild(_ghost);
         _economy.BalanceChanged += OnBalanceChanged;
         _hud.TowerChoiceRequested += OnTowerChoiceRequested;
-        _hud.TowerBarClosed += CancelPlacement; _hud.BuildCategoryChanged += CancelPlacement;
+        _hud.TowerBarClosed += CancelPlacement; _hud.BuildCategoryChanged += CancelPlacement; _hud.InspectionClosed += OnInspectionClosed;
         _hud.TowerUpgradeRequested += OnUpgradeRequested;
         SetProcessUnhandledInput(true);
         _input = GetNode<GameInput>("/root/GameInput");
@@ -81,15 +81,16 @@ public partial class TowerPlacementController : Node2D
     // Avoid subscriptions retaining scenes that are no longer alive.
     public override void _ExitTree()
     {
+        ObserveWork(null);
         foreach (var pair in _placementExits) if (GodotObject.IsInstanceValid(pair.Key)) pair.Key.TreeExiting -= pair.Value;
         _placementExits.Clear();
         if (GodotObject.IsInstanceValid(_input)) _input.Unbind(this);
         if (GodotObject.IsInstanceValid(_hud))
-        { _hud.TowerBarClosed -= CancelPlacement; _hud.BuildCategoryChanged -= CancelPlacement; _hud.TowerChoiceRequested -= OnTowerChoiceRequested; _hud.TowerUpgradeRequested -= OnUpgradeRequested; }
+        { _hud.TowerBarClosed -= CancelPlacement; _hud.BuildCategoryChanged -= CancelPlacement; _hud.InspectionClosed -= OnInspectionClosed; _hud.TowerChoiceRequested -= OnTowerChoiceRequested; _hud.TowerUpgradeRequested -= OnUpgradeRequested; }
         if (GodotObject.IsInstanceValid(_economy)) _economy.BalanceChanged -= OnBalanceChanged;
         if (GodotObject.IsInstanceValid(_buildDefinition?.DefaultConfig)) _buildDefinition.DefaultConfig.Changed -= OnPreviewConfigChanged;
         if (GodotObject.IsInstanceValid(_selected))
-        { _selected.StatsChanged -= OnSelectedStatsChanged; _selected.ExperienceChanged -= OnSelectedExperienceChanged; _selected.RuntimeChanged -= OnSelectedRuntimeChanged; _selected.WorkCompleted -= OnSelectedWorkCompleted; }
+        { _selected.StatsChanged -= OnSelectedStatsChanged; _selected.ExperienceChanged -= OnSelectedExperienceChanged; _selected.RuntimeChanged -= OnSelectedRuntimeChanged; }
     }
     #endregion
 
@@ -304,17 +305,17 @@ public partial class TowerPlacementController : Node2D
     {
         if (_selected == tower && (tower == null || _hud.IsInspectionVisible)) return;
         if (GodotObject.IsInstanceValid(_selected))
-        { _selected.StatsChanged -= OnSelectedStatsChanged; _selected.ExperienceChanged -= OnSelectedExperienceChanged; _selected.RuntimeChanged -= OnSelectedRuntimeChanged; _selected.WorkCompleted -= OnSelectedWorkCompleted; _selected.SetSelected(false); }
-        _selected = tower;
+        { _selected.StatsChanged -= OnSelectedStatsChanged; _selected.ExperienceChanged -= OnSelectedExperienceChanged; _selected.RuntimeChanged -= OnSelectedRuntimeChanged; _selected.SetSelected(false); }
+        _selected = tower; ObserveWork(tower);
         if (GodotObject.IsInstanceValid(_selected))
         {
             _selected.StatsChanged += OnSelectedStatsChanged;
-            _selected.ExperienceChanged += OnSelectedExperienceChanged; _selected.RuntimeChanged += OnSelectedRuntimeChanged; _selected.WorkCompleted += OnSelectedWorkCompleted;
+            _selected.ExperienceChanged += OnSelectedExperienceChanged; _selected.RuntimeChanged += OnSelectedRuntimeChanged;
             _selected.SetSelected(true);
             _hud.ShowTowerDetails(_selected.AuthoredConfig.DisplayName, (_selected.Definition?.Category.ToString() ?? "Tower") + " / Placed",
                 DescribeTower($"Grid cell: {_selected.GridCell.X}, {_selected.GridCell.Y}"),
                 _selected.AuthoredConfig.Description + "\nConstruction paid.");
-            _hud.SetRankDetails(_selected); _hud.SetRuntimeDetails(_selected.DescribeRuntimeWithWork());
+            _hud.SetRankDetails(_selected); _hud.SetRuntimeDetails(_selected.DescribeRuntime()); _hud.SetWorkDetails(_selected);
         }
         RefreshUpgradePreview();
         QueueRedraw();
@@ -328,15 +329,42 @@ public partial class TowerPlacementController : Node2D
         if (_hud.IsInspectionVisible) _hud.ShowTowerDetails(_selected.AuthoredConfig.DisplayName, (_selected.Definition?.Category.ToString() ?? "Tower") + " / Placed",
             DescribeTower($"Grid cell: {_selected.GridCell.X}, {_selected.GridCell.Y}"),
             _selected.AuthoredConfig.Description + "\nConstruction paid.");
-        if (_hud.IsInspectionVisible) { _hud.SetRankDetails(_selected); _hud.SetRuntimeDetails(_selected.DescribeRuntimeWithWork()); RefreshUpgradePreview(); }
+        if (_hud.IsInspectionVisible) { _hud.SetRankDetails(_selected); _hud.SetRuntimeDetails(_selected.DescribeRuntime()); _hud.SetWorkDetails(_selected); RefreshUpgradePreview(); }
         QueueRedraw();
     }
 
+    private TowerBase _workObserved;
     // =========================================================
-    // Initial construction changes only runtime status and purchase availability, never full combat stats.
+    // Only the selected visible building publishes work UI; close, selection changes and unload detach all hooks.
+    private void ObserveWork(TowerBase tower)
+    {
+        if (_workObserved == tower) return;
+        if (GodotObject.IsInstanceValid(_workObserved))
+        {
+            _workObserved.WorkStarted -= OnSelectedWorkStarted;
+            _workObserved.WorkProgressChanged -= OnSelectedWorkProgress;
+            _workObserved.WorkCompleted -= OnSelectedWorkCompleted;
+        }
+        _workObserved = tower;
+        if (GodotObject.IsInstanceValid(tower))
+        {
+            tower.WorkStarted += OnSelectedWorkStarted;
+            tower.WorkProgressChanged += OnSelectedWorkProgress;
+            tower.WorkCompleted += OnSelectedWorkCompleted;
+        }
+    }
+    // =========================================================
+    // Retain existing selection semantics but stop hidden progress notifications until reselected.
+    private void OnInspectionClosed() => ObserveWork(null);
+    // =========================================================
+    // Start/completion refresh purchase availability once; intermediate ticks never resolve combat stats.
+    private void OnSelectedWorkStarted()
+    { OnSelectedWorkProgress(); if (_hud.IsInspectionVisible) RefreshUpgradePreview(); }
+    private void OnSelectedWorkProgress()
+    { if (_hud.IsInspectionVisible && GodotObject.IsInstanceValid(_selected)) _hud.SetWorkDetails(_selected); }
     private void OnSelectedWorkCompleted()
     {
-        OnSelectedRuntimeChanged();
+        OnSelectedWorkProgress(); OnSelectedRuntimeChanged();
         if (_hud.IsInspectionVisible) RefreshUpgradePreview();
     }
 
@@ -349,7 +377,7 @@ public partial class TowerPlacementController : Node2D
         _runtimeRefreshQueued = true; Callable.From(() =>
         {
             _runtimeRefreshQueued = false;
-            if (GodotObject.IsInstanceValid(_selected) && _hud.IsInspectionVisible) _hud.SetRuntimeDetails(_selected.DescribeRuntimeWithWork());
+            if (GodotObject.IsInstanceValid(_selected) && _hud.IsInspectionVisible) _hud.SetRuntimeDetails(_selected.DescribeRuntime());
         }).CallDeferred();
     }
 
@@ -391,19 +419,21 @@ public partial class TowerPlacementController : Node2D
         try
         {
             TowerUpgradeController.Validate(_selected.Levels);
-            TowerLevel next = _selected.NextUpgrade;
+            bool upgrading = _selected.WorkPhase == TowerWorkPhase.Upgrading;
+            TowerLevel next = upgrading ? _selected.Levels[_selected.PendingUpgradeLevel - 1] : _selected.NextUpgrade;
             if (next == null) { _hud.SetUpgradeDetails(_selected.Levels.Count <= 1 ? "No upgrades available." : "Maximum level reached.", "", false); return; }
             TowerFinalStats now = _selected.FinalStats, future = _selected.ResolveLevel(_selected.UpgradeLevel + 1);
-            string changes = $"NEXT: LEVEL {next.Level} — {next.DisplayName}\n";
+            string changes = upgrading ? $"UPGRADING TO LEVEL {next.Level} — paid\nCurrent Level {_selected.UpgradeLevel} remains operational.\n"
+                : $"NEXT: LEVEL {next.Level} — {next.DisplayName}\n";
             changes += _selected.AuthoredConfig.DescribeChanges(now, future);
             if (now?.Ammunition != future?.Ammunition && future?.Ammunition is AmmunitionStats ammo)
                 changes += ammo.ChangesFrom(now?.Ammunition);
             bool enabled = !_selected.IsBusy && Settings.AllowUpgrades && _economy.CanAfford(next.Costs);
-            changes += "Price: " + TowerPresentation.DescribeResourceCosts(next.Costs);
-            if (_selected.IsBusy) changes += "\nAvailable after construction.";
+            changes += upgrading ? "Cost already paid." : "Price: " + TowerPresentation.DescribeResourceCosts(next.Costs) + $"\nWork time: {next.WorkSeconds:0.##}s";
+            if (_selected.IsBusy) changes += upgrading ? "\nUpgrade in progress." : "\nAvailable after construction.";
             else if (!Settings.AllowUpgrades) changes += "\nUpgrades disabled.";
             else if (!enabled) changes += "\nInsufficient resources.";
-            _hud.SetUpgradeDetails(changes, $"UPGRADE TO LEVEL {next.Level}", enabled);
+            _hud.SetUpgradeDetails(changes, upgrading ? "UPGRADING…" : $"UPGRADE TO LEVEL {next.Level}", enabled);
         }
         catch (Exception exception) { _hud.SetUpgradeDetails("Invalid upgrade data: " + exception.Message, "", false); }
     }

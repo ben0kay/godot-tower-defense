@@ -208,13 +208,13 @@ public static class TowerRankChecks
         try
         {
             TowerRankController.AwardExperience(tower, 1000); TowerFinalStats next = tower.ResolveLevel(2);
-            Require(TowerUpgradeController.TryUpgrade(tower, wallet, placement.Settings, 1, out _) && tower.FinalStats == next,
+            Require(ConstructionTestClock.PurchaseAndFinish(tower, wallet, placement.Settings, 1, out _) && tower.FinalStats == next,
                 "Paid next-level preview includes current Veteran bonuses");
             Require(tower.UpgradeLevel == 2 && tower.RankProgress.TotalXp == 1000 && tower.CurrentRank.Rank == TowerRank.Veteran,
                 "Purchased level never resets rank or accumulated XP");
             Near(tower.FinalStats.RangePixels, 264 * 1.01, "Rank applies after full purchased row selection");
             TowerRankController.AwardExperience(tower, 2000);
-            Require(TowerUpgradeController.TryUpgrade(tower, wallet, placement.Settings, 2, out _) && tower.FinalStats.DamagePerShot == 37,
+            Require(ConstructionTestClock.PurchaseAndFinish(tower, wallet, placement.Settings, 2, out _) && tower.FinalStats.DamagePerShot == 37,
                 "Level3 Enhanced rounds36×1.04 once");
             Require(wallet.GetBalance(wallet.CreditsResource) == 600 && tower.RankProgress.TotalXp == 3000,
                 "Existing150/250 credit purchases preserve all3000 earned XP");

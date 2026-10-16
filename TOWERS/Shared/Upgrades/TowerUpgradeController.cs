@@ -24,9 +24,9 @@ public static class TowerUpgradeController
         int expectedLevel, out string failure)
     {
         failure = "";
-        if (!GodotObject.IsInstanceValid(tower) || !tower.IsInsideTree() || wallet == null || rules?.AllowUpgrades != true)
+        if (!GodotObject.IsInstanceValid(tower) || !tower.IsInsideTree() || tower.IsQueuedForDeletion() || tower.GetTree().Paused || !GodotObject.IsInstanceValid(wallet) || !wallet.IsInsideTree() || rules?.AllowUpgrades != true)
         { failure = "Upgrades are unavailable."; return false; }
-        if (tower.IsBusy) { failure = "Building is under construction."; return false; }
+        if (tower.IsBusy) { failure = "Building is busy; wait for current work to finish."; return false; }
         if (tower.UpgradeLevel != expectedLevel) { failure = "Tower level changed; select the current upgrade."; return false; }
         TowerLevel next;
         TowerFinalStats preview;
@@ -37,9 +37,10 @@ public static class TowerUpgradeController
             preview = tower.ResolveLevel(expectedLevel + 1);
         }
         catch (Exception exception) { failure = exception.Message; return false; }
-        if (!wallet.TryPurchase(next.Costs, () => tower.NextUpgrade == next && tower.CommitUpgrade(expectedLevel, preview)))
+        bool instant = next.WorkSeconds == 0;
+        if (!wallet.TryPurchase(next.Costs, () => tower.NextUpgrade == next && tower.BeginUpgrade(expectedLevel, next, preview)))
         { failure = "Insufficient resources or tower changed; no upgrade purchased."; return false; }
-        tower.NotifyStatsChanged();
+        if (GodotObject.IsInstanceValid(tower)) tower.PublishUpgradePurchase(instant);
         return true;
     }
 }

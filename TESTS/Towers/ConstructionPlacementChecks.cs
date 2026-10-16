@@ -29,7 +29,7 @@ internal static class ConstructionPlacementChecks
                     Require(f.Placement.TowerAt(building.GridCell + new Vector2I(x, y)) == building && grid.IsOccupied(building.GridCell + new Vector2I(x, y)), "Whole footprint occupied/indexed immediately");
             }
             Require(!TowerUpgradeController.TryUpgrade(tower, f.Wallet, f.Placement.Settings, 1, out _) && f.Wallet.GetBalance(f.Wallet.CreditsResource) == money, "Cannot buy upgrade while constructing");
-            Require(f.Hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/RuntimeStats").Text.Contains("CONSTRUCTING"), "Selected unfinished site shows minimal status");
+            Require(f.Hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/WorkSection/Status").Text.Contains("CONSTRUCTING"), "Selected unfinished site shows minimal status");
             f.Tick(100);
             Require(factory.ProducedRounds == 0 && factory.Production.ProgressSeconds == 0 && factory.Inventory.Amount == 0 && f.Logistics.Jobs.Count == 0, "Unfinished factory cannot bank production time");
             factory.Inventory.TryAdd(1000); depot.Inventory.TryAdd(1000); tower.Ammunition.Inventory.TryConsume(1000);

@@ -245,7 +245,7 @@ public static class ShockwaveChecks
             Require(ReferenceEquals(cached, tower.FinalStats), "Emitting does not recalculate cached stats");
             int revision = grid.NavigationRevision;
             await main.ToSignal(main.GetTree(), SceneTree.SignalName.ProcessFrame);
-            hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/UpgradeButton").EmitSignal(Button.SignalName.Pressed);
+            hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/UpgradeButton").EmitSignal(Button.SignalName.Pressed); ConstructionTestClock.FinishWork(main);
             Require(tower.UpgradeLevel == 2 && tower.FinalStats == upgraded && wallet.GetBalance(wallet.CreditsResource) == 425
                 && grid.NavigationRevision == revision && tower.NextUpgrade == null, "Paid225 level2 matches preview and detects maximum without navigation edits");
             Require(upgraded.Shockwave == new ShockwaveStats(44, 260, 3.9f, .25f) && upgraded.RangePixels == 208, "Level2 has exact independent complete stats");

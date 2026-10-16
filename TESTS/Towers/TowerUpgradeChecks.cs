@@ -34,11 +34,11 @@ public static class TowerUpgradeChecks
                 && preview.RangePixels == 264 && first.FinalStats == initial && first.UpgradeLevel == 1,
                 "Next-tier preview selects a full snapshot without changing live stats or progression");
             wallet.Initialize(new LevelConfig { StartingCredits = 149 });
-            Require(!TowerUpgradeController.TryUpgrade(first, wallet, placement.Settings, 1, out _) &&
+            Require(!ConstructionTestClock.PurchaseAndFinish(first, wallet, placement.Settings, 1, out _) &&
                 first.UpgradeLevel == 1 && wallet.GetBalance(wallet.CreditsResource) == 149, "Unaffordable upgrade never changes level or funds");
             wallet.Initialize(new LevelConfig { StartingCredits = 400 });
             placement.Settings.AllowUpgrades = false;
-            Require(!TowerUpgradeController.TryUpgrade(first, wallet, placement.Settings, 1, out _) &&
+            Require(!ConstructionTestClock.PurchaseAndFinish(first, wallet, placement.Settings, 1, out _) &&
                 wallet.GetBalance(wallet.CreditsResource) == 400, "Global upgrade rule prevents payment");
             placement.Settings.AllowUpgrades = true;
             placement.Call("SelectTower", first);
@@ -56,38 +56,38 @@ public static class TowerUpgradeChecks
             Label info = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/UpgradeInfo");
             Require(button.Visible && !button.Disabled && info.Text.Contains("150 Credits") &&
                 info.Text.Contains("30 → 33"), "Inspector shows next tier, effective changes and affordable price");
-            hud.EmitSignal(GameplayHUD.SignalName.TowerUpgradeRequested);
+            hud.EmitSignal(GameplayHUD.SignalName.TowerUpgradeRequested); ConstructionTestClock.FinishWork(battle);
             Require(first.UpgradeLevel == 2 && first.FinalStats == preview &&
                 wallet.GetBalance(wallet.CreditsResource) == 250, "Actual HUD upgrade action pays once and matches preview");
             Require(stats.Text.Contains("Shield Penetration: 5%") && first.FinalStats.ShieldPenetration == 0.05f,
                 "Level2 Inspector retains baseline penetration");
             Require(second.UpgradeLevel == 1 && second.FinalStats == initial && shared.DamagePerShot == 30,
                 "Upgrade leaves other towers and authored base unchanged");
-            Require(!TowerUpgradeController.TryUpgrade(first, wallet, placement.Settings, 1, out _) &&
+            Require(!ConstructionTestClock.PurchaseAndFinish(first, wallet, placement.Settings, 1, out _) &&
                 wallet.GetBalance(wallet.CreditsResource) == 250, "Stale request cannot buy an already purchased tier");
-            hud.EmitSignal(GameplayHUD.SignalName.TowerUpgradeRequested);
+            hud.EmitSignal(GameplayHUD.SignalName.TowerUpgradeRequested); ConstructionTestClock.FinishWork(battle);
             Require(first.UpgradeLevel == 2 && wallet.GetBalance(wallet.CreditsResource) == 250,
                 "Repeated HUD requests in one frame cannot buy multiple tiers");
             await battle.ToSignal(battle.GetTree(), SceneTree.SignalName.ProcessFrame);
             TowerFinalStats levelThree = first.ResolveLevel(3);
-            hud.EmitSignal(GameplayHUD.SignalName.TowerUpgradeRequested);
+            hud.EmitSignal(GameplayHUD.SignalName.TowerUpgradeRequested); ConstructionTestClock.FinishWork(battle);
             Require(first.UpgradeLevel == 3 && first.FinalStats == levelThree &&
                 first.FinalStats.DamagePerShot == 36 && Mathf.IsEqualApprox(first.FinalStats.ShotsPerSecond, 1.54f) &&
                 wallet.GetBalance(wallet.CreditsResource) == 0, "Second purchase selects the complete level3 snapshot");
             Require(stats.Text.Contains("Shield Penetration: 5%") && first.FinalStats.ShieldPenetration == 0.05f,
                 "Level3 Inspector retains baseline penetration");
             Require(!button.Visible && info.Text.Contains("Maximum level"), "Maximum tier removes upgrade action");
-            Require(!TowerUpgradeController.TryUpgrade(first, wallet, placement.Settings, 3, out _) &&
+            Require(!ConstructionTestClock.PurchaseAndFinish(first, wallet, placement.Settings, 3, out _) &&
                 wallet.GetBalance(wallet.CreditsResource) == 0, "Maximum tier cannot spend again");
             first.RebuildStats(); Require(first.FinalStats == levelThree, "Repeated rebuild does not compound bonuses");
 
             ResourceDefinition alloy = new() { ResourceId = "alloy", DisplayName = "Alloy" };
             second.NextUpgrade.Costs.Add(new ResourceCost { Resource = alloy, Amount = 2 });
             wallet.Initialize(new LevelConfig { StartingCredits = 200 }); wallet.Grant(alloy, 1);
-            Require(!TowerUpgradeController.TryUpgrade(second, wallet, placement.Settings, 1, out _) &&
+            Require(!ConstructionTestClock.PurchaseAndFinish(second, wallet, placement.Settings, 1, out _) &&
                 wallet.GetBalance(wallet.CreditsResource) == 200 && wallet.GetBalance(alloy) == 1, "Missing secondary resource causes no partial payment");
             wallet.Grant(alloy, 1);
-            Require(TowerUpgradeController.TryUpgrade(second, wallet, placement.Settings, 1, out _) &&
+            Require(ConstructionTestClock.PurchaseAndFinish(second, wallet, placement.Settings, 1, out _) &&
                 wallet.GetBalance(wallet.CreditsResource) == 50 && wallet.GetBalance(alloy) == 0, "Multi-resource upgrades pay atomically");
             Require(shared.Levels[1].Costs.Count == 1, "Runtime recipe edits do not mutate saved tier defaults");
             Require(grid.NavigationRevision == revision, "Upgrading never changes occupancy/navigation revision");
@@ -103,7 +103,7 @@ public static class TowerUpgradeChecks
             {
                 int before = wallet.GetBalance(wallet.CreditsResource);
                 Require(malformed.FinalStats.DamagePerShot == 30 &&
-                    !TowerUpgradeController.TryUpgrade(malformed, wallet, placement.Settings, 1, out _) &&
+                    !ConstructionTestClock.PurchaseAndFinish(malformed, wallet, placement.Settings, 1, out _) &&
                     malformed.UpgradeLevel == 1 && wallet.GetBalance(wallet.CreditsResource) == before,
                     "Invalid upgrade profile rejects payment while baseline tower still works");
             }

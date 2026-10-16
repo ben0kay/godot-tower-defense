@@ -47,6 +47,29 @@ autowrap_mode = 3
 text = "CATEGORY"
 theme_override_font_sizes/font_size = 12
 
+[node name="WorkSection" type="VBoxContainer" parent="Insets/Body"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="Status" type="Label" parent="Insets/Body/WorkSection"]
+layout_mode = 2
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 13
+text = "OPERATIONAL"
+
+[node name="Progress" type="ProgressBar" parent="Insets/Body/WorkSection"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 8)
+mouse_filter = 2
+show_percentage = false
+step = 0.01
+
+[node name="Time" type="Label" parent="Insets/Body/WorkSection"]
+layout_mode = 2
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 11
+
 [node name="RankSection" type="VBoxContainer" parent="Insets/Body"]
 visible = false
 layout_mode = 2

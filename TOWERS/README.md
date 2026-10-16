@@ -15,7 +15,7 @@ This README is an up-to-date overview and forward plan. Completed phase-by-phase
 - **Catalog and placement:** `Shared/TowerDefinition.cs`, `Shared/TowerCatalog.cs` and `Placement/` supply generic registered build choices, rectangular placement, atomic occupancy/navigation checks, selection and an existing Inspector. `ECONOMY/Wallet/` is the one wallet/payment authority.
 - **Combat:** Battle fires guided Kinetic projectiles; Laser delivers Energy beam DPS; Blaster deals instant area damage; Shockwave uses a travelling wavefront. Shared combat and damage attribution live under `COMBAT/`.
 - **Ammunition:** optional explicit per-level reserves/consumption, full configurable starting stock, factory production, depot storage and visible cargo drones on both legs are implemented. See [Shared/Ammunition](Shared/Ammunition/README.md) and [Economy/Ammunition](Economy/Ammunition/README.md).
-- **Not currently implemented:** tower HP or tower shields, timed upgrades, magazines/reloading, accuracy simulation, power consumption, maintenance/wear or selling.
+- **Not currently implemented:** tower HP or tower shields, magazines/reloading, accuracy simulation, power consumption, maintenance/wear or selling.
 
 ### Where to find the code
 
@@ -99,7 +99,7 @@ The intent of "fixed" is **not increased by buying a tower level**; research and
 
 ### C. Suggested future implementation passes
 
-1. **Timed construction C1/C2 implemented; timed upgrades/visual stages C3/C4 remain planned.** Initial placement blocks weapons/production/logistics until complete; minimal status is shown in the existing Inspector. **Codex pass C1–C4:** [Shared/Construction/TIMED_CONSTRUCTION_PASS.md](Shared/Construction/TIMED_CONSTRUCTION_PASS.md), including future authored SVG build stages and optional sparks/VFX. See the construction README for current durations and behavior.
+1. **Timed construction/upgrades C1–C3 implemented; visual stages C4 remain planned.** Initial placement blocks weapons/production/logistics until complete; paid upgrades keep the old tier operating and the Inspector shows work progress/time. **Codex pass C1–C4:** [Shared/Construction/TIMED_CONSTRUCTION_PASS.md](Shared/Construction/TIMED_CONSTRUCTION_PASS.md), including future authored SVG build stages and optional sparks/VFX. See the construction README for current durations and behavior.
 2. **Tower HP and optional shields**, damage/repair foundations and Inspector readouts.
 3. **Completed:** generic local ammunition storage/consumption and the first physical two-leg supply loop. Magazines/reloads remain future work.
 4. **Optional magazines/reload timers**, for applicable weapons only.

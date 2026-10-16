@@ -58,7 +58,7 @@ internal static class WeaponAmmunitionChecks
         f.Placement.Call("SelectTower", upgrade);
         Require(f.Hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/UpgradeInfo").Text.Contains("1000 → 1200"), "Inspector preview uses resolved next-level ammo");
         double xp = upgrade.RankProgress.TotalXp; int stock = upgrade.Ammunition.Inventory.Amount;
-        Require(TowerUpgradeController.TryUpgrade(upgrade, f.Wallet, new TowerMasterConfig { AllowUpgrades = true }, 1, out _), "Real purchased upgrade succeeds");
+        Require(ConstructionTestClock.PurchaseAndFinish(upgrade, f.Wallet, new TowerMasterConfig { AllowUpgrades = true }, 1, out _), "Real purchased upgrade succeeds");
         Require(upgrade.Ammunition.Inventory.Amount == stock && upgrade.Ammunition.Inventory.Capacity == 1200 && upgrade.RankProgress.TotalXp == xp, "Paid levels preserve ammo and rank XP");
         GD.Print("PASS: ammunition absolute rows, initial stock, capacity policy, per-launch Battle/Blaster/Shockwave, paid beam time30/60/120, empty shutdown/refill and upgrade/rank persistence");
     }

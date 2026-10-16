@@ -1,5 +1,7 @@
 # Timed initial construction — C1/C2
 
+**Historical C1/C2 report:** C3 is now implemented; the same runner includes timed-upgrade and progress UI checks. See [TimedUpgrades.md](TimedUpgrades.md) for current behavior/results.
+
 Run `Godot --headless --path . res://TESTS/Towers/ConstructionChecks.tscn` after compiling C#.
 
 ## Covered contracts

@@ -54,7 +54,7 @@ public partial class ConstructionWorkManager : Node
                 if (!GodotObject.IsInstanceValid(job.Tower) || !job.Tower.IsInsideTree() || job.Tower.IsQueuedForDeletion())
                 { Unregister(job.Tower); continue; }
                 LastJobsVisited++;
-                job.Tower.AdvanceConstruction(this, delta);
+                job.Tower.AdvanceWork(this, delta);
                 if (_jobs.TryGetValue(job.Tower, out version) && version == job.Version) _waiting.Add(job);
             }
         }

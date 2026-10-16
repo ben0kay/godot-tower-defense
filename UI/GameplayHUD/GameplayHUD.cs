@@ -25,6 +25,7 @@ public partial class GameplayHUD : Control
     // Closing the build tray also ends any active placement in its owning controller.
     [Signal] public delegate void TowerBarClosedEventHandler();
     [Signal] public delegate void BuildCategoryChangedEventHandler();
+    [Signal] public delegate void InspectionClosedEventHandler();
 
     public bool IsInspectionVisible => _inspector?.Visible == true;
 
@@ -37,7 +38,9 @@ public partial class GameplayHUD : Control
     private Label _upgradeInfo, _runtimeStats;
     private CreditGainIndicator _creditGain;
     private ProgressBar _healthBar, _experienceBar;
-    private VBoxContainer _rankSection;
+    private VBoxContainer _rankSection, _workSection;
+    private ProgressBar _workBar;
+    private Label _workStatus, _workTime;
     private Label _rankLabel, _experienceText, _rankBonuses;
     private Tween _citadelBarTween, _citadelFlashTween, _wavePulseTween;
     private int _targetCredits, _previousCitadelHealth = -1, _previousCitadelMax, _previousWave;
@@ -82,6 +85,9 @@ public partial class GameplayHUD : Control
         _runtimeStats.Name = "RuntimeStats"; _runtimeStats.AutowrapMode = TextServer.AutowrapMode.WordSmart;
         _towerStats.AddSibling(_runtimeStats); _runtimeStats.Hide();
         _towerNotes = GetNode<Label>("BottomArea/Inspector/Insets/Body/Notes");
+        _workSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/WorkSection");
+        _workStatus = _workSection.GetNode<Label>("Status"); _workTime = _workSection.GetNode<Label>("Time");
+        _workBar = _workSection.GetNode<ProgressBar>("Progress");
         _rankSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/RankSection");
         _rankLabel = _rankSection.GetNode<Label>("Rank");
         _experienceText = _rankSection.GetNode<Label>("ExperienceText");
@@ -220,7 +226,7 @@ public partial class GameplayHUD : Control
     // Placement supplies actual instance details and build previews to the independent Inspector.
     public void ShowTowerDetails(string name, string category, string stats, string notes = "")
     {
-        SetRuntimeDetails("");
+        SetRuntimeDetails(""); SetWorkDetails(null);
         SetUpgradeDetails("", "", false);
         _rankSection.Hide();
         if (!IsInspectionVisible || _towerName.Text != name || _towerStats.Text != stats)
@@ -235,6 +241,23 @@ public partial class GameplayHUD : Control
     // =========================================================
     // Update inventory/status only; leave numeric stats, rank progress and upgrade previews untouched.
     public void SetRuntimeDetails(string text) { _runtimeStats.Text = text; _runtimeStats.Visible = text.Length > 0; }
+
+    // =========================================================
+    // Work-only updates leave current stats, rank, free previews and scroll position untouched.
+    public void SetWorkDetails(TowerBase tower)
+    {
+        if (!GodotObject.IsInstanceValid(tower)) { _workSection.Hide(); return; }
+        _workStatus.Text = tower.WorkPhase switch
+        {
+            TowerWorkPhase.Constructing => "CONSTRUCTING",
+            TowerWorkPhase.Upgrading => $"UPGRADING — to Level {tower.PendingUpgradeLevel}",
+            _ => "OPERATIONAL"
+        };
+        _workBar.Visible = _workTime.Visible = tower.IsBusy;
+        _workBar.Value = tower.WorkProgress * 100;
+        _workTime.Text = tower.IsBusy ? $"{tower.ElapsedWorkSeconds:0.0} / {tower.WorkSeconds:0.0}s — {tower.RemainingWorkSeconds:0.0}s remaining" : "";
+        _workSection.Show();
+    }
 
     // =========================================================
     // Event-driven presentation: fractional progress within the current rank, with total XP also visible.
@@ -271,7 +294,11 @@ public partial class GameplayHUD : Control
 
     // =========================================================
     // Hide the inspector independently from the build tray.
-    public void ClearInspection() => _inspector.Hide();
+    public void ClearInspection()
+    {
+        if (!IsInspectionVisible) return;
+        _inspector.Hide(); EmitSignal(SignalName.InspectionClosed);
+    }
     #endregion
 
     #region Future Gameplay Status API
@@ -521,6 +548,8 @@ public partial class GameplayHUD : Control
 
         _experienceBar.AddThemeStyleboxOverride("fill", new StyleBoxFlat { BgColor = Config.AccentColor });
         _experienceBar.AddThemeStyleboxOverride("background", new StyleBoxFlat { BgColor = Config.ButtonColor });
+        _workBar.AddThemeStyleboxOverride("fill", new StyleBoxFlat { BgColor = Config.AccentColor });
+        _workBar.AddThemeStyleboxOverride("background", new StyleBoxFlat { BgColor = Config.ButtonColor });
         _rankLabel.AddThemeColorOverride("font_color", Config.AccentColor);
         Label[] muted = { _towerCategory, _towerStats, _towerNotes, _experienceText, _rankBonuses,
             GetNode<Label>("BottomArea/TraySlot/TowerBar/Insets/Tray/Header/Hint") };

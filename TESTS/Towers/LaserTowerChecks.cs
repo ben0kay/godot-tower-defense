@@ -40,7 +40,7 @@ public static class LaserTowerChecks
             "Selected Laser Inspector refreshes coefficients without mutating the shared source");
         tower.Config.HullCoefficient = 0.15f;
         TowerFinalStats preview = tower.ResolveLevel(2); int revision = grid.NavigationRevision;
-        hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/UpgradeButton").EmitSignal(Button.SignalName.Pressed);
+        hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/UpgradeButton").EmitSignal(Button.SignalName.Pressed); ConstructionTestClock.FinishWork(main);
         Require(tower.UpgradeLevel == 2 && tower.FinalStats == preview && tower.FinalStats.Beam.Value.DamagePerSecond == 14 &&
             tower.FinalStats.RangePixels == 264 && wallet.GetBalance(wallet.CreditsResource) == 575 && grid.NavigationRevision == revision,
             "Laser175-Credit tier applies exact DPS/range preview without changing navigation");
@@ -165,7 +165,7 @@ public static class LaserTowerChecks
         Enemy upgradedTarget = spawns.Spawn(enemyScene, true); upgradedTarget.Movement.SetPhysicsProcess(false);
         LaserTower upgradedAttacker = Create(definition, towers, upgradedTarget.GlobalPosition + new Vector2(0, 64));
         upgradedAttacker.Config.SetLevelStats(2, operations.Levels[1].Stats);
-        Require(TowerUpgradeController.TryUpgrade(upgradedAttacker, wallet, placement.Settings, 1, out _) &&
+        Require(ConstructionTestClock.PurchaseAndFinish(upgradedAttacker, wallet, placement.Settings, 1, out _) &&
             upgradedAttacker.NextUpgrade == null, "Laser buys its last complete row and detects maximum level");
         upgradedAttacker._PhysicsProcess(1);
         Require(Mathf.IsEqualApprox(upgradedTarget.Health, 33.6f),

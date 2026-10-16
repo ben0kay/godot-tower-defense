@@ -18,7 +18,7 @@
 | --- | --- | --- | --- |
 | [x] | **GE1–GE3 — Generic inherited enemy scene** | [Completed pass](../ENEMIES/Shared/GENERIC_ENEMY_SCENE_PASS.md): shared parent and five inherited scenes; propagation/gameplay tests and benchmarks. | Preserve catalog scene paths, ShieldEmitter and Transporter DeathSpawn; separate editable enemy scenes stay. |
 | [ ] | **P1–P5 — Player/global XP + Research Foundation** | [Detailed phased Codex pass](../SYSTEMS/Progression/PLAYER_XP_RESEARCH_FOUNDATION_PASS.md): persistent per-profile XP/RP, signed mission scoring + ETA, Campaign Levels/Research, hex-origin graph and real Citadel Master I. | Extends Results R3/R4; **do not implement XP twice** or confuse player XP with tower Rank XP. Campaign save/load remains separate. |
-| [ ] | **C1/C2 done; C3/C4 pending — Timed construction & upgrades** | [Detailed phased Codex pass](../TOWERS/Shared/Construction/TIMED_CONSTRUCTION_PASS.md): Implemented work states/durations and initial-placement capability gating. Remaining: timed upgrades/Inspector, stage SVGs + optional sparks/VFX. | Preserve 1×1/2×2/3×2 footprints, wallet, ammo delivery, existing levels and rank XP. |
+| [ ] | **C1–C3 done; C4 pending — Timed construction & upgrades** | [Detailed phased Codex pass](../TOWERS/Shared/Construction/TIMED_CONSTRUCTION_PASS.md): Implemented construction, timed upgrades, capability gating and Inspector progress. Remaining: stage SVGs + optional sparks/VFX. | Preserve 1×1/2×2/3×2 footprints, wallet, ammo delivery, existing levels and rank XP. |
 | [ ] | **R2 — Mission Results visual polish** | [Results remaining passes](../UI/Menus/Results/README.md): layout, transitions, skippable count-up, sounds and viewport testing. | R0/R1 outcome/results behavior already complete. Optional independent polish pass. |
 | [ ] | **R3 — Actual level-run telemetry / extra stats** | [Results R3](../UI/Menus/Results/README.md): placed towers, successful upgrades, Credits earned/spent, unpaused timer, frozen final telemetry. | **P2 already covers the subset needed for XP/time**; coordinate instead of duplicating stat owners. Extra optional breakdown may be later. |
 | [ ] | **R4 — Mission XP scoring/persistence** | [Results R4](../UI/Menus/Results/README.md), implemented through [P1–P2](../SYSTEMS/Progression/PLAYER_XP_RESEARCH_FOUNDATION_PASS.md) in the approved plan. | **Overlapping scope:** after P1/P2, reconcile R4 checklist; don't create a separate XP wallet/service. |
@@ -73,7 +73,7 @@ These are real gaps or explicitly proposed systems, but **need a dedicated scope
 
 1. **Completed independent refactor:** GE1–GE3 inherited enemy scenes. No rebalancing; see `TESTS/Enemies/GenericEnemy.md` for verification limits.
 2. **Campaign loop:** P1–P5 progression. Fold in the necessary Results R3 telemetry/R4 reward work once, then optionally do independent R2 polish.
-3. **Building lifecycle:** C1/C2 complete; C3 timed upgrades/Inspector and C4 visual stages remain.
+3. **Building lifecycle:** C1–C3 complete; C4 visual stages remain.
 4. **Combat escalation:** first design/implement Tower HP/shields/damage/destruction; then E3B enemy attacks.
 5. **Large management systems:** campaign Save/Load, then staged electricity generation/island grids/relays (order may be revisited as dependencies evolve).
 6. **Pick individual optional feature passes** (advanced waves, additional towers, sounds, feedback, combat drones) rather than asking Codex to implement the entire design-only list at once.

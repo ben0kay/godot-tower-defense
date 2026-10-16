@@ -1,4 +1,4 @@
-// C1–C2 real paid construction, sparse timer/capability/lifecycle checks; visual stages and timed purchases remain C3–C4.
+// C1–C3 paid construction/upgrades, sparse work clocks and event-driven Inspector; visual stages remain C4.
 using Godot;
 using System;
 using System.Linq;
@@ -15,13 +15,13 @@ public partial class ConstructionChecks : Node
         try
         {
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-            await Timers(); ResultsPause(); ConstructionPlacementChecks.Run(this); ConstructionPerformanceChecks.Run(this);
+            await Timers(); ResultsPause(); await TimedUpgradeChecks.Run(this); ConstructionPlacementChecks.Run(this); ConstructionPerformanceChecks.Run(this);
             using (AmmoLoopFixture f = new(this))
             {
                 await TowerUpgradeChecks.Run(f.Main);
             }
             await SubsystemBattlefield.DrainFreedFixtures(this);
-            GD.Print("PASS: C1-C2 durations, active-only clock, paid construction/rollback, all weapon/production/logistics gates and existing upgrades"); GetTree().Quit();
+            GD.Print("PASS: C1-C3 work clocks, paid construction/timed upgrades, rank/ammo/Inspector and weapon/production/logistics gates"); GetTree().Quit();
         }
         catch (Exception error) { GD.PushError(error.ToString()); GetTree().Paused = false; GetTree().Quit(1); }
     }

@@ -1,6 +1,6 @@
 # Timed Construction, Timed Upgrades and Visual Build Stages — Codex Implementation Pass
 
-> **STATUS: C1/C2 IMPLEMENTED; C3/C4 PLANNED.** This file is the implementation brief for **C1–C4**. Complete stages sequentially, test each, and update this checklist **only after code really lands**. Follow `NOTES/CodePreferences.md` and the existing Godot 4 C# architecture. Documentation created 2026-10-16.
+> **STATUS: C1–C3 IMPLEMENTED; C4 PLANNED.** This file is the implementation brief for **C1–C4**. Complete stages sequentially, test each, and update this checklist **only after code really lands**. Follow `NOTES/CodePreferences.md` and the existing Godot 4 C# architecture. Documentation created 2026-10-16.
 
 ## Goal
 
@@ -72,12 +72,12 @@ This is one shared, optional construction capability: a Battle Tower, passive Am
 
 ## C3 — Timed paid upgrades and selected Inspector experience
 
-- [ ] Update upgrade controller so payment schedules the **specific next tier**. Keep `UpgradeLevel`, `FinalStats`, aiming, attack timers, ammunition contents and earned Rank XP **unchanged while Upgrading**. Preserve old-tier operation throughout.
-- [ ] At completion resolve/commit the **one selected absolute target row** using the then-valid Rank context, notify stats and synchronize ammo capacity exactly once. A rank promotion during work must remain accurate: do not apply a stale precomputed snapshot from upgrade-start and overwrite earned rank. No refill of spent ammunition on upgrade.
-- [ ] Guard against repeated mouse clicks, stale expectedLevel, insufficient secondary resources, sold/freed towers (future), failed payment and max-tier requests. One successful paid upgrade = one delayed tier transition and exactly one resource deduction. Do not let Inspector offer an additional upgrade mid-work.
-- [ ] Add clear selected-tower Inspector section: `CONSTRUCTING / UPGRADING / OPERATIONAL`, small progress bar, `elapsed / total` or seconds left, and `Upgrading to Level N` when relevant. Show what old tier currently provides and what next tier will provide; preview remains free. No per-frame rebuilding of entire Inspector, especially at 500 enemies.
-- [ ] Use work events to refresh only the selected building; update UI only at useful intervals (e.g. changed percent or 0.1s). Closing/reselecting Inspector reads current state; changing selection and unloading unsubscribes cleanly.
-- [ ] Regression tests: level1→2→3 timings, purchase-at-start, no early stats, accurate ranked completion, no duplicate payment, existing multi-resource rollback and Inspector errors, pause/resume, build+upgrade overlap across different instances.
+- [x] Update upgrade controller so payment schedules the **specific next tier**. Keep `UpgradeLevel`, `FinalStats`, aiming, attack timers, ammunition contents and earned Rank XP **unchanged while Upgrading**. Preserve old-tier operation throughout.
+- [x] At completion resolve/commit the **one selected absolute target row** using the then-valid Rank context, notify stats and synchronize ammo capacity exactly once. A rank promotion during work must remain accurate: do not apply a stale precomputed snapshot from upgrade-start and overwrite earned rank. No refill of spent ammunition on upgrade.
+- [x] Guard against repeated mouse clicks, stale expectedLevel, insufficient secondary resources, sold/freed towers (future), failed payment and max-tier requests. One successful paid upgrade = one delayed tier transition and exactly one resource deduction. Do not let Inspector offer an additional upgrade mid-work.
+- [x] Add clear selected-tower Inspector section: `CONSTRUCTING / UPGRADING / OPERATIONAL`, small progress bar, `elapsed / total` or seconds left, and `Upgrading to Level N` when relevant. Show what old tier currently provides and what next tier will provide; preview remains free. No per-frame rebuilding of entire Inspector, especially at 500 enemies.
+- [x] Use work events to refresh only the selected building; update UI only at useful intervals (e.g. changed percent or 0.1s). Closing/reselecting Inspector reads current state; changing selection and unloading unsubscribes cleanly.
+- [x] Regression tests: level1→2→3 timings, purchase-at-start, no early stats, accurate ranked completion, no duplicate payment, existing multi-resource rollback and Inspector errors, pause/resume, build+upgrade overlap across different instances.
 
 **C3 done:** purchased upgrades take real time, retain old-tier activity, and the Inspector accurately shows work status.
 
@@ -104,14 +104,14 @@ This is one shared, optional construction capability: a Battle Tower, passive Am
 - Optional animated cranes/robot builders, per-piece skeletal assembly, continuous geometry deformation and complex stage blending. The first pass can use simple SVG stage swaps + lightweight particles.
 - Major rebalancing of tower damage/range/ammo, multi-cell footprint dimensions, production batch size or drone shipment sizes.
 
-## Full C1–C4 acceptance checklist (C3/C4 items remain pending)
+## Full C1–C4 acceptance checklist (C4 visual items remain pending)
 
 - [x] Costs are charged **once at construction/upgrade start**, never at completion or stage-change.
 - [x] Building occupies whole rectangle immediately; routing/terrain rules remain identical to the completed footprint pass.
 - [x] New structures cannot operate until built; Factory/Depot logistics do not bypass this.
 - [x] Timers advance only in unpaused game time; cleanup is safe on fail, deletion and scene unload.
-- [ ] Old tower level/stats remain active during timed upgrade; next level applies once on completion.
-- [ ] Inspector shows status + correct progress; base gameplay works without SVG/VFX assignments.
+- [x] Old tower level/stats remain active during timed upgrade; next level applies once on completion.
+- [x] Inspector shows status + correct progress; base gameplay works without SVG/VFX assignments.
 - [ ] At least one 1×1 and one 3×2 construction demonstrate authored stage imagery and optional sparks/completion feedback.
 - [x] No unrelated ammunition, rank, wallet, navigation, tower-level balance or Campaign/save changes.
 - [x] Document verified tests and actual live-view limitations; update this status, `TOWERS/Shared/Construction/README.md`, `TOWERS/Shared/Upgrades/README.md`, `TOWERS/README.md` and relevant tower/Ammo READMEs **only for work actually completed**.
