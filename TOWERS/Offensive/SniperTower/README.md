@@ -1,0 +1,13 @@
+# Sniper Tower — one-muzzle long-range Kinetic weapon
+
+Implemented via the shared `TOWERS/Shared/Weapons/MultiBarrel/ProjectileTurretBase.cs`; no bespoke targeting loop or HUD changes. The authored config enforces `Single` muzzle firing. Its one `Marker2D` sits at `TurretPivot/Muzzles/MuzzleA`; projectile launches from the barrel tip, follows the existing guided `BasicProjectile`, uses typed Kinetic shield/hull damage and standard tower XP. The scene is a 1×1 offensive tower available through `TOWERS/DefaultTowerCatalog.tres`.
+
+| Purchased level | Credits (build/upgrade) | Damage/bullet | Total bullets/s | Range | Bullet speed | Penetration |
+|---|---:|---:|---:|---:|---:|---:|
+| 1 | 325 | 80 | 0.35 | 448 px | 1,300 px/s | 15% |
+| 2 | 225 | 88 | 0.37 | 456 px | 1,300 px/s | 15% |
+| 3 | 325 | 96 | 0.40 | 464 px | 1,300 px/s | 15% |
+
+Ranks: Standard 0, Veteran 1,000, Enhanced 3,000, Superior 7,000, Legendary 15,000 total XP with the existing rank damage/range percentages. Ammo: 600 local capacity, 1 round per bullet; normal physical logistics can resupply it.
+
+Balance is provisional. Level 1 one-shots unshielded 60-HP Enemy001; its strength is long range/high per-hit damage, counterbalanced by slow cooldown and price. No headshot/crit mechanic, physics raycast, lead prediction, line-of-sight, overpenetration or special targeting behavior has been added.
