@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://UI/Menus/Results/LevelResults.cs" id="1_results"]
+
+[node name="LevelResults" type="CanvasLayer"]
+process_mode = 3
+layer = 150
+script = ExtResource("1_results")
