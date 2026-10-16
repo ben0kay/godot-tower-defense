@@ -99,7 +99,7 @@ The intent of "fixed" is **not increased by buying a tower level**; research and
 
 ### C. Suggested future implementation passes
 
-1. **Timed construction and upgrades** with work state and progress UI.
+1. **Timed construction and upgrades** with work state and progress UI. **Codex pass C1–C4:** [Shared/Construction/TIMED_CONSTRUCTION_PASS.md](Shared/Construction/TIMED_CONSTRUCTION_PASS.md), including authored SVG build stages and optional sparks/VFX (planning only).
 2. **Tower HP and optional shields**, damage/repair foundations and Inspector readouts.
 3. **Completed:** generic local ammunition storage/consumption and the first physical two-leg supply loop. Magazines/reloads remain future work.
 4. **Optional magazines/reload timers**, for applicable weapons only.

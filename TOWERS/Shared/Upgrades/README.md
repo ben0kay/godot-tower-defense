@@ -13,3 +13,7 @@ The selected Inspector displays current effective stats and next-row differences
 TowerUpgradeChecks drives real HUD purchases, expected-level/repeat guards, insufficient/secondary-resource cases, maximum level, preview parity, row independence, copies, layout and unchanged navigation. Weapon-specific integration suites retain beam/penetration/AoE coverage.
 
 Paid upgrade resolution now retains the placed tower's selected named Rank. CommitUpgrade changes only UpgradeLevel/FinalStats and never resets TowerRankProgress. Credits and XP remain separate currencies/state; rank promotion is automatic and cannot trigger a purchase. TowerRankChecks verifies150/250-Credit Battle purchases preserve XP/rank and match ranked previews.
+
+## Planned timed upgrades — NOT IMPLEMENTED
+
+[Construction C1–C4 implementation pass](../Construction/TIMED_CONSTRUCTION_PASS.md) will add explicit `WorkSeconds` per level, deferred paid upgrade application, and Inspector progress. **Current upgrades still commit immediately** until that pass is implemented. During a timed upgrade, the proposed first-pass rule keeps the old tier operational and applies the next absolute row only when work completes; preserve existing wallet, rank XP and multi-resource safeguards.

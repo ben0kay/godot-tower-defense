@@ -1,5 +1,7 @@
 # Construction and upgrades — FUTURE / NOT IMPLEMENTED
 
+> **Codex implementation plan:** [TIMED_CONSTRUCTION_PASS.md](TIMED_CONSTRUCTION_PASS.md) — **C1 state/timers → C2 placement/operational gating → C3 timed upgrades/Inspector → C4 SVG stages/optional VFX and regressions**. This README describes the design; the implementation plan sets concrete first-pass defaults. **No construction gameplay has been implemented yet.**
+
 ## Gameplay design
 
 Building and paid upgrading eventually take time rather than completing instantly. Each tower's existing absolute *Levels.cs row would define its own `WorkSeconds`: Level 1 for initial construction and later rows for that individual upgrade. Never compound purchased-level stats.
