@@ -27,3 +27,5 @@ Camera WASD/arrows/middle-mouse/wheel remain in CameraController. Pausing clears
 Both `Main.tscn` and `MainLevel002.tscn` instance `UI/Menus/Pause/PauseMenu.tscn` once. Direct F6 play needs no selected profile. Pause uses real SceneTree pause, layer100 above HUD/debug UI, and `MenuNavigation` for unpaused scene transitions. Save/Load/Options remain disabled placeholders.
 
 Run `TESTS/UI/PauseControlsChecks.tscn` and `TESTS/UI/MenuTowerFlowChecks.tscn` after compiling. See `TESTS/UI/PauseControls.md` for actual results and desktop-only verification limits. No controls settings or rebinding UI is implemented yet.
+
+Mission Debrief R1 uses scoped priority-200 Escape/Ctrl bindings: Escape skips the reveal or closes its navigation error, Ctrl is consumed, and Pause cannot reopen/resume the finished mission. F11 remains global. Session unload unbinds both.

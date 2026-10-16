@@ -28,6 +28,7 @@ public partial class EnemyIntegrationChecks : Node
             TowerPlacementController placement = _battle.GetNode<TowerPlacementController>("TowerPlacement");
             Check(placement != null, "Main scene retains its tower placement controller");
             placement.Catalog = null;
+            SubsystemBattlefield.DetachSession(_battle);
             AddChild(_battle);
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);

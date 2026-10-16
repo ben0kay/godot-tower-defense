@@ -12,7 +12,7 @@ public partial class PlacementPerformanceChecks : Node
     {
         try
         {
-            Node2D main = GD.Load<PackedScene>("res://Main.tscn").Instantiate<Node2D>(); AddChild(main);
+            Node2D main = GD.Load<PackedScene>("res://Main.tscn").Instantiate<Node2D>(); SubsystemBattlefield.DetachSession(main); AddChild(main);
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
             Disable(main);
@@ -50,7 +50,7 @@ public partial class PlacementPerformanceChecks : Node
                 }
                 GD.Print($"PLACEMENT {population}: validation max {validation:0.00}ms; grid max {update:0.00}ms; next physics frame max {frame:0.00}ms");
             }
-            GetTree().Quit();
+            main.Free(); await SubsystemBattlefield.DrainFreedFixtures(this); GetTree().Quit();
         }
         catch (Exception error) { GD.PushError(error.ToString()); GetTree().Quit(1); }
     }

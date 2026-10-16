@@ -1,6 +1,6 @@
 # Headless gameplay checks
 
-Tests are grouped by system. Scripts, scenes and `.uid` sidecars stay together; gameplay scenes do not launch these runners automatically. This organization pass changes paths only, not assertions or fixture behavior.
+Tests are grouped by system. Scripts, scenes and `.uid` sidecars stay together; gameplay scenes do not launch these runners automatically. Mission lifecycle tests and deliberately isolated subsystem fixtures are described below.
 
 | Folder | Contents |
 | --- | --- |
@@ -8,7 +8,7 @@ Tests are grouped by system. Scripts, scenes and `.uid` sidecars stay together; 
 | [Towers](Towers/README.md) | Tower stats/ranks/upgrades, weapons and passive fixture |
 | [Navigation](Navigation/README.md) | Corridors, repathing, permissions, checkpoints and F3 |
 | [Terrain](Terrain/README.md) | Terrain categories, interactive hazards and migration reports |
-| [UI](UI/README.md) | HUD, menu flow, build tray and Pause/controls |
+| [UI](UI/README.md) | HUD, menu flow, build tray, Pause/controls and Mission Debrief R1 |
 | [Economy](Economy/README.md) | Wallet, kill rewards and ammunition foundations |
 | [Integration](Integration/README.md) | Main suite and enemy/level/wave/objective checks |
 | [Performance](Performance/README.md) | Benchmarks and recorded timings |
@@ -243,3 +243,7 @@ Completed: ordered and uniformly branching checkpoint graphs, full-chain F3 prev
 Moved 100 root-level test scripts/scenes/UID sidecars/reports into the system folders above. Existing fixture paths remain under Towers. All moved C# files were compared against their originals: only literal file-path replacements changed; assertions and fixture logic are unchanged. UID contents are identical. Relocated scene dependencies resolve and no old test-file paths remain in repository text files.
 
 Direct Roslyn compilation passed. From their new paths, PauseControlsChecks, MenuTowerFlowChecks, RoutePreviewChecks, CheckpointChecks, CorridorNavigationChecks, PlacementPerformanceChecks and SpatialQueryBenchmarks exited0. The unmodified integration runner launches from Integration but still exits1 at the existing Level002 painted-tile-count assertion; this cleanup neither changes nor suppresses it. The standard SDK build limitation documented in UI/PauseControls.md remains; no test script splitting or gameplay C# changes were made.
+
+## Mission Debrief R1
+
+See [Results verification](UI/Results.md) for real outcome races, both launchers, paused UI, Retry/Next/Menu/Exit and known build/integration limits. Subsystem fixtures remove the new session/results before mutating waves/HP so their original assertions remain meaningful; the dedicated R1 runners keep production orchestration intact.

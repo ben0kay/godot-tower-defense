@@ -254,3 +254,7 @@ Each `WaveEnemyEntry` now includes `SpawnWithShield` (default `false`) and `Wave
 ## Environmental damage at spawn
 
 A valid spawn can be killed immediately by an Interactive Lava entry. The scheduler still consumes that planned spawn and advances the batch, but subscribes living ownership only for an alive, nonqueued ship. This prevents waiting forever on a death that occurred before ownership could subscribe; kill Credits and removal remain in Enemy. InteractiveTerrainChecks includes a lethal authored-portal Lava spawn and verifies wave completion.
+
+## R1 results telemetry
+
+`CompletedWaves` resets on Configure and increments exactly when an owned authored wave fully clears. `LevelSessionController` consumes that telemetry and WaveCompleted/AllWavesComplete; WaveManager does not decide mission victory/defeat or own results UI.

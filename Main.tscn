@@ -13,6 +13,9 @@
 
 [ext_resource type="PackedScene" path="res://UI/Menus/Pause/PauseMenu.tscn" id="15_pause"]
 
+[ext_resource type="PackedScene" path="res://UI/Menus/Results/LevelResults.tscn" id="16_results"]
+[ext_resource type="Script" path="res://LEVELS/Session/LevelSessionController.cs" id="17_session"]
+
 [node name="Battlefield" type="Node2D" unique_id=1543557823]
 
 [node name="World" parent="." unique_id=1714434645 instance=ExtResource("1_world")]
@@ -39,3 +42,9 @@ script = ExtResource("14_citadel")
 script = ExtResource("13_waves")
 
 [node name="PauseMenu" parent="." instance=ExtResource("15_pause")]
+
+[node name="LevelResults" parent="." instance=ExtResource("16_results")]
+
+[node name="LevelSession" type="Node" parent="."]
+process_mode = 3
+script = ExtResource("17_session")

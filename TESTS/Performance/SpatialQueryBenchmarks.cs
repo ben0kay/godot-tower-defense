@@ -14,7 +14,7 @@ public partial class SpatialQueryBenchmarks : Node
     {
         try
         {
-            Node main = GD.Load<PackedScene>("res://Main.tscn").Instantiate(); AddChild(main);
+            Node main = GD.Load<PackedScene>("res://Main.tscn").Instantiate(); SubsystemBattlefield.DetachSession(main); AddChild(main);
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
             Stop(main);
             SpawnManager spawns = main.GetNode<SpawnManager>("World/EnemySystems/Spawning");
@@ -29,7 +29,7 @@ public partial class SpatialQueryBenchmarks : Node
                 GD.Print($"SPATIAL SPEEDUP {count}/{towers}/{(dense ? "dense" : "sparse")}: {before.Average(s => s.Total) / after.Average(s => s.Total):0.00}x net including maintenance");
             }
             foreach (int count in new[] { 500, 1000 }) { Overflow(spawns, count, false); Overflow(spawns, count, true); }
-            AreaDamageChecks.Clear(spawns); GetTree().Quit(0);
+            AreaDamageChecks.Clear(spawns); main.Free(); await SubsystemBattlefield.DrainFreedFixtures(this); GetTree().Quit(0);
         }
         catch (Exception error) { GD.PushError(error.ToString()); GetTree().Quit(1); }
     }

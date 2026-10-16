@@ -15,7 +15,7 @@ public partial class CheckpointChecks : Node
         Node2D main = null; EnemyMasterConfig config = null; LevelConfig settings = null;
         try
         {
-            main = GD.Load<PackedScene>("res://Main.tscn").Instantiate<Node2D>(); AddChild(main);
+            main = GD.Load<PackedScene>("res://Main.tscn").Instantiate<Node2D>(); SubsystemBattlefield.DetachSession(main); AddChild(main);
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame); await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
             Disable(main);
             WorldGrid grid = main.GetNode<WorldGrid>("World/Grid"); SpawnManager spawns = main.GetNode<SpawnManager>("World/EnemySystems/Spawning");
@@ -176,7 +176,7 @@ public partial class CheckpointChecks : Node
             CheckpointChainChecks.Run(main, grid, spawns, checkpoint);
             GD.Print("PASS: required checkpoint matrix16, exact portal attribution, physical/swept entry, persistent preferences, blocked retry, no-link parity, preview stages and bounded target cache");
             main.QueueFree(); await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame); main = null;
-            config.Dispose(); config = null; settings.Dispose(); settings = null; GetTree().Quit();
+            config.Dispose(); config = null; settings.Dispose(); settings = null; await SubsystemBattlefield.DrainFreedFixtures(this); GetTree().Quit();
         }
         catch (Exception error) { GD.PushError(error.ToString()); GetTree().Quit(1); }
     }

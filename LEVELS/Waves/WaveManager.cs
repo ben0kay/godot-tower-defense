@@ -10,6 +10,7 @@ public partial class WaveManager : Node
     public WaveState State { get; private set; } = WaveState.Disabled;
     public int CurrentWave => _waveIndex < 0 ? 0 : _waves[_waveIndex].Number;
     public int TotalWaves => _waves.Length;
+    public int CompletedWaves { get; private set; }
     public int PlannedRemaining { get; private set; }
     public int AliveCount => _owned.Count;
     public int EnemiesRemaining => PlannedRemaining + AliveCount;
@@ -56,7 +57,7 @@ public partial class WaveManager : Node
     // Reset scheduler state; existing live ships become unowned and cannot delay the next set.
     public void Configure(WaveDefinition[] waves, IReadOnlyDictionary<string, PackedScene> scenes)
     {
-        ReleaseOwnership(); _waveIndex = -1; PlannedRemaining = 0; _sequence = null; _countdown = 0; _startAttemptReserved = false;
+        ReleaseOwnership(); CompletedWaves = 0; _waveIndex = -1; PlannedRemaining = 0; _sequence = null; _countdown = 0; _startAttemptReserved = false;
         _waves = Array.Empty<WaveDefinition>(); _scenes = null;
         try { WaveCatalog.Validate(waves, scenes); }
         catch (Exception exception) { SetError(exception.Message); return; }
@@ -151,7 +152,7 @@ public partial class WaveManager : Node
     private void CompleteIfClear()
     {
         if (State != WaveState.WaitingForClear || PlannedRemaining != 0 || _owned.Count != 0) return;
-        int completedNumber = CurrentWave;
+        int completedNumber = CurrentWave; CompletedWaves++;
         State = _waveIndex + 1 < _waves.Length ? WaveState.Completed : WaveState.AllWavesComplete;
         SetPhysicsProcess(false); Publish(); WaveCompleted?.Invoke(completedNumber);
     }

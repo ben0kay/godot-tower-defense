@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public partial class SpawnManager : Node
 {
+    public event System.Action<Enemy> WaveEnemyCreated;
     [Export] public EnemyCatalog Catalog { get; set; }
     public EnemyRegistry Registry { get; private set; }
     public PathRequestManager Paths { get; private set; }
@@ -182,6 +183,7 @@ public partial class SpawnManager : Node
         if (chosen < _portalCount) spawn = OffsetPortal(spawn, ship.Definition.RadiusPixels, random, _portalObjects[chosen]);
         _ships.AddChild(ship); ship.GlobalPosition = spawn;
         EnemyPortal chosenPortal = chosen < _portalCount ? _portalObjects[chosen] as EnemyPortal : null;
+        WaveEnemyCreated?.Invoke(ship);
         ship.Initialize(Registry, Paths, spawnWithShield, chosenPortal?.ResolveCheckpoint(), chosenPortal?.RequiresCheckpoint == true); LastMessage = "Wave spawned " + ship.Definition.DisplayName;
         return ship;
     }

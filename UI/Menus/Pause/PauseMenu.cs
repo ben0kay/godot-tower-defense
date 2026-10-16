@@ -10,6 +10,7 @@ public partial class PauseMenu : CanvasLayer
     private GameInput _input;
     private Control _previousFocus;
     private AcceptDialog _error;
+    private bool _resultsLocked;
 
     // =========================================================
     // Always-process UI remains interactive while the entire battlefield is paused.
@@ -40,6 +41,7 @@ public partial class PauseMenu : CanvasLayer
     // Placement has higher priority; a single Escape either cancels placement or toggles pause.
     private bool HandleEscape()
     {
+        if (_resultsLocked) return false;
         if (_error.Visible) { _error.Hide(); return true; }
         if (IsOpen) Resume(); else Open();
         return true;
@@ -49,7 +51,7 @@ public partial class PauseMenu : CanvasLayer
     // Capture keyboard focus so resuming returns to the existing HUD without changing build state.
     public void Open()
     {
-        if (IsOpen || GetTree().Paused) return;
+        if (_resultsLocked || IsOpen || GetTree().Paused) return;
         _previousFocus = GetViewport().GuiGetFocusOwner();
         _screen.Show(); GetTree().Paused = true; _resume.GrabFocus();
     }
@@ -58,7 +60,7 @@ public partial class PauseMenu : CanvasLayer
     // Resume has no save, wave or placement side effects.
     public void Resume()
     {
-        if (!IsOpen) return;
+        if (_resultsLocked || !IsOpen) return;
         _screen.Hide(); GetTree().Paused = false;
         if (GodotObject.IsInstanceValid(_previousFocus) && _previousFocus.IsVisibleInTree()) _previousFocus.GrabFocus();
         else _resume.ReleaseFocus();
@@ -69,8 +71,16 @@ public partial class PauseMenu : CanvasLayer
     // Shared navigation unpauses before transition and restores pause if scene loading fails.
     public void QuitToMainMenu()
     {
+        if (_resultsLocked) return;
         try { MenuNavigation.Open(this, MenuNavigation.MainScene); }
         catch (Exception error) { _error.DialogText = error.Message; _error.PopupCentered(new Vector2I(460, 180)); }
+    }
+
+    // =========================================================
+    // Transfer pause ownership to the final debrief without briefly resuming the battlefield.
+    public void LockForResults()
+    {
+        _resultsLocked = true; _screen.Hide(); _error.Hide(); _previousFocus = null;
     }
 
     // =========================================================

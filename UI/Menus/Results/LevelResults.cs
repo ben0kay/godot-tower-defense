@@ -7,6 +7,8 @@ public partial class LevelResults : CanvasLayer
 {
     [Signal] public delegate void RetryRequestedEventHandler();
     [Signal] public delegate void MenuRequestedEventHandler();
+    [Signal] public delegate void NextLevelRequestedEventHandler();
+    [Signal] public delegate void ExitGameRequestedEventHandler();
 
     [ExportGroup("Presentation")]
     [Export(PropertyHint.Range, "0.05,1,0.05")] public float StatRevealSeconds { get; set; } = 0.24f;
@@ -14,12 +16,19 @@ public partial class LevelResults : CanvasLayer
     [Export] public bool PreviewOnReady { get; set; } = false;
 
     public bool IsOpen => _screen?.Visible == true;
+    public bool ActionsAvailable { get; private set; }
+    public Button PrimaryButton => _primary;
+    public Button DetailsButton => _details;
+    private bool _won, _hasNext;
+    private UIMasterConfig _palette;
+    private PanelContainer _frame;
+    private AcceptDialog _error;
 
     private Control _screen;
     private Label _heading, _subtitle;
     private VBoxContainer _experience;
     private HBoxContainer _actions;
-    private Button _retry;
+    private Button _primary, _details, _menu, _exit;
     private Button _skip;
     private Tween _reveal;
     private readonly List<(PanelContainer Panel, Label Value)> _stats = new();
@@ -32,11 +41,13 @@ public partial class LevelResults : CanvasLayer
         ProcessMode = ProcessModeEnum.Always;
         Layer = 150;
         UIMasterConfig palette = GD.Load<UIMasterConfig>("res://UI/DefaultUIConfig.tres") ?? new UIMasterConfig();
+        _palette = palette;
         _screen = new Control { Name = "Screen", MouseFilter = Control.MouseFilterEnum.Stop };
         AddChild(_screen);
         _screen.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
         VBoxContainer content = MenuLayout.Create(_screen, "MISSION DEBRIEF", "LEVEL RESULTS", 660f);
         _screen.GetChild<ColorRect>(0).Color = new Color(0.01f, 0.03f, 0.05f, 0.87f);
+        _frame = (PanelContainer)content.GetParent();
         _heading = content.GetChild<Label>(0);
         _subtitle = content.GetChild<Label>(1);
 
@@ -66,9 +77,14 @@ public partial class LevelResults : CanvasLayer
         _actions = new HBoxContainer();
         _actions.AddThemeConstantOverride("separation", 12);
         content.AddChild(_actions);
-        _retry = UIButtonFactory.Create("RETRY MISSION", () => EmitSignal(SignalName.RetryRequested), UIButtonStyle.Action, 46f, palette);
-        _actions.AddChild(_retry);
-        _actions.AddChild(UIButtonFactory.Create("RETURN TO MENU", () => EmitSignal(SignalName.MenuRequested), UIButtonStyle.Action, 46f, palette));
+        _primary = UIButtonFactory.Create("RETRY MISSION", RequestPrimary, UIButtonStyle.Action, 46f, palette);
+        _details = UIButtonFactory.Create("DETAILS", null, UIButtonStyle.Action, 46f, palette);
+        _details.Disabled = true; _details.TooltipText = "Detailed mission statistics — coming soon.";
+        _menu = UIButtonFactory.Create("EXIT TO MAIN MENU", () => { if (ActionsAvailable) EmitSignal(SignalName.MenuRequested); }, UIButtonStyle.Action, 46f, palette);
+        _exit = UIButtonFactory.Create("EXIT GAME", () => { if (ActionsAvailable) EmitSignal(SignalName.ExitGameRequested); }, UIButtonStyle.Action, 46f, palette);
+        foreach (Button button in new[] { _primary, _details, _menu, _exit }) _actions.AddChild(button);
+        _error = new AcceptDialog { Title = "Navigation error" }; AddChild(_error);
+        UIButtonFactory.Apply(_error.GetOkButton(), UIButtonStyle.Action);
 
         _screen.Hide();
         if (PreviewOnReady) ShowPreview();
@@ -97,12 +113,22 @@ public partial class LevelResults : CanvasLayer
 
     #region Display
     // =========================================================
-    // Called by the future session controller with a frozen end-of-level snapshot.
-    public void ShowResults(LevelResultSnapshot snapshot)
+    // Called by the session controller with a frozen end-of-level snapshot.
+    public void ShowResults(LevelResultSnapshot snapshot, bool hasNextLevel = false)
     {
         if (snapshot == null) throw new ArgumentNullException(nameof(snapshot));
         _reveal?.Kill();
         bool won = snapshot.Outcome == LevelOutcome.Victory;
+        _won = won; _hasNext = hasNextLevel; ActionsAvailable = false;
+        _primary.Text = won ? "NEXT LEVEL" : "RETRY MISSION";
+        _primary.TooltipText = won && !hasNextLevel ? "No next level available." : "";
+        foreach (Button button in new[] { _primary, _menu, _exit }) button.Disabled = true;
+        _error.Hide();
+        Color accent = won ? new Color("#76e3bd") : new Color("#ef7777");
+        _frame.AddThemeStyleboxOverride("panel", UIButtonFactory.Box(_palette.PanelColor, accent));
+        UIMasterConfig actionPalette = (UIMasterConfig)_palette.Duplicate(); actionPalette.AccentColor = accent;
+        foreach (Button button in new[] { _primary, _details, _menu, _exit }) UIButtonFactory.Apply(button, UIButtonStyle.Action, actionPalette);
+        foreach (var stat in _stats) stat.Value.AddThemeColorOverride("font_color", accent);
         _heading.Text = won ? "VICTORY" : "MISSION FAILED";
         _heading.AddThemeColorOverride("font_color", won ? new Color("#76e3bd") : new Color("#ef7777"));
         _subtitle.Text = snapshot.LevelName + "  //  MISSION DEBRIEF";
@@ -120,7 +146,7 @@ public partial class LevelResults : CanvasLayer
         _experience.Hide(); _experience.Modulate = new Color(1f, 1f, 1f, 0f);
         _actions.Hide();
         _skip.Show();
-        _screen.Show();
+        _screen.Show(); _skip.GrabFocus();
 
         _reveal = CreateTween();
         _reveal.TweenInterval(0.20f);
@@ -160,7 +186,9 @@ public partial class LevelResults : CanvasLayer
     // Session controller handles retry/menu navigation; this overlay only emits intents.
     private void FinishReveal()
     {
-        _skip.Hide(); _actions.Show(); _retry.GrabFocus();
+        ActionsAvailable = true; _skip.Hide(); _actions.Show();
+        _primary.Disabled = _won && !_hasNext; _menu.Disabled = false; _exit.Disabled = false;
+        if (_primary.Disabled) _menu.GrabFocus(); else _primary.GrabFocus();
     }
 
     // =========================================================
@@ -168,8 +196,19 @@ public partial class LevelResults : CanvasLayer
     public void HideResults()
     {
         _reveal?.Kill();
-        _screen.Hide();
+        _screen.Hide(); ActionsAvailable = false; _error.Hide();
     }
+
+    // =========================================================
+    // Buttons emit guarded intent only; all scene changes and unpause handling belong to the session.
+    private void RequestPrimary()
+    {
+        if (!ActionsAvailable || _primary.Disabled) return;
+        if (_won) EmitSignal(SignalName.NextLevelRequested); else EmitSignal(SignalName.RetryRequested);
+    }
+    public void ShowNavigationError(string message) { _error.DialogText = message; _error.PopupCentered(new Vector2I(460, 180)); }
+    public bool DismissError() { if (!_error.Visible) return false; _error.Hide(); return true; }
+    public override void _ExitTree() => _reveal?.Kill();
 
     // =========================================================
     // Unknown future metrics remain visibly unavailable, never invented as zero.

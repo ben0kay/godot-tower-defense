@@ -12,7 +12,7 @@ public partial class CorridorNavigationChecks : Node
     // =========================================================
     // Standalone fixture supplements the existing integrated regression runner.
     public override async void _Ready()
-    { try { await Run(this); GetTree().Quit(); } catch (Exception error) { GD.PushError(error.ToString()); GetTree().Quit(1); } }
+    { try { await Run(this); await SubsystemBattlefield.DrainFreedFixtures(this); GetTree().Quit(); } catch (Exception error) { GD.PushError(error.ToString()); GetTree().Quit(1); } }
 
     // =========================================================
     // Isolated runtime maps/settings protect original gameplay fixtures and authored resources.
@@ -46,7 +46,7 @@ public partial class CorridorNavigationChecks : Node
     // Paint an isolated bounded three-cell band or right-angle passage, keeping a solid Citadel beyond the goal.
     private static async System.Threading.Tasks.Task<Fixture> Create(Node owner, bool winding, int width)
     {
-        Node2D main = GD.Load<PackedScene>("res://Main.tscn").Instantiate<Node2D>(); owner.AddChild(main);
+        Node2D main = GD.Load<PackedScene>("res://Main.tscn").Instantiate<Node2D>(); SubsystemBattlefield.DetachSession(main); owner.AddChild(main);
         await owner.ToSignal(owner.GetTree(), SceneTree.SignalName.ProcessFrame);
         await owner.ToSignal(owner.GetTree(), SceneTree.SignalName.ProcessFrame);
         Disable(main);

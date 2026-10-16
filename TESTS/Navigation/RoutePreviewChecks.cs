@@ -20,7 +20,7 @@ public partial class RoutePreviewChecks : Node
             finally { assignment.Free(); sixteen.Dispose(); }
             foreach (string scene in new[] { "Main.tscn", "MainLevel002.tscn" }) await CheckLevel(scene);
             GD.Print("PASS: F3 preview UI, deterministic raw/refined paths, budgets, neutral comparison, duplicate reporting, input cancellation and gameplay isolation on both levels");
-            GetTree().Quit();
+            await SubsystemBattlefield.DrainFreedFixtures(this); GetTree().Quit();
         }
         catch (Exception error) { GD.PushError(error.ToString()); GetTree().Quit(1); }
     }
@@ -29,7 +29,7 @@ public partial class RoutePreviewChecks : Node
     // Real level services retain their live state while preview samples use independent assignments.
     private async Task CheckLevel(string scene)
     {
-        Node2D main = GD.Load<PackedScene>("res://" + scene).Instantiate<Node2D>(); AddChild(main);
+        Node2D main = GD.Load<PackedScene>("res://" + scene).Instantiate<Node2D>(); SubsystemBattlefield.DetachSession(main); AddChild(main);
         await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         Disable(main);

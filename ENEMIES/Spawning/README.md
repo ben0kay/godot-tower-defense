@@ -26,3 +26,7 @@ Portal offsets now scale by each EnemyPortal.SizeMultiplier and its authored tra
 ## Portal checkpoint assignment
 
 Both debug and authored wave spawns inspect only the actual selected EnemyPortal's optional CheckpointPath. Its resolved node plus a separate required flag are supplied before initial movement setup, preserving missing-link requirements. No extra wave/spawn RNG draws or changes to reservoir selection, spread, registry/economy or terrain initialization are introduced. Empty links and map-edge sources preserve existing direct routing.
+
+## Mission statistics provenance
+
+`WaveEnemyCreated` identifies successful authored-wave spawns before Enemy.Initialize, so entry-hazard deaths are countable. It is not emitted by manual/F2 spawning. The level session subscribes once for basic official kill/breach tallies; SpawnManager does not own outcomes, rewards or result presentation.
