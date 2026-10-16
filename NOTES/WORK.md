@@ -1,8 +1,22 @@
 # WORK — First complete ammunition pipeline (Codex implementation task)
 
-> **Status: REQUESTED / NOT YET IMPLEMENTED.** This is an actionable implementation task for Codex, **not** a record that the feature exists. Implement in small, testable stages within the same work order and update the checkboxes only after verifying each result. Do not treat this as permission to introduce the entire power/research/construction roadmap.
+> **Status: CORE HELPER CLASSES IMPLEMENTED / GAMEPLAY PIPELINE NOT YET IMPLEMENTED.** This is an actionable implementation task for Codex, **not** a record that the feature exists. Implement in small, testable stages within the same work order and update the checkboxes only after verifying each result. Do not treat this as permission to introduce the entire power/research/construction roadmap.
 >
 > **Important change to older planning READMEs:** **Both delivery legs must use visible transport drones:** **Ammunition Factory → Ammunition Depot → ammunition-consuming Tower**. Previous notes saying factory-to-depot transfers are instant/logical **are superseded for this pass**. Update those notes to match the implemented behaviour when the feature is working.
+
+## Implemented foundations — CODEx HANDOFF (2026-10-15)
+
+**This foundation has already been coded and committed as `dd0fe708`. Reuse it, do not re-create equivalent implementations.** The following classes are **pure foundation helpers**, not yet attached to scenes/towers/drones.
+
+- `TOWERS/Shared/Ammunition/AmmoInventory.cs`: `new AmmoInventory(capacity,initialAmount=0)` with `Amount`, `Capacity`, `FreeSpace`, `Changed`, `TryAdd(rounds)`, `TryConsume(rounds)`, `TryTransferTo(destination,rounds)`, `TrySetCapacity(capacity)`. Atomic full-quantity transfers only. Invalid quantities/overfill/overspend fail unchanged. Shrinking capacity below stored ammo is refused; choose an explicit cap policy for upgrades.
+- `TOWERS/Shared/Ammunition/AmmunitionMasterConfig.cs` and `DefaultAmmunitionConfig.tres`: global exported `ResupplyThresholdFraction=0.10` with `NeedsResupply(current,max)` (at 1,000 maximum, request at 100 or below). **This resource is not loaded by any live controller yet.**
+- `TOWERS/Economy/Ammunition/AmmunitionFactory/AmmoProduction.cs`: `new AmmoProduction(batchAmount,secondsPerBatch,bufferCapacity,initialBufferedAmmo=0)`; owns `Buffer: AmmoInventory`, `IsPaused`, `ProgressSeconds`, `Advance(deltaSeconds)` returning **rounds produced**. Produces complete batches and pauses when buffer cannot fit another. **A future factory node must invoke `Advance` at runtime; no scene invokes it yet.**
+- `TOWERS/Economy/Ammunition/AmmunitionDepot/AmmoStorage.cs`: `new AmmoStorage(capacity,initialStock=0)` with `Inventory: AmmoInventory`, `CurrentStock`, `FreeSpace`, `TryLoadInto(droneCargo,rounds)`, `TryReceiveFrom(droneCargo,rounds)`. One instance per placed depot later.
+- `TESTS/AmmoFoundationChecks.cs` is invoked by `TESTS/EnemyIntegrationChecks.cs`. It exercises the pure helpers and threshold. **These tests have been committed but NOT executed in this environment (Godot and .NET executables unavailable). Run `dotnet build` and `godot --headless --path . TESTS/EnemyIntegrationChecks.tscn` before integration.**
+
+**How Codex should use the inventory:** a factory/depot's own inventory transfers into a separate `new AmmoInventory(payloadCapacity)` carried by the **visible** drone at launch; the drone cargo transfers to the destination inventory **only on arrival**. Never call `TryAdd` when delivering, because that would create ammunition. The future shared logistics dispatcher must own flight jobs, source drone slots, **destination capacity reservations**, retry/cancel/destruction handling and one outstanding tower resupply request. Both factory → depot and depot → tower require visible outbound/return flights; no instant shipment.
+
+**NEXT (still unchecked in the stages below):** implement per-tower level ammo capacity/shot consumption, integrate `AmmoInventory` with actual offensive tower firing, add buildable Factory and Depot scenes/configs/catalog registration using `AmmoProduction` and `AmmoStorage`, implement `DRONES/Transport` and logistics for both legs, Inspector status, conservation tests, runtime validation and documentation. No weapon, HUD, tower stats, placement or drone scene was changed by the foundation pass.
 
 ## Goal / playable loop
 

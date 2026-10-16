@@ -1,12 +1,14 @@
+> **LOGISTICS REMAINS UNIMPLEMENTED.** Reuse actual [AmmoProduction](../../AmmunitionFactory/AmmoProduction.cs), [AmmoStorage](../../AmmunitionDepot/AmmoStorage.cs) and [AmmoInventory](../../../../Shared/Ammunition/AmmoInventory.cs) rather than creating competing counters. **Both legs require visible drones**, loading at source and unloading at destination. Reserve destination capacity and track jobs/flight cargo to avoid duplication. [WORK.md](../../../../../NOTES/WORK.md) is authoritative.
+
 # Ammunition transfers and drone resupply — FUTURE / NOT IMPLEMENTED
 
 ## Two distinct transport stages
 
-**Stage A — Ammunition Factory → Depot: automatic batches (first implementation candidate)**
+**Stage A — Ammunition Factory → Depot: real drone transport (required)**
 1. [Factory](../../AmmunitionFactory/README.md) automatically produces one completed batch at each production interval.
 2. Batch enters **factory's small internal buffer**, even when no depot exists.
-3. An eligible [Depot](../../AmmunitionDepot/README.md) with enough free capacity automatically receives a completed **whole batch**. This is a simple, immediate logical transfer initially; **no drones** are needed for factory-to-depot transport.
-4. If no depot exists or all are full, factory's buffer accumulates stock until it cannot fit another complete batch, then production **pauses**. Transfers out free buffer capacity and production **resumes automatically**.
+3. A factory-owned drone loads a batch from `AmmoProduction.Buffer`, then **physically flies** to a [Depot](../../AmmunitionDepot/README.md) with reserved free capacity. Only on arrival does its cargo unload into the depot. **No instant transport.**
+4. If no depot exists or all are full/busy, the factory's buffer accumulates until it cannot fit another complete batch, then production **pauses**. Loading a delivery drone frees buffer capacity so production **resumes**.
 5. Track exact source/destination amounts, with a stable depot selection policy and no double transfers. This isolated producer/storage stage can be tested before introducing towers needing ammo.
 
 **Stage B — Depot → Tower: Transport Drone deliveries (later)**

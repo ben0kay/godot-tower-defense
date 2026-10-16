@@ -208,3 +208,7 @@ Run `RoutePreviewChecks.tscn` for the F3 debug controls, ALL portals, 1–50 pat
 ## Required portal checkpoints
 
 Run `CheckpointChecks.tscn` for freely placed required regions, portal attribution, all permission combinations, swept entry at30/60/120Hz, blocked retry, staged F3 plans, thin/wide passages and500-enemy bounded scheduling. See `Checkpoints.md` for outcomes and known upstream integration limitations.
+
+## Ammunition foundation (added, not yet run)
+
+`TESTS/AmmoFoundationChecks.cs` has been added to `EnemyIntegrationChecks.cs`. The tests cover finite inventory, all-or-nothing transfers, production batches/buffer pause and resume, depot stock and the global 10% trigger. They do **not** test live towers, scenes or drones, which Codex must implement next. The foundation authoring environment lacked Godot/.NET and could not execute the suite; Codex should run `dotnet build` and the headless integration test after pulling these files. See [WORK.md](../NOTES/WORK.md).

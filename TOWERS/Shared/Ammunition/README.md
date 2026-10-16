@@ -1,3 +1,5 @@
+> **FOUNDATION IMPLEMENTED:** [AmmoInventory.cs](AmmoInventory.cs) now provides finite local stock, `TryConsume`, `TryAdd`, `TryTransferTo`, `TrySetCapacity` and change events. [AmmunitionMasterConfig.cs](AmmunitionMasterConfig.cs) + [DefaultAmmunitionConfig.tres](DefaultAmmunitionConfig.tres) provide the editable global **10%** resupply rule. None is connected to live offensive towers yet. **Codex next:** add per-level authored capacity/ammo-per-shot, instantiate one inventory per placed tower, deduct at real firing events, connect Inspector and resupply requests without duplicating these helpers. [WORK.md](../../../NOTES/WORK.md) is the full work order.
+
 # Local tower ammunition and reloading — FUTURE / NOT IMPLEMENTED
 
 ## Gameplay design
