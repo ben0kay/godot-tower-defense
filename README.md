@@ -12,6 +12,8 @@ For rapid map or combat testing, open `Main.tscn` (Level001) or `MainLevel002.ts
 
 - WASD/arrows: move camera; middle mouse: pan; mouse wheel: zoom.
 - Ctrl: toggle tower build tray. Choose Battle, Laser or Blaster Cannon, left-click valid cells to place, right-click/Escape to cancel; select towers to inspect them.
+- Escape: cancel active placement first; otherwise open/resume Pause. Save/Load/Options are disabled placeholders.
+- F11: toggle fullscreen everywhere, restoring windowed/maximized mode. Shared shortcuts live in `CONTROLS/`.
 - F2: cycle the enemy catalog through the level's debug system.
 - F3: open Route Preview; choose portal/enemy/path samples and click Simulate Paths (debug only).
 - Start/Next Wave: use the top-right wave button.
@@ -20,7 +22,7 @@ For rapid map or combat testing, open `Main.tscn` (Level001) or `MainLevel002.ts
 
 - `UI/DefaultUIConfig.tres`: HUD layout, palette and common button colors.
 - `UI/Shared/UIButtonFactory.cs`: consistent button styling across menus, HUD and dialogs.
-- `UI/Menus/`: Boot, Main, Campaign and future Pause.
+- `UI/Menus/`: Boot, Main, Campaign and level-owned Pause.
 - `SYSTEMS/Profiles/`: local profile records and persistence.
 - `SYSTEMS/Saving/`: planned campaign persistence boundaries (not implemented yet).
 - `LEVELS/Level001/`: editable terrain, portal/objective configuration and finite waves.

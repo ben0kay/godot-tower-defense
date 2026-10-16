@@ -1,5 +1,11 @@
-# Pause Menu — Future phase
+# Pause Menu — Implemented
 
-Not implemented yet. The Ctrl build tray in gameplay is **not** a pause menu. The future Pause menu will allow Resume, Save (only after real campaign persistence exists), Return to Main Menu and Quit using `UIButtonFactory` for shared styling.
+Each battlefield (`Main.tscn` / `MainLevel002.tscn`) instances `PauseMenu.tscn` once as a level-owned CanvasLayer. `PauseMenu.cs` builds a responsive centered panel using the existing MenuLayout/UIButtonFactory palette, with a translucent dark backdrop above HUD and F3 debug UI. The UI processes while the SceneTree is paused; gameplay, camera, waves and build input stop.
 
-Set a Pause UI branch to process while the world is paused, avoid stuck paused trees on scene exit, and route scenes via `MenuNavigation`. Preserve the direct `Main.tscn` playtest path without requiring profile/save setup. Saving must call `SYSTEMS/Saving/CampaignSession` rather than serializing Godot nodes or placing write logic in the UI.
+Buttons: **Resume**, **Save (not yet available)**, **Load (not yet available)**, **Options (not yet available)**, **Quit to Main Menu**, **Exit Game**. The three unavailable features are disabled and perform no writes. Campaign persistence remains future work under SYSTEMS/Saving.
+
+Escape is routed by the CONTROLS/GameInput Autoload: cancel active placement first (tray stays open), otherwise open Pause; Escape while paused resumes. Ctrl is consumed while paused. F11 is global and still works. Resume preserves the HUD/tray state and restores previous focus when possible. The full-screen overlay intercepts pointer input.
+
+Quit uses MenuNavigation.Open, which unpauses for a scene transition and restores pause on load failure. Errors are shown in a dialog. Exiting the overlay's scene unregisters its bindings and cannot leave the next screen paused. Direct F6 level play needs no profile: quitting goes to Main, whose existing profile guard redirects safely to Boot.
+
+Verification: `TESTS/PauseControlsChecks.tscn`, `TESTS/MenuTowerFlowChecks.tscn`; results and manual desktop checks in `TESTS/PauseControls.md`. No new save format, world serialization or options implementation is included.

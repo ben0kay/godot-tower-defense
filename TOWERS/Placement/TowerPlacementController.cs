@@ -25,6 +25,8 @@ public partial class TowerPlacementController : Node2D
     private Sprite2D _ghost;
     private readonly Dictionary<Vector2I, TowerBase> _placedTowers = new();
     private Vector2I _hoverCell = new(int.MinValue, int.MinValue);
+    private GameInput _input;
+    public bool IsPlacing => _placing;
     private bool _placing, _previewVisible, _previewValid;
     private TowerBase _selected;
     private int _displayedUpgradeLevel;
@@ -66,12 +68,16 @@ public partial class TowerPlacementController : Node2D
         _hud.TowerBarClosed += CancelPlacement;
         _hud.TowerUpgradeRequested += OnUpgradeRequested;
         SetProcessUnhandledInput(true);
+        _input = GetNode<GameInput>("/root/GameInput");
+        _input.Bind(this, GameInput.BackAction, () =>
+        { if (!_placing) return false; CancelPlacement(); return true; }, 10);
     }
 
     // =========================================================
     // Avoid subscriptions retaining scenes that are no longer alive.
     public override void _ExitTree()
     {
+        if (GodotObject.IsInstanceValid(_input)) _input.Unbind(this);
         if (GodotObject.IsInstanceValid(_hud))
         { _hud.TowerBarClosed -= CancelPlacement; _hud.TowerChoiceRequested -= OnTowerChoiceRequested; _hud.TowerUpgradeRequested -= OnUpgradeRequested; }
         if (GodotObject.IsInstanceValid(_economy)) _economy.BalanceChanged -= OnBalanceChanged;
@@ -168,13 +174,6 @@ public partial class TowerPlacementController : Node2D
     // Unhandled world clicks only; GUI panels consume mouse events independently.
     public override void _UnhandledInput(InputEvent input)
     {
-        if (input is InputEventKey key && key.Pressed && !key.Echo
-            && key.Keycode == Key.Escape && _placing)
-        {
-            CancelPlacement();
-            GetViewport().SetInputAsHandled();
-            return;
-        }
         if (input is not InputEventMouseButton mouse || !mouse.Pressed || IsOverUi()) return;
         if (mouse.ButtonIndex != MouseButton.Left) return;
 

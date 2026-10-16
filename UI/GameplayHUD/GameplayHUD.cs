@@ -45,6 +45,8 @@ public partial class GameplayHUD : Control
     private StyleBoxFlat _healthFill;
     private Tween _trayTween;
     private bool _trayOpen;
+    private GameInput _input;
+    public bool IsTowerBarOpen => _trayOpen;
     #endregion
 
     private readonly Dictionary<string, Button> _buildButtons = new();
@@ -90,17 +92,17 @@ public partial class GameplayHUD : Control
         GetNode<Button>("BottomArea/Inspector/Insets/Body/Heading/CloseButton").Pressed += ClearInspection;
         _inspector.Hide();
         SetTowerBarOpen(Config.StartWithTowerBarOpen, true);
+        _input = GetNode<GameInput>("/root/GameInput");
+        _input.Bind(this, GameInput.BuildAction, () => { SetTowerBarOpen(!_trayOpen); return true; });
     }
     #endregion
 
     #region Input and Tray
     // =========================================================
-    // Press Ctrl once to open or close the tower tray; no holding is necessary.
-    public override void _UnhandledKeyInput(InputEvent @event)
+    // Retire scoped controls when this HUD leaves the active battlefield.
+    public override void _ExitTree()
     {
-        if (@event is not InputEventKey key || !key.Pressed || key.Echo || key.Keycode != Key.Ctrl) return;
-        SetTowerBarOpen(!_trayOpen);
-        GetViewport().SetInputAsHandled();
+        if (GodotObject.IsInstanceValid(_input)) _input.Unbind(this);
     }
 
     // =========================================================

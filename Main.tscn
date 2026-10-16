@@ -11,6 +11,8 @@
 [ext_resource type="Script" uid="uid://b7d701nts0r0a" path="res://LEVELS/Waves/WaveManager.cs" id="13_waves"]
 [ext_resource type="Script" uid="uid://ddmuqepgay0t2" path="res://WORLD/OBJECTIVES/Citadel/CitadelSession.cs" id="14_citadel"]
 
+[ext_resource type="PackedScene" path="res://UI/Menus/Pause/PauseMenu.tscn" id="15_pause"]
+
 [node name="Battlefield" type="Node2D" unique_id=1543557823]
 
 [node name="World" parent="." unique_id=1714434645 instance=ExtResource("1_world")]
@@ -35,3 +37,5 @@ script = ExtResource("14_citadel")
 
 [node name="Waves" type="Node" parent="." unique_id=251792812]
 script = ExtResource("13_waves")
+
+[node name="PauseMenu" parent="." instance=ExtResource("15_pause")]

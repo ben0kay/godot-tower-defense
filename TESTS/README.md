@@ -215,3 +215,7 @@ Run `CheckpointChecks.tscn` for freely placed required regions, portal attributi
 ## Chained checkpoints and design diagram
 
 Completed: ordered and uniformly branching checkpoint graphs, full-chain F3 previews, and a shared above-tile editor circle/connection overlay. See [CheckpointChains.md](CheckpointChains.md) for authoring behavior, regression coverage, actual results and existing environment/map limitations.
+
+## Shared controls and Pause
+
+`PauseControlsChecks.tscn` exercises actual keyboard propagation across Boot/Main/Campaign and both levels: placement-first Escape, pause/resume, Ctrl blocking, modal priority, frozen timers, F11 routing/restoration rules, disabled placeholders and scene-binding cleanup. `MenuTowerFlowChecks` now routes Ctrl through GameInput. See [PauseControls.md](PauseControls.md) for actual results and headless/SDK/full-integration limitations.

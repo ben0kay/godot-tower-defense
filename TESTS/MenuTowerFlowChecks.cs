@@ -45,12 +45,12 @@ public partial class MenuTowerFlowChecks : Node
                 "RMB clears placement and build details while leaving the tray open");
             hud.GetBuildButton("battle").EmitSignal(Button.SignalName.Pressed);
             ghost.Show();
-            hud._UnhandledKeyInput(new InputEventKey { Keycode = Key.Ctrl, Pressed = true });
+            GetNode<GameInput>("/root/GameInput")._UnhandledKeyInput(new InputEventKey { Keycode = Key.Ctrl, Pressed = true });
             Require(!ghost.Visible && !placement.IsProcessing() && !hud.IsInspectionVisible,
                 "Ctrl immediately cancels placement before the close animation ends");
             await ToSignal(GetTree().CreateTimer(0.5), SceneTreeTimer.SignalName.Timeout);
             Require(!tray.Visible, "Ctrl closes the build tray");
-            hud._UnhandledKeyInput(new InputEventKey { Keycode = Key.Ctrl, Pressed = true });
+            GetNode<GameInput>("/root/GameInput")._UnhandledKeyInput(new InputEventKey { Keycode = Key.Ctrl, Pressed = true });
             Require(tray.Visible && !ghost.Visible && !placement.IsProcessing(), "Reopening the tray does not resume placement");
             hud.GetBuildButton("battle").EmitSignal(Button.SignalName.Pressed);
             bool placed = false;

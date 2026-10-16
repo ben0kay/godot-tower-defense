@@ -47,6 +47,13 @@ public partial class CameraController : Node2D
     }
     #endregion
 
+    // =========================================================
+    // A middle-button release may occur while paused; never resume with a stale drag latch.
+    public override void _Notification(int what)
+    {
+        if (what == NotificationPaused) _dragging = false;
+    }
+
     #region Mouse Controls
     // =========================================================
     // Consume camera navigation events without interfering with future gameplay clicks.

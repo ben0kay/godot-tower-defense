@@ -21,6 +21,8 @@ buses/default_bus_layout="res://AUDIO/AudioBuses.tres"
 
 [autoload]
 
+GameInput="*res://CONTROLS/GameInput.cs"
+
 GameAudio="*res://AUDIO/AudioManager.tscn"
 
 [display]
