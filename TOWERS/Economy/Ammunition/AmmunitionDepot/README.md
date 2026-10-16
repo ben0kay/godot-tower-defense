@@ -11,3 +11,5 @@ The selected-building Inspector shows current/max stock, incoming reserved quant
 ## Requested physical footprint (PLANNED — not yet coded)
 
 **Depot: 2×2 cells (4 tiles).** Codex must update `AmmunitionDepotDefinition.tres`, size/center the actual scene artwork and keep **10,000 rounds** of storage. See the [generic rectangular footprint pass](../../../Placement/MULTI_CELL_FOOTPRINT_PASS.md). Until implemented, the current building still uses the original 1×1 footprint.
+
+**Foundation rule for the upcoming 2×2 version:** all four buildable cells must be the same terrain category — **all PASSABLE or all IMPASSABLE**. A mixed foundation is structurally invalid and must be rejected without spending Credits or affecting navigation. [Codex footprint brief](../../../Placement/MULTI_CELL_FOOTPRINT_PASS.md).

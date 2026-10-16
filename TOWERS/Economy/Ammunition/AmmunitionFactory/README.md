@@ -11,3 +11,5 @@ Select the factory to see current/max buffered stock, producing/full status and 
 ## Requested physical footprint (PLANNED — not yet coded)
 
 **Factory: 3×2 cells (6 tiles).** Codex must update `AmmunitionFactoryDefinition.tres`, size/center the actual scene artwork and keep existing 1,000-round factory-drone shipments intact. See the [generic rectangular footprint pass](../../../Placement/MULTI_CELL_FOOTPRINT_PASS.md). Until implemented, the current building still uses the original 1×1 footprint.
+
+**Foundation rule for the upcoming 3×2 version:** all six buildable cells must be the same terrain category — **all PASSABLE or all IMPASSABLE**. A mix is structurally invalid and must be rejected without spending Credits or affecting navigation. [Codex footprint brief](../../../Placement/MULTI_CELL_FOOTPRINT_PASS.md).
