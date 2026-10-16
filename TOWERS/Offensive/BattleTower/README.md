@@ -8,9 +8,9 @@ Ctrl → Battle Tower → place on route-safe terrain. First targets the shortes
 
 | Level | Build/upgrade price | Damage | Shots/s | Range | Projectile speed | Turn | Aim | Search | Penetration |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | 200 | 30 | 1 | 256px | 800px/s | 180°/s | 12° | .15s | 5% |
-| 2 | 150 | 33 | 1.05 | 264px | 800px/s | 180°/s | 12° | .15s | 5% |
-| 3 | 250 | 36 | 1.1 | 272px | 800px/s | 180°/s | 12° | .15s | 5% |
+| 1 | 200 | 30 | 1.40 | 256px | 800px/s | 180°/s | 12° | .15s | 5% |
+| 2 | 150 | 33 | 1.47 | 264px | 800px/s | 180°/s | 12° | .15s | 5% |
+| 3 | 250 | 36 | 1.54 | 272px | 800px/s | 180°/s | 12° | .15s | 5% |
 
 DefaultBattleTowerConfig.tres retains Inspector identity, target priority and RotateWhileTracking; scene/definition retain artwork and registration. Combat stats/prices are no longer numeric .tres exports. Each placed tower gets private runtime rows/recipes. C# Level 1 convenience accessors edit row 1 only; use SetLevelStats(level, snapshot) for another row.
 
@@ -33,3 +33,5 @@ Attacks carry the tower's weak DamageSource. Actual shield/hull loss earns a bou
 ## Live ammunition supply
 
 Current complete BattleTowerLevels.cs rows include 1000 reserve / 1 per projectile launch. Defaults are provisional except Battle1000/1. InitialAmmoFraction starts full by default; empty reserves stop unpaid attacks, and paid levels/ranks never refill them. The existing Inspector displays current ammo/delivery state and changed next-level ammo values. Factory/depot drones deliver physical cargo only on arrival. See `TOWERS/Shared/Ammunition/README.md` and `TESTS/Economy/Ammunition.md`.
+
+**Fire-rate rebalance (October 2026):** Levels 1–3 now fire 1.40 / 1.47 / 1.54 rounds/s (40% more than the preceding 1.00 / 1.05 / 1.10). This changes `ShotsPerSecond`, not the already-upgraded 800 px/s projectile travel speed; per-hit damage and ammunition per launch are unchanged. For comparison, the old GameMaker Basic Tower used a 30-frame cooldown at 60 FPS = 2 shots/s. This Godot value follows the requested **+40%** rather than silently copying the old game's rate.

@@ -83,7 +83,8 @@ public abstract partial class ProjectileTurretBase : TowerBase
         if (Config == null || FinalStats == null || _registry == null || _projectiles == null
             || !double.IsFinite(delta) || delta <= 0) return;
         _searchTimer -= (float)delta;
-        _shotTimer = Mathf.Max(0, _shotTimer - (float)delta);
+        // Retain at most one small elapsed-frame overshoot: fractional attack rates should not round down to 60Hz ticks.
+        _shotTimer = Mathf.Max(-Mathf.Min((float)delta, .05f), _shotTimer - (float)delta);
         if (_searchTimer <= 0)
         {
             _target = TowerTargeting.Find(_registry, GlobalPosition, Mathf.Max(0, FinalStats.RangePixels), Config.TargetPriority);
@@ -115,7 +116,8 @@ public abstract partial class ProjectileTurretBase : TowerBase
             bullet.GlobalPosition = muzzle.GlobalPosition;
         }
         _barrels.Commit(mode);
-        _shotTimer = count / FinalStats.ShotsPerSecond;
+        // Preserve fractional frame remainder; never schedule multiple catch-up volleys after a long hitch.
+        _shotTimer = Mathf.Max(0f, count / FinalStats.ShotsPerSecond + _shotTimer);
     }
     #endregion
 

@@ -14,9 +14,9 @@ public static class MachineGunTowerLevels
     // Level | Cost | Damage | TotalBulletsPerSecond | RangePx | ProjectilePxS | TurnDegS | AmmoCapacity | AmmoPerBullet
     private static readonly Row[] Rows =
     {
-        new(1, 300, 7, 6.0f, 208, 850, 240, 1200, 1),
-        new(2, 200, 8, 6.2f, 216, 850, 240, 1200, 1),
-        new(3, 300, 9, 6.4f, 224, 850, 240, 1200, 1),
+        new(1, 300, 7, 12.0f, 208, 850, 240, 1200, 1),
+        new(2, 200, 8, 12.4f, 216, 850, 240, 1200, 1),
+        new(3, 300, 9, 12.8f, 224, 850, 240, 1200, 1),
     };
 
     // =========================================================
