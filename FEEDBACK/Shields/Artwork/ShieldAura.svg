@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- One baked, monochrome, tintable shield silhouette for all enemy sizes. No shader or per-frame drawing. -->
+  <defs>
+    <radialGradient id="field" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset=".65" stop-color="#ffffff" stop-opacity=".025"/>
+      <stop offset=".83" stop-color="#ffffff" stop-opacity=".16"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="64" cy="64" r="62" fill="url(#field)"/>
+  <circle cx="64" cy="64" r="54" fill="none" stroke="#ffffff" stroke-opacity=".095" stroke-width="9"/>
+  <circle cx="64" cy="64" r="52" fill="none" stroke="#ffffff" stroke-opacity=".31" stroke-width="2.5"/>
+  <path d="M20 43 L32 24 L50 18 M80 18 L98 26 L109 45 M108 84 L96 103 L78 110 M50 110 L32 102 L20 84"
+        fill="none" stroke="#ffffff" stroke-opacity=".24" stroke-width="1.8" stroke-linecap="round"/>
+</svg>
