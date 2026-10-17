@@ -130,7 +130,7 @@ public partial class InspectorTargetingChecks : Node
                 await hud.ToSignal(hud.GetTree(), SceneTree.SignalName.ProcessFrame);
                 await hud.ToSignal(hud.GetTree(), SceneTree.SignalName.ProcessFrame);
                 Require(hud.Size == (Vector2)viewport, "Test viewport remains the requested size");
-                Require(panel.Size.X <= 620.5f, "Compact Inspector stays within 620px for " + id);
+                Require(panel.Size.X <= 560.5f, "Compact Inspector stays within 560px for " + id);
                 var comparison = hud.GetNode<TowerUpgradeGrid>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeComparison");
                 for (int cell = 1; cell < comparison.GetChildCount(); cell++)
                     if (cell % comparison.Columns != 0)
