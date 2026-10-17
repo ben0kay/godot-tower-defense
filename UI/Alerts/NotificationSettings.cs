@@ -31,7 +31,7 @@ public partial class NotificationSettings : Resource
     public float MajorHeight { get; set; } = 128f;
 
     [Export(PropertyHint.Range, "0,160,1")]
-    public float MajorTopMargin { get; set; } = 26f;
+    public float MajorTopMargin { get; set; } = 64f;
 
     [Export(PropertyHint.Range, "0.05,2,0.01")]
     public float MajorEntranceSeconds { get; set; } = 0.34f;
@@ -66,7 +66,7 @@ public partial class NotificationSettings : Resource
     public float ToastHeight { get; set; } = 76f;
 
     [Export(PropertyHint.Range, "0,160,1")]
-    public float ToastTopMargin { get; set; } = 28f;
+    public float ToastTopMargin { get; set; } = 64f;
 
     [Export(PropertyHint.Range, "0,120,1")]
     public float ToastLeftMargin { get; set; } = 18f;
