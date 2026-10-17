@@ -5,6 +5,7 @@ Reusable visual feedback systems. **DefenseBars and DeathExplosion are now activ
 - `FeedbackMasterConfig.cs` + `DefaultFeedbackConfig.tres`: shared feedback visibility toggles.
 - `DeathExplosion/`: reusable automatically-sized kill smoke and orange flash using GPU particles.
 - `Shared/`: reusable particle textures and process-material presets. The scene/effect that uses them owns its own `GpuParticles2D` nodes, lifetime and position; currently the shared beam renderer references small energy-contact sparks.
+- `Shields/`: one shared, tinted, auto-scaled shield aura and hit/break tween component; lazily attached only to currently shielded enemies. Intended to be reusable by future damageable towers without implementing tower shields or regeneration.
 - `DefenseBars/`: event-driven health indicator component used by Enemy001 and reusable for future damageable towers. Configure its colors, capped logarithmic sizing and offset in `DefenseBars/DefaultDefenseBarConfig.tres`.
 - `DamageNumbers/`: future hit numbers and damage aggregation.
 - `CameraEffects/`: future impact shakes (normal pan/zoom remains in `CAMERA/`).
@@ -22,3 +23,7 @@ Shockwave/ owns one reusable ShockwaveEffect scene and Inspector-editable Shockw
 ## Shared particle resources — beam visual foundation
 
 [`Shared/README.md`](Shared/README.md) describes the reusable monochrome spark texture and gentle energy-contact material. The `TOWERS/Shared/Weapons/Beams/BeamRenderer.tscn` scene owns its impact/muzzle GPU particle emitters and toggles them only while the beam is active. The shared folder owns **resource presets**, not runtime emitters or a new manager. Other weapon effects can instance or reference these assets independently.
+
+## Shield visual presentation (SV1)
+
+[`Shields/README.md`](Shields/README.md) documents a single reddish baked SVG aura that scales to the owner's sprite and remains idle between shield-change events. Enemy shields already exist in `COMBAT/Damage` and `ENEMIES/Shared`; visual nodes contain **no gameplay shield state**. No new regeneration is implemented. `Shared/` continues to hold cross-effect resources rather than another copy of the shield system.
