@@ -10,3 +10,5 @@ The **consumer owns its particle nodes and lifecycle**. For example, `TOWERS/Sha
 To author distinct spark motion, duplicate the shared process material, edit the new resource, and reference it from another effect's scene. Avoid mutating a shared material at runtime; use `Duplicate()` first if a runtime material change is required.
 
 Note: in Godot C# the class is `GpuParticles2D`; the scene node declaration is `GPUParticles2D`.
+
+Shield-only visuals now live in [`FEEDBACK/Shields`](../Shields/README.md), not here. Keep `Shared/` for textures and process materials that are useful across unrelated effects; the shield-specific scene/asset stays with its owning feature.
