@@ -41,7 +41,7 @@ Double intermediates prevent overflow; resulting shield/health remain finite and
 
 The placed Battle Inspector displays `Shield Penetration: 5%` at Level1/2/3 and refreshes on instance config edits. Laser displays cached effective base DPS and its effective shield/hull coefficients. Upgrade previews use the same resolver as paid application. Config changes invalidate once; ordinary physics ticks reuse cached final stats.
 
-Permanent research is **not implemented**. Stage 04 remains neutral. Future ballistic research belongs to persistent progression, must affect eligible new/existing towers and invalidate their caches; it must not be stored on purchased tower tiers or level configs. Saving, armour, shield regeneration/UI, enemy-specific resistances, Cryo/Stasis/DoT and unrelated mechanics remain deferred.
+Permanent research is **not implemented**. Stage 04 remains neutral. Future ballistic research belongs to persistent progression, must affect eligible new/existing towers and invalidate their caches; it must not be stored on purchased tower tiers or level configs. Saving, armour, shield regeneration, tower shields/durability, shield HUD bars, enemy-specific resistances and unrelated mechanics remain deferred. Cosmetic hit/break aura for existing enemy shields is separately implemented in [FEEDBACK/Shields](../../FEEDBACK/Shields/README.md); it does not change this resolver.
 
 ## Regression coverage
 
