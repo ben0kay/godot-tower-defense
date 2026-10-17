@@ -8,3 +8,7 @@ BattleTower staggers acquisition by instance ID and checks periodically (default
 Laser Tower also staggers periodic First/Closest searches and validates cached range/alive state between them. Periodic search may replace an existing valid beam lock with the current best candidate; invalid lock hides immediately, and removal/unload subscriptions clear visuals before the next tick.
 
 See `TESTS/Combat/SpatialQueryChecks.cs` for brute-force parity and `TESTS/Performance/SpatialQueryBenchmarks.md` for paired sparse/dense timing, maintenance, candidate and allocation results.
+
+## Planned targeting extension IT1–IT4 — NOT IMPLEMENTED
+
+See [the Inspector/targeting implementation plan](../../../UI/GameplayHUD/Inspector/INSPECTOR_TARGETING_PASS.md). Six priorities are proposed: First, Last, Closest, Farthest, Strongest and Weakest, chosen **per placed aimed tower** from a wider selected Inspector. Current implementation remains **First/Closest only**, and First currently measures remaining physical distance along the active route leg, not the full downstream checkpoint chain. The plan requires scalable, bounded cached journey estimates; no tower-per-enemy A* on targeting.
