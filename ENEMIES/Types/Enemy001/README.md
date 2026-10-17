@@ -20,10 +20,10 @@ Killed Enemy001 ships now produce an automatically sized **orange flash followed
 
 ## Shield capacity (opt-in wave behavior)
 
-The saved `Enemy001.tres` has **MaxShield = 0** (it inherits the default). The integration suite temporarily sets its capacity to 100 for opt-in shield tests; ordinary Level001 waves and F2/debug spawns start without shields. A `shield: true` wave flag can only give starting shields to a type with nonzero MaxShield. To give this same enemy shields in a wave, author `Enemy("basic_mk1", shield: true)` in `LEVELS/Level001/Level001Waves.cs` (or mix weighted shielded/unshielded entries). A shielded ship absorbs damage before hull HP, with overflow passed to health; the current health bar still displays hull only. No passive recharge/blue shield bar yet.
+The saved `Enemy001.tres` now has **MaxShield = 20** (small opt-in shield capacity). This does **not** automatically shield all Standard Drones: F2/debug and wave entries without `shield: true` still start at zero. `LEVELS/Level001/Level001Waves.cs` uses a few explicitly shielded `Enemy("basic_mk1", shield: true)` entries in each wave, with increasing proportions. A shielded ship shows the shared reddish `FEEDBACK/Shields/` aura, absorbs damage before hull HP, and flashes/fades when its shield breaks. The existing hull health bar remains hull-only. **No passive shield regeneration.** The integration shield-math fixtures intentionally override this authored 20-point capacity to 100 temporarily to verify exact 100-point damage arithmetic.
 
 ## E2 preservation
-Enemy001 scene/art/base balance/F2 defaults are unchanged. DefaultEnemyCatalog registers its existing EnemyDefinition.EnemyId. It has no ability node, and cannot receive shield restoration unless its MaxShield is raised above zero. Ordinary starting shield remains 0 unless wave shield:true is authored. Typed shield/hull damage,3-Credit kills,1 Citadel arrival damage and shared navigation remain active.
+Enemy001's hull, speed, scene/art and F2 defaults remain unchanged; only its optional capacity was raised from 0 to 20. DefaultEnemyCatalog still registers its stable EnemyId. It has no ability node and receives no natural shield regeneration. The existing ShieldEmitter ability on a separate support enemy can restore eligible nearby shields, but **Level001 does not currently spawn Shield Generators**. Ordinary spawns stay unshielded unless `shield: true` is authored. Typed shield/hull damage, 3-Credit kills, 1 Citadel arrival damage and navigation remain active.
 
 ## Shared scene inheritance (GE1–GE3)
 
