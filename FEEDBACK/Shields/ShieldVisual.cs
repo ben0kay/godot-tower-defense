@@ -27,7 +27,7 @@ public partial class ShieldVisual : Node2D
     {
         if (_aura?.Texture == null) return;
         Vector2 baseSize = _aura.Texture.GetSize();
-        float multiplier = Safe(Style?.SizeMultiplier ?? 1.23f, 1.23f, 1f, 2f);
+        float multiplier = Safe(Style?.SizeMultiplier ?? 1.65f, 1.65f, 1f, 2f);
         Vector2 size = new(
             Mathf.Max(8f, Safe(sourceDimensions.X, 32f, 0f, 2048f) * multiplier),
             Mathf.Max(8f, Safe(sourceDimensions.Y, 32f, 0f, 2048f) * multiplier));
@@ -51,8 +51,8 @@ public partial class ShieldVisual : Node2D
             Visible = true; _aura.Visible = true;
             if (animate && current < previous)
             {
-                SetAlpha(Safe(Style?.HitOpacity ?? 0.82f, 0.82f, 0f, 1f));
-                FadeTo(IdleAlpha(), Safe(Style?.HitFadeSeconds ?? .24f, .24f, .05f, 2f));
+                SetAlpha(Safe(Style?.HitOpacity ?? 1.0f, 1.0f, 0f, 1f));
+                FadeTo(IdleAlpha(), Safe(Style?.HitFadeSeconds ?? .28f, .28f, .05f, 2f));
             }
             else SetAlpha(IdleAlpha());
             return;
@@ -62,10 +62,10 @@ public partial class ShieldVisual : Node2D
         if (animate && previous > 0f)
         {
             Visible = true; _aura.Visible = true;
-            SetAlpha(Safe(Style?.BreakOpacity ?? .95f, .95f, 0f, 1f));
+            SetAlpha(Safe(Style?.BreakOpacity ?? 1.0f, 1.0f, 0f, 1f));
             _feedbackTween = CreateTween();
             _feedbackTween.TweenProperty(_aura, "modulate:a", 0f,
-                Safe(Style?.BreakFadeSeconds ?? .32f, .32f, .05f, 2f));
+                Safe(Style?.BreakFadeSeconds ?? .38f, .38f, .05f, 2f));
             _feedbackTween.TweenCallback(Callable.From(() => { if (!HasShieldVisual) ResetVisual(); }));
         }
         else ResetVisual();
@@ -92,12 +92,12 @@ public partial class ShieldVisual : Node2D
 
     private void SetAlpha(float alpha)
     {
-        Color tint = Style?.Tint ?? new Color("#ff666d");
+        Color tint = Style?.Tint ?? new Color("#ff7352");
         _aura.SelfModulate = new Color(tint.R, tint.G, tint.B, tint.A);
         _aura.Modulate = new Color(1f, 1f, 1f, alpha);
     }
 
-    private float IdleAlpha() => Safe(Style?.IdleOpacity ?? .32f, .32f, 0f, 1f);
+    private float IdleAlpha() => Safe(Style?.IdleOpacity ?? .82f, .82f, 0f, 1f);
 
     private void StopFeedback()
     {
