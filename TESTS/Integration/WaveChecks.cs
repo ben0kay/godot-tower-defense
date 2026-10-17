@@ -17,6 +17,18 @@ public static class WaveChecks
         Require(manager.State == WaveManager.WaveState.Ready && spawns.Registry.Living.Count == 0 && !button.Disabled,
             "Load prepares waves without spawning; manual start is enabled");
         var scenes = WaveCatalog.LoadScenes();
+        // =========================================================
+        // Playtest wave data must retain authored counts/shield mixes without introducing support regen.
+        WaveDefinition[] levelOne = Level001Waves.Create();
+        int[] waveTotals = levelOne.Select(w => w.Batches.Sum(b => b.Count)).ToArray();
+        int[] shieldTotals = levelOne.Select(w => w.Batches.Sum(b =>
+            WaveCatalog.Compose(b, new RandomNumberGenerator { Seed = 17 }).Count(e => e.SpawnWithShield))).ToArray();
+        Require(waveTotals.SequenceEqual(new[] { 38, 40, 55 }) &&
+            shieldTotals.SequenceEqual(new[] { 7, 12, 18 }) &&
+            levelOne.SelectMany(w => w.Batches).SelectMany(b => b.Entries)
+                .All(e => e.EnemyId != "shield_emitter_mk1"),
+            "Level001 escalates 38/40/55 enemies with 7/12/18 explicit shields and no shield-restoration generators");
+        WaveCatalog.Validate(levelOne, scenes);
         WaveBatch mixed = Batch(20, 0.2, 0, Enemy("a", 80), Enemy("b", 20));
         RandomNumberGenerator rng = new() { Seed = 42 };
         var order = WaveCatalog.Compose(mixed, rng); rng.Seed = 42;
