@@ -64,12 +64,27 @@ public static class LaserTowerChecks
             Require(Count(main) == nodes && main.GetNode("World/Projectiles").GetChildCount() == projectiles, "Beam attack creates no per-tick nodes/projectiles");
             Marker2D muzzle = laser.GetNode<Marker2D>("TurretPivot/Muzzle");
             Line2D core = beam.GetNode<Line2D>("Core");
-            Require(core.GetPointCount() == 2 && beam.ToGlobal(core.GetPointPosition(0)).IsEqualApprox(muzzle.GlobalPosition) &&
-                beam.ToGlobal(core.GetPointPosition(1)).IsEqualApprox(target.GlobalPosition), "World endpoints stay anchored to muzzle/target");
+            Require(core.GetPointCount() > 2 && beam.ToGlobal(core.GetPointPosition(0)).IsEqualApprox(muzzle.GlobalPosition) &&
+                beam.ToGlobal(core.GetPointPosition(core.GetPointCount() - 1)).IsEqualApprox(beam.VisualEndWorld) &&
+                beam.VisualEndWorld.DistanceTo(target.GlobalPosition) <= beam.Style.ImpactWanderRadius + 0.01f,
+                "Shared ripple keeps the muzzle anchored and cosmetic contact within target wander radius");
+            GpuParticles2D impact = beam.GetNode<GpuParticles2D>("ImpactParticles");
+            GpuParticles2D muzzleParticles = beam.GetNode<GpuParticles2D>("MuzzleParticles");
+            Require(impact.Emitting && !muzzleParticles.Emitting &&
+                impact.ProcessMaterial == muzzleParticles.ProcessMaterial,
+                "Renderer owns two low-cost optional emitters using the shared effect material");
+            Vector2 previousPoint = core.GetPointPosition(core.GetPointCount() / 2);
+            beam._Process(0.13);
+            Require(!previousPoint.IsEqualApprox(core.GetPointPosition(core.GetPointCount() / 2)),
+                "Ripple travels across the beam during visible-only process ticks");
             TowerFinalStats cached = laser.FinalStats; float health = target.Health, shield = target.CurrentShield;
             beam.Style.CoreWidth = 6; beam.Style.OuterWidth = 15; beam.Style.CoreColor = Colors.Magenta; beam.Style.PulseAmount = 0;
             Require(core.Width == 6 && core.DefaultColor == Colors.Magenta && ReferenceEquals(cached, laser.FinalStats) &&
                 target.Health == health && target.CurrentShield == shield, "Visual edits change lines without touching stats or damage");
+            beam.Style.RippleAmplitude = 0; beam.Style.ImpactWanderRadius = 0;
+            beam.Style.ImpactGlowRadius = 0; beam.Style.ImpactParticlesEnabled = false;
+            Require(core.GetPointCount() == 2 && beam.ToGlobal(core.GetPointPosition(1)).IsEqualApprox(target.GlobalPosition) &&
+                !impact.Emitting && !beam.IsProcessing(), "All cosmetics can be disabled: exact two-point line and idle renderer");
             laser.Enabled = false;
             Require(!beam.IsActive && !beam.Visible && core.GetPointPosition(1) == Vector2.Zero, "Disable immediately clears endpoints");
             laser._PhysicsProcess(0.1); Require(target.CurrentShield == shield, "Disabled Laser deals no damage");
@@ -184,10 +199,13 @@ public static class LaserTowerChecks
         inherited.OverrideShieldCoefficient = true; inherited.ShieldCoefficient = 0;
         Require(DamageResolver.Resolve(inherited.CreateHit(12), 100, 60) == new DamageResult(100, 60), "Laser explicit zero remains an override");
         BeamStyle authored = GD.Load<BeamStyle>("res://TOWERS/Offensive/LaserTower/Beam/DefaultLaserBeamStyle.tres");
-        Require(authored.CoreWidth == 3 && authored.PulseAmount == 0.06f, "Visual fixture edits preserve shared authored style");
+        Require(authored.CoreWidth == 3 && authored.PulseAmount == 0.06f &&
+            authored.RippleAmplitude == 1.5f && authored.ImpactWanderRadius == 2.5f &&
+            authored.ImpactParticlesEnabled && !authored.MuzzleParticlesEnabled,
+            "Visual fixture edits preserve shared authored beam style and optional particle defaults");
         hud.GetBuildButton("battle").EmitSignal(Button.SignalName.Pressed); placement.Call("CancelPlacement"); hud.ClearInspection();
         wallet.Initialize(grid.Level.Settings);
-        GD.Print("PASS: Laser catalog/paid upgrade, true beam DPS30/60/120Hz, alignment/range/disable/arrival/death gates, endpoints and visual independence");
+        GD.Print("PASS: Laser catalog/paid upgrade, true beam DPS30/60/120Hz, aim/range/disable gates, cosmetic ripple/wander/GPU effects and visual independence");
     }
     // =========================================================
     // Create an isolated production Laser instance with a stationary up-facing fixture lock.
