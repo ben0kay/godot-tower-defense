@@ -1,16 +1,28 @@
-# Target selection
+# Shared target selection — IT3–IT4
 
-`TowerTargeting.Find` queries the world's shared spatial enemy index by weapon range, then compares cached remaining route length for First or squared distance to the tower for Closest. A failed/stale/pending route has infinite distance and cannot win First. Different movement speeds do not affect First; estimated time to arrival would be a separate future priority.
+`TowerTargeting.Find` visits the world's existing spatial index within firing range. One compact visitor scores eligible living enemies; no result lists, scene searches, tower-local A* or per-frame enemy-registry scans are added. Equal scores use the existing stable registration order.
 
-BattleTower staggers acquisition by instance ID and checks periodically (default 0.15s), including valid targets so overtaking can change First. Between searches, range/alive checks are cheap. The spatial visitor scores cached nearby positions directly, without per-search collections. Stable registration order preserves the former living-list tie-break; First still rejects nonfinite/stale remaining paths. Query range is conservatively expanded for float boundary rounding, then the unchanged float range comparison is applied.
+| Priority | Score policy |
+|---|---|
+| First (serialized 0) | Smallest finite estimated remaining Citadel journey |
+| Closest (serialized 1) | Smallest squared physical tower distance |
+| Last (2) | Largest finite estimated remaining Citadel journey |
+| Farthest (3) | Largest squared physical tower distance |
+| Strongest (4) | Largest **current Health + CurrentShield** |
+| Weakest (5) | Smallest **current Health + CurrentShield** |
 
+First/Closest retain original enum values and First remains the default. First/Last ignore unavailable, stale, failed or infinite estimates; infinity never wins Last. Scores are distance, not arrival time, so Slow does not arbitrarily change priority. Removed/out-of-range enemies never qualify. Cryo additionally filters already-slowed/immune enemies before scoring every mode, without fallback damage.
 
-Laser Tower also staggers periodic First/Closest searches and validates cached range/alive state between them. Periodic search may replace an existing valid beam lock with the current best candidate; invalid lock hides immediately, and removal/unload subscriptions clear visuals before the next tick.
+`ITowerTargetingPolicy` is optional on aimed weapon configs. `TowerBase.SetTargetPriority` validates placed state, enum and pause, changes only its private config, and notifies selected presentation. Aimed weapons set the existing search deadline to zero for prompt next-tick acquisition; cooldown, ammo and cached FinalStats stay intact. No choices are exposed for Shockwave or passive buildings. Runtime choice is not persisted yet; future saves should store the enum per tower using stable numeric values.
 
-See `TESTS/Combat/SpatialQueryChecks.cs` for brute-force parity and `TESTS/Performance/SpatialQueryBenchmarks.md` for paired sparse/dense timing, maintenance, candidate and allocation results.
+## Full-journey estimates
 
-## Planned targeting extension IT1–IT4 — NOT IMPLEMENTED
+`Enemy.RemainingPathDistance` still means the current refined route leg. `RemainingJourneyDistance` adds a shared cached checkpoint tail for aimed targeting. No-checkpoint enemies retain their previous score. Movement, branch RNG, route budgets, clearance, handoffs and checkpoint obligations are unchanged.
 
-See [the Inspector/targeting implementation plan](../../../UI/GameplayHUD/Inspector/INSPECTOR_TARGETING_PASS.md). Six priorities are proposed: First, Last, Closest, Farthest, Strongest and Weakest, chosen **per placed aimed tower** from a wider selected Inspector. Current implementation remains **First/Closest only**, and First currently measures remaining physical distance along the active route leg, not the full downstream checkpoint chain. The plan requires scalable, bounded cached journey estimates; no tower-per-enemy A* on targeting.
+`WORLD/NAVIGATION/JourneyEstimateCache` follows the existing captured graph with the same deterministic branch formula. It does not consume wave RNG, reroll links or force an enemy onto a preview path. Edges are shared by source/destination checkpoint, normalized effective A* profile and enemy radius. The current leg is actual refined distance; downstream legs use existing weighted navigation and clearance-tested geometry from a canonical valid source-circle representative to candidate destination regions / Citadel approaches. Physical lengths, not weighted costs, form the score. Circle entry points, later offsets, congestion and future obstructions make this an **estimate**, not an exact prediction of eventual travel.
 
-**Inspector IT1 note:** the selected aimed tower now displays its authored `First` or `Closest` target priority as a **read-only value**, using `TowerConfig.InspectorTargetPriorityLabel` overrides. Six selectable buttons and full downstream checkpoint scoring still belong to IT3/IT4; neither targeting algorithm nor spatial-query cadence changed in IT1–IT2.
+Tail A* runs only in PathRequestManager's spare query/time budget, after movement requests. Combined LastFrameCalculations stays within MaxPathCalculationsPerFrame. LastFrameJourneyCalculations / TotalJourneyCalculations identify optional work. No extra per-enemy query loop runs during target comparison. Pending estimates exclude that enemy from First/Last deterministically; the four non-route modes remain available. Under sustained movement pressure tail estimates can wait.
+
+Navigation/cost revisions and observed checkpoint geometry/removal invalidate shared tails. Active checkpoint movement additionally invalidates the old current-leg score until its normal replacement route is accepted. Captured live links remain stable through authoring link edits, matching existing movement. Buffers/caches are reused across revisions; estimate storage is capped at4096 shared edges. An unavailable/capped/blocked estimate safely excludes First/Last instead of choosing an infinite longest route. Removed enemies detach plan references; world exit releases checkpoint subscriptions. There is no tail allocation for ordinary no-checkpoint enemies.
+
+Verification: `TESTS/UI/InspectorTargetingChecks.tscn`, `TESTS/Navigation/JourneyTargetingChecks.cs`, existing spatial oracle/benchmarks and navigation suites; actual results in `TESTS/UI/InspectorTargeting.md`.

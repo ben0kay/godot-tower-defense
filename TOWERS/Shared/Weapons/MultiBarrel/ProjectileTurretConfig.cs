@@ -2,7 +2,7 @@
 using Godot;
 
 [GlobalClass]
-public partial class ProjectileTurretConfig : TowerConfig
+public partial class ProjectileTurretConfig : TowerConfig, ITowerTargetingPolicy
 {
     [ExportGroup("Firing")]
     [Export] public BarrelFireMode FiringMode { get; set; } = BarrelFireMode.Single;

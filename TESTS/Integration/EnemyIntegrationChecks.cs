@@ -148,6 +148,7 @@ public partial class EnemyIntegrationChecks : Node
             Check(tower.Rotation == 0, "Aiming leaves placement root fixed");
             tower.GetNode<Node2D>("TurretPivot").Rotation = -Mathf.Pi * 0.5f;
             HudTowerChecks.Run(_battle);
+            await InspectorTargetingChecks.Run(this);
             int killedBefore = _spawns.Registry.KilledCount;
             for (int i = 0; i < 380 && target.IsAlive; i++)
             {

@@ -7,7 +7,7 @@ public static class UpgradeTableChecks
     // The first four cells are the table headers; subsequent cells are stat/current/next/gain.
     public static bool HasRow(GameplayHUD hud, string name, string current, string next, string gain = null)
     {
-        GridContainer grid = hud.GetNode<GridContainer>("BottomArea/Inspector/Insets/Body/UpgradeComparison");
+        GridContainer grid = hud.GetNode<GridContainer>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeComparison");
         int length = grid.GetChildCount();
         for (int i = 4; i + 3 < length; i += 4)
         {

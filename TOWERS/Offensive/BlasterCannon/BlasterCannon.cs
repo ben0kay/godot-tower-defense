@@ -3,6 +3,10 @@ using Godot;
 
 public partial class BlasterCannon : TowerBase
 {
+    // =========================================================
+    // Keep firing/aiming cadence intact; only invalidate the target search deadline.
+    protected override void OnTargetPriorityChanged() => _searchTimer = 0;
+
     #region Settings and State
     private BlasterCannonConfig _config;
     private bool _initialized;

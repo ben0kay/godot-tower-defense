@@ -70,7 +70,7 @@ public partial class TowerPlacementController : Node2D
         _economy.BalanceChanged += OnBalanceChanged;
         _hud.TowerChoiceRequested += OnTowerChoiceRequested;
         _hud.TowerBarClosed += CancelPlacement; _hud.BuildCategoryChanged += CancelPlacement; _hud.InspectionClosed += OnInspectionClosed;
-        _hud.TowerUpgradeRequested += OnUpgradeRequested;
+        _hud.TowerUpgradeRequested += OnUpgradeRequested; _hud.TargetPriorityRequested += OnTargetPriorityRequested;
         SetProcessUnhandledInput(true);
         _input = GetNode<GameInput>("/root/GameInput");
         _input.Bind(this, GameInput.BackAction, () =>
@@ -86,11 +86,11 @@ public partial class TowerPlacementController : Node2D
         _placementExits.Clear();
         if (GodotObject.IsInstanceValid(_input)) _input.Unbind(this);
         if (GodotObject.IsInstanceValid(_hud))
-        { _hud.TowerBarClosed -= CancelPlacement; _hud.BuildCategoryChanged -= CancelPlacement; _hud.InspectionClosed -= OnInspectionClosed; _hud.TowerChoiceRequested -= OnTowerChoiceRequested; _hud.TowerUpgradeRequested -= OnUpgradeRequested; }
+        { _hud.TowerBarClosed -= CancelPlacement; _hud.BuildCategoryChanged -= CancelPlacement; _hud.InspectionClosed -= OnInspectionClosed; _hud.TowerChoiceRequested -= OnTowerChoiceRequested; _hud.TowerUpgradeRequested -= OnUpgradeRequested; _hud.TargetPriorityRequested -= OnTargetPriorityRequested; }
         if (GodotObject.IsInstanceValid(_economy)) _economy.BalanceChanged -= OnBalanceChanged;
         if (GodotObject.IsInstanceValid(_buildDefinition?.DefaultConfig)) _buildDefinition.DefaultConfig.Changed -= OnPreviewConfigChanged;
         if (GodotObject.IsInstanceValid(_selected))
-        { _selected.StatsChanged -= OnSelectedStatsChanged; _selected.ExperienceChanged -= OnSelectedExperienceChanged; _selected.RuntimeChanged -= OnSelectedRuntimeChanged; }
+        { _selected.StatsChanged -= OnSelectedStatsChanged; _selected.TargetPriorityChanged -= OnSelectedTargetPriorityChanged; _selected.ExperienceChanged -= OnSelectedExperienceChanged; _selected.RuntimeChanged -= OnSelectedRuntimeChanged; }
     }
     #endregion
 
@@ -305,11 +305,11 @@ public partial class TowerPlacementController : Node2D
     {
         if (_selected == tower && (tower == null || _hud.IsInspectionVisible)) return;
         if (GodotObject.IsInstanceValid(_selected))
-        { _selected.StatsChanged -= OnSelectedStatsChanged; _selected.ExperienceChanged -= OnSelectedExperienceChanged; _selected.RuntimeChanged -= OnSelectedRuntimeChanged; _selected.SetSelected(false); }
+        { _selected.StatsChanged -= OnSelectedStatsChanged; _selected.TargetPriorityChanged -= OnSelectedTargetPriorityChanged; _selected.ExperienceChanged -= OnSelectedExperienceChanged; _selected.RuntimeChanged -= OnSelectedRuntimeChanged; _selected.SetSelected(false); }
         _selected = tower; ObserveWork(tower);
         if (GodotObject.IsInstanceValid(_selected))
         {
-            _selected.StatsChanged += OnSelectedStatsChanged;
+            _selected.StatsChanged += OnSelectedStatsChanged; _selected.TargetPriorityChanged += OnSelectedTargetPriorityChanged;
             _selected.ExperienceChanged += OnSelectedExperienceChanged; _selected.RuntimeChanged += OnSelectedRuntimeChanged;
             _selected.SetSelected(true);
             _hud.ShowTowerDetails(_selected.AuthoredConfig.DisplayName, (_selected.Definition?.Category.ToString() ?? "Tower") + " / Placed",
@@ -324,6 +324,17 @@ public partial class TowerPlacementController : Node2D
 
     // =========================================================
     // Refresh the selected tower's displayed effective values/range when its inputs change.
+    private void OnSelectedTargetPriorityChanged()
+    { if (_hud.IsInspectionVisible && GodotObject.IsInstanceValid(_selected)) _hud.SetTargetPriorityDetails(_selected.TargetPriority?.ToString() ?? ""); }
+    // =========================================================
+    // A visible placed tower is the only action target; previews, pause and passive types reject safely.
+    private void OnTargetPriorityRequested(int priority)
+    {
+        if (!_hud.IsInspectionVisible || _placing || GetTree().Paused || !GodotObject.IsInstanceValid(_selected)) return;
+        _selected.SetTargetPriority((TowerTargeting.Priority)priority); OnSelectedTargetPriorityChanged();
+    }
+    // =========================================================
+    // Re-resolve only real stat input changes, never a targeting-policy selection.
     private void OnSelectedStatsChanged()
     {
         if (!GodotObject.IsInstanceValid(_selected)) return;
@@ -426,16 +437,15 @@ public partial class TowerPlacementController : Node2D
             TowerLevel next = upgrading ? _selected.Levels[_selected.PendingUpgradeLevel - 1] : _selected.NextUpgrade;
             if (next == null)
             {
-                _hud.SetUpgradeComparison(null, null);
+                _hud.SetUpgradeComparison(_selected.FinalStats, null);
                 _hud.SetUpgradeDetails("MAX LEVEL — all purchased tiers complete.", "", false);
                 return;
             }
             TowerFinalStats now = _selected.FinalStats, future = _selected.ResolveLevel(_selected.UpgradeLevel + 1);
             _hud.SetUpgradeComparison(now, future);
-            string changes = upgrading ? $"LEVEL {next.Level} — PAID, IN PROGRESS\nCurrent Level {_selected.UpgradeLevel} remains operational.\n"
-                : $"NEXT: LEVEL {next.Level} — {next.DisplayName}\n";
+            string changes = upgrading ? $"LEVEL {next.Level} · Cost already paid." : $"LEVEL {next.Level} · "
+                + TowerPresentation.DescribeResourceCosts(next.Costs) + $" · {next.WorkSeconds:0.##}s";
             bool enabled = !_selected.IsBusy && Settings.AllowUpgrades && _economy.CanAfford(next.Costs);
-            changes += upgrading ? "Cost already paid." : "Price: " + TowerPresentation.DescribeResourceCosts(next.Costs) + $"\nWork time: {next.WorkSeconds:0.##}s";
             if (_selected.IsBusy) changes += upgrading ? "\nUpgrade in progress." : "\nAvailable after construction.";
             else if (!Settings.AllowUpgrades) changes += "\nUpgrades disabled.";
             else if (!enabled) changes += "\nInsufficient resources.";

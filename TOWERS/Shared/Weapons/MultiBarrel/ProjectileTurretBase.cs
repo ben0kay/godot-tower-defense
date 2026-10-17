@@ -5,6 +5,10 @@ using System.Collections.Generic;
 public abstract partial class ProjectileTurretBase : TowerBase
 {
     // =========================================================
+    // Keep firing/aiming cadence intact; only invalidate the target search deadline.
+    protected override void OnTargetPriorityChanged() => _searchTimer = 0;
+
+    // =========================================================
     // Optional status weapons reuse the same bounded target search and launch-time projectile delivery.
     protected virtual StatusEffectId? RequiredEffect => null;
     protected virtual StatusEffectPayload? CreateEffect(TowerFinalStats stats) => null;

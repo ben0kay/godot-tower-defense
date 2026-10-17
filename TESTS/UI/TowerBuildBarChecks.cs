@@ -39,7 +39,7 @@ public static class TowerBuildBarChecks
         hud.TowerChoiceRequested += Chosen;
         last.EmitSignal(Button.SignalName.Pressed);
         hud.TowerChoiceRequested -= Chosen;
-        Require(requested == "variant-39" && hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerName").Text == "Test variant 39",
+        Require(requested == "variant-39" && hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Heading/TowerName").Text == "Test variant 39",
             "Generated action delivers the type ID to generic placement and its own preview");
         hud.SetTowerBarOpen(true, true);
         await hud.ToSignal(hud.GetTree(), SceneTree.SignalName.ProcessFrame);

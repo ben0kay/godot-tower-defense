@@ -1,3 +1,5 @@
+**Latest IT1–IT4 update:**700×330 non-scrolling two-column Inspector supersedes the historical layouts below. Current executable checks and results: [InspectorTargeting.md](InspectorTargeting.md).
+
 # Build categories / Inspector verification
 
 **Update — IT1–IT2 (2026-10-16):** The panel now defaults to **540×325**, rather than the original 392×360. See [Inspector implementation plan](../../UI/GameplayHUD/Inspector/INSPECTOR_TARGETING_PASS.md). New code separates Rank XP from paid upgrades and adds a typed comparison grid. Existing HUD tests were adapted for the new rendered upgrade cells (`TESTS/UI/UpgradeTableChecks.cs`), but **no Godot/.NET compile or headless run has been completed against this change**. The historical test results below refer to the earlier Inspector build.

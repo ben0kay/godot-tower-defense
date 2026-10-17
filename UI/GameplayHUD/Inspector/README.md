@@ -1,36 +1,26 @@
-# Tower Inspector
+# Compact placed-tower Inspector — IT1–IT4
 
-`InspectorPanel.tscn` is a modular panel at the **lower right** of the HUD. It is now392px wide ×360px high by default, with a vertical ScrollContainer at Insets. Long details scroll within that fixed height rather than growing over the battlefield. It can be shown by build-tray selection or by clicking an already placed tower.
+The existing bottom-right Inspector is **non-scrollable**, with no foldouts. Default target size is **700×330** through `UIMasterConfig` / `DefaultUIConfig.tres`; natural content may grow the panel slightly rather than clip controls. The Ctrl tray remains independent and keeps its own horizontal catalog scrolling. Background opacity remains 90%; text/buttons stay opaque.
 
-Contains name, tower role/category, formatted stats, description and independent X close button. Keep the Inspector visible even if the Ctrl build tray closes. Avoid creating separate Inspectors for build-preview vs placed towers; feed both into `GameplayHUD.ShowTowerDetails` initially.
+## Layout
 
-Paid upgrade controls are active; sell/targeting controls remain future work. Any `TBD` values shown by prototype buttons are deliberate placeholders.
+- Header: tower name, current purchased level, operational/busy status and close. Busy work shows a small progress bar and remaining seconds.
+- Left: typed **CURRENT / NEXT / GAIN** stats, paid upgrade price/time and purchase button. Maximum tier shows current-only stats and MAX LEVEL, without fake future values. Construction/upgrades retain the existing transaction and operational gates.
+- Right: six target buttons (aimed weapons only), compact named Combat Rank, within-rank XP bar, next rank, active damage/range bonuses, ammunition/delivery state and footprint. Rank XP is visibly separate from paid Credits upgrades.
+- Header tooltip: description and full technical stats/grid information. Repeated Inspector/category headings, separate total-XP line and Additional Details foldout no longer occupy the panel.
 
-## Paid tower upgrades
-The existing panel now includes UpgradeInfo and UpgradeButton. The placement controller supplies next-tier effective changes, shared resource costs, affordability and max-tier state; the HUD emits TowerUpgradeRequested and never spends currency or owns progression. Build previews/prototype selections hide upgrade controls. The panel retains its bounded height for previews; all upgrade information/actions remain reachable in its scroll area, while the bottom tray retains its configured height and independent Ctrl animation. Closing the panel remains independent.
+A rank promotion refreshes effective comparison rows; ordinary XP increments update the rank card only. Inventory and work progress have separate event-driven updates. Selecting a target priority does not recalculate stats, spend Credits, consume ammunition, reset cooldowns or change XP. Closing, switching selection and reselecting preserve the intended subscriptions and per-instance policy. Range/highlight drawing remains in TowerPlacementController.
 
-The existing Inspector X uses `UIButtonStyle.Compact` through the common factory; it remains an Inspector-owned close action. Upgrade uses UIButtonStyle.Action through the same factory; Sell remains future work.
+## Targeting
 
-## Earned Rank / XP
+Battle, Laser, Blaster, Sniper, Machine Gun and Cryo opt into `ITowerTargetingPolicy` through private runtime configs. First/Last compare cached estimated remaining Citadel journey; Closest/Farthest compare physical tower distance; Strongest/Weakest compare current hull plus shield. Stable registration order resolves ties. Button choices persist through paid levels, promotions and selection/pause. Shockwave, Factory and Depot have no false targeting buttons; build previews cannot change a placed tower.
 
-RankSection is inside this same panel, above the existing stats. Rank displays Standard/Veteran/Enhanced/Superior/Legendary; ExperienceBar and ExperienceText display within-rank progress/required XP, next named rank and total XP. RankBonuses shows only active Damage/Range totals. Legendary displays MAX RANK and a full bar. The existing stats retain Tower level and the same paid upgrade controls.
+Cryo's unslowed/nonimmune eligibility is applied before every scoring mode. Changing priority never permits damage-only fallback on already-slowed enemies.
 
-TowerPlacementController subscribes/unsubscribes ExperienceChanged alongside StatsChanged for the actual selected instance. XP-only events queue one coalesced deferred rank-section update rather than formatting/laying out the panel hundreds of times for one AoE. Promotions refresh cached stats/current upgrade preview and the rank section; previews never spend XP or Credits. Build previews hide rank data, selection switches to the new tower, and closing the panel remains independent of Ctrl. Colours/style use UIMasterConfig, matching existing HUD panels. No new rank window/button or per-frame progression polling exists.
+## Authoring and verification
 
-InspectorWidth/InspectorHeight and BottomPanelOpacity live in UI/DefaultUIConfig.tres through UIMasterConfig. Height reduces to fit shorter viewports. Background opacity defaults to90%; foreground text/controls remain opaque. Existing Insets/Body label/button paths and event-driven rank/runtime updates are preserved. New selections reset scroll to the top; selected-only runtime updates do not reset it. Category filtering preserves placed-tower inspection.
+`InspectorPanel.tscn`: MarginContainer → compact header and two-column layout, not ScrollContainer. Existing C# callers/tests use the corresponding Heading / Columns/Main / Columns/Side paths. `TowerUpgradeComparison` receives typed effective snapshots; no parsing of stat descriptions. It includes optional Slow and current-only max-tier values, and handles Kinetic projectiles whose Weapon capability is null.
 
-## Work progress (C3)
+`TESTS/UI/InspectorTargetingChecks.tscn` exercises actual Godot control bounds for all nine registered types at 1920×1080, 1366×768 and 960×540. These are headless layout assertions, not screenshot/desktop visual approval. Very small windows or unusually long future content may require another responsive layout; do not silently restore scrolling or shrink text into illegibility.
 
-The shared WorkSection shows CONSTRUCTING, UPGRADING to Level N or OPERATIONAL. Busy buildings show a compact progress bar, elapsed/total and remaining seconds. TowerPlacement observes only the selected visible building's work events (approximately10Hz); progress changes update these controls without touching combat caches, stat labels, upgrade previews or scroll position. Closing, changing selection and unloading detach listeners; reselecting reads the current state. Timed paid upgrades retain old active stats, show free target differences and “Cost already paid”, and disable the duplicate purchase button. The392×360 scrolling Inspector and subtle background remain unchanged. C4 construction artwork/particles are separate future presentation.
-
-## Planned IT1–IT4 — wider Inspector, paid upgrade gains and six targeting modes (NOT IMPLEMENTED)
-
-[INSPECTOR_TARGETING_PASS.md](INSPECTOR_TARGETING_PASS.md) is the Codex implementation brief for a ~540×325 bottom-right Inspector; separate **TARGET PRIORITY**, **COMBAT RANK (earned XP)** and **PAID UPGRADE (Credits)** sections; a typed per-stat `CURRENT → NEXT → (+gain)` table; and six per-instance aimable-weapon target priorities. Shockwave and economy buildings do not select individual enemies. First/Last must account for chained checkpoints using bounded cached journey estimates. This paragraph is **planning only**: the current panel is still 392×360 with First/Closest source-policy settings and no targeting buttons.
-
-## Inspector IT1–IT2 — implemented in source; runtime review pending
-
-The existing Inspector now defaults to **540×325** (editable in UIMasterConfig / DefaultUIConfig.tres), remains at lower right and keeps the old scrollable panel, range ring and independent Ctrl tray. A placed aimed tower shows its existing **First/Closest TARGET PRIORITY** read-only. **COMBAT RANK · EARNED IN COMBAT** contains XP/earned bonuses, entirely separate from **PAID UPGRADE · CREDITS/RESOURCES**, which contains the authoritative next-tier stat comparison and purchase. `UpgradeComparison` has columns **STAT / CURRENT / NEXT / GAIN**. The numeric values are from the selected tower's ranked `FinalStats` and `ResolveLevel`, not level defaults or hand-entered deltas. Only applicable capability rows appear: projectile, beam, blast, shockwave, ammo and penetration. Beneficial decreases such as wave interval display green. Additional Details folds lengthy stat/ammo/grid text away without deleting it; build previews retain their detailed view.
-
-Max-level and passive states omit fictional next-level stats; the busy tower continues to display its operational old tier vs already-paid next tier and ongoing WorkSection progress. `TowerUpgradeRequested` still delegates to TowerPlacement's existing wallet/upgrade controller. IT3/IT4 (six live targeting modes and full checkpoint distance) remain **unimplemented**. Runtime, responsive and desktop visual QA have **not** been performed here; see [IT implementation checklist](INSPECTOR_TARGETING_PASS.md) and `TESTS/UI/HudCategories.md`.
-
-At a purchased maximum tier, Additional Details opens automatically so the currently operational stats remain accessible without a misleading empty next-level table. Weapon response changes (effective shield/hull coefficients) appear as typed rows when the new purchased tier actually changes them.
+See [pass record](INSPECTOR_TARGETING_PASS.md), [target policies](../../../TOWERS/Shared/Targeting/README.md) and [executed verification](../../../TESTS/UI/InspectorTargeting.md). Desktop visual/playfeel review remains pending.

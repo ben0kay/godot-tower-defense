@@ -57,11 +57,11 @@ public partial class AmmunitionLoopChecks : Node
                 Require(f.AccountedRounds() == 1000 + f.ProducedRounds(), "Complete loop conserves produced, stored, consumed and carried ammo");
                 f.Placement.Call("SelectTower", tower); tower.Ammunition.Inventory.TryConsume(1);
                 await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-                Require(f.Hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/RuntimeStats").Text.Contains("349"), "Selected tower ammo updates by event");
+                Require(f.Hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Side/RuntimeStats").Text.Contains("349"), "Selected tower ammo updates by event");
                 f.Placement.Call("SelectTower", factory);
-                Require(f.Hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/RuntimeStats").Text.Contains("Buffered ammo"), "Factory Inspector shows runtime buffer");
+                Require(f.Hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Side/RuntimeStats").Text.Contains("Buffered ammo"), "Factory Inspector shows runtime buffer");
                 f.Placement.Call("SelectTower", depot);
-                Require(f.Hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/RuntimeStats").Text.Contains("Stored ammo"), "Depot Inspector shows runtime stock");
+                Require(f.Hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Side/RuntimeStats").Text.Contains("Stored ammo"), "Depot Inspector shows runtime stock");
             }
             DeliverySafetyChecks.Run(this);
             await LiveLoop();

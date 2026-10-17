@@ -29,6 +29,12 @@ public partial class EnemyMovement : Node
     private int _assignedProfile;
     private bool _allowOffsets, _allowDiversity;
     public Enemy Enemy { get; private set; }
+    private JourneyEstimateCache.Plan _journey;
+    public float RemainingJourneyDistance => !_fullAudit && _dirtyCells.Count == 0 && float.IsFinite(RemainingPathDistance)
+        ? !HeadingToCheckpoint ? RemainingPathDistance
+            : _paths.Journeys.IsCurrent
+                ? RemainingPathDistance + (_journey?.Distance ?? float.PositiveInfinity) : float.PositiveInfinity
+        : float.PositiveInfinity;
     public float RemainingPathDistance => _replacementNeeded ? float.PositiveInfinity : _remainingDistance;
     public float LateralOffsetPixels { get; private set; }
     public IReadOnlyDictionary<Vector2I, List<int>> RouteDependencies => _route.Dependencies;
@@ -127,12 +133,16 @@ public partial class EnemyMovement : Node
                 offset, CorridorSeed, _paths.Config, _travelDirection);
         else _route.Build(connected, Enemy.GlobalPosition, _paths.Navigation, Enemy.Definition.RadiusPixels, offset, _travelDirection);
         _paths.RegisterRoute(this); UpdateDistance();
+        _paths.Journeys.Detach(_journey);
+        _journey = HeadingToCheckpoint ? _paths.Journeys.Attach(_checkpointNetwork, Checkpoint, CorridorSeed,
+            CompletedCheckpointCount, RouteProfile, Enemy.Definition.RadiusPixels) : null;
     }
 
     // =========================================================
     // Only physical entry completes a stage. Drop the old chain before requesting the Citadel leg.
     private void CompleteCheckpoint()
     {
+        _paths.Journeys.Detach(_journey); _journey = null;
         CompletedCheckpointCount++;
         RouteCheckpoint next = _checkpointNetwork.Next(Checkpoint, CorridorSeed, CompletedCheckpointCount - 1, out string error);
         _checkpointError = error; CheckpointCompleted = next == null && error.Length == 0;
@@ -199,7 +209,7 @@ public partial class EnemyMovement : Node
     // =========================================================
     // Remove dependency references when enemies die, arrive or the level unloads.
     public override void _ExitTree()
-    { if (GodotObject.IsInstanceValid(_paths)) _paths.UnregisterRoute(this); Checkpoint = null; _checkpointNetwork = null; }
+    { if (GodotObject.IsInstanceValid(_paths)) { _paths.UnregisterRoute(this); _paths.Journeys.Detach(_journey); } _journey = null; Checkpoint = null; _checkpointNetwork = null; }
     #endregion
 
     #region Validation

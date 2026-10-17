@@ -26,7 +26,7 @@ public static class TowerUpgradeChecks
             Require(first.UpgradeLevel == 1 && first.NextUpgrade.Level == 2, "Placed towers begin at level 1");
             Require(!ReferenceEquals(first.Levels[0], shared.Levels[0]), "Tier Resources are isolated per instance");
             TowerFinalStats initial = first.FinalStats;
-            Label stats = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerStats");
+            Label stats = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Main/TowerStats");
             for (int level = 1; level <= 3; level++)
                 Require(first.ResolveLevel(level).ShieldPenetration == 0.05f, "Purchased tiers never increase base penetration");
             TowerFinalStats preview = first.ResolveLevel(2);
@@ -52,10 +52,10 @@ public static class TowerUpgradeChecks
             Require(panel.GetGlobalRect().End.Y <= hud.GetGlobalRect().End.Y + 1 &&
                 Mathf.IsEqualApprox(tray.Size.Y, hud.Config.BottomBarHeight), "Expanded Inspector stays onscreen while tray retains configured height");
             hud.SetTowerBarOpen(false, true);
-            Require(panel.Visible && hud.Config.InspectorWidth == 540 && hud.Config.InspectorHeight == 325,
-                "Closing build tray leaves the 540×325 Inspector open");
-            Button button = hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/UpgradeButton");
-            Label info = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/UpgradeInfo");
+            Require(panel.Visible && hud.Config.InspectorWidth == 700 && hud.Config.InspectorHeight == 330,
+                "Closing build tray leaves the 700×330 Inspector open");
+            Button button = hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeButton");
+            Label info = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeInfo");
             Require(button.Visible && !button.Disabled && info.Text.Contains("150 Credits") &&
                 UpgradeTableChecks.HasRow(hud, "Damage", "30", "33", "(+3)"), "Inspector shows next tier, typed gain and affordable price");
             hud.EmitSignal(GameplayHUD.SignalName.TowerUpgradeRequested); ConstructionTestClock.FinishWork(battle);
@@ -78,7 +78,7 @@ public static class TowerUpgradeChecks
                 wallet.GetBalance(wallet.CreditsResource) == 0, "Second purchase selects the complete level3 snapshot");
             Require(stats.Text.Contains("Shield Penetration: 5%") && first.FinalStats.ShieldPenetration == 0.05f,
                 "Level3 Inspector retains baseline penetration");
-            Require(!button.Visible && info.Text.Contains("MAX LEVEL") && !hud.GetNode<Control>("BottomArea/Inspector/Insets/Body/UpgradeComparison").Visible,
+            Require(!button.Visible && info.Text.Contains("MAX LEVEL") && hud.GetNode<GridContainer>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeComparison").Columns == 2,
                 "Maximum tier removes upgrade action and hypothetical comparison");
             Require(!ConstructionTestClock.PurchaseAndFinish(first, wallet, placement.Settings, 3, out _) &&
                 wallet.GetBalance(wallet.CreditsResource) == 0, "Maximum tier cannot spend again");

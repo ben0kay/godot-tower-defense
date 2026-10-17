@@ -23,3 +23,7 @@ PassiveTestTower.tscn is a test-only nonweapon TowerBase scene with a simple squ
 ## IT2 upgrade-comparison integration assertions (added, execution pending)
 
 `TowerUpgradeChecks` now checks typed current/next/gain cells, 540×325 defaults, maximum-level cleanup, beam vs projectile rows, ammunition capacity and beneficial shorter shockwave interval. The existing Laser, Blaster, Shockwave and ammunition suites also use the shared `TESTS/UI/UpgradeTableChecks.cs` helper instead of scraping the old freeform upgrade paragraph. **Runtime validation is outstanding** because no Godot .NET runner is available to this authoring session; do not treat the historical green results as verification of this commit.
+
+## IT1–IT4 follow-up verification
+
+The compact two-column Inspector supersedes the earlier540×325 scrolling layout. Existing upgrade/rank/work/ammo assertions follow the new scene paths and current-only MAX LEVEL table. InspectorTargetingChecks runs six-policy instance isolation, geometry checks at three desktop sizes, rank/XP and spatial regressions, plus checkpoint-aware500-enemy sharing. See TESTS/UI/InspectorTargeting.md for executed results.

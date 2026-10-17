@@ -84,7 +84,7 @@ public static class TowerStatChecks
             TowerPlacementController placement = battle.GetNode<TowerPlacementController>("TowerPlacement");
             placement.Call("SelectTower", first);
             first.Config.DamagePerShot = baseline.DamagePerShot + 1;
-            Label details = battle.GetNode<Label>("UI/GameplayHUD/BottomArea/Inspector/Insets/Body/TowerStats");
+            Label details = battle.GetNode<Label>("UI/GameplayHUD/BottomArea/Inspector/Insets/Body/Columns/Main/TowerStats");
             Require(details.Text.Contains($"Damage: {first.FinalStats.DamagePerShot}") && details.Text.Contains("Range: 400"),
                 "Selected Inspector displays updated final values");
             first.Config.ShieldPenetration = 0.1f;

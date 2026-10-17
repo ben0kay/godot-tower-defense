@@ -32,7 +32,7 @@ public static class LaserTowerChecks
         Require(tower.Config != definition.DefaultConfig && tower.Levels[0] != definition.DefaultConfig.Levels[0], "Laser source/tier data is private");
         placement.Call("TryPlace", cell); ConstructionTestClock.FinishInitial(main);
         Require(wallet.GetBalance(wallet.CreditsResource) == 750, "Repeat Laser occupancy cannot charge");
-        Label details = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerStats");
+        Label details = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Main/TowerStats");
         
         Require(details.Text.Contains("DPS: 12") && details.Text.Contains("Shield: 6.00x / Hull: 0.15x") && !details.Text.Contains("shots/s") && UpgradeTableChecks.HasRow(hud, "DPS", "12", "14", "(+2)"), "Inspector displays actual beam capability/preview");
         tower.Config.HullCoefficient = 0.2f;
@@ -40,7 +40,7 @@ public static class LaserTowerChecks
             "Selected Laser Inspector refreshes coefficients without mutating the shared source");
         tower.Config.HullCoefficient = 0.15f;
         TowerFinalStats preview = tower.ResolveLevel(2); int revision = grid.NavigationRevision;
-        hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/UpgradeButton").EmitSignal(Button.SignalName.Pressed); ConstructionTestClock.FinishWork(main);
+        hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeButton").EmitSignal(Button.SignalName.Pressed); ConstructionTestClock.FinishWork(main);
         Require(tower.UpgradeLevel == 2 && tower.FinalStats == preview && tower.FinalStats.Beam.Value.DamagePerSecond == 14 &&
             tower.FinalStats.RangePixels == 264 && wallet.GetBalance(wallet.CreditsResource) == 575 && grid.NavigationRevision == revision,
             "Laser175-Credit tier applies exact DPS/range preview without changing navigation");

@@ -7,6 +7,9 @@ public partial class PathRequestManager : Node
 {
     [Export] public EnemyMasterConfig Config { get; set; }
     public NavigationGrid Navigation { get; private set; }
+    public JourneyEstimateCache Journeys { get; private set; }
+    public int LastFrameJourneyCalculations { get; private set; }
+    public long TotalJourneyCalculations { get; private set; }
     public int PendingCount => _requests.Count;
     public int PendingValidationCount => _validationPending.Count;
     public int LastFrameCalculations { get; private set; }
@@ -43,13 +46,14 @@ public partial class PathRequestManager : Node
     public override void _Ready()
     {
         Navigation = GetNode<NavigationGrid>("../Navigation");
+        Journeys = new(Navigation);
         Navigation.Grid.NavigationChanged += OnGridChanged; Navigation.Grid.NavigationBatchChanged += OnGridBatchChanged;
     }
 
     // =========================================================
     // Disconnect world-scoped subscriptions on unload.
     public override void _ExitTree()
-    { if (GodotObject.IsInstanceValid(Navigation?.Grid)) { Navigation.Grid.NavigationChanged -= OnGridChanged; Navigation.Grid.NavigationBatchChanged -= OnGridBatchChanged; } }
+    { Journeys?.Dispose(); if (GodotObject.IsInstanceValid(Navigation?.Grid)) { Navigation.Grid.NavigationChanged -= OnGridChanged; Navigation.Grid.NavigationBatchChanged -= OnGridBatchChanged; } }
 
     // =========================================================
     // Profiles are balanced independently from offset randomization.
@@ -156,12 +160,13 @@ public partial class PathRequestManager : Node
     // Time limit is soft: an individual native A* call cannot be interrupted, then work yields.
     public override void _PhysicsProcess(double delta)
     {
-        Navigation.Refresh(); Navigation.UpdateCongestion(delta); ProcessValidations();
+        Navigation.Refresh(); Navigation.UpdateCongestion(delta); ProcessValidations(); Journeys.Refresh();
+        LastFrameJourneyCalculations = 0;
         long started = Stopwatch.GetTimestamp(); LastFrameCalculations = 0; LastFrameAStarMilliseconds = 0;
         int budget = Mathf.Max(1, Config.MaxPathCalculationsPerFrame);
         while (_requests.Count > 0 && LastFrameCalculations < budget)
         {
-            bool fair = TotalCalculations % Mathf.Max(1, Config.FairRequestEveryCalculations) == 0;
+            bool fair = (TotalCalculations - TotalJourneyCalculations) % Mathf.Max(1, Config.FairRequestEveryCalculations) == 0;
             int index = NextRequestIndex(fair); Request request = _requests[index]; EnemyMovement movement = request.Movement;
             if (!GodotObject.IsInstanceValid(movement) || !movement.Enemy.IsAlive)
             { _requests.RemoveAt(index); _pending.Remove(movement); continue; }
@@ -191,6 +196,16 @@ public partial class PathRequestManager : Node
             { _requests.RemoveAt(index); _pending.Remove(movement); movement.AcceptPath(request.Best, request.Revision); }
             if (Config.MaxPathfindingMillisecondsPerFrame > 0f
                 && Stopwatch.GetElapsedTime(started).TotalMilliseconds >= Config.MaxPathfindingMillisecondsPerFrame) break;
+        }
+        // Optional targeting estimates consume only spare queries/time after real movement work.
+        int estimateSteps = 0;
+        while (_requests.Count == 0 && estimateSteps++ < budget * 4 && Journeys.PendingEdges > 0 && LastFrameCalculations < budget
+            && (Config.MaxPathfindingMillisecondsPerFrame <= 0
+                || Stopwatch.GetElapsedTime(started).TotalMilliseconds < Config.MaxPathfindingMillisecondsPerFrame))
+        {
+            if (!Journeys.Step()) continue;
+            LastFrameCalculations++; TotalCalculations++; LastFrameJourneyCalculations++; TotalJourneyCalculations++;
+            LastFrameAStarMilliseconds += Navigation.LastAStarMilliseconds;
         }
         LastPathfindingMilliseconds = Stopwatch.GetElapsedTime(started).TotalMilliseconds;
         PeakPathfindingMilliseconds = System.Math.Max(PeakPathfindingMilliseconds, LastPathfindingMilliseconds);
