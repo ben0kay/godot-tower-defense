@@ -2,7 +2,7 @@
 
 This top-level folder owns **enemy gameplay mechanics** in the Godot 4 C#/.NET space tower-defense project. Enemy001 is the first working **basic test ship**, intentionally named `Enemy001` internally rather than `ScoutShip`. Its scene uses shared `Enemy.cs` and `EnemyMovement.cs` rather than a unique gameplay script. This is the baseline future types should reuse.
 
-**Newest plain type:** `Types/Enemy004/` adds the medium-sized **Bulwark Drone**: development asset `Enemy004.tscn`, stable ID `medium_mk1`, display name `Bulwark Drone`, 64×48 art, 160 HP, 75 px/s, 22px navigation radius, 7 Credits. Registered in the catalog for F2 and wave authoring; not added to Level001's actual waves. No special ability or new behavior is attached. See `Types/Enemy004/README.md`.
+**Earlier medium plain type:** `Types/Enemy004/` adds the medium-sized **Bulwark Drone**: development asset `Enemy004.tscn`, stable ID `medium_mk1`, display name `Bulwark Drone`, 64×48 art, 160 HP, 75 px/s, 22px navigation radius, 7 Credits. Registered in the catalog for F2 and wave authoring; not added to Level001's actual waves. No special ability or new behavior is attached. See `Types/Enemy004/README.md`.
 
 **Enemy identity (current):** Numbered `ENEMIES/Types/Enemy001/`, `Enemy002/` and `ShieldGenerator/` asset names document development history **only**. Their saved definitions now use unique wave/catalog IDs `basic_mk1`, `scout_mk1`, `shield_emitter_mk1`, and player-facing names `Standard Drone`, `Swift Interceptor`, `Shield Generator`. `EnemyDefinition.EnemyId` and `.DisplayName` are separate; wave order is authored in `LEVELS/Level001/Level001Waves.cs`, not inferred from filenames or catalog order. New enemy definitions require an explicit unique ID. The previous IDs `enemy001`, `enemy002`, `shieldgenerator` are retired; update authored waves/tests using them. The F2 debug cycler still follows catalog **scene order**.
 
@@ -20,7 +20,7 @@ See **[enemypathing.md](enemypathing.md)** for the standalone Phase N4 implement
 
 ## Shared inherited enemy scene (GE1–GE3 implemented)
 
-[Shared/GENERIC_ENEMY_SCENE_PASS.md](Shared/GENERIC_ENEMY_SCENE_PASS.md) records the completed migration to `Shared/GenericEnemy.tscn`. All five type scenes inherit `Sprite`, `Movement` and `DefenseBar`, retaining their own Definition/SVG overrides and optional ShieldEmitter/DeathSpawn children. Catalog paths, spawning and runtime scripts are unchanged. Edit shared child defaults in the parent; avoid per-type overrides unless intentional. See `TESTS/Enemies/GenericEnemy.md` for tests and limitations.
+[Shared/GENERIC_ENEMY_SCENE_PASS.md](Shared/GENERIC_ENEMY_SCENE_PASS.md) records the completed migration to `Shared/GenericEnemy.tscn`. All six type scenes inherit `Sprite`, `Movement` and `DefenseBar`, retaining their own Definition/SVG overrides and optional ShieldEmitter/DeathSpawn children. Catalog paths, spawning and runtime scripts are unchanged. Edit shared child defaults in the parent; avoid per-type overrides unless intentional. See `TESTS/Enemies/GenericEnemy.md` for tests and limitations.
 
 ## Enemy architecture — multi-type roster and modular abilities (E2A/E2B implemented; E3 later)
 

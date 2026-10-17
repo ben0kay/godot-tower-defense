@@ -88,9 +88,52 @@ public static class EnemyCatalogChecks
         medium.TakeDamage(200);
         Require(!medium.IsAlive && wallet.GetBalance(wallet.CreditsResource) == creditsBeforeMedium + 7,
             "Medium ship's existing kill pipeline pays exactly seven Credits");
+        // Big mk.1 is a separate plain heavy type: catalog/F2, clearance, credits and optional shields.
+        EnemyDefinition bigData = GD.Load<EnemyDefinition>("res://ENEMIES/Types/Enemy005/Enemy005.tres");
+        Require(bigData.EnemyId == "big_mk1" && bigData.DisplayName == "Big mk.1"
+            && bigData.MaxHealth == 1000 && bigData.MaxShield == 200 && bigData.MoveSpeed == 80
+            && bigData.CitadelDamage == 5 && bigData.KillRewardCredits == 10
+            && bigData.RadiusPixels == 24 && catalog.Find("big_mk1") == scenes["big_mk1"],
+            "Big mk.1 retains original heavy-role balance, canonical ID and catalog registration");
+        Enemy big = spawns.Spawn("big_mk1", true);
+        Require(big != null && big.Health == 1000 && big.CurrentShield == 0
+            && spawns.Paths.Navigation.HasClearance(big.GlobalPosition, big.Definition.RadiusPixels),
+            "Normal/F2 Big mk.1 spawn has no active shield and respects existing clearance");
+        big.Movement.SetPhysicsProcess(false);
+        Texture2D bigTexture = big.GetNode<Sprite2D>("Sprite").Texture;
+        Require(bigTexture != null && bigTexture.GetWidth() == 96 && bigTexture.GetHeight() == 72
+            && big.GetNode<DefenseBar>("DefenseBar").GetChildCount() == 0
+            && big.GetNodeOrNull<Node>("Abilities") == null,
+            "Big mk.1 uses the large dedicated SVG, shared lightweight bar and no extra abilities");
+        big.TakeDamage(100);
+        DefenseBar hullBar = big.GetNode<DefenseBar>("DefenseBar");
+        Require(big.Health == 900 && big.CurrentShield == 0 && hullBar.Visible
+            && hullBar.Position.Y < -bigTexture.GetHeight() * 0.5f,
+            "Large enemy hull survives hits and health bar clears oversized sprite without polling");
+        int bigCredits = wallet.GetBalance(wallet.CreditsResource);
+        big.TakeDamage(1500);
+        Require(!big.IsAlive && wallet.GetBalance(wallet.CreditsResource) == bigCredits + 10,
+            "Big mk.1 pays exactly 10 Credits through the existing kill pipeline");
+
+        Enemy shieldedBig = spawns.SpawnWave("big_mk1", new RandomNumberGenerator { Seed = 17 }, spawnWithShield: true);
+        Require(shieldedBig != null && shieldedBig.CurrentShield == 200 && shieldedBig.Health == 1000,
+            "Opt-in shielded Big mk.1 starts with full 200 shield points");
+        shieldedBig.Movement.SetPhysicsProcess(false);
+        DefenseBar stacked = shieldedBig.GetNode<DefenseBar>("DefenseBar");
+        Require(stacked.ShieldVisible && stacked.HullVisible && stacked.Visible
+            && shieldedBig.GetNodeOrNull<ShieldVisual>("ShieldVisual") != null,
+            "Big mk.1 shares existing stacked shield/hull meters and glowing shield art");
+        shieldedBig.TakeDamage(50);
+        Require(shieldedBig.CurrentShield == 150 && shieldedBig.Health == 1000
+            && Mathf.IsEqualApprox(stacked.ShieldFraction, 0.75f),
+            "Shield-only hits shrink the shared meter without harming Big mk.1 hull");
+        shieldedBig.TakeDamage(150);
+        Require(shieldedBig.CurrentShield == 0 && shieldedBig.Health == 1000 && !stacked.ShieldVisible,
+            "Shield depletion retains full hull and removes only the shield meter");
+        shieldedBig.TakeDamage(1500);
         waves.Configure(WaveCatalog.GetWaves(spawns.Paths.Navigation.Grid.Level.Settings.WaveSetId), scenes);
         wallet.Initialize(spawns.Paths.Navigation.Grid.Level.Settings); health.Initialize(health.MaxHealth);
-        GD.Print("PASS: enemy catalog validation, two-type exact waves/portals, Enemy002 movement/state/targeting/reward/arrival and oversized spawn rejection");
+        GD.Print("PASS: enemy catalog validation, Big mk.1 plain/shielded heavy behavior, inherited artwork/bars, waves/portals and oversized spawn rejection");
     }
     // =========================================================
     // Create invalid/oversized setup fixtures without altering shared authored resources.

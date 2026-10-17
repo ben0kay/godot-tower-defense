@@ -1,0 +1,11 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://ENEMIES/Shared/GenericEnemy.tscn" id="1_base"]
+[ext_resource type="Resource" path="res://ENEMIES/Types/Enemy005/Enemy005.tres" id="2"]
+[ext_resource type="Texture2D" path="res://ENEMIES/Types/Enemy005/Artwork/enemy005.svg" id="3"]
+
+[node name="Enemy005" instance=ExtResource("1_base")]
+Definition = ExtResource("2")
+
+[node name="Sprite" parent="." index="0"]
+texture = ExtResource("3")

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://ENEMIES/Shared/EnemyDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+EnemyId = "big_mk1"
+DisplayName = "Big mk.1"
+MaxHealth = 1000.0
+MaxShield = 200.0
+MoveSpeed = 80.0
+RadiusPixels = 24.0
+TurnSpeed = 4.5
+CitadelDamage = 5
+KillRewardCredits = 10
+DeathExplosionMultiplier = 1.65

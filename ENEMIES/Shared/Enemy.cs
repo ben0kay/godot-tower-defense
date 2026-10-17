@@ -74,8 +74,13 @@ public partial class Enemy : Node2D
         _damageConsumed = 0; _damageXpPool = 0; _killXp = 0; _xpRulesCaptured = false;
         _xpCredits = Math.Max(0, Definition.KillRewardCredits);
         _defenseBar = GetNodeOrNull<DefenseBar>("DefenseBar");
+        // Large hulls get extra bar clearance once, without per-type scene overrides.
+        Sprite2D sprite = GetNodeOrNull<Sprite2D>("Sprite");
+        if (_defenseBar != null && sprite?.Texture != null)
+            _defenseBar.SetOwnerVisualHeight(sprite.GetRect().Size.Y * Mathf.Abs(sprite.Scale.Y));
         _defenseBar?.SetHealth(Health, Definition.MaxHealth);
         SyncShieldVisual(0f, CurrentShield, false);
+        _defenseBar?.AlignWithOwner(Rotation);
         Movement = GetNode<EnemyMovement>("Movement");
         SetNotifyLocalTransform(true); SetNotifyTransform(true);
         _registry.Register(this);

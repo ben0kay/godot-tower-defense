@@ -1,5 +1,8 @@
 # Enemy types
 
+**Heavy Big mk.1:** `Enemy005/` is a 96×72 plated heavyweight ship with ID `big_mk1`, 1,000 HP, 200 optional shields, 80 px/s speed, 5 Citadel damage and 10 Credits. Inherits `Shared/GenericEnemy.tscn` with no unique scripts or abilities. See [Enemy005](Enemy005/README.md). Its shields remain wave-opt-in, not permanently enabled.
+
+
 `Enemy001/` is the first reusable basic test ship. Enemy002 and later variants can reuse Shared/Enemy.cs and Movement/EnemyMovement.cs, changing scenes, artwork and EnemyDefinition resources instead of duplicating scripts.
 
 **New medium hull:** `Enemy004/Enemy004.tscn` is the larger 64×48px `medium_mk1` / **Bulwark Drone** with 160 HP, 75 speed and a 22px clearance radius; see [Enemy004/README.md](Enemy004/README.md). `Enemy003` is intentionally not required for this asset and its absence does not dictate wave order.

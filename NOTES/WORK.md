@@ -1,5 +1,15 @@
 # WORK — Consolidated Outstanding Implementation Backlog
 
+## Big mk.1 heavy enemy — 2026-10-17
+
+- [x] Registered `ENEMIES/Types/Enemy005` / `big_mk1` in `DefaultEnemyCatalog.tres`, using one inherited plain enemy scene and 96×72 right-facing plated SVG. Original GameMaker-inspired balance: **1,000 hull, 200 optional shields, 80px/s, 5 Citadel damage, 10 Credits**, 24px navigation radius. No new AI or ability nodes.
+- [x] F2/F3 catalog discoverability and wave syntax (`Enemy("big_mk1", shield: true)` for 200 starting SP). **Level001 and Level002 waves remain unchanged.**
+- [x] Shared DefenseBar takes visual sprite height once on spawn so large ships' hull/shield bars clear their artwork; small ships keep authored minimum. Updated catalog/shield/credit regressions and relevant READMEs in this same commit.
+- [ ] **Godot QA pending:** compile/run enemy catalog + GenericEnemy integration runners, F2 cycle, shielded Big mk.1 test wave, portal/corridor navigation for 24px clearance radius, oversized artwork overlap, shield aura/bar visual, rewards and 500-ship performance. No runtime tests performed in this GitHub-only change.
+
+---
+
+
 ## Build preview / unobstructed placement UI — implemented 2026-10-17
 
 - [x] Ctrl-open tray: hover or keyboard-focus a tower tile to show its description, cost, build time, footprint, basic effective stats and CAN AFFORD / INSUFFICIENT RESOURCES in the existing right Inspector. No ghost/payment just for browsing.

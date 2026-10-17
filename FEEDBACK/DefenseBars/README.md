@@ -25,3 +25,7 @@ Only **hull health and current shield points** are drawn. Armour and other defen
 
 ## Manual test
 F5 -> F2 to spawn Enemy001 -> place a Battle Tower near its route. Unshielded, unharmed ships have no bar; after a hull hit, a short horizontal bar appears. For a wave-spawned shielded Standard Drone, the full hull bar and warm shield bar both show immediately. Shield damage shrinks only the top meter; depletion hides the top meter, and the hull meter behaves normally. Health bars disappear on enemy death/arrival. Use the Inspector to adjust MaxHealth on Enemy001's Resource and see the capped, slowly increasing width. Rendering still scales with world camera zoom.
+
+## Large enemy sprite offset (Big mk.1)
+
+At spawn, shared `Enemy.Initialize` passes the visual Sprite2D's height once to `DefenseBar.SetOwnerVisualHeight`. The existing `VerticalOffsetPixels` Inspector setting stays the **minimum**; wider/taller art such as the 96×72 Big mk.1 or Transporter uses enough extra offset to keep both hull and shield rows above the ship. The position continues to be counter-rotated by the existing movement hook only when visible. There is no per-frame size calculation and no scene-specific style override.
