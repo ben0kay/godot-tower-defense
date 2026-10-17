@@ -4,7 +4,7 @@ using Godot;
 public partial class WeaponVisualRenderer : Node2D
 {
     public const int FlashCapacity = 32;
-    private struct Flash { public Vector2 Position, Forward; public float Age; public MuzzleFlashSnapshot Style; }
+    private struct Flash { public Vector2 Position, Forward; public float Age; public bool Fresh; public MuzzleFlashSnapshot Style; }
     private readonly Flash[] _flashes = new Flash[FlashCapacity];
     private readonly Vector2[] _shape = new Vector2[8];
     private int _count, _overflow;
@@ -21,7 +21,7 @@ public partial class WeaponVisualRenderer : Node2D
 
     // =========================================================
     // Existing tower physics supplies aim changes. Only live flash animation needs this node's processing.
-    public override void _Ready() { ZIndex = 1; SetProcess(false); SetPhysicsProcess(false); }
+    public override void _Ready() { ZIndex = 3; SetProcess(false); SetPhysicsProcess(false); }
     // =========================================================
     // Funded launches call once per selected barrel; local coordinates track parent rotation exactly once.
     public void FlashAt(Marker2D muzzle, MuzzleFlashStyle style)
@@ -33,7 +33,7 @@ public partial class WeaponVisualRenderer : Node2D
         int slot;
         if (_count < FlashCapacity) slot = _count++;
         else { slot = _overflow; _overflow = (_overflow + 1) % FlashCapacity; OverwrittenFlashes++; }
-        _flashes[slot] = new() { Position = position, Forward = forward, Style = snapshot };
+        _flashes[slot] = new() { Position = position, Forward = forward, Fresh = true, Style = snapshot };
         LastFlashPosition = position; LastFlashStyle = snapshot; TotalFlashes++;
         SetProcess(true); QueueRedraw();
     }
@@ -58,12 +58,18 @@ public partial class WeaponVisualRenderer : Node2D
         if (_count == 0 || !double.IsFinite(delta) || delta <= 0) return;
         for (int i = _count - 1; i >= 0; i--)
         {
+            // A shot emitted during physics must survive its first process pass, even after a frame hitch.
+            if (_flashes[i].Fresh) { _flashes[i].Fresh = false; continue; }
             _flashes[i].Age += (float)delta;
             if (_flashes[i].Age >= _flashes[i].Style.Duration)
             { _flashes[i] = _flashes[--_count]; _flashes[_count] = default; }
         }
         QueueRedraw(); if (_count == 0) SetProcess(false);
     }
+    // =========================================================
+    // Brief bright hold followed by linear fade stays readable at gameplay zoom without adding light nodes.
+    public static float FlashOpacity(float age, float duration) => Mathf.Clamp((1 - age / duration) / .7f, 0, 1);
+
     // =========================================================
     // All draw data is reused. Outer translucent geometry is faux glow, independent of environment bloom.
     public override void _Draw()
@@ -72,8 +78,7 @@ public partial class WeaponVisualRenderer : Node2D
         { DrawLine(_aimStart, _aimEnd, _aim.Color, _aim.Width, true); if (_aim.TipRadius > 0) DrawCircle(_aimEnd, _aim.TipRadius, _aim.Color); }
         for (int i = 0; i < _count; i++)
         {
-            Flash flash = _flashes[i]; float alpha = 1 - flash.Age / flash.Style.Duration;
-            alpha *= alpha * flash.Style.Opacity;
+            Flash flash = _flashes[i]; float alpha = FlashOpacity(flash.Age, flash.Style.Duration) * flash.Style.Opacity;
             DrawFlash(flash, 1, flash.Style.Outer * new Color(1, 1, 1, alpha));
             DrawFlash(flash, .55f, flash.Style.Core * new Color(1, 1, 1, alpha));
         }

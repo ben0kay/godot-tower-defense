@@ -154,3 +154,7 @@ Projectile tracers, real-muzzle bounded flashes and tower-owned Battle/Machine G
 ## PV3 follow-up / Inspector width — 2026-10-17
 
 PV3 automated/resources/documentation work was already included in the tracer/muzzle commit. Follow-up retains the desktop visual-review task and reruns the focused suite. Inspector default is now620×330, with content-sized CURRENT/NEXT/GAIN columns and thin drawn vertical separators; no scrolling, smaller fonts or gameplay changes. Focused all-building/viewport geometry checks pass (620px wide, max331px high). See TESTS/UI/InspectorTargeting.md.
+
+## Barrel origins / flash visibility follow-up — 2026-10-17
+
+Blaster migrated from center launch to its actual barrel-tip marker with a shared tower-owned orange flash preset. Battle/Machine Gun/Sniper/Cryo already use real muzzle markers; Laser uses its beam muzzle and Shockwave intentionally remains centered. Shared flashes now have first-process presentation protection, a bright hold/linear fade, larger/longer presets and draw above projectiles. Preserves8c7ab2e's20% Battle/Machine Gun rate balance. See TESTS/Towers/ProjectileVisuals.md for regression evidence and pending desktop appearance review.

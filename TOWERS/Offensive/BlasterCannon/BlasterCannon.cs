@@ -31,11 +31,14 @@ public partial class BlasterCannon : TowerBase
     public override bool AcceptsConfig(TowerConfig config) => config is BlasterCannonConfig;
     // =========================================================
     // Reject malformed Blaster scenes before occupancy/payment, without imposing this on passive types.
-    public override bool ValidateScene() => GetNodeOrNull<Node2D>("TurretPivot") != null && GetNodeOrNull<Sprite2D>("TurretPivot/Sprite") != null;
+    public override bool ValidateScene() => GetNodeOrNull<Node2D>("TurretPivot") != null && GetNodeOrNull<Sprite2D>("TurretPivot/Sprite") != null
+        && GetNodeOrNull<Marker2D>("TurretPivot/Muzzles/MuzzleA") != null;
     // =========================================================
     // Per-instance initialization preserves the exported Blaster Config and its change subscriptions.
     protected override void ApplyConfig(TowerConfig config) => Config = (BlasterCannonConfig)config;
     private Sprite2D _sprite;
+    private Marker2D _muzzle;
+    private WeaponVisualRenderer _visuals;
     private Node2D _turret;
     private EnemyRegistry _registry;
     private Node2D _projectiles, _effects;
@@ -50,6 +53,8 @@ public partial class BlasterCannon : TowerBase
     {
         _turret = GetNode<Node2D>("TurretPivot");
         _sprite = _turret.GetNode<Sprite2D>("Sprite");
+        _muzzle = GetNode<Marker2D>("TurretPivot/Muzzles/MuzzleA");
+        _visuals = WeaponVisuals.Attach(_turret);
         SetProcess(false);
         _initialized = true;
         if (Config != null) Config.Changed += RebuildStats;
@@ -81,7 +86,8 @@ public partial class BlasterCannon : TowerBase
         SplashProjectile bullet = new();
         bullet.Initialize(_target, _registry, _target.GlobalPosition, FinalStats.ProjectileSpeed,
             hit, FinalStats.Area.Value, _effects, style: Config.ImpactStyle);
-        _projectiles.AddChild(bullet); bullet.GlobalPosition = GlobalPosition;
+        _projectiles.AddChild(bullet); bullet.GlobalPosition = _muzzle.GlobalPosition;
+        _visuals.FlashAt(_muzzle, Config.MuzzleFlash);
         _shotTimer = 1f / FinalStats.ShotsPerSecond;
     }
     #endregion

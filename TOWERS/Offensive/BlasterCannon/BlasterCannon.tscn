@@ -8,3 +8,7 @@ Config = ExtResource("2")
 [node name="TurretPivot" type="Node2D" parent="."]
 [node name="Sprite" type="Sprite2D" parent="TurretPivot"]
 texture = ExtResource("3")
+
+[node name="Muzzles" type="Node2D" parent="TurretPivot"]
+[node name="MuzzleA" type="Marker2D" parent="TurretPivot/Muzzles"]
+position = Vector2(0, -30)

@@ -69,3 +69,7 @@ Current complete BlasterCannonLevels.cs rows include 600 reserve / 3 per project
 ## Initial construction (C1/C2)
 
 Paid placement occupies its footprint immediately and takes **5 seconds**, authored in the Level1 WorkSeconds column of this tower's `*Levels.cs`. It cannot acquire targets/fire/consume ammunition or request deliveries until complete. Completion preserves stats, level, rank and stock. Direct scene fixtures remain operational by default. Current final artwork stays visible; stage SVGs/VFX (C4) remain deferred. C3 Inspector progress is implemented; purchased upgrades use their own WorkSeconds and retain old-tier operation until completion. Duplicate purchases are disabled while work is active. See `TOWERS/Shared/Construction/README.md`.
+
+## Barrel-tip launch and muzzle flash
+
+The projectile now starts at `TurretPivot/Muzzles/MuzzleA` `(0,-30)`, aligned to the unchanged SVG barrel tip. A funded launch adds one shared visual-only orange muzzle flash using `Visuals/BlasterMuzzleFlashStyle.tres`. The existing separately styled impact ring remains in Effects/. No direct-hit damage is added; one instantaneous AoE still occurs on impact. Flight time naturally starts from the muzzle, not the tower center.

@@ -51,3 +51,9 @@ No unrelated terrain or native-resource cleanup changes were made to hide these 
 ## Still requires desktop review
 
 Normal-zoom readability, subtle Sniper aim width, glow/flash silhouettes, high-rate multi-tower appearance and actual rendered performance. Headless tests do not verify pixel appearance. Adjust tower-owned `.tres` presets after playtesting; all look changes are separate from damage and level stats. Optional texture/ring draw branches compile but need visual artwork review before claiming an approved art variant.
+
+## Muzzle visibility follow-up — 2026-10-17
+
+Base8c7ab2e includes the newer20% Battle/Machine Gun fire-rate balance; those level rows/prices are preserved. Added real Blaster barrel-origin/flash/no-launch-damage/cooldown assertions. Renderer tests cover first-process hitch survival, bright hold/fade and eventual bounded expiry; explicit renderer clocks now advance both the initial presentation opportunity and later expiry. The existing Blaster30/60/120Hz timing assertion now derives expected flight time from the real muzzle distance rather than assuming a center-origin one-second trip. Increased visual durations/sizes and draw order are presentation-only. Manual screenshot approval is not claimed.
+
+Follow-up verification: all C# compiled using the documented Roslyn/Godot source-generator path. ProjectileVisualChecks, GenericEnemyChecks (including Laser/Blaster/Shockwave), AmmunitionLoopChecks, CompactInspectorChecks and the final ConstructionChecks run all exited0. Construction initially found a stale700px-width assertion left by the earlier UI narrowing; it now correctly expects620px. Flash emit+presentation-step+expiry microbenchmark:10,000 cycles,6.945ms,0 managed bytes. Standard SDK and manual rendered-appearance limitations remain as documented above.

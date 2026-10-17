@@ -108,6 +108,8 @@ public static class BlasterCannonChecks
         BlasterCannon tower = Create(main, definition, center + new Vector2(0, 128)); tower.Config.ProjectileSpeed = 128;
         tower._PhysicsProcess(0.2);
         SplashProjectile shot = main.GetNode("World/Projectiles").GetChild<SplashProjectile>(0);
+        float travelSeconds = shot.GlobalPosition.DistanceTo(center) / 128f;
+        Require(shot.GlobalPosition.IsEqualApprox(tower.GetNode<Marker2D>("TurretPivot/Muzzles/MuzzleA").GlobalPosition), "Blaster launches at real barrel tip");
         Require(!shot.HasDetonated && primary.Health == 60 && half.Health == 60, "Launching never applies immediate direct or area damage");
         tower.Config.ImpactStyle.RingColor = Colors.Green;
         tower.Config.DamagePerShot = 120; tower.Config.BlastRadiusPixels = 200; tower.Config.EdgeDamageFraction = 1;
@@ -119,7 +121,7 @@ public static class BlasterCannonChecks
             shot._PhysicsProcess(1.0 / rate); ticks++;
             if (ticks < rate / 2) Require(primary.Health == 60 && half.Health == 60, "Travel does not scan/damage recipients");
         }
-        Require(shot.HasDetonated && Math.Abs(ticks / (double)rate - 1) <= 1.1 / rate && shot.AppliedHits == 3,
+        Require(shot.HasDetonated && Math.Abs(ticks / (double)rate - travelSeconds) <= 1.1 / rate && shot.AppliedHits == 3,
             "Production splash reaches its point once at consistent time across physics rates");
         Require(!primary.IsAlive && wallet.GetBalance(wallet.CreditsResource) == credits + 3, "Primary kill/reward occurs once without direct+splash doubling");
         Near(half.Health, 13.125f, "Fired shot preserves launch damage, falloff and default Explosive hull coefficient");

@@ -3,8 +3,8 @@
 [resource]
 script = ExtResource("1")
 Shape = 1
-DurationSeconds = 0.09
-LengthPixels = 18.0
-WidthPixels = 9.0
+DurationSeconds = 0.16
+LengthPixels = 25
+WidthPixels = 14
 CoreColor = Color(1, 1, 0.95, 1)
 OuterColor = Color(1, 0.8, 0.45, 0.65)

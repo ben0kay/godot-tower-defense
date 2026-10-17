@@ -14,6 +14,9 @@ public partial class BlasterCannonConfig : TowerConfig, ITowerTargetingPolicy
         Levels = BlasterCannonLevels.Create();
     }
 
+    [ExportGroup("Weapon Visuals")]
+    [Export] public MuzzleFlashStyle MuzzleFlash { get; set; }
+
     [ExportGroup("Effects")]
     [Export] public ShockwaveStyle ImpactStyle { get; set; }
 

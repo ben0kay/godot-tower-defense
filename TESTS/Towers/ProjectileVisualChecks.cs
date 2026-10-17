@@ -30,7 +30,7 @@ public partial class ProjectileVisualChecks : Node
     // =========================================================
     // Shared focused group is also called by the existing integration runner.
     internal static void Run(AmmoLoopFixture f)
-    { Battle(f); Gun(f); Sniper(f); Snapshots(f); Lifecycle(f); Renderer(f); }
+    { Battle(f); Gun(f); Sniper(f); Snapshots(f); Lifecycle(f); Blaster(f); Renderer(f); }
 
     // =========================================================
     // Fired bullets outlive their source; missing/disabled visuals cannot change timeout or dead-target cleanup.
@@ -101,12 +101,12 @@ public partial class ProjectileVisualChecks : Node
             Require(shot.GlobalPosition.IsEqualApprox(marker.GlobalPosition)
                 && renderer.ToGlobal(renderer.LastFlashPosition).IsEqualApprox(marker.GlobalPosition), "Bullet and flash share selected A-B marker " + i);
             Require(renderer.TotalFlashes == i + 1 && gun.Ammunition.ConsumedRounds == i + 1, "One flash and one ammo charge per launch");
-            f.ClearProjectiles(); renderer._Process(.1);
+            f.ClearProjectiles(); renderer._Process(1); renderer._Process(1);
         }
         gun.Config.FiringMode = BarrelFireMode.Simultaneous; gun._PhysicsProcess(.1);
         Require(f.Main.GetNode("World/Projectiles").GetChildCount() == 2 && renderer.TotalFlashes == 12
             && gun.Ammunition.ConsumedRounds == 12 && renderer.ActiveFlashes == 2 && CountNodes(gun) == nodes, "Simultaneous two funded muzzles produce two slots and bullets");
-        f.ClearProjectiles(); renderer._Process(1);
+        f.ClearProjectiles(); renderer._Process(1); renderer._Process(1);
         gun.Ammunition.Inventory.TryConsume(gun.Ammunition.Inventory.Amount - 1); gun._PhysicsProcess(.5);
         Require(renderer.TotalFlashes == 12 && gun.Ammunition.Inventory.Amount == 1 && !renderer.IsProcessing(), "Unfunded simultaneous volley is completely silent and idle");
         gun.Free(); enemy.Free();
@@ -126,7 +126,7 @@ public partial class ProjectileVisualChecks : Node
         Require(renderer.AimVisible && renderer.ToGlobal(renderer.AimStart).IsEqualApprox(muzzle.GlobalPosition), "Aim begins at actual sniper muzzle");
         Vector2 direction = (renderer.ToGlobal(renderer.AimEnd) - muzzle.GlobalPosition).Normalized();
         Require(direction.Dot(-muzzle.GlobalTransform.Y.Normalized()) > .999f, "Aim follows barrel forward, with no doubled rotation");
-        f.ClearProjectiles(); renderer._Process(1); float before = enemy.Health;
+        f.ClearProjectiles(); renderer._Process(1); renderer._Process(1); float before = enemy.Health;
         tower._PhysicsProcess(.01); Require(enemy.Health == before && !renderer.IsProcessing(), "Aim alone deals no damage and adds no independent processing");
         AimLaserStyle original = tower.Config.AimLaser;
         using (AimLaserStyle hiddenAim = new() { Enabled = false })
@@ -171,6 +171,24 @@ public partial class ProjectileVisualChecks : Node
     }
 
     // =========================================================
+    // Splash launches from its barrel too, while damage remains deferred until the single instant impact.
+    private static void Blaster(AmmoLoopFixture f)
+    {
+        BlasterCannon tower = f.Add<BlasterCannon>("blaster_cannon", new(2000, 2128));
+        tower.Config.TargetPriority = TowerTargeting.Priority.Closest;
+        Enemy enemy = f.Target(new(2000, 2000)); float hp = enemy.Health;
+        tower._PhysicsProcess(.25);
+        SplashProjectile shot = f.Main.GetNode("World/Projectiles").GetChildren().OfType<SplashProjectile>().Single();
+        Marker2D muzzle = tower.GetNode<Marker2D>("TurretPivot/Muzzles/MuzzleA");
+        var renderer = tower.GetNode<WeaponVisualRenderer>("TurretPivot/WeaponVisuals");
+        Require(tower.ValidateScene() && shot.GlobalPosition.IsEqualApprox(muzzle.GlobalPosition)
+            && shot.GlobalPosition != tower.GlobalPosition && renderer.TotalFlashes == 1 && enemy.Health == hp,
+            "Blaster projectile/flash share real barrel tip, without launch damage");
+        tower._PhysicsProcess(.001); Require(renderer.TotalFlashes == 1, "Blaster cooldown creates no extra flash");
+        tower.Free(); f.ClearProjectiles(); enemy.Free();
+    }
+
+    // =========================================================
     // Warmed renderer operations allocate no managed memory, and capacity/processing remain bounded.
     private static void Renderer(AmmoLoopFixture f)
     {
@@ -181,17 +199,21 @@ public partial class ProjectileVisualChecks : Node
         int nodes = CountNodes(tower);
         for (int i = 0; i < 100; i++) renderer.FlashAt(muzzle, style);
         Require(renderer.ActiveFlashes == WeaponVisualRenderer.FlashCapacity && renderer.OverwrittenFlashes == 68 && CountNodes(tower) == nodes, "Burst overflow is bounded and creates no per-shot nodes");
+        renderer._Process(1);
+        Require(renderer.ActiveFlashes == WeaponVisualRenderer.FlashCapacity, "New flashes survive the first long process frame before presentation");
+        Require(WeaponVisualRenderer.FlashOpacity(.03f, .16f) == 1 && WeaponVisualRenderer.FlashOpacity(.08f, .16f) > .7f,
+            "Bright hold and linear fade retain visible intensity");
         renderer._Process(1); Require(renderer.ActiveFlashes == 0 && !renderer.IsProcessing(), "Expired flash state is cleared");
         using (MuzzleFlashStyle editable = new() { CoreColor = Colors.Red })
         {
             renderer.FlashAt(muzzle, editable); var captured = renderer.LastFlashStyle;
             editable.CoreColor = Colors.Blue; editable.DurationSeconds = 1;
             Require(renderer.LastFlashStyle == captured, "Active flash retains copied appearance after resource edit");
-            renderer._Process(1);
+            renderer._Process(1); renderer._Process(1);
         }
-        for (int i = 0; i < 100; i++) { renderer.FlashAt(muzzle, style); renderer._Process(.1); }
+        for (int i = 0; i < 100; i++) { renderer.FlashAt(muzzle, style); renderer._Process(1); renderer._Process(1); }
         Stopwatch watch = new(); long before = GC.GetAllocatedBytesForCurrentThread(); watch.Start();
-        for (int i = 0; i < 10000; i++) { renderer.FlashAt(muzzle, style); renderer._Process(.1); }
+        for (int i = 0; i < 10000; i++) { renderer.FlashAt(muzzle, style); renderer._Process(1); renderer._Process(1); }
         watch.Stop(); long allocated = GC.GetAllocatedBytesForCurrentThread() - before;
         Require(allocated == 0 && !renderer.IsProcessing(), "Warmed flash emissions/ticks allocate zero managed bytes");
         GD.Print($"PV BENCH: 10000 flash emit+expire operations: {watch.Elapsed.TotalMilliseconds:0.###}ms; {allocated} bytes; fixed slots={WeaponVisualRenderer.FlashCapacity}");

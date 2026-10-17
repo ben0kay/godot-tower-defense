@@ -52,8 +52,8 @@ public static class TowerUpgradeChecks
             Require(panel.GetGlobalRect().End.Y <= hud.GetGlobalRect().End.Y + 1 &&
                 Mathf.IsEqualApprox(tray.Size.Y, hud.Config.BottomBarHeight), "Expanded Inspector stays onscreen while tray retains configured height");
             hud.SetTowerBarOpen(false, true);
-            Require(panel.Visible && hud.Config.InspectorWidth == 700 && hud.Config.InspectorHeight == 330,
-                "Closing build tray leaves the 700×330 Inspector open");
+            Require(panel.Visible && hud.Config.InspectorWidth == 620 && hud.Config.InspectorHeight == 330,
+                "Closing build tray leaves the 620×330 Inspector open");
             Button button = hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeButton");
             Label info = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeInfo");
             Require(button.Visible && !button.Disabled && info.Text.Contains("150 Credits") &&
