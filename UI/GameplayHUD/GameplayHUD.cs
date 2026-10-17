@@ -103,9 +103,9 @@ public partial class GameplayHUD : Control
         _workSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/Heading/WorkSection");
         _workStatus = _workSection.GetNode<Label>("Status"); _workTime = _workSection.GetNode<Label>("Time");
         _workBar = _workSection.GetNode<ProgressBar>("Progress");
-        _conditionSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/Columns/Main/Conditions");
+        _conditionSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/Columns/Side/Conditions");
         _heatText = _conditionSection.GetNode<Label>("HeatText"); _heatBar = _conditionSection.GetNode<ProgressBar>("HeatBar");
-        _disableReasons = _conditionSection.GetNode<Label>("DisableReasons");
+        _disableReasons = GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Main/DisableReasons");
         _rankSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/Columns/Side/RankSection");
         _rankLabel = _rankSection.GetNode<Label>("Rank");
         _experienceText = _rankSection.GetNode<Label>("ExperienceText");
@@ -314,7 +314,7 @@ public partial class GameplayHUD : Control
         bool valid = GodotObject.IsInstanceValid(tower) && !_buildPreview;
         HeatStats? heat = valid ? tower.FinalStats?.Heat : null;
         bool disabled = valid && tower.IsDisabled;
-        _conditionSection.Visible = heat.HasValue || disabled;
+        _conditionSection.Visible = heat.HasValue;
         _heatText.Visible = _heatBar.Visible = heat.HasValue;
         _disableReasons.Visible = disabled;
         if (!valid) return;
