@@ -1,5 +1,15 @@
 # Level session / mission outcome — R1 implemented
 
+## Real run statistics extension — 2026-10-17
+
+LevelSession now owns one LevelRunStats child: successful paid tower placements, completed first constructions, purchased tower upgrades and unpaused mission time. It subscribes to placement and placed-tower work/purchase events; no scene scans/per-tower polling. Instant builds count immediately; unfinished/canceled sites count as placed but not constructed. Upgrade completion is not a second construction. Historical totals survive tower removal.
+
+The controller freezes stats immediately when an outcome latches, then copies them into the immutable result snapshot with existing official wave-owned kills/breaches/waves/integrity. Final lethal-breach callback arbitration remains R1-owned. Credits earned/spent remain null. Older R1 statements below about untracked duration/construction are superseded by this extension.
+
+Research affects only deployment initialization: CitadelSession resolves authored max HP plus selected-profile purchased bonuses before Initialize/HUD notification; Results uses the same effective denominator. There is no Research UI/purchase access in the battlefield or Results. Mission rewards remain unconfigured/unawarded.
+
+---
+
 `LevelSessionController.cs` is a small level-owned coordinator shared by `Main.tscn` and `MainLevel002.tscn`. State is Playing, Victory or Defeat. It caches sibling services once and uses events; there are no per-frame outcome checks or scene searches.
 
 ## Outcome arbitration

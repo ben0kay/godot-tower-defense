@@ -1,5 +1,11 @@
 # Campaign — Two standalone playable levels
 
+## Research-first extension — 2026-10-17
+
+Campaign now offers RESEARCH, opening Research/ResearchMenu.tscn between deployments. Existing Play Level001/002 actions remain unchanged; no fake unlock/Continue/Load actions. Research graph/purchases/Citadel Master I are implemented; profile XP scoring and the separate LEVELS-area hub split remain future work. See Research/README.md.
+
+---
+
 `CampaignMenu.tscn` / `CampaignMenu.cs` display **Level 001 — Defend the Citadel**, **Level 002 — The Five Gates**, buttons to launch either level, and **Back to Main Menu**. It requires a selected local profile. Level001 opens the original `res://Main.tscn`; Level002 opens `res://MainLevel002.tscn` (which shares combat/UI services via a small World variant). These are standalone fresh levels; profile saves and unlock gating are not implemented.
 
 **No campaign save is created or restored in this pass.** This button starts a fresh Level001 session. Do not enable misleading Continue, Load, stage completion or level unlock buttons before `SYSTEMS/Saving` and progression actually support them.

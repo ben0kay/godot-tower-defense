@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="ResearchCatalog" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://SYSTEMS/Progression/Research/ResearchCatalog.cs" id="1_catalog"]
+[ext_resource type="Script" path="res://SYSTEMS/Progression/Research/ResearchDefinition.cs" id="2_node"]
+
+[sub_resource type="Resource" id="Core"]
+script = ExtResource("2_node")
+Id = "research_core"
+DisplayName = "Research Core"
+Description = "The origin of your permanent research network. Expand outward as new technologies become available."
+CostRP = 0
+AxialPosition = Vector2i(0, 0)
+
+[sub_resource type="Resource" id="Citadel"]
+script = ExtResource("2_node")
+Id = "citadel_master_1"
+DisplayName = "Citadel Master I"
+Description = "Reinforce the heart of your defenses. Each new deployment starts with 10% greater Citadel maximum and current health."
+CostRP = 1
+PrerequisiteIds = PackedStringArray("research_core")
+AxialPosition = Vector2i(1, 0)
+Effect = 1
+EffectPercent = 10.0
+
+[resource]
+script = ExtResource("1_catalog")
+Definitions = Array[Resource]([SubResource("Core"), SubResource("Citadel")])

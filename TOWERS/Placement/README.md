@@ -1,5 +1,11 @@
 # Generic rectangular tower placement — F1–F5 implemented
 
+## Research-first extension — 2026-10-17
+
+TowerPlacementController now emits TowerPlaced only after successful wallet/occupancy commit, for LevelRunStats. Failed clicks/ghosts/rollbacks emit no placement count. Event consumers track initial work completion separately; placements and construction totals are distinct.
+
+---
+
 Main/TowerPlacement exports Settings and Catalog. Registered definitions supply scene/art/config and positive `Footprint` dimensions. The clicked cell is the top-left anchor; X is width and Y is height. Factory is **3×2**, Depot **2×2**, and current offensive towers **1×1**. Fixed rectangles support future sizes including 2×3; rotation/irregular shapes and upgrade-time resizing are out of scope. See [the completed pass](MULTI_CELL_FOOTPRINT_PASS.md) and [verification](../../TESTS/Towers/Footprints.md).
 
 ## Validation, claims and navigation

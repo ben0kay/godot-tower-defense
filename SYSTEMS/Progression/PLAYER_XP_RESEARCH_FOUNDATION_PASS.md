@@ -1,5 +1,22 @@
 # Codex Implementation Pass — Player XP, Campaign Hub and First Research Node
 
+## User-approved sequence amendment — 2026-10-17
+
+**Read this before the original P1–P5 ordering below. Nothing in the original specification is removed.** The user now wants actual mission statistics and usable research ahead of XP scoring/balancing. The original scoring formulas remain proposals for a later pass, not a prerequisite for Research.
+
+### Revised implementation order and current status
+
+1. **Initial XP/level/RP storage + menu display: implemented.** Keep the existing ProgressionService, stored curve, separate profile GUID file and development-only grant.
+2. **Real mission-stat foundation: implemented.** LevelRunStats counts successful paid placements, completed initial builds, successful paid upgrades and unpaused game time. Placement is not construction completion. Session freezes these with official R1 killed/breached/waves/integrity data. Results renders ten rows with a compact stat scroller; Credits remain null until actual transaction telemetry exists.
+3. **Campaign-only Research Room and purchase/effect loop: implemented.** Campaign has RESEARCH alongside the existing level launch actions. No entry from Results or gameplay; purchases require the actual active ResearchMenu scene. A central free Research Core connects to Citadel Master I (1 RP, +10% starting max/current Citadel HP). Hex axial coordinates support six-direction expansion, pan/zoom and mouse/keyboard selection. Info includes prerequisites, description, effect, RP cost and explicit state. Purchases save once and display RESEARCHED; insufficient/locked/repeated/failed-save requests cannot charge. Profile v1 migration to v2 preserves XP, curve and RP; v2 adds immutable purchased IDs. See Research/README.md.
+4. **Next research work:** author approved real nodes/effects incrementally. Common effects may share handlers; unusual mechanics need explicit handlers. Future tower-stat research belongs in 04_PermanentResearch with cached per-level snapshots, not authored tower-level edits. No tower damage modifier is claimed implemented by the Citadel-only proof node.
+5. **Later scoring pass (remaining P1 + P2 / R4): OPEN and intentionally deferred.** Choose mission reward/scoring rules, then implement deterministic breakdowns, first-clear/replay data and persisted once-only run markers before wiring Results grants. The prior formulas and anti-farming notes below remain available for that decision. Current missions do not award or deduct XP.
+6. **Remaining menu/polish work:** separate LEVELS area from the full P3 design remains open; R2 presentation/sounds and Credits/detailed R3 metrics remain open. Full P5 should not be marked complete; only the focused Research/profile/stat checks recorded in TESTS/Research/README.md have been verified.
+
+The original combined P1–P5 checkboxes below are intentionally retained as the complete long-term brief. This amendment records partial/overlapping delivery and is authoritative for the next task. Campaign/battlefield saving, save slots and offline progression remain separate and unimplemented.
+
+---
+
 > **STATUS: PARTIAL — initial profile progression/menu slice implemented; full P1–P5 remain open.** Implement in the ordered, testable phases P1–P5 below. This is a narrow **first playable foundation**, not the complete research tree, account economy, or full campaign save/load. Last checked against the Godot C# repository on 2026-10-16. Follow `NOTES/CodePreferences.md` and the current code before writing.
 
 ## Smaller first slice selected by user (2026-10-17)

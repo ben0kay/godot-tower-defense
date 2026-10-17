@@ -1,5 +1,15 @@
 # Player progression — initial menu foundation
 
+## Research-first extension — implemented 2026-10-17
+
+Progression schema **v2** adds immutable PurchasedResearchIds. v1 records migrate in memory with their XP, RP and curve intact; saving the next successful grant/purchase writes v2 through the same atomic/backup path. Profile identity/index is unchanged. A Research purchase spends RP and adds one stable ID in one record replacement; save failures do not publish changes.
+
+Research/ owns authored catalog validation, pure eligibility/payment and explicit effect resolution. UI/Menus/Campaign/Research owns graph/presentation only. CitadelSession resolves purchased HP bonuses once from authored max HP at deployment; direct profileless F6 keeps authored HP. No menu-time/live HP multiplication. Unknown purchased IDs are preserved for deliberate future catalog migration and do not fabricate effects.
+
+Campaign-only purchases and the first real node are implemented; mission XP scoring, replay/first-clear history, persisted mission award tokens and Results rewards remain deferred. The DEBUG grant is still off by default and is the current way to obtain test RP. The initial v1 description below is retained as history; use this amendment for current behavior.
+
+---
+
 The selected profile GUID owns Player XP, player levels and Research Points independently of tower Rank XP, Credits and campaign/battlefield saves.
 
 - PlayerProgression: immutable source fields and derived level/current XP.

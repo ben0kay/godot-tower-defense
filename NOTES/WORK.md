@@ -1,5 +1,20 @@
 # WORK — Consolidated Outstanding Implementation Backlog
 
+## Current amendment — Research before mission XP balancing (2026-10-17)
+
+**This amendment supersedes older status/order statements below; all original plans are retained.** The user explicitly prioritized real mission statistics and the Campaign-only Research Room before finalized XP rewards/deductions.
+
+- [x] **Research foundation / P4 first playable slice:** Campaign → RESEARCH, axial center-origin hex graph, pan/zoom, keyboard selection, prerequisite/effect/cost/state panel and atomic per-profile purchase. Research Core is free/virtual; Citadel Master I costs 1 RP and gives +10% maximum/current starting Citadel HP on both deployed levels. Results and gameplay have no Research link; purchase authority validates the active Research Room. See UI/Menus/Campaign/Research/README.md and SYSTEMS/Progression/Research/README.md.
+- [x] **R3 actual telemetry slice:** event-driven paid placements, first construction completions, paid upgrades, unpaused mission clock; existing official kills/breaches/waves/integrity retained. Frozen results show these real counters. Successful placement and completed construction are separate metrics. Credits earned/spent remain untracked/null, not fabricated.
+- [x] **Progression v2:** purchased stable research IDs and RP payment saved together; existing v1 XP/level/curve/RP migrate without reset or identity-index changes. XP grant remains a development helper, not a mission reward API.
+- [ ] **Remaining P1/P2 / Results R4:** mission reward calculator, editable scoring/ETA, first-clear/replay history, once-only run-token awards and Results XP animation/itemization are intentionally deferred until scoring is chosen. Do not add provisional reward tuning merely to use Research; the default-off DEBUG XP grant supplies test RP.
+- [ ] **Remaining P3:** separate LEVELS area/hub reorganization; current two deployment actions remain and Research is added alongside them.
+- [ ] **Remaining R2/R3/P5:** desktop visual review, Credits/optional additional statistics, expanded/full regression and optional presentation polish. No tower damage research was added: future tower modifiers use 04_PermanentResearch; no fake catalog nodes.
+
+Focused tests and scope/limits: TESTS/Research/README.md. Do not mark full P1–P5 or all Results R3/R4 complete. Follow the revised sequence in the progression brief rather than repeating the already delivered foundation.
+
+---
+
 **Audit date:** 2026-10-16 (latest audited pushed commit UTC 2026-10-17). Checked against GitHub `main` at `967435719798` (Add Battle Tower construction SVG stages and shared optional level artwork). **This is a documentation/code-presence audit, not a new Godot test run.** Status is a snapshot: check current HEAD and relevant code/tests before Codex acts, particularly if another Codex task was pushed meanwhile.
 
 **Purpose:** One entrypoint for *outstanding implementation passes scattered across project notes*. Links point to the authoritative full specification; this index intentionally does **not** replace those notes. [Code preferences](CodePreferences.md). Keep completed historical work below this index.

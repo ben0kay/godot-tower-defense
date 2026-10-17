@@ -54,23 +54,28 @@ public partial class LevelResults : CanvasLayer
         _skip = UIButtonFactory.Create("SKIP REVEAL", SkipReveal, UIButtonStyle.Compact, 30f, palette);
         content.AddChild(_skip);
 
-        VBoxContainer rows = new();
+        ScrollContainer statScroll = new() { CustomMinimumSize = new Vector2(0, 220),
+            HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled,
+            VerticalScrollMode = ScrollContainer.ScrollMode.Auto };
+        content.AddChild(statScroll);
+        VBoxContainer rows = new() { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
         rows.AddThemeConstantOverride("separation", 7);
-        content.AddChild(rows);
-        foreach (string heading in new[] { "ENEMIES DESTROYED", "ENEMIES BREACHED", "TOWERS CONSTRUCTED",
+        statScroll.AddChild(rows);
+        foreach (string heading in new[] { "ENEMIES DESTROYED", "ENEMIES BREACHED", "TOWERS PLACED",
+            "TOWERS CONSTRUCTED", "UPGRADES PURCHASED",
             "MISSION DURATION", "WAVES COMPLETED", "CITADEL INTEGRITY", "CREDITS EARNED", "CREDITS SPENT" })
             AddStat(rows, heading, palette);
 
         _experience = new VBoxContainer();
         _experience.AddThemeConstantOverride("separation", 7);
         content.AddChild(_experience);
-        Label xpHeading = UIButtonFactory.Label("PLAYER EXPERIENCE  //  COMING SOON", 14, palette);
+        Label xpHeading = UIButtonFactory.Label("MISSION XP  //  REWARDS NOT CONFIGURED", 14, palette);
         xpHeading.AddThemeColorOverride("font_color", palette.MutedTextColor);
         _experience.AddChild(xpHeading);
         ProgressBar xpBar = new() { MinValue = 0, MaxValue = 100, Value = 0, ShowPercentage = false,
             CustomMinimumSize = new Vector2(0, 12), MouseFilter = Control.MouseFilterEnum.Ignore };
         _experience.AddChild(xpBar);
-        Label xpNote = UIButtonFactory.Label("Player XP and bonuses have not been implemented.", 12, palette);
+        Label xpNote = UIButtonFactory.Label("Mission XP rewards are not configured yet.", 12, palette);
         xpNote.AddThemeColorOverride("font_color", palette.MutedTextColor);
         _experience.AddChild(xpNote);
 
@@ -136,7 +141,8 @@ public partial class LevelResults : CanvasLayer
         string[] values =
         {
             snapshot.EnemiesKilled.ToString("N0"), snapshot.EnemiesBreached.ToString("N0"),
-            CountOrDash(snapshot.TowersPlaced), DurationOrDash(snapshot.MissionSeconds),
+            CountOrDash(snapshot.TowersPlaced), CountOrDash(snapshot.TowersConstructed),
+            CountOrDash(snapshot.UpgradesPurchased), DurationOrDash(snapshot.MissionSeconds),
             snapshot.WavesCompleted + " / " + snapshot.TotalWaves,
             snapshot.CitadelIntegrityPercent is int integrity ? integrity + "%" : "—",
             CountOrDash(snapshot.CreditsEarned), CountOrDash(snapshot.CreditsSpent)
@@ -167,7 +173,7 @@ public partial class LevelResults : CanvasLayer
     public void ShowPreview() => ShowResults(new LevelResultSnapshot
     {
         Outcome = LevelOutcome.Victory, LevelName = "UI PREVIEW — EXAMPLE VALUES",
-        EnemiesKilled = 348, EnemiesBreached = 12, TowersPlaced = 26, MissionSeconds = 1122,
+        EnemiesKilled = 348, EnemiesBreached = 12, TowersPlaced = 26, TowersConstructed = 24, UpgradesPurchased = 9, MissionSeconds = 1122,
         WavesCompleted = 12, TotalWaves = 12, CitadelHealth = 780, CitadelMaxHealth = 1000
     });
 

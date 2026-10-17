@@ -1,5 +1,11 @@
 # SYSTEMS — Cross-scene application services
 
+## Research-first extension — 2026-10-17
+
+Progression now includes a v2 purchased-research-ID record and the first Campaign-only Research purchase/effect loop. Existing profile XP/RP migrate intact; no campaign/battlefield serializer was added. See Progression/Research/README.md. Mission scoring/replay/idempotent awards remain future work despite older planned/completed wording below.
+
+---
+
 This folder holds systems shared between Boot, Main Menu, campaigns and gameplay, not individual tower/enemy/world mechanics.
 
 - `Profiles/`: **implemented** persistent local player identity, selection and backup recovery.

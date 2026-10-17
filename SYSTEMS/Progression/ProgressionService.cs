@@ -31,10 +31,25 @@ public static class ProgressionService
         PlayerProgression updated = current.AddXP(amount);
         if (amount == 0) return current;
         Store.Save(updated);
+        Notify(updated.ProfileId);
+        return updated;
+    }
+
+    // =========================================================
+    // ResearchService validates the active room and eligibility before this internal atomic commit.
+    internal static void CommitResearch(PlayerProgression updated)
+    {
+        if (ProfileStore.Selected?.Id != updated.ProfileId) throw new InvalidOperationException("Profile changed.");
+        Store.Save(updated); Notify(updated.ProfileId);
+    }
+
+    // =========================================================
+    // Presentation failures never invalidate an already committed progression change.
+    private static void Notify(string id)
+    {
         if (Changed != null)
             foreach (Action<string> listener in Changed.GetInvocationList())
-                try { listener(updated.ProfileId); }
+                try { listener(id); }
                 catch (Exception error) { GD.PushError(error.ToString()); }
-        return updated;
     }
 }

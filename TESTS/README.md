@@ -1,5 +1,11 @@
 # Headless gameplay checks
 
+## Research-first extension — 2026-10-17
+
+Research-first extension: TESTS/Research/ResearchFoundationChecks.tscn and ResearchMenuChecks.tscn cover graph/catalog/persistent purchasing/v1 migration, both-level effects and actual frozen run telemetry. See TESTS/Research/README.md for executed suites and build/desktop limitations.
+
+---
+
 Tests are grouped by system. Scripts, scenes and `.uid` sidecars stay together; gameplay scenes do not launch these runners automatically. Mission lifecycle tests and deliberately isolated subsystem fixtures are described below.
 
 | Folder | Contents |

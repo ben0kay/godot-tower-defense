@@ -13,6 +13,7 @@ public partial class ResultsChecks : Node
         {
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
             await MissionOutcomeChecks.Run(this);
+            await SubsystemBattlefield.DrainFreedFixtures(this);
             await ResultsNavigationChecks.Run(this);
             await SubsystemBattlefield.DrainFreedFixtures(this);
             GD.Print("PASS: Mission Debrief R1 outcomes, UI and playable navigation"); GetTree().Quit(0);

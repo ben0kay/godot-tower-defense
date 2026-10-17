@@ -1,5 +1,11 @@
 # Saving — Campaign persistence contract (not yet implemented)
 
+## Research-first extension — 2026-10-17
+
+Current persistence now includes separate profile XP/level/RP and purchased-research state in SYSTEMS/Progression (v2), in addition to identity. This supersedes the historical identity-only status below. It is NOT battlefield/campaign-slot saving: no Continue, Load or Pause Save/Load was enabled. Profile-wide research applies on deployment, independently of future campaign/empire ownership migration.
+
+---
+
 **Current state:** Only local profile index persistence is implemented in `SYSTEMS/Profiles/`. There is no campaign serializer, campaign slots, Continue/Load action or in-game Save button yet. Playing Level001 from Campaign currently starts a **fresh session**.
 
 ## Recommended next phase

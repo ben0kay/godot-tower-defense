@@ -1,5 +1,11 @@
 # UI — Shared menus and live gameplay HUD
 
+## Research-first extension — 2026-10-17
+
+Menus/Campaign/Research now supplies Campaign-only persistent Research purchases and a hex graph. No gameplay/Results access. Results shows actual paid placement, construction completion, upgrade purchases and unpaused duration via LEVELS/Session/LevelRunStats. Mission XP rewards remain deferred; Main/Campaign XP displays remain profile-owned.
+
+---
+
 `UIMasterConfig.cs` / `DefaultUIConfig.tres` provide the Inspector-editable common HUD palette/layout. `Shared/UIButtonFactory.cs` centralizes styling and creation of all interface buttons; `Shared/MenuLayout.cs` provides consistent menu panels.
 
 - `Menus/Boot/` is the active F5 startup for creating/selecting locally persistent profiles.

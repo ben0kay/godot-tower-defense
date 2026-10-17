@@ -1,5 +1,11 @@
 # Shared tower foundation
 
+## Research-first extension — 2026-10-17
+
+TowerBase now publishes UpgradePurchased after the real wallet transaction commits. LevelRunStats subscribes only to placed towers for paid-upgrade totals and initial construction completion. Rank XP and stats are unaffected. The first permanent Research node affects the Citadel only; 04_PermanentResearch remains neutral for future tower-stat upgrades.
+
+---
+
 Phase 4A adds TowerConfig (Inspector identity, private complete level rows/recipes), TowerDefinition (stable ID, category, scene, config reference, icon and rectangular footprint (default 1×1)) and TowerCatalog (validated ID lookup). Name/description are read from Config; prices come from its C# level rows, never duplicated in definition/HUD. The default catalog registers Battle, Laser, Blaster Cannon and Shockwave towers. Unavailable types remain registered but cannot be built. Rebuild validates blank/duplicate IDs, costs, category, footprint, scene root, config compatibility and type-specific scene prerequisites; call Rebuild after editing registration data.
 
 TowerBase owns type/definition, fixed grid anchor, footprint, placement/selection hooks, optional range capability, purchased UpgradeLevel, FinalStats and StatsChanged. Types supply config compatibility/application and resolution; it has no mandatory weapon nodes or processing. TowerConfig explicitly copies runtime rows/cost recipes per instance. Passive types can have no combat snapshot, range or upgrades.

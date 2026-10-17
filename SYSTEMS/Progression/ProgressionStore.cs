@@ -1,6 +1,8 @@
 // Validated per-GUID progression persistence with flushed atomic writes and backup recovery.
 using System;
 using System.IO;
+using System.Linq;
+using System.Collections.Immutable;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -52,12 +54,16 @@ public sealed class ProgressionStore
     // Validate source fields and derived arithmetic before displaying or replacing data.
     private static void Validate(PlayerProgression value, string id)
     {
-        if (value == null || value.Version != 1 || value.ProfileId != id ||
+        if (value == null || value.Version != 2 || value.ProfileId != id ||
             value.LifetimePlayerXP < 0 || value.UnspentResearchPoints < 0 ||
             value.FirstLevelXP <= 0 || value.LevelStepXP < 0)
             throw new InvalidDataException("Invalid progression record.");
         if (value.UnspentResearchPoints > value.Level - 1L)
             throw new InvalidDataException("Research Points exceed earned promotions.");
+        if (value.PurchasedResearchIds.IsDefault || value.PurchasedResearchIds.Length > 4096 ||
+            value.PurchasedResearchIds.Any(id => string.IsNullOrWhiteSpace(id) || id.Length > 128) ||
+            value.PurchasedResearchIds.Distinct(StringComparer.Ordinal).Count() != value.PurchasedResearchIds.Length)
+            throw new InvalidDataException("Invalid purchased research IDs.");
         _ = value.RequiredXP;
     }
 
@@ -73,6 +79,14 @@ public sealed class ProgressionStore
             if (!document.RootElement.TryGetProperty(name, out _))
                 throw new InvalidDataException("Incomplete progression record.");
         PlayerProgression value = JsonSerializer.Deserialize<PlayerProgression>(text, Json);
+        if (value.Version == 1)
+        {
+            if (document.RootElement.TryGetProperty("PurchasedResearchIds", out _))
+                throw new InvalidDataException("Unexpected research data in version 1.");
+            value = value with { Version = 2, PurchasedResearchIds = ImmutableArray<string>.Empty };
+        }
+        else if (!document.RootElement.TryGetProperty("PurchasedResearchIds", out _))
+            throw new InvalidDataException("Missing purchased research IDs.");
         Validate(value, id);
         return value;
     }

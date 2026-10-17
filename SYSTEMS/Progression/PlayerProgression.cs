@@ -1,9 +1,11 @@
 // Immutable profile progression snapshot; separate from identity, Credits and tower rank XP.
 using System;
+using System.Collections.Immutable;
 
 public sealed record PlayerProgression
 {
-    public int Version { get; init; } = 1;
+    public int Version { get; init; } = 2;
+    public ImmutableArray<string> PurchasedResearchIds { get; init; } = ImmutableArray<string>.Empty;
     public string ProfileId { get; init; } = "";
     public long LifetimePlayerXP { get; init; }
     public long UnspentResearchPoints { get; init; }

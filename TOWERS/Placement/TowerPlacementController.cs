@@ -6,6 +6,8 @@ using System;
 
 public partial class TowerPlacementController : Node2D
 {
+    public event Action<TowerBase> TowerPlaced;
+
     #region Inspector
     [ExportGroup("Global Placement")]
     [Export] public TowerMasterConfig Settings { get; set; }
@@ -218,6 +220,7 @@ public partial class TowerPlacementController : Node2D
                 ? "Tower creation failed; no resources charged." : "Insufficient resources.");
             return;
         }
+        TowerPlaced?.Invoke(tower);
         SelectTower(tower);
         UpdatePreview();
     }

@@ -1,5 +1,15 @@
 # Mission Debrief / End-of-Level Results — R1 implemented
 
+## Current statistics / Research-first amendment — 2026-10-17
+
+Real Results now displays **ENEMIES DESTROYED, ENEMIES BREACHED, TOWERS PLACED, TOWERS CONSTRUCTED, UPGRADES PURCHASED, MISSION DURATION, WAVES COMPLETED, CITADEL INTEGRITY, CREDITS EARNED, CREDITS SPENT**. Placement/first construction/purchased upgrades/time come from frozen LevelRunStats; kills/breaches remain official wave-only R1 tallies. Credits still display —. A 220px vertical stat scroller holds the expanded rows; skip/reveal/outcome/navigation behavior is preserved.
+
+Player XP exists at profile/menu level, but **mission XP rewards are deliberately not configured or granted**. The Results XP placeholder says this explicitly. No Research action or shortcut was added: players return to Main → Campaign → Research to buy between levels. The R3/R4/P1/P2 plans below remain for later completion; do not infer finalized scoring, reward persistence or replay handling from the Research foundation.
+
+Validation: TESTS/Research/README.md plus the updated existing R1 outcome expectations. Desktop animation/scroll appearance remains an R2 review task.
+
+---
+
 R0's shared visual foundation is now connected to real mission outcomes in both battlefield launchers. Player XP, rewards, saving and advanced statistics remain deferred. Follow `NOTES/CodePreferences.md`.
 
 ## Ownership and lifecycle

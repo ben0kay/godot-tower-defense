@@ -1,5 +1,11 @@
 # Profiles — Implemented local identity foundation
 
+## Research-first extension — 2026-10-17
+
+Player identity/index remains unchanged. Separate progression.json version 2 persists XP, saved curve, RP and purchased research IDs under the profile GUID. Existing version 1 progression migrates without resetting XP or points; purchases persist atomically. Campaign-only Research is implemented, mission XP rewards/campaign saves remain deferred. See ../Progression/Research/README.md.
+
+---
+
 `PlayerProfile.cs` is a serializable data record (`Id`, `Name`, `CreatedUtc`). `ProfileStore.cs` owns the `Selected` profile during this process, the validated list and create/select/clear behavior. `UI/Menus/Boot/BootScreen.cs` is its UI; gameplay and HUD should not open dialogs or manipulate JSON.
 
 ## Storage

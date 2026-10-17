@@ -1,5 +1,11 @@
 # Godot Tower Defense — C#/.NET
 
+## Research-first extension — 2026-10-17
+
+Permanent player research now has a first playable foundation: Campaign → RESEARCH → Research Core / Citadel Master I (1 RP, +10% starting Citadel HP). Ownership and RP persist per profile; v1 XP records migrate without reset. Results now tracks real placements, initial construction completions, paid upgrades and unpaused time alongside kills/breaches/waves/integrity. Mission XP scoring/rewards remain deferred. See SYSTEMS/Progression/Research/README.md and TESTS/Research/README.md.
+
+---
+
 A 2D top-down sci-fi tower-defense game in Godot 4.7.x. Editable Level001 and five-portal Level002 maps, enemy spawning and A* routing, finite manual waves, Battle/Laser/Blaster combat, shared instant area damage, wallet/kill credits, Citadel HP and the eight-stage tower-stat foundation are implemented.
 
 ## Launch

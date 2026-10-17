@@ -26,7 +26,7 @@ public partial class CitadelSession : Node
 
         Health.HealthChanged += UpdateHud;
         _registry.EnemyArrived += OnEnemyArrived;
-        Health.Initialize(level.Settings.CitadelMaxHealth);
+        Health.Initialize(ResearchService.ResolveCitadelMaximum(level.Settings.CitadelMaxHealth));
     }
 
     // =========================================================

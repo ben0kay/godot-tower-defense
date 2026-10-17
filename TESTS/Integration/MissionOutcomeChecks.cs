@@ -29,8 +29,8 @@ internal static class MissionOutcomeChecks
                 "Official counters exclude F2/unowned kills and breaches");
             Require(snapshot.CitadelHealth == f.Health.CurrentHealth && snapshot.CitadelHealth > 0 && snapshot.CitadelMaxHealth == f.Health.MaxHealth,
                 "Snapshot reads actual Citadel integrity");
-            Require(snapshot.TowersPlaced == null && snapshot.MissionSeconds == null && snapshot.CreditsEarned == null && snapshot.CreditsSpent == null,
-                "Untracked values remain null, not fabricated zeros");
+            Require(snapshot.TowersPlaced == 0 && snapshot.TowersConstructed == 0 && snapshot.UpgradesPurchased == 0 && snapshot.MissionSeconds == 0 && snapshot.CreditsEarned == null && snapshot.CreditsSpent == null,
+                "Tracked stats report actual zero; Credits remain explicitly untracked");
             Require(!f.Main.GetNode<TowerPlacementController>("TowerPlacement").IsPlacing && !f.Main.GetNode<Sprite2D>("TowerPlacement/PlacementGhost").Visible,
                 "Outcome clears active placement/ghost");
             Require(!f.Results.ActionsAvailable && f.Results.DetailsButton.Disabled && f.Results.PrimaryButton.Disabled,
@@ -46,9 +46,9 @@ internal static class MissionOutcomeChecks
             Require(f.Results.PrimaryButton.Text == "NEXT LEVEL" && f.Results.PrimaryButton.Disabled == (path == MenuNavigation.Level002Scene),
                 "Victory primary reflects actual next playable launcher");
             Require(f.Results.DetailsButton.Disabled && f.Results.DetailsButton.TooltipText.Contains("coming soon"), "Details remains disabled after Skip");
-            Require(f.Results.FindChildren("*", "Label", true, false).OfType<Label>().Count(label => label.Text == "—") == 4
+            Require(f.Results.FindChildren("*", "Label", true, false).OfType<Label>().Count(label => label.Text == "—") == 2
                 && f.Results.FindChildren("*", "ProgressBar", true, false).OfType<ProgressBar>().Single().Value == 0,
-                "Four untracked statistics show dashes and Player XP remains an empty placeholder");
+                "Two untracked Credits statistics show dashes and Player XP remains an empty placeholder");
             f.Health.TakeDamage(f.Health.CurrentHealth); last.TakeDamage(999999); last.Arrive();
             await parent.ToSignal(tree, SceneTree.SignalName.ProcessFrame);
             Require(ReferenceEquals(snapshot, f.Session.Snapshot) && f.Session.State == LevelSessionState.Victory,

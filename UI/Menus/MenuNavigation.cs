@@ -7,6 +7,7 @@ public static class MenuNavigation
     public const string BootScene = "res://UI/Menus/Boot/BootScreen.tscn";
     public const string MainScene = "res://UI/Menus/Main/MainMenu.tscn";
     public const string CampaignScene = "res://UI/Menus/Campaign/CampaignMenu.tscn";
+    public const string ResearchScene = "res://UI/Menus/Campaign/Research/ResearchMenu.tscn";
     public const string Level001Scene = "res://Main.tscn";
     public const string Level002Scene = "res://MainLevel002.tscn";
 

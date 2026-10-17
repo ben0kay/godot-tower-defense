@@ -1,5 +1,11 @@
 # Menus — Boot / Main / Campaign / Pause
 
+## Research-first extension — 2026-10-17
+
+Campaign now includes RESEARCH alongside its existing two level deployments; Research has only BACK TO CAMPAIGN as its navigation exit. Purchases are profile-persistent and guarded to the actual active ResearchMenu scene. Main and Results do not expose a Research shortcut. The separate LEVELS-area reorganization remains future P3 work.
+
+---
+
 Godot startup (`project.godot`) is `UI/Menus/Boot/BootScreen.tscn`. From F5:
 
 ```text

@@ -15,6 +15,7 @@ public partial class LevelSessionController : Node
     private SpawnManager _spawns;
     private EnemyRegistry _registry;
     private LevelResults _results;
+    public LevelRunStats RunStats { get; private set; }
     private PauseMenu _pause;
     private GameplayHUD _hud;
     private GameInput _input;
@@ -33,6 +34,7 @@ public partial class LevelSessionController : Node
         _spawns = GetNode<SpawnManager>("../World/EnemySystems/Spawning"); _registry = _spawns.Registry;
         _results = GetNode<LevelResults>("../LevelResults"); _pause = GetNode<PauseMenu>("../PauseMenu");
         _hud = GetNode<GameplayHUD>("../UI/GameplayHUD"); _input = GetNode<GameInput>("/root/GameInput");
+        RunStats = new LevelRunStats { Name = "RunStats" }; AddChild(RunStats);
         _scenePath = GetParent().SceneFilePath;
         _levelName = PlayableLevelCatalog.Identify(GetParent(), _spawns.Paths.Navigation.Grid.Level);
         _spawns.WaveEnemyCreated += TrackWaveEnemy;
@@ -95,10 +97,13 @@ public partial class LevelSessionController : Node
         Outcome = State == LevelSessionState.Victory ? LevelOutcome.Victory : LevelOutcome.Defeat,
         LevelName = _levelName, EnemiesKilled = _killed, EnemiesBreached = _breached,
         WavesCompleted = _waves.CompletedWaves, TotalWaves = _waves.TotalWaves,
-        CitadelHealth = _health.CurrentHealth, CitadelMaxHealth = _health.MaxHealth
+        CitadelHealth = _health.CurrentHealth, CitadelMaxHealth = _health.MaxHealth,
+        TowersPlaced = RunStats.TowersPlaced, TowersConstructed = RunStats.TowersConstructed,
+        UpgradesPurchased = RunStats.UpgradesPurchased, MissionSeconds = RunStats.MissionSeconds
     };
     private void Freeze()
     {
+        RunStats.Freeze();
         _pause.LockForResults(); _hud.SetTowerBarOpen(false, true);
         _input.Bind(this, GameInput.BackAction, ConsumeBack, 200);
         _input.Bind(this, GameInput.BuildAction, () => true, 200);

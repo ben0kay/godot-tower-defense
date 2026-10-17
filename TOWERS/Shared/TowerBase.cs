@@ -134,6 +134,8 @@ public abstract partial class TowerBase : Node2D
     internal void PublishUpgradePurchase(bool instant)
     {
         if (!IsInsideTree() || IsQueuedForDeletion()) return;
+        UpgradePurchased?.Invoke();
+        if (!GodotObject.IsInstanceValid(this) || !IsInsideTree() || IsQueuedForDeletion()) return;
         if (WorkPhase == TowerWorkPhase.Upgrading) WorkStarted?.Invoke();
         else if (instant)
         {
@@ -151,6 +153,7 @@ public abstract partial class TowerBase : Node2D
     public double WorkProgress => WorkSeconds <= 0 ? 1 : System.Math.Clamp(ElapsedWorkSeconds / WorkSeconds, 0, 1);
     public bool IsOperational => WorkPhase != TowerWorkPhase.Constructing;
     public bool IsBusy => WorkPhase != TowerWorkPhase.Operational;
+    public event Action UpgradePurchased;
     public event Action WorkStarted;
     public event Action WorkProgressChanged;
     public event Action WorkCompleted;

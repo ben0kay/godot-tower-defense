@@ -16,6 +16,8 @@ public sealed class LevelResultSnapshot
 
     // A null field is intentionally UNTRACKED, not an invented zero.
     public int? TowersPlaced { get; init; }
+    public int? TowersConstructed { get; init; }
+    public int? UpgradesPurchased { get; init; }
     public double? MissionSeconds { get; init; }
     public int? CreditsEarned { get; init; }
     public int? CreditsSpent { get; init; }

@@ -1,5 +1,11 @@
 # Initial player progression verification — 2026-10-17
 
+## Research schema extension — 2026-10-17
+
+Progression v2 adds purchased research IDs and preserves prior XP/RP/curve through v1 migration. The original PlayerProgressionChecks continues passing; Research-specific migration/payment/ownership checks live in TESTS/Research. Historical v1 limitations below are retained; current Research ownership/purchases and deployed Citadel bonuses are implemented. Mission reward idempotency/scoring/replays remain unimplemented.
+
+---
+
 Run res://TESTS/Progression/PlayerProgressionChecks.tscn in a Godot .NET build.
 The fixture uses a unique temporary directory and deletes it afterwards; it never writes the player's profile index.
 

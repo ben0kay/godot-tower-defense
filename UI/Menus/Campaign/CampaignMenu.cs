@@ -23,6 +23,7 @@ public partial class CampaignMenu : Control
         VBoxContainer content = MenuLayout.Create(this, "CAMPAIGN",
             "Commander " + ProfileStore.Selected.Name + "  /  Select a deployment", PanelWidth);
         content.AddChild(new PlayerProgressionPanel { Name = "PlayerProgression", AllowDebugGrant = ShowProgressionDebugGrant });
+        content.AddChild(UIButtonFactory.Create("RESEARCH", () => Navigate(MenuNavigation.ResearchScene), UIButtonStyle.Action, 48f));
         content.AddChild(UIButtonFactory.Label("LEVEL 001  —  DEFEND THE CITADEL", 17));
         Label details = UIButtonFactory.Label("Initial combat test map with compact routes.", 14);
         details.AutowrapMode = TextServer.AutowrapMode.WordSmart;
