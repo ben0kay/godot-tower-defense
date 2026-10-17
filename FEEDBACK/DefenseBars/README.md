@@ -1,3 +1,7 @@
+## Tower reuse — implemented 2026-10-17
+
+All registered towers/structures now attach this exact shared DefenseBar scene through TOWERS/Shared/Durability. Hull changes drive SetHealth and fixed-root alignment; full healthy towers have no visible meter, and damaged towers share the enemy colors/width policy. Footprint height sets bar clearance. Tower shield mechanics remain deferred. See TOWERS/Shared/Durability/README.md.
+
 # Defense Bars — Reusable Hull + Shield Meters
 
 Implemented for all enemies via the shared `GenericEnemy.tscn`, and reusable later for damageable towers or world objects. The `DefenseBar.tscn` scene is one lightweight `Node2D` drawing a procedural hull health bar **and, only when shield points remain, a thinner shield bar above it**. No additional scene node or particle emitter is created per enemy. It does not need a `ProgressBar`, physics collision, global manager, timers or its own `_Process` callback.
@@ -29,3 +33,4 @@ F5 -> F2 to spawn Enemy001 -> place a Battle Tower near its route. Unshielded, u
 ## Large enemy sprite offset (Big mk.1)
 
 At spawn, shared `Enemy.Initialize` passes the visual Sprite2D's height once to `DefenseBar.SetOwnerVisualHeight`. The existing `VerticalOffsetPixels` Inspector setting stays the **minimum**; wider/taller art such as the 96×72 Big mk.1 or Transporter uses enough extra offset to keep both hull and shield rows above the ship. The position continues to be counter-rotated by the existing movement hook only when visible. There is no per-frame size calculation and no scene-specific style override.
+

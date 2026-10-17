@@ -4,6 +4,19 @@ using Godot;
 [GlobalClass]
 public partial class TowerConfig : Resource
 {
+    private float _passiveMaxHealth = 100;
+    [ExportGroup("Durability")]
+    [Export(PropertyHint.Range, "1,10000,1,or_greater")]
+    public float MaxHealth
+    {
+        get => Levels.Count == 0 ? _passiveMaxHealth : Levels[0].Stats.MaxHealth;
+        set
+        {
+            if (Levels.Count == 0) { if (_passiveMaxHealth == value) return; _passiveMaxHealth = value; EmitChanged(); }
+            else SetLevelStats(1, Levels[0].Stats with { MaxHealth = value });
+        }
+    }
+
     [ExportGroup("Passive Construction (no level rows)")]
     [Export(PropertyHint.Range, "0,300,0.1,or_greater")] public double ConstructionSeconds { get; set; }
     public double BuildSeconds => Levels.Count == 0 ? ConstructionSeconds : Levels[0].WorkSeconds;

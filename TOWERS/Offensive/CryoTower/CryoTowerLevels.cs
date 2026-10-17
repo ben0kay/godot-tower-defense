@@ -4,16 +4,17 @@ using System.Collections.Generic;
 public static class CryoTowerLevels
 {
     private readonly record struct Row(int Level, int Credits, double WorkSeconds, int Damage, float Rate,
-        float Range, float Speed, float Turn, float Slow, int AmmoCapacity, int AmmoPerShot, HeatStats? Heat = null)
+        float Range, float Speed, float Turn, float Slow, int AmmoCapacity, int AmmoPerShot, HeatStats? Heat = null, float MaxHealth = 100)
     {
         // =========================================================
         // Rank modifies damage/range later; Slow remains the selected row's absolute strength.
         public TowerLevel Create() => new(Level, Credits, new TowerStatBlock(Range, Rate, Damage, Speed, Turn, 8, .15f,
             Weapon: new(DamageType.Energy, false, 1, false, 1), Ammunition: new(AmmoCapacity, AmmoPerShot),
-            Slow: new(Slow)) with { Heat = Heat }, WorkSeconds);
+            Slow: new(Slow)) with { Heat = Heat, MaxHealth = MaxHealth }, WorkSeconds);
     }
     // Level | Cost | WorkSeconds | Damage | Shots/s | RangePx | ProjectilePx/s | TurnDeg/s | Slow | AmmoCapacity | Ammo/shot
     // Optional final named column: Heat: new(Capacity, PerShot, PerBeamSecond, CoolingPerSecond, RestartFraction).
+    // Optional named MaxHealth column is absolute per level; 100 is provisional baseline balance.
     private static readonly Row[] Rows =
     {
         new(1, 250, 4, 10, .50f, 239, 650, 180, .33f, 600, 1),

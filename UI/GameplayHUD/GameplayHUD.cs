@@ -420,7 +420,7 @@ public partial class GameplayHUD : Control
         double total = tower.RankProgress.TotalXp;
         _rankLabel.Text = $"{current.Rank}";
         _experienceText.TooltipText = $"Total combat XP: {total:0.##}. Earned rank is independent of paid tower levels.";
-        _rankBonuses.Text = $"Damage +{current.DamageBonus * 100:0.##}% · Range +{current.RangeBonus * 100:0.##}%";
+        _rankBonuses.Text = $"Damage +{current.DamageBonus * 100:0.##}% · Range +{current.RangeBonus * 100:0.##}% · HP +{current.HpBonus * 100:0.##}%";
         _experienceBar.MinValue = 0;
         _experienceBar.MaxValue = next.HasValue ? next.Value.TotalXp - current.TotalXp : 1;
         _experienceBar.Value = next.HasValue ? total - current.TotalXp : 1;

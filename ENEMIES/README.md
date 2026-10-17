@@ -1,3 +1,7 @@
+## Tower hull prerequisite — implemented 2026-10-17
+
+Shared tower HP/damage/destruction and existing DefenseBar reuse are implemented in TOWERS/Shared/Durability, including all nine registered weapon/economy types. Destruction clears selection, occupancy/navigation, work and logistics without refunds. This supersedes the missing-hull prerequisite in E3B below; E3B attacks/target selection still require a separate pass and are not enabled here. Tower shields and repair producers remain deferred.
+
 # ENEMIES — Enemy Ships, Navigation, Spawning, Waves and Targeting Integration
 
 This top-level folder owns **enemy gameplay mechanics** in the Godot 4 C#/.NET space tower-defense project. Enemy001 is the first working **basic test ship**, intentionally named `Enemy001` internally rather than `ScoutShip`. Its scene uses shared `Enemy.cs` and `EnemyMovement.cs` rather than a unique gameplay script. This is the baseline future types should reuse.
@@ -438,3 +442,4 @@ Selected ships sample sparse lateral clearance anchors and interpolate coherent 
 ## Tower XP attribution
 
 Enemy.Initialize snapshots starting hull+spawned shield and existing KillRewardCredits. CommitDamage counts actual shield+hull loss against one finite damage budget, so restoration cannot farm XP; first actual attributed damage captures shared TowerMasterConfig XP multipliers. The current lethal DamageSource receives a single kill XP reward after guarded death commits. Manual TakeDamage, arrivals, invalid targets and absent/freed tower sources never infer a last attacker. No per-enemy authored XP fields or changes to Credits rewards/registry outcomes were added. See COMBAT/Attribution/README.md and TOWERS/Shared/Ranks/README.md.
+

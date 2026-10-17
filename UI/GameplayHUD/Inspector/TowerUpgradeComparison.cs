@@ -15,6 +15,7 @@ public static class TowerUpgradeComparison
     {
         List<TowerUpgradeRow> rows = new();
         if (current == null || next == null) return rows;
+        if (current.MaxHealth != next.MaxHealth) Add(rows, "Max HP", current.MaxHealth, next.MaxHealth, 1);
         bool beam = current.Beam.HasValue && next.Beam.HasValue;
         bool wave = current.Shockwave.HasValue && next.Shockwave.HasValue;
         bool projectile = !beam && !wave;

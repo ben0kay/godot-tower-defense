@@ -22,7 +22,8 @@ This README is an up-to-date overview and forward plan. Completed phase-by-phase
 - **Catalog and placement:** `Shared/TowerDefinition.cs`, `Shared/TowerCatalog.cs` and `Placement/` supply generic registered build choices, rectangular placement, atomic occupancy/navigation checks, selection and an existing Inspector. `ECONOMY/Wallet/` is the one wallet/payment authority.
 - **Combat:** Battle fires guided Kinetic projectiles; Laser delivers Energy beam DPS; Blaster deals instant area damage; Shockwave uses a travelling wavefront. Shared combat and damage attribution live under `COMBAT/`.
 - **Ammunition:** optional explicit per-level reserves/consumption, full configurable starting stock, factory production, depot storage and visible cargo drones on both legs are implemented. See [Shared/Ammunition](Shared/Ammunition/README.md) and [Economy/Ammunition](Economy/Ammunition/README.md).
-- **Not currently implemented:** tower HP or tower shields, magazines/reloading, accuracy simulation, power consumption, maintenance/wear or selling.
+- **Hull HP:** all registered types use Shared/Durability, the shared DefenseBar and typed damage; provisional 100 HP, active rank HP, missing-HP preservation and destructive removal cleanup. Enemy tower attacks remain separate. See [Durability](Shared/Durability/README.md).
+- **Not currently implemented:** tower shields, magazines/reloading, accuracy simulation, power consumption, maintenance/wear or selling.
 
 ### Where to find the code
 
@@ -54,7 +55,7 @@ Detailed existing behavior belongs in [Shared/Stats/README.md](Shared/Stats/READ
 | 07 Safety Clamps | Active | Validate/clamp effective capability stats |
 | 08 Final Stats | Active | Cached, immutable values consumed by gameplay |
 
-Keep authored values, purchased level, rank/XP, future research, level rules and runtime effects **separate** from final calculated results. Rebuild `FinalStats` only when inputs change, not per combat frame. Purchase previews resolve through the same pipeline as real purchases. Existing rank data reserves a future HP bonus, but tower health does not yet exist.
+Keep authored values, purchased level, rank/XP, future research, level rules and runtime effects **separate** from final calculated results. Rebuild `FinalStats` only when inputs change, not per combat frame. Purchase previews resolve through the same pipeline as real purchases. Rank HP bonuses now scale maximum hull health; see Shared/Durability/README.md.
 
 Permanent research must belong to future persistent player/profile state, **not** the research-center building or LevelConfig. Current-level modifiers disappear when switching maps. Buffs, debuffs and operational conditions belong to the affected runtime instance/source. Do not add a new stat pipeline or an unused generic modifier engine in advance.
 

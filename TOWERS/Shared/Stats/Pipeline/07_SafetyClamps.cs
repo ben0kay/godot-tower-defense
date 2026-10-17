@@ -7,6 +7,7 @@ public static class SafetyClampsStage
     // Nonfinite values resolve to safe minima; authored Resources are never changed.
     public static TowerStatBlock Apply(TowerStatBlock stats, TowerStatContext context) => stats with
     {
+        MaxHealth = FiniteMinimum(stats.MaxHealth, 1),
         Heat = HeatStats.Sanitize(stats.Heat ?? context.HeatTiming?.Resolve(stats.ShotsPerSecond)),
         ShieldPenetration = Mathf.Min(1, FiniteMinimum(stats.ShieldPenetration, 0)),
         RangePixels = FiniteMinimum(stats.RangePixels, 0),

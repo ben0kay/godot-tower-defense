@@ -2,7 +2,7 @@
 
 Purchased **Level** and earned **Rank** are independent. TowerBase owns its UpgradeLevel and private TowerRankProgress. Buying a level never resets total XP or named rank, and earning a rank never buys a level or spends Credits. Standard defaults reproduce all previous baseline stats.
 
-| Rank | Total XP | XP from previous | Damage bonus | Range bonus | Future HP bonus (inactive) |
+| Rank | Total XP | XP from previous | Damage bonus | Range bonus | HP bonus (active) |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | Standard | 0 | — | 0% | 0% | 0% |
 | Veteran | 1,000 | 1,000 | 2% | 1% | 2% |
@@ -32,12 +32,12 @@ The existing player Credits economy and EnemyKilled registry event remain unchan
 
 TowerRankProgress uses double XP with compensated fractional summation. Positive finite awards can cross several thresholds; a large lethal award can reach Legendary at once. Total XP is retained at maximum rank. No XP/rank processing runs per frame.
 
-Stage02 selects the complete explicit Level row. Active Stage03 then applies only the current Rank's damage/range percentages. Projectile integer damage rounds once to nearest/ties-to-even (Level3 Battle36×1.02 rounds37; Legendary36×1.08 rounds39). Beam DPS and shockwave damage remain float. Range scales acquisition range and Shockwave's maximum radius; Blaster blast radius/falloff, speed, intervals, coefficients and penetration do not gain unrequested rank bonuses. HP bonus is reserved row metadata; no tower health/ability system exists. The named rank identity/data can later key unique abilities without introducing an unused ability engine now.
+Stage02 selects the complete explicit Level row. Active Stage03 then applies only the current Rank's damage/range/HP percentages. Projectile integer damage rounds once to nearest/ties-to-even (Level3 Battle36×1.02 rounds37; Legendary36×1.08 rounds39). Beam DPS and shockwave damage remain float. Range scales acquisition range and Shockwave's maximum radius; Blaster blast radius/falloff, speed, intervals, coefficients and penetration do not gain unrequested rank bonuses. HP bonus scales maximum hull health; capacity changes preserve missing HP. See ../Durability/README.md. No rank ability system exists. The named rank identity/data can later key unique abilities without introducing an unused ability engine now.
 
 Ordinary XP awards emit ExperienceChanged only. Promotions rebuild cached FinalStats once and emit StatsChanged, then ExperienceChanged. Paid previews call the same ranked resolver as application. Normal combat ticks reuse FinalStats. No pipeline stage spends money or owns attribution.
 
-The existing bottom-right Inspector shows named Rank, within-rank XP progress/bar, total XP and active Damage/Range bonuses. At Legendary it shows MAX RANK. A Veteran with1,200 total XP shows200 /2,000 XP to Enhanced. Selection subscribes to that actual tower's events; changing selection/unloading unsubscribes. Ordinary XP updates are deferred/coalesced per selected frame and preserve upgrade details. Promotions update combat/preview immediately. Build previews hide rank details. No new window, polling loop or Rank Up button was added.
+The existing bottom-right Inspector shows named Rank, within-rank XP progress/bar, total XP and active Damage/Range/HP bonuses. At Legendary it shows MAX RANK. A Veteran with1,200 total XP shows200 /2,000 XP to Enhanced. Selection subscribes to that actual tower's events; changing selection/unloading unsubscribes. Ordinary XP updates are deferred/coalesced per selected frame and preserve upgrade details. Promotions update combat/preview immediately. Build previews hide rank details. No new window, polling loop or Rank Up button was added.
 
-TowerRankChecks runs in EnemyIntegrationChecks and covers actual/fractional XP, all four production attack deliveries, competing attackers, splash recipients, shields/restoration, overkill, invalid/zero/manual/arrival cases, weak-source lifetime, named thresholds/multiple promotions, type-specific tables, Stage03/order/rounding, explicit level/prices, purchases, Inspector events/layout/MAX and500 recipients. See TESTS/README.md for executed results. Research, saving, tower HP and rank abilities remain deferred.
+TowerRankChecks runs in EnemyIntegrationChecks and covers actual/fractional XP, all four production attack deliveries, competing attackers, splash recipients, shields/restoration, overkill, invalid/zero/manual/arrival cases, weak-source lifetime, named thresholds/multiple promotions, type-specific tables, Stage03/order/rounding, explicit level/prices, purchases, Inspector events/layout/MAX and500 recipients. See TESTS/README.md for executed results. Tower HP is now implemented in Shared/Durability; saving and rank abilities remain deferred.
 
 **October 2026 rebalance:** Rank XP thresholds are 10× higher; damage/kill XP income and rank bonus percentages are unchanged. Purchased level balance lives in each tower's `*Levels.cs`.

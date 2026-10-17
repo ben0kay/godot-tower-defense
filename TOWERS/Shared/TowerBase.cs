@@ -83,7 +83,7 @@ public abstract partial class TowerBase : Node2D
     // Publish once after committed changes; wallet/controller retain payment ownership.
     internal void NotifyStatsChanged()
     {
-        SynchronizeAmmunition(); SynchronizeConditions(); StatsChanged?.Invoke();
+        SynchronizeHealth(); SynchronizeAmmunition(); SynchronizeConditions(); StatsChanged?.Invoke();
     }
 
     // =========================================================
@@ -152,7 +152,7 @@ public abstract partial class TowerBase : Node2D
     public double WorkSeconds { get; private set; }
     public double RemainingWorkSeconds => System.Math.Max(0, WorkSeconds - ElapsedWorkSeconds);
     public double WorkProgress => WorkSeconds <= 0 ? 1 : System.Math.Clamp(ElapsedWorkSeconds / WorkSeconds, 0, 1);
-    public bool IsOperational => WorkPhase != TowerWorkPhase.Constructing;
+    public bool IsOperational => !IsDestroyed && WorkPhase != TowerWorkPhase.Constructing;
     public bool IsBusy => WorkPhase != TowerWorkPhase.Operational;
     public event Action UpgradePurchased;
     public event Action WorkStarted;
@@ -224,6 +224,6 @@ public abstract partial class TowerBase : Node2D
         ConstructionWorkManager manager = _construction; _construction = null;
         if (GodotObject.IsInstanceValid(manager)) manager.Unregister(this);
     }
-    public override void _ExitTree() { _conditions?.Clear(); _conditions = null; CancelConstruction(); }
+    public override void _ExitTree() { Ready -= InitializeDurability; _conditions?.Clear(); _conditions = null; CancelConstruction(); }
     #endregion
 }

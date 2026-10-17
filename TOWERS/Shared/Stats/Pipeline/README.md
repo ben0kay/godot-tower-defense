@@ -16,7 +16,7 @@ Research does not alter authored *Levels.cs values, attack rate, heat timing, am
 | --- | --- |
 | 01_BaseStats.cs | Copy the tower's complete Level 1 snapshot |
 | 02_TowerUpgrades.cs | Replace with the selected level's complete absolute snapshot |
-| 03_TowerRanks.cs | Active; current named rank’s explicit total damage/range bonuses |
+| 03_TowerRanks.cs | Active; current named rank’s explicit total damage/range/HP bonuses |
 | 04_PermanentResearch.cs | Neutral; persistent research deferred |
 | 05_LevelModifiers.cs | Neutral; map conditions deferred |
 | 06_ActiveEffects.cs | Neutral; temporary effects deferred |
@@ -35,7 +35,7 @@ ShockwaveStats(DamagePerWave, ExpansionSpeedPixelsPerSecond, IntervalSeconds, Ed
 
 ## Earned rank context
 
-TowerStatContext includes an optional immutable TowerRankDefinition. Placed TowerBase.ResolveRankedLevel supplies its actual current rank for both application and purchase previews; raw Config.ResolveStats remains a neutral-rank build preview. Stage03 scales float range, integer projectile damage (nearest/ties-to-even), optional beam DPS and optional shockwave damage. It does not compound earlier ranks, alter level rows/costs or activate the reserved HP bonus. Ordinary XP awards update progress only; promotion rebuilds the per-instance FinalStats once. See TOWERS/Shared/Ranks/README.md for ownership/XP policy. Permanent research, map modifiers and active effects remain neutral.
+TowerStatContext includes an optional immutable TowerRankDefinition. Placed TowerBase.ResolveRankedLevel supplies its actual current rank for both application and purchase previews; raw Config.ResolveStats remains a neutral-rank build preview. Stage03 scales float range, integer projectile damage (nearest/ties-to-even), optional beam DPS and optional shockwave damage. It does not compound earlier ranks, alter level rows/costs or compound HP bonuses; Stage03 now applies the current total HpBonus to MaxHealth. Ordinary XP awards update progress only; promotion rebuilds the per-instance FinalStats once. See TOWERS/Shared/Ranks/README.md for ownership/XP policy. Permanent research, map modifiers and active effects remain neutral.
 
 The optional AmmunitionStats group follows the same eight stages: complete selected-level values enter Stage02; future research/effects may alter them afterward; Stage07 clamps capacity/attack/rate minima and Stage08 includes them in FinalStats. No cumulative ammo upgrade modifiers or second pipeline exists. Runtime stock and prepaid beam fractions belong to TowerAmmunition and never enter stat snapshots.
 
