@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="MajorAlertCatalog" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://UI/Alerts/MajorAlerts/MajorAlertCatalog.cs" id="1_catalog"]
+[ext_resource type="Script" path="res://UI/Alerts/MajorAlerts/MajorAlertDefinition.cs" id="2_definition"]
+[ext_resource type="Resource" path="res://UI/Alerts/MajorAlerts/Definitions/CitadelCritical.tres" id="3_citadel"]
+[ext_resource type="Resource" path="res://UI/Alerts/MajorAlerts/Definitions/LargeWaveIncoming.tres" id="4_wave"]
+[ext_resource type="Resource" path="res://UI/Alerts/MajorAlerts/Definitions/BossDetected.tres" id="5_boss"]
+
+[resource]
+script = ExtResource("1_catalog")
+Alerts = Array[ExtResource("2_definition")]([ExtResource("3_citadel"), ExtResource("4_wave"), ExtResource("5_boss")])
