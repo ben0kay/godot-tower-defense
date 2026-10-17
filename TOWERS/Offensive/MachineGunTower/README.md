@@ -4,9 +4,9 @@ A 1×1 offensive tower with one aim target and **two independently positioned mu
 
 | Purchased level | Credits (build/upgrade) | Damage/bullet | Total bullets/s | Range | Projectile speed |
 |---|---:|---:|---:|---:|---:|
-| 1 | 300 | 7 | 14.4 | 208 px | 850 px/s |
-| 2 | 200 | 8 | 14.88 | 216 px | 850 px/s |
-| 3 | 300 | 9 | 15.36 | 224 px | 850 px/s |
+| 1 | 300 | 7 | 14.4 | 208 px | 1062.5 px/s |
+| 2 | 200 | 8 | 14.88 | 216 px | 1062.5 px/s |
+| 3 | 300 | 9 | 15.36 | 224 px | 1062.5 px/s |
 
 Rate applies to **both barrels combined**: 14.4 total shots/s means ~7.2 shots/s per barrel; it is not 6 per barrel. Ammo reserve 1,200, consumption 1 per bullet (from physical shared logistics). No shield penetration; ordinary Kinetic damage coefficients apply. Standard → Veteran → Enhanced → Superior → Legendary use the normal 0/1,000/3,000/7,000/15,000 total XP table. Paid level and earned rank remain independent.
 
@@ -22,4 +22,6 @@ Paid placement occupies its footprint immediately and takes **4 seconds**, autho
 
 Implemented 12px narrow amber tracer and brief orange/white cone at each actual A/B barrel. Tower-owned presets live in `Visuals/` and are assigned in `DefaultMachineGunTowerConfig.tres` (Weapon Visuals). Presentation never enters level/rank stat tables. Shared behavior and authoring: [Visuals](../../Shared/Weapons/Visuals/README.md). Regression evidence: [ProjectileVisuals](../../../TESTS/Towers/ProjectileVisuals.md). Manual appearance review at normal gameplay zoom remains pending.
 
-**Current firing rate (additional +20%):** The two barrels now fire **14.4 / 14.88 / 15.36 total bullets/s** at Levels 1–3, up from 12 / 12.4 / 12.8. Alternate muzzle order stays A → B → A; a level-one barrel contributes an average of 7.2 shots/s. This changes only cadence (and therefore ammo used per second), not damage per shot, travel speed, cost, range, construction time, rank XP, or bullet/muzzle effects. Real 60Hz simulation checks now use all three updated rates.
+**Current firing rate (additional +20%):** The two barrels now fire **14.4 / 14.88 / 15.36 total bullets/s** at Levels 1–3, up from 12 / 12.4 / 12.8. Alternate muzzle order stays A → B → A; a level-one barrel contributes an average of 7.2 shots/s. That rebalance changed only cadence (and therefore ammo used per second), not damage per shot, travel speed, cost, range, construction time, rank XP, or bullet/muzzle effects. Real 60Hz simulation checks now use all three updated rates.
+
+**Projectile-speed rebalance (+25%, October 2026):** All three levels now launch Kinetic tracers at **1,062.5 px/s** instead of 850 px/s. The two barrels still alternate A → B → A, with unchanged 14.4 / 14.88 / 15.36 **total** bullets/s across both barrels. Damage, ammunition/round, visuals, ranks and prices remain unchanged.

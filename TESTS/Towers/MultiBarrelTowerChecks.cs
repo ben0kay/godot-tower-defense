@@ -49,7 +49,11 @@ public static class MultiBarrelTowerChecks
             && sniperAuthored.ResolveStats(2).RangePixels == 456 && sniperAuthored.Ranks[1].TotalXp == 1000,
             "Sniper complete levels and earned ranks resolve");
         Require(Mathf.IsEqualApprox(gunAuthored.ResolveStats(1).ShotsPerSecond, 14.4f) && gunAuthored.ResolveStats(3).DamagePerShot == 9
-            && gunAuthored.Ranks[4].TotalXp == 15000, "Machine Gun complete levels and earned ranks resolve");
+            && gunAuthored.Ranks[4].TotalXp == 15000
+            && gunAuthored.ResolveStats(1).ProjectileSpeed == 1062.5f
+            && gunAuthored.ResolveStats(2).ProjectileSpeed == 1062.5f
+            && gunAuthored.ResolveStats(3).ProjectileSpeed == 1062.5f,
+            "Machine Gun complete levels, 25% faster projectiles and earned ranks resolve");
 
         Node2D towers = main.GetNode<Node2D>("World/Towers");
         Node projectiles = main.GetNode("World/Projectiles");

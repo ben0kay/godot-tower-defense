@@ -111,9 +111,9 @@ public static class TowerStatChecks
     {
         BattleTowerConfig battle = new(); LaserTowerConfig laser = new(); BlasterCannonConfig blaster = new();
         TowerFinalStats[] battleExpected = {
-            new(256, 1.68f, 30, 800, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
-            new(264, 1.764f, 33, 800, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
-            new(272, 1.848f, 36, 800, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)) };
+            new(256, 1.68f, 30, 1000, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
+            new(264, 1.764f, 33, 1000, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
+            new(272, 1.848f, 36, 1000, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)) };
         TowerFinalStats[] laserExpected = {
             new(256, 0, 0, 1, 180, 12, .15f, new BeamStats(12), Weapon: new(DamageType.Energy, true, 6, true, .15f), Ammunition: new(1000, 0, 2)),
             new(264, 0, 0, 1, 180, 12, .15f, new BeamStats(14), Weapon: new(DamageType.Energy, true, 6, true, .15f), Ammunition: new(1000, 0, 2)) };

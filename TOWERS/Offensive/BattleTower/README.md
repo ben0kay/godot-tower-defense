@@ -8,9 +8,9 @@ Ctrl → Battle Tower → place on route-safe terrain. First targets the shortes
 
 | Level | Build/upgrade price | Damage | Shots/s | Range | Projectile speed | Turn | Aim | Search | Penetration |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | 200 | 30 | 1.68 | 256px | 800px/s | 180°/s | 12° | .15s | 5% |
-| 2 | 150 | 33 | 1.764 | 264px | 800px/s | 180°/s | 12° | .15s | 5% |
-| 3 | 250 | 36 | 1.848 | 272px | 800px/s | 180°/s | 12° | .15s | 5% |
+| 1 | 200 | 30 | 1.68 | 256px | 1000px/s | 180°/s | 12° | .15s | 5% |
+| 2 | 150 | 33 | 1.764 | 264px | 1000px/s | 180°/s | 12° | .15s | 5% |
+| 3 | 250 | 36 | 1.848 | 272px | 1000px/s | 180°/s | 12° | .15s | 5% |
 
 DefaultBattleTowerConfig.tres retains Inspector identity, target priority and RotateWhileTracking; scene/definition retain artwork and registration. Combat stats/prices are no longer numeric .tres exports. Each placed tower gets private runtime rows/recipes. C# Level 1 convenience accessors edit row 1 only; use SetLevelStats(level, snapshot) for another row.
 
@@ -50,4 +50,6 @@ The optional shared presenter uses `../TurretPivot/Sprite`, preserving aiming, s
 
 Implemented 18px amber tracer and stronger golden starburst; actual muzzle is `(0, -28.5)` under `TurretPivot/Muzzles/MuzzleA`. Tower-owned presets live in `Visuals/` and are assigned in `DefaultBattleTowerConfig.tres` (Weapon Visuals). Presentation never enters level/rank stat tables. Shared behavior and authoring: [Visuals](../../Shared/Weapons/Visuals/README.md). Regression evidence: [ProjectileVisuals](../../../TESTS/Towers/ProjectileVisuals.md). Manual appearance review at normal gameplay zoom remains pending.
 
-**Current firing rate (additional +20%):** Levels 1–3 fire **1.68 / 1.764 / 1.848 bullets/s**, multiplying the immediately preceding 1.40 / 1.47 / 1.54 by 1.20. The unchanged projectile travel speed remains 800 px/s, with unchanged per-hit damage, ammunition cost, prices, aiming, construction times and rank bonuses.
+**Current firing rate (additional +20%):** Levels 1–3 fire **1.68 / 1.764 / 1.848 bullets/s**, multiplying the immediately preceding 1.40 / 1.47 / 1.54 by 1.20. The projectile travel speed was 800 px/s at that time, with unchanged per-hit damage, ammunition cost, prices, aiming, construction times and rank bonuses.
+
+**Projectile-speed rebalance (+25%, October 2026):** All three levels now launch guided Kinetic tracers at **1,000 px/s** instead of 800 px/s. Fire cadence remains 1.68 / 1.764 / 1.848 shots/s; muzzle flash, impact damage, range, ammunition and upgrades are unchanged.
