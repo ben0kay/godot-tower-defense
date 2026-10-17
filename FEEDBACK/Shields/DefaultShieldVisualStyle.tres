@@ -4,10 +4,10 @@
 
 [resource]
 script = ExtResource("1_style")
-Tint = Color(1, 0.4, 0.427, 1)
-SizeMultiplier = 1.23
-IdleOpacity = 0.32
-HitOpacity = 0.82
-HitFadeSeconds = 0.24
-BreakOpacity = 0.95
-BreakFadeSeconds = 0.32
+Tint = Color(1, 0.451, 0.322, 1)
+SizeMultiplier = 1.65
+IdleOpacity = 0.82
+HitOpacity = 1.0
+HitFadeSeconds = 0.28
+BreakOpacity = 1.0
+BreakFadeSeconds = 0.38
