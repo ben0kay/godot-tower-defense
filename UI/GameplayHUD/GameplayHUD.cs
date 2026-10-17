@@ -46,7 +46,10 @@ public partial class GameplayHUD : Control
     private TowerFinalStats _comparisonNow, _comparisonNext;
     private CreditGainIndicator _creditGain;
     private ProgressBar _healthBar, _experienceBar;
-    private VBoxContainer _rankSection, _workSection;
+    private VBoxContainer _rankSection, _workSection, _conditionSection;
+    private Label _heatText, _disableReasons;
+    private ProgressBar _heatBar;
+    private StyleBoxFlat _heatFill;
     private ProgressBar _workBar;
     private Label _workStatus, _workTime;
     private Label _rankLabel, _experienceText, _rankBonuses;
@@ -100,6 +103,9 @@ public partial class GameplayHUD : Control
         _workSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/Heading/WorkSection");
         _workStatus = _workSection.GetNode<Label>("Status"); _workTime = _workSection.GetNode<Label>("Time");
         _workBar = _workSection.GetNode<ProgressBar>("Progress");
+        _conditionSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/Columns/Main/Conditions");
+        _heatText = _conditionSection.GetNode<Label>("HeatText"); _heatBar = _conditionSection.GetNode<ProgressBar>("HeatBar");
+        _disableReasons = _conditionSection.GetNode<Label>("DisableReasons");
         _rankSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/Columns/Side/RankSection");
         _rankLabel = _rankSection.GetNode<Label>("Rank");
         _experienceText = _rankSection.GetNode<Label>("ExperienceText");
@@ -240,7 +246,7 @@ public partial class GameplayHUD : Control
     {
         bool preview = category.EndsWith("Build Preview", StringComparison.Ordinal) || category == "Placement rejected";
         _buildPreview = preview;
-        SetRuntimeDetails(""); SetWorkDetails(null); SetUpgradeComparison(null, null); SetUpgradeDetails("", "", false);
+        SetRuntimeDetails(""); SetWorkDetails(null); SetConditionDetails(null); SetUpgradeComparison(null, null); SetUpgradeDetails("", "", false);
         _targetSection.Hide(); _rankSection.Hide();
         _towerName.Text = name; _towerName.TooltipText = category + "\n" + notes + "\n" + stats;
         _towerCategory.Text = "";
@@ -302,6 +308,53 @@ public partial class GameplayHUD : Control
     { _runtimeStats.Text = text; RefreshDetailsVisibility(); }
 
     // =========================================================
+    // Selected-only events update this compact card; never resolve stats or poll every tower/frame.
+    public void SetConditionDetails(TowerBase tower)
+    {
+        bool valid = GodotObject.IsInstanceValid(tower) && !_buildPreview;
+        HeatStats? heat = valid ? tower.FinalStats?.Heat : null;
+        bool disabled = valid && tower.IsDisabled;
+        _conditionSection.Visible = heat.HasValue || disabled;
+        _heatText.Visible = _heatBar.Visible = heat.HasValue;
+        _disableReasons.Visible = disabled;
+        if (!valid) return;
+        if (heat.HasValue)
+        {
+            _heatText.Text = $"HEAT: {tower.CurrentHeat:0.#} / {heat.Value.Capacity:0.#}"
+                + (tower.IsOverheated ? " · OVERHEATED / COOLING" : disabled && tower.CurrentHeat > 0 ? " · COOLING" : "");
+            _heatBar.MaxValue = heat.Value.Capacity; _heatBar.Value = tower.CurrentHeat;
+            _heatFill.BgColor = tower.IsOverheated ? Config.HealthCriticalColor
+                : tower.CurrentHeat >= heat.Value.Capacity * .75f ? Config.HealthWarningColor : Config.AccentColor;
+        }
+        if (disabled)
+        {
+            var text = new System.Text.StringBuilder("DISABLED: ");
+            bool first = true;
+            foreach (TowerDisableReason reason in Enum.GetValues<TowerDisableReason>())
+            {
+                int count = 0;
+                for (int i = 0; i < tower.DisableCount; i++) if (tower.GetDisableReason(i) == reason) count++;
+                if (count == 0) continue;
+                if (!first) text.Append(" + "); first = false;
+                text.Append(reason == TowerDisableReason.NoPower ? "NO POWER" : reason.ToString().ToUpperInvariant());
+                if (count > 1) text.Append(" ×").Append(count);
+            }
+            _disableReasons.Text = text.ToString(); _disableReasons.TooltipText = _disableReasons.Text;
+        }
+        if (!tower.IsBusy) _workStatus.Text = disabled ? "DISABLED" : "OPERATIONAL";
+    }
+
+    // =========================================================
+    // Full current/next thermal numbers remain readable in a tooltip without five more permanent table rows.
+    private void SetHeatComparisonTooltip()
+    {
+        static string Describe(HeatStats value) => $"Capacity: {value.Capacity:0.##} · Heat/shot: {value.PerShot:0.###}"
+            + $"\nHeat/beam second: {value.PerBeamSecond:0.###} · Cooling/s: {value.CoolingPerSecond:0.###} · Restart: {value.RestartBelowFraction * 100:0.#}%";
+        _conditionSection.TooltipText = _comparisonNow?.Heat is HeatStats current ? "CURRENT\n" + Describe(current) : "";
+        if (_comparisonNext?.Heat is HeatStats next) _conditionSection.TooltipText += "\nNEXT LEVEL\n" + Describe(next);
+    }
+
+    // =========================================================
     // Work-only updates leave current stats, rank, free previews and scroll position untouched.
     public void SetWorkDetails(TowerBase tower)
     {
@@ -312,7 +365,7 @@ public partial class GameplayHUD : Control
         {
             TowerWorkPhase.Constructing => "CONSTRUCTING",
             TowerWorkPhase.Upgrading => $"UPGRADING → {tower.PendingUpgradeLevel}",
-            _ => "OPERATIONAL"
+            _ => tower.IsDisabled ? "DISABLED" : "OPERATIONAL"
         };
         _workBar.Visible = _workTime.Visible = tower.IsBusy;
         _workBar.Value = tower.WorkProgress * 100;
@@ -351,7 +404,10 @@ public partial class GameplayHUD : Control
             + (_comparisonNow != null ? " · " + (_comparisonNow.Weapon?.Type ?? DamageType.Kinetic).ToString().ToUpperInvariant() : "");
         _upgradeDivider.Hide();
         _upgradeButton.TooltipText = "";
-        _upgradeInfo.Text = preview; _upgradeInfo.Visible = present && preview.Length > 0;
+        // Busy status already appears in the header/button; retain the full explanation as a tooltip.
+        int extraLine = preview.IndexOf('\n');
+        _upgradeInfo.Text = _workSection.Visible && _workBar.Visible && extraLine >= 0 ? preview[..extraLine] : preview;
+        _upgradeInfo.TooltipText = preview; _upgradeInfo.Visible = present && preview.Length > 0;
         _upgradeButton.Text = button; _upgradeButton.Visible = present && button.Length > 0;
         _upgradeButton.Disabled = !affordable;
     }
@@ -361,7 +417,7 @@ public partial class GameplayHUD : Control
     public void SetUpgradeComparison(TowerFinalStats current, TowerFinalStats next)
     {
         if (Equals(_comparisonNow, current) && Equals(_comparisonNext, next)) return;
-        _comparisonNow = current; _comparisonNext = next;
+        _comparisonNow = current; _comparisonNext = next; SetHeatComparisonTooltip();
         foreach (Node child in _upgradeComparison.GetChildren())
         { _upgradeComparison.RemoveChild(child); child.QueueFree(); }
         bool hasNext = next != null;
@@ -666,6 +722,11 @@ public partial class GameplayHUD : Control
         _experienceBar.AddThemeStyleboxOverride("background", new StyleBoxFlat { BgColor = Config.ButtonColor });
         _workBar.AddThemeStyleboxOverride("fill", new StyleBoxFlat { BgColor = Config.AccentColor });
         _workBar.AddThemeStyleboxOverride("background", new StyleBoxFlat { BgColor = Config.ButtonColor });
+        _heatFill = new StyleBoxFlat { BgColor = Config.AccentColor };
+        _heatBar.AddThemeStyleboxOverride("fill", _heatFill);
+        _heatBar.AddThemeStyleboxOverride("background", new StyleBoxFlat { BgColor = Config.ButtonColor });
+        _heatText.AddThemeColorOverride("font_color", Config.MutedTextColor);
+        _disableReasons.AddThemeColorOverride("font_color", Config.HealthCriticalColor);
         _rankLabel.AddThemeColorOverride("font_color", Config.AccentColor);
         Label[] muted = { _towerCategory, _towerStats, _towerNotes, _experienceText, _rankBonuses,
             GetNode<Label>("BottomArea/TraySlot/TowerBar/Insets/Tray/Header/Hint") };

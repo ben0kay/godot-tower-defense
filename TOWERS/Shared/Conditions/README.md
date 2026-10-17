@@ -43,11 +43,11 @@ Heat is stored on the placed instance. Successful projectile launches/pulses cha
 
 Cooling runs at CoolingPerSecond even under other disable causes. At capacity, the heat system installs its own Overheated handle. It removes only that handle at/below the restart fraction, leaving any EMP/no-power applications intact. Zero cooling is valid and requires explicit capability/balance changes to recover. Invalid/zero/nonfinite capacity makes the capability absent; invalid rates become0 and restart fraction clamps0–.99. Invalid clock deltas do nothing.
 
-Rank promotions/purchases retain absolute heat. Capacity reductions clamp and may overheat; increases retain the existing latch until the new restart threshold permits recovery. Removing the heat capability clears only its own latch and resets heat. Heat/timer updates never rebuild FinalStats. `CurrentHeat`, `IsOverheated`, `FinalStats.Heat` and `HeatChanged` are ready for HD3. Shots publish heat changes; cooling notices are limited to about10Hz, plus threshold/state changes.
+Rank promotions/purchases retain absolute heat. Capacity reductions clamp and may overheat; increases retain the existing latch until the new restart threshold permits recovery. Removing the heat capability clears only its own latch and resets heat. Heat/timer updates never rebuild FinalStats. `CurrentHeat`, `IsOverheated`, `FinalStats.Heat` and `HeatChanged` drive the selected Inspector in HD3. Shots publish heat changes; cooling notices are limited to about10Hz, plus threshold/state changes.
 
 ## Remaining work
 
-**HD3 is deferred:** no heat bar, disable-reason label, heat upgrade-comparison rows, cooling artwork or Inspector layout changes. No save persistence, EMP attack, electricity, tower HP/shields or abilities were introduced. Explicit clock stepping through `AdvanceConditions` supports tests; normal gameplay uses the shared pause-aware physics clock.
+**HD3 is implemented:** compact selected heat bar, grouped disable reasons, cached current/next thermal tooltip and lifecycle tests. Cooling artwork remains deferred. No save persistence, EMP attack, electricity, tower HP/shields or abilities were introduced. Explicit clock stepping through `AdvanceConditions` supports tests; normal gameplay uses the shared pause-aware physics clock.
 
 Verification: [TowerConditions.md](../../../TESTS/Towers/TowerConditions.md).
 

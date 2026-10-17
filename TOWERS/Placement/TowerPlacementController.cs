@@ -92,7 +92,7 @@ public partial class TowerPlacementController : Node2D
         if (GodotObject.IsInstanceValid(_economy)) _economy.BalanceChanged -= OnBalanceChanged;
         if (GodotObject.IsInstanceValid(_buildDefinition?.DefaultConfig)) _buildDefinition.DefaultConfig.Changed -= OnPreviewConfigChanged;
         if (GodotObject.IsInstanceValid(_selected))
-        { _selected.StatsChanged -= OnSelectedStatsChanged; _selected.TargetPriorityChanged -= OnSelectedTargetPriorityChanged; _selected.ExperienceChanged -= OnSelectedExperienceChanged; _selected.RuntimeChanged -= OnSelectedRuntimeChanged; }
+        { _selected.StatsChanged -= OnSelectedStatsChanged; _selected.TargetPriorityChanged -= OnSelectedTargetPriorityChanged; _selected.ExperienceChanged -= OnSelectedExperienceChanged; _selected.RuntimeChanged -= OnSelectedRuntimeChanged; _selected.HeatChanged -= OnSelectedConditionsChanged; _selected.DisableStateChanged -= OnSelectedConditionsChanged; }
     }
     #endregion
 
@@ -308,18 +308,18 @@ public partial class TowerPlacementController : Node2D
     {
         if (_selected == tower && (tower == null || _hud.IsInspectionVisible)) return;
         if (GodotObject.IsInstanceValid(_selected))
-        { _selected.StatsChanged -= OnSelectedStatsChanged; _selected.TargetPriorityChanged -= OnSelectedTargetPriorityChanged; _selected.ExperienceChanged -= OnSelectedExperienceChanged; _selected.RuntimeChanged -= OnSelectedRuntimeChanged; _selected.SetSelected(false); }
+        { _selected.StatsChanged -= OnSelectedStatsChanged; _selected.TargetPriorityChanged -= OnSelectedTargetPriorityChanged; _selected.ExperienceChanged -= OnSelectedExperienceChanged; _selected.RuntimeChanged -= OnSelectedRuntimeChanged; _selected.HeatChanged -= OnSelectedConditionsChanged; _selected.DisableStateChanged -= OnSelectedConditionsChanged; _selected.SetSelected(false); }
         _selected = tower; ObserveWork(tower);
         if (GodotObject.IsInstanceValid(_selected))
         {
             _selected.StatsChanged += OnSelectedStatsChanged; _selected.TargetPriorityChanged += OnSelectedTargetPriorityChanged;
-            _selected.ExperienceChanged += OnSelectedExperienceChanged; _selected.RuntimeChanged += OnSelectedRuntimeChanged;
+            _selected.ExperienceChanged += OnSelectedExperienceChanged; _selected.RuntimeChanged += OnSelectedRuntimeChanged; _selected.HeatChanged += OnSelectedConditionsChanged; _selected.DisableStateChanged += OnSelectedConditionsChanged;
             _selected.SetSelected(true);
             _hud.ShowTowerDetails(_selected.AuthoredConfig.DisplayName, (_selected.Definition?.Category.ToString() ?? "Tower") + " / Placed",
                 DescribeTower($"Grid cell: {_selected.GridCell.X}, {_selected.GridCell.Y}"),
                 _selected.AuthoredConfig.Description + "\nConstruction paid.", newSelection: true);
             _hud.SetTargetPriorityDetails(_selected.AuthoredConfig.InspectorTargetPriorityLabel);
-            _hud.SetRankDetails(_selected); _hud.SetRuntimeDetails(_selected.DescribeRuntime()); _hud.SetWorkDetails(_selected);
+            _hud.SetRankDetails(_selected); _hud.SetRuntimeDetails(_selected.DescribeRuntime()); _hud.SetWorkDetails(_selected); _hud.SetConditionDetails(_selected);
         }
         RefreshUpgradePreview();
         QueueRedraw();
@@ -344,7 +344,7 @@ public partial class TowerPlacementController : Node2D
         if (_hud.IsInspectionVisible) _hud.ShowTowerDetails(_selected.AuthoredConfig.DisplayName, (_selected.Definition?.Category.ToString() ?? "Tower") + " / Placed",
             DescribeTower($"Grid cell: {_selected.GridCell.X}, {_selected.GridCell.Y}"),
             _selected.AuthoredConfig.Description + "\nConstruction paid.");
-        if (_hud.IsInspectionVisible) { _hud.SetTargetPriorityDetails(_selected.AuthoredConfig.InspectorTargetPriorityLabel); _hud.SetRankDetails(_selected); _hud.SetRuntimeDetails(_selected.DescribeRuntime()); _hud.SetWorkDetails(_selected); RefreshUpgradePreview(); }
+        if (_hud.IsInspectionVisible) { _hud.SetTargetPriorityDetails(_selected.AuthoredConfig.InspectorTargetPriorityLabel); _hud.SetRankDetails(_selected); _hud.SetRuntimeDetails(_selected.DescribeRuntime()); _hud.SetWorkDetails(_selected); _hud.SetConditionDetails(_selected); RefreshUpgradePreview(); }
         QueueRedraw();
     }
 
@@ -370,17 +370,37 @@ public partial class TowerPlacementController : Node2D
     }
     // =========================================================
     // Retain existing selection semantics but stop hidden progress notifications until reselected.
-    private void OnInspectionClosed() => ObserveWork(null);
+    private void OnInspectionClosed()
+    {
+        ObserveWork(null);
+        if (GodotObject.IsInstanceValid(_selected))
+        { _selected.HeatChanged -= OnSelectedConditionsChanged; _selected.DisableStateChanged -= OnSelectedConditionsChanged; }
+    }
     // =========================================================
     // Start/completion refresh purchase availability once; intermediate ticks never resolve combat stats.
     private void OnSelectedWorkStarted()
     { OnSelectedWorkProgress(); if (_hud.IsInspectionVisible) RefreshUpgradePreview(); }
     private void OnSelectedWorkProgress()
-    { if (_hud.IsInspectionVisible && GodotObject.IsInstanceValid(_selected)) _hud.SetWorkDetails(_selected); }
+    { if (_hud.IsInspectionVisible && GodotObject.IsInstanceValid(_selected)) { _hud.SetWorkDetails(_selected); _hud.SetConditionDetails(_selected); } }
     private void OnSelectedWorkCompleted()
     {
         OnSelectedWorkProgress(); OnSelectedRuntimeChanged();
         if (_hud.IsInspectionVisible) RefreshUpgradePreview();
+    }
+
+    private bool _conditionRefreshQueued;
+    // =========================================================
+    // One pending callback reads the current selection, so switching/closing cannot publish a stale tower card.
+    private void OnSelectedConditionsChanged()
+    {
+        if (_conditionRefreshQueued || !_hud.IsInspectionVisible) return;
+        _conditionRefreshQueued = true; Callable.From(() =>
+        {
+            _conditionRefreshQueued = false;
+            if (!GodotObject.IsInstanceValid(this) || !IsInsideTree() || !GodotObject.IsInstanceValid(_hud)) return;
+            if (GodotObject.IsInstanceValid(_selected) && !_selected.IsQueuedForDeletion() && _hud.IsInspectionVisible)
+                _hud.SetConditionDetails(_selected);
+        }).CallDeferred();
     }
 
     // =========================================================

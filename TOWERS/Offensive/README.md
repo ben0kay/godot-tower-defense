@@ -22,7 +22,7 @@ Missile Tower, armour, terrain-blocking line of sight and enemy timed status eff
 
 ## Shared tower heat and disabling — HD1/HD2
 
-**Status (2026-10-17): HD1/HD2 IMPLEMENTED; HD3 remains deferred.** Public API, source/expiry policy, optional level authoring and runtime behavior are documented in [Shared/Conditions](../Shared/Conditions/README.md). Battle is enabled through its minutes-based config (3min,9s recovery); other tower heat settings remain TBD. The existing Ammunition Factory **production buffer** is unrelated to weapon heat. The original implementation requirements follow.
+**Status (2026-10-17): HD1/HD2 IMPLEMENTED; HD3 Inspector presentation is implemented.** Public API, source/expiry policy, optional level authoring and runtime behavior are documented in [Shared/Conditions](../Shared/Conditions/README.md). Battle is enabled through its minutes-based config (3min,9s recovery); other tower heat settings remain TBD. The existing Ammunition Factory **production buffer** is unrelated to weapon heat. The original implementation requirements follow.
 
 ### 1. Shared, source-aware tower disabling (HD1)
 
@@ -47,4 +47,4 @@ Missile Tower, armour, terrain-blocking line of sight and enemy timed status eff
 - Regression-test overlapping independent disable sources, source expiry/unload, overheat recovery under continuing EMP/no power, construction and paid upgrades, target/beam/aim cleanup, ammo conservation, rank promotions, existing travelling shots/waves, teardown, direct-scene fixtures and selected-Inspector updates. Run focused Godot/headless checks **and** leave actual desktop visual/playfeel QA explicitly pending until performed.
 - Keep logic lightweight: compact per-instance state, no extra all-towers-per-frame scan and no stat-pipeline rebuild per shot or cooling tick. Use existing attack loops and shared helper(s) rather than seven divergent heat implementations.
 
-**Scope boundary:** HD1/HD2 were approved and implemented; HD3 presentation is still future work. No tower HP/shields, enemy EMP attack, electricity network, cooling VFX/audio, save/load, or balancing decisions are included. Shared disabling should be established before those eventual mechanics depend on it. For backlog tracking, see [NOTES/WORK.md](../../NOTES/WORK.md).
+**Scope boundary:** HD1/HD2 were approved and implemented; HD3 presentation is implemented. No tower HP/shields, enemy EMP attack, electricity network, cooling VFX/audio, save/load, or balancing decisions are included. Shared disabling should be established before those eventual mechanics depend on it. For backlog tracking, see [NOTES/WORK.md](../../NOTES/WORK.md).
