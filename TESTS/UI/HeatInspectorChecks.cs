@@ -5,7 +5,7 @@ using static AmmoLoopFixture;
 
 public partial class HeatInspectorChecks : Node
 {
-    private const string Card = "BottomArea/Inspector/Insets/Body/Columns/Main/Conditions";
+    private const string Card = "BottomArea/Inspector/Insets/Body/Columns/Side/Conditions";
     // =========================================================
     // Real HUD, catalog tower instances, paid work clocks and deferred condition notifications.
     public override async void _Ready()
@@ -19,7 +19,7 @@ public partial class HeatInspectorChecks : Node
                 battle.SetTargetPriority(TowerTargeting.Priority.Closest);
                 f.Placement.Call("SelectTower", battle); await Frames();
                 ProgressBar bar = f.Hud.GetNode<ProgressBar>(Card + "/HeatBar");
-                Label heat = f.Hud.GetNode<Label>(Card + "/HeatText"), reasons = f.Hud.GetNode<Label>(Card + "/DisableReasons");
+                Label heat = f.Hud.GetNode<Label>(Card + "/HeatText"), reasons = f.Hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Main/DisableReasons");
                 Require(bar.IsVisibleInTree() && bar.Value == 0 && bar.MaxValue == 10 && heat.Text.Contains("0 / 10"), "Cold selected heat tower shows actual capacity");
                 Require(f.Hud.GetNode<Control>(Card).TooltipText.Contains("NEXT LEVEL"), "Cached current/next thermal details available without extra rows");
                 var grid = f.Hud.GetNode<GridContainer>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeComparison");
@@ -79,7 +79,7 @@ public partial class HeatInspectorChecks : Node
         {
             f.Hud.Size = viewport; await Frames(); Control panel = f.Hud.GetNode<Control>("BottomArea/Inspector");
             if (panel.Size.Y > 331.5) Dump(panel);
-            Require(panel.Size.X <= 620.5 && panel.Size.Y <= 331.5, "Heat plus busy/MAX RANK keeps compact footprint: " + panel.Size);
+            Require(panel.Size.X <= 560.5 && panel.Size.Y <= 331.5, "Heat plus busy/MAX RANK keeps compact footprint: " + panel.Size);
             Contained(panel, panel.GetGlobalRect());
             GD.Print($"HD3 STRESS GEOMETRY {viewport}: {panel.Size}");
         }
