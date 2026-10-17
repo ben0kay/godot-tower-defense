@@ -266,3 +266,7 @@ Run `res://TESTS/Enemies/DeathSpawnChecks.tscn` for real Transporter release, fi
 ## Build HUD categories and compact Inspector
 
 Run `res://TESTS/UI/HudCategoryChecks.tscn` for catalog-driven tabs, filter memory/fallback, placement/inspection independence, bounded Inspector and background transparency. See [verification](UI/HudCategories.md).
+
+## Shared shield aura SV1 — source assertions added, execution pending
+
+`TESTS/Combat/EnemyShieldChecks.cs` now checks lazy shield-aura attachment only on shielded instances, baked visual sizing, zero idle processing, shield-only hit brightness, break fade, and explicit ShieldEmitter-compatible restoration without allocating a second visual. `FEEDBACK/Shields/` owns only the event-driven display and single shared SVG; original shield arithmetic stays in `COMBAT/Damage`. The modified integration test has **not been run in Godot/.NET during this GitHub-only pass**.
