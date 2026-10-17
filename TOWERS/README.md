@@ -1,5 +1,12 @@
 # TOWERS — Player-placeable structures
 
+## Range rebalance — 2026-10-17
+
+Every authored level of the seven current **offensive** towers has approximately **15% more attack range**, rounded to whole pixels; the values remain absolute per level. Battle/Laser/Blaster: 294px level 1, 304px level 2 (Battle level 3: 313px). Cryo/Machine Gun: 239/248/258px; Sniper: 515/524/534px; Shockwave **maximum damaging radius**: 230/239px. All existing earned rank percentages apply afterward through Stage03. The Inspector, upgrade previews and selected range indicator use the unchanged cached `FinalStats.RangePixels` source.
+
+**Not changed:** damage, cadence, aim, projectile speed, credits, work time, ammo, heat, Blaster Cannon splash radius/falloff, enemy/wave properties or future passive/support ranges. This is an authored-balance adjustment, not an added global range modifier.
+
+
 This folder holds all buildable towers: offensive weapons, Ammunition Factory/Depot economy structures, and future support/utility structures. A tower's category describes its primary purpose; it does **not** require a weapon, ammo system, targeting loop or combat stats.
 
 This README is an up-to-date overview and forward plan. Completed phase-by-phase implementation notes have been removed because the feature-specific READMEs and actual code are authoritative.

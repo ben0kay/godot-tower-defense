@@ -1,5 +1,14 @@
 # WORK — Consolidated Outstanding Implementation Backlog
 
+## Offensive tower range balance — 2026-10-17
+
+- [x] Increased **all seven offensive tower types at every authored purchased level** approximately 15% (nearest whole px): Battle 294/304/313, Laser 294/304, Blaster 294/304, Shockwave 230/239, Cryo 239/248/258, Machine Gun 239/248/258, Sniper 515/524/534. Source of truth remains each `*Levels.cs` row; rank bonuses/Inspector/range rings/upgrade previews resolve normally. No modifier or change to weapon cooldown, damage, ammo, build costs or Blaster blast radius.
+- [x] Updated exact-value regression assertions and per-type README balance tables in the **same commit**.
+- [ ] **Godot validation outstanding:** rerun TowerStat, TowerUpgrade, Laser, Shockwave, Cryo, MultiBarrel and TowerRank checks. Review placement-range rings, upgrade comparison, Shockwave propagation and level playfeel. No Godot/.NET runtime available to run tests in this pass.
+
+---
+
+
 ## Inspector visual trim / right-side bars — 2026-10-17
 
 - [x] Narrowed `InspectorPanel.tscn` and the HUD default from **620×330** to nominal **560×330**; the Main stats/paid-upgrade area shrinks, while the six target-priority buttons retain their original **210px right-section layout**.

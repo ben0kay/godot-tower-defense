@@ -16,9 +16,9 @@ public static class CryoTowerLevels
     // Optional final named column: Heat: new(Capacity, PerShot, PerBeamSecond, CoolingPerSecond, RestartFraction).
     private static readonly Row[] Rows =
     {
-        new(1, 250, 4, 10, .50f, 208, 650, 180, .33f, 600, 1),
-        new(2, 175, 5, 11, .52f, 216, 650, 180, .33f, 600, 1),
-        new(3, 250, 6, 12, .54f, 224, 650, 180, .33f, 600, 1),
+        new(1, 250, 4, 10, .50f, 239, 650, 180, .33f, 600, 1),
+        new(2, 175, 5, 11, .52f, 248, 650, 180, .33f, 600, 1),
+        new(3, 250, 6, 12, .54f, 258, 650, 180, .33f, 600, 1),
     };
     // =========================================================
     // Changing one purchased level never modifies another level or another placed tower.

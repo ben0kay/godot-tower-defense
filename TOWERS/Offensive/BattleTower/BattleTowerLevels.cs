@@ -15,9 +15,9 @@ public static class BattleTowerLevels
     // Optional final named column: Heat: new(Capacity, PerShot, PerBeamSecond, CoolingPerSecond, RestartFraction).
     private static readonly Row[] Rows =
     {
-        new(1, 200, 3, 30, 1.68f, 256, 1000, 180, 12, 0.15f, 0.05f, 1000, 1),
-        new(2, 150, 4, 33, 1.764f, 264, 1000, 180, 12, 0.15f, 0.05f, 1000, 1),
-        new(3, 250, 5, 36, 1.848f, 272, 1000, 180, 12, 0.15f, 0.05f, 1000, 1),
+        new(1, 200, 3, 30, 1.68f, 294, 1000, 180, 12, 0.15f, 0.05f, 1000, 1),
+        new(2, 150, 4, 33, 1.764f, 304, 1000, 180, 12, 0.15f, 0.05f, 1000, 1),
+        new(3, 250, 5, 36, 1.848f, 313, 1000, 180, 12, 0.15f, 0.05f, 1000, 1),
     };
 
     // =========================================================

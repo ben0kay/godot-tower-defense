@@ -1,3 +1,9 @@
+## Offensive range rebalance regression notes — 2026-10-17
+
+All seven offensive types now author approximately 15% more range at **every** level in their own `*Levels.cs`. Existing exact-row assertions were updated in `TowerStatChecks`, `TowerUpgradeChecks`, `LaserTowerChecks`, `CryoTowerChecks`, `MultiBarrelTowerChecks`, `ShockwaveChecks`, and `TowerRankChecks` (including Shockwave's rank-scaled radius). These preserve the existing stat pipeline and distinguish Blaster **target range** from unchanged **area radius**. Godot headless/desktop tests could not run in this environment because neither Godot nor .NET is installed; rerun test scenes and visually review range rings and targeting at max range.
+
+---
+
 # Tower tests and architecture fixture
 
 Tower catalog, per-level stats, ranks, upgrades, Laser/Blaster and Shield Emitter regression checks live here. They are invoked by the integration runner.

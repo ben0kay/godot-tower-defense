@@ -15,9 +15,9 @@ public static class SniperTowerLevels
     // Optional final named column: Heat: new(Capacity, PerShot, PerBeamSecond, CoolingPerSecond, RestartFraction).
     private static readonly Row[] Rows =
     {
-        new(1, 325, 4, 80, .35f, 448, 1300, 135, 600, 1),
-        new(2, 225, 5, 88, .37f, 456, 1300, 135, 600, 1),
-        new(3, 325, 6, 96, .40f, 464, 1300, 135, 600, 1),
+        new(1, 325, 4, 80, .35f, 515, 1300, 135, 600, 1),
+        new(2, 225, 5, 88, .37f, 524, 1300, 135, 600, 1),
+        new(3, 325, 6, 96, .40f, 534, 1300, 135, 600, 1),
     };
 
     // =========================================================

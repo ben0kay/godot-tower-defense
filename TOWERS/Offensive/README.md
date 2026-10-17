@@ -1,5 +1,12 @@
 # Offensive towers
 
+## Range rebalance — 2026-10-17
+
+Every authored level of the seven current **offensive** towers has approximately **15% more attack range**, rounded to whole pixels; the values remain absolute per level. Battle/Laser/Blaster: 294px level 1, 304px level 2 (Battle level 3: 313px). Cryo/Machine Gun: 239/248/258px; Sniper: 515/524/534px; Shockwave **maximum damaging radius**: 230/239px. All existing earned rank percentages apply afterward through Stage03. The Inspector, upgrade previews and selected range indicator use the unchanged cached `FinalStats.RangePixels` source.
+
+**Not changed:** damage, cadence, aim, projectile speed, credits, work time, ammo, heat, Blaster Cannon splash radius/falloff, enemy/wave properties or future passive/support ranges. This is an authored-balance adjustment, not an added global range modifier.
+
+
 The default catalog contains BattleTower (guided Kinetic projectile), LaserTower (sustained Energy beam), BlasterCannon (Explosive instantaneous area projectile) and purple ShockwaveTower (timed expanding Energy front). Targeted weapons reuse shared targeting/aiming; all reuse generic catalog-driven placement/HUD, canonical ResourceCost recipes and the same eight-stage cached stats/paid upgrades.
 
 COMBAT/Damage owns shield/hull responses, optional absolute weapon overrides and penetration. COMBAT/AreaDamage owns instant-disc selection and weapon-input distance falloff. SplashProjectile delivers Blaster's launch-snapshotted area payload exactly once at impact; FEEDBACK/Shockwave is cosmetic only. See BlasterCannon/README.md for current values and tests.

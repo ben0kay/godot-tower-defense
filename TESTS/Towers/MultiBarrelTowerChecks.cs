@@ -46,7 +46,7 @@ public static class MultiBarrelTowerChecks
         SniperTowerConfig sniperAuthored = (SniperTowerConfig)sniperDef.DefaultConfig;
         MachineGunTowerConfig gunAuthored = (MachineGunTowerConfig)gunDef.DefaultConfig;
         Require(sniperAuthored.ResolveStats(1).DamagePerShot == 80
-            && sniperAuthored.ResolveStats(2).RangePixels == 456 && sniperAuthored.Ranks[1].TotalXp == 1000,
+            && sniperAuthored.ResolveStats(2).RangePixels == 524 && sniperAuthored.Ranks[1].TotalXp == 1000,
             "Sniper complete levels and earned ranks resolve");
         Require(Mathf.IsEqualApprox(gunAuthored.ResolveStats(1).ShotsPerSecond, 14.4f) && gunAuthored.ResolveStats(3).DamagePerShot == 9
             && gunAuthored.Ranks[4].TotalXp == 15000
@@ -124,7 +124,7 @@ public static class MultiBarrelTowerChecks
 
             TowerRankController.AwardExperience(gun, 1000);
             Require(gun.CurrentRank.Rank == TowerRank.Veteran && gun.UpgradeLevel == 1
-                && gun.FinalStats.RangePixels > 208, "Earned rank changes range without purchasing a level");
+                && gun.FinalStats.RangePixels > 239, "Earned rank changes range without purchasing a level");
             Require(gun.ResolveLevel(2).DamagePerShot >= 8 && gun.Levels[1].Stats.DamagePerShot == 8
                 && Mathf.IsEqualApprox(gun.Levels[1].Stats.ShotsPerSecond, 14.88f)
                 && Mathf.IsEqualApprox(gun.Levels[2].Stats.ShotsPerSecond, 15.36f),

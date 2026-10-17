@@ -42,7 +42,7 @@ public static class LaserTowerChecks
         TowerFinalStats preview = tower.ResolveLevel(2); int revision = grid.NavigationRevision;
         hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeButton").EmitSignal(Button.SignalName.Pressed); ConstructionTestClock.FinishWork(main);
         Require(tower.UpgradeLevel == 2 && tower.FinalStats == preview && tower.FinalStats.Beam.Value.DamagePerSecond == 14 &&
-            tower.FinalStats.RangePixels == 264 && wallet.GetBalance(wallet.CreditsResource) == 575 && grid.NavigationRevision == revision,
+            tower.FinalStats.RangePixels == 304 && wallet.GetBalance(wallet.CreditsResource) == 575 && grid.NavigationRevision == revision,
             "Laser175-Credit tier applies exact DPS/range preview without changing navigation");
         placement.Call("SelectTower", default(Variant)); placement.Call("CancelPlacement");
         tower.Free(); grid.ReleaseOccupancy(cell);

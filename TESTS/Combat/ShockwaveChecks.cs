@@ -227,7 +227,7 @@ public static class ShockwaveChecks
         try
         {
             Require(wallet.GetBalance(wallet.CreditsResource) == 650 && grid.IsOccupied(cell), "Real350-credit placement succeeds");
-            Require(tower.FinalStats.Shockwave == new ShockwaveStats(40, 250, 4, .25f) && tower.FinalStats.RangePixels == 200
+            Require(tower.FinalStats.Shockwave == new ShockwaveStats(40, 250, 4, .25f) && tower.FinalStats.RangePixels == 230
                 && tower.FinalStats.ShieldPenetration == 0 && tower.FinalStats.Weapon.Value.Type == DamageType.Energy,
                 "Level1 preserves every proposed playtest stat");
             Require(tower.Config != definition.DefaultConfig && tower.Config.Levels[0] != definition.DefaultConfig.Levels[0]
@@ -248,7 +248,7 @@ public static class ShockwaveChecks
             hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeButton").EmitSignal(Button.SignalName.Pressed); ConstructionTestClock.FinishWork(main);
             Require(tower.UpgradeLevel == 2 && tower.FinalStats == upgraded && wallet.GetBalance(wallet.CreditsResource) == 425
                 && grid.NavigationRevision == revision && tower.NextUpgrade == null, "Paid225 level2 matches preview and detects maximum without navigation edits");
-            Require(upgraded.Shockwave == new ShockwaveStats(44, 260, 3.9f, .25f) && upgraded.RangePixels == 208, "Level2 has exact independent complete stats");
+            Require(upgraded.Shockwave == new ShockwaveStats(44, 260, 3.9f, .25f) && upgraded.RangePixels == 239, "Level2 has exact independent complete stats");
             emission._PhysicsProcess(.2); Near(emission.CurrentRadius, 100, "Upgrade cannot change a launched emission's speed/range");
             Require(details.Text.Contains("Damage per wave: 44") && !hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeButton").Visible, "Inspector applies paid stats and maximum-level state");
             Require(!TowerUpgradeController.TryUpgrade(tower, wallet, placement.Settings, 2, out _)

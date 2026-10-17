@@ -10,11 +10,11 @@ Catalog ID `cryo`, Offensive, 1×1. Single rotating muzzle fires a cyan guided E
 
 | Level | Credits | Work seconds | Damage | Shots/s | Range | Projectile speed | Slow | Ammo capacity / shot |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| 1 | 250 | 4 | 10 | 0.50 | 208 | 650 | 33% | 600 / 1 |
-| 2 | 175 | 5 | 11 | 0.52 | 216 | 650 | 33% | 600 / 1 |
-| 3 | 250 | 6 | 12 | 0.54 | 224 | 650 | 33% | 600 / 1 |
+| 1 | 250 | 4 | 10 | 0.50 | 239 | 650 | 33% | 600 / 1 |
+| 2 | 175 | 5 | 11 | 0.52 | 248 | 650 | 33% | 600 / 1 |
+| 3 | 250 | 6 | 12 | 0.54 | 258 | 650 | 33% | 600 / 1 |
 
-Original provisional damage/rate/range retained. Added construction/upgrade times 4/5/6 seconds to match current timed-work conventions. Energy uses existing physical ammo logistics, not a new power economy. New construction cannot fire; paid upgrades keep current-tier combat until completion. XP and rank survive purchases. Initial construction uses existing default visuals; no new staged construction artwork in this pass.
+Original provisional damage/rate retained; all three targeting ranges were raised about 15% during the October 2026 range rebalance. Added construction/upgrade times 4/5/6 seconds to match current timed-work conventions. Energy uses existing physical ammo logistics, not a new power economy. New construction cannot fire; paid upgrades keep current-tier combat until completion. XP and rank survive purchases. Initial construction uses existing default visuals; no new staged construction artwork in this pass.
 
 `SlowStats` is an optional eight-stage capability, with safety clamps and identical live/preview resolution. Inspector shows permanent Slow, Energy damage and eligibility. Launch captures resolved damage/overrides/penetration/Slow values; upgrades or source removal cannot change that projectile. Runtime config copies keep level rows private.
 

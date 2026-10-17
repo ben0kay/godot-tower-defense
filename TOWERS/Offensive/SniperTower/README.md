@@ -4,9 +4,9 @@ Implemented via the shared `TOWERS/Shared/Weapons/MultiBarrel/ProjectileTurretBa
 
 | Purchased level | Credits (build/upgrade) | Damage/bullet | Total bullets/s | Range | Bullet speed | Penetration |
 |---|---:|---:|---:|---:|---:|---:|
-| 1 | 325 | 80 | 0.35 | 448 px | 1,300 px/s | 15% |
-| 2 | 225 | 88 | 0.37 | 456 px | 1,300 px/s | 15% |
-| 3 | 325 | 96 | 0.40 | 464 px | 1,300 px/s | 15% |
+| 1 | 325 | 80 | 0.35 | 515 px | 1,300 px/s | 15% |
+| 2 | 225 | 88 | 0.37 | 524 px | 1,300 px/s | 15% |
+| 3 | 325 | 96 | 0.40 | 534 px | 1,300 px/s | 15% |
 
 Ranks: Standard 0, Veteran 1,000, Enhanced 3,000, Superior 7,000, Legendary 15,000 total XP with the existing rank damage/range percentages. Ammo: 600 local capacity, 1 round per bullet; normal physical logistics can resupply it.
 

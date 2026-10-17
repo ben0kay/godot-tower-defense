@@ -15,9 +15,9 @@ public static class MachineGunTowerLevels
     // Optional final named column: Heat: new(Capacity, PerShot, PerBeamSecond, CoolingPerSecond, RestartFraction).
     private static readonly Row[] Rows =
     {
-        new(1, 300, 4, 7, 14.4f, 208, 1062.5f, 240, 1200, 1),
-        new(2, 200, 5, 8, 14.88f, 216, 1062.5f, 240, 1200, 1),
-        new(3, 300, 6, 9, 15.36f, 224, 1062.5f, 240, 1200, 1),
+        new(1, 300, 4, 7, 14.4f, 239, 1062.5f, 240, 1200, 1),
+        new(2, 200, 5, 8, 14.88f, 248, 1062.5f, 240, 1200, 1),
+        new(3, 300, 6, 9, 15.36f, 258, 1062.5f, 240, 1200, 1),
     };
 
     // =========================================================

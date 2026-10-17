@@ -4,9 +4,9 @@ A 1×1 offensive tower with one aim target and **two independently positioned mu
 
 | Purchased level | Credits (build/upgrade) | Damage/bullet | Total bullets/s | Range | Projectile speed |
 |---|---:|---:|---:|---:|---:|
-| 1 | 300 | 7 | 14.4 | 208 px | 1062.5 px/s |
-| 2 | 200 | 8 | 14.88 | 216 px | 1062.5 px/s |
-| 3 | 300 | 9 | 15.36 | 224 px | 1062.5 px/s |
+| 1 | 300 | 7 | 14.4 | 239 px | 1062.5 px/s |
+| 2 | 200 | 8 | 14.88 | 248 px | 1062.5 px/s |
+| 3 | 300 | 9 | 15.36 | 258 px | 1062.5 px/s |
 
 Rate applies to **both barrels combined**: 14.4 total shots/s means ~7.2 shots/s per barrel; it is not 6 per barrel. Ammo reserve 1,200, consumption 1 per bullet (from physical shared logistics). No shield penetration; ordinary Kinetic damage coefficients apply. Standard → Veteran → Enhanced → Superior → Legendary use the normal 0/1,000/3,000/7,000/15,000 total XP table. Paid level and earned rank remain independent.
 

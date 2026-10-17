@@ -8,8 +8,8 @@ Edit `ShockwaveTowerLevels.cs`: one complete independent typed row per level, no
 
 | Level | Cost | Damage/wave | Max radius | Expansion speed | Interval | Edge retention | Penetration | Type |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| 1 | 350 Credits | 40 | 200px | 250px/s | 4s | 25% | 0% | Energy |
-| 2 | 225 Credits | 44 | 208px | 260px/s | 3.9s | 25% | 0% | Energy |
+| 1 | 350 Credits | 40 | 230px | 250px/s | 4s | 25% | 0% | Energy |
+| 2 | 225 Credits | 44 | 239px | 260px/s | 3.9s | 25% | 0% | Energy |
 
 Each row also explicitly declares independent shield/hull override flags/coefficients, initially disabled: inherit Energy2x shield/.85x hull. At Level1, exposed center/half/edge hull damage is34/21.25/8.5. At half range,25 base damage removes50 shield points; fractional breaks and penetration remain owned by COMBAT/Damage.
 

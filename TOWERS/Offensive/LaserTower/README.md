@@ -1,6 +1,6 @@
 # Laser Tower — sustained Energy beam (Phases 4C-2/4C-3)
 
-Ctrl → Laser Tower → place on route-safe terrain. LaserTowerDefinition registers `laser` in DefaultTowerCatalog; generic placement/HUD handle its 1×1 footprint, private config, prices, selection and upgrades without per-type branches. Initial price 250 Credits, range 256px and 12 base DPS are provisional playtest balance. Level2 costs 175 Credits and directly selects 14 DPS/264px. Battle Tower remains200 Credits with its existing150/250 upgrade prices.
+Ctrl → Laser Tower → place on route-safe terrain. LaserTowerDefinition registers `laser` in DefaultTowerCatalog; generic placement/HUD handle its 1×1 footprint, private config, prices, selection and upgrades without per-type branches. Initial price 250 Credits, range 294px and 12 base DPS are provisional playtest balance. Level2 costs 175 Credits and directly selects 14 DPS/304px. Battle Tower remains200 Credits with its existing150/250 upgrade prices.
 
 ## Combat and retargeting
 
@@ -16,7 +16,7 @@ Each renderer duplicates its mutable Style on Ready. During play, Remote → Wor
 
 ## Stats and tests
 
-Edit `LaserTowerLevels.cs` for balance; DefaultLaserTowerConfig.tres no longer exports numeric combat values or prices. Both rows explicitly repeat 180°/s turn, 12° aim, .15s search, Energy type, 6x shield/.15x hull overrides and zero penetration. Level1 is 250 Credits / 12 DPS / 256px; Level2 is 175 Credits / 22 DPS / 288px. Changing either row never changes the other. Add a consecutive row for Level3.
+Edit `LaserTowerLevels.cs` for balance; DefaultLaserTowerConfig.tres no longer exports numeric combat values or prices. Both rows explicitly repeat 180°/s turn, 12° aim, .15s search, Energy type, 6x shield/.15x hull overrides and zero penetration. Level1 is 250 Credits / 12 DPS / 294px; Level2 is 175 Credits / 14 DPS / 304px. Changing either row never changes the other. Add a consecutive row for Level3.
 
 Optional immutable BeamStats and WeaponDamageStats enter the same eight-stage pipeline. Stage 02 selects the entire row rather than applying modifiers; Stage 07 clamps invalid DPS/penetration; Stage 08 publishes the cache. Attack and selected Inspector/upgrade preview consume the same selected snapshot, including shield/hull response and penetration. Level 1 C# convenience properties forward only to row 1; SetLevelStats targets any row. No projectile/fire-rate fields are required in the authored beam row. Passive fixtures still need no combat snapshot.
 

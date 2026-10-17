@@ -42,7 +42,7 @@ public partial class CryoTowerChecks : Node
             "Cryo is a catalog-driven Offensive HUD choice");
         var authored = (CryoTowerConfig)definition.DefaultConfig;
         int[] damage = { 10, 11, 12 }, costs = { 250, 175, 250 };
-        float[] rate = { .5f, .52f, .54f }, range = { 208, 216, 224 };
+        float[] rate = { .5f, .52f, .54f }, range = { 239, 248, 258 };
         for (int i = 0; i < 3; i++)
         {
             TowerFinalStats s = authored.ResolveStats(i + 1);

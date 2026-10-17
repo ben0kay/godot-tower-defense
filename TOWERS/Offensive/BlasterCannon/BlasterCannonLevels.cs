@@ -15,8 +15,8 @@ public static class BlasterCannonLevels
     // Optional final named column: Heat: new(Capacity, PerShot, PerBeamSecond, CoolingPerSecond, RestartFraction).
     private static readonly Row[] Rows =
     {
-        new(1, 300, 5, 60, 0.5f, 256, 500, 180, 12, 0.15f, 0, 80, 0.25f, DamageType.Explosive, false, 1, false, 1, 600, 3),
-        new(2, 200, 6, 66, 0.5f, 264, 500, 180, 12, 0.15f, 0, 88, 0.25f, DamageType.Explosive, false, 1, false, 1, 600, 3),
+        new(1, 300, 5, 60, 0.5f, 294, 500, 180, 12, 0.15f, 0, 80, 0.25f, DamageType.Explosive, false, 1, false, 1, 600, 3),
+        new(2, 200, 6, 66, 0.5f, 304, 500, 180, 12, 0.15f, 0, 88, 0.25f, DamageType.Explosive, false, 1, false, 1, 600, 3),
     };
 
     // =========================================================

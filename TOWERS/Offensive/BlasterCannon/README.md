@@ -13,9 +13,9 @@ A real 1x1 offensive tower registered as `blaster_cannon` in `TOWERS/DefaultTowe
 | Edge damage fraction | 0.25 (25%) |
 | Fire rate | 0.5 shots/sec |
 | Projectile speed | 500 px/sec |
-| Target range | 256 px |
+| Target range | 294 px |
 | Shield penetration | 0% |
-| Level 2 purchase | 200 Credits: 66 base damage, 88 px blast radius and 264 px targeting range |
+| Level 2 purchase | 200 Credits: 66 base damage, 88 px blast radius and 304 px targeting range |
 
 Level 2 resolves 66 base damage / 88 px radius / unchanged 25% edge retention. Type defaults inherit Explosive 0.25x shield / 1.25x hull. Independent opt-in coefficient overrides in each complete level row can replace either response; zero is explicit. Existing shield penetration behavior is supported and launch-snapshotted. These defaults are editable playtest balance, not resolver constants.
 

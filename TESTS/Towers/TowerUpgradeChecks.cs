@@ -32,7 +32,7 @@ public static class TowerUpgradeChecks
             TowerFinalStats preview = first.ResolveLevel(2);
             VerifyTypedComparison();
             Require(preview.DamagePerShot == 33 && Mathf.IsEqualApprox(preview.ShotsPerSecond, 1.764f)
-                && preview.RangePixels == 264 && first.FinalStats == initial && first.UpgradeLevel == 1,
+                && preview.RangePixels == 304 && first.FinalStats == initial && first.UpgradeLevel == 1,
                 "Next-tier preview selects a full snapshot without changing live stats or progression");
             wallet.Initialize(new LevelConfig { StartingCredits = 149 });
             Require(!ConstructionTestClock.PurchaseAndFinish(first, wallet, placement.Settings, 1, out _) &&

@@ -111,15 +111,15 @@ public static class TowerStatChecks
     {
         BattleTowerConfig battle = new(); LaserTowerConfig laser = new(); BlasterCannonConfig blaster = new();
         TowerFinalStats[] battleExpected = {
-            new(256, 1.68f, 30, 1000, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
-            new(264, 1.764f, 33, 1000, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
-            new(272, 1.848f, 36, 1000, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)) };
+            new(294, 1.68f, 30, 1000, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
+            new(304, 1.764f, 33, 1000, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
+            new(313, 1.848f, 36, 1000, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)) };
         TowerFinalStats[] laserExpected = {
-            new(256, 0, 0, 1, 180, 12, .15f, new BeamStats(12), Weapon: new(DamageType.Energy, true, 6, true, .15f), Ammunition: new(1000, 0, 2)),
-            new(264, 0, 0, 1, 180, 12, .15f, new BeamStats(14), Weapon: new(DamageType.Energy, true, 6, true, .15f), Ammunition: new(1000, 0, 2)) };
+            new(294, 0, 0, 1, 180, 12, .15f, new BeamStats(12), Weapon: new(DamageType.Energy, true, 6, true, .15f), Ammunition: new(1000, 0, 2)),
+            new(304, 0, 0, 1, 180, 12, .15f, new BeamStats(14), Weapon: new(DamageType.Energy, true, 6, true, .15f), Ammunition: new(1000, 0, 2)) };
         TowerFinalStats[] blasterExpected = {
-            new(256, .5f, 60, 500, 180, 12, .15f, Area: new(80, .25f), Weapon: new(DamageType.Explosive, false, 1, false, 1), Ammunition: new(600, 3)),
-            new(264, .5f, 66, 500, 180, 12, .15f, Area: new(88, .25f), Weapon: new(DamageType.Explosive, false, 1, false, 1), Ammunition: new(600, 3)) };
+            new(294, .5f, 60, 500, 180, 12, .15f, Area: new(80, .25f), Weapon: new(DamageType.Explosive, false, 1, false, 1), Ammunition: new(600, 3)),
+            new(304, .5f, 66, 500, 180, 12, .15f, Area: new(88, .25f), Weapon: new(DamageType.Explosive, false, 1, false, 1), Ammunition: new(600, 3)) };
         CheckRows(battle, battleExpected, new[] { 200, 150, 250 });
         CheckRows(laser, laserExpected, new[] { 250, 175 });
         CheckRows(blaster, blasterExpected, new[] { 300, 200 });

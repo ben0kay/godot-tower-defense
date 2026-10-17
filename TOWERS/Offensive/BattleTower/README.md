@@ -18,9 +18,9 @@ Ctrl → Battle Tower → place on route-safe terrain. First targets the shortes
 
 | Level | Build/upgrade price | Damage | Shots/s | Range | Projectile speed | Turn | Aim | Search | Penetration |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | 200 | 30 | 1.68 | 256px | 1000px/s | 180°/s | 12° | .15s | 5% |
-| 2 | 150 | 33 | 1.764 | 264px | 1000px/s | 180°/s | 12° | .15s | 5% |
-| 3 | 250 | 36 | 1.848 | 272px | 1000px/s | 180°/s | 12° | .15s | 5% |
+| 1 | 200 | 30 | 1.68 | 294px | 1000px/s | 180°/s | 12° | .15s | 5% |
+| 2 | 150 | 33 | 1.764 | 304px | 1000px/s | 180°/s | 12° | .15s | 5% |
+| 3 | 250 | 36 | 1.848 | 313px | 1000px/s | 180°/s | 12° | .15s | 5% |
 
 DefaultBattleTowerConfig.tres retains Inspector identity, target priority and RotateWhileTracking; scene/definition retain artwork and registration. Combat stats/prices are no longer numeric .tres exports. Each placed tower gets private runtime rows/recipes. C# Level 1 convenience accessors edit row 1 only; use SetLevelStats(level, snapshot) for another row.
 

@@ -17,8 +17,8 @@ public static class ShockwaveTowerLevels
     // Optional final named column: Heat: new(Capacity, PerShot, PerBeamSecond, CoolingPerSecond, RestartFraction).
     private static readonly Row[] Rows =
     {
-        new(1, 350, 5, 40, 200, 250, 4.0f, .25f, 0, DamageType.Energy, false, 1, false, 1, 400, 5),
-        new(2, 225, 6, 44, 208, 260, 3.9f, .25f, 0, DamageType.Energy, false, 1, false, 1, 400, 5),
+        new(1, 350, 5, 40, 230, 250, 4.0f, .25f, 0, DamageType.Energy, false, 1, false, 1, 400, 5),
+        new(2, 225, 6, 44, 239, 260, 3.9f, .25f, 0, DamageType.Energy, false, 1, false, 1, 400, 5),
     };
 
     // =========================================================
