@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="MajorAlertDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://UI/Alerts/MajorAlerts/MajorAlertDefinition.cs" id="1_alert"]
+
+[resource]
+script = ExtResource("1_alert")
+Id = "citadel_critical"
+Title = "CITADEL IN DANGER"
+Description = "Citadel integrity has reached a critical level."
+Footer = "DEFENSIVE ALERT"
+BadgeText = "!"
+Tone = 3
+Priority = 95
+DurationSeconds = 6.0
+CooldownSeconds = 40.0
+OncePerSession = false
+VoiceCueId = ""
