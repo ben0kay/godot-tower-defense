@@ -8,8 +8,8 @@ public partial class UIMasterConfig : Resource
     [ExportGroup("HUD Layout")]
     [Export(PropertyHint.Range, "32,96,1")] public int TopBarHeight { get; set; } = 46;
     [Export(PropertyHint.Range, "110,270,1")] public int BottomBarHeight { get; set; } = 176;
-    [Export(PropertyHint.Range, "200,480,1")] public int InspectorWidth { get; set; } = 392;
-    [Export(PropertyHint.Range, "240,600,1")] public int InspectorHeight { get; set; } = 360;
+    [Export(PropertyHint.Range, "260,900,1")] public int InspectorWidth { get; set; } = 540;
+    [Export(PropertyHint.Range, "180,600,1")] public int InspectorHeight { get; set; } = 325;
     [Export(PropertyHint.Range, "0.5,1,0.01")] public float BottomPanelOpacity { get; set; } = 0.90f;
     [Export(PropertyHint.Range, "0,36,1")] public int EdgeMargin { get; set; } = 12;
     [Export(PropertyHint.Range, "80,180,1")] public int TowerButtonWidth { get; set; } = 112;

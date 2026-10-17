@@ -18,6 +18,7 @@ public partial class LaserTowerConfig : TowerConfig
     [Export] public bool RotateWhileTracking { get; set; } = true;
     [ExportGroup("Targeting")]
     [Export] public TowerTargeting.Priority TargetPriority { get; set; } = TowerTargeting.Priority.First;
+    public override string InspectorTargetPriorityLabel => TargetPriority.ToString();
 
     // Level-one C# tuning accessors forward directly to its snapshot; they are not Inspector sources.
     public float RangePixels { get => Levels[0].Stats.RangePixels; set => SetLevelStats(1, Levels[0].Stats with { RangePixels = value }); }

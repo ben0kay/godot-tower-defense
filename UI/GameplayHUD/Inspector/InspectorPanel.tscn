@@ -1,7 +1,7 @@
 [gd_scene format=3]
 
 [node name="Inspector" type="PanelContainer"]
-custom_minimum_size = Vector2(392, 360)
+custom_minimum_size = Vector2(540, 325)
 size_flags_vertical = 8
 mouse_filter = 0
 
@@ -70,10 +70,36 @@ layout_mode = 2
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 11
 
+[node name="TargetSection" type="VBoxContainer" parent="Insets/Body"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="Divider" type="HSeparator" parent="Insets/Body/TargetSection"]
+layout_mode = 2
+
+[node name="TargetHeading" type="Label" parent="Insets/Body/TargetSection"]
+layout_mode = 2
+text = "TARGET PRIORITY"
+theme_override_font_sizes/font_size = 12
+
+[node name="TargetValue" type="Label" parent="Insets/Body/TargetSection"]
+layout_mode = 2
+text = "First"
+theme_override_font_sizes/font_size = 13
+
 [node name="RankSection" type="VBoxContainer" parent="Insets/Body"]
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 3
+
+[node name="Divider" type="HSeparator" parent="Insets/Body/RankSection"]
+layout_mode = 2
+
+[node name="RankHeading" type="Label" parent="Insets/Body/RankSection"]
+layout_mode = 2
+text = "COMBAT RANK  ·  EARNED IN COMBAT"
+theme_override_font_sizes/font_size = 12
 
 [node name="Rank" type="Label" parent="Insets/Body/RankSection"]
 layout_mode = 2
@@ -99,17 +125,23 @@ autowrap_mode = 3
 text = "Rank bonuses: Damage +0% / Range +0%"
 theme_override_font_sizes/font_size = 11
 
-[node name="TowerStats" type="Label" parent="Insets/Body"]
+[node name="UpgradeDivider" type="HSeparator" parent="Insets/Body"]
+visible = false
 layout_mode = 2
-autowrap_mode = 3
-text = "Prototype stats"
-theme_override_font_sizes/font_size = 13
 
-[node name="Notes" type="Label" parent="Insets/Body"]
+[node name="UpgradeTitle" type="Label" parent="Insets/Body"]
+visible = false
 layout_mode = 2
-text = "Select a tower to preview."
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 11
+text = "PAID UPGRADE  ·  CREDITS"
+theme_override_font_sizes/font_size = 12
+
+[node name="UpgradeComparison" type="GridContainer" parent="Insets/Body"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 4
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 4
 
 [node name="UpgradeInfo" type="Label" parent="Insets/Body"]
 visible = false
@@ -122,3 +154,23 @@ visible = false
 layout_mode = 2
 custom_minimum_size = Vector2(0, 30)
 text = "UPGRADE"
+
+[node name="DetailsToggle" type="Button" parent="Insets/Body"]
+visible = false
+layout_mode = 2
+custom_minimum_size = Vector2(0, 26)
+text = "ADDITIONAL DETAILS ▸"
+tooltip_text = "Show detailed stats, ammunition and grid information"
+
+[node name="TowerStats" type="Label" parent="Insets/Body"]
+layout_mode = 2
+autowrap_mode = 3
+text = "Prototype stats"
+theme_override_font_sizes/font_size = 13
+
+[node name="Notes" type="Label" parent="Insets/Body"]
+layout_mode = 2
+text = "Select a tower to preview."
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 11
+

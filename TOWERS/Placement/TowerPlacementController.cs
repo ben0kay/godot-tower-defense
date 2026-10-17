@@ -314,7 +314,8 @@ public partial class TowerPlacementController : Node2D
             _selected.SetSelected(true);
             _hud.ShowTowerDetails(_selected.AuthoredConfig.DisplayName, (_selected.Definition?.Category.ToString() ?? "Tower") + " / Placed",
                 DescribeTower($"Grid cell: {_selected.GridCell.X}, {_selected.GridCell.Y}"),
-                _selected.AuthoredConfig.Description + "\nConstruction paid.");
+                _selected.AuthoredConfig.Description + "\nConstruction paid.", newSelection: true);
+            _hud.SetTargetPriorityDetails(_selected.AuthoredConfig.InspectorTargetPriorityLabel);
             _hud.SetRankDetails(_selected); _hud.SetRuntimeDetails(_selected.DescribeRuntime()); _hud.SetWorkDetails(_selected);
         }
         RefreshUpgradePreview();
@@ -329,7 +330,7 @@ public partial class TowerPlacementController : Node2D
         if (_hud.IsInspectionVisible) _hud.ShowTowerDetails(_selected.AuthoredConfig.DisplayName, (_selected.Definition?.Category.ToString() ?? "Tower") + " / Placed",
             DescribeTower($"Grid cell: {_selected.GridCell.X}, {_selected.GridCell.Y}"),
             _selected.AuthoredConfig.Description + "\nConstruction paid.");
-        if (_hud.IsInspectionVisible) { _hud.SetRankDetails(_selected); _hud.SetRuntimeDetails(_selected.DescribeRuntime()); _hud.SetWorkDetails(_selected); RefreshUpgradePreview(); }
+        if (_hud.IsInspectionVisible) { _hud.SetTargetPriorityDetails(_selected.AuthoredConfig.InspectorTargetPriorityLabel); _hud.SetRankDetails(_selected); _hud.SetRuntimeDetails(_selected.DescribeRuntime()); _hud.SetWorkDetails(_selected); RefreshUpgradePreview(); }
         QueueRedraw();
     }
 

@@ -10,6 +10,7 @@ public partial class ProjectileTurretConfig : TowerConfig
     [Export] public bool RotateWhileTracking { get; set; } = true;
     [ExportGroup("Targeting")]
     [Export] public TowerTargeting.Priority TargetPriority { get; set; } = TowerTargeting.Priority.First;
+    public override string InspectorTargetPriorityLabel => TargetPriority.ToString();
 
     // =========================================================
     // C# Level 1 accessors edit the authored instance row, never a second shadow balance source.

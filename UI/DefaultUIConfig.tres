@@ -4,3 +4,5 @@
 
 [resource]
 script = ExtResource("1_ui")
+InspectorWidth = 540
+InspectorHeight = 325

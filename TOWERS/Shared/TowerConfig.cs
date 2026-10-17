@@ -62,6 +62,10 @@ public partial class TowerConfig : Resource
     public virtual string DescribeStats(TowerFinalStats final) => "Passive tower; no weapon capability.";
 
     // =========================================================
+    // Read-only target priority for aimed weapons. IT3 adds a live per-instance selector.
+    public virtual string InspectorTargetPriorityLabel => "";
+
+    // =========================================================
     // Types describe changes from their own resolver; no duplicated preview arithmetic.
     public virtual string DescribeChanges(TowerFinalStats now, TowerFinalStats future) => "";
     // =========================================================

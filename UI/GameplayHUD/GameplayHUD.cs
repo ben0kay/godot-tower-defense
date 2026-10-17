@@ -35,7 +35,12 @@ public partial class GameplayHUD : Control
     private Control _traySlot;
     private Label _wave, _credits, _core, _towerName, _towerCategory, _towerStats, _towerNotes;
     private Button _startWave, _upgradeButton;
-    private Label _upgradeInfo, _runtimeStats;
+    private Label _upgradeInfo, _runtimeStats, _upgradeTitle, _targetValue;
+    private VBoxContainer _targetSection;
+    private GridContainer _upgradeComparison;
+    private Control _upgradeDivider;
+    private Button _detailsToggle;
+    private bool _detailsExpanded, _buildPreview;
     private CreditGainIndicator _creditGain;
     private ProgressBar _healthBar, _experienceBar;
     private VBoxContainer _rankSection, _workSection;
@@ -85,6 +90,13 @@ public partial class GameplayHUD : Control
         _runtimeStats.Name = "RuntimeStats"; _runtimeStats.AutowrapMode = TextServer.AutowrapMode.WordSmart;
         _towerStats.AddSibling(_runtimeStats); _runtimeStats.Hide();
         _towerNotes = GetNode<Label>("BottomArea/Inspector/Insets/Body/Notes");
+        _detailsToggle = GetNode<Button>("BottomArea/Inspector/Insets/Body/DetailsToggle");
+        _detailsToggle.Pressed += ToggleDetails;
+        _targetSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/TargetSection");
+        _targetValue = _targetSection.GetNode<Label>("TargetValue");
+        _upgradeTitle = GetNode<Label>("BottomArea/Inspector/Insets/Body/UpgradeTitle");
+        _upgradeDivider = GetNode<Control>("BottomArea/Inspector/Insets/Body/UpgradeDivider");
+        _upgradeComparison = GetNode<GridContainer>("BottomArea/Inspector/Insets/Body/UpgradeComparison");
         _workSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/WorkSection");
         _workStatus = _workSection.GetNode<Label>("Status"); _workTime = _workSection.GetNode<Label>("Time");
         _workBar = _workSection.GetNode<ProgressBar>("Progress");
@@ -224,23 +236,42 @@ public partial class GameplayHUD : Control
 
     // =========================================================
     // Placement supplies actual instance details and build previews to the independent Inspector.
-    public void ShowTowerDetails(string name, string category, string stats, string notes = "")
+    public void ShowTowerDetails(string name, string category, string stats, string notes = "", bool newSelection = false)
     {
-        SetRuntimeDetails(""); SetWorkDetails(null);
-        SetUpgradeDetails("", "", false);
-        _rankSection.Hide();
-        if (!IsInspectionVisible || _towerName.Text != name || _towerStats.Text != stats)
-            _inspector.GetNode<ScrollContainer>("Insets").ScrollVertical = 0;
-        _towerName.Text = name;
-        _towerCategory.Text = category;
-        _towerStats.Text = stats;
-        _towerNotes.Text = notes;
-        _inspector.Show();
+        bool preview = !category.EndsWith("/ Placed", StringComparison.Ordinal);
+        bool changed = newSelection || !IsInspectionVisible || _towerName.Text != name || _towerCategory.Text != category;
+        if (changed)
+        { _inspector.GetNode<ScrollContainer>("Insets").ScrollVertical = 0; _detailsExpanded = preview; }
+        _buildPreview = preview;
+        SetRuntimeDetails(""); SetWorkDetails(null); SetUpgradeDetails("", "", false);
+        _targetSection.Hide(); _rankSection.Hide();
+        _towerName.Text = name; _towerCategory.Text = category;
+        _towerStats.Text = stats; _towerNotes.Text = notes;
+        RefreshDetailsVisibility(); _inspector.Show();
     }
 
     // =========================================================
+    // Detailed stats stay accessible below separately labeled earned and paid progression.
+    private void ToggleDetails() { _detailsExpanded = !_detailsExpanded; RefreshDetailsVisibility(); }
+    private void RefreshDetailsVisibility()
+    {
+        bool show = _buildPreview || _detailsExpanded;
+        _detailsToggle.Visible = !_buildPreview;
+        _detailsToggle.Text = show ? "ADDITIONAL DETAILS ▾" : "ADDITIONAL DETAILS ▸";
+        _towerStats.Visible = show && _towerStats.Text.Length > 0;
+        _towerNotes.Visible = show && _towerNotes.Text.Length > 0;
+        _runtimeStats.Visible = show && _runtimeStats.Text.Length > 0;
+    }
+
+    // =========================================================
+    // IT1 presents existing First/Closest policy read-only; editable modes are the IT3 pass.
+    public void SetTargetPriorityDetails(string priority)
+    { _targetSection.Visible = !_buildPreview && priority.Length > 0; _targetValue.Text = priority; }
+
+    // =========================================================
     // Update inventory/status only; leave numeric stats, rank progress and upgrade previews untouched.
-    public void SetRuntimeDetails(string text) { _runtimeStats.Text = text; _runtimeStats.Visible = text.Length > 0; }
+    public void SetRuntimeDetails(string text)
+    { _runtimeStats.Text = text; RefreshDetailsVisibility(); }
 
     // =========================================================
     // Work-only updates leave current stats, rank, free previews and scroll position untouched.
@@ -263,7 +294,8 @@ public partial class GameplayHUD : Control
     // Event-driven presentation: fractional progress within the current rank, with total XP also visible.
     public void SetRankDetails(TowerBase tower)
     {
-        if (!GodotObject.IsInstanceValid(tower) || tower.AuthoredConfig == null) { _rankSection.Hide(); return; }
+        if (!GodotObject.IsInstanceValid(tower) || tower.FinalStats == null || tower.AuthoredConfig == null || tower.AuthoredConfig.Ranks.Count < 2)
+        { _rankSection.Hide(); return; }
         TowerRankDefinition current = tower.CurrentRank;
         TowerRankDefinition? next = tower.NextRank;
         double total = tower.RankProgress.TotalXp;
@@ -536,7 +568,12 @@ public partial class GameplayHUD : Control
         inspection.ContentMarginTop = inspection.ContentMarginBottom = 10;
         _inspector.AddThemeStyleboxOverride("panel", inspection);
 
-        _upgradeInfo.AddThemeColorOverride("font_color", Config.AccentColor);
+        _upgradeInfo.AddThemeColorOverride("font_color", Config.MutedTextColor);
+        _upgradeTitle.AddThemeColorOverride("font_color", Config.AccentColor);
+        _targetValue.AddThemeColorOverride("font_color", Config.TextColor);
+        _targetSection.GetNode<Label>("TargetHeading").AddThemeColorOverride("font_color", Config.AccentColor);
+        _rankSection.GetNode<Label>("RankHeading").AddThemeColorOverride("font_color", Config.AccentColor);
+        UIButtonFactory.Apply(_detailsToggle, UIButtonStyle.Compact, Config);
         UIButtonFactory.Apply(_upgradeButton, UIButtonStyle.Action, Config);
         UIButtonFactory.Apply(_startWave, UIButtonStyle.Action, Config);
         _healthFill = new StyleBoxFlat { BgColor = Config.HealthHealthyColor };
