@@ -46,7 +46,7 @@ public partial class AmmunitionLoopChecks : Node
                 f.Return(incoming); Require(f.Logistics.BusySlots(factory) == 0, "Returning home releases factory slot");
                 tower.Config.TargetPriority = TowerTargeting.Priority.Closest;
                 Enemy enemy = f.Target(tower.GlobalPosition + new Vector2(100, 0));
-                for (int i = 0; i < 900; i++) { tower._PhysicsProcess(2); f.ClearProjectiles(); }
+                for (int i = 0; i < 900; i++) { tower.AdvanceConditions(2); tower._PhysicsProcess(2); f.ClearProjectiles(); }
                 Require(tower.Ammunition.Inventory.Amount == 100 && tower.Ammunition.ConsumedRounds == 900 && tower.Ammunition.ResupplyRequested,
                     "900 actual Battle launches reach global 10% threshold and one demand");
                 f.Dispatch(); AmmoDeliveryJob refill = f.Logistics.Jobs.Single(j => j.Destination == tower);

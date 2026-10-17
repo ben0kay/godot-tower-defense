@@ -50,3 +50,7 @@ Rank promotions/purchases retain absolute heat. Capacity reductions clamp and ma
 **HD3 is deferred:** no heat bar, disable-reason label, heat upgrade-comparison rows, cooling artwork or Inspector layout changes. No save persistence, EMP attack, electricity, tower HP/shields or abilities were introduced. Explicit clock stepping through `AdvanceConditions` supports tests; normal gameplay uses the shared pause-aware physics clock.
 
 Verification: [TowerConditions.md](../../../TESTS/Towers/TowerConditions.md).
+
+## Battle timing profile follow-up
+
+Battle is now enabled through its authored config: **OverheatAfterMinutes=3**, **OverheatRecoverySeconds=9**. Other offensive defaults remain heatless. The statement above that all defaults are heatless describes the original HD1/HD2 foundation only. Shared HeatTiming resolves once at Stage07 using the selected final shot cadence; complete explicit HeatStats rows take priority. Capacity100 and restart35% are the normalized defaults. For target T seconds, cadence R and cooling C, heat per shot is `(100 + C*T)/(R*T + 1)`; `C=65/recoverySeconds`. The initial-shot contribution and normal inter-shot cooling are included. It is a cold-start approximation bounded by discrete shot/frame scheduling, not a wall-clock disable countdown. No shots means no heat. See BattleTower/README.md for editor tuning and tests.

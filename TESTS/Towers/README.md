@@ -37,3 +37,5 @@ The compact two-column Inspector supersedes the earlier540×325 scrolling layout
 ## Shared beam ripple and particle presentation — 2026-10-17
 
 `LaserTowerChecks` now asserts travelling ripple geometry (more than two points while enabled), an exactly anchored muzzle, last visual point within the configured target wander radius, unchanged gameplay damage/stats across visual edits, the two scene-owned `GpuParticles2D` emitters with shared motion material, independent particle switches and a two-point idle/straight-line fallback when all effects are off. Particle textures/materials live in `FEEDBACK/Shared/`; implementation notes are in `TOWERS/Shared/Weapons/Beams/README.md`. **Source changed; the modified fixture has not yet been run in Godot here.** Headless checks alone will not verify rendered glow/spark quality.
+
+`BattleHeatTimingChecks.tscn` exercises the enabled authored Battle preset with3/3.5 minutes, all three selected level rows, and30/60/120Hz clocks. It checks cold-start duration, nine-second recovery, passive cooling, private live config changes and unchanged cached FinalStats. Actual outcomes: BattleHeatTiming.md.

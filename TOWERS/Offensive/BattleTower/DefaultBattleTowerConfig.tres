@@ -12,3 +12,7 @@ ConstructionArt = ExtResource("2_art")
 
 ProjectileVisual = ExtResource("pv_tracer")
 MuzzleFlash = ExtResource("pv_flash")
+
+HeatEnabled = true
+OverheatAfterMinutes = 3.0
+OverheatRecoverySeconds = 9.0

@@ -14,6 +14,19 @@ public partial class BattleTowerConfig : TowerConfig, ITowerTargetingPolicy, IPr
         Levels = BattleTowerLevels.Create();
     }
 
+    private bool _heatEnabled;
+    private double _overheatMinutes = 3, _recoverySeconds = 9;
+    [ExportGroup("Heat")]
+    [Export] public bool HeatEnabled
+    { get => _heatEnabled; set { if (_heatEnabled == value) return; _heatEnabled = value; EmitChanged(); } }
+    [Export(PropertyHint.Range, "0.1,30,0.1,or_greater,suffix:min")]
+    public double OverheatAfterMinutes
+    { get => _overheatMinutes; set { if (_overheatMinutes == value) return; _overheatMinutes = value; EmitChanged(); } }
+    [Export(PropertyHint.Range, "1,120,0.5,or_greater,suffix:s")]
+    public double OverheatRecoverySeconds
+    { get => _recoverySeconds; set { if (_recoverySeconds == value) return; _recoverySeconds = value; EmitChanged(); } }
+    public override HeatTiming? SustainedHeatTiming => HeatEnabled ? new(OverheatAfterMinutes * 60, OverheatRecoverySeconds) : null;
+
     [ExportGroup("Weapon Visuals")]
     [Export] public ProjectileVisualStyle ProjectileVisual { get; set; }
     [Export] public MuzzleFlashStyle MuzzleFlash { get; set; }

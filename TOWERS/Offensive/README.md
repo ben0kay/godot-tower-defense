@@ -4,7 +4,7 @@ The default catalog contains BattleTower (guided Kinetic projectile), LaserTower
 
 COMBAT/Damage owns shield/hull responses, optional absolute weapon overrides and penetration. COMBAT/AreaDamage owns instant-disc selection and weapon-input distance falloff. SplashProjectile delivers Blaster's launch-snapshotted area payload exactly once at impact; FEEDBACK/Shockwave is cosmetic only. See BlasterCannon/README.md for current values and tests.
 
-Missile Tower, armour, terrain-blocking line of sight and enemy timed status effects remain deferred. **HD1/HD2 shared disabling and opt-in heat are implemented**; existing balance remains heatless until per-level settings are authored. See [below](#shared-tower-heat-and-disabling--hd1hd2). The implemented Phase4E ShockwaveEmitter damages only when its advancing front reaches an enemy and shares the visual effect with Blaster. It uses its own explicit C# levels and cached optional ShockwaveStats.
+Missile Tower, armour, terrain-blocking line of sight and enemy timed status effects remain deferred. **HD1/HD2 shared disabling and opt-in heat are implemented**; Battle now has a3min sustained-fire profile with9s recovery; other defaults remain heatless. See [below](#shared-tower-heat-and-disabling--hd1hd2). The implemented Phase4E ShockwaveEmitter damages only when its advancing front reaches an enemy and shares the visual effect with Blaster. It uses its own explicit C# levels and cached optional ShockwaveStats.
 
 
 ## Sniper and Machine Gun — new projectile specializations
@@ -22,7 +22,7 @@ Missile Tower, armour, terrain-blocking line of sight and enemy timed status eff
 
 ## Shared tower heat and disabling — HD1/HD2
 
-**Status (2026-10-17): HD1/HD2 IMPLEMENTED; HD3 remains deferred.** Public API, source/expiry policy, optional level authoring and runtime behavior are documented in [Shared/Conditions](../Shared/Conditions/README.md). Existing Heat=null rows preserve current tower balance; opt-ins/numeric heat balance remain TBD. The existing Ammunition Factory **production buffer** is unrelated to weapon heat. The original implementation requirements follow.
+**Status (2026-10-17): HD1/HD2 IMPLEMENTED; HD3 remains deferred.** Public API, source/expiry policy, optional level authoring and runtime behavior are documented in [Shared/Conditions](../Shared/Conditions/README.md). Battle is enabled through its minutes-based config (3min,9s recovery); other tower heat settings remain TBD. The existing Ammunition Factory **production buffer** is unrelated to weapon heat. The original implementation requirements follow.
 
 ### 1. Shared, source-aware tower disabling (HD1)
 

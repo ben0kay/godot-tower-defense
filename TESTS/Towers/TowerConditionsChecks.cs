@@ -33,7 +33,7 @@ public partial class TowerConditionsChecks : Node
     // Handles isolate applications/towers; same nonzero source refreshes, separate sources overlap safely.
     private static void Sources(AmmoLoopFixture f)
     {
-        TowerBase a = f.Add<TowerBase>("battle", new(2000,2064)), b = f.Add<TowerBase>("battle", new(2400,2064));
+        TowerBase a = f.Add<TowerBase>("battle", new(2000,2064), c => ((BattleTowerConfig)c).HeatEnabled = false), b = f.Add<TowerBase>("battle", new(2400,2064), c => ((BattleTowerConfig)c).HeatEnabled = false);
         Require(a.GetNodeOrNull("CombatConditions") == null && a.CanAttack, "Heatless unaffected towers have no extra clock");
         int changes = 0; a.DisableStateChanged += () => changes++;
         var first = a.ApplyDisable(TowerDisableReason.EMP, 2, 10);
@@ -57,7 +57,7 @@ public partial class TowerConditionsChecks : Node
     // =========================================================
     // Optional heat is configured through the selected complete row, not modifiers or shared resource mutations.
     private static TowerBase Heated(AmmoLoopFixture f, string id, HeatStats stats) =>
-        f.Add<TowerBase>(id, new(2000,2128), config => config.SetLevelStats(1, config.Levels[0].Stats with { Heat = stats }));
+        f.Add<TowerBase>(id, new(2000,2128), config => { if (config is BattleTowerConfig battle) battle.HeatEnabled = false; config.SetLevelStats(1, config.Levels[0].Stats with { Heat = stats }); });
     // =========================================================
     // Commit threshold attack once, block subsequent launches/beam/aim, retain launched attacks and other causes.
     private static void Weapons(AmmoLoopFixture f)

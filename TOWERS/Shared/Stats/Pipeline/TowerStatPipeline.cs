@@ -14,7 +14,7 @@ public static class TowerStatPipeline
         if (config == null) throw new ArgumentNullException(nameof(config));
         if (level < 1 || level > config.Levels.Count) throw new ArgumentOutOfRangeException(nameof(level));
         if (level > 1) TowerUpgradeController.Validate(config.Levels);
-        return Resolve(new TowerStatContext(config.Levels[0].Stats, config.Levels[level - 1].Stats, rank), trace);
+        return Resolve(new TowerStatContext(config.Levels[0].Stats, config.Levels[level - 1].Stats, rank, config.SustainedHeatTiming), trace);
     }
 
     // =========================================================

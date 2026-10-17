@@ -73,7 +73,7 @@ public partial class BattleTower : TowerBase
     {
         if (!CanAttack) return;
         if (FinalStats == null) return;
-        _searchTimer -= (float)delta; _shotTimer = Mathf.Max(0f, _shotTimer - (float)delta);
+        _searchTimer -= (float)delta; _shotTimer = Mathf.Max(-Mathf.Min((float)delta, .05f), _shotTimer - (float)delta);
         if (_searchTimer <= 0f)
         {
             _target = TowerTargeting.Find(_registry, GlobalPosition, Mathf.Max(0f, FinalStats.RangePixels), Config.TargetPriority);
@@ -88,7 +88,7 @@ public partial class BattleTower : TowerBase
         bullet.Initialize(_target, FinalStats.ProjectileSpeed,
             new DamageInfo(FinalStats.DamagePerShot, DamageType.Kinetic, shieldPenetration: FinalStats.ShieldPenetration, source: DamageSource), visual: Config.ProjectileVisual);
         _projectiles.AddChild(bullet); WeaponVisuals.Present(bullet, _muzzle, Config, _visuals);
-        _shotTimer = 1f / FinalStats.ShotsPerSecond;
+        _shotTimer = Mathf.Max(0, 1f / FinalStats.ShotsPerSecond + _shotTimer);
         RecordAttackHeat();
     }
     #endregion

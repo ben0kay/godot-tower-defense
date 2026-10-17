@@ -53,3 +53,13 @@ Implemented 18px amber tracer and stronger golden starburst; actual muzzle is `(
 **Current firing rate (additional +20%):** Levels 1–3 fire **1.68 / 1.764 / 1.848 bullets/s**, multiplying the immediately preceding 1.40 / 1.47 / 1.54 by 1.20. The projectile travel speed was 800 px/s at that time, with unchanged per-hit damage, ammunition cost, prices, aiming, construction times and rank bonuses.
 
 **Projectile-speed rebalance (+25%, October 2026):** All three levels now launch guided Kinetic tracers at **1,000 px/s** instead of 800 px/s. Fire cadence remains 1.68 / 1.764 / 1.848 shots/s; muzzle flash, impact damage, range, ammunition and upgrades are unchanged.
+
+## Enabled heat: minutes-based authoring
+
+Battle now overheats after approximately **3 minutes of uninterrupted firing from cold**, at every purchased level, and recovers to its35% restart threshold in about9 seconds. Brief genuine combat breaks cool it; ordinary scheduled gaps between shots are already included in the timing calculation. Other towers have not been assigned heat balance in this pass.
+
+In Godot's FileSystem, select `DefaultBattleTowerConfig.tres`, expand **Heat**, and edit **Overheat After Minutes**. Enter `3.5` for roughly210 seconds; this is minutes, not seconds. **Heat Enabled** switches the default timing profile off/on. **Overheat Recovery Seconds** defaults9. These are editor/Remote Inspector config fields, not a new editable field in the bottom-right gameplay HUD. The in-game heat bar/status remains HD3.
+
+The shared HeatTiming value converts this authoring target to cached HeatStats after selected-level/rank/research/effect cadence inputs. It accounts for continuous passive cooling and the initial immediate shot. FinalStats are not rebuilt per attack. Explicit non-null per-level HeatStats override the timing profile; other level values/prices remain authoritative in BattleTowerLevels.cs. Config edits preserve accumulated heat, and runtime copies remain private. Invalid/nonpositive timing settings yield no timing capability; HeatEnabled is the intended off switch.
+
+Battle cooldown now preserves fractional frame overshoot, as the shared multi-barrel weapons already do. This maintains authored rates instead of rounding the firing period upward each frame, and makes thermal timing consistent at30/60/120Hz without changing rate rows or firing catch-up bursts. Heavy frame hitches, ammo shortages or target loss reduce actual firing and can delay/prevent overheating. Verification: TESTS/Towers/BattleHeatTimingChecks.tscn.
