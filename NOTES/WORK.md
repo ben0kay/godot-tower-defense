@@ -8,6 +8,14 @@
 
 ---
 
+## Level001 combat/shield playtest balance — 2026-10-17
+
+- [x] Standard Drone (`basic_mk1` / Enemy001) has **20 optional shield points** in its saved EnemyDefinition; zero-shield ordinary/F2 starts remain unchanged.
+- [x] Level001's existing three waves remain manual and now contain **38 / 40 / 55** enemies with **7 / 12 / 18** shielded entries respectively. Wave 1 introduces shielded Standard Drones; waves 2–3 add Scouts; final wave adds a few Bulwarks. **No ShieldGenerator** is authored; no shield regeneration, mechanic refactor or new difficulty system was introduced. See [Level001Waves.cs](../LEVELS/Level001/Level001Waves.cs) and [Authoring.md](../LEVELS/Waves/Authoring.md).
+- [ ] **Balance/playtest verification:** Confirm 20-point red aura is readable, portal navigation works for the few Level001 Bulwarks, and the three escalating waves are still manageable at 1,000 starting Credits. C# build/headless/desktop test runs are outstanding for this GitHub-only balance pass.
+
+---
+
 ## Current amendment — Research before mission XP balancing (2026-10-17)
 
 **This amendment supersedes older status/order statements below; all original plans are retained.** The user explicitly prioritized real mission statistics and the Campaign-only Research Room before finalized XP rewards/deductions.
