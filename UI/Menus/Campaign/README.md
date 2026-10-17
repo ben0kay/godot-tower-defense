@@ -9,3 +9,7 @@ Later replace this single-level gateway with **Campaign → Levels screen** wher
 ## Planned Campaign Hub + Research Room (NOT IMPLEMENTED)
 
 See [Player XP & Research Foundation P1–P5](../../../SYSTEMS/Progression/PLAYER_XP_RESEARCH_FOUNDATION_PASS.md). Target: show **Profile Name / Player Level / next-level XP progress / RP**, provide **LEVELS** (existing Level001/Level002 selection) and **RESEARCH** entries. Research will be an expandable center-origin hex tech tree with one real node: **Citadel Master I** (1 RP, +10% Citadel maximum health). **Existing direct level buttons are current behavior until Codex implements this.**
+
+## Player progression foundation (2026-10-17)
+
+Separate per-profile XP/levels/Research Points now live in SYSTEMS/Progression (see its README). Main and Campaign show the selected profile's level, XP bar and RP. Missing progression starts at Level 1; saved grants survive restart and profile switching. Identity/index format is unchanged. The optional menu DEBUG grant is Inspector-controlled and off by default. Mission rewards/Results XP, replay rules, research purchasing and full campaign/battlefield saving remain deferred; this does not complete P1–P5 or Results R4.

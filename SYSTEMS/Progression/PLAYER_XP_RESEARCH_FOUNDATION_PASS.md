@@ -1,6 +1,10 @@
 # Codex Implementation Pass — Player XP, Campaign Hub and First Research Node
 
-> **STATUS: PLANNED — DOCUMENTATION ONLY.** Implement in the ordered, testable phases P1–P5 below. This is a narrow **first playable foundation**, not the complete research tree, account economy, or full campaign save/load. Last checked against the Godot C# repository on 2026-10-16. Follow `NOTES/CodePreferences.md` and the current code before writing.
+> **STATUS: PARTIAL — initial profile progression/menu slice implemented; full P1–P5 remain open.** Implement in the ordered, testable phases P1–P5 below. This is a narrow **first playable foundation**, not the complete research tree, account economy, or full campaign save/load. Last checked against the Godot C# repository on 2026-10-16. Follow `NOTES/CodePreferences.md` and the current code before writing.
+
+## Smaller first slice selected by user (2026-10-17)
+
+Implemented the XP/level/RP record, atomic separate store, selected-profile grant API, editable starting curve and shared Main/Campaign display. Default-off DEBUG grant enables verification. Curve parameters persist with each saved record. See README.md for ownership and TESTS/Progression/README.md for validation limits. P1's mission calculator, replay/first-clear history and award-token persistence are still absent; its combined checkboxes intentionally remain open. P2 and P4 are unimplemented; P3 only has the progression display, without the hub split. Preserve this foundation rather than create a second XP service.
 
 ## Player experience and intended menu flow
 

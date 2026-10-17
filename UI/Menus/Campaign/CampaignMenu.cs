@@ -8,6 +8,8 @@ public partial class CampaignMenu : Control
     #region Inspector
     [ExportGroup("Layout")]
     [Export(PropertyHint.Range, "300,900,10")] public float PanelWidth { get; set; } = 560f;
+    [ExportGroup("Development")]
+    [Export] public bool ShowProgressionDebugGrant { get; set; } = false;
     #endregion
 
     #region Lifecycle
@@ -20,6 +22,7 @@ public partial class CampaignMenu : Control
         if (ProfileStore.Selected == null) { MenuNavigation.ReturnToBoot(this); return; }
         VBoxContainer content = MenuLayout.Create(this, "CAMPAIGN",
             "Commander " + ProfileStore.Selected.Name + "  /  Select a deployment", PanelWidth);
+        content.AddChild(new PlayerProgressionPanel { Name = "PlayerProgression", AllowDebugGrant = ShowProgressionDebugGrant });
         content.AddChild(UIButtonFactory.Label("LEVEL 001  —  DEFEND THE CITADEL", 17));
         Label details = UIButtonFactory.Label("Initial combat test map with compact routes.", 14);
         details.AutowrapMode = TextServer.AutowrapMode.WordSmart;

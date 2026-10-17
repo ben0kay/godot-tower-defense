@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ProgressionMasterConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://SYSTEMS/Progression/ProgressionMasterConfig.cs" id="1_config"]
+
+[resource]
+script = ExtResource("1_config")
+FirstLevelXP = 500
+LevelStepXP = 250

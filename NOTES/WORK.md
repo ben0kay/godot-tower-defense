@@ -12,6 +12,11 @@
 - **[x] COMPLETE:** listed to stop Codex from repeating the work.
 - A long-term idea mentioned in a README is **not** automatically approved for a giant implementation. Split large systems into narrow passes first.
 
+
+## Initial progression/menu foundation — 2026-10-17
+
+The user selected a smaller first slice of P1/P3: separate per-profile persistent XP/levels/RP, editable starting curve, multi-level carry and +1 RP per promotion, shared Main/Campaign display, and an off-by-default DEBUG grant option. See [Progression README](../SYSTEMS/Progression/README.md). Mission XP scoring, replay/first-clear history, once-only mission awards, Results XP, the Levels/Research hub split and Research Room remain **OPEN**. Do not mark all P1 or P3 complete. Verification: TESTS/Progression/README.md.
+
 ## A. Open implementation passes (Codex-ready or scoped in existing notes)
 
 | Status | Pass / work | Authoritative notes and next action | Dependencies / caveats |

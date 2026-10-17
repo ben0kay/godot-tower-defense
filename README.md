@@ -54,3 +54,7 @@ The eventual concept is **one persistent sci-fi campaign / empire** with three c
 ## Ammunition supply
 
 All four offensive weapons consume finite local reserves. Build an Ammunition Factory (200 Credits) and Depot (150 Credits) from the Ctrl tray: factories manufacture automatically, visible drones carry stock to depots, then depot drones supply towers at/below10%. New weapons start full by default; their config InitialAmmoFraction permits quicker low/empty testing. See `TOWERS/Economy/Ammunition/README.md` and `TESTS/Economy/Ammunition.md`. Magazines, power, inputs, research and campaign saving remain deferred.
+
+## Player progression foundation (2026-10-17)
+
+Separate per-profile XP/levels/Research Points now live in SYSTEMS/Progression (see its README). Main and Campaign show the selected profile's level, XP bar and RP. Missing progression starts at Level 1; saved grants survive restart and profile switching. Identity/index format is unchanged. The optional menu DEBUG grant is Inspector-controlled and off by default. Mission rewards/Results XP, replay rules, research purchasing and full campaign/battlefield saving remain deferred; this does not complete P1–P5 or Results R4.

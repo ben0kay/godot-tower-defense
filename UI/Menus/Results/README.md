@@ -56,3 +56,7 @@ R1 has C# source-generator compilation and Godot .NET headless coverage. Ordinar
 ## Planned XP awarding extension (P1/P2; NOT IMPLEMENTED)
 
 See [the phased Player XP / Research implementation brief](../../../SYSTEMS/Progression/PLAYER_XP_RESEARCH_FOUNDATION_PASS.md). Replace the existing XP placeholder with **authored victory baseline + signed performance modifiers** (Citadel integrity, editable target mission completion time, breaches), a once-only persistent profile award, player level-ups and +1 RP per level. The calculator/store owns awards; LevelResults only reveals the frozen breakdown. This implements a small defined subset of existing R3/R4, without implying all optional presentation/scoring is finished.
+
+## Player progression foundation (2026-10-17)
+
+Separate per-profile XP/levels/Research Points now live in SYSTEMS/Progression (see its README). Main and Campaign show the selected profile's level, XP bar and RP. Missing progression starts at Level 1; saved grants survive restart and profile switching. Identity/index format is unchanged. The optional menu DEBUG grant is Inspector-controlled and off by default. Mission rewards/Results XP, replay rules, research purchasing and full campaign/battlefield saving remain deferred; this does not complete P1–P5 or Results R4.

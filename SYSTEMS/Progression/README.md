@@ -1,9 +1,20 @@
-# Player Progression — planned campaign XP and research foundation
+# Player progression — initial menu foundation
 
-**Status: PLANNED / NOT IMPLEMENTED.**
+The selected profile GUID owns Player XP, player levels and Research Points independently of tower Rank XP, Credits and campaign/battlefield saves.
 
-Codex's authoritative phased implementation plan is **[PLAYER_XP_RESEARCH_FOUNDATION_PASS.md](PLAYER_XP_RESEARCH_FOUNDATION_PASS.md)** (P1–P5).
+- PlayerProgression: immutable source fields and derived level/current XP.
+- PlayerLevelCurve: pure linear curve, bounded binary search for multiple level-ups.
+- ProgressionMasterConfig + DefaultProgressionConfig.tres: new-profile thresholds (500 first, +250 each subsequent level).
+- ProgressionStore: version 1 JSON at user://Profiles/{GUID}/progression.json, flushed atomic replacement and validated backup recovery. Missing records start Level 1 / 0 XP / 0 RP without rewriting profile identity. Corruption with no valid backup raises an error and preserves files.
+- ProgressionService.GetCurrent / GrantXP(amount): selected-profile authority, save-before-notify, one RP per promotion, no autoload/frame processing.
+- UI/Menus/PlayerProgressionPanel: shared event-driven menu view; Main and Campaign display level, XP bar and RP.
 
-The goal is profile-wide Player XP → levels → +1 Research Point per level-up, a Campaign hub showing profile name/level/XP with **LEVELS** and **RESEARCH** entries, a Results XP baseline with performance bonuses/penalties (including editable target completion time), and a hex/radial Research Room with central Research Core and first real **Citadel Master I (+10% Citadel HP, 1 RP)**. Keep profile/global progression separate from the unimplemented battlefield campaign Save/Load, per-tower Rank XP and level Credits.
+Curve values are copied into the progression record on its first saved grant. Existing earned levels cannot shift just because the default resource changes. Deliberate migrations can be designed later. Derived levels are not serialized.
 
-**Documentation only.** Codex must implement, test and update statuses before marking this complete.
+## Development verification
+
+MainMenu and CampaignMenu expose ShowProgressionDebugGrant (default false). Enable it in the Inspector in a DEBUG build to show a clearly labelled 600 XP grant button. It **saves real progression** for the selected profile; use a disposable test profile. First click: Level 2, 100 / 750 XP, 1 RP. Release exports do not include the button.
+
+GrantXP is a low-level foundation API, not a mission reward claim API: repeated calls intentionally grant repeatedly. P2 must add frozen scoring and persisted run-token idempotency before connecting Results. No mission grants, replay history, research purchases or Citadel bonuses exist in this smaller pass.
+
+See PLAYER_XP_RESEARCH_FOUNDATION_PASS.md for remaining P1–P5 work and TESTS/Progression/README.md for actual verification.

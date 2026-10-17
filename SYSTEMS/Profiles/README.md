@@ -14,6 +14,10 @@ Godot `user://Profiles/profiles.json`: one versioned JSON index of local profile
 
 After F5: create a profile, choose Campaign, quit and relaunch; the existing name remains listed. Create two profiles and switch between them without losing either. Test invalid/duplicate names and an unreadable index with/without backup. `Main.tscn` remains directly runnable for gameplay tests without a selected profile.
 
-## Planned profile-wide progression (NOT IMPLEMENTED)
+## Profile-wide progression (initial foundation implemented)
 
-The selected profile GUID will own separate persistent Player XP/level and research-point/unlock state in [the P1–P5 progression brief](../Progression/PLAYER_XP_RESEARCH_FOUNDATION_PASS.md). Current `PlayerProfile` / `ProfileStore` still store **identity only**. Do not confuse Player XP with per-tower Rank XP or invent campaign Save/Load.
+The selected profile GUID now owns separate persistent Player XP/level and Research Point state; research unlocks remain planned in [the P1–P5 progression brief](../Progression/PLAYER_XP_RESEARCH_FOUNDATION_PASS.md). Current `PlayerProfile` / `ProfileStore` still store **identity only**. Do not confuse Player XP with per-tower Rank XP or invent campaign Save/Load.
+
+## Player progression foundation (2026-10-17)
+
+Separate per-profile XP/levels/Research Points now live in SYSTEMS/Progression (see its README). Main and Campaign show the selected profile's level, XP bar and RP. Missing progression starts at Level 1; saved grants survive restart and profile switching. Identity/index format is unchanged. The optional menu DEBUG grant is Inspector-controlled and off by default. Mission rewards/Results XP, replay rules, research purchasing and full campaign/battlefield saving remain deferred; this does not complete P1–P5 or Results R4.

@@ -9,4 +9,8 @@ The Boot screen selects the identity. Game scenes remain independent of menu lif
 
 Reference design: `ben0kay/isometric-new-2d/SYSTEMS/Profiles/ProfileStore.cs` and `SYSTEMS/Saving/`. Port only the patterns appropriate to a finite wave-based tower defense, not that game's world generation, entities or player survival serializer.
 
-- `Progression/`: **planned P1–P5** profile-wide player XP, levels, Research Points and Research Room; see [implementation brief](Progression/PLAYER_XP_RESEARCH_FOUNDATION_PASS.md). This is distinct from profile identity and future campaign/battlefield saves.
+- `Progression/`: **initial foundation implemented** profile-wide player XP, levels and Research Points; mission rewards and Research Room remain planned in P1–P5; see [implementation brief](Progression/PLAYER_XP_RESEARCH_FOUNDATION_PASS.md). This is distinct from profile identity and future campaign/battlefield saves.
+
+## Player progression foundation (2026-10-17)
+
+Separate per-profile XP/levels/Research Points now live in SYSTEMS/Progression (see its README). Main and Campaign show the selected profile's level, XP bar and RP. Missing progression starts at Level 1; saved grants survive restart and profile switching. Identity/index format is unchanged. The optional menu DEBUG grant is Inspector-controlled and off by default. Mission rewards/Results XP, replay rules, research purchasing and full campaign/battlefield saving remain deferred; this does not complete P1–P5 or Results R4.

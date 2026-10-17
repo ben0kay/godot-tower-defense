@@ -8,6 +8,8 @@ public partial class MainMenu : Control
     #region Inspector
     [ExportGroup("Layout")]
     [Export(PropertyHint.Range, "300,900,10")] public float PanelWidth { get; set; } = 560f;
+    [ExportGroup("Development")]
+    [Export] public bool ShowProgressionDebugGrant { get; set; } = false;
     #endregion
 
     #region Lifecycle
@@ -20,6 +22,7 @@ public partial class MainMenu : Control
         if (ProfileStore.Selected == null) { MenuNavigation.ReturnToBoot(this); return; }
         VBoxContainer content = MenuLayout.Create(this, "TOWER DEFENSE",
             "COMMAND INTERFACE  /  ACTIVE PROFILE: " + ProfileStore.Selected.Name.ToUpperInvariant(), PanelWidth);
+        content.AddChild(new PlayerProgressionPanel { Name = "PlayerProgression", AllowDebugGrant = ShowProgressionDebugGrant });
         Button campaign = UIButtonFactory.Create("CAMPAIGN", () => Navigate(MenuNavigation.CampaignScene),
             UIButtonStyle.Menu, 64f);
         content.AddChild(campaign);
