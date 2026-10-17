@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="96" height="72" viewBox="0 0 96 72">
-  <defs>
+<svg xmlns="http://www.w3.org/2000/svg" width="112" height="120" viewBox="0 0 112 120">
+<defs>
     <linearGradient id="armor" x1="0" y1="0" x2="0.85" y2="1">
       <stop offset="0" stop-color="#8b9aa7"/>
       <stop offset=".48" stop-color="#405160"/>
@@ -16,47 +16,65 @@
       <stop offset="1" stop-color="#c3faff"/>
     </linearGradient>
   </defs>
+  <!-- Big mk.1's oversized upper/lower armor wings create its heavy silhouette.
+       The existing hull is uniformly scaled; these wings are added artwork, not stretched. -->
+  <path d="M11 50 L20 19 L35 5 L54 12 L82 40 L93 51 L69 46 L47 30 L33 24 L26 54 Z"
+        fill="#182735" stroke="#99a8ae" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M11 70 L20 101 L35 115 L54 108 L82 80 L93 69 L69 74 L47 90 L33 96 L26 66 Z"
+        fill="#182735" stroke="#99a8ae" stroke-width="2.4" stroke-linejoin="round"/>
+  <!-- Reinforced wing plating and segmented details retain the sci-fi vector look. -->
+  <path d="M23 39 L27 19 L37 12 L53 18 L78 43 L60 41 L41 28 L33 27 L29 47 Z"
+        fill="url(#armor)" stroke="#b5c6c7" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M23 81 L27 101 L37 108 L53 102 L78 77 L60 79 L41 92 L33 93 L29 73 Z"
+        fill="url(#armor)" stroke="#b5c6c7" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M34 22 L47 22 L64 38 L47 33 Z M34 98 L47 98 L64 82 L47 87 Z"
+        fill="#243a4a" stroke="#66879a" stroke-width="1.2"/>
+  <path d="M38 12 L48 17 L60 28 M38 108 L48 103 L60 92"
+        stroke="#e6b06b" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <!-- Preserve the original hull reactor/engines, with uniform magnification. -->
+  <g transform="translate(0 18) scale(1.1666667)">
   <!-- Big mk.1: broad, high-mass armored ship pointing right (+X), matching shared enemy orientation. -->
-  <path d="M4 12 L21 16 L31 5 L59 8 L83 25 L94 36 L83 47 L59 64 L31 67 L21 56 L4 60 L11 41 L2 36 L11 31 Z"
-        fill="#182633" stroke="#a1adad" stroke-width="2" stroke-linejoin="round"/>
-  <!-- Huge symmetrical plated shoulders and forward reinforced fins. -->
-  <path d="M9 14 L24 17 L35 9 L55 11 L76 26 L54 27 L33 24 L19 29 Z"
-        fill="url(#armor)" stroke="#9eabb3" stroke-width="1.4" stroke-linejoin="round"/>
-  <path d="M9 58 L24 55 L35 63 L55 61 L76 46 L54 45 L33 48 L19 43 Z"
-        fill="url(#armor)" stroke="#9eabb3" stroke-width="1.4" stroke-linejoin="round"/>
-  <path d="M34 14 L53 16 L63 24 L41 23 Z M34 58 L53 56 L63 48 L41 49 Z"
-        fill="#1e303e" stroke="#65879a" stroke-width="1"/>
-  <path d="M26 30 L50 22 L77 27 L90 36 L77 45 L50 50 L26 42 L32 36 Z"
-        fill="url(#hull)" stroke="#bfcbc9" stroke-width="2.4" stroke-linejoin="round"/>
-  <!-- Double-chevron reinforced bow makes this silhouette heavier than Bulwark. -->
-  <path d="M66 26 L83 32 L90 36 L83 40 L66 46 L74 36 Z"
-        fill="#1b2b39" stroke="#9cbcc4" stroke-width="1.5"/>
-  <path d="M74 32 L86 36 L74 40" fill="none" stroke="#e1a05b" stroke-width="2"/>
-  <!-- Massive plated dorsal/ventral hull with angular seams. -->
-  <path d="M18 21 L38 26 L43 31 L30 33 L15 29 Z M18 51 L38 46 L43 41 L30 39 L15 43 Z"
-        fill="#536779" stroke="#a6b9c0" stroke-width="1.2"/>
-  <path d="M25 18 L37 22 L51 22 M25 54 L37 50 L51 50 M49 12 L61 22 M49 60 L61 50"
-        fill="none" stroke="#c4d1cb" stroke-opacity=".6" stroke-width="1.25"/>
-  <!-- Internal reactor / sensor slits and gold danger markings. -->
-  <path d="M37 33 L60 29 L75 36 L60 43 L37 39 L41 36 Z"
-        fill="#142c3d" stroke="#80adbd" stroke-width="1.4"/>
-  <path d="M43 34 L60 32 L68 36 L60 40 L43 38 Z" fill="url(#reactor)"/>
-  <path d="M21 24 L34 27 L31 29 L18 27 Z M21 48 L34 45 L31 43 L18 45 Z"
-        fill="#e5a34e" stroke="#ffd08d" stroke-width=".65"/>
-  <!-- Four heavy engines with orange exhaust, instead of a rapid scout's single drive. -->
-  <g fill="#1c2936" stroke="#bed1d0" stroke-width="1">
-    <rect x="4" y="23" width="14" height="5" rx="1"/>
-    <rect x="2" y="30" width="17" height="5" rx="1"/>
-    <rect x="2" y="37" width="17" height="5" rx="1"/>
-    <rect x="4" y="44" width="14" height="5" rx="1"/>
-  </g>
-  <g fill="#ffa64d">
-    <rect x="3" y="24" width="8" height="3" rx="1"/>
-    <rect x="1" y="31" width="9" height="3" rx="1"/>
-    <rect x="1" y="38" width="9" height="3" rx="1"/>
-    <rect x="3" y="45" width="8" height="3" rx="1"/>
-  </g>
-  <g fill="none" stroke="#ffe0a5" stroke-width="1" stroke-linecap="round">
-    <path d="M5 25.5 H10 M3 32.5 H9 M3 39.5 H9 M5 46.5 H10"/>
+    <path d="M4 12 L21 16 L31 5 L59 8 L83 25 L94 36 L83 47 L59 64 L31 67 L21 56 L4 60 L11 41 L2 36 L11 31 Z"
+          fill="#182633" stroke="#a1adad" stroke-width="2" stroke-linejoin="round"/>
+    <!-- Huge symmetrical plated shoulders and forward reinforced fins. -->
+    <path d="M9 14 L24 17 L35 9 L55 11 L76 26 L54 27 L33 24 L19 29 Z"
+          fill="url(#armor)" stroke="#9eabb3" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M9 58 L24 55 L35 63 L55 61 L76 46 L54 45 L33 48 L19 43 Z"
+          fill="url(#armor)" stroke="#9eabb3" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M34 14 L53 16 L63 24 L41 23 Z M34 58 L53 56 L63 48 L41 49 Z"
+          fill="#1e303e" stroke="#65879a" stroke-width="1"/>
+    <path d="M26 30 L50 22 L77 27 L90 36 L77 45 L50 50 L26 42 L32 36 Z"
+          fill="url(#hull)" stroke="#bfcbc9" stroke-width="2.4" stroke-linejoin="round"/>
+    <!-- Double-chevron reinforced bow makes this silhouette heavier than Bulwark. -->
+    <path d="M66 26 L83 32 L90 36 L83 40 L66 46 L74 36 Z"
+          fill="#1b2b39" stroke="#9cbcc4" stroke-width="1.5"/>
+    <path d="M74 32 L86 36 L74 40" fill="none" stroke="#e1a05b" stroke-width="2"/>
+    <!-- Massive plated dorsal/ventral hull with angular seams. -->
+    <path d="M18 21 L38 26 L43 31 L30 33 L15 29 Z M18 51 L38 46 L43 41 L30 39 L15 43 Z"
+          fill="#536779" stroke="#a6b9c0" stroke-width="1.2"/>
+    <path d="M25 18 L37 22 L51 22 M25 54 L37 50 L51 50 M49 12 L61 22 M49 60 L61 50"
+          fill="none" stroke="#c4d1cb" stroke-opacity=".6" stroke-width="1.25"/>
+    <!-- Internal reactor / sensor slits and gold danger markings. -->
+    <path d="M37 33 L60 29 L75 36 L60 43 L37 39 L41 36 Z"
+          fill="#142c3d" stroke="#80adbd" stroke-width="1.4"/>
+    <path d="M43 34 L60 32 L68 36 L60 40 L43 38 Z" fill="url(#reactor)"/>
+    <path d="M21 24 L34 27 L31 29 L18 27 Z M21 48 L34 45 L31 43 L18 45 Z"
+          fill="#e5a34e" stroke="#ffd08d" stroke-width=".65"/>
+    <!-- Four heavy engines with orange exhaust, instead of a rapid scout's single drive. -->
+    <g fill="#1c2936" stroke="#bed1d0" stroke-width="1">
+      <rect x="4" y="23" width="14" height="5" rx="1"/>
+      <rect x="2" y="30" width="17" height="5" rx="1"/>
+      <rect x="2" y="37" width="17" height="5" rx="1"/>
+      <rect x="4" y="44" width="14" height="5" rx="1"/>
+    </g>
+    <g fill="#ffa64d">
+      <rect x="3" y="24" width="8" height="3" rx="1"/>
+      <rect x="1" y="31" width="9" height="3" rx="1"/>
+      <rect x="1" y="38" width="9" height="3" rx="1"/>
+      <rect x="3" y="45" width="8" height="3" rx="1"/>
+    </g>
+    <g fill="none" stroke="#ffe0a5" stroke-width="1" stroke-linecap="round">
+      <path d="M5 25.5 H10 M3 32.5 H9 M3 39.5 H9 M5 46.5 H10"/>
+    </g>
   </g>
 </svg>

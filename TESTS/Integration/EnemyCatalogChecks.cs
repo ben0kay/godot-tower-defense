@@ -101,10 +101,10 @@ public static class EnemyCatalogChecks
             "Normal/F2 Big mk.1 spawn has no active shield and respects existing clearance");
         big.Movement.SetPhysicsProcess(false);
         Texture2D bigTexture = big.GetNode<Sprite2D>("Sprite").Texture;
-        Require(bigTexture != null && bigTexture.GetWidth() == 96 && bigTexture.GetHeight() == 72
+        Require(bigTexture != null && bigTexture.GetWidth() == 112 && bigTexture.GetHeight() == 120
             && big.GetNode<DefenseBar>("DefenseBar").GetChildCount() == 0
             && big.GetNodeOrNull<Node>("Abilities") == null,
-            "Big mk.1 uses the large dedicated SVG, shared lightweight bar and no extra abilities");
+            "Big mk.1 has oversized 112x120 SVG with no added ability nodes or runtime bar children");
         big.TakeDamage(100);
         DefenseBar hullBar = big.GetNode<DefenseBar>("DefenseBar");
         Require(big.Health == 900 && big.CurrentShield == 0 && hullBar.Visible

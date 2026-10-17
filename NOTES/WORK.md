@@ -11,9 +11,17 @@
 
 # WORK — Consolidated Outstanding Implementation Backlog
 
+## Big mk.1 visual enlargement — 2026-10-17
+
+- [x] Enlarged `big_mk1` artwork from **96×72 to 112×120 px**. Kept the original heavy hull with uniform scale and added large upper/lower plated wings (3.5× Enemy001 width, 5× height). The medium Bulwark stays 64×48.
+- [x] Updated exact sprite-size catalog assertions and feature/wave/feedback documentation. **No enemy HP/shield/speed/credits/abilities, scene transforms, wave authoring or navigation algorithm changed.** Big mk.1 keeps its existing 24px circular navigation radius.
+- [ ] **Godot visual QA outstanding:** reimport the SVG, verify silhouette/bar clearance, rotations, narrow corridors/wing overlap and mass-wave look; run EnemyCatalogChecks. No Godot runtime test run in this GitHub-only art pass.
+
+---
+
 ## Big mk.1 heavy enemy — 2026-10-17
 
-- [x] Registered `ENEMIES/Types/Enemy005` / `big_mk1` in `DefaultEnemyCatalog.tres`, using one inherited plain enemy scene and 96×72 right-facing plated SVG. Original GameMaker-inspired balance: **1,000 hull, 200 optional shields, 80px/s, 5 Citadel damage, 10 Credits**, 24px navigation radius. No new AI or ability nodes.
+- [x] Registered `ENEMIES/Types/Enemy005` / `big_mk1` in `DefaultEnemyCatalog.tres`, using one inherited plain enemy scene and 112×120 right-facing plated SVG. Original GameMaker-inspired balance: **1,000 hull, 200 optional shields, 80px/s, 5 Citadel damage, 10 Credits**, 24px navigation radius. No new AI or ability nodes.
 - [x] F2/F3 catalog discoverability and wave syntax (`Enemy("big_mk1", shield: true)` for 200 starting SP). **Level001 and Level002 waves remain unchanged.**
 - [x] Shared DefenseBar takes visual sprite height once on spawn so large ships' hull/shield bars clear their artwork; small ships keep authored minimum. Updated catalog/shield/credit regressions and relevant READMEs in this same commit.
 - [ ] **Godot QA pending:** compile/run enemy catalog + GenericEnemy integration runners, F2 cycle, shielded Big mk.1 test wave, portal/corridor navigation for 24px clearance radius, oversized artwork overlap, shield aura/bar visual, rewards and 500-ship performance. No runtime tests performed in this GitHub-only change.

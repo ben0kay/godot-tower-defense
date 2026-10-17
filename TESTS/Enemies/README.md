@@ -5,4 +5,4 @@
 `GenericEnemyChecks.tscn` verifies all registered inherited scenes, shared-default propagation, definitions/artwork, exact paths/node counts and catalog-driven movement, then reuses catalog, shields, ShieldEmitter, waves/portal, Citadel, area and weapon regression helpers. Optional pre-migration scene fixtures enable 100/500-instance construction benchmarks. See [GenericEnemy.md](GenericEnemy.md).
 
 
-`TESTS/Integration/EnemyCatalogChecks.cs` now also verifies Big mk.1 (Enemy005): original-inspired balance, real catalog and portal spawn, 96×72 art, no abilities, extra shared DefenseBar clearance, unshielded debug state, optional 200-point wave shields, shield-only hits and normal 10-Credit kill. Godot runtime verification remains to be run.
+`TESTS/Integration/EnemyCatalogChecks.cs` now also verifies Big mk.1 (Enemy005): original-inspired balance, real catalog and portal spawn, 112×120 art, no abilities, extra shared DefenseBar clearance, unshielded debug state, optional 200-point wave shields, shield-only hits and normal 10-Credit kill. Godot runtime verification remains to be run.

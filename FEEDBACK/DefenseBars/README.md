@@ -32,5 +32,5 @@ F5 -> F2 to spawn Enemy001 -> place a Battle Tower near its route. Unshielded, u
 
 ## Large enemy sprite offset (Big mk.1)
 
-At spawn, shared `Enemy.Initialize` passes the visual Sprite2D's height once to `DefenseBar.SetOwnerVisualHeight`. The existing `VerticalOffsetPixels` Inspector setting stays the **minimum**; wider/taller art such as the 96×72 Big mk.1 or Transporter uses enough extra offset to keep both hull and shield rows above the ship. The position continues to be counter-rotated by the existing movement hook only when visible. There is no per-frame size calculation and no scene-specific style override.
+At spawn, shared `Enemy.Initialize` passes the visual Sprite2D's height once to `DefenseBar.SetOwnerVisualHeight`. The existing `VerticalOffsetPixels` Inspector setting stays the **minimum**; wider/taller art such as the 112×120 Big mk.1 or Transporter uses enough extra offset to keep both hull and shield rows above the ship. The position continues to be counter-rotated by the existing movement hook only when visible. There is no per-frame size calculation and no scene-specific style override.
 

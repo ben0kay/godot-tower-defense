@@ -11,9 +11,9 @@ A **large, slow, high-durability plain enemy** inspired by the original GameMake
 | Kill Credits | **10** | 10 |
 | Navigation radius | **24 px** | No directly equivalent exported navigation radius |
 | TurnSpeed | **4.5** | Uses old shared movement/rotation |
-| Artwork | **96 × 72 SVG** | Original separate GameMaker sprite |
+| Artwork | **112 × 120 SVG** | Original separate GameMaker sprite |
 
-The large, plated twin-wing SVG faces **right (+X)** to match the shared enemy movement orientation. Its visible hull extends beyond its **24px circular clearance radius**, just as the existing Transporter art does. This is a deliberate approximation under the current grid-size constraint (radius strictly below 32px), **not** enlarged hull-aware pathfinding. Validate tight corridor visuals when trying the enemy in a level.
+The resized **112×120 SVG** uses broader, longer upper/lower armor wings around the original hull (uniformly magnified, not distorted), making Big mk.1 **3.5× as wide and 5× as tall as Enemy001** and **1.75× as wide and 2.5× as tall as the 64×48 medium Bulwark**. This brings its proportions closer to the old GameMaker version. The large, plated twin-wing SVG faces **right (+X)** to match the shared enemy movement orientation. Its visible hull extends beyond its **24px circular clearance radius**, just as the existing Transporter art does. This is a deliberate approximation under the current grid-size constraint (radius strictly below 32px), **not** enlarged hull-aware pathfinding. Validate wing overlap and tight corridor visuals in game. **Navigation radius remains 24px; increasing visual size does not change navigation clearance or targeting hit detection.**
 
 **Shield opt-in:** F2 and normal `SpawnManager.Spawn("big_mk1")` start with no shield, despite 200 capacity. In a wave use `Enemy("big_mk1", shield: true)` to start with 200 SP and automatically show the existing shield aura and shield meter; `Enemy("big_mk1")` stays unshielded. No passive regeneration is introduced.
 
