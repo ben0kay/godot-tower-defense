@@ -30,6 +30,7 @@ public static class TowerUpgradeChecks
             for (int level = 1; level <= 3; level++)
                 Require(first.ResolveLevel(level).ShieldPenetration == 0.05f, "Purchased tiers never increase base penetration");
             TowerFinalStats preview = first.ResolveLevel(2);
+            VerifyTypedComparison();
             Require(preview.DamagePerShot == 33 && Mathf.IsEqualApprox(preview.ShotsPerSecond, 1.47f)
                 && preview.RangePixels == 264 && first.FinalStats == initial && first.UpgradeLevel == 1,
                 "Next-tier preview selects a full snapshot without changing live stats or progression");
@@ -51,11 +52,12 @@ public static class TowerUpgradeChecks
             Require(panel.GetGlobalRect().End.Y <= hud.GetGlobalRect().End.Y + 1 &&
                 Mathf.IsEqualApprox(tray.Size.Y, hud.Config.BottomBarHeight), "Expanded Inspector stays onscreen while tray retains configured height");
             hud.SetTowerBarOpen(false, true);
-            Require(panel.Visible, "Closing build tray leaves upgrade Inspector open");
+            Require(panel.Visible && hud.Config.InspectorWidth == 540 && hud.Config.InspectorHeight == 325,
+                "Closing build tray leaves the 540×325 Inspector open");
             Button button = hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/UpgradeButton");
             Label info = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/UpgradeInfo");
             Require(button.Visible && !button.Disabled && info.Text.Contains("150 Credits") &&
-                info.Text.Contains("30 → 33"), "Inspector shows next tier, effective changes and affordable price");
+                HasComparison(hud, "Damage", "30", "33", "(+3)"), "Inspector shows next tier, typed gain and affordable price");
             hud.EmitSignal(GameplayHUD.SignalName.TowerUpgradeRequested); ConstructionTestClock.FinishWork(battle);
             Require(first.UpgradeLevel == 2 && first.FinalStats == preview &&
                 wallet.GetBalance(wallet.CreditsResource) == 250, "Actual HUD upgrade action pays once and matches preview");
@@ -76,7 +78,8 @@ public static class TowerUpgradeChecks
                 wallet.GetBalance(wallet.CreditsResource) == 0, "Second purchase selects the complete level3 snapshot");
             Require(stats.Text.Contains("Shield Penetration: 5%") && first.FinalStats.ShieldPenetration == 0.05f,
                 "Level3 Inspector retains baseline penetration");
-            Require(!button.Visible && info.Text.Contains("Maximum level"), "Maximum tier removes upgrade action");
+            Require(!button.Visible && info.Text.Contains("MAX LEVEL") && !hud.GetNode<Control>("BottomArea/Inspector/Insets/Body/UpgradeComparison").Visible,
+                "Maximum tier removes upgrade action and hypothetical comparison");
             Require(!ConstructionTestClock.PurchaseAndFinish(first, wallet, placement.Settings, 3, out _) &&
                 wallet.GetBalance(wallet.CreditsResource) == 0, "Maximum tier cannot spend again");
             first.RebuildStats(); Require(first.FinalStats == levelThree, "Repeated rebuild does not compound bonuses");
@@ -129,6 +132,42 @@ public static class TowerUpgradeChecks
             first.Free(); second.Free(); placement.Settings.AllowUpgrades = allow;
             wallet.Initialize(grid.Level.Settings); hud.ClearInspection();
         }
+    }
+
+    // =========================================================
+    // Typed comparison examples test exact display precision and positive/negative improvement.
+    private static void VerifyTypedComparison()
+    {
+        TowerFinalStats a = new(220, .8f, 18, 800, 100, 3, .15f,
+            Weapon: new WeaponDamageStats(DamageType.Kinetic, false, 1, false, 1),
+            Ammunition: new AmmunitionStats(1000, 1));
+        TowerFinalStats b = a with { DamagePerShot = 21, RangePixels = 228, ShotsPerSecond = .92f,
+            Ammunition = new AmmunitionStats(1200, 1) };
+        var rows = TowerUpgradeComparison.Build(a, b);
+        Require(rows.Any(x => x.Name == "Damage" && x.Current == "18" && x.Next == "21" && x.Gain == "(+3)" && x.Tone == TowerUpgradeGain.Better)
+            && rows.Any(x => x.Name == "Range (px)" && x.Gain == "(+8)")
+            && rows.Any(x => x.Name == "Ammo Capacity" && x.Gain == "(+200)"),
+            "Typed projectile comparisons show real numbers and gains");
+        TowerFinalStats laserA = a with { Beam = new BeamStats(25), Weapon = new WeaponDamageStats(DamageType.Energy, false, 1, false, 1) };
+        var laserRows = TowerUpgradeComparison.Build(laserA, laserA with { Beam = new BeamStats(28) });
+        Require(laserRows.Any(x => x.Name == "DPS" && x.Gain == "(+3)") && !laserRows.Any(x => x.Name == "Projectile (px/s)"),
+            "Beam comparison omits fictional projectile statistics");
+        TowerFinalStats waveA = a with { Shockwave = new ShockwaveStats(10, 150, 2.4f, .5f) };
+        var waveRows = TowerUpgradeComparison.Build(waveA, waveA with { Shockwave = new ShockwaveStats(12, 150, 2f, .5f) });
+        Require(waveRows.Any(x => x.Name == "Wave Interval (s)" && x.Gain == "(−0.4)" && x.Tone == TowerUpgradeGain.Better),
+            "Shorter wave interval is a green improvement despite a negative delta");
+        Require(TowerUpgradeComparison.Build(null, b).Count == 0, "Missing snapshots don't generate made-up rows");
+    }
+
+    // =========================================================
+    // Inspect actual grid cell labels rather than parsing a freeform upgrade paragraph.
+    private static bool HasComparison(GameplayHUD hud, string name, string current, string next, string gain)
+    {
+        GridContainer grid = hud.GetNode<GridContainer>("BottomArea/Inspector/Insets/Body/UpgradeComparison");
+        var labels = grid.GetChildren().OfType<Label>().Select(x => x.Text).ToArray();
+        for (int i = 4; i + 3 < labels.Length; i += 4)
+            if (labels[i] == name && labels[i + 1] == current && labels[i + 2] == next && labels[i + 3] == gain) return true;
+        return false;
     }
 
     // =========================================================

@@ -41,6 +41,7 @@ public partial class GameplayHUD : Control
     private Control _upgradeDivider;
     private Button _detailsToggle;
     private bool _detailsExpanded, _buildPreview;
+    private TowerFinalStats _comparisonNow, _comparisonNext;
     private CreditGainIndicator _creditGain;
     private ProgressBar _healthBar, _experienceBar;
     private VBoxContainer _rankSection, _workSection;
@@ -243,7 +244,7 @@ public partial class GameplayHUD : Control
         if (changed)
         { _inspector.GetNode<ScrollContainer>("Insets").ScrollVertical = 0; _detailsExpanded = preview; }
         _buildPreview = preview;
-        SetRuntimeDetails(""); SetWorkDetails(null); SetUpgradeDetails("", "", false);
+        SetRuntimeDetails(""); SetWorkDetails(null); SetUpgradeDetails("", "", false); SetUpgradeComparison(null, null);
         _targetSection.Hide(); _rankSection.Hide();
         _towerName.Text = name; _towerCategory.Text = category;
         _towerStats.Text = stats; _towerNotes.Text = notes;
@@ -314,10 +315,52 @@ public partial class GameplayHUD : Control
     // Display an authoritative controller preview; buttons carry no payment or stat logic.
     public void SetUpgradeDetails(string preview, string button, bool affordable)
     {
+        bool present = !_buildPreview && (preview.Length > 0 || button.Length > 0);
+        _upgradeTitle.Visible = _upgradeDivider.Visible = present;
         _upgradeButton.TooltipText = "";
-        _upgradeInfo.Text = preview; _upgradeInfo.Visible = preview.Length > 0;
-        _upgradeButton.Text = button; _upgradeButton.Visible = button.Length > 0;
+        _upgradeInfo.Text = preview; _upgradeInfo.Visible = present && preview.Length > 0;
+        _upgradeButton.Text = button; _upgradeButton.Visible = present && button.Length > 0;
         _upgradeButton.Disabled = !affordable;
+    }
+
+    // =========================================================
+    // Numeric cells only rebuild when resolved snapshots change; wallet/progress refreshes reuse them.
+    public void SetUpgradeComparison(TowerFinalStats current, TowerFinalStats next)
+    {
+        if (Equals(_comparisonNow, current) && Equals(_comparisonNext, next)) return;
+        _comparisonNow = current; _comparisonNext = next;
+        foreach (Node child in _upgradeComparison.GetChildren())
+        { _upgradeComparison.RemoveChild(child); child.QueueFree(); }
+        var rows = TowerUpgradeComparison.Build(current, next);
+        _upgradeComparison.Visible = !_buildPreview && rows.Count > 0;
+        if (rows.Count == 0) return;
+        AddCell("STAT", true, true, Config.MutedTextColor);
+        AddCell("CURRENT", false, true, Config.MutedTextColor);
+        AddCell("NEXT", false, true, Config.MutedTextColor);
+        AddCell("GAIN", false, true, Config.MutedTextColor);
+        foreach (TowerUpgradeRow row in rows)
+        {
+            AddCell(row.Name, true, false, Config.TextColor);
+            AddCell(row.Current, false, false, Config.MutedTextColor);
+            AddCell(row.Next, false, false, Config.TextColor);
+            AddCell(row.Gain, false, false, row.Tone switch
+            {
+                TowerUpgradeGain.Better => Config.CreditRewardColor,
+                TowerUpgradeGain.Worse => Config.HealthCriticalColor,
+                _ => Config.MutedTextColor
+            });
+        }
+    }
+
+    // =========================================================
+    // The existing Godot GridContainer distributes four lightweight display-only labels per row.
+    private void AddCell(string value, bool left, bool header, Color color)
+    {
+        Label cell = UIButtonFactory.Label(value, header ? 10 : 12, Config);
+        cell.HorizontalAlignment = left ? HorizontalAlignment.Left : HorizontalAlignment.Right;
+        cell.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        cell.AddThemeColorOverride("font_color", color);
+        _upgradeComparison.AddChild(cell);
     }
 
     // =========================================================

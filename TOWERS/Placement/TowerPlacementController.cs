@@ -415,20 +415,25 @@ public partial class TowerPlacementController : Node2D
     private void RefreshUpgradePreview()
     {
         if (!GodotObject.IsInstanceValid(_selected))
-        { _hud.SetUpgradeDetails("", "", false); return; }
+        { _hud.SetUpgradeComparison(null, null); _hud.SetUpgradeDetails("", "", false); return; }
         _displayedUpgradeLevel = _selected.UpgradeLevel;
         try
         {
+            if (_selected.Levels == null || _selected.Levels.Count == 0)
+            { _hud.SetUpgradeComparison(null, null); _hud.SetUpgradeDetails("", "", false); return; }
             TowerUpgradeController.Validate(_selected.Levels);
             bool upgrading = _selected.WorkPhase == TowerWorkPhase.Upgrading;
             TowerLevel next = upgrading ? _selected.Levels[_selected.PendingUpgradeLevel - 1] : _selected.NextUpgrade;
-            if (next == null) { _hud.SetUpgradeDetails(_selected.Levels.Count <= 1 ? "No upgrades available." : "Maximum level reached.", "", false); return; }
+            if (next == null)
+            {
+                _hud.SetUpgradeComparison(null, null);
+                _hud.SetUpgradeDetails("MAX LEVEL — all purchased tiers complete.", "", false);
+                return;
+            }
             TowerFinalStats now = _selected.FinalStats, future = _selected.ResolveLevel(_selected.UpgradeLevel + 1);
-            string changes = upgrading ? $"UPGRADING TO LEVEL {next.Level} — paid\nCurrent Level {_selected.UpgradeLevel} remains operational.\n"
+            _hud.SetUpgradeComparison(now, future);
+            string changes = upgrading ? $"LEVEL {next.Level} — PAID, IN PROGRESS\nCurrent Level {_selected.UpgradeLevel} remains operational.\n"
                 : $"NEXT: LEVEL {next.Level} — {next.DisplayName}\n";
-            changes += _selected.AuthoredConfig.DescribeChanges(now, future);
-            if (now?.Ammunition != future?.Ammunition && future?.Ammunition is AmmunitionStats ammo)
-                changes += ammo.ChangesFrom(now?.Ammunition);
             bool enabled = !_selected.IsBusy && Settings.AllowUpgrades && _economy.CanAfford(next.Costs);
             changes += upgrading ? "Cost already paid." : "Price: " + TowerPresentation.DescribeResourceCosts(next.Costs) + $"\nWork time: {next.WorkSeconds:0.##}s";
             if (_selected.IsBusy) changes += upgrading ? "\nUpgrade in progress." : "\nAvailable after construction.";
@@ -436,7 +441,8 @@ public partial class TowerPlacementController : Node2D
             else if (!enabled) changes += "\nInsufficient resources.";
             _hud.SetUpgradeDetails(changes, upgrading ? "UPGRADING…" : $"UPGRADE TO LEVEL {next.Level}", enabled);
         }
-        catch (Exception exception) { _hud.SetUpgradeDetails("Invalid upgrade data: " + exception.Message, "", false); }
+        catch (Exception exception)
+        { _hud.SetUpgradeComparison(null, null); _hud.SetUpgradeDetails("Invalid upgrade data: " + exception.Message, "", false); }
     }
 
     // =========================================================
