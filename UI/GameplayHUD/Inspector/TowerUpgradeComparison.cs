@@ -41,8 +41,19 @@ public static class TowerUpgradeComparison
         if (current.Weapon.HasValue && next.Weapon.HasValue)
         {
             Add(rows, "Shield Pen. (%)", current.ShieldPenetration * 100d, next.ShieldPenetration * 100d, 1);
-            if (current.Weapon.Value.Type != next.Weapon.Value.Type)
-                rows.Add(new("Damage Type", current.Weapon.Value.Type.ToString(), next.Weapon.Value.Type.ToString(), "Changed", TowerUpgradeGain.Neutral));
+            WeaponDamageStats before = current.Weapon.Value, after = next.Weapon.Value;
+            if (before.Type != after.Type)
+                rows.Add(new("Damage Type", before.Type.ToString(), after.Type.ToString(), "Changed", TowerUpgradeGain.Neutral));
+            var oldDefaults = DamageResolver.DefaultProfile.Coefficients(before.Type);
+            var newDefaults = DamageResolver.DefaultProfile.Coefficients(after.Type);
+            double oldShield = before.OverrideShield ? before.ShieldCoefficient : oldDefaults.Shield;
+            double newShield = after.OverrideShield ? after.ShieldCoefficient : newDefaults.Shield;
+            double oldHull = before.OverrideHull ? before.HullCoefficient : oldDefaults.Hull;
+            double newHull = after.OverrideHull ? after.HullCoefficient : newDefaults.Hull;
+            if (Math.Abs(oldShield - newShield) > 0.001)
+                Add(rows, "Shield Mult. (x)", oldShield, newShield, 2);
+            if (Math.Abs(oldHull - newHull) > 0.001)
+                Add(rows, "Hull Mult. (x)", oldHull, newHull, 2);
         }
         if (current.Ammunition.HasValue && next.Ammunition.HasValue)
         {

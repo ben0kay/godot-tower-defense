@@ -317,6 +317,9 @@ public partial class GameplayHUD : Control
     public void SetUpgradeDetails(string preview, string button, bool affordable)
     {
         bool present = !_buildPreview && (preview.Length > 0 || button.Length > 0);
+        // Once all levels are purchased, reveal current effective stats rather than an empty future table.
+        if (present && preview.StartsWith("MAX LEVEL", StringComparison.Ordinal))
+        { _detailsExpanded = true; RefreshDetailsVisibility(); }
         _upgradeTitle.Visible = _upgradeDivider.Visible = present;
         _upgradeButton.TooltipText = "";
         _upgradeInfo.Text = preview; _upgradeInfo.Visible = present && preview.Length > 0;
