@@ -1,4 +1,4 @@
-// Single explicit coordinator for all eight stat stages; explicit purchased levels are active; earned ranks are active; research/conditions/effects remain neutral.
+// Single explicit coordinator for all eight stat stages; explicit purchased levels are active; earned ranks and captured research are active; conditions/effects remain separate.
 using System;
 
 public static class TowerStatPipeline
@@ -9,12 +9,12 @@ public static class TowerStatPipeline
 
     // =========================================================
     // Select exactly one row; resolving level 3 never reads level 2's combat values.
-    public static TowerFinalStats Resolve(TowerConfig config, int level, TowerStatTrace trace = null, TowerRankDefinition? rank = null)
+    public static TowerFinalStats Resolve(TowerConfig config, int level, TowerStatTrace trace = null, TowerRankDefinition? rank = null, TowerResearchBonuses research = default)
     {
         if (config == null) throw new ArgumentNullException(nameof(config));
         if (level < 1 || level > config.Levels.Count) throw new ArgumentOutOfRangeException(nameof(level));
         if (level > 1) TowerUpgradeController.Validate(config.Levels);
-        return Resolve(new TowerStatContext(config.Levels[0].Stats, config.Levels[level - 1].Stats, rank, config.SustainedHeatTiming), trace);
+        return Resolve(new TowerStatContext(config.Levels[0].Stats, config.Levels[level - 1].Stats, rank, config.SustainedHeatTiming, research), trace);
     }
 
     // =========================================================

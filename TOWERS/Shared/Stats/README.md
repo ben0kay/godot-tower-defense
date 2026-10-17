@@ -1,5 +1,15 @@
 # Tower stats — complete explicit levels
 
+## Permanent Battle damage research — 2026-10-17
+
+Stage04 is now active for **captured TowerResearchBonuses**. Battle Tower Weapons I adds5% damage after Stage03's selected rank and before Stage07's safety clamps. DamagePerShot uses the existing rank convention (nearest/ties-to-even); at standard rank the three Battle tiers become32/35/38. Typed beam/wave damage retains fractional arithmetic if a future node explicitly targets such a tower; no such additional node is authored in this pass.
+
+CitadelSession captures ResearchDeployment once on deployment. Placement passes the per-type immutable input into TowerBase.InitializeDefinition; TowerBase keeps it across paid upgrades, rank promotions and config edits. The same pipeline resolves actual shots, selected-tower Inspector, next-level comparison and build preview. No stat stage reads profile files or current menu state. Direct config/tooling calls remain neutral unless explicit research inputs are supplied, and profileless F6 remains neutral. New missions refresh bonuses; active missions never subscribe to purchase changes.
+
+Research does not alter authored *Levels.cs values, attack rate, heat timing, ammo, wallet costs, or unrelated tower types. See TESTS/Research/BATTLE_RESEARCH.md. Older statements below about neutral Stage04 or deferred tower damage research are historical and superseded here.
+
+---
+
 Author combat values and credit prices in each tower's `*Levels.cs` file. Its labeled, strongly typed rows contain actual values at that level, including aiming/search interval, penetration, optional beam DPS or area radius/edge retention, and applicable shield/hull response overrides. There are no purchased modifier resources or duplicate numeric Inspector defaults.
 
 TowerConfig holds private runtime row/recipe copies. Its C# Level 1 convenience accessors forward directly to row 1; they are not separate sources and do not affect other levels. For any level use `config.SetLevelStats(level, config.Levels[level - 1].Stats with { ... })`. This replaces an absolute snapshot and emits Changed once. Direct low-level row edits require RebuildStats; use CreateInstanceCopy rather than Godot Duplicate for copying runtime rows/recipes.

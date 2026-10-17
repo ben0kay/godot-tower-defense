@@ -247,7 +247,8 @@ public partial class TowerPlacementController : Node2D
             tower = created; // Track ownership before any preflight can throw.
             if (!created.AcceptsConfig(_buildDefinition.DefaultConfig) || !created.ValidateScene())
             { created.Free(); tower = null; return false; }
-            tower.InitializeDefinition(_buildDefinition, Settings);
+            tower.InitializeDefinition(_buildDefinition, Settings,
+                GetNode<CitadelSession>("../CitadelSession").Research.ForTower(_buildDefinition.TowerId));
             TowerUpgradeController.Validate(tower.Levels); TowerConfig.ValidateWorkSeconds(tower.AuthoredConfig.BuildSeconds);
             if (tower.Levels.Count > 0) tower.ResolveLevel(1); // Fail invalid inputs before occupancy/Ready/payment.
             if (!_grid.TryOccupy(cell, _buildDefinition.Footprint)) { tower.Free(); tower = null; return false; }
@@ -504,11 +505,16 @@ public partial class TowerPlacementController : Node2D
 
     #region Feedback
     // =========================================================
+    // Build previews use the same frozen deployment bonuses as paid placement; passive configs stay capability-free.
+    private TowerFinalStats ResolveBuildStats(TowerConfig config) => config.Levels.Count == 0 ? config.ResolveStats(1) :
+        TowerStatPipeline.Resolve(config, 1, research: GetNode<CitadelSession>("../CitadelSession").Research.ForTower(_buildDefinition.TowerId));
+
+    // =========================================================
     // Show active weapon stats and the one authoritative shared construction recipe.
     private string DescribeTower(string extra = "")
     {
         TowerConfig config = _selected?.AuthoredConfig ?? _buildDefinition.DefaultConfig;
-        TowerFinalStats final = _selected == null ? config.ResolveStats(1) : _selected.FinalStats;
+        TowerFinalStats final = _selected == null ? ResolveBuildStats(config) : _selected.FinalStats;
         Vector2I footprint = _selected?.Footprint ?? _buildDefinition.Footprint;
         string stats = $"Footprint: {footprint.X} x {footprint.Y}\n" +
             (_selected == null ? "" : $"Tower level: {_selected.UpgradeLevel}\n") +

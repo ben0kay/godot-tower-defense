@@ -1,5 +1,16 @@
 # WORK — Consolidated Outstanding Implementation Backlog
 
+## Battle research proof node — implemented 2026-10-17
+
+- [x] **Battle Tower Weapons I:** battle_weapons_1, 1 RP, requires Research Core, axial (-1,0), +5% Battle Tower damage from the next mission. Saved ownership/RP use the existing progression v2 record; no new currency or XP scoring rules.
+- [x] **Tower permanent research Stage04:** an immutable deployment snapshot is captured once in CitadelSession, shared with paid placement/build previews, and retained by each tower. Selected paid level → rank → research → safety clamps → final stats. Standard Battle damage30/33/36 becomes32/35/38 using existing nearest/ties-to-even integer rounding. All ranks/tiers, config rebuilds and paid previews retain the bonus without compounding.
+- [x] **Reusable targeted damage effect:** catalog defines TowerDamagePercent + TargetTowerId; only Battle has an authored node. Other towers, Citadel health, ammo, heat, prices, authored rows, profileless F6 and other profiles are unchanged by this purchase. No progression I/O in combat/stat resolution.
+- [x] **Graph extension:** real third node, balanced labels, and initial/reset view fits authored branches; pan/zoom selection remains shared geometry.
+
+Verification and remaining manual review: TESTS/Research/BATTLE_RESEARCH.md. Mission XP rewards/replays/award tokens remain deferred. Earlier research-expansion examples below are preserved as history; Battle damage is now implemented rather than a future-only example.
+
+---
+
 ## Shield visual foundation (SV1) — 2026-10-17
 
 - [x] Reusable **[FEEDBACK/Shields](../FEEDBACK/Shields/README.md)** presentation: one baked tintable reddish SVG aura, auto-sized behind the enemy, event-only shield damage/break flashes, lazy attachment only to shielded enemy instances, shield-restoration reactivation, no per-frame shield visual script processing. Purely cosmetic; existing shield arithmetic, shield generator and wave opt-in remain unchanged.

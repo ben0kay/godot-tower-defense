@@ -1,5 +1,17 @@
 # Permanent Research — first playable foundation
 
+## Battle Tower Weapons I extension — 2026-10-17
+
+The Research Room now contains **three real nodes**, including battle_weapons_1 / Battle Tower Weapons I (cost1 RP, prerequisite research_core, axial -1,0). It permanently grants +5% Battle Tower damage in future deployments. The stored purchased ID uses existing progression v2; previous saves and Citadel research stay compatible.
+
+TowerDamagePercent effects carry a stable TargetTowerId (battle for this node). ResearchDeployment resolves purchased IDs once at mission initialization; CitadelSession owns this immutable snapshot. Paid placement/build previews take their type's bonuses from it; TowerBase retains those values for rank/config/paid-level rebuilds. Stage04 performs arithmetic only and never loads profiles or Resources. Live missions retain their captured bonuses even if selection changes externally; a fresh mission captures current research.
+
+Integer projectile damage rounds nearest/ties-to-even after Stage03 rank rounding: standard-rank Battle levels1/2/3 are32/35/38 rather than30/33/36. Authored source rows, costs, ammo and heat are not modified. Build Inspector and next-tier previews use the same researched values. Only Battle's node is authored; additional approved effects/nodes remain future work. Mission XP scoring/replays/once-only rewards remain deferred.
+
+Graph reset/initial resize now fits the authored nodes and balances long names across two lines. Test/authoring details: TESTS/Research/BATTLE_RESEARCH.md. Original notes below remain for history; statements that tower research is neutral/future-only are superseded by this extension.
+
+---
+
 **Implemented:** free research_core at axial (0,0), citadel_master_1 at (1,0), cost 1 RP, permanent +10% Citadel maximum/current starting health on new deployments. Campaign is the only Research entry; Results/gameplay have none.
 
 ## Ownership and authoring

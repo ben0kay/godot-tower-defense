@@ -31,6 +31,10 @@ public static class ResearchService
 
     // =========================================================
     // Profileless F6 tests retain their authored health and never create a profile.
-    public static int ResolveCitadelMaximum(int authored) => ProfileStore.Selected == null ? authored :
-        ResearchRules.CitadelMaximum(authored, ProgressionService.GetCurrent(), Nodes);
+    public static ResearchDeployment CaptureDeployment() => ProfileStore.Selected == null ? ResearchDeployment.None :
+        ResearchDeployment.Resolve(ProgressionService.GetCurrent(), Nodes);
+
+    // =========================================================
+    // Compatibility/tooling accessor; battlefield owners retain CaptureDeployment instead of repeatedly reading profiles.
+    public static int ResolveCitadelMaximum(int authored) => CaptureDeployment().CitadelMaximum(authored);
 }

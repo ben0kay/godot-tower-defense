@@ -1,7 +1,7 @@
 // Inspector-authored research data; IDs and axial coordinates are independent of display text.
 using Godot;
 
-public enum ResearchEffectKind { None, CitadelMaxHealthPercent }
+public enum ResearchEffectKind { None, CitadelMaxHealthPercent, TowerDamagePercent }
 
 [GlobalClass]
 public partial class ResearchDefinition : Resource
@@ -15,5 +15,6 @@ public partial class ResearchDefinition : Resource
     [Export] public Vector2I AxialPosition { get; set; }
     [ExportGroup("Gameplay Effect")]
     [Export] public ResearchEffectKind Effect { get; set; }
+    [Export] public string TargetTowerId { get; set; } = "";
     [Export] public double EffectPercent { get; set; }
 }

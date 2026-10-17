@@ -1,5 +1,11 @@
 # Research-first foundation — validation 2026-10-17
 
+## Battle damage research extension — 2026-10-17
+
+Added res://TESTS/Research/BattleResearchChecks.tscn. It uses temporary profile files and checks an actual purchase button/save/reopen, deployment snapshots, every Battle rank/level, both launchers, researched build/paid previews, actual projectile damage, unchanged unrelated stats/towers, config rebuilds, profile isolation and neutral profileless play. Existing ResearchFoundationChecks now expects three real catalog nodes. Execution evidence and exact limits are in BATTLE_RESEARCH.md.
+
+---
+
 ## Dedicated runners
 
 - res://TESTS/Research/ResearchFoundationChecks.tscn: pure catalog validation; free root; RP/prerequisite/duplicate purchase rejection; purchased IDs persistence; v1 progression migration and backup recovery; profileless HP; six-direction axial geometry; mouse hit parity after pan/zoom; keyboard selection; actual paid placements vs failed clicks; construction completion; upgrade payment vs completion; paused/frozen clock; immutable Results counters on both actual launchers.

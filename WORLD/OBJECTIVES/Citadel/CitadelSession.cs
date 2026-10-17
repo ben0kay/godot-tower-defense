@@ -6,6 +6,7 @@ public partial class CitadelSession : Node
 {
     #region Dependencies
     public CitadelHealth Health { get; private set; }
+    public ResearchDeployment Research { get; private set; } = ResearchDeployment.None;
     private EnemyRegistry _registry;
     private GameplayHUD _hud;
     #endregion
@@ -26,7 +27,8 @@ public partial class CitadelSession : Node
 
         Health.HealthChanged += UpdateHud;
         _registry.EnemyArrived += OnEnemyArrived;
-        Health.Initialize(ResearchService.ResolveCitadelMaximum(level.Settings.CitadelMaxHealth));
+        Research = ResearchService.CaptureDeployment();
+        Health.Initialize(Research.CitadelMaximum(level.Settings.CitadelMaxHealth));
     }
 
     // =========================================================

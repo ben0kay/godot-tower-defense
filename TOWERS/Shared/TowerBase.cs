@@ -36,6 +36,7 @@ public abstract partial class TowerBase : Node2D
     public TowerRankDefinition CurrentRank => RankProgress.Current(AuthoredConfig.Ranks);
     public TowerRankDefinition? NextRank => RankProgress.Next(AuthoredConfig.Ranks);
     private TowerMasterConfig _experienceRules;
+    private TowerResearchBonuses _research;
     private DamageSource _damageSource;
     public TowerMasterConfig ExperienceRules => _experienceRules ?? TowerRankController.DefaultRules;
     public DamageSource DamageSource => _damageSource ??= new DamageSource(this);
@@ -53,11 +54,11 @@ public abstract partial class TowerBase : Node2D
 
     // =========================================================
     // Apply a private source copy before Ready; definition remains shared authored metadata.
-    public void InitializeDefinition(TowerDefinition definition, TowerMasterConfig rules = null)
+    public void InitializeDefinition(TowerDefinition definition, TowerMasterConfig rules = null, TowerResearchBonuses research = default)
     {
         if (definition == null || !AcceptsConfig(definition.DefaultConfig))
             throw new InvalidOperationException("Tower/config mismatch.");
-        Definition = definition; _experienceRules = rules;
+        Definition = definition; _experienceRules = rules; _research = research;
         ApplyConfig(definition.DefaultConfig.CreateInstanceCopy());
     }
 
@@ -98,7 +99,7 @@ public abstract partial class TowerBase : Node2D
 
     // =========================================================
     // Both live stats and purchased-level previews retain this instance's currently earned rank.
-    protected TowerFinalStats ResolveRankedLevel(int level) => TowerStatPipeline.Resolve(AuthoredConfig, level, rank: CurrentRank);
+    protected TowerFinalStats ResolveRankedLevel(int level) => TowerStatPipeline.Resolve(AuthoredConfig, level, rank: CurrentRank, research: _research);
 
     // =========================================================
     // XP-only changes publish progress, while promotions rebuild effective stats exactly once.

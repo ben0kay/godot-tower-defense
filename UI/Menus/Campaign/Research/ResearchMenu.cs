@@ -83,8 +83,12 @@ public partial class ResearchMenu : Control
         ResearchNode node = _graph.Nodes[_graph.SelectedId];
         ResearchState state = ResearchRules.State(_player, node);
         _name.Text = node.Name; _description.Text = node.Description;
-        _effect.Text = node.Effect == ResearchEffectKind.CitadelMaxHealthPercent ?
-            $"EFFECT: +{node.Percent:0.##}% Citadel maximum HP\nApplies from the next deployment." : "EFFECT: Origin of the research network.";
+        _effect.Text = node.Effect switch
+        {
+            ResearchEffectKind.CitadelMaxHealthPercent => $"EFFECT: +{node.Percent:0.##}% Citadel maximum HP\nApplies from the next deployment.",
+            ResearchEffectKind.TowerDamagePercent => $"EFFECT: +{node.Percent:0.##}% tower damage\nAll levels and ranks. Applies from the next deployment.",
+            _ => "EFFECT: Origin of the research network."
+        };
         _prerequisites.Text = "PREREQUISITES: " + (node.Prerequisites.Length == 0 ? "None" :
             string.Join(", ", node.Prerequisites.Select(id => _graph.Nodes[id].Name)));
         _cost.Text = node.Cost == 0 ? "COST: FREE" : $"COST: {node.Cost} RP   /   BALANCE: {_player.UnspentResearchPoints} RP";

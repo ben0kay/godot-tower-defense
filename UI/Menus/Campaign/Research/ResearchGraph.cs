@@ -12,7 +12,7 @@ public partial class ResearchGraph : Control
     public string SelectedId { get; private set; } = "research_core";
     public float Zoom { get; private set; } = 1f;
     public Vector2 Pan { get; private set; }
-    private bool _dragging;
+    private bool _dragging, _viewChanged;
     private Vector2 _pressPosition;
     private bool _leftBackground;
     private const float Radius = 55;
@@ -24,7 +24,7 @@ public partial class ResearchGraph : Control
     {
         FocusMode = FocusModeEnum.All; MouseFilter = MouseFilterEnum.Stop; ClipContents = true;
         CustomMinimumSize = new Vector2(240, 240); MouseDefaultCursorShape = CursorShape.Cross;
-        Resized += QueueRedraw; FocusEntered += QueueRedraw; FocusExited += QueueRedraw;
+        Resized += () => { if (!_viewChanged) ResetView(); QueueRedraw(); }; FocusEntered += QueueRedraw; FocusExited += QueueRedraw;
         TooltipText = "Select a hex. Middle-drag or drag empty space to pan; wheel to zoom. Arrow keys browse; Home resets.";
     }
 
@@ -52,12 +52,25 @@ public partial class ResearchGraph : Control
     // Zoom anchors the graph point under the cursor; clamp prevents unusably tiny/huge nodes.
     public void ZoomAt(Vector2 screen, float factor)
     {
+        _viewChanged = true;
         Vector2 before = ScreenToGraph(screen);
         Zoom = Mathf.Clamp(Zoom * factor, .45f, 1.8f);
         Pan = screen - Size / 2 - before * Zoom;
         QueueRedraw();
     }
-    public void ResetView() { Pan = new Vector2(-80, 0); Zoom = 1; QueueRedraw(); }
+    // =========================================================
+    // Fit real authored nodes on first layout/reset, including newly added branches on smaller viewports.
+    public void ResetView()
+    {
+        _viewChanged = false;
+        if (Nodes == null || Nodes.Count == 0) { Pan = Vector2.Zero; Zoom = 1; QueueRedraw(); return; }
+        Vector2 minimum = new(float.MaxValue, float.MaxValue), maximum = new(float.MinValue, float.MinValue);
+        foreach (ResearchNode node in Nodes.Values)
+        { Vector2 point = AxialPosition(node.Axial); minimum = minimum.Min(point); maximum = maximum.Max(point); }
+        Vector2 extent = maximum - minimum + Vector2.One * (Radius * 2 + 24);
+        Zoom = Mathf.Clamp(Mathf.Min((Size.X - 24) / extent.X, (Size.Y - 24) / extent.Y), .45f, 1f);
+        Pan = -(minimum + maximum) / 2 * Zoom; QueueRedraw();
+    }
     public void Select(string id)
     {
         if (Nodes == null || !Nodes.ContainsKey(id)) return;
@@ -90,7 +103,7 @@ public partial class ResearchGraph : Control
         }
         if (input is InputEventMouseMotion motion)
         {
-            if (_dragging) { Pan += motion.Relative; QueueRedraw(); }
+            if (_dragging) { _viewChanged = true; Pan += motion.Relative; QueueRedraw(); }
             string id = HitNode(motion.Position);
             TooltipText = id != null ? Nodes[id].Name + " — " + StatusText(Nodes[id]) :
                 "Drag empty space to pan · Scroll to zoom · Arrows browse · Home resets";
@@ -105,7 +118,7 @@ public partial class ResearchGraph : Control
                 if (Nodes == null) return;
                 var ids = Nodes.Keys.ToArray(); int index = Array.IndexOf(ids, SelectedId);
                 Select(ids[(index + (key.Keycode is Key.Left or Key.Up ? ids.Length - 1 : 1)) % ids.Length]);
-                Pan = -AxialPosition(Nodes[SelectedId].Axial) * Zoom;
+                _viewChanged = true; Pan = -AxialPosition(Nodes[SelectedId].Axial) * Zoom;
             }
             else return;
             AcceptEvent();
@@ -149,8 +162,9 @@ public partial class ResearchGraph : Control
                 DrawPolyline(ring.Append(ring[0]).ToArray(), HasFocus() ? Colors.White : new Color("#e4c887"), 2, true);
             }
             string[] words = node.Name.Split(' ');
-            string line1 = string.Join(" ", words.Take(Math.Max(1, words.Length - 1)));
-            string line2 = words.Length > 1 ? words[^1] : "";
+            int split = (words.Length + 1) / 2;
+            string line1 = string.Join(" ", words.Take(split));
+            string line2 = string.Join(" ", words.Skip(split));
             DrawCentered(font, center + new Vector2(0, -10 * Zoom), line1, accent, (int)(13 * Zoom));
             DrawCentered(font, center + new Vector2(0, 7 * Zoom), line2, accent, (int)(13 * Zoom));
             DrawCentered(font, center + new Vector2(0, 29 * Zoom), StatusText(node), accent, (int)(9 * Zoom));

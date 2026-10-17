@@ -6,7 +6,7 @@ using System.Collections.Immutable;
 using System.Linq;
 
 public sealed record ResearchNode(string Id, string Name, string Description, int Cost,
-    ImmutableArray<string> Prerequisites, Vector2I Axial, ResearchEffectKind Effect, double Percent);
+    ImmutableArray<string> Prerequisites, Vector2I Axial, ResearchEffectKind Effect, double Percent, string TowerId = "");
 
 [GlobalClass]
 public partial class ResearchCatalog : Resource
@@ -29,6 +29,10 @@ public partial class ResearchCatalog : Resource
                 definition.EffectPercent < 0 || definition.EffectPercent > 10000 ||
                 Math.Abs((long)definition.AxialPosition.X) > 10000 || Math.Abs((long)definition.AxialPosition.Y) > 10000)
                 throw new InvalidOperationException("Malformed research definition.");
+            if (definition.Effect == ResearchEffectKind.TowerDamagePercent ?
+                string.IsNullOrWhiteSpace(definition.TargetTowerId) || definition.TargetTowerId.Length > 128 :
+                !string.IsNullOrEmpty(definition.TargetTowerId))
+                throw new InvalidOperationException("Tower damage research needs a stable target tower ID; other effects must not have one.");
             bool core = definition.Id == "research_core";
             if (core ? definition.CostRP != 0 || definition.AxialPosition != Vector2I.Zero ||
                 definition.PrerequisiteIds.Length != 0 || definition.Effect != ResearchEffectKind.None || definition.EffectPercent != 0
@@ -36,7 +40,7 @@ public partial class ResearchCatalog : Resource
                   definition.Effect == ResearchEffectKind.None || definition.EffectPercent <= 0)
                 throw new InvalidOperationException("Invalid research cost, root or effect.");
             var node = new ResearchNode(definition.Id, definition.DisplayName, definition.Description, definition.CostRP,
-                definition.PrerequisiteIds.ToImmutableArray(), definition.AxialPosition, definition.Effect, definition.EffectPercent);
+                definition.PrerequisiteIds.ToImmutableArray(), definition.AxialPosition, definition.Effect, definition.EffectPercent, definition.TargetTowerId);
             if (!nodes.TryAdd(node.Id, node) || !coordinates.Add(node.Axial))
                 throw new InvalidOperationException("Duplicate research ID or axial coordinate.");
         }

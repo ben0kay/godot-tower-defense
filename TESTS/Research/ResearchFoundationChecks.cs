@@ -31,7 +31,7 @@ public partial class ResearchFoundationChecks : Node
     // Only temporary profile files are touched; purchases and XP remain independent of campaign saves.
     private static void PureResearch()
     {
-        var nodes = ResearchService.Nodes; Require(nodes.Count == 2, "Only two real nodes");
+        var nodes = ResearchService.Nodes; Require(nodes.Count == 3, "Only three real nodes");
         ResearchNode core = nodes["research_core"], upgrade = nodes["citadel_master_1"];
         string root = Path.Combine(Path.GetTempPath(), "td-research-" + Guid.NewGuid().ToString("N"));
         try

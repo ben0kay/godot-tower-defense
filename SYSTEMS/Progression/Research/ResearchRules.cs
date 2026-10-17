@@ -30,11 +30,6 @@ public static class ResearchRules
     // Always start from authored maximum; opening menus never compounds existing HP.
     public static int CitadelMaximum(int authored, PlayerProgression player, IReadOnlyDictionary<string, ResearchNode> nodes)
     {
-        if (authored <= 0) throw new ArgumentOutOfRangeException(nameof(authored));
-        double percent = 0;
-        foreach (string id in player.PurchasedResearchIds)
-            if (nodes.TryGetValue(id, out ResearchNode node) && node.Effect == ResearchEffectKind.CitadelMaxHealthPercent)
-                percent += node.Percent;
-        return checked((int)Math.Round(authored * (1.0 + percent / 100.0), MidpointRounding.AwayFromZero));
+        return ResearchDeployment.Resolve(player, nodes).CitadelMaximum(authored);
     }
 }
