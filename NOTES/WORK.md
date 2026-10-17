@@ -19,6 +19,13 @@ Verification and remaining manual review: TESTS/Research/BATTLE_RESEARCH.md. Mis
 
 ---
 
+## Shield aura art polish — 2026-10-17
+
+- [x] Replaced the nearly invisible shield outline with a **single baked radial-fill SVG** (lightly translucent centre, thicker high-contrast bright rim, layered outer glow and static electric zap filaments). Tuned `FEEDBACK/Shields/DefaultShieldVisualStyle.tres` to 1.65× size, 0.82 idle opacity, 1.0 hit/break peaks, warm red-orange tint; `ShieldVisual.tscn` uses linear filtering. No change to shield gameplay, wave flags, regeneration, particles or per-frame CPU work.
+- [ ] **Visual QA:** open Godot to re-import `FEEDBACK/Shields/Artwork/ShieldAura.svg`; check Shielded Enemy001 at normal zoom, small/large enemies, line-of-fire visibility, hit/break fade, layering and mass-wave performance. XML/reference checks passed; Godot headless/desktop tests were not run in this authoring session.
+
+---
+
 ## Shield visual foundation (SV1) — 2026-10-17
 
 - [x] Reusable **[FEEDBACK/Shields](../FEEDBACK/Shields/README.md)** presentation: one baked tintable reddish SVG aura, auto-sized behind the enemy, event-only shield damage/break flashes, lazy attachment only to shielded enemy instances, shield-restoration reactivation, no per-frame shield visual script processing. Purely cosmetic; existing shield arithmetic, shield generator and wave opt-in remain unchanged.
