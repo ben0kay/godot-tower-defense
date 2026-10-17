@@ -1,4 +1,4 @@
-// Immutable-at-presentation mission outcome snapshot; progression and tallying are separate later passes.
+// Immutable-at-presentation mission outcome snapshot; progression awards consume this frozen data separately from presentation.
 using System;
 
 public enum LevelOutcome { Victory, Defeat }

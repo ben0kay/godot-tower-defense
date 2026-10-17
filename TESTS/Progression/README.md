@@ -1,3 +1,9 @@
+## Mission XP foundation — 2026-10-17
+
+New MissionXPChecks.tscn covers real mission rewards, v3 migration, once-only receipts, save retry and Results geometry; see MissionXP.md. Existing PlayerProgressionChecks also passed.
+
+---
+
 # Initial player progression verification — 2026-10-17
 
 ## Research schema extension — 2026-10-17

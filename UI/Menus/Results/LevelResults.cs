@@ -9,6 +9,7 @@ public partial class LevelResults : CanvasLayer
     [Signal] public delegate void MenuRequestedEventHandler();
     [Signal] public delegate void NextLevelRequestedEventHandler();
     [Signal] public delegate void ExitGameRequestedEventHandler();
+    [Signal] public delegate void RewardRetryRequestedEventHandler();
 
     [ExportGroup("Presentation")]
     [Export(PropertyHint.Range, "0.05,1,0.05")] public float StatRevealSeconds { get; set; } = 0.24f;
@@ -27,6 +28,9 @@ public partial class LevelResults : CanvasLayer
     private Control _screen;
     private Label _heading, _subtitle;
     private VBoxContainer _experience;
+    private Label _xpHeading, _xpNote, _xpLines;
+    private ProgressBar _xpBar;
+    private Button _retryXP;
     private HBoxContainer _actions;
     private Button _primary, _details, _menu, _exit;
     private Button _skip;
@@ -69,15 +73,19 @@ public partial class LevelResults : CanvasLayer
         _experience = new VBoxContainer();
         _experience.AddThemeConstantOverride("separation", 7);
         content.AddChild(_experience);
-        Label xpHeading = UIButtonFactory.Label("MISSION XP  //  REWARDS NOT CONFIGURED", 14, palette);
-        xpHeading.AddThemeColorOverride("font_color", palette.MutedTextColor);
-        _experience.AddChild(xpHeading);
-        ProgressBar xpBar = new() { MinValue = 0, MaxValue = 100, Value = 0, ShowPercentage = false,
+        _xpHeading = UIButtonFactory.Label("MISSION XP", 14, palette); _xpHeading.Name = "MissionXPHeading";
+        _xpHeading.AddThemeColorOverride("font_color", palette.AccentColor);
+        _experience.AddChild(_xpHeading);
+        _xpLines = UIButtonFactory.Label("", 12, palette); _xpLines.Name = "MissionXPLines";
+        _xpLines.AutowrapMode = TextServer.AutowrapMode.WordSmart; _experience.AddChild(_xpLines);
+        _xpBar = new() { Name = "PlayerXPBar", MinValue = 0, MaxValue = 100, Value = 0, ShowPercentage = false,
             CustomMinimumSize = new Vector2(0, 12), MouseFilter = Control.MouseFilterEnum.Ignore };
-        _experience.AddChild(xpBar);
-        Label xpNote = UIButtonFactory.Label("Mission XP rewards are not configured yet.", 12, palette);
-        xpNote.AddThemeColorOverride("font_color", palette.MutedTextColor);
-        _experience.AddChild(xpNote);
+        _experience.AddChild(_xpBar);
+        _xpNote = UIButtonFactory.Label("", 12, palette); _xpNote.Name = "PlayerXPSummary";
+        _xpNote.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        _xpNote.AddThemeColorOverride("font_color", palette.MutedTextColor); _experience.AddChild(_xpNote);
+        _retryXP = UIButtonFactory.Create("RETRY XP SAVE", () => EmitSignal(SignalName.RewardRetryRequested), UIButtonStyle.Compact, 30f, palette);
+        _experience.AddChild(_retryXP); _retryXP.Hide();
 
         _actions = new HBoxContainer();
         _actions.AddThemeConstantOverride("separation", 12);
@@ -85,7 +93,7 @@ public partial class LevelResults : CanvasLayer
         _primary = UIButtonFactory.Create("RETRY MISSION", RequestPrimary, UIButtonStyle.Action, 46f, palette);
         _details = UIButtonFactory.Create("DETAILS", null, UIButtonStyle.Action, 46f, palette);
         _details.Disabled = true; _details.TooltipText = "Detailed mission statistics — coming soon.";
-        _menu = UIButtonFactory.Create("EXIT TO MAIN MENU", () => { if (ActionsAvailable) EmitSignal(SignalName.MenuRequested); }, UIButtonStyle.Action, 46f, palette);
+        _menu = UIButtonFactory.Create("RETURN TO CAMPAIGN", () => { if (ActionsAvailable) EmitSignal(SignalName.MenuRequested); }, UIButtonStyle.Action, 46f, palette);
         _exit = UIButtonFactory.Create("EXIT GAME", () => { if (ActionsAvailable) EmitSignal(SignalName.ExitGameRequested); }, UIButtonStyle.Action, 46f, palette);
         foreach (Button button in new[] { _primary, _details, _menu, _exit }) _actions.AddChild(button);
         _error = new AcceptDialog { Title = "Navigation error" }; AddChild(_error);
@@ -123,6 +131,7 @@ public partial class LevelResults : CanvasLayer
     {
         if (snapshot == null) throw new ArgumentNullException(nameof(snapshot));
         _reveal?.Kill();
+        SetMissionReward(null, "", true);
         bool won = snapshot.Outcome == LevelOutcome.Victory;
         _won = won; _hasNext = hasNextLevel; ActionsAvailable = false;
         _primary.Text = won ? "NEXT LEVEL" : "RETRY MISSION";
@@ -166,6 +175,33 @@ public partial class LevelResults : CanvasLayer
         _reveal.TweenCallback(Callable.From(() => _experience.Show()));
         _reveal.TweenProperty(_experience, "modulate:a", 1.0f, 0.3f);
         _reveal.TweenCallback(Callable.From(FinishReveal));
+    }
+
+    // =========================================================
+    // Display a saved immutable receipt only; showing, skipping or reopening this UI cannot grant XP.
+    public void SetMissionReward(MissionRewardResult reward, string error, bool profileless)
+    {
+        _retryXP.Visible = !profileless && reward == null && !string.IsNullOrEmpty(error);
+        _xpBar.Visible = reward != null; _xpLines.Visible = reward != null;
+        if (reward == null)
+        {
+            _xpHeading.Text = profileless ? "MISSION XP  //  NOT SAVED" : "MISSION XP  //  SAVE FAILED";
+            _xpNote.Text = profileless ? "No deployment profile. Select a profile before starting a mission to earn XP."
+                : "XP has not been saved. " + error + " Retry before leaving this mission.";
+            _xpHeading.AddThemeColorOverride("font_color", profileless ? _palette.MutedTextColor : _palette.HealthCriticalColor);
+            return;
+        }
+        PlayerProgression before = reward.Before, after = reward.After;
+        _xpHeading.Text = $"MISSION XP  //  +{reward.Breakdown.TotalXP:N0} XP SAVED";
+        _xpHeading.AddThemeColorOverride("font_color", _palette.AccentColor);
+        var rows = new List<string>();
+        foreach (var line in reward.Breakdown.Lines) rows.Add($"{line.Label}: {line.Amount:+#,0;-#,0;0} XP");
+        _xpLines.Text = string.Join("\n", rows);
+        long points = after.UnspentResearchPoints - before.UnspentResearchPoints;
+        _xpNote.Text = (after.Level > before.Level ? $"LEVEL UP · {before.Level} → {after.Level} · +{points:N0} Research Points\n" : $"Player Level {after.Level}\n")
+            + $"{after.CurrentXP:N0} / {after.RequiredXP:N0} XP toward Level {after.Level + 1}. Research is available from Campaign.";
+        _xpBar.MaxValue = after.RequiredXP; _xpBar.Value = after.CurrentXP;
+        _xpBar.TooltipText = $"Lifetime player XP: {before.LifetimePlayerXP:N0} → {after.LifetimePlayerXP:N0}";
     }
 
     // =========================================================

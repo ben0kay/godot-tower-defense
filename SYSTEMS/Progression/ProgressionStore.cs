@@ -54,7 +54,7 @@ public sealed class ProgressionStore
     // Validate source fields and derived arithmetic before displaying or replacing data.
     private static void Validate(PlayerProgression value, string id)
     {
-        if (value == null || value.Version != 2 || value.ProfileId != id ||
+        if (value == null || value.Version != 3 || value.ProfileId != id ||
             value.LifetimePlayerXP < 0 || value.UnspentResearchPoints < 0 ||
             value.FirstLevelXP <= 0 || value.LevelStepXP < 0)
             throw new InvalidDataException("Invalid progression record.");
@@ -65,6 +65,28 @@ public sealed class ProgressionStore
             value.PurchasedResearchIds.Distinct(StringComparer.Ordinal).Count() != value.PurchasedResearchIds.Length)
             throw new InvalidDataException("Invalid purchased research IDs.");
         _ = value.RequiredXP;
+        ValidateMissionLedger(value);
+    }
+
+    // =========================================================
+    // Constant-size ticket watermarks and the latest receipt must agree with the same saved XP balance.
+    private static void ValidateMissionLedger(PlayerProgression value)
+    {
+        if (value.LastIssuedMissionNumber < 0 || value.LastAwardedMissionNumber < 0 ||
+            value.LastAwardedMissionNumber > value.LastIssuedMissionNumber)
+            throw new InvalidDataException("Invalid mission award sequence.");
+        MissionAwardReceipt receipt = value.LastMissionAward;
+        if (value.LastAwardedMissionNumber == 0)
+        { if (receipt != null) throw new InvalidDataException("Unexpected mission receipt."); return; }
+        if (receipt == null || receipt.MissionNumber != value.LastAwardedMissionNumber ||
+            string.IsNullOrWhiteSpace(receipt.LevelId) || receipt.LevelId.Length > 64 || receipt.XPBefore < 0 ||
+            receipt.ResearchPointsBefore < 0 || receipt.Breakdown == null || receipt.Breakdown.Lines.IsDefaultOrEmpty ||
+            receipt.Breakdown.Lines.Length > 128 || receipt.Breakdown.Lines.Any(line => line == null ||
+                string.IsNullOrWhiteSpace(line.Id) || line.Id.Length > 64 || string.IsNullOrWhiteSpace(line.Label) || line.Label.Length > 128))
+            throw new InvalidDataException("Invalid mission award receipt.");
+        if (checked(receipt.XPBefore + receipt.Breakdown.TotalXP) > value.LifetimePlayerXP ||
+            receipt.ResearchPointsBefore > PlayerLevelCurve.LevelAt(receipt.XPBefore, value.FirstLevelXP, value.LevelStepXP) - 1L)
+            throw new InvalidDataException("Mission receipt exceeds earned progression.");
     }
 
     // =========================================================
@@ -83,10 +105,19 @@ public sealed class ProgressionStore
         {
             if (document.RootElement.TryGetProperty("PurchasedResearchIds", out _))
                 throw new InvalidDataException("Unexpected research data in version 1.");
-            value = value with { Version = 2, PurchasedResearchIds = ImmutableArray<string>.Empty };
+            value = value with { PurchasedResearchIds = ImmutableArray<string>.Empty };
         }
         else if (!document.RootElement.TryGetProperty("PurchasedResearchIds", out _))
             throw new InvalidDataException("Missing purchased research IDs.");
+        string[] missionFields = { "LastIssuedMissionNumber", "LastAwardedMissionNumber", "LastMissionAward" };
+        if (value.Version == 1 || value.Version == 2)
+        {
+            if (missionFields.Any(name => document.RootElement.TryGetProperty(name, out _)))
+                throw new InvalidDataException("Unexpected mission ledger in old progression version.");
+            value = value with { Version = 3 };
+        }
+        else if (missionFields.Any(name => !document.RootElement.TryGetProperty(name, out _)))
+            throw new InvalidDataException("Missing mission ledger fields.");
         Validate(value, id);
         return value;
     }

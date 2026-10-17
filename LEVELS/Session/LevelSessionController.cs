@@ -1,4 +1,4 @@
-// Level-owned outcome orchestration, wave-only basic tallies and safe results navigation; no rewards or saves.
+// Level-owned outcomes, frozen telemetry and once-only mission reward orchestration; Results never grants XP.
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -9,6 +9,13 @@ public partial class LevelSessionController : Node
 {
     public LevelSessionState State { get; private set; } = LevelSessionState.Playing;
     public LevelResultSnapshot Snapshot { get; private set; }
+    public MissionRewardResult Reward { get; private set; }
+    public string RewardError { get; private set; } = "";
+    private MissionRewardTicket _rewardTicket;
+    private MissionXPPolicy _rewardPolicy;
+    private bool _rewardPolicyCaptured;
+    private LevelConfig _levelConfig;
+    private string _rewardProfileId;
     public string NextScenePath { get; private set; }
     private WaveManager _waves;
     private CitadelHealth _health;
@@ -37,11 +44,15 @@ public partial class LevelSessionController : Node
         RunStats = new LevelRunStats { Name = "RunStats" }; AddChild(RunStats);
         _scenePath = GetParent().SceneFilePath;
         _levelName = PlayableLevelCatalog.Identify(GetParent(), _spawns.Paths.Navigation.Grid.Level);
+        _levelConfig = _spawns.Paths.Navigation.Grid.Level.Settings;
+        _rewardProfileId = GetNode<CitadelSession>("../CitadelSession").Research.ProfileId;
+        if (!string.IsNullOrEmpty(_rewardProfileId)) PrepareReward();
         _spawns.WaveEnemyCreated += TrackWaveEnemy;
         _registry.EnemyKilled += CountKill; _registry.EnemyArrived += CountBreach;
         _health.Destroyed += Defeat; _waves.WaveCompleted += OnWaveCompleted;
         _results.RetryRequested += Retry; _results.NextLevelRequested += NextLevel;
-        _results.MenuRequested += MainMenu; _results.ExitGameRequested += ExitGame;
+        _results.MenuRequested += ReturnToCampaign; _results.ExitGameRequested += ExitGame;
+        _results.RewardRetryRequested += RetryReward;
         if (_health.CurrentHealth == 0) Defeat(); else QueueVictoryIfComplete();
     }
 
@@ -113,7 +124,41 @@ public partial class LevelSessionController : Node
     private void Present()
     {
         NextScenePath = Snapshot.Outcome == LevelOutcome.Victory ? PlayableLevelCatalog.NextScene(_levelName) : null;
+        TryAwardReward();
         _results.ShowResults(Snapshot, NextScenePath != null);
+        _results.SetMissionReward(Reward, RewardError, string.IsNullOrEmpty(_rewardProfileId));
+    }
+
+    // =========================================================
+    // Reserve a monotonic ticket at deployment; failed preparation is visible and can be retried at Results.
+    private void PrepareReward()
+    {
+        try
+        {
+            if (!_rewardPolicyCaptured) { _rewardPolicy = MissionXPPolicy.Capture(_levelConfig); _rewardPolicyCaptured = true; }
+            _rewardTicket = ProgressionService.BeginMission(_rewardProfileId, _levelName, _rewardPolicy);
+            RewardError = "";
+        }
+        catch (Exception error) { RewardError = error.Message; }
+    }
+
+    // =========================================================
+    // One persisted award after authoritative outcome capture; failures never masquerade as saved XP.
+    private void TryAwardReward()
+    {
+        if (Reward != null || string.IsNullOrEmpty(_rewardProfileId) || Snapshot == null) return;
+        if (_rewardTicket == null) { if (RewardError.Length == 0) RewardError = "Mission reward preparation failed."; return; }
+        try { Reward = ProgressionService.AwardMission(_rewardTicket, Snapshot); RewardError = ""; }
+        catch (Exception error) { RewardError = error.Message; }
+    }
+
+    // =========================================================
+    // Retrying persistence does not rerun gameplay, outcome calculation, reveal or navigation.
+    private void RetryReward()
+    {
+        if (Snapshot == null || Reward != null || string.IsNullOrEmpty(_rewardProfileId)) return;
+        if (_rewardTicket == null) PrepareReward();
+        TryAwardReward(); _results.SetMissionReward(Reward, RewardError, false);
     }
     #endregion
 
@@ -123,7 +168,7 @@ public partial class LevelSessionController : Node
     private bool CanNavigate => Snapshot != null && _results.ActionsAvailable && !_navigating;
     public void Retry() { if (CanNavigate && State == LevelSessionState.Defeat) Navigate(_scenePath); }
     public void NextLevel() { if (CanNavigate && State == LevelSessionState.Victory && NextScenePath != null) Navigate(NextScenePath); }
-    public void MainMenu() { if (CanNavigate) Navigate(MenuNavigation.MainScene); }
+    public void ReturnToCampaign() { if (CanNavigate) Navigate(MenuNavigation.CampaignScene); }
     public void ExitGame() { if (!CanNavigate) return; _navigating = true; GetTree().Paused = false; GetTree().Quit(); }
     private void Navigate(string scene)
     {
@@ -147,7 +192,7 @@ public partial class LevelSessionController : Node
         foreach (var pair in _waveEnemies) if (GodotObject.IsInstanceValid(pair.Key)) pair.Key.TreeExiting -= pair.Value;
         _waveEnemies.Clear();
         if (GodotObject.IsInstanceValid(_results))
-        { _results.RetryRequested -= Retry; _results.NextLevelRequested -= NextLevel; _results.MenuRequested -= MainMenu; _results.ExitGameRequested -= ExitGame; }
+        { _results.RewardRetryRequested -= RetryReward; _results.RetryRequested -= Retry; _results.NextLevelRequested -= NextLevel; _results.MenuRequested -= ReturnToCampaign; _results.ExitGameRequested -= ExitGame; }
         if (GodotObject.IsInstanceValid(_input)) _input.Unbind(this);
         if (State != LevelSessionState.Playing) GetTree().Paused = false;
     }

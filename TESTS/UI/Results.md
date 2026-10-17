@@ -1,3 +1,9 @@
+## Mission XP foundation — 2026-10-17
+
+Mission XP pass: ResultsChecks passed with Campaign-return expectations and a temporary progression store. MissionXPChecks covers real saved XP, failed-save retry/profileless behavior and viewport geometry; see TESTS/Progression/MissionXP.md.
+
+---
+
 # Mission Debrief R1 verification
 
 Build C# with a matching Godot .NET SDK, then run:

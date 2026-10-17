@@ -2,7 +2,7 @@
 using Godot;
 using System;
 
-public static class ProgressionService
+public static partial class ProgressionService
 {
     private static ProgressionStore _store;
     private static ProgressionStore Store => _store ??= new(
@@ -24,7 +24,7 @@ public static class ProgressionService
 
     // =========================================================
     // Save first; errors propagate and never announce a successful fictitious XP grant.
-    // This low-level API is not an idempotent mission award: P2 must add run-token protection.
+    // This low-level development/manual grant is not idempotent; real missions use AwardMission.
     public static PlayerProgression GrantXP(long amount)
     {
         PlayerProgression current = GetCurrent();

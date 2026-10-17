@@ -57,7 +57,7 @@ public partial class ResearchFoundationChecks : Node
             Directory.CreateDirectory(Path.GetDirectoryName(path));
             File.WriteAllText(path, "{\"Version\":1,\"ProfileId\":\"" + oldId + "\",\"LifetimePlayerXP\":600,\"UnspentResearchPoints\":1,\"FirstLevelXP\":500,\"LevelStepXP\":250}");
             var migrated = store.Load(oldId);
-            Require(migrated.Version == 2 && migrated.Level == 2 && migrated.UnspentResearchPoints == 1 &&
+            Require(migrated.Version == 3 && migrated.Level == 2 && migrated.UnspentResearchPoints == 1 &&
                 migrated.PurchasedResearchIds.Length == 0 && File.ReadAllText(path).Contains("\"Version\":1"), "v1 migration preserves data without write-on-load");
             store.Save(ResearchRules.Purchase(migrated, upgrade));
             Require(store.Load(oldId).PurchasedResearchIds.Contains(upgrade.Id), "Migrated purchase persists");

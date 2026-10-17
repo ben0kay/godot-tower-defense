@@ -1,3 +1,9 @@
+## Mission XP foundation — 2026-10-17
+
+Results now returns directly to Campaign after committing profile XP. The existing profile panel reads the updated XP/level/RP; Research remains accessible only here between deployments. A separate Levels area and mission unlocking are still deferred.
+
+---
+
 # Campaign — Two standalone playable levels
 
 ## Research-first extension — 2026-10-17

@@ -3,6 +3,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 using System.Threading.Tasks;
 using static MissionFixture;
 
@@ -56,8 +57,10 @@ internal static class ResultsNavigationChecks
         await owner.ToSignal(tree, SceneTree.SignalName.ProcessFrame);
         results = next.GetNode<LevelResults>("LevelResults"); results.SkipReveal();
         Require(results.PrimaryButton.Disabled && results.PrimaryButton.TooltipText == "No next level available.", "Missing next remains visible/disabled while other exits work");
-        ButtonFor(results, "EXIT TO MAIN MENU").EmitSignal(Button.SignalName.Pressed);
-        await Scene<MainMenu>(owner); Require(!tree.Paused && owner.GetNode<GameInput>("/root/GameInput").BindingCount == 0, "Menu exits unpaused with no stale gameplay/results bindings");
+        ButtonFor(results, "RETURN TO CAMPAIGN").EmitSignal(Button.SignalName.Pressed);
+        CampaignMenu campaign = await Scene<CampaignMenu>(owner);
+        Require(campaign.FindChildren("*", "Label", true, false).OfType<Label>().Any(label => label.Text.Contains("PLAYER LEVEL 2")), "Campaign displays progression earned from actual mission wins");
+        Require(!tree.Paused && owner.GetNode<GameInput>("/root/GameInput").BindingCount == 0, "Menu exits unpaused with no stale gameplay/results bindings");
         ProfileStore.ClearSelection(); MenuNavigation.Open(owner, MenuNavigation.Level002Scene);
         Node direct = await Scene<Node2D>(owner); direct.GetNode<CitadelSession>("CitadelSession").Health.TakeDamage(int.MaxValue);
         await owner.ToSignal(tree, SceneTree.SignalName.ProcessFrame);
@@ -66,7 +69,7 @@ internal static class ResultsNavigationChecks
         Require(direct.SceneFilePath == MenuNavigation.Level002Scene && !tree.Paused, "Level002 Retry also reloads its current playable launcher");
         direct.GetNode<CitadelSession>("CitadelSession").Health.TakeDamage(int.MaxValue);
         await owner.ToSignal(tree, SceneTree.SignalName.ProcessFrame);
-        results = direct.GetNode<LevelResults>("LevelResults"); results.SkipReveal(); ButtonFor(results, "EXIT TO MAIN MENU").EmitSignal(Button.SignalName.Pressed);
+        results = direct.GetNode<LevelResults>("LevelResults"); results.SkipReveal(); ButtonFor(results, "RETURN TO CAMPAIGN").EmitSignal(Button.SignalName.Pressed);
         await Scene<BootScreen>(owner); Require(!tree.Paused, "Direct F6/profileless menu exit safely redirects to Boot");
         GD.Print("PASS: R1 actual Retry/Next/Menu navigation, launcher validation, missing-next safety, carry boundaries and binding cleanup");
     }

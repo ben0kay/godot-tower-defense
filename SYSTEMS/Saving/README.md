@@ -1,3 +1,9 @@
+## Mission reward persistence — 2026-10-17
+
+Profile progression v3 now persists atomic mission XP/RP awards and bounded-size sequence/receipt data, with v1/v2 migration. Mission XP is not battlefield saving: pending failed awards are not resumed after leaving a mission, and campaign slots/Continue/Pause Save–Load remain unavailable. See SYSTEMS/Progression/Missions/README.md.
+
+---
+
 # Saving — Campaign persistence contract (not yet implemented)
 
 ## Research-first extension — 2026-10-17

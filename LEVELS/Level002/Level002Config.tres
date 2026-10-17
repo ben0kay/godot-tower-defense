@@ -3,6 +3,8 @@
 
 [resource]
 script = ExtResource("1")
+VictoryBaseXP = 500
+DefeatBaseXP = 0
 StartingCredits = 1700
 ActivePortals = Array[NodePath]([NodePath("Portals/EnemyPortal01"), NodePath("Portals/EnemyPortal02"), NodePath("Portals/EnemyPortal03"), NodePath("Portals/EnemyPortal04"), NodePath("Portals/EnemyPortal05")])
 WaveSetId = "level002"

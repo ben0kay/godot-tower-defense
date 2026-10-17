@@ -1,3 +1,9 @@
+## Mission XP foundation — 2026-10-17
+
+LevelConfig now exposes Player XP Rewards: VictoryBaseXP and DefeatBaseXP, provisional500/0 on both playable levels. Session captures these at deployment; reward math/persistence live in SYSTEMS/Progression/Missions, not enemies/waves.
+
+---
+
 # LEVELS — Authored Maps, Settings and Waves
 
 - `Level001/Level001.tscn`: the original terrain/placement test map, mounted as `World/Level` by `WORLD/World.tscn`.
