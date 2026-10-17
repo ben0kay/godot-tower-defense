@@ -1,5 +1,13 @@
 # WORK — Consolidated Outstanding Implementation Backlog
 
+## Shield visual foundation (SV1) — 2026-10-17
+
+- [x] Reusable **[FEEDBACK/Shields](../FEEDBACK/Shields/README.md)** presentation: one baked tintable reddish SVG aura, auto-sized behind the enemy, event-only shield damage/break flashes, lazy attachment only to shielded enemy instances, shield-restoration reactivation, no per-frame shield visual script processing. Purely cosmetic; existing shield arithmetic, shield generator and wave opt-in remain unchanged.
+- [ ] **Godot desktop/headless SV1 verification** — run modified `TESTS/Combat/EnemyShieldChecks.cs`; inspect spawn/damage/break/restore, layering, red tint on different ship shapes, and 500-enemy performance. The code/resources are pushed but not compiled or visually tested here.
+- [ ] **Later, separate decisions:** tower HP/shields/durability, natural shield regeneration, shield bars, premium sparks/shaders. None are implemented in SV1.
+
+---
+
 ## Current amendment — Research before mission XP balancing (2026-10-17)
 
 **This amendment supersedes older status/order statements below; all original plans are retained.** The user explicitly prioritized real mission statistics and the Campaign-only Research Room before finalized XP rewards/deductions.
