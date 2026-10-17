@@ -56,6 +56,8 @@ public partial class Enemy : Node2D
     private Vector2 _terrainPosition;
     private bool _terrainMovement;
     private DefenseBar _defenseBar;
+    private ShieldVisual _shieldVisual;
+    private static PackedScene _shieldVisualScene;
     private double _initialDurability, _damageConsumed, _damageXpPool, _killXp;
     private int _xpCredits;
     private bool _xpRulesCaptured;
@@ -73,6 +75,7 @@ public partial class Enemy : Node2D
         _xpCredits = Math.Max(0, Definition.KillRewardCredits);
         _defenseBar = GetNodeOrNull<DefenseBar>("DefenseBar");
         _defenseBar?.SetHealth(Health, Definition.MaxHealth);
+        SyncShieldVisual(0f, CurrentShield, false);
         Movement = GetNode<EnemyMovement>("Movement");
         SetNotifyLocalTransform(true); SetNotifyTransform(true);
         _registry.Register(this);
@@ -146,7 +149,9 @@ public partial class Enemy : Node2D
             if (_initialDurability > 0 && double.IsFinite(_initialDurability)) xp = _damageXpPool * (eligible / _initialDurability);
             if (oldHealth > 0 && result.Health <= 0) xp += _killXp;
         }
+        float oldShield = CurrentShield;
         CurrentShield = result.Shield; Health = result.Health;
+        if (CurrentShield != oldShield) SyncShieldVisual(oldShield, CurrentShield);
         if (Health != oldHealth)
         {
             _defenseBar?.SetHealth(Health, Definition.MaxHealth);
@@ -163,7 +168,32 @@ public partial class Enemy : Node2D
             !float.IsFinite(Definition.MaxShield) || Definition.MaxShield <= CurrentShield) return 0;
         float before = CurrentShield;
         CurrentShield = (float)Math.Min(Definition.MaxShield, (double)CurrentShield + amount);
+        if (CurrentShield != before) SyncShieldVisual(before, CurrentShield);
         return CurrentShield - before;
+    }
+
+    // =========================================================
+    // Shield feedback is a lazy child of shielded recipients only; ordinary enemies allocate no effect.
+    // A future damageable tower can use ShieldVisual.SetShield directly without any Enemy dependency.
+    private void SyncShieldVisual(float before, float after, bool animate = true)
+    {
+        if (after > 0f && (_shieldVisual == null || !GodotObject.IsInstanceValid(_shieldVisual)))
+        {
+            _shieldVisualScene ??= GD.Load<PackedScene>("res://FEEDBACK/Shields/ShieldVisual.tscn");
+            if (_shieldVisualScene == null) return;
+            _shieldVisual = _shieldVisualScene.Instantiate<ShieldVisual>();
+            _shieldVisual.Name = "ShieldVisual";
+            AddChild(_shieldVisual);
+
+            Sprite2D sprite = GetNodeOrNull<Sprite2D>("Sprite");
+            Vector2 dimensions = sprite != null && sprite.Texture != null
+                ? sprite.GetRect().Size * new Vector2(Mathf.Abs(sprite.Scale.X), Mathf.Abs(sprite.Scale.Y))
+                : Vector2.One * Mathf.Max(8f, (Definition?.RadiusPixels ?? 16f) * 2f);
+            _shieldVisual.Position = sprite?.Position ?? Vector2.Zero;
+            _shieldVisual.SetVisualSize(dimensions);
+        }
+        if (GodotObject.IsInstanceValid(_shieldVisual))
+            _shieldVisual.SetShield(before, after, animate);
     }
 
     // =========================================================
@@ -195,5 +225,9 @@ public partial class Enemy : Node2D
     // =========================================================
     // Also clean up when the whole level is unloaded.
     public override void _ExitTree()
-    { ClearStatuses(); bool unresolved = IsAlive; IsAlive = false; _registry?.Unregister(this); Terrain = null; if (unresolved) Removed?.Invoke(this); }
+    {
+        ClearStatuses(); _shieldVisual?.ResetVisual(); _shieldVisual = null;
+        bool unresolved = IsAlive; IsAlive = false; _registry?.Unregister(this);
+        Terrain = null; if (unresolved) Removed?.Invoke(this);
+    }
 }
