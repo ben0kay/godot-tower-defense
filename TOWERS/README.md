@@ -8,7 +8,7 @@ This README is an up-to-date overview and forward plan. Completed phase-by-phase
 
 ## Current implementation (October 2026)
 
-- **Playable:** Battle Tower, Laser Tower, Blaster Cannon, Shockwave Tower. Ammunition Factory and Ammunition Depot are also registered Economy buildings. All six types use `DefaultTowerCatalog.tres`; other type folders may contain plans only.
+- **Playable:** Battle Tower, Laser Tower, Blaster Cannon, Shockwave Tower, Sniper Tower, Machine Gun Tower and Cryo Tower. Ammunition Factory and Ammunition Depot are also registered Economy buildings. All nine types use `DefaultTowerCatalog.tres`; other type folders may contain plans only.
 - **Purchased levels:** `Offensive/<Tower>/*Levels.cs` contains one **complete, absolute row per level**, with construction price in Level 1 and upgrade price in later rows. October 2026 rebalance: Battle Level 1 deals 30 Kinetic hull damage (two hits versus 60-HP unshielded Enemy001), Battle projectile speed is 800 px/s at each level, and bought levels get gentler stat/range increases. Level 3 never accumulates the stat values from Level 2. Never restore cumulative purchased-level modifiers or scattered per-level `.tres` values.
 - **Earned ranks:** `*Ranks.cs` beside `*Levels.cs` defines Standard → Veteran → Enhanced → Superior → Legendary, at 0 / 1,000 / 3,000 / 7,000 / 15,000 cumulative XP from actual shield/hull damage and kills. XP award multipliers are unchanged. Rank bonuses are independent of purchased levels; the bottom-right Inspector shows Rank, XP and bonuses. See [Shared/Ranks/README.md](Shared/Ranks/README.md).
 - **Foundation:** `Shared/TowerBase.cs`, `Shared/TowerConfig.cs`, `Shared/Upgrades/` and `Shared/Stats/Pipeline/` own per-instance progression, independent config copies, payments/previews and cached effective stats.
@@ -126,3 +126,7 @@ The [Construction](Shared/Construction/README.md), [Ammunition](Shared/Ammunitio
 ## Future shared generator and drone umbrellas — README-only
 
 [Economy/Power](Economy/Power/README.md) groups Solar, Industrial and Fusion as **different generator types sharing the same future generation implementation**; avoid copying the same generator code three times. [DRONES](../DRONES/README.md) is the top-level home for reusable moving drones: [Transport](../DRONES/Transport/README.md) for future factory → depot and depot → tower physical deliveries, and [Combat](../DRONES/Combat/README.md) for a possible player-launched drone ability following enemy corridors. The isolated ammunition inventory, factory timer/buffer, depot stock and global 10% policy helpers are already coded but **not attached to live gameplay**. The required integration uses physical drones on both delivery legs; see [NOTES/WORK.md](../NOTES/WORK.md). Keep combat and tower stats unchanged until Codex's explicit integration work.
+
+## Cryo Tower — implemented CT1–CT3
+
+Cryo is a catalog-registered Offensive Energy projectile tower, with permanent nonstacking 33% Slow and unslowed/nonimmune-only targeting. It reuses shared construction, physical ammo, paid absolute levels, earned ranks and cached stats. See [Cryo](Offensive/CryoTower/README.md) and [status architecture](../ENEMIES/StatusEffects/README.md). Stasis and timed statuses remain deferred.

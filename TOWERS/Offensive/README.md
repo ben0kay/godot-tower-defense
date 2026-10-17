@@ -14,3 +14,7 @@ Missile Tower, armour, terrain-blocking line of sight, timed effects and heat re
 - Both reuse `Shared/Weapons/MultiBarrel/ProjectileTurretBase.cs` for targeting/aiming/projectile dispatch, and `BarrelFireController.cs` for `Single`, `Sequential`, and `Simultaneous` firing modes. No new weapon-wide polling or changes to existing offensive tower attack loops; details in `Shared/Weapons/MultiBarrel/README.md`.
 
 **UI integration:** The existing catalog-driven CTRL tray can show these tower definitions automatically, but the live UI redesign belongs to Codex. This implementation adds only the two catalog entries; it does not change GameplayHUD, the build tray scene, or keyboard handling.
+
+## Cryo
+
+[CryoTower](CryoTower/README.md) is playable: Energy projectile plus permanent Slow, using shared single-barrel delivery, levels/ranks/ammunition and construction. Only unslowed, nonimmune enemies are targeted; there is no damage-only fallback.

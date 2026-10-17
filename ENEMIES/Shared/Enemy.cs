@@ -15,6 +15,41 @@ public partial class Enemy : Node2D
     public int SpawnGeneration { get; private set; }
     public event Action<Enemy> Initialized;
     public EnemyRegistry Registry => _registry;
+    private EnemyStatusEffects _statuses;
+    private Sprite2D _statusSprite;
+    private Color _originalStatusColor;
+    public float EffectiveMoveSpeed => Mathf.Max(0, Definition.MoveSpeed) * (_statuses?.MovementMultiplier ?? 1);
+    public bool HasStatus(StatusEffectId id) => _statuses?.Has(id) == true;
+    public bool CanReceiveStatus(StatusEffectId id) => IsAlive && IsInsideTree() && !IsQueuedForDeletion()
+        && GodotObject.IsInstanceValid(_registry) && _registry.Contains(this)
+        && Definition != null && Definition.StatusImmunities?.Contains(id) != true;
+
+    // =========================================================
+    // Shared impact API changes instance state only; status application itself grants no XP or Credits.
+    public bool ApplyStatus(StatusEffectPayload effect)
+    {
+        if (!CanReceiveStatus(effect.Id) || effect.Strength <= 0 || !float.IsFinite(effect.Strength)
+            || effect.Strength >= 1 || !System.Enum.IsDefined(effect.Id)) return false;
+        _statuses ??= new EnemyStatusEffects();
+        if (!_statuses.Apply(effect)) return false;
+        if (_statusSprite == null)
+        {
+            _statusSprite = GetNodeOrNull<Sprite2D>("Sprite");
+            if (_statusSprite != null) _originalStatusColor = _statusSprite.SelfModulate;
+        }
+        if (GodotObject.IsInstanceValid(_statusSprite))
+            _statusSprite.SelfModulate = _originalStatusColor * new Color(.65f, .95f, 1f);
+        return true;
+    }
+
+    // =========================================================
+    // Release instance effects on every lifecycle exit without retaining their source tower.
+    private void ClearStatuses()
+    {
+        _statuses = null;
+        if (GodotObject.IsInstanceValid(_statusSprite)) _statusSprite.SelfModulate = _originalStatusColor;
+        _statusSprite = null;
+    }
     private EnemyRegistry _registry;
     internal InteractiveTileManager Terrain { get; private set; }
     private Vector2 _terrainPosition;
@@ -28,6 +63,7 @@ public partial class Enemy : Node2D
     // Called by SpawnManager after adding the scene, using world-scoped services.
     public void Initialize(EnemyRegistry registry, PathRequestManager paths, bool spawnWithShield = false, RouteCheckpoint checkpoint = null, bool requiresCheckpoint = false, EnemyRouteHandoff routeHandoff = null, int generation = 0)
     {
+        ClearStatuses();
         SpawnGeneration = generation; _registry = registry; Health = Mathf.Max(1f, Definition.MaxHealth); IsAlive = true;
         CurrentShield = spawnWithShield && float.IsFinite(Definition.MaxShield)
             ? Mathf.Max(0f, Definition.MaxShield) : 0f;
@@ -142,7 +178,7 @@ public partial class Enemy : Node2D
     private void Finish(bool arrived)
     {
         if (!IsAlive) return;
-        IsAlive = false; Movement.SetPhysicsProcess(false);
+        IsAlive = false; ClearStatuses(); Movement.SetPhysicsProcess(false);
         if (!arrived)
         {
             KilledBeforeRemoval?.Invoke(this);
@@ -158,5 +194,5 @@ public partial class Enemy : Node2D
     // =========================================================
     // Also clean up when the whole level is unloaded.
     public override void _ExitTree()
-    { bool unresolved = IsAlive; IsAlive = false; _registry?.Unregister(this); Terrain = null; if (unresolved) Removed?.Invoke(this); }
+    { ClearStatuses(); bool unresolved = IsAlive; IsAlive = false; _registry?.Unregister(this); Terrain = null; if (unresolved) Removed?.Invoke(this); }
 }

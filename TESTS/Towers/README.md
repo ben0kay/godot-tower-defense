@@ -15,3 +15,7 @@ PassiveTestTower.tscn is a test-only nonweapon TowerBase scene with a simple squ
 `ConstructionChecks.tscn` now includes `TimedUpgradeChecks` (C3): real paid1→2→3 timing, mid-work promotion, old-tier combat/deliveries, stock/capacity preservation, selected work UI and close/reselect, pause/results, overlap, zero/invalid/stale/free and missing-manager cases. Older finished-weapon helpers wait through real paid work using ConstructionTestClock.PurchaseAndFinish; they do not set authored times to zero. See [TimedUpgrades.md](TimedUpgrades.md).
 
 `ConstructionArtChecks` runs inside ConstructionChecks: actual paid Battle stage references, phase timing/selection/pause/ghost independence, no redundant texture writes or processing, missing/invalid styles, optional intermediate/final upgrade images, zero-time completion, rectangular transform preservation and teardown. See [ConstructionArtwork.md](ConstructionArtwork.md).
+
+## Cryo CT1–CT3
+
+`CryoTowerChecks.tscn` runs focused status/weapon/purchase/HUD/movement/Lava/500-enemy checks plus existing multi-barrel weapons. The Cryo group is also linked into EnemyIntegrationChecks. See [verification](CryoTower.md).

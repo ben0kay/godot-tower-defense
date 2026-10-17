@@ -24,6 +24,7 @@ public static class SafetyClampsStage
             Mathf.Min(1, FiniteMinimum(stats.Shockwave.Value.EdgeDamageFraction, 0))) : null,
         Ammunition = stats.Ammunition.HasValue ? new AmmunitionStats(Mathf.Max(0, stats.Ammunition.Value.Capacity),
             Mathf.Max(0, stats.Ammunition.Value.PerShot), FiniteMinimum(stats.Ammunition.Value.PerSecond, 0)) : null,
+        Slow = stats.Slow.HasValue ? new SlowStats(Mathf.Min(.99f, FiniteMinimum(stats.Slow.Value.Fraction, 0))) : null,
         Beam = stats.Beam.HasValue ? new BeamStats(FiniteMinimum(stats.Beam.Value.DamagePerSecond, 0)) : null
     };
 

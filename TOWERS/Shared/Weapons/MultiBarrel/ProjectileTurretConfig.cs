@@ -24,7 +24,7 @@ public partial class ProjectileTurretConfig : TowerConfig
 
     // =========================================================
     // This is bullet damage (Kinetic), not a per-muzzle damage multiplier.
-    public DamageInfo CreateHit(TowerFinalStats final, DamageSource source = null) =>
+    public virtual DamageInfo CreateHit(TowerFinalStats final, DamageSource source = null) =>
         new(final.DamagePerShot, DamageType.Kinetic, shieldPenetration: final.ShieldPenetration, source: source);
 
     // =========================================================

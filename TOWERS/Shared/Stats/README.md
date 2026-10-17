@@ -21,3 +21,5 @@ Ranks are explicit immutable *Ranks.cs rows beside each *Levels.cs table. TowerS
 ## Optional ammunition capability
 
 AmmunitionStats adds absolute capacity and per-launch/per-second cost to the same complete C# rows and cached pipeline. Safety clamps preserve nonnegative finite values; ranks do not silently change ammo cost. TowerAmmunition owns current stock and paid beam fractions outside FinalStats. Stats rebuilds, rank promotions and paid upgrades preserve stock (with explicit excess discard on capacity shrink). Current reserve/delivery status has a separate event-driven Inspector label; ammo changes do not run the pipeline. See ../Ammunition/README.md.
+
+Cryo CT1–CT3 adds optional `SlowStats` to working/final snapshots. Complete level rows author the fraction; all eight stages preserve it, Stage07 clamps finite values to 0–0.99 and Stage08 publishes it. Current rank bonuses affect damage/range only. Cryo previews and combat read this same effective capability. No research is activated.

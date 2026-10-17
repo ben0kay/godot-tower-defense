@@ -65,6 +65,8 @@ public partial class EnemyIntegrationChecks : Node
             ShieldEmitterChecks.Run(_battle, _spawns);
             DamageTypeChecks.Run(_battle, _spawns);
             MultiBarrelTowerChecks.Run(_battle, _spawns);
+            using (AmmoLoopFixture cryo = new(this))
+            { SubsystemBattlefield.DetachSession(cryo.Main); CryoTowerChecks.Run(cryo); }
             await LaserTowerChecks.Run(_battle, _spawns);
             AreaDamageChecks.Run(_battle, _spawns);
             SpatialQueryChecks.Run(_battle, _spawns);

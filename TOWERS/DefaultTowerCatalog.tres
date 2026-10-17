@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TowerCatalog" load_steps=10 format=3]
+[gd_resource type="Resource" script_class="TowerCatalog" load_steps=11 format=3]
 [ext_resource type="Script" path="res://TOWERS/Shared/TowerCatalog.cs" id="1"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/BattleTowerDefinition.tres" id="2"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/LaserTower/LaserTowerDefinition.tres" id="3"]
@@ -8,6 +8,7 @@
 [ext_resource type="Resource" path="res://TOWERS/Economy/Ammunition/AmmunitionDepot/AmmunitionDepotDefinition.tres" id="7"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/SniperTower/SniperTowerDefinition.tres" id="8"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/MachineGunTower/MachineGunTowerDefinition.tres" id="9"]
+[ext_resource type="Resource" path="res://TOWERS/Offensive/CryoTower/CryoTowerDefinition.tres" id="10"]
 [resource]
 script = ExtResource("1")
-Definitions = [ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9")]
+Definitions = [ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10")]

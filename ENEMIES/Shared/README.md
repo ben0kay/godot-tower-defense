@@ -60,3 +60,7 @@ See [GENERIC_ENEMY_SCENE_PASS.md](GENERIC_ENEMY_SCENE_PASS.md). Keep per-type `.
 Open each type's `.tscn` normally in Godot: its inherited common nodes remain Inspector-editable. Change common transforms/settings in GenericEnemy so they propagate to all types; a deliberate child property override stops inheritance for that property (use Inspector Revert to restore it). All current types inherit the bar transform unchanged. Bar drawing/style remains owned by `FEEDBACK/DefenseBars/`. Each type overrides only root Definition and Sprite texture, and adds its actual optional Abilities children. New types should use **New Inherited Scene** from GenericEnemy, assign their Definition/SVG, then register that individual scene in the existing EnemyCatalog.
 
 No runtime scripts, node counts, balance, scene paths, wave IDs or spawn lifecycle changed. See `TESTS/Enemies/GenericEnemy.md` for propagation, gameplay and 100/500-instance measurements.
+
+## Status effects — CT1
+
+Enemy exposes HasStatus, CanReceiveStatus, ApplyStatus and EffectiveMoveSpeed. Lazy per-instance state holds permanent strongest-wins Slow; authored MoveSpeed stays unchanged. EnemyDefinition exposes an Inspector StatusImmunities list. Lifecycle exits clear effects. See ../StatusEffects/README.md for complexity and future Stasis/DoT contracts.

@@ -1,6 +1,6 @@
 # Cryo Tower — Codex Implementation Pass (CT1–CT3)
 
-**Status: PLANNED / NOT YET IMPLEMENTED.**
+**Status: CT1–CT3 implemented. See README.md and TESTS/Towers/CryoTower.md for actual verification and remaining manual checks.**
 **Target:** Godot 4.7 C# tower-defense project. This file is an implementation brief, not a claim that the code exists.
 **Scope:** Implement the **Cryo Tower** plus an extensible, performance-conscious **enemy status-effect foundation**. **Do not implement the Stasis Tower yet.** Design the foundation so Stasis and many other effects can be added without another enemy-movement rewrite.
 
@@ -27,7 +27,7 @@ Source: the user's older `SPACE-SHOOTER-TD-IDLE-CLICKER-HYBRID` repository, espe
 2. A single turret barrel rotates/tracks and fires a visible guided **Energy** projectile. Reuse shared targeting/aiming/ammunition/stat machinery; avoid copying `BattleTower.cs` wholesale or creating a second projectile framework.
 3. Successful projectile contact applies **Energy damage exactly once** through `COMBAT/Damage`, then applies a **permanent 33% slow** if the target survives and is eligible. Shields absorb damage per the existing global Energy coefficients, but do **not** block the slow by default. Document this explicitly.
 4. Slow is **per enemy instance**, independent of `EnemyDefinition.MoveSpeed` and its saved resource. Existing slow stays active if the source tower is sold/destroyed/unloaded. A second equal/weaker slow must not compound; if later stronger slows are supported, the **strongest slow wins** (e.g. 20% then 33% => 33%, not 46.4%). No permanent-effect timer is needed.
-5. Prefer **in-range targets without Cryo**. Follow existing `First` targeting preference among eligible enemies, then optionally fall back to already-slowed targets for damage once all enemies are affected. Ensure targeting remains bounded/cached like the present staggered/spatial-index system; no full-enemy scan each frame or new scene-tree searches. Do not alter other towers' default targeting semantics.
+5. Prefer **in-range targets without Cryo**. Follow existing `First` targeting preference among eligible enemies, then wait without firing if no eligible target exists. User clarification: never target already-slowed enemies, including weaker slows; no damage-only fallback. Ensure targeting remains bounded/cached like the present staggered/spatial-index system; no full-enemy scan each frame or new scene-tree searches. Do not alter other towers' default targeting semantics.
 6. Build immunity as **data** on enemy definitions (e.g. flags/tags/policy) rather than `EnemyId` comparisons or `IsBoss` hardcoding. Initial nonimmune types can be slowed; there is presently no generic boss-identity property, so avoid inventing boss behavior. Provide a test fixture/type configured immune to Slow.
 7. Statuses cannot create extra credits or XP on application alone. Regular actual Energy damage and kills keep their normal `DamageSource` rank attribution. Cryo shots consume ammunition via the existing system **once per launched projectile**.
 8. Clearly show affected enemies through inexpensive visual feedback (e.g. subtle cyan tint/indicator), respecting existing sprites/DefenseBar. Do not create ongoing particle emitters or per-effect Godot nodes for every afflicted enemy. Visuals must not drive simulation.
@@ -115,6 +115,10 @@ Add focused regression coverage and link it into the existing relevant headless 
 - The status API and immunity data belong to enemy/combat shared systems, **not** in `CryoTower.cs` or a mutable `EnemyDefinition`, and are free of tower-specific enemy type-name exceptions.
 - Purchased levels, rank experience, power/construction behavior, existing ammo logistics, damage attribution and default build HUD continue to work.
 - The Stasis Tower remains **unimplemented** (design notes only).
+
+## Implemented design checkpoint
+
+Chosen: lazy compact typed status storage with a cached movement multiplier; immutable launch payload separate from DamageInfo; enum identity and Inspector immunity array. Permanent Slow has no ticking/scheduler. Strongest Slow wins; shields do not block it. Cryo reuses ProjectileTurretBase and the existing spatial visitor, without altering other weapons. Detailed alternatives, complexity, Freeze coexistence and future DoT attribution/scheduling contracts: `ENEMIES/StatusEffects/README.md`. No timed effects or Stasis behavior is claimed implemented.
 
 ## Codex completion report
 

@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 public abstract partial class ProjectileTurretBase : TowerBase
 {
+    // =========================================================
+    // Optional status weapons reuse the same bounded target search and launch-time projectile delivery.
+    protected virtual StatusEffectId? RequiredEffect => null;
+    protected virtual StatusEffectPayload? CreateEffect(TowerFinalStats stats) => null;
     #region Config and Runtime
     private ProjectileTurretConfig _config;
     private bool _initialized;
@@ -87,10 +91,11 @@ public abstract partial class ProjectileTurretBase : TowerBase
         _shotTimer = Mathf.Max(-Mathf.Min((float)delta, .05f), _shotTimer - (float)delta);
         if (_searchTimer <= 0)
         {
-            _target = TowerTargeting.Find(_registry, GlobalPosition, Mathf.Max(0, FinalStats.RangePixels), Config.TargetPriority);
+            _target = TowerTargeting.Find(_registry, GlobalPosition, Mathf.Max(0, FinalStats.RangePixels), Config.TargetPriority, RequiredEffect);
             _searchTimer = Mathf.Max(.05f, FinalStats.TargetSearchInterval);
         }
-        if (!TowerTargeting.Valid(_target, GlobalPosition, Mathf.Max(0, FinalStats.RangePixels))) return;
+        if (!TowerTargeting.Valid(_target, GlobalPosition, Mathf.Max(0, FinalStats.RangePixels))
+            || !TowerTargeting.Eligible(_target, RequiredEffect)) return;
         bool aligned = TurretAiming.Track(_pivot, _target.GlobalPosition, FinalStats.RotationSpeedDegrees,
             FinalStats.AimToleranceDegrees, Config.RotateWhileTracking, delta);
         if (!aligned || _shotTimer > 0 || FinalStats.ShotsPerSecond <= 0) return;
@@ -111,7 +116,7 @@ public abstract partial class ProjectileTurretBase : TowerBase
             if (Ammunition?.TryFire() == false) return;
             Marker2D muzzle = _muzzles[_barrels.MuzzleIndex(mode, i)];
             BasicProjectile bullet = new();
-            bullet.Initialize(_target, FinalStats.ProjectileSpeed, hit);
+            bullet.Initialize(_target, FinalStats.ProjectileSpeed, hit, CreateEffect(FinalStats));
             _projectiles.AddChild(bullet);
             bullet.GlobalPosition = muzzle.GlobalPosition;
         }

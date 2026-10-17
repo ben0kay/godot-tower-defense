@@ -278,7 +278,7 @@ public partial class EnemyMovement : Node
             if (_retry <= 0f) RequestRoute(float.PositiveInfinity);
             return;
         }
-        float speed = Mathf.Max(0f, Enemy.Definition.MoveSpeed);
+        float speed = Enemy.EffectiveMoveSpeed;
         float travel = speed * (float)delta;
         double terrainElapsed = 0;
         while (_next < _route.Points.Length)

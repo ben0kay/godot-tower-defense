@@ -1,0 +1,30 @@
+// Complete independent purchased levels: permanent slowdown strength is an explicit pipeline capability.
+using System.Collections.Generic;
+
+public static class CryoTowerLevels
+{
+    private readonly record struct Row(int Level, int Credits, double WorkSeconds, int Damage, float Rate,
+        float Range, float Speed, float Turn, float Slow, int AmmoCapacity, int AmmoPerShot)
+    {
+        // =========================================================
+        // Rank modifies damage/range later; Slow remains the selected row's absolute strength.
+        public TowerLevel Create() => new(Level, Credits, new(Range, Rate, Damage, Speed, Turn, 8, .15f,
+            Weapon: new(DamageType.Energy, false, 1, false, 1), Ammunition: new(AmmoCapacity, AmmoPerShot),
+            Slow: new(Slow)), WorkSeconds);
+    }
+    // Level | Cost | WorkSeconds | Damage | Shots/s | RangePx | ProjectilePx/s | TurnDeg/s | Slow | AmmoCapacity | Ammo/shot
+    private static readonly Row[] Rows =
+    {
+        new(1, 250, 4, 10, .50f, 208, 650, 180, .33f, 600, 1),
+        new(2, 175, 5, 11, .52f, 216, 650, 180, .33f, 600, 1),
+        new(3, 250, 6, 12, .54f, 224, 650, 180, .33f, 600, 1),
+    };
+    // =========================================================
+    // Changing one purchased level never modifies another level or another placed tower.
+    public static List<TowerLevel> Create()
+    {
+        List<TowerLevel> result = new(Rows.Length);
+        foreach (Row row in Rows) result.Add(row.Create());
+        return result;
+    }
+}

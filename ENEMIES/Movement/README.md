@@ -63,3 +63,7 @@ F3 now previews both legs through each actual portal checkpoint, draws its circl
 ## Checkpoint chains and branches
 
 A checkpoint's NextCheckpoints list may be empty (Citadel), single (chain) or multiple (uniform random branch). CheckpointNetwork validates a bounded acyclic graph and captures outgoing links for each spawn/preview. Branch choices use a separate deterministic hash of the existing stable seed and completed count, never wave RNG. Movement keeps the selected node across repaths and retains all profile/corridor/offset preferences. Every physical area entry advances one link; missing/cyclic/duplicate networks or removed/unreachable selected nodes wait instead of bypassing/rerolling. Link edits affect future snapshots; live geometry edits still affect the current stage. The existing path manager and budgets are unchanged. F3 returns full sequence/entry diagnostics, with cache invalidation for downstream edits. See WORLD/ROUTING/RouteCheckpoint/README.md and TESTS/Navigation/CheckpointChains.md.
+
+## Effective status speed
+
+Cryo CT1 changes only the travel-speed input to Enemy.EffectiveMoveSpeed. No effect mutates authored speed or requests a new route. Existing clearance, checkpoint progress, spatial notifications and swept Lava segment timing use the same movement code. Permanent Slow needs no timer; stationary Lava damage remains owned by InteractiveTileManager.

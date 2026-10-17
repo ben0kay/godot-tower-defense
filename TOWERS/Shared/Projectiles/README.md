@@ -18,3 +18,7 @@ The completion flag is set before damage callbacks, so repeated ticks cannot hit
 See BlasterCannon/README.md and TESTS/README.md for launch snapshots, rates, target loss, overrides/penetration, one-hit primary/nearby recipients and cleanup regressions. Phase4E travelling wavefronts use the separate ShockwaveEmitter and never repeatedly call this instant-disc mechanic.
 
 Phase4E adds a trailing optional ShockwaveStyle argument to Initialize, preserving existing effects/lifetime call sites. Blaster supplies its own orange style; the projectile duplicates it at launch. On contact it first completes ApplyInstant, then spawns the shared autonomous visual with the snapshotted radius/style. No BlastFlash class remains. Source/effect style edits cannot change damage or trigger another contact.
+
+## Optional status impacts — Cryo CT1–CT3
+
+BasicProjectile now accepts an optional immutable StatusEffectPayload separate from DamageInfo. Contact is guarded before callbacks: resolve damage once, then apply the status only to a valid surviving enemy. Cyan bullets indicate a status payload; ordinary Kinetic visuals are unchanged. Expiry/target loss does not apply Slow. Cryo uses this path; no second projectile framework. See COMBAT/StatusEffects/README.md.
