@@ -1,6 +1,6 @@
 # Wider Tower Inspector + Six Targeting Priorities — Implementation Pass IT1–IT4
 
-> **STATUS: PLANNED / NOT IMPLEMENTED.** Docs-only Codex brief. Follow `NOTES/CodePreferences.md`; inspect current code and latest GitHub HEAD before implementation. Preserve existing Godot 4 C# hierarchy, gameplay UI, rank XP, wallet, combat, construction and pause behavior.
+**STATUS: IT1–IT2 IMPLEMENTED IN SOURCE (desktop/headless verification pending); IT3–IT4 NOT IMPLEMENTED.** This remains the authoritative Codex brief for remaining targeting phases. Follow `NOTES/CodePreferences.md`; inspect current code and latest GitHub HEAD before implementation. Preserve existing Godot 4 C# hierarchy, gameplay UI, rank XP, wallet, combat, construction and pause behavior.
 
 ## Goal and user-approved design
 
@@ -61,23 +61,30 @@ Cost: 250 Credits      [UPGRADE TO LEVEL 3]
 
 ## IT1 — Refresh the actual Inspector layout (UI only)
 
-- [ ] Rework existing `InspectorPanel.tscn` into labeled **TARGET PRIORITY**, **COMBAT RANK**, **PAID UPGRADE**, and optional collapsed **ADDITIONAL DETAILS** sections. Keep work/status compact in header; when busy its current progress bar appears visibly. Reuse existing signals/paths or update all callers/tests safely.
-- [ ] Default `InspectorWidth=540`, `InspectorHeight=325`; widen the exported range beyond 480 and update `DefaultUIConfig.tres` + scene sizing. Clamp to viewport without clipping bottom tray, buttons or right edge. Scroll within Inspector. Maintain 90% (configurable) **background** opacity while text/buttons stay opaque.
-- [ ] Keep selected tower range ring, highlight, close button, bottom-right position, independent Ctrl tray, Pause/Results input precedence, keyboard focus and pointer interception. Empty space must not intercept gameplay clicks.
-- [ ] Only show options suitable to the selected type; don't show a blank Rank/target/upgrade band on build preview or passive buildings.
+- [x] Rework existing `InspectorPanel.tscn` into labeled **TARGET PRIORITY**, **COMBAT RANK**, **PAID UPGRADE**, and optional collapsed **ADDITIONAL DETAILS** sections. Keep work/status compact in header; when busy its current progress bar appears visibly. Reuse existing signals/paths or update all callers/tests safely.
+- [x] Default `InspectorWidth=540`, `InspectorHeight=325`; widen the exported range beyond 480 and update `DefaultUIConfig.tres` + scene sizing. Clamp to viewport without clipping bottom tray, buttons or right edge. Scroll within Inspector. Maintain 90% (configurable) **background** opacity while text/buttons stay opaque.
+- [x] Keep selected tower range ring, highlight, close button, bottom-right position, independent Ctrl tray, Pause/Results input precedence, keyboard focus and pointer interception. Empty space must not intercept gameplay clicks.
+- [x] Only show options suitable to the selected type; don't show a blank Rank/target/upgrade band on build preview or passive buildings.
 
 **IT1 done:** the existing Inspector is visually clearer, wider and shorter, with coherent separation of earned progression and paid purchases and no behavior changes.
 
 ## IT2 — Authoritative current → next upgrade comparison
 
-- [ ] Replace the **dense freeform upgrade text** with a structured per-stat table: `STAT | CURRENT | NEXT LEVEL | GAIN` and e.g. `33 | 36 | (+3)`. Each row comes from **typed existing current effective `FinalStats` and the same next-level `ResolveLevel` used for real purchases**; no parsing of `DescribeStats()` / `DescribeChanges()` strings or hardcoded table values.
-- [ ] Include only valid weapon-specific rows: e.g. projectile tower Damage/Range/Fire rate/Projectile speed, Laser DPS/Range and relevant damage response, Blaster blast radius/edge falloff, Shockwave damage/range/expansion/interval, optional ammo capacity; omit irrelevant values (Laser has no projectile speed, passive factory has no invented damage). Allow a narrow type-owned **presentation row provider** if necessary; avoid complex reflection or a growing HUD tower-type switch.
-- [ ] Delta is calculated `future - current`, formatted with a literal explicit sign and parentheses `(+3)`, `(-2)` or an em dash for no change. Color by **benefit**, not numeric sign: lower cooldown/interval can be an improvement; nonnumeric changes (damage type) show `Kinetic → Energy` or `Changed` without fake numeric delta. Avoid bad float noise, NaN/Infinity and false +0 after rounding. Include units and readable decimals.
-- [ ] Rank modifiers already included in the snapshots must display accurately (including damage rounding). Recompute only on selected tower/level/rank/config input changes; ordinary XP increments should update **COMBAT RANK only** until promotion. Display enough unchanged rows for context, with secondary technical information collapsed.
-- [ ] Existing wallet `TryPurchase` remains the sole authority. Keep exact multi-resource prices, affordability, expected-level/repeat guards, next-tier `WorkSeconds`, purchase-at-start and upgrade progress. While Upgrading, show old operational stats versus already-paid target stats; never apply them early.
-- [ ] Keep Ranks in their **own** independent card/section, with existing within-rank bar, next-rank threshold and current total bonus; never show Credits or `Upgrade to Level 3` inside that section.
+- [x] Replace the **dense freeform upgrade text** with a structured per-stat table: `STAT | CURRENT | NEXT LEVEL | GAIN` and e.g. `33 | 36 | (+3)`. Each row comes from **typed existing current effective `FinalStats` and the same next-level `ResolveLevel` used for real purchases**; no parsing of `DescribeStats()` / `DescribeChanges()` strings or hardcoded table values.
+- [x] Include only valid weapon-specific rows: e.g. projectile tower Damage/Range/Fire rate/Projectile speed, Laser DPS/Range and relevant damage response, Blaster blast radius/edge falloff, Shockwave damage/range/expansion/interval, optional ammo capacity; omit irrelevant values (Laser has no projectile speed, passive factory has no invented damage). Allow a narrow type-owned **presentation row provider** if necessary; avoid complex reflection or a growing HUD tower-type switch.
+- [x] Delta is calculated `future - current`, formatted with a literal explicit sign and parentheses `(+3)`, `(-2)` or an em dash for no change. Color by **benefit**, not numeric sign: lower cooldown/interval can be an improvement; nonnumeric changes (damage type) show `Kinetic → Energy` or `Changed` without fake numeric delta. Avoid bad float noise, NaN/Infinity and false +0 after rounding. Include units and readable decimals.
+- [x] Rank modifiers already included in the snapshots must display accurately (including damage rounding). Recompute only on selected tower/level/rank/config input changes; ordinary XP increments should update **COMBAT RANK only** until promotion. Display enough unchanged rows for context, with secondary technical information collapsed.
+- [x] Existing wallet `TryPurchase` remains the sole authority. Keep exact multi-resource prices, affordability, expected-level/repeat guards, next-tier `WorkSeconds`, purchase-at-start and upgrade progress. While Upgrading, show old operational stats versus already-paid target stats; never apply them early.
+- [x] Keep Ranks in their **own** independent card/section, with existing within-rank bar, next-rank threshold and current total bonus; never show Credits or `Upgrade to Level 3` inside that section.
 
 **IT2 done:** every supported offensive tower displays correct current/next values and readable actual gains, not guessed +3 labels.
+
+### IT1–IT2 implementation record (2026-10-16)
+
+- **IT1:** 540×325 configured scene/default size; existing bottom-right panel remains bounded/scrollable, retains range circle and independent Ctrl tray; explicit read-only TARGET PRIORITY for aimed weapons, earned COMBAT RANK, PAID UPGRADE, and collapsible ADDITIONAL DETAILS. Build previews and passive buildings do not get a false target selector.
+- **IT2:** `TowerUpgradeComparison.cs` creates typed capability-specific comparison rows from the selected real current `FinalStats` and authoritative rank-aware next `ResolveLevel`. The four-column GridContainer displays CURRENT / NEXT / GAIN, including differences, unchanged dash, beneficial cooldown/interval decreases, and ammunition capacity. Multi-resource prices, WorkSeconds and payment guards are unchanged. Active upgrade compares old tier to already-paid future row. Maximum level removes future comparison.
+- **Existing targeting only:** `First`/`Closest` are displayed **read-only**. **Do not mark IT3 or IT4 complete.** Shockwave/factory/depot have no targeting controls.
+- **Tests changed, not executed:** `TowerUpgradeChecks`, `WeaponAmmunitionChecks`, `LaserTowerChecks`, `BlasterCannonChecks`, `ShockwaveChecks`, and shared `UpgradeTableChecks` now assert typed table values rather than discontinued legacy preview text. Godot/.NET is not installed in the authoring runtime and the GitHub commit has no CI check runs. **Compile, headless suites, manual 1920×1080 / 1366×768 / small viewport review remain required**. Check earned Rank vs purchased tier is visually unambiguous.
 
 ## IT3 — Six per-tower target priorities and UI action
 

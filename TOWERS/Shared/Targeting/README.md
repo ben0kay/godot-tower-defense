@@ -12,3 +12,5 @@ See `TESTS/Combat/SpatialQueryChecks.cs` for brute-force parity and `TESTS/Perfo
 ## Planned targeting extension IT1–IT4 — NOT IMPLEMENTED
 
 See [the Inspector/targeting implementation plan](../../../UI/GameplayHUD/Inspector/INSPECTOR_TARGETING_PASS.md). Six priorities are proposed: First, Last, Closest, Farthest, Strongest and Weakest, chosen **per placed aimed tower** from a wider selected Inspector. Current implementation remains **First/Closest only**, and First currently measures remaining physical distance along the active route leg, not the full downstream checkpoint chain. The plan requires scalable, bounded cached journey estimates; no tower-per-enemy A* on targeting.
+
+**Inspector IT1 note:** the selected aimed tower now displays its authored `First` or `Closest` target priority as a **read-only value**, using `TowerConfig.InspectorTargetPriorityLabel` overrides. Six selectable buttons and full downstream checkpoint scoring still belong to IT3/IT4; neither targeting algorithm nor spatial-query cadence changed in IT1–IT2.

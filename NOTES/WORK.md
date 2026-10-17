@@ -16,7 +16,7 @@
 
 | Status | Pass / work | Authoritative notes and next action | Dependencies / caveats |
 | --- | --- | --- | --- |
-| [ ] | **IT1–IT4 — Wider tower Inspector + six targeting priorities** | [Detailed Codex pass](../UI/GameplayHUD/Inspector/INSPECTOR_TARGETING_PASS.md): 540×325 panel, separate earned **COMBAT RANK** and Credits **PAID UPGRADE**, typed current/next/(+gain) stat table, six per-placed-tower targeting choices. | Current code offers **First/Closest only**, with no in-game selector. Account for downstream checkpoints when calculating First/Last; Shockwave and passive buildings have no single-enemy targeting. |
+| [ ] | **IT1–IT2 source implemented; IT3–IT4 open — Tower Inspector & targeting** | [Implementation/checklist](../UI/GameplayHUD/Inspector/INSPECTOR_TARGETING_PASS.md): wider 540×325 Inspector, clearly separated earned **COMBAT RANK** and **PAID UPGRADE**, typed effective CURRENT / NEXT / GAIN (+3) table and detailed stats toggle. | **Code pushed, NOT runtime-verified** (Godot/.NET and desktop QA pending). Six per-instance targeting buttons, Last/Weakest/etc and checkpoint-aware First/Last remain unimplemented. |
 | [x] | **CT1–CT3 — Cryo Tower + reusable enemy status-effect foundation** | [New 2026-10-16 Codex plan](../TOWERS/Offensive/CryoTower/CRYO_TOWER_IMPLEMENTATION.md): energy-projectile Cryo, permanent nonstacking 33% slow, scalable optional status infrastructure and tests. | **IMPLEMENTED**, with focused headless tests. Cryo only targets unslowed/nonimmune enemies. See [verification](../TESTS/Towers/CryoTower.md); manual playfeel remains outstanding. Stasis remains deferred. |
 | [ ] | **P1–P5 — Player/global XP + Research Foundation** | [Detailed phased Codex pass](../SYSTEMS/Progression/PLAYER_XP_RESEARCH_FOUNDATION_PASS.md): persistent per-profile XP/RP, signed mission scoring + ETA, Campaign Levels/Research, hex-origin graph and real Citadel Master I. | Extends Results R3/R4; **do not implement XP twice** or confuse player XP with tower Rank XP. Campaign save/load remains separate. |
 
@@ -75,7 +75,7 @@ These are real gaps or explicitly proposed systems, but **need a dedicated scope
 
 ## E. Suggested sequencing when returning
 
-1. **Inspector + targeting IT1–IT4** — implement 540×325 organized panel, completely separate earned Rank from Credits upgrades, typed current/next/gain rows and per-instance six-mode priority. **Special correctness:** multi-checkpoint First/Last need credible *full remaining journey* estimates; do not add A* per tower.
+1. **Inspector follow-up:** IT1–IT2 are pushed in source; first run the Godot/visual QA checklist, then implement IT3 six per-instance targeting modes and IT4 multi-checkpoint full-journey estimates (no tower-local A*).
 2. **Cryo Tower CT1–CT3** — implemented: reusable status-effect architecture and permanent nonstacking slow; **do not implement Stasis now**. Coordinate targeting-related edits in `TowerTargeting.cs` with IT1–IT4 so concurrent Codex work doesn't overwrite changes.
 3. **Campaign progression P1–P5** — profile XP, mission awards, Research Room and first real research; coordinate Results R3/R4 telemetry and don't conflate this with still-missing campaign saves.
 4. **Tower durability + enemy E3B** — first implement tower health/shields/destruction safely, then enable enemy attacks. Only proceed after dependency passes are scoped and tested.

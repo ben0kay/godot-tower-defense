@@ -19,3 +19,7 @@ PassiveTestTower.tscn is a test-only nonweapon TowerBase scene with a simple squ
 ## Cryo CT1–CT3
 
 `CryoTowerChecks.tscn` runs focused status/weapon/purchase/HUD/movement/Lava/500-enemy checks plus existing multi-barrel weapons. The Cryo group is also linked into EnemyIntegrationChecks. See [verification](CryoTower.md).
+
+## IT2 upgrade-comparison integration assertions (added, execution pending)
+
+`TowerUpgradeChecks` now checks typed current/next/gain cells, 540×325 defaults, maximum-level cleanup, beam vs projectile rows, ammunition capacity and beneficial shorter shockwave interval. The existing Laser, Blaster, Shockwave and ammunition suites also use the shared `TESTS/UI/UpgradeTableChecks.cs` helper instead of scraping the old freeform upgrade paragraph. **Runtime validation is outstanding** because no Godot .NET runner is available to this authoring session; do not treat the historical green results as verification of this commit.

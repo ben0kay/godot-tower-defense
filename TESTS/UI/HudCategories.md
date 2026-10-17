@@ -1,4 +1,10 @@
-# Build categories / compact Inspector verification
+# Build categories / Inspector verification
+
+**Update — IT1–IT2 (2026-10-16):** The panel now defaults to **540×325**, rather than the original 392×360. See [Inspector implementation plan](../../UI/GameplayHUD/Inspector/INSPECTOR_TARGETING_PASS.md). New code separates Rank XP from paid upgrades and adds a typed comparison grid. Existing HUD tests were adapted for the new rendered upgrade cells (`TESTS/UI/UpgradeTableChecks.cs`), but **no Godot/.NET compile or headless run has been completed against this change**. The historical test results below refer to the earlier Inspector build.
+
+**Manual TODO:** Check 1920×1080, 1366×768 and smaller viewports; bottom-right anchoring/shorter height, Inspector vs tray, scroll to Upgrade, Details expand/collapse, earned Rank separation, long per-weapon rows, selection changes, during-work and max-level states, keyboard/focus and background-only 90% opacity.
+
+## Historical compact Inspector verification (original 392×360)
 
 `HudCategoryChecks.tscn` drives real catalog controls and paid placement in a production world. It verifies initial All, populated category tabs/counts, filtering, per-level tab memory across Ctrl, pending ghost cancellation, preserved placed-tower inspection, category retention/fallback on rebind, automatic new Support registration, safe empty catalogs, the existing40-entry scroll/action test, bounded392×360 Inspector geometry,176px tray height, access to scrolled upgrade actions, selection scroll reset and background-only90% alpha with normal input blocking.
 

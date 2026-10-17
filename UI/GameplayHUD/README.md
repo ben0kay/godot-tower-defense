@@ -36,3 +36,7 @@ Keyboard routing now lives in `CONTROLS/GameInput`: this HUD registers/unregiste
 The placed-tower Inspector also has a separate RuntimeStats label for ammo, delivery status, factory buffers/production and depot stock/slots. Updates are event-driven and coalesced by placement; they do not erase rank/upgrade details or recalculate FinalStats.
 
 `TESTS/UI/HudCategoryChecks.tscn` verifies categories/counts/filtering/remembering/rebinding, placement cancellation, independent selection, bounded scrolling/upgrade access, background-only transparency and the existing40-entry tray check. See `TESTS/UI/HudCategories.md` for actual verification limits.
+
+## New selected Inspector layout (IT1–IT2 source implementation)
+
+Aimed placed towers now show a read-only target policy and independently labeled earned Rank vs paid upgrade. The configurable 540×325 lower-right Inspector has a typed effective CURRENT/NEXT/GAIN table with meaningful +/- improvements and a collapsed Additional Details area; the existing construction progress and range ring remain. Build previews expand details and hide purchased-rank/target UI. Interactive targeting modes and checkpoint-correct First/Last remain IT3–IT4. See [Inspector/README.md](Inspector/README.md) and its implementation plan. Godot desktop layout check remains outstanding.
