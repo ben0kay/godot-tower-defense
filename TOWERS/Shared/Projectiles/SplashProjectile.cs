@@ -12,14 +12,15 @@ public partial class SplashProjectile : Node2D
     private AreaBlastStats _blast;
     private ShockwaveStyle _style;
     private float _speed, _life;
-    private bool _initialized, _finished;
+    private bool _initialized, _finished, _trackTarget = true;
+    public Color ProjectileColor { get; set; } = new(1f, 0.55f, 0.15f);
     public bool HasDetonated { get; private set; }
     public int AppliedHits { get; private set; }
 
     // =========================================================
     // Values are immutable copies; the projectile retains no tower or mutable config reference.
     public void Initialize(Enemy target, EnemyRegistry registry, Vector2 lastKnownImpact, float speed,
-        DamageInfo hit, AreaBlastStats blast, Node2D effects = null, float lifetime = 5f, ShockwaveStyle style = null)
+        DamageInfo hit, AreaBlastStats blast, Node2D effects = null, float lifetime = 5f, ShockwaveStyle style = null, bool trackTarget = true)
     {
         if (_initialized) throw new InvalidOperationException("Projectile is already initialized.");
         AreaDamage.Validate(blast.RadiusPixels, blast.EdgeDamageFraction);
@@ -29,7 +30,8 @@ public partial class SplashProjectile : Node2D
             throw new ArgumentOutOfRangeException(nameof(speed));
         _registry = registry; _effects = effects; _impact = lastKnownImpact; _speed = speed; _life = lifetime;
         _hit = hit; _blast = blast; _style = style == null ? null : (ShockwaveStyle)style.Duplicate(true); _initialized = true;
-        if (GodotObject.IsInstanceValid(target) && target.IsAlive && target.IsInsideTree() && !target.IsQueuedForDeletion())
+        _trackTarget = trackTarget;
+        if (_trackTarget && GodotObject.IsInstanceValid(target) && target.IsAlive && target.IsInsideTree() && !target.IsQueuedForDeletion())
         { _target = target; _target.Removed += OnTargetRemoved; _target.TreeExiting += OnTargetExiting; }
     }
 
@@ -41,7 +43,7 @@ public partial class SplashProjectile : Node2D
         _life -= (float)delta;
         if (_life <= 0 || !GodotObject.IsInstanceValid(_registry) || !_registry.IsInsideTree() || _registry.IsQueuedForDeletion())
         { Finish(); return; }
-        CaptureTargetPosition();
+        if (_trackTarget) CaptureTargetPosition();
         float step = (float)Math.Min(float.MaxValue, _speed * delta);
         if (GlobalPosition.DistanceTo(_impact) <= step)
         {
@@ -93,5 +95,5 @@ public partial class SplashProjectile : Node2D
     // =========================================================
     // Lightweight native projectile artwork; presentation has no effect on blast selection.
     public override void _Draw()
-    { DrawCircle(Vector2.Zero, 5f, new Color(1f, 0.55f, 0.15f)); DrawCircle(Vector2.Zero, 2f, Colors.White); }
+    { DrawCircle(Vector2.Zero, 5f, ProjectileColor); DrawCircle(Vector2.Zero, 2f, Colors.White); }
 }

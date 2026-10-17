@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TowerCatalog" load_steps=11 format=3]
+[gd_resource type="Resource" script_class="TowerCatalog" load_steps=12 format=3]
 [ext_resource type="Script" path="res://TOWERS/Shared/TowerCatalog.cs" id="1"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/BattleTowerDefinition.tres" id="2"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/LaserTower/LaserTowerDefinition.tres" id="3"]
@@ -9,6 +9,7 @@
 [ext_resource type="Resource" path="res://TOWERS/Offensive/SniperTower/SniperTowerDefinition.tres" id="8"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/MachineGunTower/MachineGunTowerDefinition.tres" id="9"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/CryoTower/CryoTowerDefinition.tres" id="10"]
+[ext_resource type="Resource" path="res://TOWERS/Offensive/RocketTower/RocketTowerDefinition.tres" id="10_rocket"]
 [resource]
 script = ExtResource("1")
-Definitions = [ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10")]
+Definitions = [ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10"), ExtResource("10_rocket")]
