@@ -3,15 +3,16 @@ using System.Collections.Generic;
 
 public static class MachineGunTowerLevels
 {
-    private readonly record struct Row(int Level, int Credits, double WorkSeconds, int Damage, float Rate, float Range, float Speed, float Turn, int AmmoCapacity, int AmmoPerShot)
+    private readonly record struct Row(int Level, int Credits, double WorkSeconds, int Damage, float Rate, float Range, float Speed, float Turn, int AmmoCapacity, int AmmoPerShot, HeatStats? Heat = null)
     {
         // =========================================================
         // One bullet per sequential attack; the two muzzles never double total authored fire rate.
-        public TowerLevel Create() => new(Level, Credits, new(Range, Rate, Damage, Speed, Turn, 12f, .12f,
-            ShieldPenetration: 0f, Ammunition: new(AmmoCapacity, AmmoPerShot)), WorkSeconds);
+        public TowerLevel Create() => new(Level, Credits, new TowerStatBlock(Range, Rate, Damage, Speed, Turn, 12f, .12f,
+            ShieldPenetration: 0f, Ammunition: new(AmmoCapacity, AmmoPerShot)) with { Heat = Heat }, WorkSeconds);
     }
 
     // Level | Cost | WorkSeconds | Damage | TotalBulletsPerSecond | RangePx | ProjectilePxS | TurnDegS | AmmoCapacity | AmmoPerBullet
+    // Optional final named column: Heat: new(Capacity, PerShot, PerBeamSecond, CoolingPerSecond, RestartFraction).
     private static readonly Row[] Rows =
     {
         new(1, 300, 4, 7, 14.4f, 208, 1062.5f, 240, 1200, 1),

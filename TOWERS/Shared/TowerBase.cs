@@ -82,7 +82,7 @@ public abstract partial class TowerBase : Node2D
     // Publish once after committed changes; wallet/controller retain payment ownership.
     internal void NotifyStatsChanged()
     {
-        SynchronizeAmmunition(); StatsChanged?.Invoke();
+        SynchronizeAmmunition(); SynchronizeConditions(); StatsChanged?.Invoke();
     }
 
     // =========================================================
@@ -220,6 +220,6 @@ public abstract partial class TowerBase : Node2D
         ConstructionWorkManager manager = _construction; _construction = null;
         if (GodotObject.IsInstanceValid(manager)) manager.Unregister(this);
     }
-    public override void _ExitTree() => CancelConstruction();
+    public override void _ExitTree() { _conditions?.Clear(); _conditions = null; CancelConstruction(); }
     #endregion
 }

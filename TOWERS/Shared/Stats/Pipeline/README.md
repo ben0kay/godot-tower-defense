@@ -34,3 +34,5 @@ Construction C1/C2: `TowerLevel.WorkSeconds` is purchase/work metadata outside c
 ## Cryo Slow capability
 
 Optional SlowStats travels through the existing eight stages without a parallel resolver. Stage02 selects the complete row, Stage03 leaves Slow unchanged, Stage07 sanitizes its fraction, Stage08 publishes it. Cryo snapshots final Slow at projectile launch and displays it in Inspector/previews. No cumulative purchased modifier is introduced.
+
+HD2: nullable Heat capability passes through the same eight stages. Complete selected levels supply it, Stage07 sanitizes invalid inputs, Stage08 publishes it. Current heat/disable timers live in TowerConditions and never feed back into stat resolution. Current authored Heat defaults are null; future research can modify the selected capability afterward. HD3 heat preview presentation is not implemented.

@@ -134,3 +134,5 @@ Cryo is a catalog-registered Offensive Energy projectile tower, with permanent n
 ## Compact Inspector and six priorities — IT1–IT4
 
 Placed aimed weapons (including Cryo) expose independent First/Last/Closest/Farthest/Strongest/Weakest choices. The bottom-right Inspector is now700×330, two-column and non-scrollable, with typed current/next/gain stats beside rank/targeting/ammo. Full-journey First/Last estimates include captured checkpoint chains via shared budgeted caching. No targeting choices for Shockwave/Factory/Depot; Cryo retains strict unslowed/nonimmune eligibility. See UI/GameplayHUD/Inspector/README.md and TESTS/UI/InspectorTargeting.md for actual verification and remaining desktop review.
+
+HD1/HD2: [shared disabling and optional heat](Shared/Conditions/README.md) are implemented for all offensive weapons, independently of purchased levels/ranks/construction. Existing authored rows keep heat absent pending balance decisions. HD3 Inspector presentation remains deferred. [Tests](../TESTS/Towers/TowerConditions.md).

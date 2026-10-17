@@ -55,7 +55,7 @@ public partial class ShockwaveTower : TowerBase
     // Emit immediately, then periodically even without targets; do not burst missed intervals after a hitch.
     public override void _PhysicsProcess(double delta)
     {
-        if (!IsOperational) return;
+        if (!CanAttack) return;
         if (!Enabled || FinalStats?.Shockwave == null || !IsInsideTree() || IsQueuedForDeletion()
             || !double.IsFinite(delta) || delta <= 0 || !GodotObject.IsInstanceValid(_registry)
             || !GodotObject.IsInstanceValid(_delivery) || !_delivery.IsInsideTree()) return;
@@ -68,6 +68,7 @@ public partial class ShockwaveTower : TowerBase
         emission.Initialize(_registry, GlobalPosition, Config.CreateHit(FinalStats, DamageSource), FinalStats.RangePixels,
             wave.ExpansionSpeedPixelsPerSecond, wave.EdgeDamageFraction, _effects, Config.WaveStyle);
         _delivery.AddChild(emission);
+        RecordAttackHeat();
         _cooldown = _cooldown > -wave.IntervalSeconds ? _cooldown + wave.IntervalSeconds : wave.IntervalSeconds;
     }
 

@@ -5,6 +5,9 @@ using System.Collections.Generic;
 public abstract partial class ProjectileTurretBase : TowerBase
 {
     // =========================================================
+    // Generic disabling clears this weapon's live lock/continuous presentation immediately.
+    protected override void OnDisableChanged() { if (IsDisabled) { _target = null; _searchTimer = 0; _visuals?.SetAim(null, Vector2.Zero, 0, null, false); } }
+    // =========================================================
     // Keep firing/aiming cadence intact; only invalidate the target search deadline.
     protected override void OnTargetPriorityChanged() => _searchTimer = 0;
 
@@ -90,7 +93,7 @@ public abstract partial class ProjectileTurretBase : TowerBase
     // One target, one turret rotation, one cooldown; no per-barrel searches or running muzzle nodes.
     public override void _PhysicsProcess(double delta)
     {
-        if (!IsOperational || Config == null || FinalStats == null || _registry == null || _projectiles == null
+        if (!CanAttack || Config == null || FinalStats == null || _registry == null || _projectiles == null
             || !double.IsFinite(delta) || delta <= 0)
         { _visuals?.SetAim(null, Vector2.Zero, 0, null, false); return; }
         _searchTimer -= (float)delta;
@@ -131,6 +134,7 @@ public abstract partial class ProjectileTurretBase : TowerBase
             WeaponVisuals.Present(bullet, muzzle, Config, _visuals);
         }
         _barrels.Commit(mode);
+        RecordAttackHeat(count);
         // Preserve fractional frame remainder; never schedule multiple catch-up volleys after a long hitch.
         _shotTimer = Mathf.Max(0f, count / FinalStats.ShotsPerSecond + _shotTimer);
     }

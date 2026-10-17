@@ -4,6 +4,9 @@ using Godot;
 public partial class BlasterCannon : TowerBase
 {
     // =========================================================
+    // Generic disabling clears this weapon's live lock/continuous presentation immediately.
+    protected override void OnDisableChanged() { if (IsDisabled) { _target = null; _searchTimer = 0; } }
+    // =========================================================
     // Keep firing/aiming cadence intact; only invalidate the target search deadline.
     protected override void OnTargetPriorityChanged() => _searchTimer = 0;
 
@@ -69,7 +72,7 @@ public partial class BlasterCannon : TowerBase
     // Refresh First periodically to allow overtaking, checking cached range between searches.
     public override void _PhysicsProcess(double delta)
     {
-        if (!IsOperational) return;
+        if (!CanAttack) return;
         if (FinalStats?.Area == null || !double.IsFinite(delta) || delta <= 0 || !IsInsideTree()) return;
         _searchTimer -= (float)delta; _shotTimer = Mathf.Max(0f, _shotTimer - (float)delta);
         if (_searchTimer <= 0f)
@@ -89,6 +92,7 @@ public partial class BlasterCannon : TowerBase
         _projectiles.AddChild(bullet); bullet.GlobalPosition = _muzzle.GlobalPosition;
         _visuals.FlashAt(_muzzle, Config.MuzzleFlash);
         _shotTimer = 1f / FinalStats.ShotsPerSecond;
+        RecordAttackHeat();
     }
     #endregion
 

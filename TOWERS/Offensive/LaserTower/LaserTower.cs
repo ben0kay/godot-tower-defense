@@ -3,6 +3,9 @@ using Godot;
 public partial class LaserTower : TowerBase
 {
     // =========================================================
+    // Generic disabling clears this weapon's live lock/continuous presentation immediately.
+    protected override void OnDisableChanged() { if (IsDisabled) { SetTarget(null); _searchTimer = 0; } }
+    // =========================================================
     // Keep firing/aiming cadence intact; only invalidate the target search deadline.
     protected override void OnTargetPriorityChanged() => _searchTimer = 0;
 
@@ -80,7 +83,7 @@ public partial class LaserTower : TowerBase
     // Periodically choose First/Closest; aligned valid lock deals float base DPS times physics delta.
     public override void _PhysicsProcess(double delta)
     {
-        if (!IsOperational) return;
+        if (!CanAttack) return;
         if (!Enabled || FinalStats == null || _registry == null || !double.IsFinite(delta) || delta <= 0)
         { ClearBeam(); return; }
         _searchTimer -= (float)delta;
@@ -95,10 +98,17 @@ public partial class LaserTower : TowerBase
             FinalStats.AimToleranceDegrees, Config.RotateWhileTracking, delta);
         if (!aligned) { ClearBeam(); return; }
         Enemy locked = _target;
-        double funded = Ammunition?.FundBeamSeconds(delta) ?? delta;
+        double permitted = delta;
+        if (FinalStats.Heat is HeatStats heat && heat.PerBeamSecond > 0)
+            permitted = System.Math.Min(permitted, System.Math.Max(0, (heat.Capacity - CurrentHeat) / heat.PerBeamSecond));
+        double funded = Ammunition?.FundBeamSeconds(permitted) ?? permitted;
         if (funded <= 0) { ClearBeam(); return; }
         double amount = FinalStats.Beam.Value.DamagePerSecond * funded;
+        float healthBefore = locked.Health, shieldBefore = locked.CurrentShield;
         locked.ApplyDamage(Config.CreateHit((float)System.Math.Min(float.MaxValue, amount), FinalStats, DamageSource));
+        if (!GodotObject.IsInstanceValid(locked) || locked.Health < healthBefore || locked.CurrentShield < shieldBefore)
+            RecordAttackHeat(0, funded);
+        if (IsDisabled) { ClearBeam(); return; }
         // Removal callbacks may clear/change the lock; never apply this tick to a replacement enemy.
         if (locked != _target || !TowerTargeting.Valid(locked, GlobalPosition, FinalStats.RangePixels))
         { ClearBeam(); return; }

@@ -4,7 +4,7 @@ The default catalog contains BattleTower (guided Kinetic projectile), LaserTower
 
 COMBAT/Damage owns shield/hull responses, optional absolute weapon overrides and penetration. COMBAT/AreaDamage owns instant-disc selection and weapon-input distance falloff. SplashProjectile delivers Blaster's launch-snapshotted area payload exactly once at impact; FEEDBACK/Shockwave is cosmetic only. See BlasterCannon/README.md for current values and tests.
 
-Missile Tower, armour, terrain-blocking line of sight and timed effects remain deferred. **Tower heat/overheating and shared disabling are also not implemented**; the proposal is documented [below](#proposed-tower-heat-and-shared-disabling--design-only). The implemented Phase4E ShockwaveEmitter damages only when its advancing front reaches an enemy and shares the visual effect with Blaster. It uses its own explicit C# levels and cached optional ShockwaveStats.
+Missile Tower, armour, terrain-blocking line of sight and enemy timed status effects remain deferred. **HD1/HD2 shared disabling and opt-in heat are implemented**; existing balance remains heatless until per-level settings are authored. See [below](#shared-tower-heat-and-disabling--hd1hd2). The implemented Phase4E ShockwaveEmitter damages only when its advancing front reaches an enemy and shares the visual effect with Blaster. It uses its own explicit C# levels and cached optional ShockwaveStats.
 
 
 ## Sniper and Machine Gun — new projectile specializations
@@ -20,13 +20,13 @@ Missile Tower, armour, terrain-blocking line of sight and timed effects remain d
 [CryoTower](CryoTower/README.md) is playable: Energy projectile plus permanent Slow, using shared single-barrel delivery, levels/ranks/ammunition and construction. Only unslowed, nonimmune enemies are targeted; there is no damage-only fallback.
 
 
-## Proposed tower heat and shared disabling — design only
+## Shared tower heat and disabling — HD1/HD2
 
-**Status (2026-10-17): NOT IMPLEMENTED.** This is a gameplay/architecture proposal for a later, separately approved implementation pass; it does not change any tower balance, C# code, scenes or Inspector yet. The existing Ammunition Factory **production buffer** is unrelated to weapon heat.
+**Status (2026-10-17): HD1/HD2 IMPLEMENTED; HD3 remains deferred.** Public API, source/expiry policy, optional level authoring and runtime behavior are documented in [Shared/Conditions](../Shared/Conditions/README.md). Existing Heat=null rows preserve current tower balance; opt-ins/numeric heat balance remain TBD. The existing Ammunition Factory **production buffer** is unrelated to weapon heat. The original implementation requirements follow.
 
 ### 1. Shared, source-aware tower disabling (HD1)
 
-- Give each placed `TowerBase` one authoritative *runtime* disabled state, independent of levels, earned ranks, current construction work and damage/stats. Expose a readable status such as `IsDisabled` and a combined ability gate such as `CanOperate` / weapon-specific `CanAttack`; choose final API names during implementation.
+- Give each placed `TowerBase` one authoritative *runtime* disabled state, independent of levels, earned ranks, current construction work and damage/stats. Expose a readable status such as `IsDisabled` and a combined ability gate such as `CanOperate` / weapon-specific `CanAttack`; implemented as ApplyDisable/RemoveDisable, CanOperate and CanAttack.
 - Track **multiple concurrent disable sources**, not one Boolean. Each entry should identify both its reason and its distinct source/instance, so two overlapping enemy EMPs coexist and clearing Overheated never clears another enemy's effect. Reasons can include `Overheated`, `EMP`, `NoPower`, and future special enemy/control effects. Removing/expiring one source only enables operations when **no other reason remains** and existing construction requirements are met.
 - Keep existing `IsOperational` construction semantics (it currently means not under initial construction). Do **not** replace it, mutate `FinalStats` to zero, reuse per-weapon `Enabled` flags as a global authority, or stop all physics/timers: cooling and future disable expirations must keep advancing even while attacks are blocked.
 - An active disable blocks **new** target acquisition/aiming where appropriate, projectile/volley launch, Laser damage/ammo funding/visible beam, and Shockwave emission. Any projectile or wave **already launched** continues normally. Support and economy buildings should later consult the same gate for their own work, when their disable behavior is explicitly specified.
@@ -47,4 +47,4 @@ Missile Tower, armour, terrain-blocking line of sight and timed effects remain d
 - Regression-test overlapping independent disable sources, source expiry/unload, overheat recovery under continuing EMP/no power, construction and paid upgrades, target/beam/aim cleanup, ammo conservation, rank promotions, existing travelling shots/waves, teardown, direct-scene fixtures and selected-Inspector updates. Run focused Godot/headless checks **and** leave actual desktop visual/playfeel QA explicitly pending until performed.
 - Keep logic lightweight: compact per-instance state, no extra all-towers-per-frame scan and no stat-pipeline rebuild per shot or cooling tick. Use existing attack loops and shared helper(s) rather than seven divergent heat implementations.
 
-**Scope boundary:** HD1–HD3 are suggested *future* implementation slices, **not completed or yet approved**. No tower HP/shields, enemy EMP attack, electricity network, cooling VFX/audio, save/load, or balancing decisions are included. Shared disabling should be established before those eventual mechanics depend on it. For backlog tracking, see [NOTES/WORK.md](../../NOTES/WORK.md).
+**Scope boundary:** HD1/HD2 were approved and implemented; HD3 presentation is still future work. No tower HP/shields, enemy EMP attack, electricity network, cooling VFX/audio, save/load, or balancing decisions are included. Shared disabling should be established before those eventual mechanics depend on it. For backlog tracking, see [NOTES/WORK.md](../../NOTES/WORK.md).
