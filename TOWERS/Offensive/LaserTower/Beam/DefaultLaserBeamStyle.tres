@@ -3,21 +3,21 @@
 
 [resource]
 script = ExtResource("1")
-CoreColor = Color(0.8, 1, 1, 1)
-OuterColor = Color(0.1, 0.8, 1, 0.35)
+CoreColor = Color(1, 0.97, 0.68, 1)
+OuterColor = Color(1, 0.72, 0.06, 0.44)
 CoreWidth = 3.0
 OuterWidth = 9.0
 PulseAmount = 0.06
 PulseFrequency = 2.0
-RippleAmplitude = 1.5
-RippleWavelength = 45.0
-RippleTravelSpeed = 55.0
-RippleEndFadeFraction = 0.15
-OuterRippleScale = 1.3
-RippleIrregularity = 0.12
-PointSpacing = 18.0
-ImpactWanderRadius = 2.5
-ImpactWanderFrequency = 1.8
+RippleAmplitude = 1.1
+RippleWavelength = 62.0
+RippleTravelSpeed = 39.0
+RippleEndFadeFraction = 0.22
+OuterRippleScale = 1.08
+RippleIrregularity = 0.82
+PointSpacing = 14.0
+ImpactWanderRadius = 1.4
+ImpactWanderFrequency = 1.15
 ImpactGlowRadius = 4.0
 ImpactGlowOpacity = 0.42
 ImpactGlowFlicker = 0.08

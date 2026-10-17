@@ -27,7 +27,11 @@ The inactive renderer hides, reverts to two zeroed points, and disables both emi
 
 ## Presets, code and validation
 
-- [Laser preset](../../../Offensive/LaserTower/Beam/DefaultLaserBeamStyle.tres): subtle cyan ripple (1.5px, 45px, 55px/s), 15% end fade, 2.5px contact wander, small 4px glow and four low-count impact particles. Muzzle particles are disabled.
+- [Laser preset](../../../Offensive/LaserTower/Beam/DefaultLaserBeamStyle.tres): bright warm-yellow core, golden-yellow halo, restrained 1.1px ripple (62px wavelength, 39px/s) blended heavily with smooth seeded noise, 22% end fade, 1.4px wandering contact, 4px glow and four low-count impact particles. Muzzle particles are disabled.
 - [Shared particle assets](../../../../FEEDBACK/Shared/README.md) can be reused by any other effect without coupling it to Laser Tower code.
 - `TESTS/Towers/LaserTowerChecks.cs` includes ripple point-count/endpoints, animated geometry, bounded contact movement, particle ownership/style toggle, optional straight-line fallback, unchanged DPS, and node-count regression checks.
 - **Execution status for this change:** source and GitHub resource paths checked; **Godot/.NET headless tests and desktop visuals not executed** in the authoring environment. Inspect moving targets, short/long beams, 960×540 and 1920×1080, pause/resume, loss of ammo/EMP/overheat, and multiple simultaneously firing towers in the editor.
+
+### Organic ripple refinement (2026-10-17)
+
+The shared renderer retains the zero-irregularity travelling-sine fallback, but at nonzero `RippleIrregularity` blends in coherent bilinear value noise derived from each renderer's fixed seed. Transverse displacement and the purely cosmetic target-end wander evolve continuously rather than stepping through random offsets. Both share the existing in-place capped Line2D geometry and active-only processing; no gameplay endpoint, damage or tower-stat logic changed. The Laser Tower opts into the subtler yellow style via its own `.tres`, leaving other beam styles free to use different colors and irregularity settings.

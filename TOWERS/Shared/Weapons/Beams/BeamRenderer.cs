@@ -11,6 +11,7 @@ public partial class BeamRenderer : Node2D
     private GpuParticles2D _impactParticles, _muzzleParticles;
     private Vector2 _start, _end, _visualEnd;
     private float _time, _phase;
+    private uint _noiseSeed;
     private bool _ready;
 
     [Export] public BeamStyle Style
@@ -45,6 +46,7 @@ public partial class BeamRenderer : Node2D
         _core.AddPoint(Vector2.Zero); _core.AddPoint(Vector2.Zero);
         _style = _style == null ? new BeamStyle() : (BeamStyle)_style.Duplicate(true);
         _phase = (float)(GetInstanceId() % 997UL) * Mathf.Tau / 997f;
+        _noiseSeed = unchecked((uint)GetInstanceId() * 2654435761u);
         _ready = true; _style.Changed += RefreshStyle;
         RefreshStyle(); SetBeam(Vector2.Zero, Vector2.Zero, false);
     }
@@ -114,9 +116,11 @@ public partial class BeamRenderer : Node2D
         }
 
         float radius = Safe(Style.ImpactWanderRadius), frequency = Safe(Style.ImpactWanderFrequency);
-        float angle = _time * Mathf.Tau * frequency + _phase;
+        float drift = _time * frequency * 0.65f;
+        // Smooth seeded wander, not a circular repeating Lissajous orbit; always inside the authored radius.
         Vector2 wander = radius > 0 && frequency > 0
-            ? new Vector2(Mathf.Cos(angle), Mathf.Sin(angle * 0.79f)) * (radius * 0.7f)
+            ? new Vector2(SmoothNoise(drift + 6.11f + _phase, 17.1f),
+                SmoothNoise(drift * 0.82f + 31.7f + _phase, 43.3f)) * (radius * 0.62f)
             : Vector2.Zero;
         _visualEnd = _end + wander;
 
@@ -141,8 +145,13 @@ public partial class BeamRenderer : Node2D
             float fade = i == 0 || i == count - 1 ? 0f :
                 (fadeSpan <= 0f ? 1f : Mathf.Min(1f, Mathf.Min(t, 1f - t) / fadeSpan));
             float phase = Mathf.Tau * (length * t - progress) / wavelength + _phase;
-            float ripple = amplitude * fade * (Mathf.Sin(phase) +
-                irregular * 0.3f * Mathf.Sin(phase * 1.83f + _time * 2.4f));
+            // Blend the wave with smoothly interpolated, per-instance seeded noise.
+            // Irregularity=0 retains the original sine; higher values favor organic motion.
+            float noise = irregular > 0f ? SmoothNoise(
+                (length * t - progress) / (wavelength * 0.65f) + _phase,
+                _time * 0.7f + _phase) : 0f;
+            float ripple = amplitude * fade * (Mathf.Sin(phase) * (1f - irregular * 0.85f)
+                + noise * irregular * 0.72f);
             _core.SetPointPosition(i, centre + normal * ripple);
             _outer.SetPointPosition(i, centre + normal * ripple * haloScale);
         }
@@ -150,6 +159,29 @@ public partial class BeamRenderer : Node2D
         if (_impactParticles != null) _impactParticles.Position = _visualEnd;
         if (_muzzleParticles != null) _muzzleParticles.Position = _start;
         if (Safe(Style.ImpactGlowRadius) > 0f) QueueRedraw();
+    }
+
+    // =========================================================
+    // Continuous seed-stable 2D value noise: no per-frame RNG, arrays, allocations or jitter.
+    private float SmoothNoise(float x, float y)
+    {
+        int ix = Mathf.FloorToInt(x), iy = Mathf.FloorToInt(y);
+        float fx = x - ix, fy = y - iy;
+        fx = fx * fx * (3f - 2f * fx); fy = fy * fy * (3f - 2f * fy);
+        return Mathf.Lerp(Mathf.Lerp(NoiseCorner(ix, iy), NoiseCorner(ix + 1, iy), fx),
+            Mathf.Lerp(NoiseCorner(ix, iy + 1), NoiseCorner(ix + 1, iy + 1), fx), fy);
+    }
+
+    // =========================================================
+    // Compact deterministic lattice hash, independent for every placed beam renderer.
+    private float NoiseCorner(int x, int y)
+    {
+        unchecked
+        {
+            uint n = ((uint)x * 374761393u) ^ ((uint)y * 668265263u) ^ _noiseSeed;
+            n = (n ^ (n >> 13)) * 1274126177u;
+            return ((n ^ (n >> 16)) & 65535u) / 32767.5f - 1f;
+        }
     }
 
     // =========================================================

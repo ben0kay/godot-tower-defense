@@ -200,9 +200,12 @@ public static class LaserTowerChecks
         Require(DamageResolver.Resolve(inherited.CreateHit(12), 100, 60) == new DamageResult(100, 60), "Laser explicit zero remains an override");
         BeamStyle authored = GD.Load<BeamStyle>("res://TOWERS/Offensive/LaserTower/Beam/DefaultLaserBeamStyle.tres");
         Require(authored.CoreWidth == 3 && authored.PulseAmount == 0.06f &&
-            authored.RippleAmplitude == 1.5f && authored.ImpactWanderRadius == 2.5f &&
+            Mathf.IsEqualApprox(authored.RippleAmplitude, 1.1f) && authored.RippleIrregularity > 0.8f &&
+            authored.OuterRippleScale < 1.1f && Mathf.IsEqualApprox(authored.ImpactWanderRadius, 1.4f) &&
+            authored.CoreColor.R > 0.95f && authored.CoreColor.G > 0.9f && authored.CoreColor.B < 0.8f &&
+            authored.OuterColor.R > 0.95f && authored.OuterColor.B < 0.2f &&
             authored.ImpactParticlesEnabled && !authored.MuzzleParticlesEnabled,
-            "Visual fixture edits preserve shared authored beam style and optional particle defaults");
+            "Laser preset is yellow with restrained seeded wobble and original optional emitter settings");
         hud.GetBuildButton("battle").EmitSignal(Button.SignalName.Pressed); placement.Call("CancelPlacement"); hud.ClearInspection();
         wallet.Initialize(grid.Level.Settings);
         GD.Print("PASS: Laser catalog/paid upgrade, true beam DPS30/60/120Hz, aim/range/disable gates, cosmetic ripple/wander/GPU effects and visual independence");

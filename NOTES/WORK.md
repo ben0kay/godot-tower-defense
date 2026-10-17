@@ -1,5 +1,14 @@
 # WORK — Consolidated Outstanding Implementation Backlog
 
+## Laser Tower silver/yellow visual refinement — 2026-10-17
+
+- [x] Replace Laser Tower SVG with silver/gunmetal body and yellow emitter/rails, retaining existing 64×64 scene sizing and muzzle marker.
+- [x] Recolor only the Laser beam preset to ivory-yellow core / golden halo and reduce wave/end wander. Extend shared BeamRenderer's opt-in irregularity with smoothly sampled deterministic noise, preserving zero-irregularity sine fallback and inactive behavior.
+- [x] Update Laser visual fixture assertions and the two beam READMEs; no gameplay/targeting/ammo/upgrade changes.
+- [ ] **Godot verification pending:** run `TESTS/Towers/LaserTowerChecks` via its existing suite and inspect beam at normal zoom, short/long distances, pause, multiple beams and end wander. This pass was source-validated and its SVG preview-rendered, but no Godot/.NET headless tests could run in this environment.
+
+---
+
 ## Enemy shield meter in shared DefenseBar — 2026-10-17
 
 - [x] Added the **shield bar above the regular hull bar**, inside the existing `FEEDBACK/DefenseBars/DefenseBar` Node2D (no extra scene node per enemy). Full shields show both stacked rows, preserving normal hull-bar behavior when unshielded or after shield break. Uses warm red-orange shield tint, separate Inspector-configurable shield thickness/gap, existing width/border/offset, movement counter-rotation and `DefenseBarsEnabled`.
