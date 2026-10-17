@@ -33,3 +33,7 @@ Only selected towers have heat/disable UI subscriptions. Close/switch/unload det
 Manual normal-zoom artwork/readability approval remains pending; headless layout does not establish pixel appearance. Full EnemyIntegrationChecks was not rerun for this presentation-only follow-up; its previously documented Level002 terrain assertion remains outside scope. No EMP attack, power grid, cooling particles/audio, save state or new heat balance was introduced.
 
 All nine listed runners were rerun successfully after the rebase; combined C# compilation also passed.
+
+## Current 560px layout follow-up — pending execution
+
+The Inspector has since narrowed from620 to560px. HeatText/HeatBar moved from `Columns/Main/Conditions` to `Columns/Side/Conditions`, beneath Combat Rank/XP; DisableReasons remains on the left as `Columns/Main/DisableReasons`. The regression test paths and width assertions were updated, but the above `620×330` execution results are **historical**. Godot editor/headless testing and desktop inspection of wrapped hot/disabled/Legendary states at1920×1080,1366×768 and960×540 are still required before reporting a passing 560px geometry check.
