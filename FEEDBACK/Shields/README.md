@@ -7,7 +7,7 @@ This folder owns one reusable visual **component**, not the shield damage mechan
 - **Gameplay shield state:** `Enemy.CurrentShield` and `EnemyDefinition.MaxShield` remain in `ENEMIES/Shared/`. `COMBAT/Damage/DamageResolver.cs` still owns typed shield-first absorption, spillover and penetration. Do not duplicate them here.
 - **Rendering:** `FEEDBACK/Shields/ShieldVisual.tscn` owns its own `Sprite2D` and short triggered tweens. `ShieldVisual.cs` accepts only `SetVisualSize(Vector2)`, `SetShield(previous, current, animate)` and `ResetVisual()`; it does not reference `Enemy`, `TowerBase`, `DamageInfo`, damage types or regeneration.
 - **Reusable assets:** The single baked-looking `Artwork/ShieldAura.svg` belongs here because it is shield-specific. `FEEDBACK/Shared/` is for assets such as the energy spark materials used by multiple unrelated effects. Put future broadly reusable material/textures there, not the shield controller.
-- **Per-instance styling:** `DefaultShieldVisualStyle.tres` (Inspector) sets reddish tint, 1.23× auto-sizing, idle alpha, damage-flash alpha/duration and break-flash alpha/duration. Changing style cannot affect actual shielding or combat.
+- **Per-instance styling:** `DefaultShieldVisualStyle.tres` (Inspector) sets warm reddish-orange tint, **1.65× auto-sizing**, **0.82 idle alpha**, hit/break peak opacity of **1.0** and short fade durations (0.28s / 0.38s). Changing style cannot affect actual shielding or combat.
 
 ## Current runtime behavior
 
@@ -18,7 +18,7 @@ This folder owns one reusable visual **component**, not the shield damage mechan
 5. **Existing ShieldEmitter restores shields:** the same recipient visual becomes visible again if the shield rises from zero. It remains a single child; restoration is **not natural regeneration**.
 6. **Death, arrival, scene unload:** shield visuals stay owned by the enemy and are released with it. No detached effect persists after the owner is removed.
 
-The base sprite is a tintable white energy field with faint ring arcs, using one imported SVG asset. No custom image file is required for each enemy. The effect uses zero `GpuParticles2D` for now; if the design later needs a light impact spark/break burst, own the emitter under `ShieldVisual.tscn` and reference broadly reusable assets from `FEEDBACK/Shared/`.
+The baked monochrome SVG has a **lightly translucent filled centre**, a **much brighter and thicker radial-gradient perimeter**, three soft wide outer ring layers, a strong crisp edge, and several **angular electrical filaments with bright contact nodes**. All details are embedded in one SVG and share the Inspector tint. No custom image file is required for each enemy. The effect uses zero `GpuParticles2D` for now; if the design later needs a light impact spark/break burst, own the emitter under `ShieldVisual.tscn` and reference broadly reusable assets from `FEEDBACK/Shared/`.
 
 ## Files
 
@@ -42,4 +42,4 @@ After a tower health/shield capability actually exists, that separate durability
 
 `TESTS/Combat/EnemyShieldChecks.cs` now asserts that shielded instances lazily own a visible shield aura, ordinary zero-shield enemies own none, shield-only hits flash without hull loss, shield breaks trigger visual fade, and an explicit restoration reuses the existing visual. Existing ShieldEmitter/typed damage tests still exercise source and gameplay isolation.
 
-**Not yet executed in Godot/.NET in this GitHub-only pass.** Visually check tiny Swift Interceptors and wide Transporters, hit/break/restoration, top-down draw order, paused tweens, 500-enemy wave frame times and whether the muted red aura reads clearly at normal camera zoom. No shader/geometry animation, per-frame shield polling, new regeneration, tower durability or HUD shield bars were added.
+**Latest visual revision (2026-10-17):** replaced the formerly barely visible outline with a filled red-orange shield and baked electrical zaps, raised initial opacity, increased size, and explicitly enabled linear texture sampling for smooth edges. No GPU particles/shaders were introduced. **Not yet executed in Godot/.NET in this GitHub-only pass.** Visually check small Enemy001 shields, Swift Interceptors and wide Transporters, hit/break/restoration, top-down draw order, paused tweens, and 500-enemy wave frame times. No shader/geometry animation, per-frame shield polling, new regeneration, tower durability or HUD shield bars were added.
