@@ -226,7 +226,9 @@ public partial class Enemy : Node2D
     // Also clean up when the whole level is unloaded.
     public override void _ExitTree()
     {
-        ClearStatuses(); _shieldVisual?.ResetVisual(); _shieldVisual = null;
+        ClearStatuses();
+        if (GodotObject.IsInstanceValid(_shieldVisual)) _shieldVisual.ResetVisual();
+        _shieldVisual = null;
         bool unresolved = IsAlive; IsAlive = false; _registry?.Unregister(this);
         Terrain = null; if (unresolved) Removed?.Invoke(this);
     }
