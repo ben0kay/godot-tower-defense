@@ -1,6 +1,6 @@
 # Shared shield aura — visuals only (SV1)
 
-This folder owns one reusable visual **component**, not the shield damage mechanic. It can be attached to **any** shield-owning gameplay entity (enemies now, optional towers later).
+This folder owns the reusable **aura visual**, not the shield damage mechanic or the shield **meter**. The slim shield bar above hull health lives in [`FEEDBACK/DefenseBars`](../DefenseBars/README.md) and is drawn in the already-inherited `DefenseBar` node when shields are present. It can be attached to **any** shield-owning gameplay entity (enemies now, optional towers later).
 
 ## Architecture: keep combat separate from feedback
 

@@ -50,6 +50,15 @@ public static class EnemyShieldChecks
             Enemy ordinary = ships.First(e => e.CurrentShield == 0f);
             DefenseBar bar = shielded.GetNode<DefenseBar>("DefenseBar");
             ShieldVisual visual = shielded.GetNodeOrNull<ShieldVisual>("ShieldVisual");
+            Require(bar.Visible && bar.HullVisible && bar.ShieldVisible
+                && Mathf.IsEqualApprox(bar.HealthFraction, 1f) && Mathf.IsEqualApprox(bar.ShieldFraction, 1f)
+                && !bar.IsProcessing() && !bar.IsPhysicsProcessing()
+                && !ordinary.GetNode<DefenseBar>("DefenseBar").Visible,
+                "Full-shield enemies display stacked full hull and shield meters; unshielded enemies stay uncluttered");
+            shielded.Rotation = 0.3f; shielded.UpdateDefenseBarTransform();
+            Require(Mathf.IsEqualApprox(bar.Rotation, -0.3f),
+                "Shield and hull meters share counter-rotation from the existing movement callback");
+            shielded.Rotation = 0f; shielded.UpdateDefenseBarTransform();
             Require(visual != null && visual.HasShieldVisual && visual.Visible &&
                 !visual.IsProcessing() && !visual.IsPhysicsProcessing() &&
                 shielded.GetNode<Sprite2D>("Sprite").Texture != null &&
@@ -58,16 +67,19 @@ public static class EnemyShieldChecks
                 "Only shielded enemies lazily instance one baked, scaled, idle shield visual");
 
             shielded.TakeDamage(40f);
-            Require(shielded.CurrentShield == 60f && shielded.Health == 60f && !bar.Visible &&
-                visual.HasShieldVisual && visual.GetNode<Sprite2D>("Aura").Visible &&
+            Require(shielded.CurrentShield == 60f && shielded.Health == 60f && bar.Visible
+                && bar.HullVisible && bar.ShieldVisible
+                && Mathf.IsEqualApprox(bar.HealthFraction, 1f) && Mathf.IsEqualApprox(bar.ShieldFraction, 0.6f)
+                && visual.HasShieldVisual && visual.GetNode<Sprite2D>("Aura").Visible &&
                 visual.GetNode<Sprite2D>("Aura").Modulate.A > visual.Style.IdleOpacity,
                 "Shield-only damage flashes the same aura and preserves hull/defense bar");
             shielded.TakeDamage(60f);
             Require(shielded.CurrentShield == 0f && shielded.Health == 60f && shielded.IsAlive &&
-                !visual.HasShieldVisual && visual.Visible,
+                !bar.ShieldVisible && !bar.Visible && Mathf.IsZeroApprox(bar.ShieldFraction)
+                && !visual.HasShieldVisual && visual.Visible,
                 "Exact shield break leaves hull intact and starts a brief event-only break flash");
             shielded.TakeDamage(12f);
-            Require(shielded.Health == 48f && bar.Visible &&
+            Require(shielded.Health == 48f && bar.Visible && bar.HullVisible && !bar.ShieldVisible &&
                 Mathf.IsEqualApprox(bar.HealthFraction, 0.8f),
                 "A subsequent hit damages health and updates the existing health bar");
 
@@ -80,11 +92,14 @@ public static class EnemyShieldChecks
                 "Unshielded wave entries retain original damage and allocate no shield art");
 
             Require(shielded.RestoreShield(15f) == 15f &&
-                visual.HasShieldVisual && visual.Visible &&
+                bar.Visible && bar.HullVisible && bar.ShieldVisible
+                && Mathf.IsEqualApprox(bar.ShieldFraction, 0.15f)
+                && visual.HasShieldVisual && visual.Visible &&
                 shielded.GetNodeOrNull<ShieldVisual>("ShieldVisual") == visual,
                 "Existing support restoration reactivates the same visual without new nodes or regeneration");
             shielded.TakeDamage(15f);
-            Require(!visual.HasShieldVisual && shielded.Health == 48f,
+            Require(!visual.HasShieldVisual && !bar.ShieldVisible && bar.HullVisible
+                && bar.Visible && shielded.Health == 48f,
                 "Re-depleting a restored shield plays break feedback without changing hull");
 
             Enemy debug = spawns.Spawn(scene, true);
@@ -93,9 +108,10 @@ public static class EnemyShieldChecks
                 "F2-style default spawning never grants shields even with shield capacity");
             debug.Movement.SetPhysicsProcess(false);
             debug.TakeDamage(12f);
-            Require(debug.Health == 48f && shielded.CurrentShield == 0f &&
+            Require(debug.Health == 48f && shielded.CurrentShield == 0f
+                && !debug.GetNode<DefenseBar>("DefenseBar").ShieldVisible &&
                 authored.MaxShield == 100f, "Per-instance shield state never modifies the shared definition");
-            GD.Print("PASS: wave-only shield opt-in, mixed entries, shield overflow and debug defaults");
+            GD.Print("PASS: opt-in shields, stacked hull/shield bars, event-only redraw, depletion/restoration, overflow and debug defaults");
         }
         finally
         {

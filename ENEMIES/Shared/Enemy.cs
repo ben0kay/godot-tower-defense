@@ -173,10 +173,12 @@ public partial class Enemy : Node2D
     }
 
     // =========================================================
-    // Shield feedback is a lazy child of shielded recipients only; ordinary enemies allocate no effect.
-    // A future damageable tower can use ShieldVisual.SetShield directly without any Enemy dependency.
+    // Send the same authoritative shield update to the existing stacked HUD bar
+    // and the lazy shield aura. Neither presentation system owns combat data.
+    // =========================================================
     private void SyncShieldVisual(float before, float after, bool animate = true)
     {
+        _defenseBar?.SetShield(after, Definition?.MaxShield ?? 0f);
         if (after > 0f && (_shieldVisual == null || !GodotObject.IsInstanceValid(_shieldVisual)))
         {
             _shieldVisualScene ??= GD.Load<PackedScene>("res://FEEDBACK/Shields/ShieldVisual.tscn");
@@ -197,7 +199,7 @@ public partial class Enemy : Node2D
     }
 
     // =========================================================
-    // Only a damaged visible defense bar needs to counter-rotate as this ship turns.
+    // Only visible health/shield meters counter-rotate; idle or absent meters do no work.
     public void UpdateDefenseBarTransform() => _defenseBar?.AlignWithOwner(Rotation);
 
     // =========================================================

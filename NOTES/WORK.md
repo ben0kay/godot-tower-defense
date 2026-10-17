@@ -1,5 +1,15 @@
 # WORK — Consolidated Outstanding Implementation Backlog
 
+## Enemy shield meter in shared DefenseBar — 2026-10-17
+
+- [x] Added the **shield bar above the regular hull bar**, inside the existing `FEEDBACK/DefenseBars/DefenseBar` Node2D (no extra scene node per enemy). Full shields show both stacked rows, preserving normal hull-bar behavior when unshielded or after shield break. Uses warm red-orange shield tint, separate Inspector-configurable shield thickness/gap, existing width/border/offset, movement counter-rotation and `DefenseBarsEnabled`.
+- [x] Shared Enemy shield-change bridge now notifies both `DefenseBar.SetShield` and the existing `ShieldVisual` aura for spawn/damage/explicit restoration; no shield regen, extra damage logic, spawn changes or polling.
+- [x] Updated `TESTS/Combat/EnemyShieldChecks.cs` and feedback/enemy docs for full/partial/depleted/recovered shields.
+- [ ] **Verify:** run Godot .NET shield fixture and visual test on Level001 shielded Enemy001; confirm shield row sits distinctly above hull, stays horizontal on turns, does not overlap other enemy indicators, and both disappear on removal. Runtime testing unavailable during this GitHub-only pass.
+
+---
+
+
 ## Offensive tower range balance — 2026-10-17
 
 - [x] Increased **all seven offensive tower types at every authored purchased level** approximately 15% (nearest whole px): Battle 294/304/313, Laser 294/304, Blaster 294/304, Shockwave 230/239, Cryo 239/248/258, Machine Gun 239/248/258, Sniper 515/524/534. Source of truth remains each `*Levels.cs` row; rank bonuses/Inspector/range rings/upgrade previews resolve normally. No modifier or change to weapon cooldown, damage, ammo, build costs or Blaster blast radius.

@@ -1,5 +1,5 @@
-// Lightweight reusable hull-health display for enemies and future damageable towers.
-// Draws only on health changes; never polls health or runs its own Process callback.
+// Reusable event-driven hull + shield display for enemies and future damageable towers.
+// Uses one canvas node for both stacked meters; no per-frame processing or extra scene nodes.
 using Godot;
 
 public partial class DefenseBar : Node2D
@@ -8,12 +8,16 @@ public partial class DefenseBar : Node2D
     [Export] public DefenseBarConfig Style { get; set; }
     [Export] public FeedbackMasterConfig MasterConfig { get; set; }
     public float HealthFraction { get; private set; } = 1f;
+    public float ShieldFraction { get; private set; }
+    public bool ShieldVisible { get; private set; }
+    public bool HullVisible { get; private set; }
     public float WidthPixels { get; private set; }
+    private bool _hullAlive;
     #endregion
 
-    #region Lifecycle and Health
+    #region Lifecycle and State Changes
     // =========================================================
-    // A full-health or uninitialized bar is invisible; no per-bar ticking is required.
+    // Rendering is updated by owner events only; the shield does not introduce a tick.
     public override void _Ready()
     {
         Visible = false;
@@ -22,33 +26,53 @@ public partial class DefenseBar : Node2D
     }
 
     // =========================================================
-    // Health providers call this only when initialized, damaged or healed.
-    // A dead or fully healed target has no bar; no timer-based disappearance.
+    // The hull row remains visible alongside a live shield, even at full health.
+    // Unshielded ships retain the former damaged-hull-only behavior.
     public void SetHealth(float current, float maximum)
     {
-        if (Style == null) { Visible = false; return; }
-        float safeMax = Mathf.Max(0f, maximum);
-        HealthFraction = safeMax > 0f ? Mathf.Clamp(current / safeMax, 0f, 1f) : 0f;
+        float safeMax = float.IsFinite(maximum) ? Mathf.Max(0f, maximum) : 0f;
+        float safeCurrent = float.IsFinite(current) ? Mathf.Max(0f, current) : 0f;
+        HealthFraction = safeMax > 0f ? Mathf.Clamp(safeCurrent / safeMax, 0f, 1f) : 0f;
+        _hullAlive = safeMax > 0f && safeCurrent > 0f;
         WidthPixels = CalculateWidth(safeMax);
-        Visible = (MasterConfig == null || MasterConfig.DefenseBarsEnabled)
-            && safeMax > 0f && current > 0f && HealthFraction < 1f;
-        if (Visible) QueueRedraw();
+        RefreshVisibility();
     }
 
     // =========================================================
-    // Per-enemy rotation cancellation keeps the bar horizontal and above its hull.
-    // Call only during actual movement when the bar is visible; the bar doesn't tick.
+    // Called on shielded spawn, shield damage, restoration or depletion, not each frame.
+    // The shield row sits ABOVE the existing hull row and uses the same width.
+    public void SetShield(float current, float maximum)
+    {
+        float safeMax = float.IsFinite(maximum) ? Mathf.Max(0f, maximum) : 0f;
+        float safeCurrent = float.IsFinite(current) ? Mathf.Max(0f, current) : 0f;
+        ShieldFraction = safeMax > 0f ? Mathf.Clamp(safeCurrent / safeMax, 0f, 1f) : 0f;
+        RefreshVisibility();
+    }
+
+    // =========================================================
+    // Reuse the owner's existing movement callback for counter-rotation and world position.
     public void AlignWithOwner(float ownerRotation)
     {
-        if (!Visible) return;
+        if (!Visible || Style == null) return;
         Position = Vector2.Up.Rotated(-ownerRotation) * Style.VerticalOffsetPixels;
         Rotation = -ownerRotation;
+    }
+
+    // =========================================================
+    // Respect the shared feedback switch for both meters.
+    private void RefreshVisibility()
+    {
+        ShieldVisible = _hullAlive && ShieldFraction > 0f;
+        HullVisible = _hullAlive && (HealthFraction < 1f || ShieldVisible);
+        Visible = Style != null && (MasterConfig == null || MasterConfig.DefenseBarsEnabled)
+            && (HullVisible || ShieldVisible);
+        if (Visible) QueueRedraw();
     }
     #endregion
 
     #region Width and Rendering
     // =========================================================
-    // Each doubling of max HP adds a small amount of width, up to a hard cap.
+    // Keep existing logarithmic HP sizing; the shield meter shares hull width for alignment.
     public float CalculateWidth(float maximum)
     {
         if (Style == null) return 0f;
@@ -60,20 +84,39 @@ public partial class DefenseBar : Node2D
     }
 
     // =========================================================
-    // A dark border/background and colored fill; rendered only after damage changes.
+    // One canvas draw draws the hull meter and (when present) a slimmer shield meter above.
     public override void _Draw()
     {
         if (Style == null || !Visible) return;
-        float w = WidthPixels, h = Mathf.Max(2f, Style.HeightPixels);
-        float border = Mathf.Clamp(Style.BorderPixels, 0f, Mathf.Min(h, w) * 0.5f);
-        Rect2 rect = new(-w * 0.5f, -h * 0.5f, w, h);
+        float hullHeight = Mathf.Max(2f, Style.HeightPixels);
+        if (HullVisible)
+        {
+            Color hull = HealthFraction <= Style.CriticalFraction ? Style.CriticalColor
+                : HealthFraction <= Style.WarningFraction ? Style.WarningColor : Style.HealthyColor;
+            DrawMeter(0f, hullHeight, HealthFraction, hull);
+        }
+        if (ShieldVisible)
+        {
+            float height = Mathf.Max(2f, Style.ShieldHeightPixels);
+            float gap = Mathf.Max(0f, Style.ShieldGapPixels);
+            float y = -(hullHeight + height) * 0.5f - gap;
+            DrawMeter(y, height, ShieldFraction, Style.ShieldColor);
+        }
+    }
+
+    // =========================================================
+    // Both meters use the same existing border/background and one reusable drawing helper.
+    private void DrawMeter(float y, float height, float fraction, Color fill)
+    {
+        float width = WidthPixels;
+        if (width <= 0f) return;
+        float border = Mathf.Clamp(Style.BorderPixels, 0f, Mathf.Min(height, width) * 0.5f);
+        Rect2 rect = new(-width * 0.5f, y - height * 0.5f, width, height);
         DrawRect(rect, Style.BorderColor);
         Rect2 inner = rect.Grow(-border);
         DrawRect(inner, Style.BackgroundColor);
-        if (HealthFraction <= 0f || inner.Size.X <= 0f || inner.Size.Y <= 0f) return;
-        Color fill = HealthFraction <= Style.CriticalFraction ? Style.CriticalColor
-            : HealthFraction <= Style.WarningFraction ? Style.WarningColor : Style.HealthyColor;
-        DrawRect(new Rect2(inner.Position, new Vector2(inner.Size.X * HealthFraction, inner.Size.Y)), fill);
+        if (fraction > 0f && inner.Size.X > 0f && inner.Size.Y > 0f)
+            DrawRect(new Rect2(inner.Position, new Vector2(inner.Size.X * fraction, inner.Size.Y)), fill);
     }
     #endregion
 }

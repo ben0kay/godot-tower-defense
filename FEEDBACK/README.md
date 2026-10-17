@@ -6,7 +6,7 @@ Reusable visual feedback systems. **DefenseBars and DeathExplosion are now activ
 - `DeathExplosion/`: reusable automatically-sized kill smoke and orange flash using GPU particles.
 - `Shared/`: reusable particle textures and process-material presets. The scene/effect that uses them owns its own `GpuParticles2D` nodes, lifetime and position; currently the shared beam renderer references small energy-contact sparks.
 - `Shields/`: one shared, tinted, auto-scaled shield aura and hit/break tween component; lazily attached only to currently shielded enemies. Intended to be reusable by future damageable towers without implementing tower shields or regeneration.
-- `DefenseBars/`: event-driven health indicator component used by Enemy001 and reusable for future damageable towers. Configure its colors, capped logarithmic sizing and offset in `DefenseBars/DefaultDefenseBarConfig.tres`.
+- `DefenseBars/`: event-driven combined **hull + shield** indicators used by inherited enemy scenes and reusable for future damageable towers. The shield meter renders as an extra row within the *same* `DefenseBar` node only while the owner has shield points. Configure its colors, capped logarithmic sizing and offset in `DefenseBars/DefaultDefenseBarConfig.tres`.
 - `DamageNumbers/`: future hit numbers and damage aggregation.
 - `CameraEffects/`: future impact shakes (normal pan/zoom remains in `CAMERA/`).
 

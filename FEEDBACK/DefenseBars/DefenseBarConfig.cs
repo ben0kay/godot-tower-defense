@@ -21,6 +21,11 @@ public partial class DefenseBarConfig : Resource
     [Export] public Color WarningColor { get; set; } = new("#f4bd61");
     [Export] public Color CriticalColor { get; set; } = new("#f36b72");
 
+    [ExportGroup("Shield Meter")]
+    [Export(PropertyHint.Range, "2,12,1")] public float ShieldHeightPixels { get; set; } = 4f;
+    [Export(PropertyHint.Range, "0,12,1")] public float ShieldGapPixels { get; set; } = 2f;
+    [Export] public Color ShieldColor { get; set; } = new("#ff865b");
+
     [ExportGroup("Thresholds")]
     [Export(PropertyHint.Range, "0.05,0.95,0.05")] public float WarningFraction { get; set; } = 0.5f;
     [Export(PropertyHint.Range, "0.05,0.95,0.05")] public float CriticalFraction { get; set; } = 0.25f;
