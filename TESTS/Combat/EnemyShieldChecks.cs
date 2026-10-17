@@ -49,13 +49,23 @@ public static class EnemyShieldChecks
             Enemy overflow = ships.Last(e => e.CurrentShield == 100f);
             Enemy ordinary = ships.First(e => e.CurrentShield == 0f);
             DefenseBar bar = shielded.GetNode<DefenseBar>("DefenseBar");
+            ShieldVisual visual = shielded.GetNodeOrNull<ShieldVisual>("ShieldVisual");
+            Require(visual != null && visual.HasShieldVisual && visual.Visible &&
+                !visual.IsProcessing() && !visual.IsPhysicsProcessing() &&
+                shielded.GetNode<Sprite2D>("Sprite").Texture != null &&
+                visual.GetNode<Sprite2D>("Aura").Scale.X > 0f &&
+                ordinary.GetNodeOrNull<ShieldVisual>("ShieldVisual") == null,
+                "Only shielded enemies lazily instance one baked, scaled, idle shield visual");
 
             shielded.TakeDamage(40f);
-            Require(shielded.CurrentShield == 60f && shielded.Health == 60f && !bar.Visible,
-                "Shield-only damage preserves hull HP and the hull-only defense bar");
+            Require(shielded.CurrentShield == 60f && shielded.Health == 60f && !bar.Visible &&
+                visual.HasShieldVisual && visual.GetNode<Sprite2D>("Aura").Visible &&
+                visual.GetNode<Sprite2D>("Aura").Modulate.A > visual.Style.IdleOpacity,
+                "Shield-only damage flashes the same aura and preserves hull/defense bar");
             shielded.TakeDamage(60f);
-            Require(shielded.CurrentShield == 0f && shielded.Health == 60f && shielded.IsAlive,
-                "An exact shield-breaking hit does not damage health or kill the enemy");
+            Require(shielded.CurrentShield == 0f && shielded.Health == 60f && shielded.IsAlive &&
+                !visual.HasShieldVisual && visual.Visible,
+                "Exact shield break leaves hull intact and starts a brief event-only break flash");
             shielded.TakeDamage(12f);
             Require(shielded.Health == 48f && bar.Visible &&
                 Mathf.IsEqualApprox(bar.HealthFraction, 0.8f),
@@ -65,8 +75,17 @@ public static class EnemyShieldChecks
             Require(overflow.CurrentShield == 0f && overflow.Health == 35f && overflow.IsAlive,
                 "Damage exceeding the shield carries exactly the excess into hull health");
             ordinary.TakeDamage(12f);
-            Require(ordinary.CurrentShield == 0f && ordinary.Health == 48f,
-                "Unshielded wave entries retain original damage behavior");
+            Require(ordinary.CurrentShield == 0f && ordinary.Health == 48f &&
+                ordinary.GetNodeOrNull<ShieldVisual>("ShieldVisual") == null,
+                "Unshielded wave entries retain original damage and allocate no shield art");
+
+            Require(shielded.RestoreShield(15f) == 15f &&
+                visual.HasShieldVisual && visual.Visible &&
+                shielded.GetNodeOrNull<ShieldVisual>("ShieldVisual") == visual,
+                "Existing support restoration reactivates the same visual without new nodes or regeneration");
+            shielded.TakeDamage(15f);
+            Require(!visual.HasShieldVisual && shielded.Health == 48f,
+                "Re-depleting a restored shield plays break feedback without changing hull");
 
             Enemy debug = spawns.Spawn(scene, true);
             Require(debug != null && debug.Definition.MaxShield == 100f &&
