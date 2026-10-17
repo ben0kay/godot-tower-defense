@@ -1,4 +1,4 @@
-# Shared construction — C1–C3 implemented; C4 planned
+# Shared construction — C1–C3 and Battle-only C4 artwork implemented
 
 Paid placements now occupy their complete footprint immediately, take authored time to build, and become operational once. Payment still uses the existing atomic wallet callback; invalid construction setup, scene/index failures and failed placement roll back cells, nodes and work before payment. Construction completion does not alter occupancy or navigation. Directly instantiated scenes remain operational unless placement explicitly starts construction.
 
@@ -27,11 +27,18 @@ One `ConstructionWorkManager` in each playable World advances only active jobs. 
 
 Weapon and Factory processing is disabled during construction, with a shared operational guard protecting explicit ticks. Finished weapons regain their normal processing without stat rebuild, ammo refill, XP award or cooldown reset. Unfinished buildings/consumers stay outside logistics registration and demand searches. Operational checks also protect dispatch and arrival; completion registers the existing stock once. Factory remains100 rounds/2s,1000-round shipments; Depot remains10000 capacity. Existing drones/logistics remain the sole delivery authority.
 
-The existing selected-tower Inspector has a compact work section: **CONSTRUCTING / UPGRADING to Level N / OPERATIONAL**, progress bar, elapsed/total seconds and time remaining. Only its work controls update on throttled progress events; full stat/preview resolution occurs at input/state changes, not each timer tick. Closing/switching/unloading detaches work listeners; reselecting reads current progress. A paid upgrade preview says the cost is already paid and its button stays disabled. Current stats continue describing the old active tier. Regular finished artwork remains visible; stage SVGs/VFX remain C4.
+The existing selected-tower Inspector has a compact work section: **CONSTRUCTING / UPGRADING to Level N / OPERATIONAL**, progress bar, elapsed/total seconds and time remaining. Only its work controls update on throttled progress events; full stat/preview resolution occurs at input/state changes, not each timer tick. Closing/switching/unloading detaches work listeners; reselecting reads current progress. A paid upgrade preview says the cost is already paid and its button stays disabled. Current stats continue describing the old active tier. Battle now shows authored construction stages; other buildings retain regular artwork. All current upgrade images remain unchanged unless optional level artwork is assigned.
 
-## C4 remaining
+## Shared artwork (Battle-only C4 pilot)
 
-- **C4:** optional threshold-based SVG stage swaps, stable stage sprite/overlay, shared texture resources, optional globally budgeted/offscreen-aware sparks and completion effects. Battle1×1 and Factory3×2 need real stage examples; preserve live turret hierarchy during upgrades. Missing art/VFX must not change gameplay.
-- Refund/selling, builder drones, damage/repair, research and campaign saving remain deferred.
+`TowerConfig.ConstructionArt` is an Inspector resource with `BuildStages` and `LevelArtwork`. Battle's default config references `Artwork/Construction/BattleConstructionArt.tres`:0% bare foundation,35% frame,70% assembly, then the original finished SVG at completion. These are cosmetic thresholds, not work-duration or stat sources. There is no fixed stage count; invalid/missing entries are ignored.
 
-See [TIMED_CONSTRUCTION_PASS.md](TIMED_CONSTRUCTION_PASS.md) for the accepted refinements and checklist, and `TESTS/Towers/Construction.md` for actual execution and benchmarks.
+`TowerConstructionVisuals` is an optional scene child with a SpritePath pointing to the existing Sprite2D. It reads state on Ready (including paid construction set before AddChild), listens to start/completion and busy-only throttled progress, and changes only Texture when necessary. It never changes sprite transform/tint, aiming hierarchy, world/input/collisions or work progress. Idle presenters have no process/physics loop. The construction ghost keeps its ordinary icon.
+
+To enable another building, add this presenter as a child, point SpritePath at that building's Sprite2D, and assign a ConstructionArt profile before placement. Author every image on the same canvas/anchor/facing as its existing sprite so full rectangular scale/offsets remain correct. Other production scenes currently have no presenter/art profile. Factory stage imagery is deliberately deferred.
+
+Each optional LevelArtwork entry has Level, FinishedTexture, UpgradeTexture and UpgradeProgress. During upgrades, keep the completed old-tier texture until the one intermediate-image threshold; at completion use the target finished image if supplied. Missing finished images retain the nearest earlier completed appearance, never an intermediate construction image. Battle has empty Inspector slots for Levels2/3; it currently looks the same at every upgraded tier. Art metadata stays outside numeric C# level rows.
+
+Profiles/textures are shared immutable authored resources. Config copies remain private; numeric rows/recipes are explicitly copied, and weapon-specific mutable effect styles still use their existing private-copy overrides. No runtime profile/texture duplication or texture loads occur on progress events.
+
+No sparks, particles, completion effects, research, selling/refunds, builder drones or saving were added. Desktop playtesting remains manual. See [TIMED_CONSTRUCTION_PASS.md](TIMED_CONSTRUCTION_PASS.md) for revised scope and `TESTS/Towers/ConstructionArtwork.md` for execution and visual checklist.

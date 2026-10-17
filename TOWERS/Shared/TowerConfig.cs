@@ -13,6 +13,9 @@ public partial class TowerConfig : Resource
     public static void ValidateWorkSeconds(double seconds)
     { if (!double.IsFinite(seconds) || seconds < 0) throw new System.ArgumentOutOfRangeException(nameof(seconds), "Work duration must be finite and nonnegative."); }
 
+    [ExportGroup("Construction Artwork")]
+    [Export] public TowerConstructionArt ConstructionArt { get; set; }
+
     [ExportGroup("Starting Ammunition")]
     [Export(PropertyHint.Range, "0,1,0.01")] public float InitialAmmoFraction { get; set; } = 1f;
     [ExportGroup("Identity")]
@@ -41,7 +44,9 @@ public partial class TowerConfig : Resource
     // Copy absolute rows and mutable recipes rather than sharing placed-instance inputs.
     public virtual TowerConfig CreateInstanceCopy()
     {
-        TowerConfig copy = (TowerConfig)Duplicate(true);
+        // Keep presentation profiles and textures shared; mutable combat rows/recipes still get private copies below.
+        TowerConfig copy = (TowerConfig)Duplicate(false);
+        copy.ConstructionArt = ConstructionArt;
         copy._passiveCosts = TowerLevel.CopyCosts(_passiveCosts);
         copy.Levels = new();
         foreach (TowerLevel level in Levels) copy.Levels.Add(level?.CreateInstanceCopy());

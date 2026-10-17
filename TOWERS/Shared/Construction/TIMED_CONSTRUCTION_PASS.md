@@ -1,10 +1,14 @@
 # Timed Construction, Timed Upgrades and Visual Build Stages — Codex Implementation Pass
 
-> **STATUS: C1–C3 IMPLEMENTED; C4 PLANNED.** This file is the implementation brief for **C1–C4**. Complete stages sequentially, test each, and update this checklist **only after code really lands**. Follow `NOTES/CodePreferences.md` and the existing Godot 4 C# architecture. Documentation created 2026-10-16.
+> **STATUS: C1–C3 IMPLEMENTED; C4 BATTLE-ART PILOT IMPLEMENTED.** This file is the implementation brief for **C1–C4**. Complete stages sequentially, test each, and update this checklist **only after code really lands**. Follow `NOTES/CodePreferences.md` and the existing Godot 4 C# architecture. Documentation created 2026-10-16.
+
+## C4 scope revision — user request (2026-10-16)
+
+Implement shared artwork presentation with **Battle Tower only** as the initial authored example. **No sparks, particles or other construction VFX.** Actual Factory/Depot stage art is deferred. Optional per-level finished/intermediate upgrade images are supported, but no unique upgraded Battle artwork is authored yet. Missing upgrade images retain the last completed appearance. The original broader C4 checklist below is narrowed accordingly; live Godot visual QA remains a manual checklist, not claimed by headless tests.
 
 ## Goal
 
-Placed towers and economy buildings take **authored, configurable time** to be constructed. Their appearance visibly progresses through optional SVG/texture stages, with subtle welding sparks and completion effects. Purchased tower upgrades can also have their own **independent work durations**. Reuse existing placement, credits, inventories, ranks, stat pipeline and Inspector; **no new economy**, no construction drones/repair/saving system in this pass.
+Placed towers and economy buildings take **authored, configurable time** to be constructed. Their appearance visibly progresses through optional SVG/texture stages. The current Battle-only pilot excludes sparks and completion effects. Purchased tower upgrades can also have their own **independent work durations**. Reuse existing placement, credits, inventories, ranks, stat pipeline and Inspector; **no new economy**, no construction drones/repair/saving system in this pass.
 
 This is one shared, optional construction capability: a Battle Tower, passive Ammo Factory and 3×2 building should all use the same work-lifecycle API, without being forced to inherit each other's combat or production behavior.
 
@@ -81,20 +85,19 @@ This is one shared, optional construction capability: a Battle Tower, passive Am
 
 **C3 done:** purchased upgrades take real time, retain old-tier activity, and the Inspector accurately shows work status.
 
-## C4 — SVG build stages, optional spark/VFX hooks and full verification
+## C4 — Battle SVG build stages and reusable optional level artwork
 
-**Visual architecture: presentation is optional, not game state.**
+**Visual architecture: presentation is optional, not game state. Revised Battle-only scope.**
 
-- [ ] Provide a small reusable construction-visual component, used by any `TowerBase` without inserting per-building state machines. The **TowerDefinition / tower config or optional stage-presenter resource** should expose a series of `(threshold 0..1, Texture2D/SVG asset)` entries and optional effect references. Node/art transform and anchor align to the **whole rectangular footprint**, not one tile. Do not hardcode 4 stages, and do not require every tower to author stages on day one.
-- [ ] Support e.g. `stage0.svg` (bare foundation), `stage1.svg` (frame), `stage2.svg` (nearly complete), final existing finished SVG as default operational stage. Discrete progress thresholds (such as 0%, 35%, 70%, 100%) are editable; update the sprite **only when stage index changes**, not every frame. If stages are missing/invalid, fall back to existing sprite/progress UI with no gameplay impact.
-- [ ] For an actual first visual demo, supply **minimal placeholder stage visuals** for at least one **1×1 Battle Tower** and one **3×2 Ammunition Factory** (or a reusable stage overlay proven against both), reusing existing SVG vocabulary. Do not overwrite current final artwork or manually adjust authored level terrain. Different stage assets may have different numbers, and factory/depot visuals should stay centered within their full footprint.
-- [ ] Add optional low-cost construction effect(s): a small welding spark emitter / intermittent flash during work, plus optional one-shot completion flash/puff. Reuse `FEEDBACK/` patterns. Respect Pause, cleanup and deletion; no effects during build-ghost preview, idle operation or offscreen when reasonable. A building with **no VFX or SVG stages works identically**.
-- [ ] **Upgrades are visually distinct from rebuilding a structure**: retain the existing live old-tier model while working, with an optional scaffolding/glow overlay and completion cue. Only the initial build needs the bare-to-finished sequence. Do not replace/remove a live turret sprite in a way that breaks turret rotation or attacks during upgrade.
-- [ ] Visuals must not own work progress, change physics/collisions, block input or modify `WorldGrid`. Do not instantiate an extra visual node every construction frame. Stop looping emitters and clean one-shot effects when a scene exits or construction ends.
-- [ ] Validate appearance and transitions for construction, upgrading and completion, including missing SVG and VFX resources, mid-progress tower selection, 1×1 and 3×2 structures, different authored durations, pause/resume and rapid scene unload. Provide a real Godot editor screenshot/playtest checklist; headless geometry checks alone don't establish visual quality.
-- [ ] Run focused new `TESTS/Towers/ConstructionChecks.cs` + `*.tscn` (or existing-suite inclusion), existing `TESTS/Towers/TowerUpgradeChecks.cs`, `TESTS/Towers/FootprintChecks.cs`, `TESTS/Economy/AmmunitionLoopChecks.cs`, `TESTS/UI/MenuTowerFlowChecks.cs`, Citadel/Results navigation and enemy combat/headless integration suites. Record *actual* executed results and known pre-existing environment failures.
+- [x] Reusable `TowerConstructionVisuals` targets an authored Sprite2D path on any TowerBase. Config references Inspector `TowerConstructionArt` with arbitrary `(threshold, texture)` build stages. It changes no transforms, physics, occupancy or work state and owns no timer/processing callback.
+- [x] Battle Tower has foundation/frame/assembly SVGs at0/35/70%; completion restores the unchanged finished SVG. Textures are shared loaded references, assigned only when the image changes. Invalid/missing entries fall back safely.
+- [x] Only Battle's scene opts into the presenter. Existing Factory/Depot/other weapons keep their current art and gain no extra presentation nodes. Shared3×2 transform preservation is covered by an isolated geometry fixture; actual Factory stage artwork is deferred.
+- [x] Upgrades keep the current completed model unless the purchased tier supplies one optional intermediate image/threshold; completion chooses that tier's optional finished image. Unassigned later tiers retain the nearest earlier completed image. No unique Level2/3 Battle images are authored in this pass.
+- [x] Initial build, positive/zero upgrade, missing styles/assets, pause, selection/ghost independence, stage-change-only writes, teardown and per-level fallback are regression-tested. No particles or VFX resources are created.
+- [x] Existing construction/upgrade, footprint, ammo, HUD/menu, pause/results and enemy combat suites run with actual outcomes documented in `TESTS/Towers/ConstructionArtwork.md`.
+- [ ] Desktop Godot visual playtest: follow the checklist in `TESTS/Towers/ConstructionArtwork.md`. A rendered SVG contact sheet is provided and visually reviewed, but is not an in-game screenshot.
 
-**C4 done:** players visibly see construction stages and optional sparks, without gameplay depending on stage art.
+**Battle-art pilot implemented.** Additional building stage art is optional future content; sparks/VFX are excluded by the current request.
 
 ## Deferred — explicitly NOT part of C1–C4
 
@@ -104,7 +107,7 @@ This is one shared, optional construction capability: a Battle Tower, passive Am
 - Optional animated cranes/robot builders, per-piece skeletal assembly, continuous geometry deformation and complex stage blending. The first pass can use simple SVG stage swaps + lightweight particles.
 - Major rebalancing of tower damage/range/ammo, multi-cell footprint dimensions, production batch size or drone shipment sizes.
 
-## Full C1–C4 acceptance checklist (C4 visual items remain pending)
+## C1–C4 revised-scope acceptance checklist (manual visual QA pending)
 
 - [x] Costs are charged **once at construction/upgrade start**, never at completion or stage-change.
 - [x] Building occupies whole rectangle immediately; routing/terrain rules remain identical to the completed footprint pass.
@@ -112,7 +115,7 @@ This is one shared, optional construction capability: a Battle Tower, passive Am
 - [x] Timers advance only in unpaused game time; cleanup is safe on fail, deletion and scene unload.
 - [x] Old tower level/stats remain active during timed upgrade; next level applies once on completion.
 - [x] Inspector shows status + correct progress; base gameplay works without SVG/VFX assignments.
-- [ ] At least one 1×1 and one 3×2 construction demonstrate authored stage imagery and optional sparks/completion feedback.
+- [x] Battle1×1 demonstrates authored stage images; shared rectangular transform preservation is tested. Factory images are deferred and sparks/VFX excluded by request.
 - [x] No unrelated ammunition, rank, wallet, navigation, tower-level balance or Campaign/save changes.
 - [x] Document verified tests and actual live-view limitations; update this status, `TOWERS/Shared/Construction/README.md`, `TOWERS/Shared/Upgrades/README.md`, `TOWERS/README.md` and relevant tower/Ammo READMEs **only for work actually completed**.
 

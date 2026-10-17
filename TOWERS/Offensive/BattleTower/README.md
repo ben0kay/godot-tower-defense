@@ -38,4 +38,10 @@ Current complete BattleTowerLevels.cs rows include 1000 reserve / 1 per projecti
 
 ## Initial construction (C1/C2)
 
-Paid placement occupies its footprint immediately and takes **3 seconds**, authored in the Level1 WorkSeconds column of this tower's `*Levels.cs`. It cannot acquire targets/fire/consume ammunition or request deliveries until complete. Completion preserves stats, level, rank and stock. Direct scene fixtures remain operational by default. Current final artwork stays visible; stage SVGs/VFX (C4) remain deferred. C3 Inspector progress is implemented; purchased upgrades use their own WorkSeconds and retain old-tier operation until completion. Duplicate purchases are disabled while work is active. See `TOWERS/Shared/Construction/README.md`.
+Paid placement occupies its footprint immediately and takes **3 seconds**, authored in the Level1 WorkSeconds column of this tower's `*Levels.cs`. It cannot acquire targets/fire/consume ammunition or request deliveries until complete. Completion preserves stats, level, rank and stock. Direct scene fixtures remain operational by default. Initial construction now uses the Battle-only C4 stage SVGs described below; no sparks/VFX. C3 Inspector progress is implemented; purchased upgrades use their own WorkSeconds and retain old-tier operation until completion. Duplicate purchases are disabled while work is active. See `TOWERS/Shared/Construction/README.md`.
+
+## Battle construction artwork (C4 pilot)
+
+Three new64×64 SVGs in `Artwork/Construction/` show foundation (0%), frame (35%) and assembly (70%). Completion restores the unchanged `Artwork/battle_tower.svg`. Current build time remains3 seconds. The default config's ConstructionArt resource exposes all thresholds/textures; its LevelArtwork entries2/3 are optional empty slots for a future intermediate upgrade image and a finished tier image. Current upgrades retain their existing look. No sparks or particles.
+
+The optional shared presenter uses `../TurretPivot/Sprite`, preserving aiming, selection tint and numeric gameplay. Other towers are unchanged. [Artwork preview](Artwork/Construction/construction_preview.svg) shows the actual SVG progression; it is not an in-game screenshot. See `TESTS/Towers/ConstructionArtwork.md` for tests and live playtest checklist.

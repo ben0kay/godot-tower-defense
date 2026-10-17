@@ -1,4 +1,4 @@
-// C1–C3 paid construction/upgrades, sparse work clocks and event-driven Inspector; visual stages remain C4.
+// Shared work clocks, timed paid upgrades, Inspector and Battle-only construction art; no construction VFX.
 using Godot;
 using System;
 using System.Linq;
@@ -15,7 +15,7 @@ public partial class ConstructionChecks : Node
         try
         {
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-            await Timers(); ResultsPause(); await TimedUpgradeChecks.Run(this); ConstructionPlacementChecks.Run(this); ConstructionPerformanceChecks.Run(this);
+            await Timers(); ResultsPause(); ConstructionArtChecks.Run(this); await TimedUpgradeChecks.Run(this); ConstructionPlacementChecks.Run(this); ConstructionPerformanceChecks.Run(this);
             using (AmmoLoopFixture f = new(this))
             {
                 await TowerUpgradeChecks.Run(f.Main);

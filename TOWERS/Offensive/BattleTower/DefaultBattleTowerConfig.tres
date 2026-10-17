@@ -2,5 +2,8 @@
 
 [ext_resource type="Script" path="res://TOWERS/Offensive/BattleTower/BattleTowerConfig.cs" id="1"]
 
+[ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/Artwork/Construction/BattleConstructionArt.tres" id="2_art"]
+
 [resource]
 script = ExtResource("1")
+ConstructionArt = ExtResource("2_art")

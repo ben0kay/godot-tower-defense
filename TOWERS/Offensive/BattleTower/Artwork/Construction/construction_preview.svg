@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="280" viewBox="0 0 960 280">
+<rect width="960" height="280" rx="12" fill="#0b1722"/>
+<rect x="8" y="8" width="224" height="264" rx="8" fill="#112431" stroke="#2e4a5b"/>
+<g transform="translate(24,24) scale(3)">
+  <defs>
+    <linearGradient id="p0_hull" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#728c99"/>
+      <stop offset=".5" stop-color="#344957"/>
+      <stop offset="1" stop-color="#182b38"/>
+    </linearGradient>
+    <linearGradient id="p0_metal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#223846"/>
+      <stop offset=".42" stop-color="#9eb3bd"/>
+      <stop offset=".68" stop-color="#4a6b7c"/>
+      <stop offset="1" stop-color="#1b2d3a"/>
+    </linearGradient>
+  </defs>
+  <path d="M13 8H23L27 13H37L41 8H51L56 13V23L51 27V37L56 41V51L51 56H41L37 51H27L23 56H13L8 51V41L13 37V27L8 23V13Z"
+        fill="#172c3a" stroke="#5c7c8c" stroke-width="1.3"/>
+  <path d="M18 17H46V47H18Z" fill="#203541" stroke="#3c5967" stroke-width="1.2"/>
+  <circle cx="32" cy="32" r="13" fill="none" stroke="#466a79" stroke-width="1" stroke-dasharray="3 3"/>
+  <path d="M25 32H39M32 25V39" stroke="#2e4b5a" stroke-width="1"/>
+  <g fill="#0b1d29" stroke="#668492" stroke-width="1"><circle cx="17" cy="17" r="2"/><circle cx="47" cy="17" r="2"/><circle cx="17" cy="47" r="2"/><circle cx="47" cy="47" r="2"/></g>
+</g>
+<text x="120" y="249" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#c1e0e8">0% — Foundation</text>
+<rect x="248" y="8" width="224" height="264" rx="8" fill="#112431" stroke="#2e4a5b"/>
+<g transform="translate(264,24) scale(3)">
+  <defs>
+    <linearGradient id="p1_hull" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#728c99"/>
+      <stop offset=".5" stop-color="#344957"/>
+      <stop offset="1" stop-color="#182b38"/>
+    </linearGradient>
+    <linearGradient id="p1_metal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#223846"/>
+      <stop offset=".42" stop-color="#9eb3bd"/>
+      <stop offset=".68" stop-color="#4a6b7c"/>
+      <stop offset="1" stop-color="#1b2d3a"/>
+    </linearGradient>
+  </defs>
+  <path d="M13 8H23L27 13H37L41 8H51L56 13V23L51 27V37L56 41V51L51 56H41L37 51H27L23 56H13L8 51V41L13 37V27L8 23V13Z"
+        fill="#172c3a" stroke="#5c7c8c" stroke-width="1.3"/>
+  <path d="M16 13L25 17H39L48 13L51 16V48L48 51L39 47H25L16 51L13 48V16Z" fill="#203743" stroke="#597988" stroke-width="1.4"/>
+  <path d="M15 19L23 24M49 19L41 24M15 45L23 40M49 45L41 40M17 32H47" stroke="#6c8a96" stroke-width="2"/>
+  <circle cx="32" cy="32" r="17.5" fill="#102532" stroke="#72aabd" stroke-width="1.8"/>
+  <circle cx="32" cy="32" r="13.5" fill="none" stroke="#476b7c" stroke-width="2"/>
+  <path d="M24 34L28 26H36L40 34L36 42H28Z" fill="#162c38" stroke="#829ba7" stroke-width="1.5"/>
+  <path d="M28 29L36 39M36 29L28 39" stroke="#4c7181" stroke-width="1.5"/>
+  <rect x="27" y="20" width="10" height="5" rx="1" fill="#314c5c" stroke="#7d929b" stroke-width="1"/>
+  <g fill="#0b1d29" stroke="#668492" stroke-width="1"><circle cx="17" cy="17" r="2"/><circle cx="47" cy="17" r="2"/><circle cx="17" cy="47" r="2"/><circle cx="47" cy="47" r="2"/></g>
+</g>
+<text x="360" y="249" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#c1e0e8">35% — Frame</text>
+<rect x="488" y="8" width="224" height="264" rx="8" fill="#112431" stroke="#2e4a5b"/>
+<g transform="translate(504,24) scale(3)">
+  <defs>
+    <linearGradient id="p2_hull" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#728c99"/>
+      <stop offset=".5" stop-color="#344957"/>
+      <stop offset="1" stop-color="#182b38"/>
+    </linearGradient>
+    <linearGradient id="p2_metal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#223846"/>
+      <stop offset=".42" stop-color="#9eb3bd"/>
+      <stop offset=".68" stop-color="#4a6b7c"/>
+      <stop offset="1" stop-color="#1b2d3a"/>
+    </linearGradient>
+  </defs>
+  <path d="M13 8H23L27 13H37L41 8H51L56 13V23L51 27V37L56 41V51L51 56H41L37 51H27L23 56H13L8 51V41L13 37V27L8 23V13Z"
+        fill="#172c3a" stroke="#5c7c8c" stroke-width="1.3"/>
+  <path d="M16 13L25 17H39L48 13L51 16V48L48 51L39 47H25L16 51L13 48V16Z"
+        fill="url(#p2_hull)" stroke="#081a25" stroke-width="1.4"/>
+  <circle cx="32" cy="32" r="17.5" fill="#152b37" stroke="#72aabd" stroke-width="1.8"/>
+  <circle cx="32" cy="32" r="13.5" fill="#365565" stroke="#0b1d29" stroke-width="2"/>
+  <path d="M17 24L12 19M47 24L52 19M17 40L12 45M47 40L52 45" stroke="#64b9cc" stroke-width="2"/>
+  <path d="M27 28V15L29 12H35L37 15V28Z" fill="url(#p2_metal)" stroke="#101f2a" stroke-width="1.5"/>
+  <path d="M30 13H34V22H30Z" fill="#142b38"/>
+  <circle cx="32" cy="34" r="10.5" fill="#253e4d" stroke="#8aaab4" stroke-width="1.5"/>
+  <path d="M24 34L28 26H36L40 34L36 42H28Z" fill="#476776" stroke="#152936" stroke-width="1.2"/>
+  <circle cx="32" cy="34" r="4.2" fill="#1c3441" stroke="#668b99" stroke-width="1.1"/>
+  <rect x="17" y="28.5" width="3" height="7" rx="1" fill="#375e70"/>
+  <rect x="44" y="28.5" width="3" height="7" rx="1" fill="#375e70"/>
+
+</g>
+<text x="600" y="249" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#c1e0e8">70% — Assembly</text>
+<rect x="728" y="8" width="224" height="264" rx="8" fill="#112431" stroke="#2e4a5b"/>
+<g transform="translate(744,24) scale(3)">
+  <defs>
+    <linearGradient id="p3_hull" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#728c99"/>
+      <stop offset=".5" stop-color="#344957"/>
+      <stop offset="1" stop-color="#182b38"/>
+    </linearGradient>
+    <linearGradient id="p3_metal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#223846"/>
+      <stop offset=".42" stop-color="#9eb3bd"/>
+      <stop offset=".68" stop-color="#4a6b7c"/>
+      <stop offset="1" stop-color="#1b2d3a"/>
+    </linearGradient>
+  </defs>
+  <!-- Compact sci-fi pad and fixed circular base; one-piece placeholder. -->
+  <path d="M13 8H23L27 13H37L41 8H51L56 13V23L51 27V37L56 41V51L51 56H41L37 51H27L23 56H13L8 51V41L13 37V27L8 23V13Z"
+        fill="#172c3a" stroke="#5c7c8c" stroke-width="1.3"/>
+  <path d="M16 13L25 17H39L48 13L51 16V48L48 51L39 47H25L16 51L13 48V16Z"
+        fill="url(#p3_hull)" stroke="#081a25" stroke-width="1.4"/>
+  <circle cx="32" cy="32" r="17.5" fill="#152b37" stroke="#72aabd" stroke-width="1.8"/>
+  <circle cx="32" cy="32" r="13.5" fill="#365565" stroke="#0b1d29" stroke-width="2"/>
+  <path d="M17 24L12 19M47 24L52 19M17 40L12 45M47 40L52 45" stroke="#64b9cc" stroke-width="2"/>
+  <!-- One barrel facing upward; separate base/head/muzzle later. -->
+  <path d="M26 28V7L29 4H35L38 7V28Z" fill="url(#p3_metal)" stroke="#101f2a" stroke-width="1.5"/>
+  <rect x="28.5" y="3.5" width="7" height="5" rx="1" fill="#172833" stroke="#8edbe3" stroke-width="1.1"/>
+  <path d="M32 10V25" stroke="#abdfe8" stroke-opacity=".72" stroke-width="1.4"/>
+  <circle cx="32" cy="34" r="10.5" fill="#253e4d" stroke="#b5d8dd" stroke-width="1.5"/>
+  <path d="M24 34L28 26H36L40 34L36 42H28Z" fill="#476776" stroke="#152936" stroke-width="1.2"/>
+  <circle cx="32" cy="34" r="4.2" fill="#65c6d5" stroke="#d0faff" stroke-width="1.1"/>
+  <circle cx="32" cy="34" r="1.5" fill="#e0ffff"/>
+  <rect x="17" y="28.5" width="3" height="7" rx="1" fill="#5fc2d3"/>
+  <rect x="44" y="28.5" width="3" height="7" rx="1" fill="#5fc2d3"/>
+</g>
+<text x="840" y="249" text-anchor="middle" font-family="sans-serif" font-size="16" fill="#c1e0e8">100% — Operational</text>
+</svg>

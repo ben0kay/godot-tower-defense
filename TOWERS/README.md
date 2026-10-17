@@ -99,7 +99,7 @@ The intent of "fixed" is **not increased by buying a tower level**; research and
 
 ### C. Suggested future implementation passes
 
-1. **Timed construction/upgrades C1–C3 implemented; visual stages C4 remain planned.** Initial placement blocks weapons/production/logistics until complete; paid upgrades keep the old tier operating and the Inspector shows work progress/time. **Codex pass C1–C4:** [Shared/Construction/TIMED_CONSTRUCTION_PASS.md](Shared/Construction/TIMED_CONSTRUCTION_PASS.md), including future authored SVG build stages and optional sparks/VFX. See the construction README for current durations and behavior.
+1. **Timed construction/upgrades C1–C3 and Battle-only C4 stage artwork implemented.** Initial placement blocks weapons/production/logistics until complete; paid upgrades keep the old tier operating and the Inspector shows work progress/time. **Codex pass C1–C4:** [Shared/Construction/TIMED_CONSTRUCTION_PASS.md](Shared/Construction/TIMED_CONSTRUCTION_PASS.md), including Battle stage SVGs and optional future per-level artwork. Other building stage art is deferred; sparks/VFX are excluded by the latest request. See the construction README for current durations and behavior.
 2. **Tower HP and optional shields**, damage/repair foundations and Inspector readouts.
 3. **Completed:** generic local ammunition storage/consumption and the first physical two-leg supply loop. Magazines/reloads remain future work.
 4. **Optional magazines/reload timers**, for applicable weapons only.
