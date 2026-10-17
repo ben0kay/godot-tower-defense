@@ -41,6 +41,9 @@ public partial class ShieldVisual : Node2D
     public void SetShield(float previous, float current, bool animate = true)
     {
         if (_aura == null) return;
+        // Sustained beams may damage the same shield at 60+Hz: do not restart the same flash each tick.
+        if (animate && current > 0f && current < previous && HasShieldVisual &&
+            _feedbackTween != null && _feedbackTween.IsValid() && _feedbackTween.IsRunning()) return;
         StopFeedback();
         if (current > 0f)
         {
