@@ -48,7 +48,7 @@ public static class MultiBarrelTowerChecks
         Require(sniperAuthored.ResolveStats(1).DamagePerShot == 80
             && sniperAuthored.ResolveStats(2).RangePixels == 456 && sniperAuthored.Ranks[1].TotalXp == 1000,
             "Sniper complete levels and earned ranks resolve");
-        Require(gunAuthored.ResolveStats(1).ShotsPerSecond == 12 && gunAuthored.ResolveStats(3).DamagePerShot == 9
+        Require(Mathf.IsEqualApprox(gunAuthored.ResolveStats(1).ShotsPerSecond, 14.4f) && gunAuthored.ResolveStats(3).DamagePerShot == 9
             && gunAuthored.Ranks[4].TotalXp == 15000, "Machine Gun complete levels and earned ranks resolve");
 
         Node2D towers = main.GetNode<Node2D>("World/Towers");
@@ -86,8 +86,8 @@ public static class MultiBarrelTowerChecks
             gun.GlobalPosition = Origin + new Vector2(0, 64);
             gun.Config.TargetPriority = TowerTargeting.Priority.Closest;
             Require(gun.MuzzleCount == 2 && gun.Config.FiringMode == BarrelFireMode.Sequential
-                && gun.Ammunition.Inventory.Amount == 1200 && gun.FinalStats.DamagePerShot == 7 && gun.FinalStats.ShotsPerSecond == 12,
-                "Machine Gun starts with two muzzles and a twelve-bullets-per-second shared attack rate");
+                && gun.Ammunition.Inventory.Amount == 1200 && gun.FinalStats.DamagePerShot == 7 && Mathf.IsEqualApprox(gun.FinalStats.ShotsPerSecond, 14.4f),
+                "Machine Gun starts with two muzzles and a 14.4-bullets-per-second shared attack rate");
             Marker2D a = gun.GetNode<Marker2D>("TurretPivot/Muzzles/MuzzleA");
             Marker2D b = gun.GetNode<Marker2D>("TurretPivot/Muzzles/MuzzleB");
 
@@ -122,15 +122,15 @@ public static class MultiBarrelTowerChecks
             Require(gun.CurrentRank.Rank == TowerRank.Veteran && gun.UpgradeLevel == 1
                 && gun.FinalStats.RangePixels > 208, "Earned rank changes range without purchasing a level");
             Require(gun.ResolveLevel(2).DamagePerShot >= 8 && gun.Levels[1].Stats.DamagePerShot == 8
-                && Mathf.IsEqualApprox(gun.Levels[1].Stats.ShotsPerSecond, 12.4f)
-                && Mathf.IsEqualApprox(gun.Levels[2].Stats.ShotsPerSecond, 12.8f),
+                && Mathf.IsEqualApprox(gun.Levels[1].Stats.ShotsPerSecond, 14.88f)
+                && Mathf.IsEqualApprox(gun.Levels[2].Stats.ShotsPerSecond, 15.36f),
                 "Upgrade previews retain gentle damage and real fractional rate increases");
 
             // Keep the target stationary and destroy each projectile before its next tick:
             // test the actual firing cadence without changing enemy health or tracking.
             Require(gun.Ammunition.Inventory.TryAdd(1199), "Cadence fixture refills the depleted reserve");
             gun.Config.FiringMode = BarrelFireMode.Sequential;
-            foreach (float rate in new[] { 12f, 12.4f, 12.8f })
+            foreach (float rate in new[] { 14.4f, 14.88f, 15.36f })
             {
                 gun.Config.ShotsPerSecond = rate;
                 long beforeShots = gun.Ammunition.ConsumedRounds;

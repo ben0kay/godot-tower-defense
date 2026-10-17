@@ -31,7 +31,7 @@ public static class TowerUpgradeChecks
                 Require(first.ResolveLevel(level).ShieldPenetration == 0.05f, "Purchased tiers never increase base penetration");
             TowerFinalStats preview = first.ResolveLevel(2);
             VerifyTypedComparison();
-            Require(preview.DamagePerShot == 33 && Mathf.IsEqualApprox(preview.ShotsPerSecond, 1.47f)
+            Require(preview.DamagePerShot == 33 && Mathf.IsEqualApprox(preview.ShotsPerSecond, 1.764f)
                 && preview.RangePixels == 264 && first.FinalStats == initial && first.UpgradeLevel == 1,
                 "Next-tier preview selects a full snapshot without changing live stats or progression");
             wallet.Initialize(new LevelConfig { StartingCredits = 149 });
@@ -74,7 +74,7 @@ public static class TowerUpgradeChecks
             TowerFinalStats levelThree = first.ResolveLevel(3);
             hud.EmitSignal(GameplayHUD.SignalName.TowerUpgradeRequested); ConstructionTestClock.FinishWork(battle);
             Require(first.UpgradeLevel == 3 && first.FinalStats == levelThree &&
-                first.FinalStats.DamagePerShot == 36 && Mathf.IsEqualApprox(first.FinalStats.ShotsPerSecond, 1.54f) &&
+                first.FinalStats.DamagePerShot == 36 && Mathf.IsEqualApprox(first.FinalStats.ShotsPerSecond, 1.848f) &&
                 wallet.GetBalance(wallet.CreditsResource) == 0, "Second purchase selects the complete level3 snapshot");
             Require(stats.Text.Contains("Shield Penetration: 5%") && first.FinalStats.ShieldPenetration == 0.05f,
                 "Level3 Inspector retains baseline penetration");

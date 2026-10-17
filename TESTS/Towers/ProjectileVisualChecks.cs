@@ -93,7 +93,7 @@ public partial class ProjectileVisualChecks : Node
         MachineGunTower gun = f.Add<MachineGunTower>("machine_gun", new(2000, 2064));
         Enemy enemy = f.Target(new(2000, 2000)); gun.Config.TargetPriority = TowerTargeting.Priority.Closest;
         var renderer = gun.GetNode<WeaponVisualRenderer>("TurretPivot/WeaponVisuals");
-        int nodes = CountNodes(gun); Require(gun.FinalStats.ShotsPerSecond == 12, "Cadence remains twelve total bullets/s");
+        int nodes = CountNodes(gun); Require(Mathf.IsEqualApprox(gun.FinalStats.ShotsPerSecond, 14.4f), "Cadence is 14.4 total bullets/s after 20% increase");
         for (int i = 0; i < 10; i++)
         {
             gun._PhysicsProcess(.1); BasicProjectile shot = Shot(f);
