@@ -1,5 +1,13 @@
 # WORK — Consolidated Outstanding Implementation Backlog
 
+## Inspector visual trim / right-side bars — 2026-10-17
+
+- [x] Narrowed `InspectorPanel.tscn` and the HUD default from **620×330** to nominal **560×330**; the Main stats/paid-upgrade area shrinks, while the six target-priority buttons retain their original **210px right-section layout**.
+- [x] Moved the Heat text/bar under the right-side Combat Rank/XP bar. Left-side disabled reasons remain independent. Adjusted `GameplayHUD.cs` cached paths and Heat/Inspector/upgrade regression expectations; no placement/Ctrl/visibility/targeting/heat mechanics changes.
+- [ ] **Verify in Godot after the latest commit:** run `TESTS/UI/CompactInspectorChecks.tscn`, `HeatInspectorChecks.tscn`, `InspectorTargetingChecks.tscn` and existing HUD/upgrade test suites. Visually review all nine families, the hot+disabled+Legendary/active-upgrade worst case, header/title and CURRENT/NEXT/GAIN alignment at multiple viewports; ensure no right-side wrap/clipping or unexpected height expansion. These checks have **not been executed for 560px**. Codex's separate placement-mode Inspector/HUD visibility pass must retain this new layout and node paths. See [Inspector current layout](../UI/GameplayHUD/Inspector/README.md).
+
+---
+
 ## Battle research proof node — implemented 2026-10-17
 
 - [x] **Battle Tower Weapons I:** battle_weapons_1, 1 RP, requires Research Core, axial (-1,0), +5% Battle Tower damage from the next mission. Saved ownership/RP use the existing progression v2 record; no new currency or XP scoring rules.
