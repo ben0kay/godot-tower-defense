@@ -130,3 +130,7 @@ The [Construction](Shared/Construction/README.md), [Ammunition](Shared/Ammunitio
 ## Cryo Tower — implemented CT1–CT3
 
 Cryo is a catalog-registered Offensive Energy projectile tower, with permanent nonstacking 33% Slow and unslowed/nonimmune-only targeting. It reuses shared construction, physical ammo, paid absolute levels, earned ranks and cached stats. See [Cryo](Offensive/CryoTower/README.md) and [status architecture](../ENEMIES/StatusEffects/README.md). Stasis and timed statuses remain deferred.
+
+## Compact Inspector and six priorities — IT1–IT4
+
+Placed aimed weapons (including Cryo) expose independent First/Last/Closest/Farthest/Strongest/Weakest choices. The bottom-right Inspector is now700×330, two-column and non-scrollable, with typed current/next/gain stats beside rank/targeting/ammo. Full-journey First/Last estimates include captured checkpoint chains via shared budgeted caching. No targeting choices for Shockwave/Factory/Depot; Cryo retains strict unslowed/nonimmune eligibility. See UI/GameplayHUD/Inspector/README.md and TESTS/UI/InspectorTargeting.md for actual verification and remaining desktop review.

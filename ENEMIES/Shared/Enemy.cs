@@ -9,6 +9,7 @@ public partial class Enemy : Node2D
     public float CurrentShield { get; private set; }
     public bool IsAlive { get; private set; }
     public EnemyMovement Movement { get; private set; }
+    public float RemainingJourneyDistance => Movement?.RemainingJourneyDistance ?? float.PositiveInfinity;
     public float RemainingPathDistance => Movement?.RemainingPathDistance ?? float.PositiveInfinity;
     public event Action<Enemy> Removed;
     public event Action<Enemy> KilledBeforeRemoval;

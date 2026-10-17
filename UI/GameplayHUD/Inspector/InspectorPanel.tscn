@@ -1,14 +1,12 @@
 [gd_scene format=3]
 
 [node name="Inspector" type="PanelContainer"]
-custom_minimum_size = Vector2(540, 325)
+custom_minimum_size = Vector2(700, 330)
 size_flags_vertical = 8
 mouse_filter = 0
 
-[node name="Insets" type="ScrollContainer" parent="."]
+[node name="Insets" type="MarginContainer" parent="."]
 layout_mode = 2
-horizontal_scroll_mode = 0
-vertical_scroll_mode = 1
 
 [node name="Body" type="VBoxContainer" parent="Insets"]
 layout_mode = 2
@@ -17,160 +15,164 @@ theme_override_constants/separation = 6
 
 [node name="Heading" type="HBoxContainer" parent="Insets/Body"]
 layout_mode = 2
+theme_override_constants/separation = 8
 
-[node name="Title" type="Label" parent="Insets/Body/Heading"]
+[node name="TowerName" type="Label" parent="Insets/Body/Heading"]
 layout_mode = 2
-text = "INSPECTOR"
-theme_override_font_sizes/font_size = 14
-
-[node name="Spacer" type="Control" parent="Insets/Body/Heading"]
-layout_mode = 2
-mouse_filter = 2
+text = "No tower selected"
+theme_override_font_sizes/font_size = 16
 size_flags_horizontal = 3
 
+[node name="WorkSection" type="VBoxContainer" parent="Insets/Body/Heading"]
+layout_mode = 2
+visible = false
+theme_override_constants/separation = 1
+
+[node name="Status" type="Label" parent="Insets/Body/Heading/WorkSection"]
+layout_mode = 2
+text = "OPERATIONAL"
+theme_override_font_sizes/font_size = 11
+
+[node name="Progress" type="ProgressBar" parent="Insets/Body/Heading/WorkSection"]
+layout_mode = 2
+custom_minimum_size = Vector2(140, 6)
+show_percentage = false
+mouse_filter = 2
+step = 0.01
+
+[node name="Time" type="Label" parent="Insets/Body/Heading/WorkSection"]
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 10
+
 [node name="CloseButton" type="Button" parent="Insets/Body/Heading"]
-custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 text = "X"
 flat = true
+custom_minimum_size = Vector2(24, 24)
 tooltip_text = "Close inspector"
 
-[node name="TowerName" type="Label" parent="Insets/Body"]
+[node name="Columns" type="HBoxContainer" parent="Insets/Body"]
 layout_mode = 2
-autowrap_mode = 3
-text = "No tower selected"
-theme_override_font_sizes/font_size = 17
+theme_override_constants/separation = 14
 
-[node name="TowerCategory" type="Label" parent="Insets/Body"]
-layout_mode = 2
-autowrap_mode = 3
-text = "CATEGORY"
-theme_override_font_sizes/font_size = 12
-
-[node name="WorkSection" type="VBoxContainer" parent="Insets/Body"]
-visible = false
-layout_mode = 2
-theme_override_constants/separation = 3
-
-[node name="Status" type="Label" parent="Insets/Body/WorkSection"]
-layout_mode = 2
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 13
-text = "OPERATIONAL"
-
-[node name="Progress" type="ProgressBar" parent="Insets/Body/WorkSection"]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 8)
-mouse_filter = 2
-show_percentage = false
-step = 0.01
-
-[node name="Time" type="Label" parent="Insets/Body/WorkSection"]
-layout_mode = 2
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 11
-
-[node name="TargetSection" type="VBoxContainer" parent="Insets/Body"]
-visible = false
-layout_mode = 2
-theme_override_constants/separation = 3
-
-[node name="Divider" type="HSeparator" parent="Insets/Body/TargetSection"]
-layout_mode = 2
-
-[node name="TargetHeading" type="Label" parent="Insets/Body/TargetSection"]
-layout_mode = 2
-text = "TARGET PRIORITY"
-theme_override_font_sizes/font_size = 12
-
-[node name="TargetValue" type="Label" parent="Insets/Body/TargetSection"]
-layout_mode = 2
-text = "First"
-theme_override_font_sizes/font_size = 13
-
-[node name="RankSection" type="VBoxContainer" parent="Insets/Body"]
-visible = false
-layout_mode = 2
-theme_override_constants/separation = 3
-
-[node name="Divider" type="HSeparator" parent="Insets/Body/RankSection"]
-layout_mode = 2
-
-[node name="RankHeading" type="Label" parent="Insets/Body/RankSection"]
-layout_mode = 2
-text = "COMBAT RANK  ·  EARNED IN COMBAT"
-theme_override_font_sizes/font_size = 12
-
-[node name="Rank" type="Label" parent="Insets/Body/RankSection"]
-layout_mode = 2
-autowrap_mode = 3
-text = "Rank: Standard"
-theme_override_font_sizes/font_size = 13
-
-[node name="ExperienceBar" type="ProgressBar" parent="Insets/Body/RankSection"]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 8)
-mouse_filter = 2
-show_percentage = false
-
-[node name="ExperienceText" type="Label" parent="Insets/Body/RankSection"]
-layout_mode = 2
-autowrap_mode = 3
-text = "0 / 100 XP to Veteran"
-theme_override_font_sizes/font_size = 11
-
-[node name="RankBonuses" type="Label" parent="Insets/Body/RankSection"]
-layout_mode = 2
-autowrap_mode = 3
-text = "Rank bonuses: Damage +0% / Range +0%"
-theme_override_font_sizes/font_size = 11
-
-[node name="UpgradeDivider" type="HSeparator" parent="Insets/Body"]
-visible = false
-layout_mode = 2
-
-[node name="UpgradeTitle" type="Label" parent="Insets/Body"]
-visible = false
-layout_mode = 2
-text = "PAID UPGRADE  ·  CREDITS"
-theme_override_font_sizes/font_size = 12
-
-[node name="UpgradeComparison" type="GridContainer" parent="Insets/Body"]
-visible = false
+[node name="Main" type="VBoxContainer" parent="Insets/Body/Columns"]
 layout_mode = 2
 size_flags_horizontal = 3
-columns = 4
-theme_override_constants/h_separation = 10
-theme_override_constants/v_separation = 4
+theme_override_constants/separation = 4
 
-[node name="UpgradeInfo" type="Label" parent="Insets/Body"]
+[node name="UpgradeDivider" type="HSeparator" parent="Insets/Body/Columns/Main"]
+layout_mode = 2
 visible = false
-layout_mode = 2
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 12
 
-[node name="UpgradeButton" type="Button" parent="Insets/Body"]
-visible = false
+[node name="UpgradeTitle" type="Label" parent="Insets/Body/Columns/Main"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 30)
-text = "UPGRADE"
-
-[node name="DetailsToggle" type="Button" parent="Insets/Body"]
-visible = false
-layout_mode = 2
-custom_minimum_size = Vector2(0, 26)
-text = "ADDITIONAL DETAILS ▸"
-tooltip_text = "Show detailed stats, ammunition and grid information"
-
-[node name="TowerStats" type="Label" parent="Insets/Body"]
-layout_mode = 2
-autowrap_mode = 3
-text = "Prototype stats"
-theme_override_font_sizes/font_size = 13
-
-[node name="Notes" type="Label" parent="Insets/Body"]
-layout_mode = 2
-text = "Select a tower to preview."
-autowrap_mode = 3
+text = "STATS / PAID UPGRADE"
 theme_override_font_sizes/font_size = 11
 
+[node name="UpgradeComparison" type="GridContainer" parent="Insets/Body/Columns/Main"]
+visible = false
+layout_mode = 2
+columns = 4
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 2
+
+[node name="UpgradeInfo" type="Label" parent="Insets/Body/Columns/Main"]
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 11
+autowrap_mode = 3
+
+[node name="UpgradeButton" type="Button" parent="Insets/Body/Columns/Main"]
+layout_mode = 2
+text = "UPGRADE"
+custom_minimum_size = Vector2(0, 28)
+
+[node name="TowerStats" type="Label" parent="Insets/Body/Columns/Main"]
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+
+[node name="Notes" type="Label" parent="Insets/Body/Columns/Main"]
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 11
+visible = false
+
+[node name="Divider" type="VSeparator" parent="Insets/Body/Columns"]
+layout_mode = 2
+
+[node name="Side" type="VBoxContainer" parent="Insets/Body/Columns"]
+layout_mode = 2
+custom_minimum_size = Vector2(210, 0)
+theme_override_constants/separation = 6
+
+[node name="TargetSection" type="VBoxContainer" parent="Insets/Body/Columns/Side"]
+layout_mode = 2
+visible = false
+theme_override_constants/separation = 3
+
+[node name="TargetHeading" type="Label" parent="Insets/Body/Columns/Side/TargetSection"]
+layout_mode = 2
+text = "TARGET PRIORITY"
+theme_override_font_sizes/font_size = 11
+
+[node name="TargetValue" type="Label" parent="Insets/Body/Columns/Side/TargetSection"]
+layout_mode = 2
+text = "First"
+theme_override_font_sizes/font_size = 12
+visible = false
+
+[node name="Choices" type="GridContainer" parent="Insets/Body/Columns/Side/TargetSection"]
+layout_mode = 2
+columns = 3
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+
+[node name="RankSection" type="VBoxContainer" parent="Insets/Body/Columns/Side"]
+layout_mode = 2
+visible = false
+theme_override_constants/separation = 3
+
+[node name="Divider" type="HSeparator" parent="Insets/Body/Columns/Side/RankSection"]
+layout_mode = 2
+
+[node name="RankHeading" type="Label" parent="Insets/Body/Columns/Side/RankSection"]
+layout_mode = 2
+text = "COMBAT RANK · EARNED XP"
+theme_override_font_sizes/font_size = 11
+
+[node name="Rank" type="Label" parent="Insets/Body/Columns/Side/RankSection"]
+layout_mode = 2
+text = "Standard"
+theme_override_font_sizes/font_size = 13
+
+[node name="ExperienceBar" type="ProgressBar" parent="Insets/Body/Columns/Side/RankSection"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 7)
+show_percentage = false
+mouse_filter = 2
+
+[node name="ExperienceText" type="Label" parent="Insets/Body/Columns/Side/RankSection"]
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 11
+autowrap_mode = 3
+
+[node name="RankBonuses" type="Label" parent="Insets/Body/Columns/Side/RankSection"]
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 11
+autowrap_mode = 3
+
+[node name="RuntimeStats" type="Label" parent="Insets/Body/Columns/Side"]
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 11
+autowrap_mode = 3
+
+[node name="TowerCategory" type="Label" parent="Insets/Body/Columns/Side"]
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 11

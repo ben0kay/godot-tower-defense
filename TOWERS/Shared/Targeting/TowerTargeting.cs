@@ -4,20 +4,23 @@ using System;
 
 public static class TowerTargeting
 {
-    public enum Priority { First, Closest }
+    public enum Priority { First = 0, Closest = 1, Last = 2, Farthest = 3, Strongest = 4, Weakest = 5 }
 
     // =========================================================
     // Search only living enemies in firing range; stale/failed paths cannot win First.
     public static Enemy Find(EnemyRegistry registry, Vector2 position, float range, Priority priority, StatusEffectId? requiredEffect = null)
     {
+        if (!Enum.IsDefined(priority)) throw new ArgumentOutOfRangeException(nameof(priority));
         if (!float.IsFinite(range) || range < 0) throw new ArgumentOutOfRangeException(nameof(range));
         TargetVisitor visitor = new() { Position = position, RangeSquared = range * range, Mode = priority,
-            Score = float.PositiveInfinity, Order = ulong.MaxValue, RequiredEffect = requiredEffect };
+            Score = Largest(priority) ? float.NegativeInfinity : float.PositiveInfinity, Order = ulong.MaxValue, RequiredEffect = requiredEffect };
         // Preserve the old float-distance inclusive boundary; narrow scoring still uses its exact comparison.
         float queryRange = float.IsFinite(MathF.BitIncrement(range)) ? MathF.BitIncrement(range) : range;
         registry.VisitEnemiesInRadius(position, queryRange, ref visitor);
         return visitor.Best;
     }
+
+    private static bool Largest(Priority mode) => mode is Priority.Last or Priority.Farthest or Priority.Strongest;
 
     private struct TargetVisitor : EnemySpatialIndex.INeighborVisitor
     {
@@ -34,8 +37,15 @@ public static class TowerTargeting
             if (!Eligible(nearby.Enemy, RequiredEffect)) return;
             float distance = Position.DistanceSquaredTo(nearby.Position);
             if (distance > RangeSquared) return;
-            float candidate = Mode == Priority.First ? nearby.Enemy.RemainingPathDistance : distance;
-            if (candidate < Score || (Best != null && candidate == Score && nearby.Order < Order))
+            float candidate = Mode switch
+            {
+                Priority.First or Priority.Last => nearby.Enemy.RemainingJourneyDistance,
+                Priority.Strongest or Priority.Weakest => nearby.Enemy.Health + nearby.Enemy.CurrentShield,
+                _ => distance
+            };
+            if (!float.IsFinite(candidate)) return;
+            if ((Largest(Mode) ? candidate > Score : candidate < Score)
+                || (Best != null && candidate == Score && nearby.Order < Order))
             { Score = candidate; Best = nearby.Enemy; Order = nearby.Order; }
         }
     }

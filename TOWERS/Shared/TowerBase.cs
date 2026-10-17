@@ -15,6 +15,20 @@ public abstract partial class TowerBase : Node2D
     public event Action StatsChanged;
     public event Action RuntimeChanged;
     public TowerAmmunition Ammunition { get; private set; }
+    public event Action TargetPriorityChanged;
+    public TowerTargeting.Priority? TargetPriority => AuthoredConfig is ITowerTargetingPolicy policy ? policy.TargetPriority : null;
+    // =========================================================
+    // Selection policy changes cost nothing and never rebuild the combat stat cache or touch cooldown/ammo.
+    public bool SetTargetPriority(TowerTargeting.Priority priority)
+    {
+        if (!IsInsideTree() || IsQueuedForDeletion() || GetTree().Paused || !System.Enum.IsDefined(priority)
+            || AuthoredConfig is not ITowerTargetingPolicy policy) return false;
+        if (policy.TargetPriority == priority) return true;
+        policy.TargetPriority = priority; OnTargetPriorityChanged(); TargetPriorityChanged?.Invoke(); return true;
+    }
+    // =========================================================
+    // Aimed weapons request one fresh acquisition on their next normal physics tick.
+    protected virtual void OnTargetPriorityChanged() { }
     public virtual string DescribeRuntime() => Ammunition?.Describe() ?? "";
     internal void NotifyRuntimeChanged() => RuntimeChanged?.Invoke();
     public event Action ExperienceChanged;

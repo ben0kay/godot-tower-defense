@@ -2,6 +2,10 @@
 using Godot;
 public partial class LaserTower : TowerBase
 {
+    // =========================================================
+    // Keep firing/aiming cadence intact; only invalidate the target search deadline.
+    protected override void OnTargetPriorityChanged() => _searchTimer = 0;
+
     #region Configuration and Cached State
     private LaserTowerConfig _config;
     private bool _ready, _enabled = true;

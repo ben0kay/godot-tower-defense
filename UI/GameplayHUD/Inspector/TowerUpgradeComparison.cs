@@ -17,7 +17,7 @@ public static class TowerUpgradeComparison
         if (current == null || next == null) return rows;
         bool beam = current.Beam.HasValue && next.Beam.HasValue;
         bool wave = current.Shockwave.HasValue && next.Shockwave.HasValue;
-        bool projectile = !beam && !wave && current.Weapon.HasValue && next.Weapon.HasValue;
+        bool projectile = !beam && !wave;
         if (beam) Add(rows, "DPS", current.Beam.Value.DamagePerSecond, next.Beam.Value.DamagePerSecond, 2);
         else if (wave) Add(rows, "Wave Damage", current.Shockwave.Value.DamagePerWave, next.Shockwave.Value.DamagePerWave, 2);
         else if (projectile) Add(rows, "Damage", current.DamagePerShot, next.DamagePerShot, 0);
@@ -27,6 +27,7 @@ public static class TowerUpgradeComparison
             Add(rows, "Fire Rate (/s)", current.ShotsPerSecond, next.ShotsPerSecond, 2);
             Add(rows, "Projectile (px/s)", current.ProjectileSpeed, next.ProjectileSpeed, 1);
         }
+        if (current.Slow.HasValue && next.Slow.HasValue) Add(rows, "Slow (%)", current.Slow.Value.Fraction * 100d, next.Slow.Value.Fraction * 100d, 1);
         if (current.Area.HasValue && next.Area.HasValue)
         {
             Add(rows, "Blast Radius (px)", current.Area.Value.RadiusPixels, next.Area.Value.RadiusPixels, 1);
@@ -38,9 +39,9 @@ public static class TowerUpgradeComparison
             Add(rows, "Wave Interval (s)", current.Shockwave.Value.IntervalSeconds, next.Shockwave.Value.IntervalSeconds, 2, false);
             Add(rows, "Wave Edge (%)", current.Shockwave.Value.EdgeDamageFraction * 100d, next.Shockwave.Value.EdgeDamageFraction * 100d, 1);
         }
+        Add(rows, "Shield Pen. (%)", current.ShieldPenetration * 100d, next.ShieldPenetration * 100d, 1);
         if (current.Weapon.HasValue && next.Weapon.HasValue)
         {
-            Add(rows, "Shield Pen. (%)", current.ShieldPenetration * 100d, next.ShieldPenetration * 100d, 1);
             WeaponDamageStats before = current.Weapon.Value, after = next.Weapon.Value;
             if (before.Type != after.Type)
                 rows.Add(new("Damage Type", before.Type.ToString(), after.Type.ToString(), "Changed", TowerUpgradeGain.Neutral));

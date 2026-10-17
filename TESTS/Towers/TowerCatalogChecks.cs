@@ -49,8 +49,8 @@ public static class TowerCatalogChecks
             "Passive tower needs no artificial weapon stats, range or ticks");
         Require(wallet.GetBalance(wallet.CreditsResource) == 925 && p.AuthoredConfig != passive.DefaultConfig &&
             p.AuthoredConfig.ConstructionCosts[0] != passive.DefaultConfig.ConstructionCosts[0], "Passive recipe paid with private config/cost data");
-        Require(hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerName").Text == "Passive fixture" &&
-            !hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/UpgradeButton").Visible, "Actual passive selection has safe no-upgrades Inspector");
+        Require(hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Heading/TowerName").Text == "Passive fixture · Lv 1" &&
+            !hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeButton").Visible, "Actual passive selection has safe no-upgrades Inspector");
         placement.Call("TryPlace", first); ConstructionTestClock.FinishInitial(main);
         Require(wallet.GetBalance(wallet.CreditsResource) == 925, "Repeat passive placement never charges");
         hud.EmitSignal(GameplayHUD.SignalName.TowerChoiceRequested, "battle");
@@ -62,7 +62,7 @@ public static class TowerCatalogChecks
             b.UpgradeLevel == 2 && p.UpgradeLevel == 1 && b.FinalStats.DamagePerShot == 33 &&
             wallet.GetBalance(wallet.CreditsResource) == 575, "Mixed types retain independent progression and paid Battle upgrades");
         placement.Call("SelectTower", p);
-        Require(hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerName").Text == passive.DisplayName,
+        Require(hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Heading/TowerName").Text == passive.DisplayName + " · Lv " + p.UpgradeLevel,
             "Selection reads actual tower rather than last build config");
         passive.Available = false;
         hud.EmitSignal(GameplayHUD.SignalName.TowerChoiceRequested, passive.TowerId);

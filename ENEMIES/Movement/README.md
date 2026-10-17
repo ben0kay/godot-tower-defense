@@ -67,3 +67,7 @@ A checkpoint's NextCheckpoints list may be empty (Citadel), single (chain) or mu
 ## Effective status speed
 
 Cryo CT1 changes only the travel-speed input to Enemy.EffectiveMoveSpeed. No effect mutates authored speed or requests a new route. Existing clearance, checkpoint progress, spatial notifications and swept Lava segment timing use the same movement code. Permanent Slow needs no timer; stationary Lava damage remains owned by InteractiveTileManager.
+
+## IT4 full-journey targeting score
+
+RemainingPathDistance remains current-leg refined physical distance. RemainingJourneyDistance adds a cached, shared downstream checkpoint estimate; both First and Last exclude unavailable/stale scores. A valid normal Citadel route retains its old score. PathRequestManager computes tails only within spare existing budgets. Captured checkpoint choices, actual travel/corridor offsets, clearance, Lava and route handoffs are unchanged. See TOWERS/Shared/Targeting/README.md.

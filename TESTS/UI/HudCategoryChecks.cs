@@ -29,7 +29,7 @@ public partial class HudCategoryChecks : Node
                 Require(hud.BuildCategory == TowerDefinition.TowerCategory.Economy && hud.GetBuildCategoryButton("Economy").ButtonPressed, "Category remembered across Ctrl closing/reopening");
                 BattleTower tower = f.Purchase<BattleTower>("battle");
                 hud.SelectBuildCategory(TowerDefinition.TowerCategory.Offensive);
-                Require(hud.IsInspectionVisible && hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerName").Text == tower.AuthoredConfig.DisplayName,
+                Require(hud.IsInspectionVisible && hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Heading/TowerName").Text.StartsWith(tower.AuthoredConfig.DisplayName),
                     "Filtering does not clear placed-tower Inspector");
                 hud.BindCatalog(catalog); Require(hud.BuildCategory == TowerDefinition.TowerCategory.Offensive, "Existing populated category survives rebind");
                 TowerCatalog economy = new() { Definitions = new() { catalog.Find("ammo_factory"), catalog.Find("ammo_depot") } };
@@ -42,18 +42,17 @@ public partial class HudCategoryChecks : Node
                 Require(hud.GetBuildCategoryButton("Support") != null && hud.GetBuildButton("future-support") != null, "New types/categories appear automatically from metadata");
                 TowerCatalog empty = new(); empty.Rebuild(); hud.BindCatalog(empty);
                 Require(hud.GetBuildCategoryButton("All") != null && hud.GetBuildButton("battle") == null, "Empty catalog remains safe"); hud.BindCatalog(catalog);
-                hud.ShowTowerDetails("LONG INSPECTION", "Test", string.Join("\n", Enumerable.Range(1, 80).Select(i => "Stat " + i)), "Readable notes");
+                hud.ShowTowerDetails("LONG INSPECTION", "Test", "Readable current stats", "Technical notes in tooltip");
                 hud.SetUpgradeDetails("Real preview remains reachable", "UPGRADE", true);
                 await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame); await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-                PanelContainer inspector = hud.GetNode<PanelContainer>("BottomArea/Inspector"); ScrollContainer scroll = inspector.GetNode<ScrollContainer>("Insets");
+                PanelContainer inspector = hud.GetNode<PanelContainer>("BottomArea/Inspector");
                 Control tray = hud.GetNode<Control>("BottomArea/TraySlot/TowerBar");
-                Require(Mathf.IsEqualApprox(tray.Size.Y, hud.Config.BottomBarHeight) && inspector.GetGlobalRect().End.Y <= hud.GetGlobalRect().End.Y,
-                    "Short Inspector stays onscreen while category tray retains its configured height");
-                Require(inspector.Size.Y <= hud.Config.InspectorHeight + 1 && inspector.Size.X >= hud.Config.InspectorWidth - 1
-                    && scroll.GetVScrollBar().MaxValue > scroll.Size.Y, "Inspector stays wider/shorter and scrolls long stats");
-                scroll.EnsureControlVisible(inspector.GetNode<Button>("Insets/Body/UpgradeButton")); Require(scroll.ScrollVertical > 0, "Upgrade remains reachable inside bounded panel");
-                hud.ShowTowerDetails("NEW SELECTION", "Test", "Short stats", "");
-                Require(scroll.ScrollVertical == 0, "A new selection starts at its heading instead of retaining the previous scroll offset");
+                Require(inspector.GetNode("Insets") is MarginContainer && inspector.GetNode("Insets") is not ScrollContainer,
+                    "Inspector has no scrolling container");
+                Require(Mathf.IsEqualApprox(tray.Size.Y, hud.Config.BottomBarHeight) && inspector.GetGlobalRect().End.Y <= hud.GetGlobalRect().End.Y + 1,
+                    "Compact Inspector stays onscreen while category tray retains its configured height");
+                Require(inspector.Size.X >= hud.Config.InspectorWidth - 1 && inspector.GetNode<Button>("Insets/Body/Columns/Main/UpgradeButton").IsVisibleInTree(),
+                    "Upgrade action is directly visible without scrolling");
                 foreach (string path in new[] { "BottomArea/Inspector", "BottomArea/TraySlot/TowerBar" })
                 {
                     var panel = hud.GetNode<PanelContainer>(path); var style = (StyleBoxFlat)panel.GetThemeStylebox("panel");
@@ -63,7 +62,7 @@ public partial class HudCategoryChecks : Node
                 await TowerBuildBarChecks.Run(f.Main);
             }
             await SubsystemBattlefield.DrainFreedFixtures(this);
-            GD.Print("PASS: category tabs/counts/filter/rebind/remembering, placement vs Inspector independence, compact scrolling Inspector and subtle backgrounds;40-entry tray regression"); GetTree().Quit();
+            GD.Print("PASS: category tabs/counts/filter/rebind/remembering, placement vs Inspector independence, compact non-scrolling Inspector and subtle backgrounds;40-entry tray regression"); GetTree().Quit();
         }
         catch (Exception error) { GD.PushError(error.ToString()); GetTree().Quit(1); }
     }

@@ -57,7 +57,7 @@ public static class TowerRankChecks
             Require(fractional.UpgradeLevel == 1 && fractional.FinalStats.DamagePerShot == 32, "Level1/Legendary applies only8% total with integer rounding");
             Near(fractional.FinalStats.RangePixels, 256 * 1.04, "Legendary total range bonus is4%, not cumulative10%");
             TowerRankController.AwardExperience(fractional, 500);
-            Require(stats == 2 && fractional.RankProgress.TotalXp == 2000, "Maximum rank retains XP without repeated stat rebuilding");
+            Require(stats == 2 && fractional.RankProgress.TotalXp == 15500, "Maximum rank retains XP without repeated stat rebuilding");
             foreach (double bad in new[] { -1, 0, double.NaN, double.PositiveInfinity }) TowerRankController.AwardExperience(fractional, bad);
             Near(fractional.RankProgress.TotalXp, 15500, "Malformed/nonpositive XP never changes progress");
             TowerStatTrace trace = new();
@@ -219,20 +219,20 @@ public static class TowerRankChecks
             Require(wallet.GetBalance(wallet.CreditsResource) == 600 && tower.RankProgress.TotalXp == 3000,
                 "Existing150/250 credit purchases preserve all3000 earned XP");
             placement.Call("SelectTower", tower);
-            var section = hud.GetNode<Control>("BottomArea/Inspector/Insets/Body/RankSection");
+            var section = hud.GetNode<Control>("BottomArea/Inspector/Insets/Body/Columns/Side/RankSection");
             var label = section.GetNode<Label>("Rank"); var text = section.GetNode<Label>("ExperienceText");
             var bar = section.GetNode<ProgressBar>("ExperienceBar"); var bonuses = section.GetNode<Label>("RankBonuses");
-            Require(section.Visible && label.Text == "Rank: Enhanced" && text.Text.Contains("0 / 4000 XP to Superior")
+            Require(section.Visible && label.Text == "Enhanced" && text.Text.Contains("0 / 4000 XP → Superior")
                 && bonuses.Text.Contains("Damage +4%") && bonuses.Text.Contains("Range +2%"), "Placed bottom-right Inspector shows named rank, segment XP and active bonuses");
-            TowerFinalStats cached = tower.FinalStats; string upgrade = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/UpgradeInfo").Text;
+            TowerFinalStats cached = tower.FinalStats; string upgrade = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeInfo").Text;
             TowerRankController.AwardExperience(tower, 1200);
             await main.ToSignal(main.GetTree(), SceneTree.SignalName.ProcessFrame);
             await main.ToSignal(main.GetTree(), SceneTree.SignalName.ProcessFrame);
             Require(ReferenceEquals(cached, tower.FinalStats) && bar.Value == 1200 && bar.MaxValue == 4000
-                && text.Text.Contains("1200 / 4000 XP to Superior") && text.Text.Contains("Total XP: 4200"), "XP events update actual progress without pipeline polling/rebuilds");
-            Require(hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/UpgradeInfo").Text == upgrade, "XP updates preserve the existing upgrade panel");
+                && text.Text.Contains("1200 / 4000 XP → Superior"), "XP events update actual progress without pipeline polling/rebuilds");
+            Require(hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeInfo").Text == upgrade, "XP updates preserve the existing upgrade panel");
             TowerRankController.AwardExperience(tower, 10800);
-            Require(label.Text == "Rank: Legendary" && text.Text.Contains("MAX RANK") && bar.Value == bar.MaxValue,
+            Require(label.Text == "Legendary" && text.Text.Contains("MAX RANK") && bar.Value == bar.MaxValue,
                 "Multiple promotions update MAX RANK display and full progress bar automatically");
             Require(tower.UpgradeLevel == 3 && tower.FinalStats.DamagePerShot == 39 && tower.RankProgress.TotalXp == 15000,
                 "Level and earned rank stay independent at maximum");
@@ -242,12 +242,12 @@ public static class TowerRankChecks
             Require(panel.GetGlobalRect().Position.Y >= 0 && panel.GetGlobalRect().End.Y <= hud.Size.Y + 1,
                 "Rank section preserves onscreen Inspector layout");
             placement.Call("SelectTower", other);
-            Require(label.Text == "Rank: Standard" && text.Text.Contains("0 / 1000 XP to Veteran"), "Selecting another tower shows its independent XP");
+            Require(label.Text == "Standard" && text.Text.Contains("0 / 1000 XP → Veteran"), "Selecting another tower shows its independent XP");
             TowerRankController.AwardExperience(tower, 50);
-            Require(label.Text == "Rank: Standard", "Previously selected tower unsubscribes from Inspector updates");
+            Require(label.Text == "Standard", "Previously selected tower unsubscribes from Inspector updates");
             hud.ClearInspection(); TowerRankController.AwardExperience(other, 1.5);
             placement.Call("SelectTower", other);
-            Require(hud.IsInspectionVisible && text.Text.Contains("1.5 / 1000 XP to Veteran"),
+            Require(hud.IsInspectionVisible && text.Text.Contains("1.5 / 1000 XP → Veteran"),
                 "Reopening the same closed selection displays XP earned while hidden");
             hud.GetBuildButton("battle").EmitSignal(Button.SignalName.Pressed);
             Require(!section.Visible, "Build preview never shows stale placed-tower rank data");

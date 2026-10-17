@@ -2,7 +2,7 @@
 using Godot;
 
 [GlobalClass]
-public partial class BattleTowerConfig : TowerConfig
+public partial class BattleTowerConfig : TowerConfig, ITowerTargetingPolicy
 {
     public override System.Collections.Generic.IReadOnlyList<TowerRankDefinition> Ranks => BattleTowerRanks.Rows;
     // =========================================================

@@ -19,6 +19,7 @@ public partial class GameplayHUD : Control
     // =========================================================
     // The placement/upgrade controller validates the selected tower and payment.
     [Signal] public delegate void TowerUpgradeRequestedEventHandler();
+    [Signal] public delegate void TargetPriorityRequestedEventHandler(int priority);
     #endregion
 
     // =========================================================
@@ -39,8 +40,9 @@ public partial class GameplayHUD : Control
     private VBoxContainer _targetSection;
     private GridContainer _upgradeComparison;
     private Control _upgradeDivider;
-    private Button _detailsToggle;
-    private bool _detailsExpanded, _buildPreview;
+    private readonly Dictionary<TowerTargeting.Priority, Button> _targetButtons = new();
+    public Button GetTargetPriorityButton(TowerTargeting.Priority priority) => _targetButtons.GetValueOrDefault(priority);
+    private bool _buildPreview;
     private TowerFinalStats _comparisonNow, _comparisonNext;
     private CreditGainIndicator _creditGain;
     private ProgressBar _healthBar, _experienceBar;
@@ -84,24 +86,21 @@ public partial class GameplayHUD : Control
         _creditGain = GetNode<CreditGainIndicator>("TopBar/Status/CreditGain");
         _creditGain.Configure(Config);
         _core = GetNode<Label>("TopBar/Status/Citadel/Health");
-        _towerName = GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerName");
-        _towerCategory = GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerCategory");
-        _towerStats = GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerStats");
-        _runtimeStats = UIButtonFactory.Label("", 13, Config);
-        _runtimeStats.Name = "RuntimeStats"; _runtimeStats.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-        _towerStats.AddSibling(_runtimeStats); _runtimeStats.Hide();
-        _towerNotes = GetNode<Label>("BottomArea/Inspector/Insets/Body/Notes");
-        _detailsToggle = GetNode<Button>("BottomArea/Inspector/Insets/Body/DetailsToggle");
-        _detailsToggle.Pressed += ToggleDetails;
-        _targetSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/TargetSection");
+        _towerName = GetNode<Label>("BottomArea/Inspector/Insets/Body/Heading/TowerName");
+        _towerCategory = GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Side/TowerCategory");
+        _towerStats = GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Main/TowerStats");
+        _runtimeStats = GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Side/RuntimeStats");
+        _towerNotes = GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Main/Notes");
+        BuildTargetChoices();
+        _targetSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/Columns/Side/TargetSection");
         _targetValue = _targetSection.GetNode<Label>("TargetValue");
-        _upgradeTitle = GetNode<Label>("BottomArea/Inspector/Insets/Body/UpgradeTitle");
-        _upgradeDivider = GetNode<Control>("BottomArea/Inspector/Insets/Body/UpgradeDivider");
-        _upgradeComparison = GetNode<GridContainer>("BottomArea/Inspector/Insets/Body/UpgradeComparison");
-        _workSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/WorkSection");
+        _upgradeTitle = GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeTitle");
+        _upgradeDivider = GetNode<Control>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeDivider");
+        _upgradeComparison = GetNode<GridContainer>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeComparison");
+        _workSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/Heading/WorkSection");
         _workStatus = _workSection.GetNode<Label>("Status"); _workTime = _workSection.GetNode<Label>("Time");
         _workBar = _workSection.GetNode<ProgressBar>("Progress");
-        _rankSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/RankSection");
+        _rankSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/Columns/Side/RankSection");
         _rankLabel = _rankSection.GetNode<Label>("Rank");
         _experienceText = _rankSection.GetNode<Label>("ExperienceText");
         _rankBonuses = _rankSection.GetNode<Label>("RankBonuses");
@@ -111,8 +110,8 @@ public partial class GameplayHUD : Control
         _startWave.Pressed += () => EmitSignal(SignalName.WaveStartRequested);
         _healthBar = GetNode<ProgressBar>("TopBar/Status/Citadel/Bar");
         _topBar.GetNode<Control>("Status").Resized += LayoutStatus;
-        _upgradeInfo = GetNode<Label>("BottomArea/Inspector/Insets/Body/UpgradeInfo");
-        _upgradeButton = GetNode<Button>("BottomArea/Inspector/Insets/Body/UpgradeButton");
+        _upgradeInfo = GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeInfo");
+        _upgradeButton = GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeButton");
         _upgradeButton.Pressed += () => EmitSignal(SignalName.TowerUpgradeRequested);
         Resized += ApplyLayout;
         ApplyLayout();
@@ -240,35 +239,62 @@ public partial class GameplayHUD : Control
     public void ShowTowerDetails(string name, string category, string stats, string notes = "", bool newSelection = false)
     {
         bool preview = category.EndsWith("Build Preview", StringComparison.Ordinal) || category == "Placement rejected";
-        bool synthetic = !preview && !category.EndsWith("/ Placed", StringComparison.Ordinal);
-        bool changed = newSelection || !IsInspectionVisible || _towerName.Text != name || _towerCategory.Text != category;
-        if (changed)
-        { _inspector.GetNode<ScrollContainer>("Insets").ScrollVertical = 0; _detailsExpanded = preview || synthetic; }
         _buildPreview = preview;
-        SetRuntimeDetails(""); SetWorkDetails(null); SetUpgradeDetails("", "", false); SetUpgradeComparison(null, null);
+        SetRuntimeDetails(""); SetWorkDetails(null); SetUpgradeComparison(null, null); SetUpgradeDetails("", "", false);
         _targetSection.Hide(); _rankSection.Hide();
-        _towerName.Text = name; _towerCategory.Text = category;
+        _towerName.Text = name; _towerName.TooltipText = category + "\n" + notes + "\n" + stats;
+        _towerCategory.Text = "";
         _towerStats.Text = stats; _towerNotes.Text = notes;
         RefreshDetailsVisibility(); _inspector.Show();
     }
 
     // =========================================================
-    // Detailed stats stay accessible below separately labeled earned and paid progression.
-    private void ToggleDetails() { _detailsExpanded = !_detailsExpanded; RefreshDetailsVisibility(); }
+    // Keep full technical descriptions in tooltips; visible gameplay stats never need a foldout.
     private void RefreshDetailsVisibility()
     {
-        bool show = _buildPreview || _detailsExpanded;
-        _detailsToggle.Visible = !_buildPreview;
-        _detailsToggle.Text = show ? "ADDITIONAL DETAILS ▾" : "ADDITIONAL DETAILS ▸";
-        _towerStats.Visible = show && _towerStats.Text.Length > 0;
-        _towerNotes.Visible = show && _towerNotes.Text.Length > 0;
-        _runtimeStats.Visible = show && _runtimeStats.Text.Length > 0;
+        _towerNotes.Hide();
+        // Detailed descriptions stay on the header tooltip; stats are never hidden behind a foldout.
+        _towerStats.Visible = !_upgradeComparison.Visible && _towerStats.Text.Length > 0;
+        _runtimeStats.Visible = _runtimeStats.Text.Length > 0;
     }
 
     // =========================================================
-    // IT1 presents existing First/Closest policy read-only; editable modes are the IT3 pass.
+    // Six mutually-exclusive keyboard-focusable choices; the controller validates all user intent.
+    private void BuildTargetChoices()
+    {
+        GridContainer choices = GetNode<GridContainer>("BottomArea/Inspector/Insets/Body/Columns/Side/TargetSection/Choices");
+        ButtonGroup group = new();
+        foreach (TowerTargeting.Priority priority in new[] { TowerTargeting.Priority.First, TowerTargeting.Priority.Last,
+            TowerTargeting.Priority.Closest, TowerTargeting.Priority.Farthest, TowerTargeting.Priority.Strongest, TowerTargeting.Priority.Weakest })
+        {
+            var selected = priority;
+            Button button = UIButtonFactory.Create(priority.ToString(), () => EmitSignal(SignalName.TargetPriorityRequested, (int)selected),
+                UIButtonStyle.Compact, 26, Config);
+            button.ToggleMode = true; button.ButtonGroup = group;
+            // Compact buttons have smaller margins while keeping readable text and a clear selected fill.
+            foreach (string state in new[] { "normal", "hover", "pressed", "focus", "disabled" })
+                if (button.GetThemeStylebox(state) is StyleBoxFlat box)
+                { box.ContentMarginLeft = box.ContentMarginRight = 5; box.ContentMarginTop = box.ContentMarginBottom = 4; }
+            button.TooltipText = priority switch
+            {
+                TowerTargeting.Priority.First => "Shortest valid estimated remaining journey to the Citadel, including required checkpoints.",
+                TowerTargeting.Priority.Last => "Longest valid estimated remaining journey to the Citadel; unavailable routes are excluded.",
+                TowerTargeting.Priority.Closest => "Nearest eligible enemy within weapon range.",
+                TowerTargeting.Priority.Farthest => "Farthest eligible enemy within weapon range.",
+                TowerTargeting.Priority.Strongest => "Most currently remaining hull + shield points.",
+                _ => "Fewest currently remaining hull + shield points."
+            };
+            choices.AddChild(button); _targetButtons.Add(priority, button);
+        }
+    }
+
+    // =========================================================
+    // Bind the six selected-instance choices without emitting another user request.
     public void SetTargetPriorityDetails(string priority)
-    { _targetSection.Visible = !_buildPreview && priority.Length > 0; _targetValue.Text = priority; }
+    {
+        _targetSection.Visible = !_buildPreview && priority.Length > 0; _targetValue.Text = priority;
+        foreach (var pair in _targetButtons) pair.Value.SetPressedNoSignal(pair.Key.ToString() == priority);
+    }
 
     // =========================================================
     // Update inventory/status only; leave numeric stats, rank progress and upgrade previews untouched.
@@ -280,15 +306,17 @@ public partial class GameplayHUD : Control
     public void SetWorkDetails(TowerBase tower)
     {
         if (!GodotObject.IsInstanceValid(tower)) { _workSection.Hide(); return; }
+        _towerName.Text = tower.AuthoredConfig.DisplayName + " · Lv " + tower.UpgradeLevel;
+        _towerCategory.Text = "Footprint: " + (tower.Definition?.Footprint ?? Vector2I.One).X + "×" + (tower.Definition?.Footprint ?? Vector2I.One).Y;
         _workStatus.Text = tower.WorkPhase switch
         {
             TowerWorkPhase.Constructing => "CONSTRUCTING",
-            TowerWorkPhase.Upgrading => $"UPGRADING — to Level {tower.PendingUpgradeLevel}",
+            TowerWorkPhase.Upgrading => $"UPGRADING → {tower.PendingUpgradeLevel}",
             _ => "OPERATIONAL"
         };
         _workBar.Visible = _workTime.Visible = tower.IsBusy;
         _workBar.Value = tower.WorkProgress * 100;
-        _workTime.Text = tower.IsBusy ? $"{tower.ElapsedWorkSeconds:0.0} / {tower.WorkSeconds:0.0}s — {tower.RemainingWorkSeconds:0.0}s remaining" : "";
+        _workTime.Text = tower.IsBusy ? $"{tower.RemainingWorkSeconds:0.0}s remaining" : "";
         _workSection.Show();
     }
 
@@ -301,14 +329,15 @@ public partial class GameplayHUD : Control
         TowerRankDefinition current = tower.CurrentRank;
         TowerRankDefinition? next = tower.NextRank;
         double total = tower.RankProgress.TotalXp;
-        _rankLabel.Text = $"Rank: {current.Rank}";
-        _rankBonuses.Text = $"Rank bonuses: Damage +{current.DamageBonus * 100:0.##}% / Range +{current.RangeBonus * 100:0.##}%";
+        _rankLabel.Text = $"{current.Rank}";
+        _experienceText.TooltipText = $"Total combat XP: {total:0.##}. Earned rank is independent of paid tower levels.";
+        _rankBonuses.Text = $"Damage +{current.DamageBonus * 100:0.##}% · Range +{current.RangeBonus * 100:0.##}%";
         _experienceBar.MinValue = 0;
         _experienceBar.MaxValue = next.HasValue ? next.Value.TotalXp - current.TotalXp : 1;
         _experienceBar.Value = next.HasValue ? total - current.TotalXp : 1;
         _experienceText.Text = next.HasValue
-            ? $"{total - current.TotalXp:0.##} / {next.Value.TotalXp - current.TotalXp:0.##} XP to {next.Value.Rank}\nTotal XP: {total:0.##}"
-            : $"MAX RANK\nTotal XP: {total:0.##}";
+            ? $"{total - current.TotalXp:0.##} / {next.Value.TotalXp - current.TotalXp:0.##} XP → {next.Value.Rank}"
+            : "MAX RANK";
         _rankSection.Show();
     }
 
@@ -317,10 +346,10 @@ public partial class GameplayHUD : Control
     public void SetUpgradeDetails(string preview, string button, bool affordable)
     {
         bool present = !_buildPreview && (preview.Length > 0 || button.Length > 0);
-        // Once all levels are purchased, reveal current effective stats rather than an empty future table.
-        if (present && preview.StartsWith("MAX LEVEL", StringComparison.Ordinal))
-        { _detailsExpanded = true; RefreshDetailsVisibility(); }
-        _upgradeTitle.Visible = _upgradeDivider.Visible = present;
+        _upgradeTitle.Visible = present || _upgradeComparison.Visible;
+        _upgradeTitle.Text = (_comparisonNext != null ? "STATS · PAID UPGRADE" : "CURRENT STATS")
+            + (_comparisonNow != null ? " · " + (_comparisonNow.Weapon?.Type ?? DamageType.Kinetic).ToString().ToUpperInvariant() : "");
+        _upgradeDivider.Hide();
         _upgradeButton.TooltipText = "";
         _upgradeInfo.Text = preview; _upgradeInfo.Visible = present && preview.Length > 0;
         _upgradeButton.Text = button; _upgradeButton.Visible = present && button.Length > 0;
@@ -335,17 +364,20 @@ public partial class GameplayHUD : Control
         _comparisonNow = current; _comparisonNext = next;
         foreach (Node child in _upgradeComparison.GetChildren())
         { _upgradeComparison.RemoveChild(child); child.QueueFree(); }
-        var rows = TowerUpgradeComparison.Build(current, next);
+        bool hasNext = next != null;
+        var rows = TowerUpgradeComparison.Build(current, next ?? current);
+        _upgradeComparison.Columns = hasNext ? 4 : 2;
         _upgradeComparison.Visible = !_buildPreview && rows.Count > 0;
+        RefreshDetailsVisibility();
         if (rows.Count == 0) return;
         AddCell("STAT", true, true, Config.MutedTextColor);
         AddCell("CURRENT", false, true, Config.MutedTextColor);
-        AddCell("NEXT", false, true, Config.MutedTextColor);
-        AddCell("GAIN", false, true, Config.MutedTextColor);
+        if (hasNext) { AddCell("NEXT", false, true, Config.MutedTextColor); AddCell("GAIN", false, true, Config.MutedTextColor); }
         foreach (TowerUpgradeRow row in rows)
         {
             AddCell(row.Name, true, false, Config.TextColor);
             AddCell(row.Current, false, false, Config.MutedTextColor);
+            if (!hasNext) continue;
             AddCell(row.Next, false, false, Config.TextColor);
             AddCell(row.Gain, false, false, row.Tone switch
             {
@@ -620,7 +652,7 @@ public partial class GameplayHUD : Control
         _targetValue.AddThemeColorOverride("font_color", Config.TextColor);
         _targetSection.GetNode<Label>("TargetHeading").AddThemeColorOverride("font_color", Config.AccentColor);
         _rankSection.GetNode<Label>("RankHeading").AddThemeColorOverride("font_color", Config.AccentColor);
-        UIButtonFactory.Apply(_detailsToggle, UIButtonStyle.Compact, Config);
+
         UIButtonFactory.Apply(_upgradeButton, UIButtonStyle.Action, Config);
         UIButtonFactory.Apply(_startWave, UIButtonStyle.Action, Config);
         _healthFill = new StyleBoxFlat { BgColor = Config.HealthHealthyColor };
@@ -640,8 +672,7 @@ public partial class GameplayHUD : Control
         foreach (Label label in muted) label.AddThemeColorOverride("font_color", Config.MutedTextColor);
 
         Label[] accents = {
-            GetNode<Label>("BottomArea/TraySlot/TowerBar/Insets/Tray/Header/Title"),
-            GetNode<Label>("BottomArea/Inspector/Insets/Body/Heading/Title") };
+            GetNode<Label>("BottomArea/TraySlot/TowerBar/Insets/Tray/Header/Title") };
         foreach (Label label in accents) label.AddThemeColorOverride("font_color", Config.AccentColor);
 
         Button close = GetNode<Button>("BottomArea/Inspector/Insets/Body/Heading/CloseButton");

@@ -25,10 +25,11 @@ public partial class RouteCheckpoint : Node2D
 		string error = CheckpointNetwork.Capture(this).Error;
 		return error.Length == 0 ? System.Array.Empty<string>() : new[] { error };
 	}
+	public event System.Action GeometryChanged;
 	private float _radius = 128;
 	[Export(PropertyHint.Range, "1,4096,1,or_greater")]
 	public float RadiusPixels
-	{ get => _radius; set { _radius = float.IsFinite(value) ? Mathf.Max(1, value) : 128; _targets.Clear(); QueueRedraw(); } }
+	{ get => _radius; set { _radius = float.IsFinite(value) ? Mathf.Max(1, value) : 128; _targets.Clear(); QueueRedraw(); GeometryChanged?.Invoke(); } }
 	public int GeometryStamp => HashCode.Combine(GlobalPosition, RadiusPixels);
 	public int TargetBuildCount { get; private set; }
 	private sealed record Cache(int Revision, int Geometry, Vector2[] Points);
@@ -40,7 +41,7 @@ public partial class RouteCheckpoint : Node2D
 	// =========================================================
 	// Global transforms may change through a parent; the gameplay circle remains world-space and circular.
 	public override void _Notification(int what)
-	{ if (what == NotificationTransformChanged && Engine.IsEditorHint()) QueueRedraw(); }
+	{ if (what == NotificationTransformChanged) { if (Engine.IsEditorHint()) QueueRedraw(); else GeometryChanged?.Invoke(); } }
 	// =========================================================
 	// Center-entry semantics: physical ship center must enter a clearance-valid part of the region.
 	public bool Contains(Vector2 position) => position.DistanceSquaredTo(GlobalPosition) <= (RadiusPixels + 0.01f) * (RadiusPixels + 0.01f);

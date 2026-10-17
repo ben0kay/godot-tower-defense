@@ -26,9 +26,9 @@ internal static class TimedUpgradeChecks
         Enemy enemy = f.Target(tower.GlobalPosition + new Vector2(0, -64));
         f.Placement.Call("SelectTower", tower);
         var body = f.Hud.GetNode("BottomArea/Inspector/Insets/Body");
-        Label status = body.GetNode<Label>("WorkSection/Status"), time = body.GetNode<Label>("WorkSection/Time");
-        ProgressBar bar = body.GetNode<ProgressBar>("WorkSection/Progress");
-        Button button = body.GetNode<Button>("UpgradeButton"); Label preview = body.GetNode<Label>("UpgradeInfo");
+        Label status = body.GetNode<Label>("Heading/WorkSection/Status"), time = body.GetNode<Label>("Heading/WorkSection/Time");
+        ProgressBar bar = body.GetNode<ProgressBar>("Heading/WorkSection/Progress");
+        Button button = body.GetNode<Button>("Columns/Main/UpgradeButton"); Label preview = body.GetNode<Label>("Columns/Main/UpgradeInfo");
         int started = 0, completed = 0, changed = 0;
         tower.WorkStarted += () => { started++; Require(f.Wallet.GetBalance(f.Wallet.CreditsResource) == (started == 1 ? 850 : 600), "WorkStarted publishes after payment"); };
         tower.WorkCompleted += () => completed++; tower.StatsChanged += () => changed++;
@@ -37,8 +37,8 @@ internal static class TimedUpgradeChecks
         Require(tower.UpgradeLevel == 1 && tower.FinalStats == old && tower.RankProgress.TotalXp == xp && tower.WorkPhase == TowerWorkPhase.Upgrading
             && tower.IsOperational && tower.IsBusy && tower.CaptureWorkState().PendingUpgradeLevel == 2 && tower.PendingUpgradeLevel == 2 && tower.WorkSeconds == 4 && started == 1 && changed == 0
             && tower.Ammunition.Inventory.Amount == 900 && tower.Ammunition.Inventory.Capacity == 1000, "Purchase charges once but preserves old tier/cached stats/XP/ammo");
-        Require(f.Wallet.GetBalance(f.Wallet.CreditsResource) == 850 && button.Disabled && status.Text.Contains("UPGRADING") && status.Text.Contains("Level 2")
-            && preview.Text.Contains("Cost already paid") && preview.Text.Contains("Current Level 1"), "Inspector distinguishes paid work from another purchase");
+        Require(f.Wallet.GetBalance(f.Wallet.CreditsResource) == 850 && button.Disabled && status.Text.Contains("UPGRADING") && status.Text.Contains("→ 2")
+            && preview.Text.Contains("Cost already paid") && tower.UpgradeLevel == 1, "Inspector distinguishes paid work from another purchase");
         Require(!TowerUpgradeController.TryUpgrade(tower, f.Wallet, f.Placement.Settings, 1, out _) && f.Wallet.GetBalance(f.Wallet.CreditsResource) == 850, "Repeat purchase while busy cannot spend again");
         manager.Advance(1);
         Require(bar.Value == 25 && time.Text.Contains("3.0s remaining") && tower.FinalStats == old && changed == 0, "Progress updates only work controls/cache remains untouched");
