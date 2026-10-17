@@ -172,3 +172,7 @@ When complete, report:
 - [ ] Manual normal-zoom appearance, rapid-fire and multi-tower desktop playtest. Automated checks do not establish visual quality or GPU FPS.
 
 Implementation uses `WeaponVisualRenderer` for both muzzle drawing and optional aiming, avoiding a second visual node. Actual compilation/test outcomes and environment limitations: [verification](../../../../TESTS/Towers/ProjectileVisuals.md). Research, weapon stats, recoil and unrelated effects remain outside scope.
+
+### PV3 follow-up
+
+Sniper/Cryo presets, focused regression runner, integration linkage and authoring docs were already implemented with PV1/PV2. The follow-up reruns those checks alongside the narrower Inspector work rather than adding duplicate visual systems. Manual gameplay-zoom tracer/flash/aim appearance remains pending; the supplied screenshot verifies the UI design request, not projectile appearance.

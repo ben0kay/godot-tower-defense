@@ -2,14 +2,14 @@
 
 **STATUS: IT1–IT4 implemented, with automated compilation/headless verification. Manual desktop visual review remains pending.**
 
-**Latest user-approved layout revision:** no Inspector scrolling or expandable sections. Use a compact two-column layout, initially700×330, with readable controls and all current gameplay information visible. Rank/targeting/ammo are beside stats/paid upgrades, not stacked above them. Technical descriptions use tooltips. This revision supersedes the original scrolling540×325 proposal. See README.md and TESTS/UI/InspectorTargeting.md for actual verification.
+**Latest user-approved layout revision:** no Inspector scrolling or expandable sections. Use a compact two-column layout, initially620×330, with readable controls and all current gameplay information visible. Rank/targeting/ammo are beside stats/paid upgrades, not stacked above them. Technical descriptions use tooltips. This revision supersedes the original scrolling540×325 proposal. See README.md and TESTS/UI/InspectorTargeting.md for actual verification.
 
 
 ## Goal and user-approved design
 
 Refresh **the existing placed-tower Inspector**, not a new window. Keep it anchored at **bottom-right**, independent of the Ctrl build tray; selecting a placed weapon still displays its existing world-space range circle through `TowerPlacementController._Draw` and `TowerMasterConfig.ShowSelectionRange`.
 
-- **Wider and slightly shorter:** target **700 px width × 330 px height**, rather than current default 392 × 360. Inspector remains user-adjustable via `UIMasterConfig.InspectorWidth` / `InspectorHeight`, with responsive clamping and no internal scrolling. The configurable width hint supports the new value. Inspect the `.tscn` minimum width as well.
+- **Wider and slightly shorter:** target **620 px width × 330 px height**, rather than current default 392 × 360. Inspector remains user-adjustable via `UIMasterConfig.InspectorWidth` / `InspectorHeight`, with responsive clamping and no internal scrolling. The configurable width hint supports the new value. Inspect the `.tscn` minimum width as well.
 - **Prioritized reading order:** compact header, then stats/paid upgrades on the left and targeting/earned rank/ammunition on the right. Use clear headings/dividers/spacing; do not put the rank XP bar beside the upgrade price/button.
 - Keep all actual gameplay controls visible without scrolling or foldouts. Use the existing sci-fi palette and readable12px table text.
 
@@ -32,7 +32,7 @@ Header: name/current level/status/close. Left column: typed current/next/gain an
 | --- | --- |
 | `UI/GameplayHUD/Inspector/InspectorPanel.tscn` | Existing panel, now non-scrollable, heading, rank, work, text stats and upgrade action. Rearrange/reuse components, add targeting buttons + clear comparison rows/sections. |
 | `UI/GameplayHUD/GameplayHUD.cs` | Presentation and user-intent signals; no authority to spend or mutate enemy state. Bind six choices, active selection, compact stat rows and hide irrelevant sections. |
-| `UI/UIMasterConfig.cs` + `UI/DefaultUIConfig.tres` | Width/height and palette: set editable initial layout 700×330, keep responsive containment; preserve tray category tabs, theme and background-only opacity. |
+| `UI/UIMasterConfig.cs` + `UI/DefaultUIConfig.tres` | Width/height and palette: set editable initial layout 620×330, keep responsive containment; preserve tray category tabs, theme and background-only opacity. |
 | `TOWERS/Placement/TowerPlacementController.cs` | Selected instance, range ring, event subscriptions, preview/current-vs-next resolver, paid transaction and Inspector action gate remain authoritative. Subscribe only for visible selected tower; no per-frame all-tower UI rebuilding. |
 | `TOWERS/Shared/Targeting/TowerTargeting.cs` | Spatial radius query and stable-order tie-break already implement `First` and `Closest`. Extend modes without per-tower A* / GetNodesInGroup scans. |
 | `TOWERS/Shared/TowerBase.cs`, type configs and `Shared/Weapons/MultiBarrel/` | Placed tower has a private config copy; weapon configs already expose `TargetPriority` in Battle, Laser, Blaster and shared ProjectileTurretConfig. Prefer a tiny **opt-in typed targeting-policy contract** instead of per-ID switches or forcing Shockwave/factories into aimed targeting. |
@@ -42,7 +42,7 @@ Header: name/current level/status/close. Left column: typed current/next/gain an
 ## IT1 — Refresh the actual Inspector layout (UI only)
 
 - [x] Rework existing `InspectorPanel.tscn` into labeled **TARGET PRIORITY**, **COMBAT RANK**, **PAID UPGRADE**, and compact ammunition/runtime information and tooltips. Keep work/status compact in header; when busy its current progress bar appears visibly. Reuse existing signals/paths or update all callers/tests safely.
-- [x] Default `InspectorWidth=700`, `InspectorHeight=330`; widen the exported range beyond 480 and update `DefaultUIConfig.tres` + scene sizing. Clamp to viewport without clipping bottom tray, buttons or right edge. Use a MarginContainer with two columns; no scrollbars. Maintain 90% (configurable) **background** opacity while text/buttons stay opaque.
+- [x] Default `InspectorWidth=620`, `InspectorHeight=330`; widen the exported range beyond 480 and update `DefaultUIConfig.tres` + scene sizing. Clamp to viewport without clipping bottom tray, buttons or right edge. Use a MarginContainer with two columns; no scrollbars. Maintain 90% (configurable) **background** opacity while text/buttons stay opaque.
 - [x] Keep selected tower range ring, highlight, close button, bottom-right position, independent Ctrl tray, Pause/Results input precedence, keyboard focus and pointer interception. Empty space must not intercept gameplay clicks.
 - [x] Only show options suitable to the selected type; don't show a blank Rank/target/upgrade band on build preview or passive buildings.
 
@@ -61,7 +61,7 @@ Header: name/current level/status/close. Left column: typed current/next/gain an
 
 ### Current implementation record — IT1–IT4
 
-The initial vertical scrolling IT1/IT2 layout was replaced following direct user feedback. Current code uses a compact700×330 two-column MarginContainer, typed comparisons (including Slow and current-only max-tier stats), six opt-in targeting buttons and shared budgeted checkpoint-tail estimates. Existing Kinetic snapshots with null Weapon now correctly receive projectile/damage/penetration rows. Tests were migrated to the real new node hierarchy; one stale rank-XP assertion was corrected from2000 to15500 to match its own fixture arithmetic. See `TESTS/UI/InspectorTargeting.md` for executed suites and inherited build/full-suite blockers. No desktop screenshots are claimed.
+The initial vertical scrolling IT1/IT2 layout was replaced following direct user feedback. Current code uses a compact620×330 two-column MarginContainer, typed comparisons (including Slow and current-only max-tier stats), six opt-in targeting buttons and shared budgeted checkpoint-tail estimates. Existing Kinetic snapshots with null Weapon now correctly receive projectile/damage/penetration rows. Tests were migrated to the real new node hierarchy; one stale rank-XP assertion was corrected from2000 to15500 to match its own fixture arithmetic. See `TESTS/UI/InspectorTargeting.md` for executed suites and inherited build/full-suite blockers. No desktop screenshots are claimed.
 
 ## IT3 — Six per-tower target priorities and UI action
 

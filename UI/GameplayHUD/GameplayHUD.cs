@@ -389,12 +389,12 @@ public partial class GameplayHUD : Control
     }
 
     // =========================================================
-    // The existing Godot GridContainer distributes four lightweight display-only labels per row.
+    // Only stat names absorb spare width; numeric columns stay content-sized and easy to compare.
     private void AddCell(string value, bool left, bool header, Color color)
     {
         Label cell = UIButtonFactory.Label(value, header ? 10 : 12, Config);
         cell.HorizontalAlignment = left ? HorizontalAlignment.Left : HorizontalAlignment.Right;
-        cell.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        cell.SizeFlagsHorizontal = left ? SizeFlags.ExpandFill : SizeFlags.Fill;
         cell.AddThemeColorOverride("font_color", color);
         _upgradeComparison.AddChild(cell);
     }

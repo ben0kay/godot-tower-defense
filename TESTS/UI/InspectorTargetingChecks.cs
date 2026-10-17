@@ -117,7 +117,7 @@ public partial class InspectorTargetingChecks : Node
 
     // =========================================================
     // All current tower families fit without scroll/foldouts at supported desktop sizes and busy/max states.
-    private static async System.Threading.Tasks.Task Layout(AmmoLoopFixture f)
+    internal static async System.Threading.Tasks.Task Layout(AmmoLoopFixture f)
     {
         GameplayHUD hud = f.Hud; hud.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.TopLeft); Control panel = hud.GetNode<Control>("BottomArea/Inspector");
         foreach (Vector2I viewport in new[] { new Vector2I(1920,1080), new Vector2I(1366,768), new Vector2I(960,540) })
@@ -130,6 +130,16 @@ public partial class InspectorTargetingChecks : Node
                 await hud.ToSignal(hud.GetTree(), SceneTree.SignalName.ProcessFrame);
                 await hud.ToSignal(hud.GetTree(), SceneTree.SignalName.ProcessFrame);
                 Require(hud.Size == (Vector2)viewport, "Test viewport remains the requested size");
+                Require(panel.Size.X <= 620.5f, "Compact Inspector stays within 620px for " + id);
+                var comparison = hud.GetNode<TowerUpgradeGrid>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeComparison");
+                for (int cell = 1; cell < comparison.GetChildCount(); cell++)
+                    if (cell % comparison.Columns != 0)
+                    {
+                        Control numeric = comparison.GetChild<Control>(cell);
+                        Require((numeric.SizeFlagsHorizontal & Control.SizeFlags.Expand) == 0 && numeric.Size.X < 90,
+                            "Numeric comparison columns stay content-sized for " + id);
+                    }
+
                 Require(panel.GetNode("Insets") is MarginContainer, "Inspector is not a scrolling surface");
                 CheckVisible(panel, panel.GetGlobalRect()); maximumHeight = Math.Max(maximumHeight, panel.Size.Y);
                 Require(panel.GetGlobalRect().Position.Y >= hud.Config.TopBarHeight

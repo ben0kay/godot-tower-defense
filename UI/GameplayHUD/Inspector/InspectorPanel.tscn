@@ -1,7 +1,9 @@
-[gd_scene format=3]
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://UI/GameplayHUD/Inspector/TowerUpgradeGrid.cs" id="1_grid"]
 
 [node name="Inspector" type="PanelContainer"]
-custom_minimum_size = Vector2(700, 330)
+custom_minimum_size = Vector2(620, 330)
 size_flags_vertical = 8
 mouse_filter = 0
 
@@ -54,7 +56,7 @@ tooltip_text = "Close inspector"
 
 [node name="Columns" type="HBoxContainer" parent="Insets/Body"]
 layout_mode = 2
-theme_override_constants/separation = 14
+theme_override_constants/separation = 10
 
 [node name="Main" type="VBoxContainer" parent="Insets/Body/Columns"]
 layout_mode = 2
@@ -73,8 +75,9 @@ theme_override_font_sizes/font_size = 11
 [node name="UpgradeComparison" type="GridContainer" parent="Insets/Body/Columns/Main"]
 visible = false
 layout_mode = 2
+script = ExtResource("1_grid")
 columns = 4
-theme_override_constants/h_separation = 8
+theme_override_constants/h_separation = 12
 theme_override_constants/v_separation = 2
 
 [node name="UpgradeInfo" type="Label" parent="Insets/Body/Columns/Main"]
