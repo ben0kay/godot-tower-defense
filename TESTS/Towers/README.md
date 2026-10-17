@@ -33,3 +33,7 @@ The compact two-column Inspector supersedes the earlier540×325 scrolling layout
 `ProjectileVisualChecks.tscn` runs real Battle/Machine Gun/Sniper firing, guided launch snapshots, cleanup, fixed-slot renderer allocation checks, and existing MultiBarrel/Cryo compatibility groups. Its focused `Run` group is also linked into EnemyIntegrationChecks. See [actual verification](ProjectileVisuals.md).
 
 `TowerConditionsChecks.tscn` covers HD1/HD2 source/handle isolation and timing, all seven offensive attack gates/heat charges, threshold volleys, beam30/60/120Hz, cooling/pause, purchases/rank retention, real clock expiry and allocation checks. It is also linked into the integration runner. See [actual verification](TowerConditions.md).
+
+## Shared beam ripple and particle presentation — 2026-10-17
+
+`LaserTowerChecks` now asserts travelling ripple geometry (more than two points while enabled), an exactly anchored muzzle, last visual point within the configured target wander radius, unchanged gameplay damage/stats across visual edits, the two scene-owned `GpuParticles2D` emitters with shared motion material, independent particle switches and a two-point idle/straight-line fallback when all effects are off. Particle textures/materials live in `FEEDBACK/Shared/`; implementation notes are in `TOWERS/Shared/Weapons/Beams/README.md`. **Source changed; the modified fixture has not yet been run in Godot here.** Headless checks alone will not verify rendered glow/spark quality.
