@@ -53,7 +53,7 @@ Placing one tower updates one cell in each shared A* profile. Ships with unaffec
 In Level001Config.tres (or the level root Settings), edit Starting Resources / Starting Credits. This map currently starts at 1,000. Battle Tower requires 200 Credits by default; set Construction Costs in DefaultBattleTowerConfig.tres. F5 initializes a fresh wallet and successful builds update the top-left credit display. Invalid terrain, insufficient funds and route-blocking builds do not spend. There is no income/kill reward yet.
 
 ## Manual finite waves
-F5 prepares Wave 00 / 03; START WAVE appears just below the top-right status. Three Enemy001-only test waves are authored in LEVELS/Level001/Level001Waves.cs. Previous batch ships keep moving during later batches. NEXT WAVE unlocks only after all scheduled and wave-owned ships resolve, while F2 debug enemies do not count. Ordinary ships randomly choose eligible registered portals per spawn; debug F2 stays round-robin. There is no wave reward or automatic next wave yet.
+F5 prepares Wave 00 / 03; START WAVE appears just below the top-right status. Three escalating combat-test waves are authored in LEVELS/Level001/Level001Waves.cs (38 / 40 / 55 ships). Wave 1 introduces a few shielded Standard Drones; waves 2 and 3 include some faster Swift Interceptors, and the final wave introduces a few Bulwarks. Previous batch ships keep moving during later batches. NEXT WAVE unlocks only after all scheduled and wave-owned ships resolve, while F2 debug enemies do not count. Ordinary ships randomly choose eligible registered portals per spawn; debug F2 stays round-robin. There is no wave reward or automatic next wave yet.
 
 ## Terrain categories
 Passable offers metal/dirt floors; Impassable offers walls/rocks; Interactive offers raised Foundation and Lava; Decorations offers only decals. Build permission is independent of movement: raised platforms are solid but buildable. Erase the old gameplay-layer cell before changing a cell from solid to passable or vice versa. Empty space stays passable/unbuildable. All 176 previously authored cells were preserved during the palette migration.
@@ -64,7 +64,7 @@ Open `Level001Config.tres` → **Destination / Citadel Max Health** to choose th
 
 ## Wave-controlled enemy shields
 
-Enemy001 has **MaxShield = 100** in `ENEMIES/Types/Enemy001/Enemy001.tres`, but all existing Level001 wave entries remain unshielded. To opt in a specific weighted group, edit `Level001Waves.cs` and use `Enemy("enemy001", shield: true)`. Shields absorb incoming damage before hull HP. F2 defaults to zero shield, and no separate shield visual is implemented yet.
+Enemy001 now has **MaxShield = 20** in `ENEMIES/Types/Enemy001/Enemy001.tres`. The `basic_mk1` wave entries explicitly opt some ships in with `shield: true`; other spawns (including F2/debug) remain unshielded. The shared `FEEDBACK/Shields/` reddish aura appears only for actually shielded ships and fades on break. Shields absorb damage before hull HP. The three authored test waves contain **7 / 12 / 18 shielded ships** respectively (including a few 40-point shielded Scouts in later waves). No natural shield regeneration or Shield Generator enemies are included in Level001.
 
 ## Interactive Terrain
 
