@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="MajorAlertDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://UI/Alerts/MajorAlerts/MajorAlertDefinition.cs" id="1_alert"]
+
+[resource]
+script = ExtResource("1_alert")
+Id = "boss_detected"
+Title = "MAJOR THREAT DETECTED"
+Description = "A powerful enemy signature has entered the battlefield."
+Footer = "HIGH PRIORITY TARGET"
+BadgeText = "!"
+Tone = 3
+Priority = 100
+DurationSeconds = 6.0
+CooldownSeconds = 60.0
+OncePerSession = false
+VoiceCueId = ""
