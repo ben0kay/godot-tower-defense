@@ -4,6 +4,7 @@ Reusable visual feedback systems. **DefenseBars and DeathExplosion are now activ
 
 - `FeedbackMasterConfig.cs` + `DefaultFeedbackConfig.tres`: shared feedback visibility toggles.
 - `DeathExplosion/`: reusable automatically-sized kill smoke and orange flash using GPU particles.
+- `Shared/`: reusable particle textures and process-material presets. The scene/effect that uses them owns its own `GpuParticles2D` nodes, lifetime and position; currently the shared beam renderer references small energy-contact sparks.
 - `DefenseBars/`: event-driven health indicator component used by Enemy001 and reusable for future damageable towers. Configure its colors, capped logarithmic sizing and offset in `DefenseBars/DefaultDefenseBarConfig.tres`.
 - `DamageNumbers/`: future hit numbers and damage aggregation.
 - `CameraEffects/`: future impact shakes (normal pan/zoom remains in `CAMERA/`).
@@ -17,3 +18,7 @@ Keep feedback separate from combat simulation. Health values come from owners: b
 ## Shared shockwave presentation — Phase4E
 
 Shockwave/ owns one reusable ShockwaveEffect scene and Inspector-editable ShockwaveStyle. Blaster supplies its own orange impact style and uses autonomous cosmetic expansion after instant damage. The new Shockwave Tower supplies a purple style and drives the same visual with its actual gameplay wavefront radius. The visual has no enemies or damage code. The former AreaBlast/BlastFlash was removed; AreaBlast/README.md points to the replacement. DeathExplosion remains a separate kill-only visual.
+
+## Shared particle resources — beam visual foundation
+
+[`Shared/README.md`](Shared/README.md) describes the reusable monochrome spark texture and gentle energy-contact material. The `TOWERS/Shared/Weapons/Beams/BeamRenderer.tscn` scene owns its impact/muzzle GPU particle emitters and toggles them only while the beam is active. The shared folder owns **resource presets**, not runtime emitters or a new manager. Other weapon effects can instance or reference these assets independently.
