@@ -35,9 +35,9 @@ public static class BlasterCannonChecks
             && tower.FinalStats.ShieldPenetration == 0 && tower.Config.DamageType == DamageType.Explosive, "Authored baseline is60/80px/25% with zero penetration");
         placement.Call("TryPlace", cell); ConstructionTestClock.FinishInitial(main); Require(wallet.GetBalance(wallet.CreditsResource) == 700, "Repeated occupancy does not charge Blaster again");
         Label details = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerStats");
-        Label upgrade = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/UpgradeInfo");
+        
         Require(details.Text.Contains("Base damage: 60") && details.Text.Contains("Blast radius: 80") && details.Text.Contains("Edge damage: 25%")
-            && upgrade.Text.Contains("60 → 66") && upgrade.Text.Contains("80 → 88"), "Placed Inspector shows real AoE stats and next-tier preview");
+            && UpgradeTableChecks.HasRow(hud, "Damage", "60", "66", "(+6)") && UpgradeTableChecks.HasRow(hud, "Blast Radius (px)", "80", "88", "(+8)"), "Placed Inspector shows real AoE stats and next-tier preview");
         TowerFinalStats preview = tower.ResolveLevel(2); int revision = grid.NavigationRevision;
         hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/UpgradeButton").EmitSignal(Button.SignalName.Pressed); ConstructionTestClock.FinishWork(main);
         Require(tower.UpgradeLevel == 2 && tower.FinalStats == preview && tower.FinalStats.DamagePerShot == 66

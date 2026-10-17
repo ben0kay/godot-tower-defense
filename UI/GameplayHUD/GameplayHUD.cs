@@ -239,10 +239,11 @@ public partial class GameplayHUD : Control
     // Placement supplies actual instance details and build previews to the independent Inspector.
     public void ShowTowerDetails(string name, string category, string stats, string notes = "", bool newSelection = false)
     {
-        bool preview = !category.EndsWith("/ Placed", StringComparison.Ordinal);
+        bool preview = category.EndsWith("Build Preview", StringComparison.Ordinal) || category == "Placement rejected";
+        bool synthetic = !preview && !category.EndsWith("/ Placed", StringComparison.Ordinal);
         bool changed = newSelection || !IsInspectionVisible || _towerName.Text != name || _towerCategory.Text != category;
         if (changed)
-        { _inspector.GetNode<ScrollContainer>("Insets").ScrollVertical = 0; _detailsExpanded = preview; }
+        { _inspector.GetNode<ScrollContainer>("Insets").ScrollVertical = 0; _detailsExpanded = preview || synthetic; }
         _buildPreview = preview;
         SetRuntimeDetails(""); SetWorkDetails(null); SetUpgradeDetails("", "", false); SetUpgradeComparison(null, null);
         _targetSection.Hide(); _rankSection.Hide();

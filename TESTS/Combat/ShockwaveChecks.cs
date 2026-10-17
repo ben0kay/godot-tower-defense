@@ -232,9 +232,9 @@ public static class ShockwaveChecks
                 "Level1 preserves every proposed playtest stat");
             Require(tower.Config != definition.DefaultConfig && tower.Config.Levels[0] != definition.DefaultConfig.Levels[0]
                 && tower.Config.WaveStyle != ((ShockwaveTowerConfig)definition.DefaultConfig).WaveStyle, "Placed rows/recipes/styles are isolated");
-            Label details = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerStats"), preview = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/UpgradeInfo");
+            Label details = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerStats");
             Require(details.Text.Contains("Damage per wave: 40") && details.Text.Contains("Expansion speed: 250") && details.Text.Contains("Interval: 4")
-                && details.Text.Contains("Edge damage: 25%") && preview.Text.Contains("40 → 44") && preview.Text.Contains("4 → 3.9"), "Inspector shows actual wave stats and complete paid preview");
+                && details.Text.Contains("Edge damage: 25%") && UpgradeTableChecks.HasRow(hud, "Wave Damage", "40", "44", "(+4)") && UpgradeTableChecks.HasRow(hud, "Wave Interval (s)", "4", "3.9", "(−0.1)"), "Inspector shows actual wave stats and complete paid preview");
             placement.Call("TryPlace", cell); ConstructionTestClock.FinishInitial(main); Require(wallet.GetBalance(wallet.CreditsResource) == 650, "Occupied placement never double-charges");
             TowerFinalStats cached = tower.FinalStats, upgraded = tower.ResolveLevel(2);
             tower.Config.WaveStyle.RingWidth = 7; tower.Config.WaveStyle.ExpansionDuration = .01f;

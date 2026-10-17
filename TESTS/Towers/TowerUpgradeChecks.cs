@@ -57,7 +57,7 @@ public static class TowerUpgradeChecks
             Button button = hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/UpgradeButton");
             Label info = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/UpgradeInfo");
             Require(button.Visible && !button.Disabled && info.Text.Contains("150 Credits") &&
-                HasComparison(hud, "Damage", "30", "33", "(+3)"), "Inspector shows next tier, typed gain and affordable price");
+                UpgradeTableChecks.HasRow(hud, "Damage", "30", "33", "(+3)"), "Inspector shows next tier, typed gain and affordable price");
             hud.EmitSignal(GameplayHUD.SignalName.TowerUpgradeRequested); ConstructionTestClock.FinishWork(battle);
             Require(first.UpgradeLevel == 2 && first.FinalStats == preview &&
                 wallet.GetBalance(wallet.CreditsResource) == 250, "Actual HUD upgrade action pays once and matches preview");
@@ -157,17 +157,6 @@ public static class TowerUpgradeChecks
         Require(waveRows.Any(x => x.Name == "Wave Interval (s)" && x.Gain == "(−0.4)" && x.Tone == TowerUpgradeGain.Better),
             "Shorter wave interval is a green improvement despite a negative delta");
         Require(TowerUpgradeComparison.Build(null, b).Count == 0, "Missing snapshots don't generate made-up rows");
-    }
-
-    // =========================================================
-    // Inspect actual grid cell labels rather than parsing a freeform upgrade paragraph.
-    private static bool HasComparison(GameplayHUD hud, string name, string current, string next, string gain)
-    {
-        GridContainer grid = hud.GetNode<GridContainer>("BottomArea/Inspector/Insets/Body/UpgradeComparison");
-        var labels = grid.GetChildren().OfType<Label>().Select(x => x.Text).ToArray();
-        for (int i = 4; i + 3 < labels.Length; i += 4)
-            if (labels[i] == name && labels[i + 1] == current && labels[i + 2] == next && labels[i + 3] == gain) return true;
-        return false;
     }
 
     // =========================================================

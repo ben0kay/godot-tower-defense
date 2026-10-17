@@ -33,8 +33,8 @@ public static class LaserTowerChecks
         placement.Call("TryPlace", cell); ConstructionTestClock.FinishInitial(main);
         Require(wallet.GetBalance(wallet.CreditsResource) == 750, "Repeat Laser occupancy cannot charge");
         Label details = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/TowerStats");
-        Label upgrade = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/UpgradeInfo");
-        Require(details.Text.Contains("DPS: 12") && details.Text.Contains("Shield: 6.00x / Hull: 0.15x") && !details.Text.Contains("shots/s") && upgrade.Text.Contains("DPS: 12 → 14"), "Inspector displays actual beam capability/preview");
+        
+        Require(details.Text.Contains("DPS: 12") && details.Text.Contains("Shield: 6.00x / Hull: 0.15x") && !details.Text.Contains("shots/s") && UpgradeTableChecks.HasRow(hud, "DPS", "12", "14", "(+2)"), "Inspector displays actual beam capability/preview");
         tower.Config.HullCoefficient = 0.2f;
         Require(details.Text.Contains("Hull: 0.20x") && ((LaserTowerConfig)definition.DefaultConfig).HullCoefficient == 0.15f,
             "Selected Laser Inspector refreshes coefficients without mutating the shared source");
