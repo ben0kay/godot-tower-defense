@@ -1,5 +1,15 @@
 # Gameplay HUD — status, catalog build tray and tower Inspector
 
+## Clear-view placement flow — 2026-10-17
+
+Hover/focus a build tile to browse basic information, cost and affordability on the right. An affordable click temporarily hides the lower tray and Inspector while the ghost is active; top status stays present. A denied tile click retains the visible preview and emits the controller's BuildDenied signal for future audio.
+
+SetPlacementPresentation changes BottomArea visibility without toggling IsTowerBarOpen. RMB/Escape restore the tray and clear the preview; Ctrl cancels and closes. Successful one-shot placement restores the tray but leaves the tower unselected/Inspector hidden. Independent later clicks inspect placed towers. The latest560×330 Inspector layout, fonts, right column and heat presentation remain intact; affordability wraps inside the same dimensions. No full-screen HUD mouse blocker or per-frame wallet polling was added.
+
+See TESTS/UI/PlacementHud.md for the dedicated runner and resize-preservation evidence. Original descriptions below that imply immediate post-placement inspection are superseded by this flow.
+
+---
+
 The CanvasLayer HUD displays gameplay state. ECONOMY owns balances, CitadelSession owns objective HP, WaveManager owns scheduling, TowerCatalog owns registered build choices and TowerPlacementController owns placement/upgrade decisions.
 
 ## Current implementation

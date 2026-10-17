@@ -12,6 +12,7 @@ public partial class GameplayHUD : Control
     // =========================================================
     // Placement owns validation and building; the HUD emits only a registered tower ID.
     [Signal] public delegate void TowerChoiceRequestedEventHandler(string towerId);
+    [Signal] public delegate void TowerPreviewRequestedEventHandler(string towerId);
     // =========================================================
     // The wave service owns scheduling; this button only requests a manual start.
     [Signal] public delegate void WaveStartRequestedEventHandler();
@@ -62,6 +63,8 @@ public partial class GameplayHUD : Control
     private bool _trayOpen;
     private GameInput _input;
     public bool IsTowerBarOpen => _trayOpen;
+    public bool IsPlacementPresentation { get; private set; }
+    private bool _suppressRestoredHover;
     #endregion
 
     private readonly Dictionary<string, Button> _buildButtons = new();
@@ -139,9 +142,39 @@ public partial class GameplayHUD : Control
     }
 
     // =========================================================
+    // Temporary placement visibility preserves the logical Ctrl-open state and keeps top status usable.
+    public void SetPlacementPresentation(bool active)
+    {
+        if (!active && IsPlacementPresentation) _suppressRestoredHover = true;
+        IsPlacementPresentation = active;
+        if (active)
+        {
+            Control focus = GetViewport().GuiGetFocusOwner();
+            if (focus != null && _bottomArea.IsAncestorOf(focus)) focus.ReleaseFocus();
+            _bottomArea.Hide();
+        }
+        else { _bottomArea.Show(); _towerBar.Visible = _trayOpen; }
+    }
+
+    // =========================================================
+    // Restoring a tray beneath a stationary cursor is not a new browsing action after placement/cancel.
+    public override void _Input(InputEvent input)
+    {
+        if (!_suppressRestoredHover || IsPlacementPresentation || input is not InputEventMouseMotion motion || motion.Relative.IsZeroApprox()) return;
+        _suppressRestoredHover = false;
+        if (!_trayOpen) return;
+        Control hovered = GetViewport().GuiGetHoveredControl();
+        if (hovered == null) return;
+        foreach (var pair in _buildButtons)
+            if (pair.Value == hovered || pair.Value.IsAncestorOf(hovered))
+            { EmitSignal(SignalName.TowerPreviewRequested, pair.Key); break; }
+    }
+
+    // =========================================================
     // Slide/fade the tray without moving the inspector; suppress stale close tweens.
     public void SetTowerBarOpen(bool open, bool immediate = false)
     {
+        if (IsPlacementPresentation && !open) immediate = true;
         _trayOpen = open;
         if (!open) EmitSignal(SignalName.TowerBarClosed);
         _trayTween?.Kill();
@@ -181,6 +214,8 @@ public partial class GameplayHUD : Control
             Button button = UIButtonFactory.Create(definition.DisplayName + "\n" + definition.Category + " · " +
                 TowerPresentation.DescribeResourceCosts(definition.DefaultConfig.ConstructionCosts),
                 () => EmitSignal(SignalName.TowerChoiceRequested, id), UIButtonStyle.TowerTile, height: 65f, config: Config);
+            button.MouseEntered += () => { if (!IsPlacementPresentation && _trayOpen && !_suppressRestoredHover) EmitSignal(SignalName.TowerPreviewRequested, id); };
+            button.FocusEntered += () => { if (!IsPlacementPresentation && _trayOpen) EmitSignal(SignalName.TowerPreviewRequested, id); };
             button.Name = "Tower_" + entries.GetChildCount();
             button.CustomMinimumSize = new Vector2(Config.TowerButtonWidth, 65f);
             button.TooltipText = definition.Description;
@@ -258,7 +293,8 @@ public partial class GameplayHUD : Control
     // Keep full technical descriptions in tooltips; visible gameplay stats never need a foldout.
     private void RefreshDetailsVisibility()
     {
-        _towerNotes.Hide();
+        _towerNotes.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        _towerNotes.Visible = _buildPreview && _towerNotes.Text.Length > 0;
         // Detailed descriptions stay on the header tooltip; stats are never hidden behind a foldout.
         _towerStats.Visible = !_upgradeComparison.Visible && _towerStats.Text.Length > 0;
         _runtimeStats.Visible = _runtimeStats.Text.Length > 0;

@@ -68,8 +68,8 @@ internal static class FootprintPlacementChecks
             && (ghost.Scale * ghost.Texture.GetSize()).IsEqualApprox(new Vector2(192, 128)), "Preview spans/centers 3x2, green and flood-free");
         f.Paint(new(f.Anchor + new Vector2I(2, 1), Vector2I.One), true); f.Grid.RebuildTerrain();
         f.World.Placement.Call("RefreshPreview", f.Anchor, true);
-        Require(ghost.Modulate.R > ghost.Modulate.G && f.World.Hud.FindChildren("*", "Label", true, false)
-            .Any(label => ((Label)label).Text.Contains("uniform")), "Mixed foundation has red preview and structural failure message");
+        Require(ghost.Modulate.R > ghost.Modulate.G && f.World.Placement.PreviewFailure.Contains("uniform")
+            && !f.World.Hud.IsInspectionVisible, "Mixed foundation retains a structural rejection reason and red ghost without reopening hidden Inspector");
         f.Paint(new(f.Anchor, new(3, 2)), false, true); f.Grid.RebuildTerrain();
         f.World.Placement.Call("CancelPlacement"); Require(!ghost.Visible, "Cancellation clears full ghost");
     }

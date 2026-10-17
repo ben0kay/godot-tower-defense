@@ -43,6 +43,7 @@ public static class TowerCatalogChecks
         Vector2I first = Cell(grid, spawns);
         placement.Call("TryPlace", first); ConstructionTestClock.FinishInitial(main);
         TowerBase p = towers.GetChild<TowerBase>(towers.GetChildCount() - 1);
+        placement.Call("SelectTower", p); // Explicit inspection is separate from paid placement.
         Require(p is PassiveTestTower && p.TowerTypeId == passive.TowerId && p.GridCell == first && p.Footprint == Vector2I.One,
             "Generic placement uses registered scene/type/anchor");
         Require(p.FinalStats == null && !p.InspectionRange.HasValue && !p.IsPhysicsProcessing() && p.NextUpgrade == null,

@@ -34,6 +34,7 @@ internal sealed class FootprintFixture : IDisposable
     { int n = 0; for (int y = 0; y < size.Y; y++) for (int x = 0; x < size.X; x++) if (Grid.IsOccupied(anchor + new Vector2I(x, y))) n++; return n; }
     internal TowerBase Build(string id, Vector2I anchor)
     {
+        World.Placement.Call("CancelPlacement");
         World.Hud.GetBuildButton(id).EmitSignal(Button.SignalName.Pressed); World.Placement.Call("TryPlace", anchor);
         return World.Placement.TowerAt(anchor);
     }

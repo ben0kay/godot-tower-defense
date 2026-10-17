@@ -1,5 +1,13 @@
 # Compact placed-tower Inspector — IT1–IT4
 
+## Build-preview interaction extension — 2026-10-17
+
+The existing560×330 placed-tower layout and right-column/heat visuals are preserved. Hover/focus in the Ctrl build tray uses this same right-hand panel for a compact description, cost, build time, footprint, effective basic stats and visible affordability. There are no rank/upgrade actions on a build preview.
+
+Affordable tile clicks hide the lower tray and Inspector during placement; denied clicks retain the preview. Placement completion clears the Inspector and does not select the new tower. A separate later click selects normally. Affordability labels wrap rather than increasing the panel's minimum width; no layout resource/font/default-size changes were made. All registered build previews and the existing placed/max/busy/heat fixtures fit at1920×1080,1366×768,960×540 in headless geometry checks. Desktop mouse/appearance review remains manual; see TESTS/UI/PlacementHud.md.
+
+---
+
 The existing bottom-right Inspector is **non-scrollable**, with no foldouts. Default target size is **560×330** through `UIMasterConfig` / `DefaultUIConfig.tres`; natural content may grow the panel slightly rather than clip controls. The Ctrl tray remains independent and keeps its own horizontal catalog scrolling. Background opacity remains 90%; text/buttons stay opaque.
 
 ## Layout

@@ -1,5 +1,11 @@
 # UI tests
 
+## Placement HUD runner — 2026-10-17
+
+Added PlacementHudChecks.tscn for hover/focus/cost/affordability, rejection signal, hidden lower HUD, RMB/Escape/Ctrl behavior, one-shot placement without selection, independent later inspection and all-type560×330 preview bounds. Existing shared test helpers now explicitly select towers when testing their Inspector; production placement no longer auto-selects. See PlacementHud.md for actual execution and remaining desktop checks.
+
+---
+
 HUD, build tray, menu flow, shared controls/Pause and Mission Debrief. Standalone runners: MenuTowerFlowChecks.tscn, PauseControlsChecks.tscn, ResultsChecks.tscn, ResultsExitChecks.tscn and HudCategoryChecks.tscn.
 
 See [Results verification](Results.md) for R1 scenarios, commands and actual build/suite limitations, and [the test index](../README.md) for other suites.

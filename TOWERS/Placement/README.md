@@ -1,5 +1,17 @@
 # Generic rectangular tower placement — F1–F5 implemented
 
+## Browsing vs placement vs inspection — 2026-10-17
+
+TowerPreviewRequested (hover/focus) shows basic definition, cost and event-driven affordability in the right Inspector, without entering placement. TowerChoiceRequested is a purchase intent: insufficient resources emit BuildDenied(towerId, reason), retain the tray/Inspector and do not reserve/pay. Affordable choice hides the lower HUD and arms a ghost; real route/terrain/payment checks still occur on the world placement click, including an affordability recheck.
+
+During placement, grid changes update only the ghost/preview rectangle and cached PreviewFailure; they never reopen the hidden Inspector. Rejected world attempts stay armed and emit the same future-audio rejection signal. No audio clips or new alert producers are wired.
+
+RMB/Escape cancel and restore the tray, clearing preview/ghost. Ctrl closes the logical tray and cancels immediately. Successful placement is one-shot: publish the existing committed TowerPlaced event, stop placement, restore the tray, clear Inspector/selection. It intentionally does NOT auto-select. HandleWorldClick consumes the placement frame's follow-up selection; a new later click uses normal any-cell selection. Wallet/navigation/construction/research authority is unchanged.
+
+The HUD visibility flag is separate from logical tray-open state, so temporarily hiding BottomArea cannot accidentally toggle Ctrl. Hover/focus callbacks and preview wallet/config updates do not resurrect a closed Inspector; stationary-cursor restoration is ignored until a real browsing action. TESTS/UI/PlacementHud.md records actual checks.
+
+---
+
 ## Research-first extension — 2026-10-17
 
 TowerPlacementController now emits TowerPlaced only after successful wallet/occupancy commit, for LevelRunStats. Failed clicks/ghosts/rollbacks emit no placement count. Event consumers track initial work completion separately; placements and construction totals are distinct.

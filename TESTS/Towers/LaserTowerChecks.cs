@@ -27,6 +27,7 @@ public static class LaserTowerChecks
         Require(found, "Laser build cell is route-safe");
         placement.Call("TryPlace", cell); ConstructionTestClock.FinishInitial(main);
         LaserTower tower = towers.GetChild<LaserTower>(towers.GetChildCount() - 1); tower.SetPhysicsProcess(false);
+        placement.Call("SelectTower", tower); // Inspect via a separate action after placement.
         Require(tower.TowerTypeId == "laser" && grid.IsOccupied(cell) && wallet.GetBalance(wallet.CreditsResource) == 750 &&
             tower.FinalStats.Beam.Value.DamagePerSecond == 12 && tower.FinalStats.ShieldPenetration == 0, "Dynamic action places/pays the correct Energy tower");
         Require(tower.Config != definition.DefaultConfig && tower.Levels[0] != definition.DefaultConfig.Levels[0], "Laser source/tier data is private");

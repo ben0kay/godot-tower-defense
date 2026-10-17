@@ -28,6 +28,7 @@ public static class BlasterCannonChecks
         Vector2I cell = grid.Level.Passable.GetUsedCells().First(c => grid.PlacementFailure(c).Length == 0 && spawns.PlacementFailure(c).Length == 0);
         placement.Call("TryPlace", cell); ConstructionTestClock.FinishInitial(main);
         BlasterCannon tower = towers.GetChild<BlasterCannon>(towers.GetChildCount() - 1); tower.SetPhysicsProcess(false);
+        placement.Call("SelectTower", tower); // Inspect via a separate action after placement.
         Require(tower.TowerTypeId == "blaster_cannon" && grid.IsOccupied(cell) && wallet.GetBalance(wallet.CreditsResource) == 700,
             "Catalog action places a1x1 Blaster and pays300");
         Require(tower.Config != definition.DefaultConfig && tower.Levels[0] != definition.DefaultConfig.Levels[0], "Blaster config and nested tiers are private");

@@ -1,5 +1,17 @@
 # WORK — Consolidated Outstanding Implementation Backlog
 
+## Build preview / unobstructed placement UI — implemented 2026-10-17
+
+- [x] Ctrl-open tray: hover or keyboard-focus a tower tile to show its description, cost, build time, footprint, basic effective stats and CAN AFFORD / INSUFFICIENT RESOURCES in the existing right Inspector. No ghost/payment just for browsing.
+- [x] Affordable tile click arms one placement and temporarily hides BottomArea (tray + Inspector). Logical tray-open state stays intact; the permanent top status remains usable. Unaffordable clicks keep the preview/tray visible, create no tower and emit TowerPlacementController.BuildDenied(towerId, reason) for future audio; no audio playback was added.
+- [x] RMB/Escape cancel the ghost and restore the tray with no tower selected; Ctrl cancels and actually closes the build tray. Reopening Ctrl does not resume canceled placement.
+- [x] Successful placement no longer calls SelectTower(newTower). It ends placement, restores the tray, clears the Inspector and consumes/suppresses the placement frame's selection path. A separate later world click selects the tower normally. Restoring the tray under a stationary cursor does not immediately reopen a hover preview.
+- [x] Preserved the latest Inspector resize: existing560×330 dimensions, fonts, right-column/heat structure, styles and layout resources. Compact build descriptions and wrapped affordability text fit the same panel. No InspectorPanel.tscn, UIMasterConfig.cs or DefaultUIConfig.tres changes in this pass.
+
+Verification: TESTS/UI/PlacementHud.md. Current-control descriptions here supersede historical auto-selection/always-visible placement-preview notes below; original plans remain preserved.
+
+---
+
 ## Laser Tower silver/yellow visual refinement — 2026-10-17
 
 - [x] Replace Laser Tower SVG with silver/gunmetal body and yellow emitter/rails, retaining existing 64×64 scene sizing and muzzle marker.

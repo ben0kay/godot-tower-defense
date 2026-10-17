@@ -224,6 +224,7 @@ public static class ShockwaveChecks
         placement.Call("TryPlace", cell); ConstructionTestClock.FinishInitial(main);
         Node towers = main.GetNode("World/Towers");
         ShockwaveTower tower = towers.GetChild<ShockwaveTower>(towers.GetChildCount() - 1); tower.SetPhysicsProcess(false);
+        placement.Call("SelectTower", tower); // Inspect via a separate action after placement.
         try
         {
             Require(wallet.GetBalance(wallet.CreditsResource) == 650 && grid.IsOccupied(cell), "Real350-credit placement succeeds");

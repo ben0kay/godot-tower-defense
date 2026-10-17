@@ -7,6 +7,9 @@ using System;
 public partial class TowerPlacementController : Node2D
 {
     public event Action<TowerBase> TowerPlaced;
+    [Signal] public delegate void BuildDeniedEventHandler(string towerId, string reason);
+    private bool _browsingBuild;
+    private ulong _ignorePreviewFrame = ulong.MaxValue, _placedInputFrame = ulong.MaxValue;
 
     #region Inspector
     [ExportGroup("Global Placement")]
@@ -31,6 +34,7 @@ public partial class TowerPlacementController : Node2D
     private Vector2I _hoverCell = new(int.MinValue, int.MinValue);
     private GameInput _input;
     public bool IsPlacing => _placing;
+    public string PreviewFailure => _previewFailure ?? "";
     private bool _placing, _previewVisible, _previewValid;
     private readonly Dictionary<TowerBase, Action> _placementExits = new();
     private TowerBase _selected;
@@ -70,13 +74,13 @@ public partial class TowerPlacementController : Node2D
         };
         AddChild(_ghost);
         _economy.BalanceChanged += OnBalanceChanged;
-        _hud.TowerChoiceRequested += OnTowerChoiceRequested;
+        _hud.TowerChoiceRequested += OnTowerChoiceRequested; _hud.TowerPreviewRequested += OnTowerPreviewRequested;
         _hud.TowerBarClosed += CancelPlacement; _hud.BuildCategoryChanged += CancelPlacement; _hud.InspectionClosed += OnInspectionClosed;
         _hud.TowerUpgradeRequested += OnUpgradeRequested; _hud.TargetPriorityRequested += OnTargetPriorityRequested;
         SetProcessUnhandledInput(true);
         _input = GetNode<GameInput>("/root/GameInput");
         _input.Bind(this, GameInput.BackAction, () =>
-        { if (!_placing) return false; CancelPlacement(); return true; }, 10);
+        { if (!_placing && !_browsingBuild) return false; CancelPlacement(); return true; }, 10);
     }
 
     // =========================================================
@@ -88,7 +92,7 @@ public partial class TowerPlacementController : Node2D
         _placementExits.Clear();
         if (GodotObject.IsInstanceValid(_input)) _input.Unbind(this);
         if (GodotObject.IsInstanceValid(_hud))
-        { _hud.TowerBarClosed -= CancelPlacement; _hud.BuildCategoryChanged -= CancelPlacement; _hud.InspectionClosed -= OnInspectionClosed; _hud.TowerChoiceRequested -= OnTowerChoiceRequested; _hud.TowerUpgradeRequested -= OnUpgradeRequested; _hud.TargetPriorityRequested -= OnTargetPriorityRequested; }
+        { _hud.TowerBarClosed -= CancelPlacement; _hud.BuildCategoryChanged -= CancelPlacement; _hud.InspectionClosed -= OnInspectionClosed; _hud.TowerChoiceRequested -= OnTowerChoiceRequested; _hud.TowerPreviewRequested -= OnTowerPreviewRequested; _hud.TowerUpgradeRequested -= OnUpgradeRequested; _hud.TargetPriorityRequested -= OnTargetPriorityRequested; }
         if (GodotObject.IsInstanceValid(_economy)) _economy.BalanceChanged -= OnBalanceChanged;
         if (GodotObject.IsInstanceValid(_buildDefinition?.DefaultConfig)) _buildDefinition.DefaultConfig.Changed -= OnPreviewConfigChanged;
         if (GodotObject.IsInstanceValid(_selected))
@@ -98,28 +102,58 @@ public partial class TowerPlacementController : Node2D
 
     #region Build Mode
     // =========================================================
-    // Resolve an available registered type without per-type branches.
-    private void OnTowerChoiceRequested(string id)
+    // Browsing is mouse-hover/keyboard-focus only; it never arms a ghost or spends resources.
+    private void OnTowerPreviewRequested(string id)
+    {
+        if (_placing || GetTree().Paused || !_hud.IsTowerBarOpen || Engine.GetProcessFrames() == _ignorePreviewFrame) return;
+        PreviewBuild(id);
+    }
+
+    // =========================================================
+    // One shared definition/affordability view for hover, focus and rejected clicks.
+    private bool PreviewBuild(string id)
     {
         TowerDefinition choice = Catalog.Find(id);
-        if (choice == null || !choice.Available)
-        {
-            CancelPlacement(); SelectTower(null);
-            if (GodotObject.IsInstanceValid(_buildDefinition?.DefaultConfig)) _buildDefinition.DefaultConfig.Changed -= OnPreviewConfigChanged;
-            _buildDefinition = null; return;
-        }
+        if (choice == null || !choice.Available) return false;
         if (GodotObject.IsInstanceValid(_buildDefinition?.DefaultConfig)) _buildDefinition.DefaultConfig.Changed -= OnPreviewConfigChanged;
-        _buildDefinition = choice;
-        choice.DefaultConfig.Changed += OnPreviewConfigChanged;
-        _ghost.Texture = choice.Icon;
-        SelectTower(null);
-        _affordable = _buildDefinition != null && _economy.CanAfford(_buildDefinition.DefaultConfig.ConstructionCosts);
-        _previewDirty = true;
-        _placing = true;
-        SetProcess(true);
-        _hud.ShowTowerDetails(_buildDefinition.DisplayName, _buildDefinition.Category + " / Build Preview",
-            DescribeTower(), "Left-click a buildable terrain square to build. Right-click / Esc cancels.");
-        UpdatePreview();
+        _buildDefinition = choice; choice.DefaultConfig.Changed += OnPreviewConfigChanged;
+        _ghost.Texture = choice.Icon; SelectTower(null); _browsingBuild = true;
+        _affordable = _economy.CanAfford(choice.DefaultConfig.ConstructionCosts);
+        RefreshBuildDetails(); return true;
+    }
+
+    // =========================================================
+    // Basic definition/cost/affordability belongs in the existing right-hand Inspector while browsing.
+    private void RefreshBuildDetails()
+    {
+        if (!_browsingBuild || _placing || _buildDefinition == null) return;
+        TowerConfig config = _buildDefinition.DefaultConfig;
+        TowerFinalStats final = ResolveBuildStats(config);
+        string info = _buildDefinition.Description + "\n\n" +
+            $"Cost: {TowerPresentation.DescribeResourceCosts(config.ConstructionCosts)}\n" +
+            $"Build time: {config.BuildSeconds:0.#} s\nFootprint: {_buildDefinition.Footprint.X} x {_buildDefinition.Footprint.Y}";
+        if (final != null)
+        {
+            info += final.Beam.HasValue ? $"\nDamage: {final.Beam.Value.DamagePerSecond:0.##} DPS" :
+                final.Shockwave.HasValue ? $"\nDamage: {final.Shockwave.Value.DamagePerWave:0.##} per wave" : $"\nDamage: {final.DamagePerShot}";
+            info += $"\nRange: {final.RangePixels:0.#} px";
+            if (final.ShotsPerSecond > 0) info += $"\nRate: {final.ShotsPerSecond:0.##} shots/s";
+        }
+        _hud.ShowTowerDetails(_buildDefinition.DisplayName, _buildDefinition.Category + " / Build Preview", info,
+            _affordable ? "CAN AFFORD — Click to place." : "INSUFFICIENT RESOURCES");
+    }
+
+    // =========================================================
+    // An affordable click arms one placement and clears the lower UI; unaffordable clicks retain the preview.
+    private void OnTowerChoiceRequested(string id)
+    {
+        if (GetTree().Paused || _placing) return;
+        if (!PreviewBuild(id)) { CancelPlacement(); SelectTower(null); _hud.ClearInspection(); return; }
+        if (!_affordable)
+        { EmitSignal(SignalName.BuildDenied, id, "Insufficient resources."); GetViewport().SetInputAsHandled(); return; }
+        _browsingBuild = false; _placing = true; _previewDirty = true;
+        _hud.ClearInspection(); _hud.SetPlacementPresentation(true);
+        SetProcess(true); UpdatePreview(); GetViewport().SetInputAsHandled();
     }
 
     // =========================================================
@@ -150,10 +184,6 @@ public partial class TowerPlacementController : Node2D
         _ghost.Visible = visible && Settings.ShowPlacementPreview;
         if (visible)
         {
-            if (_selected == null)
-                _hud.ShowTowerDetails(_buildDefinition.DisplayName, _buildDefinition.Category + " / Build Preview", DescribeTower(),
-                    valid ? "Left-click to build. Right-click / Esc cancels."
-                        : failure.Length > 0 ? failure : "Insufficient resources.");
             _ghost.GlobalPosition = _grid.FootprintCenter(cell, _buildDefinition.Footprint);
             Vector2 pixels = (Vector2)_buildDefinition.Footprint * _grid.Config.CellSize;
             if (_ghost.Texture != null) _ghost.Scale = pixels / _ghost.Texture.GetSize();
@@ -167,8 +197,11 @@ public partial class TowerPlacementController : Node2D
     // Clear build previews without closing the tray or a placed-tower Inspector.
     private void CancelPlacement()
     {
-        if (_placing && _selected == null) _hud.ClearInspection();
-        _placing = false;
+        bool clearPreview = _placing || _browsingBuild;
+        if (clearPreview || _hud.IsPlacementPresentation) _ignorePreviewFrame = Engine.GetProcessFrames();
+        _placing = false; _browsingBuild = false;
+        if (clearPreview && _selected == null) _hud.ClearInspection();
+        _hud.SetPlacementPresentation(false);
         _previewVisible = false;
         _previewValid = false;
         if (_ghost != null) _ghost.Hide();
@@ -182,7 +215,7 @@ public partial class TowerPlacementController : Node2D
     // RMB cancels placement even when the cursor is over the build tray or Inspector.
     public override void _Input(InputEvent input)
     {
-        if (!_placing || input is not InputEventMouseButton mouse || !mouse.Pressed
+        if ((!_placing && !_browsingBuild) || input is not InputEventMouseButton mouse || !mouse.Pressed
             || mouse.ButtonIndex != MouseButton.Right) return;
         CancelPlacement();
         GetViewport().SetInputAsHandled();
@@ -195,11 +228,18 @@ public partial class TowerPlacementController : Node2D
         if (input is not InputEventMouseButton mouse || !mouse.Pressed || IsOverUi()) return;
         if (mouse.ButtonIndex != MouseButton.Left) return;
 
-        Vector2I cell = _grid.WorldToCell(GetGlobalMousePosition());
+        HandleWorldClick(_grid.WorldToCell(GetGlobalMousePosition()));
+        GetViewport().SetInputAsHandled();
+    }
+
+    // =========================================================
+    // One placement press cannot also inspect; a later independent click uses the normal selection path.
+    private void HandleWorldClick(Vector2I cell)
+    {
+        if (!_placing && Engine.GetProcessFrames() == _placedInputFrame) return;
         if (_placing) TryPlace(cell);
         else if (_placedTowers.TryGetValue(cell, out TowerBase tower)) SelectTower(tower);
-        else { SelectTower(null); _hud.ClearInspection(); }
-        GetViewport().SetInputAsHandled();
+        else { SelectTower(null); _browsingBuild = false; _hud.ClearInspection(); }
     }
 
     // =========================================================
@@ -207,6 +247,8 @@ public partial class TowerPlacementController : Node2D
     private void TryPlace(Vector2I cell)
     {
         if (_buildDefinition == null || !_buildDefinition.Available) return;
+        if (!_economy.CanAfford(_buildDefinition.DefaultConfig.ConstructionCosts))
+        { ShowPlacementFailure("Insufficient resources."); return; }
         string failure = _spawns.PlacementFailure(cell, _buildDefinition.Footprint);
         if (failure.Length != 0)
         {
@@ -221,8 +263,8 @@ public partial class TowerPlacementController : Node2D
             return;
         }
         TowerPlaced?.Invoke(tower);
-        SelectTower(tower);
-        UpdatePreview();
+        _placedInputFrame = Engine.GetProcessFrames();
+        CancelPlacement(); SelectTower(null); _hud.ClearInspection();
     }
 
     // =========================================================
@@ -230,7 +272,8 @@ public partial class TowerPlacementController : Node2D
     private void ShowPlacementFailure(string failure)
     {
         if (GodotObject.IsInstanceValid(_selected)) _hud.SetUpgradeError(failure);
-        else _hud.ShowTowerDetails(_buildDefinition.DisplayName, "Placement rejected", DescribeTower(), failure);
+        else if (!_placing) _hud.ShowTowerDetails(_buildDefinition.DisplayName, "Placement rejected", DescribeTower(), failure);
+        EmitSignal(SignalName.BuildDenied, _buildDefinition.TowerId, failure);
     }
 
     // =========================================================
@@ -300,7 +343,8 @@ public partial class TowerPlacementController : Node2D
     {
         _affordable = _buildDefinition != null && _economy.CanAfford(_buildDefinition.DefaultConfig.ConstructionCosts);
         _previewDirty = true;
-        if (_hud.IsInspectionVisible) RefreshUpgradePreview();
+        if (_browsingBuild) RefreshBuildDetails();
+        else if (_hud.IsInspectionVisible) RefreshUpgradePreview();
     }
 
     // =========================================================
@@ -311,6 +355,7 @@ public partial class TowerPlacementController : Node2D
         if (GodotObject.IsInstanceValid(_selected))
         { _selected.StatsChanged -= OnSelectedStatsChanged; _selected.TargetPriorityChanged -= OnSelectedTargetPriorityChanged; _selected.ExperienceChanged -= OnSelectedExperienceChanged; _selected.RuntimeChanged -= OnSelectedRuntimeChanged; _selected.HeatChanged -= OnSelectedConditionsChanged; _selected.DisableStateChanged -= OnSelectedConditionsChanged; _selected.SetSelected(false); }
         _selected = tower; ObserveWork(tower);
+        if (tower != null) _browsingBuild = false;
         if (GodotObject.IsInstanceValid(_selected))
         {
             _selected.StatsChanged += OnSelectedStatsChanged; _selected.TargetPriorityChanged += OnSelectedTargetPriorityChanged;
@@ -373,6 +418,7 @@ public partial class TowerPlacementController : Node2D
     // Retain existing selection semantics but stop hidden progress notifications until reselected.
     private void OnInspectionClosed()
     {
+        _browsingBuild = false;
         ObserveWork(null);
         if (GodotObject.IsInstanceValid(_selected))
         { _selected.HeatChanged -= OnSelectedConditionsChanged; _selected.DisableStateChanged -= OnSelectedConditionsChanged; }
@@ -442,7 +488,8 @@ public partial class TowerPlacementController : Node2D
     {
         _previewDirty = true;
         _affordable = _buildDefinition != null && _economy.CanAfford(_buildDefinition.DefaultConfig.ConstructionCosts);
-        if (_placing && _selected == null) UpdatePreview();
+        if (_browsingBuild) RefreshBuildDetails();
+        else if (_placing && _selected == null) UpdatePreview();
     }
 
     // =========================================================

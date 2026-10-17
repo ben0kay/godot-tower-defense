@@ -36,6 +36,7 @@ internal sealed class AmmoLoopFixture : IDisposable
     // Exercise real build buttons and the authoritative paid placement transaction.
     internal T Purchase<T>(string id, bool completeConstruction = true) where T : TowerBase
     {
+        Placement.Call("CancelPlacement");
         Hud.GetBuildButton(id).EmitSignal(Button.SignalName.Pressed);
         WorldGrid grid = Main.GetNode<WorldGrid>("World/Grid");
         int before = Towers.GetChildCount();
@@ -46,6 +47,7 @@ internal sealed class AmmoLoopFixture : IDisposable
             if (Towers.GetChildCount() == before) continue;
             T tower = Towers.GetChild<T>(Towers.GetChildCount() - 1);
             if (completeConstruction) ConstructionTestClock.FinishInitial(Main);
+            Placement.Call("SelectTower", tower); // Explicit inspection is separate from the placement action.
             Disable(tower); return tower;
         }
         throw new InvalidOperationException("Could not purchase " + id);
