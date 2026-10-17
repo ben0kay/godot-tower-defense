@@ -1,10 +1,13 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://UI/GameplayHUD/GameplayHUD.cs" id="1_hud"]
 [ext_resource type="Resource" path="res://UI/DefaultUIConfig.tres" id="2_config"]
 [ext_resource type="PackedScene" path="res://UI/GameplayHUD/TopBar/TopBar.tscn" id="3_top"]
 [ext_resource type="PackedScene" path="res://UI/GameplayHUD/TowerBar/TowerBar.tscn" id="4_tray"]
 [ext_resource type="PackedScene" path="res://UI/GameplayHUD/Inspector/InspectorPanel.tscn" id="5_inspector"]
+
+[ext_resource type="PackedScene" path="res://UI/Alerts/NotificationManager.tscn" id="6_alerts"]
+[ext_resource type="Script" path="res://UI/Alerts/Debug/AlertPreview.cs" id="7_preview"]
 
 [node name="GameplayHUD" type="Control"]
 layout_mode = 3
@@ -56,3 +59,8 @@ grow_vertical = 2
 [node name="Inspector" parent="BottomArea" instance=ExtResource("5_inspector")]
 visible = false
 layout_mode = 2
+
+[node name="NotificationManager" parent="." instance=ExtResource("6_alerts")]
+
+[node name="AlertPreview" type="Node" parent="."]
+script = ExtResource("7_preview")
