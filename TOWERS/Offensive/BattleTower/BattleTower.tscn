@@ -18,3 +18,8 @@ texture = ExtResource("3_art")
 [node name="ConstructionVisuals" type="Node" parent="."]
 script = ExtResource("4_construction")
 SpritePath = NodePath("../TurretPivot/Sprite")
+
+[node name="Muzzles" type="Node2D" parent="TurretPivot"]
+
+[node name="MuzzleA" type="Marker2D" parent="TurretPivot/Muzzles"]
+position = Vector2(0, -28.5)

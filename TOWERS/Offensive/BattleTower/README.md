@@ -1,6 +1,6 @@
 # Battle Tower — explicit levels and guided Kinetic fire
 
-Ctrl → Battle Tower → place on route-safe terrain. First targets the shortest remaining path; Closest targets nearest. Shared turret aiming rotates the child visual toward the target, leaving the grid root fixed. Fire requires a living in-range aligned lock and elapsed cooldown; zero rate disables firing. Guided shots still originate at the center and retain launch-time damage/penetration.
+Ctrl → Battle Tower → place on route-safe terrain. First targets the shortest remaining path; Closest targets nearest. Shared turret aiming rotates the child visual toward the target, leaving the grid root fixed. Fire requires a living in-range aligned lock and elapsed cooldown; zero rate disables firing. Guided shots originate at the barrel-tip marker and retain launch-time damage/penetration.
 
 ## Level data
 
@@ -45,3 +45,7 @@ Paid placement occupies its footprint immediately and takes **3 seconds**, autho
 Three new64×64 SVGs in `Artwork/Construction/` show foundation (0%), frame (35%) and assembly (70%). Completion restores the unchanged `Artwork/battle_tower.svg`. Current build time remains3 seconds. The default config's ConstructionArt resource exposes all thresholds/textures; its LevelArtwork entries2/3 are optional empty slots for a future intermediate upgrade image and a finished tier image. Current upgrades retain their existing look. No sparks or particles.
 
 The optional shared presenter uses `../TurretPivot/Sprite`, preserving aiming, selection tint and numeric gameplay. Other towers are unchanged. [Artwork preview](Artwork/Construction/construction_preview.svg) shows the actual SVG progression; it is not an in-game screenshot. See `TESTS/Towers/ConstructionArtwork.md` for tests and live playtest checklist.
+
+## Projectile presentation — PV1/PV2
+
+Implemented 18px amber tracer and stronger golden starburst; actual muzzle is `(0, -28.5)` under `TurretPivot/Muzzles/MuzzleA`. Tower-owned presets live in `Visuals/` and are assigned in `DefaultBattleTowerConfig.tres` (Weapon Visuals). Presentation never enters level/rank stat tables. Shared behavior and authoring: [Visuals](../../Shared/Weapons/Visuals/README.md). Regression evidence: [ProjectileVisuals](../../../TESTS/Towers/ProjectileVisuals.md). Manual appearance review at normal gameplay zoom remains pending.

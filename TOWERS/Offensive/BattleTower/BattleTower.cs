@@ -31,12 +31,15 @@ public partial class BattleTower : TowerBase
     public override bool AcceptsConfig(TowerConfig config) => config is BattleTowerConfig;
     // =========================================================
     // Reject malformed Battle scenes before occupancy/payment, without imposing this on passive types.
-    public override bool ValidateScene() => GetNodeOrNull<Node2D>("TurretPivot") != null && GetNodeOrNull<Sprite2D>("TurretPivot/Sprite") != null;
+    public override bool ValidateScene() => GetNodeOrNull<Node2D>("TurretPivot") != null && GetNodeOrNull<Sprite2D>("TurretPivot/Sprite") != null
+        && GetNodeOrNull<Marker2D>("TurretPivot/Muzzles/MuzzleA") != null;
     // =========================================================
     // Per-instance initialization preserves the exported Battle Config and its change subscriptions.
     protected override void ApplyConfig(TowerConfig config) => Config = (BattleTowerConfig)config;
     private Sprite2D _sprite;
     private Node2D _turret;
+    private Marker2D _muzzle;
+    private WeaponVisualRenderer _visuals;
     private EnemyRegistry _registry;
     private Node2D _projectiles;
     private Enemy _target;
@@ -50,6 +53,8 @@ public partial class BattleTower : TowerBase
     {
         _turret = GetNode<Node2D>("TurretPivot");
         _sprite = _turret.GetNode<Sprite2D>("Sprite");
+        _muzzle = GetNode<Marker2D>("TurretPivot/Muzzles/MuzzleA");
+        _visuals = WeaponVisuals.Attach(_turret);
         SetProcess(false);
         _initialized = true;
         if (Config != null) Config.Changed += RebuildStats;
@@ -78,8 +83,8 @@ public partial class BattleTower : TowerBase
         if (Ammunition?.TryFire() == false) return;
         BasicProjectile bullet = new();
         bullet.Initialize(_target, FinalStats.ProjectileSpeed,
-            new DamageInfo(FinalStats.DamagePerShot, DamageType.Kinetic, shieldPenetration: FinalStats.ShieldPenetration, source: DamageSource));
-        _projectiles.AddChild(bullet); bullet.GlobalPosition = GlobalPosition;
+            new DamageInfo(FinalStats.DamagePerShot, DamageType.Kinetic, shieldPenetration: FinalStats.ShieldPenetration, source: DamageSource), visual: Config.ProjectileVisual);
+        _projectiles.AddChild(bullet); WeaponVisuals.Present(bullet, _muzzle, Config, _visuals);
         _shotTimer = 1f / FinalStats.ShotsPerSecond;
     }
     #endregion

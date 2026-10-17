@@ -1,4 +1,11 @@
-[gd_resource type="Resource" script_class="SniperTowerConfig" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="SniperTowerConfig" load_steps=5 format=3]
 [ext_resource type="Script" path="res://TOWERS/Offensive/SniperTower/SniperTowerConfig.cs" id="1"]
+[ext_resource type="Resource" path="res://TOWERS/Offensive/SniperTower/Visuals/SniperTracerStyle.tres" id="pv_tracer"]
+[ext_resource type="Resource" path="res://TOWERS/Offensive/SniperTower/Visuals/SniperMuzzleFlashStyle.tres" id="pv_flash"]
+[ext_resource type="Resource" path="res://TOWERS/Offensive/SniperTower/Visuals/SniperAimLaserStyle.tres" id="pv_aim"]
 [resource]
 script = ExtResource("1")
+
+ProjectileVisual = ExtResource("pv_tracer")
+MuzzleFlash = ExtResource("pv_flash")
+AimLaser = ExtResource("pv_aim")

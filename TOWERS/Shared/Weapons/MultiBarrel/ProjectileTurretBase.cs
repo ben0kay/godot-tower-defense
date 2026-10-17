@@ -22,6 +22,7 @@ public abstract partial class ProjectileTurretBase : TowerBase
     private float _searchTimer, _shotTimer;
     private readonly List<Marker2D> _muzzles = new();
     private BarrelFireController _barrels;
+    private WeaponVisualRenderer _visuals;
 
     [Export] public ProjectileTurretConfig Config
     {
@@ -72,6 +73,7 @@ public abstract partial class ProjectileTurretBase : TowerBase
         Node2D holder = GetNode<Node2D>("TurretPivot/Muzzles");
         foreach (Node node in holder.GetChildren()) if (node is Marker2D muzzle) _muzzles.Add(muzzle);
         _barrels = new BarrelFireController(_muzzles.Count);
+        _visuals = WeaponVisuals.Attach(_pivot);
         SetProcess(false);
         _initialized = true;
         if (Config != null) Config.Changed += RebuildStats;
@@ -89,7 +91,8 @@ public abstract partial class ProjectileTurretBase : TowerBase
     public override void _PhysicsProcess(double delta)
     {
         if (!IsOperational || Config == null || FinalStats == null || _registry == null || _projectiles == null
-            || !double.IsFinite(delta) || delta <= 0) return;
+            || !double.IsFinite(delta) || delta <= 0)
+        { _visuals?.SetAim(null, Vector2.Zero, 0, null, false); return; }
         _searchTimer -= (float)delta;
         // Retain at most one small elapsed-frame overshoot: fractional attack rates should not round down to 60Hz ticks.
         _shotTimer = Mathf.Max(-Mathf.Min((float)delta, .05f), _shotTimer - (float)delta);
@@ -99,9 +102,12 @@ public abstract partial class ProjectileTurretBase : TowerBase
             _searchTimer = Mathf.Max(.05f, FinalStats.TargetSearchInterval);
         }
         if (!TowerTargeting.Valid(_target, GlobalPosition, Mathf.Max(0, FinalStats.RangePixels))
-            || !TowerTargeting.Eligible(_target, RequiredEffect)) return;
+            || !TowerTargeting.Eligible(_target, RequiredEffect))
+        { _visuals.SetAim(null, Vector2.Zero, 0, null, false); return; }
         bool aligned = TurretAiming.Track(_pivot, _target.GlobalPosition, FinalStats.RotationSpeedDegrees,
             FinalStats.AimToleranceDegrees, Config.RotateWhileTracking, delta);
+        _visuals.SetAim(_muzzles[0], _target.GlobalPosition, FinalStats.RangePixels, Config.AimLaser,
+            Ammunition == null || Ammunition.Inventory.Amount > 0);
         if (!aligned || _shotTimer > 0 || FinalStats.ShotsPerSecond <= 0) return;
         FireVolley();
     }
@@ -120,9 +126,9 @@ public abstract partial class ProjectileTurretBase : TowerBase
             if (Ammunition?.TryFire() == false) return;
             Marker2D muzzle = _muzzles[_barrels.MuzzleIndex(mode, i)];
             BasicProjectile bullet = new();
-            bullet.Initialize(_target, FinalStats.ProjectileSpeed, hit, CreateEffect(FinalStats));
+            bullet.Initialize(_target, FinalStats.ProjectileSpeed, hit, CreateEffect(FinalStats), Config.ProjectileVisual);
             _projectiles.AddChild(bullet);
-            bullet.GlobalPosition = muzzle.GlobalPosition;
+            WeaponVisuals.Present(bullet, muzzle, Config, _visuals);
         }
         _barrels.Commit(mode);
         // Preserve fractional frame remainder; never schedule multiple catch-up volleys after a long hitch.

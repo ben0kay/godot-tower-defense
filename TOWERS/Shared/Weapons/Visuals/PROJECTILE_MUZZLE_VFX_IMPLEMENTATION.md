@@ -163,3 +163,12 @@ When complete, report:
 2. **Which visual shapes and fallback behaviors** work; whether custom textures are supported.
 3. **Compilation/headless tests** actually executed and any manual visual checks.
 4. **Performance approach**, limitations (e.g. faux glow vs real bloom), and remaining optional Sniper/Cryo styling.
+
+## Implementation status — 2026-10-17
+
+- [x] PV1: reusable Inspector styles, launch snapshots and guided tracers; Battle/Machine Gun authored presets.
+- [x] PV2: one bounded shared renderer, Battle real muzzle, actual funded A/B and simultaneous-barrel flashes.
+- [x] PV3 automated/resources/docs: Sniper and Cryo presets, Sniper optional red aiming, focused tests linked to the integration harness, authoring guide.
+- [ ] Manual normal-zoom appearance, rapid-fire and multi-tower desktop playtest. Automated checks do not establish visual quality or GPU FPS.
+
+Implementation uses `WeaponVisualRenderer` for both muzzle drawing and optional aiming, avoiding a second visual node. Actual compilation/test outcomes and environment limitations: [verification](../../../../TESTS/Towers/ProjectileVisuals.md). Research, weapon stats, recoil and unrelated effects remain outside scope.

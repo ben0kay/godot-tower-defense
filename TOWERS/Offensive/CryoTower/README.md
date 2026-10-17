@@ -19,3 +19,7 @@ Original provisional damage/rate/range retained. Added construction/upgrade time
 `SlowStats` is an optional eight-stage capability, with safety clamps and identical live/preview resolution. Inspector shows permanent Slow, Energy damage and eligibility. Launch captures resolved damage/overrides/penetration/Slow values; upgrades or source removal cannot change that projectile. Runtime config copies keep level rows private.
 
 Shared status runtime: `ENEMIES/StatusEffects/README.md`. Stasis, timed effects, DoT, research and save integration remain deferred. Focused tests: `TESTS/Towers/CryoTowerChecks.tscn`; actual verification outcomes are in `TESTS/Towers/CryoTower.md`.
+
+## Projectile presentation — PV1/PV2
+
+Implemented 16px icy cyan tracer and pale cyan crystalline starburst; the existing Energy damage and permanent Slow payload are unchanged. Tower-owned presets live in `Visuals/` and are assigned in `DefaultCryoTowerConfig.tres` (Weapon Visuals). Presentation never enters level/rank stat tables. Shared behavior and authoring: [Visuals](../../Shared/Weapons/Visuals/README.md). Regression evidence: [ProjectileVisuals](../../../TESTS/Towers/ProjectileVisuals.md). Manual appearance review at normal gameplay zoom remains pending.

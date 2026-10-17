@@ -17,3 +17,7 @@ The config exposes optional `Single`, `Sequential`, and `Simultaneous` modes for
 ## Initial construction (C1/C2)
 
 Paid placement occupies its footprint immediately and takes **4 seconds**, authored in the Level1 WorkSeconds column of this tower's `*Levels.cs`. It cannot acquire targets/fire/consume ammunition or request deliveries until complete. Completion preserves stats, level, rank and stock. Direct scene fixtures remain operational by default. Current final artwork stays visible; stage SVGs/VFX (C4) remain deferred. C3 Inspector progress is implemented; purchased upgrades use their own WorkSeconds and retain old-tier operation until completion. Duplicate purchases are disabled while work is active. See `TOWERS/Shared/Construction/README.md`.
+
+## Projectile presentation — PV1/PV2
+
+Implemented 12px narrow amber tracer and brief orange/white cone at each actual A/B barrel. Tower-owned presets live in `Visuals/` and are assigned in `DefaultMachineGunTowerConfig.tres` (Weapon Visuals). Presentation never enters level/rank stat tables. Shared behavior and authoring: [Visuals](../../Shared/Weapons/Visuals/README.md). Regression evidence: [ProjectileVisuals](../../../TESTS/Towers/ProjectileVisuals.md). Manual appearance review at normal gameplay zoom remains pending.

@@ -27,3 +27,7 @@ PassiveTestTower.tscn is a test-only nonweapon TowerBase scene with a simple squ
 ## IT1–IT4 follow-up verification
 
 The compact two-column Inspector supersedes the earlier540×325 scrolling layout. Existing upgrade/rank/work/ammo assertions follow the new scene paths and current-only MAX LEVEL table. InspectorTargetingChecks runs six-policy instance isolation, geometry checks at three desktop sizes, rank/XP and spatial regressions, plus checkpoint-aware500-enemy sharing. See TESTS/UI/InspectorTargeting.md for executed results.
+
+## PV1/PV2 tracer, muzzle and Sniper aiming checks
+
+`ProjectileVisualChecks.tscn` runs real Battle/Machine Gun/Sniper firing, guided launch snapshots, cleanup, fixed-slot renderer allocation checks, and existing MultiBarrel/Cryo compatibility groups. Its focused `Run` group is also linked into EnemyIntegrationChecks. See [actual verification](ProjectileVisuals.md).

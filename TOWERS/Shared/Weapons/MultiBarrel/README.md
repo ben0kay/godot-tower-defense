@@ -15,3 +15,7 @@ Each tower's `TurretPivot` contains its rotating `Sprite` and `Muzzles` Node2D h
 Scope: **no** barrel temperature/recoil/spread/reloading, separate per-barrel targeting, weapon changes for Battle/Laser/Blaster/Shockwave, HUD layout changes, or new autoloads. Existing authored ranks and shared damage rules apply unchanged. Upgrade rows affect cached stats only; ammo inventory persists. Godot import of new SVGs and a .NET/headless run are required to verify runtime behavior.
 
 **Cadence precision:** A shared turret carries forward fractional cooldown overshoot (bounded to the current physics frame, at most 0.05 seconds), instead of rounding every interval up to a full physics tick. This is important at 12.4 and 12.8 bullets/s on a 60-Hz game. Long pauses/hitches still never emit more than one volley in one physics tick. `MultiBarrelTowerChecks` tests ten simulated seconds at each of 12 / 12.4 / 12.8 bullets/s.
+
+## PV1/PV2 visual delivery
+
+The existing funded firing loop passes each selected marker to `WeaponVisuals.Present`. Bullet origin and flash origin therefore agree in Single, Sequential and Simultaneous modes. No changes to `BarrelFireController`, total bullet cadence or ammo funding. One renderer under TurretPivot owns bounded flash drawing and optional Sniper aiming; tower-owned resources control appearance. See [Visuals](../Visuals/README.md).

@@ -146,3 +146,7 @@ No permanent research, saving, magazines/reload timers, power grids/consumption,
 ## Cryo CT1–CT3
 
 Implemented shared lazy permanent-Slow status storage/Inspector immunity, immutable projectile payload, Cryo Energy weapon/catalog/artwork, explicit levels/ranks and effective Slow stat previews. Targeting excludes any already-slowed or immune enemy, without damage-only fallback. Reuses construction, physical ammo and spatial queries. Stasis/DoT/timed scheduler/research/saving remain deferred. See TOWERS/Offensive/CryoTower/README.md and TESTS/Towers/CryoTower.md for verification.
+
+## PV1/PV2 implemented — 2026-10-17
+
+Projectile tracers, real-muzzle bounded flashes and tower-owned Battle/Machine Gun/Sniper/Cryo presets are implemented. Sniper additionally has optional subtle red barrel-forward aiming. No HUD, gameplay stats, targeting or ammo systems were redesigned. [Authoring](../TOWERS/Shared/Weapons/Visuals/README.md), [actual verification and remaining desktop review](../TESTS/Towers/ProjectileVisuals.md).

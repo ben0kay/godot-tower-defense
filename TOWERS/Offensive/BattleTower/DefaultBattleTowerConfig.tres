@@ -4,6 +4,11 @@
 
 [ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/Artwork/Construction/BattleConstructionArt.tres" id="2_art"]
 
+[ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/Visuals/BattleTracerStyle.tres" id="pv_tracer"]
+[ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/Visuals/BattleMuzzleFlashStyle.tres" id="pv_flash"]
 [resource]
 script = ExtResource("1")
 ConstructionArt = ExtResource("2_art")
+
+ProjectileVisual = ExtResource("pv_tracer")
+MuzzleFlash = ExtResource("pv_flash")

@@ -2,10 +2,14 @@
 using Godot;
 
 [GlobalClass]
-public partial class ProjectileTurretConfig : TowerConfig, ITowerTargetingPolicy
+public partial class ProjectileTurretConfig : TowerConfig, ITowerTargetingPolicy, IProjectileVisualConfig
 {
     [ExportGroup("Firing")]
     [Export] public BarrelFireMode FiringMode { get; set; } = BarrelFireMode.Single;
+    [ExportGroup("Weapon Visuals")]
+    [Export] public ProjectileVisualStyle ProjectileVisual { get; set; }
+    [Export] public MuzzleFlashStyle MuzzleFlash { get; set; }
+    [Export] public AimLaserStyle AimLaser { get; set; }
     [ExportGroup("Aiming")]
     [Export] public bool RotateWhileTracking { get; set; } = true;
     [ExportGroup("Targeting")]

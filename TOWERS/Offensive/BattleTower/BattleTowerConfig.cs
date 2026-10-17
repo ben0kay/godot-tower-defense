@@ -2,7 +2,7 @@
 using Godot;
 
 [GlobalClass]
-public partial class BattleTowerConfig : TowerConfig, ITowerTargetingPolicy
+public partial class BattleTowerConfig : TowerConfig, ITowerTargetingPolicy, IProjectileVisualConfig
 {
     public override System.Collections.Generic.IReadOnlyList<TowerRankDefinition> Ranks => BattleTowerRanks.Rows;
     // =========================================================
@@ -14,6 +14,9 @@ public partial class BattleTowerConfig : TowerConfig, ITowerTargetingPolicy
         Levels = BattleTowerLevels.Create();
     }
 
+    [ExportGroup("Weapon Visuals")]
+    [Export] public ProjectileVisualStyle ProjectileVisual { get; set; }
+    [Export] public MuzzleFlashStyle MuzzleFlash { get; set; }
     [ExportGroup("Aiming")]
     [Export] public bool RotateWhileTracking { get; set; } = true;
     [ExportGroup("Targeting")]
