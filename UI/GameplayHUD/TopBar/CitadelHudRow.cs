@@ -15,7 +15,7 @@ public partial class CitadelHudRow : Control
         internal CreditBuffer Buffer;
         internal StyleBoxFlat Fill;
         internal Action<int, int> Changed, CreditsChanged;
-        internal Action<InputEvent> Clicked;
+        internal Control.GuiInputEventHandler Clicked;
         internal Tween BarTween, FlashTween;
         internal int Previous = -1, PreviousMaximum;
     }
