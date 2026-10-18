@@ -3,6 +3,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.IO;
 using System.Threading.Tasks;
 
 public partial class MenuTowerFlowChecks : Node
@@ -11,8 +12,14 @@ public partial class MenuTowerFlowChecks : Node
     // Persist this runner across real scene changes and use actual menu/HUD button callbacks.
     public override async void _Ready()
     {
+        string temporary = Path.Combine(Path.GetTempPath(), "td-menu-flow-" + Guid.NewGuid().ToString("N"));
+        FieldInfo profiles = typeof(ProfileStore).GetField("_profiles", BindingFlags.Static | BindingFlags.NonPublic);
+        FieldInfo store = typeof(ProgressionService).GetField("_store", BindingFlags.Static | BindingFlags.NonPublic);
+        object previousProfiles = profiles.GetValue(null), previousStore = store.GetValue(null);
+        PlayerProfile previousSelection = ProfileStore.Selected;
         try
         {
+            store.SetValue(null, new ProgressionStore(temporary));
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
             GetTree().CurrentScene = null;
             PlayerProfile fixture = new() { Id = Guid.NewGuid().ToString("N"), Name = "Tower flow fixture" };
@@ -26,7 +33,17 @@ public partial class MenuTowerFlowChecks : Node
             Require(ProfileStore.Selected == fixture, "Boot's real profile action selects its memory-only fixture");
             ButtonFor(menu, "CAMPAIGN").EmitSignal(Button.SignalName.Pressed);
             CampaignMenu campaign = await Scene<CampaignMenu>();
-            ButtonFor(campaign, "PLAY LEVEL 001").EmitSignal(Button.SignalName.Pressed);
+            Require(ButtonFor(campaign, "PLAY LEVEL 001") == null && ButtonFor(campaign, "RESEARCH") != null, "Hub separates Levels from Research");
+            await Geometry(campaign);
+            ButtonFor(campaign, "LEVELS").EmitSignal(Button.SignalName.Pressed);
+            LevelSelectionMenu levels = await Scene<LevelSelectionMenu>();
+            Require(ButtonFor(levels, "PLAY LEVEL 002") != null && ProfileStore.Selected == fixture, "Levels offers both existing missions for the same profile");
+            await Geometry(levels);
+            ButtonFor(levels, "BACK TO CAMPAIGN").EmitSignal(Button.SignalName.Pressed);
+            campaign = await Scene<CampaignMenu>();
+            ButtonFor(campaign, "LEVELS").EmitSignal(Button.SignalName.Pressed);
+            levels = await Scene<LevelSelectionMenu>();
+            ButtonFor(levels, "PLAY LEVEL 001").EmitSignal(Button.SignalName.Pressed);
             Node2D battlefield = await Scene<Node2D>();
             GameplayHUD hud = battlefield.GetNode<GameplayHUD>("UI/GameplayHUD");
             TowerPlacementController placement = battlefield.GetNode<TowerPlacementController>("TowerPlacement");
@@ -68,10 +85,33 @@ public partial class MenuTowerFlowChecks : Node
             hud.SetTowerBarOpen(false, true);
             Require(hud.IsInspectionVisible, "Closing the tray preserves placed-tower inspection");
             await SubsystemBattlefield.DrainFreedFixtures(this);
-            GD.Print("PASS: Boot → Main → Campaign → Level001 real button flow, catalog build and paid Battle upgrade (no save writes)");
+            GD.Print("PASS: Boot → Main → Campaign → Levels/back → Level001, both mission choices, viewport geometry, catalog build and paid Battle upgrade (temporary saves only)");
             GetTree().Quit(0);
         }
         catch (Exception error) { GD.PushError(error.ToString()); GetTree().Quit(1); }
+        finally
+        {
+            ProfileStore.ClearSelection(); profiles.SetValue(null, previousProfiles); store.SetValue(null, previousStore);
+            if (previousSelection != null) ProfileStore.Select(previousSelection.Id);
+            if (Directory.Exists(temporary)) Directory.Delete(temporary, true);
+        }
+    }
+
+    // =========================================================
+    // Verify the actual hub/mission panels fit common viewports without changing shared menu layout.
+    private async Task Geometry(Control screen)
+    {
+        var panel = screen.GetChild(1).GetChild(0).GetChild<PanelContainer>(0);
+        screen.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.TopLeft);
+        foreach (Vector2 size in new[] { new Vector2(1920,1080), new Vector2(1366,768), new Vector2(960,540) })
+        {
+            screen.Size = size;
+            await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            Rect2 rect = panel.GetGlobalRect(), bounds = screen.GetGlobalRect();
+            Require(rect.Position.X >= bounds.Position.X - 1 && rect.Position.Y >= bounds.Position.Y - 1 &&
+                rect.End.X <= bounds.End.X + 1 && rect.End.Y <= bounds.End.Y + 1, "Campaign panel fits " + size);
+        }
     }
 
     // =========================================================

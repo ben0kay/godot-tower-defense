@@ -14,7 +14,7 @@ public static class MenuFoundationChecks
             "Campaign exposes the playable Level002 launch scene");
         Level002Checks.Run();
         foreach (string scenePath in new[] {
-            MenuNavigation.BootScene, MenuNavigation.MainScene, MenuNavigation.CampaignScene })
+            MenuNavigation.BootScene, MenuNavigation.MainScene, MenuNavigation.CampaignScene, MenuNavigation.LevelsScene })
         {
             PackedScene packed = GD.Load<PackedScene>(scenePath);
             Require(packed != null, "Menu scene loads: " + scenePath);

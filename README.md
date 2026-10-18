@@ -1,3 +1,9 @@
+## Campaign hub — 2026-10-17
+
+Campaign now displays profile progression with LEVELS and RESEARCH. LEVELS opens the existing two-mission chooser; both mission buttons launch the same battlefields. Results returns to Campaign, and Research remains between missions. See UI/Menus/Campaign/Levels/README.md.
+
+---
+
 ## Mission XP foundation — 2026-10-17
 
 Mission outcomes now grant configurable per-level player XP (victory500 / defeat0 initially) once to the deployment profile. Results shows the saved reward/level changes/RP and returns to Campaign for Research. See SYSTEMS/Progression/Missions/README.md; first-clear/replay balancing and battlefield saves remain deferred.

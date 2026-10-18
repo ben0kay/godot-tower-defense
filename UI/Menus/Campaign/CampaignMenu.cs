@@ -1,4 +1,4 @@
-// Simple campaign gateway for two standalone authored battlefields; saves/unlocks remain later.
+// Profile-owned campaign hub: progression plus clear Levels and Research destinations.
 using Godot;
 using System;
 
@@ -21,34 +21,33 @@ public partial class CampaignMenu : Control
         Input.MouseMode = Input.MouseModeEnum.Visible;
         if (ProfileStore.Selected == null) { MenuNavigation.ReturnToBoot(this); return; }
         VBoxContainer content = MenuLayout.Create(this, "CAMPAIGN",
-            "Commander " + ProfileStore.Selected.Name + "  /  Select a deployment", PanelWidth);
+            "Commander " + ProfileStore.Selected.Name + "  /  Campaign command", PanelWidth);
         content.AddChild(new PlayerProgressionPanel { Name = "PlayerProgression", AllowDebugGrant = ShowProgressionDebugGrant });
-        content.AddChild(UIButtonFactory.Create("RESEARCH", () => Navigate(MenuNavigation.ResearchScene), UIButtonStyle.Action, 48f));
-        content.AddChild(UIButtonFactory.Label("LEVEL 001  —  DEFEND THE CITADEL", 17));
-        Label details = UIButtonFactory.Label("Initial combat test map with compact routes.", 14);
-        details.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-        content.AddChild(details);
-        Button play = UIButtonFactory.Create("PLAY LEVEL 001", () => Navigate(MenuNavigation.Level001Scene),
-            UIButtonStyle.Action, 64f);
-        content.AddChild(play);
-        content.AddChild(UIButtonFactory.Label("LEVEL 002  —  THE FIVE GATES", 17));
-        Label mazeDetails = UIButtonFactory.Label("Five western portals. Open staging ground and a sprawling eastern maze with multiple paths.", 14);
-        mazeDetails.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-        content.AddChild(mazeDetails);
-        content.AddChild(UIButtonFactory.Create("PLAY LEVEL 002", () => Navigate(MenuNavigation.Level002Scene),
-            UIButtonStyle.Action, 64f));
+        Button levels = UIButtonFactory.Create("LEVELS", () => Navigate(MenuNavigation.LevelsScene), UIButtonStyle.Menu, 64f);
+        content.AddChild(levels);
+        AddDescription(content, "Choose a mission and deploy your defenses.");
+        content.AddChild(UIButtonFactory.Create("RESEARCH", () => Navigate(MenuNavigation.ResearchScene), UIButtonStyle.Menu, 64f));
+        AddDescription(content, "Spend Research Points on permanent upgrades between missions.");
         content.AddChild(UIButtonFactory.Create("BACK TO MAIN MENU",
             () => Navigate(MenuNavigation.MainScene), UIButtonStyle.Compact));
         _errorDialog = new AcceptDialog { Title = "Could not launch" };
         AddChild(_errorDialog);
         UIButtonFactory.Apply(_errorDialog.GetOkButton(), UIButtonStyle.Action);
-        play.GrabFocus();
+        levels.GrabFocus();
     }
     #endregion
 
+    // =========================================================
+    // Keep supporting copy consistent with the existing menu typography and responsive wrapping.
+    private static void AddDescription(VBoxContainer content, string text)
+    {
+        Label label = UIButtonFactory.Label(text, 14); label.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        content.AddChild(label);
+    }
+
     #region Routing
     // =========================================================
-    // Both authored battlefields use identical shared navigation, combat, UI and wallet systems.
+    // Both hub destinations use the same guarded scene navigation as the rest of the menus.
     private void Navigate(string scene)
     {
         try { MenuNavigation.Open(this, scene); }
