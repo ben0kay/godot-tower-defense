@@ -6,6 +6,7 @@ using static AmmoLoopFixture;
 
 public partial class InspectorTargetingChecks : Node
 {
+    #region Integration Checks
     // =========================================================
     // Drive production controls and wait for actual Godot layout; no mocked HUD or damage systems.
     public override async void _Ready()
@@ -125,8 +126,8 @@ public partial class InspectorTargetingChecks : Node
             hud.Size = viewport; float maximumHeight = 0;
             foreach (string id in new[] { "battle", "laser", "blaster_cannon", "shockwave", "sniper", "machine_gun", "cryo", "ammo_factory", "ammo_depot" })
             {
-                TowerBase tower = f.Add<TowerBase>(id, new(2000, 2000)); f.Placement.Call("SelectTower", tower);
                 hud.SetTowerBarOpen(true, true);
+                TowerBase tower = f.Add<TowerBase>(id, new(2000, 2000)); f.Placement.Call("SelectTower", tower);
                 await hud.ToSignal(hud.GetTree(), SceneTree.SignalName.ProcessFrame);
                 await hud.ToSignal(hud.GetTree(), SceneTree.SignalName.ProcessFrame);
                 Require(hud.Size == (Vector2)viewport, "Test viewport remains the requested size");
@@ -199,4 +200,5 @@ public partial class InspectorTargetingChecks : Node
             CheckVisible(child, bounds);
         }
     }
+    #endregion
 }

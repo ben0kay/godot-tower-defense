@@ -75,7 +75,7 @@ public partial class TowerPlacementController : Node2D
         AddChild(_ghost);
         _economy.BalanceChanged += OnBalanceChanged;
         _hud.TowerChoiceRequested += OnTowerChoiceRequested; _hud.TowerPreviewRequested += OnTowerPreviewRequested;
-        _hud.TowerBarClosed += CancelPlacement; _hud.BuildCategoryChanged += CancelPlacement; _hud.InspectionClosed += OnInspectionClosed;
+        _hud.TowerBarOpened += OnBuildTrayOpened; _hud.TowerBarClosed += CancelPlacement; _hud.BuildCategoryChanged += CancelPlacement; _hud.InspectionClosed += OnInspectionClosed;
         _hud.TowerUpgradeRequested += OnUpgradeRequested; _hud.TargetPriorityRequested += OnTargetPriorityRequested;
         SetProcessUnhandledInput(true);
         _input = GetNode<GameInput>("/root/GameInput");
@@ -92,7 +92,7 @@ public partial class TowerPlacementController : Node2D
         _placementExits.Clear();
         if (GodotObject.IsInstanceValid(_input)) _input.Unbind(this);
         if (GodotObject.IsInstanceValid(_hud))
-        { _hud.TowerBarClosed -= CancelPlacement; _hud.BuildCategoryChanged -= CancelPlacement; _hud.InspectionClosed -= OnInspectionClosed; _hud.TowerChoiceRequested -= OnTowerChoiceRequested; _hud.TowerPreviewRequested -= OnTowerPreviewRequested; _hud.TowerUpgradeRequested -= OnUpgradeRequested; _hud.TargetPriorityRequested -= OnTargetPriorityRequested; }
+        { _hud.TowerBarOpened -= OnBuildTrayOpened; _hud.TowerBarClosed -= CancelPlacement; _hud.BuildCategoryChanged -= CancelPlacement; _hud.InspectionClosed -= OnInspectionClosed; _hud.TowerChoiceRequested -= OnTowerChoiceRequested; _hud.TowerPreviewRequested -= OnTowerPreviewRequested; _hud.TowerUpgradeRequested -= OnUpgradeRequested; _hud.TargetPriorityRequested -= OnTargetPriorityRequested; }
         if (GodotObject.IsInstanceValid(_economy)) _economy.BalanceChanged -= OnBalanceChanged;
         if (GodotObject.IsInstanceValid(_buildDefinition?.DefaultConfig)) _buildDefinition.DefaultConfig.Changed -= OnPreviewConfigChanged;
         if (GodotObject.IsInstanceValid(_selected))
@@ -101,6 +101,10 @@ public partial class TowerPlacementController : Node2D
     #endregion
 
     #region Build Mode
+    // =========================================================
+    // Ctrl starts a fresh blank browser and detaches old instance events before the shell becomes visible.
+    private void OnBuildTrayOpened() { CancelPlacement(); SelectTower(null); }
+
     // =========================================================
     // Browsing is mouse-hover/keyboard-focus only; it never arms a ghost or spends resources.
     private void OnTowerPreviewRequested(string id)

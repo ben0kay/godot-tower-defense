@@ -43,13 +43,16 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="Scroll" type="ScrollContainer" parent="Insets/Tray"]
-custom_minimum_size = Vector2(0, 82)
+custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 horizontal_scroll_mode = 1
 vertical_scroll_mode = 0
+follow_focus = true
 
-[node name="Buttons" type="HBoxContainer" parent="Insets/Tray/Scroll"]
+[node name="Buttons" type="GridContainer" parent="Insets/Tray/Scroll"]
 layout_mode = 2
-theme_override_constants/separation = 7
+theme_override_constants/h_separation = 7
+theme_override_constants/v_separation = 7
+columns = 1

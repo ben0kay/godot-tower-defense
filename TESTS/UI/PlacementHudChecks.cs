@@ -17,6 +17,7 @@ public partial class PlacementHudChecks : Node
             ProfileStore.ClearSelection();
             foreach (string path in new[] { MenuNavigation.Level001Scene, MenuNavigation.Level002Scene }) await Run(path);
             await PreviewLayout();
+            await StableBuildTray();
             await SubsystemBattlefield.DrainFreedFixtures(this);
             GD.Print("PlacementHudChecks: PASS both maps hover/focus/cost/affordability, denied signal, hidden placement, RMB/Ctrl, no auto-selection and separate later inspection");
             GetTree().Quit();
@@ -48,6 +49,65 @@ public partial class PlacementHudChecks : Node
         GD.Print("PASS: build previews for all catalog types fit the existing560x330 Inspector at1920x1080,1366x768,960x540");
     }
 
+    #region Stable Build Tray Regression
+    // =========================================================
+    // Reserve Inspector space before hover, keep a blank shell and prove two rows/overflow with real catalog data.
+    private async Task StableBuildTray()
+    {
+        using AmmoLoopFixture f = new(this);
+        GameplayHUD hud = f.Hud;
+        hud.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.TopLeft);
+        Control panel = hud.GetNode<Control>("BottomArea/Inspector"), body = panel.GetNode<Control>("Insets/Body");
+        Control tray = hud.GetNode<Control>("BottomArea/TraySlot/TowerBar");
+        GridContainer entries = tray.GetNode<GridContainer>("Insets/Tray/Scroll/Buttons");
+        ScrollContainer scroll = entries.GetParent<ScrollContainer>();
+        foreach (Vector2 size in new[] { new Vector2(1920,1080), new Vector2(1366,768), new Vector2(960,540) })
+        {
+            GetTree().Root.Size = (Vector2I)size; GetTree().Root.ContentScaleSize = (Vector2I)size;
+            hud.SetTowerBarOpen(false, true); hud.Size = size; hud.SetTowerBarOpen(true, true);
+            await SettleTray();
+            Require(panel.Visible && !body.Visible && !hud.IsInspectionVisible, "Ctrl opening shows blank reserved shell");
+            Require(Math.Abs(tray.Size.Y - hud.Config.BottomBarHeight) < .01f, "Two rows fit configured tray height");
+            Rect2 before = tray.GetGlobalRect(); Button rocket = hud.GetBuildButton("rocket");
+            Require(rocket != null, "Actual Rocket build entry exists");
+            hud._Input(new InputEventMouseMotion { Relative = Vector2.One });
+            rocket.EmitSignal(Control.SignalName.MouseEntered); await SettleTray();
+            Require(body.Visible && tray.GetGlobalRect() == before && before.End.X <= panel.GetGlobalRect().Position.X,
+                "Hover cannot move tray or cover Rocket at " + size);
+            Require(entries.Columns == (f.Placement.Catalog.Definitions.Count(d => d.Available) + 1) / 2 &&
+                entries.Size.Y <= 138 && scroll.GetVScrollBar().Visible == false, "Two rows with horizontal overflow only");
+            scroll.EnsureControlVisible(rocket); await SettleTray();
+            Vector2 cursor = rocket.GetGlobalRect().GetCenter();
+            GetViewport().PushInput(new InputEventMouseMotion { Position = cursor, GlobalPosition = cursor, Relative = Vector2.One });
+            await SettleTray();
+            Require(GetViewport().GuiGetHoveredControl() == rocket, "Real pointer hits Rocket rather than Inspector: " + GetViewport().GuiGetHoveredControl()?.GetPath() + " cursor=" + cursor + " tile=" + rocket.GetGlobalRect() + " viewport=" + GetViewport().GetVisibleRect());
+            GetViewport().PushInput(new InputEventMouseButton { Position = cursor, GlobalPosition = cursor, ButtonIndex = MouseButton.Left, Pressed = true });
+            GetViewport().PushInput(new InputEventMouseButton { Position = cursor, GlobalPosition = cursor, ButtonIndex = MouseButton.Left, Pressed = false });
+            Require(f.Placement.IsPlacing && hud.IsPlacementPresentation, "Rocket can be chosen beside Inspector");
+            f.Placement.Call("CancelPlacement"); await SettleTray();
+            Require(panel.Visible && !body.Visible && !hud.IsInspectionVisible, "Cancel restores blank shell without stale details");
+            Require(tray.GetGlobalRect() == before, "Placement/cancel never expands the tray");
+        }
+        TowerDefinition source = f.Placement.Catalog.Find("battle");
+        TowerCatalog many = new();
+        for (int n = 0; n < 40; n++)
+            many.Definitions.Add(new TowerDefinition { TowerId = "tray-layout-" + n, Scene = source.Scene,
+                DefaultConfig = source.DefaultConfig, Icon = source.Icon, Category = source.Category });
+        many.Rebuild(); hud.BindCatalog(many); await SettleTray();
+        Require(entries.Columns == 20 && entries.Size.Y <= 138 && scroll.GetHScrollBar().MaxValue > scroll.Size.X,
+            "Forty entries remain two rows and overflow horizontally");
+        scroll.EnsureControlVisible(hud.GetBuildButton("tray-layout-39")); await SettleTray();
+        Require(scroll.ScrollHorizontal > 0 && tray.GetGlobalRect().End.X <= panel.GetGlobalRect().Position.X, "Final tile scrolls into reserved tray");
+        hud.BindCatalog(f.Placement.Catalog); hud.SelectBuildCategory(TowerDefinition.TowerCategory.Economy); await SettleTray();
+        Require(entries.Columns == 1, "Filtering recomputes two-row columns without empty gaps");
+        GD.Print("PASS: blank Ctrl shell, stable non-overlapping Rocket tray, two-row categories and forty-tile horizontal scrolling at three sizes");
+    }
+    // =========================================================
+    // Native containers settle before geometry assertions; there is no wall-clock delay.
+    private async Task SettleTray()
+    { await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame); await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame); }
+    #endregion
+
     // =========================================================
     // The same cell-based production input handler is used by unhandled LMB and these headless checks.
     private async Task Run(string scene)
@@ -64,6 +124,7 @@ public partial class PlacementHudChecks : Node
         var grid = f.Main.GetNode<WorldGrid>("World/Grid");
         Vector2I cell = grid.Level.Passable.GetUsedCells().First(c => f.Spawns.PlacementFailure(c).Length == 0);
         int rejected = 0; f.Placement.BuildDenied += (_, _) => rejected++;
+        f.Hud._Input(new InputEventMouseMotion { Relative = Vector2.One });
         button.EmitSignal(Control.SignalName.MouseEntered);
         Require(f.Hud.IsInspectionVisible && lower.Visible && !f.Placement.IsPlacing && !ghost.Visible &&
             details.Text.Contains("200 Credits") && notes.Visible && notes.Text.Contains("CAN AFFORD"), "Hover shows basic cost/affordability without placement");

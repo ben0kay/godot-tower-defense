@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 public static class TowerBuildBarChecks
 {
+    #region Integration Checks
     // =========================================================
     // Generate a large tray without instantiating towers, exercise action IDs and keyboard focus.
     public static async Task Run(Node main)
@@ -28,7 +29,7 @@ public static class TowerBuildBarChecks
         int active = main.GetNode("World/Towers").GetChildCount();
         placement.Catalog = many;
         hud.BindCatalog(many);
-        HBoxContainer entries = hud.GetNode<HBoxContainer>("BottomArea/TraySlot/TowerBar/Insets/Tray/Scroll/Buttons");
+        GridContainer entries = hud.GetNode<GridContainer>("BottomArea/TraySlot/TowerBar/Insets/Tray/Scroll/Buttons");
         Require(entries.GetChildCount() == 39 && hud.GetBuildButton("variant-5") == null &&
             main.GetNode("World/Towers").GetChildCount() == active, "Arbitrary registered types render without inactive placeholders or live tower instances");
         Button last = hud.GetBuildButton("variant-39");
@@ -41,6 +42,7 @@ public static class TowerBuildBarChecks
         hud.TowerChoiceRequested -= Chosen;
         Require(requested == "variant-39" && hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Heading/TowerName").Text == "Test variant 39",
             "Generated action delivers the type ID to generic placement and its own preview");
+        placement.Call("CancelPlacement"); // Placement deliberately hides the lower HUD; finish it before testing scrolling.
         hud.SetTowerBarOpen(true, true);
         await hud.ToSignal(hud.GetTree(), SceneTree.SignalName.ProcessFrame);
         await hud.ToSignal(hud.GetTree(), SceneTree.SignalName.ProcessFrame);
@@ -48,6 +50,8 @@ public static class TowerBuildBarChecks
         Require(scroll.GetHScrollBar().MaxValue > scroll.Size.X && scroll.GetGlobalRect().End.X <= hud.GetGlobalRect().End.X,
             "Large catalog scrolls inside viewport without widening the HUD");
         scroll.EnsureControlVisible(last);
+        await hud.ToSignal(hud.GetTree(), SceneTree.SignalName.ProcessFrame);
+        await hud.ToSignal(hud.GetTree(), SceneTree.SignalName.ProcessFrame);
         Require(scroll.ScrollHorizontal > 0, "Last registered entry is reachable via scrolling");
         hud.SetTowerBarOpen(false, true);
         Require(!hud.IsInspectionVisible, "Closing large tray clears active build-preview Inspector");
@@ -65,4 +69,5 @@ public static class TowerBuildBarChecks
     // Fail on dynamic build UI integration regression.
     private static void Require(bool value, string message)
     { if (!value) throw new InvalidOperationException(message); }
+    #endregion
 }

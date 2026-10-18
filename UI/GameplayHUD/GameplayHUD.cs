@@ -26,10 +26,12 @@ public partial class GameplayHUD : Control
     // =========================================================
     // Closing the build tray also ends any active placement in its owning controller.
     [Signal] public delegate void TowerBarClosedEventHandler();
+    [Signal] public delegate void TowerBarOpenedEventHandler();
     [Signal] public delegate void BuildCategoryChangedEventHandler();
     [Signal] public delegate void InspectionClosedEventHandler();
 
-    public bool IsInspectionVisible => _inspector?.Visible == true;
+    // An empty reserved shell is visible UI, but is not an active tower inspection.
+    public bool IsInspectionVisible => _inspector?.Visible == true && _hasInspectionDetails;
 
     #region Cached Nodes
     private PanelContainer _topBar, _towerBar, _inspector;
@@ -43,7 +45,8 @@ public partial class GameplayHUD : Control
     private Control _upgradeDivider;
     private readonly Dictionary<TowerTargeting.Priority, Button> _targetButtons = new();
     public Button GetTargetPriorityButton(TowerTargeting.Priority priority) => _targetButtons.GetValueOrDefault(priority);
-    private bool _buildPreview;
+    private bool _buildPreview, _hasInspectionDetails;
+    private Control _inspectorBody;
     private TowerFinalStats _comparisonNow, _comparisonNext;
     private CreditGainIndicator _creditGain;
     private ProgressBar _healthBar, _experienceBar;
@@ -85,6 +88,7 @@ public partial class GameplayHUD : Control
         _traySlot = GetNode<Control>("BottomArea/TraySlot");
         _traySlot.Resized += FitTrayToSlot;
         _inspector = GetNode<PanelContainer>("BottomArea/Inspector");
+        _inspectorBody = _inspector.GetNode<Control>("Insets/Body");
 
         _wave = GetNode<Label>("TopBar/Status/Wave");
         _credits = GetNode<Label>("TopBar/Status/Credits");
@@ -153,7 +157,7 @@ public partial class GameplayHUD : Control
             if (focus != null && _bottomArea.IsAncestorOf(focus)) focus.ReleaseFocus();
             _bottomArea.Hide();
         }
-        else { _bottomArea.Show(); _towerBar.Visible = _trayOpen; }
+        else { _bottomArea.Show(); _towerBar.Visible = _trayOpen; _inspector.Visible = _trayOpen || _hasInspectionDetails; }
     }
 
     // =========================================================
@@ -175,7 +179,14 @@ public partial class GameplayHUD : Control
     public void SetTowerBarOpen(bool open, bool immediate = false)
     {
         if (IsPlacementPresentation && !open) immediate = true;
+        bool opening = open && !_trayOpen;
         _trayOpen = open;
+        if (opening)
+        {
+            _suppressRestoredHover = true;
+            EmitSignal(SignalName.TowerBarOpened); ClearInspection();
+        }
+        if (!open && !_hasInspectionDetails) _inspector.Hide();
         if (!open) EmitSignal(SignalName.TowerBarClosed);
         _trayTween?.Kill();
         if (open) _towerBar.Show();
@@ -204,7 +215,7 @@ public partial class GameplayHUD : Control
     // Call after Catalog.Rebuild when registration/availability changes, never each physics frame.
     public void BindCatalog(TowerCatalog catalog)
     {
-        HBoxContainer entries = GetNode<HBoxContainer>("BottomArea/TraySlot/TowerBar/Insets/Tray/Scroll/Buttons");
+        GridContainer entries = GetNode<GridContainer>("BottomArea/TraySlot/TowerBar/Insets/Tray/Scroll/Buttons");
         foreach (Node child in entries.GetChildren()) { entries.RemoveChild(child); child.QueueFree(); }
         _buildButtons.Clear(); _buildCategories.Clear();
         foreach (TowerDefinition definition in catalog.Definitions)
@@ -266,7 +277,13 @@ public partial class GameplayHUD : Control
     // Toggle visibility/focus states without rebuilding controls or polling the catalog.
     private void FilterBuildButtons()
     {
-        foreach (var entry in _buildButtons) entry.Value.Visible = !BuildCategory.HasValue || _buildCategories[entry.Key] == BuildCategory.Value;
+        int visible = 0;
+        foreach (var entry in _buildButtons)
+        {
+            entry.Value.Visible = !BuildCategory.HasValue || _buildCategories[entry.Key] == BuildCategory.Value;
+            if (entry.Value.Visible) visible++;
+        }
+        GetNode<GridContainer>("BottomArea/TraySlot/TowerBar/Insets/Tray/Scroll/Buttons").Columns = Math.Max(1, (visible + 1) / 2);
         foreach (var entry in _categoryButtons) entry.Value.SetPressedNoSignal(entry.Key == (BuildCategory?.ToString() ?? "All"));
         GetNode<ScrollContainer>("BottomArea/TraySlot/TowerBar/Insets/Tray/Scroll").ScrollHorizontal = 0;
     }
@@ -286,7 +303,7 @@ public partial class GameplayHUD : Control
         _towerName.Text = name; _towerName.TooltipText = category + "\n" + notes + "\n" + stats;
         _towerCategory.Text = "";
         _towerStats.Text = stats; _towerNotes.Text = notes;
-        RefreshDetailsVisibility(); _inspector.Show();
+        RefreshDetailsVisibility(); _hasInspectionDetails = true; _inspectorBody.Show(); _inspector.Show();
     }
 
     // =========================================================
@@ -496,11 +513,12 @@ public partial class GameplayHUD : Control
     public void SetUpgradeError(string message) => _upgradeInfo.Text = message + "\n" + _upgradeInfo.Text;
 
     // =========================================================
-    // Hide the inspector independently from the build tray.
+    // Retire details while keeping the reserved blank shell visible beside an open build tray.
     public void ClearInspection()
     {
-        if (!IsInspectionVisible) return;
-        _inspector.Hide(); EmitSignal(SignalName.InspectionClosed);
+        bool hadDetails = _hasInspectionDetails; _hasInspectionDetails = false;
+        _inspectorBody.Hide(); _inspector.Visible = _trayOpen && !IsPlacementPresentation;
+        if (hadDetails) EmitSignal(SignalName.InspectionClosed);
     }
     #endregion
 
@@ -689,7 +707,11 @@ public partial class GameplayHUD : Control
         _bottomArea.OffsetTop = -(Config.BottomBarHeight + Config.EdgeMargin);
         _bottomArea.OffsetBottom = -Config.EdgeMargin;
         Control slot = GetNode<Control>("BottomArea/TraySlot");
-        slot.CustomMinimumSize = new Vector2(0, Config.BottomBarHeight);
+        float inspectorWidth = Mathf.Min(Config.InspectorWidth, Mathf.Max(200, Size.X - Config.EdgeMargin * 2));
+        float trayWidth = Mathf.Max(0, Size.X - Config.EdgeMargin * 2 - inspectorWidth - _bottomArea.GetThemeConstant("separation"));
+        slot.SizeFlagsHorizontal = SizeFlags.Fill;
+        slot.CustomMinimumSize = new Vector2(trayWidth, Config.BottomBarHeight);
+        GetNode<Control>("BottomArea/TraySlot/TowerBar/Insets/Tray/Header/Hint").Visible = trayWidth >= 300;
         slot.SizeFlagsVertical = SizeFlags.ShrinkEnd;
         _inspector.CustomMinimumSize = new Vector2(Mathf.Min(Config.InspectorWidth, Mathf.Max(200, Size.X - Config.EdgeMargin * 2)),
             Mathf.Min(Config.InspectorHeight, Mathf.Max(180, Size.Y - Config.TopBarHeight - Config.EdgeMargin * 3 - 40)));
