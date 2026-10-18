@@ -23,3 +23,8 @@ Shared status runtime: `ENEMIES/StatusEffects/README.md`. Stasis, timed effects,
 ## Projectile presentation — PV1/PV2
 
 Implemented 16px icy cyan tracer and pale cyan crystalline starburst; the existing Energy damage and permanent Slow payload are unchanged. Tower-owned presets live in `Visuals/` and are assigned in `DefaultCryoTowerConfig.tres` (Weapon Visuals). Presentation never enters level/rank stat tables. Shared behavior and authoring: [Visuals](../../Shared/Weapons/Visuals/README.md). Regression evidence: [ProjectileVisuals](../../../TESTS/Towers/ProjectileVisuals.md). Manual appearance review at normal gameplay zoom remains pending.
+
+
+## Stasis follow-up — 2026-10-18
+
+ST1 now implements independent timed Freeze alongside permanent Slow. Freeze gates movement to zero and expires via an active-only, pause-aware world scheduler; any prior Slow remains. Both tower targeting rules exclude their own active effect and explicit immunity. See `ENEMIES/StatusEffects/README.md` and `TOWERS/Offensive/StasisTower/README.md` from the repository root. Older deferred-Stasis statements are historical.

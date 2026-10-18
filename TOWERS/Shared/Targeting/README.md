@@ -38,3 +38,8 @@ Tail A* runs only in PathRequestManager's spare query/time budget, after movemen
 Navigation/cost revisions and observed checkpoint geometry/removal invalidate shared tails. Active checkpoint movement additionally invalidates the old current-leg score until its normal replacement route is accepted. Captured live links remain stable through authoring link edits, matching existing movement. Buffers/caches are reused across revisions; estimate storage is capped at4096 shared edges. An unavailable/capped/blocked estimate safely excludes First/Last instead of choosing an infinite longest route. Removed enemies detach plan references; world exit releases checkpoint subscriptions. There is no tail allocation for ordinary no-checkpoint enemies.
 
 Verification: `TESTS/UI/InspectorTargetingChecks.tscn`, `TESTS/Navigation/JourneyTargetingChecks.cs`, existing spatial oracle/benchmarks and navigation suites; actual results in `TESTS/UI/InspectorTargeting.md`.
+
+
+## Stasis eligibility — ST1
+
+Stasis passes RequiredEffect=Freeze to the existing eligibility hook. Already-frozen and Freeze-immune enemies are removed before mode scoring, including First/Last full journey estimates. Cryo Slow is independent and does not exclude Stasis targets. No eligible target means wait; after expiry the enemy qualifies again. This is a strict eligibility rule (like Cryo), distinct from Laser shield preference with fallback.

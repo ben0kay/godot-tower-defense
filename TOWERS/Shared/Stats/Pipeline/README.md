@@ -48,3 +48,8 @@ Optional SlowStats travels through the existing eight stages without a parallel 
 HD2: nullable Heat capability passes through the same eight stages. Complete selected levels supply it, Stage07 sanitizes invalid inputs, Stage08 publishes it. Current heat/disable timers live in TowerConditions and never feed back into stat resolution. Current authored Heat defaults are null; future research can modify the selected capability afterward. HD3 presents the cached current/next thermal values in its heat-card tooltip.
 
 Battle minute-based heat authoring: immutable context optionally carries HeatTiming from its private config. Stage07 resolves it against effective ShotsPerSecond after earlier stages, only when the selected row has no explicit HeatStats. Thus purchased levels remain independent, a new firing-rate modifier does not require manually retuning per-shot heat, and explicit per-level heat remains authoritative when supplied. No ninth stage or per-shot stat computation was added. HeatTiming currently calibrates shot-based delivery; beams may retain explicit HeatStats.
+
+
+## Stasis — 2026-10-18
+
+FreezeStats follows Slow through the same eight stages. Stage07 sanitizes seconds to finite nonnegative values; Stage08 publishes the capability. Zero duration creates no effect. No parallel resolver or cumulative purchased modifier.

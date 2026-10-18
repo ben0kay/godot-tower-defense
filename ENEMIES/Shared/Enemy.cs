@@ -16,7 +16,9 @@ public partial class Enemy : Node2D
     public int SpawnGeneration { get; private set; }
     public event Action<Enemy> Initialized;
     public EnemyRegistry Registry => _registry;
+    #region Status Effects
     private EnemyStatusEffects _statuses;
+    private TimedStatusScheduler _statusClock;
     private Sprite2D _statusSprite;
     private Color _originalStatusColor;
     public float EffectiveMoveSpeed => Mathf.Max(0, Definition.MoveSpeed) * (_statuses?.MovementMultiplier ?? 1);
@@ -29,8 +31,7 @@ public partial class Enemy : Node2D
     // Shared impact API changes instance state only; status application itself grants no XP or Credits.
     public bool ApplyStatus(StatusEffectPayload effect)
     {
-        if (!CanReceiveStatus(effect.Id) || effect.Strength <= 0 || !float.IsFinite(effect.Strength)
-            || effect.Strength >= 1 || !System.Enum.IsDefined(effect.Id)) return false;
+        if (!CanReceiveStatus(effect.Id) || !effect.IsValid) return false;
         _statuses ??= new EnemyStatusEffects();
         if (!_statuses.Apply(effect)) return false;
         if (_statusSprite == null)
@@ -38,8 +39,8 @@ public partial class Enemy : Node2D
             _statusSprite = GetNodeOrNull<Sprite2D>("Sprite");
             if (_statusSprite != null) _originalStatusColor = _statusSprite.SelfModulate;
         }
-        if (GodotObject.IsInstanceValid(_statusSprite))
-            _statusSprite.SelfModulate = _originalStatusColor * new Color(.65f, .95f, 1f);
+        if (_statuses.HasTimed) { _statusClock ??= TimedStatusScheduler.For(_registry); _statusClock.Register(this); }
+        RefreshStatusColor();
         return true;
     }
 
@@ -47,10 +48,28 @@ public partial class Enemy : Node2D
     // Release instance effects on every lifecycle exit without retaining their source tower.
     private void ClearStatuses()
     {
-        _statuses = null;
+        if (GodotObject.IsInstanceValid(_statusClock)) _statusClock.Unregister(this);
+        _statusClock = null; _statuses = null;
         if (GodotObject.IsInstanceValid(_statusSprite)) _statusSprite.SelfModulate = _originalStatusColor;
         _statusSprite = null;
     }
+    // =========================================================
+    // Expiry changes cached movement/presentation only, never routing or terrain clocks.
+    internal bool AdvanceStatuses(float seconds)
+    {
+        if (!IsAlive || IsQueuedForDeletion() || _statuses == null) return false;
+        bool active = _statuses.Advance(seconds); if (!active) RefreshStatusColor(); return active;
+    }
+    // =========================================================
+    // One resolver composes concurrent Slow and Freeze without touching DefenseBar or Modulate.
+    private void RefreshStatusColor()
+    {
+        if (!GodotObject.IsInstanceValid(_statusSprite)) return;
+        Color tint = HasStatus(StatusEffectId.Slow) ? new(.65f, .95f, 1f) : Colors.White;
+        if (HasStatus(StatusEffectId.Freeze)) tint *= new Color(.4f, 1f, .45f);
+        _statusSprite.SelfModulate = _originalStatusColor * tint;
+    }
+    #endregion
     private EnemyRegistry _registry;
     internal InteractiveTileManager Terrain { get; private set; }
     private Vector2 _terrainPosition;

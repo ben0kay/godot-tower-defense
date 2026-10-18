@@ -44,6 +44,7 @@ public static class JourneyTargetingChecks
             && TowerTargeting.Find(f.Spawns.Registry, origin, 4096, TowerTargeting.Priority.Last) == checkpointShip,
             "First/Last compare the full estimated journey across portals");
         ShieldPreference(f, checkpointShip, directShip, origin);
+        FreezeExclusion(f, checkpointShip, directShip, origin);
         for (int i = 0; i < 1000; i++) TowerTargeting.Find(f.Spawns.Registry, origin, 4096, TowerTargeting.Priority.Last);
         Require(calculations == paths.TotalCalculations && random.State == rng, "Target scoring does no A* and consumes no wave RNG");
         float before = checkpointShip.RemainingJourneyDistance;
@@ -110,6 +111,23 @@ public static class JourneyTargetingChecks
         EnemyPortal Portal(string name, Vector2I cell)
         { var portal = new EnemyPortal { Name = name }; portal.AddChild(new Marker2D { Name = "SpawnExit" }); grid.Level.AddChild(portal); portal.GlobalPosition = grid.CellToWorldCenter(cell); return portal; }
     }
+
+    #region Freeze Eligibility
+    // =========================================================
+    // Frozen and immune candidates are excluded before every mode, including full two-portal routes.
+    private static void FreezeExclusion(AmmoLoopFixture f, Enemy checkpoint, Enemy direct, Vector2 origin)
+    {
+        checkpoint.ApplyStatus(new(StatusEffectId.Freeze, 0, 1));
+        foreach (var mode in Enum.GetValues<TowerTargeting.Priority>())
+            Require(TowerTargeting.Find(f.Spawns.Registry, origin, 4096, mode, StatusEffectId.Freeze) == direct, "Freeze excludes routed candidate: " + mode);
+        direct.ApplyStatus(new(StatusEffectId.Freeze, 0, 1));
+        foreach (var mode in Enum.GetValues<TowerTargeting.Priority>())
+            Require(TowerTargeting.Find(f.Spawns.Registry, origin, 4096, mode, StatusEffectId.Freeze) == null, "All frozen means wait: " + mode);
+        TimedStatusScheduler.For(f.Spawns.Registry)._PhysicsProcess(1);
+        Require(TowerTargeting.Find(f.Spawns.Registry, origin, 4096, TowerTargeting.Priority.First, StatusEffectId.Freeze) == direct
+            && TowerTargeting.Find(f.Spawns.Registry, origin, 4096, TowerTargeting.Priority.Last, StatusEffectId.Freeze) == checkpoint, "Expiry restores routed First/Last");
+    }
+    #endregion
 
     #region Shield Preference
     // =========================================================

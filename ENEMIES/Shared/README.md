@@ -64,3 +64,8 @@ No runtime scripts, node counts, balance, scene paths, wave IDs or spawn lifecyc
 ## Status effects — CT1
 
 Enemy exposes HasStatus, CanReceiveStatus, ApplyStatus and EffectiveMoveSpeed. Lazy per-instance state holds permanent strongest-wins Slow; authored MoveSpeed stays unchanged. EnemyDefinition exposes an Inspector StatusImmunities list. Lifecycle exits clear effects. See ../StatusEffects/README.md for complexity and future Stasis/DoT contracts.
+
+
+## Stasis follow-up — 2026-10-18
+
+ST1 now implements independent timed Freeze alongside permanent Slow. Freeze gates movement to zero and expires via an active-only, pause-aware world scheduler; any prior Slow remains. Both tower targeting rules exclude their own active effect and explicit immunity. See `ENEMIES/StatusEffects/README.md` and `TOWERS/Offensive/StasisTower/README.md` from the repository root. Older deferred-Stasis statements are historical.

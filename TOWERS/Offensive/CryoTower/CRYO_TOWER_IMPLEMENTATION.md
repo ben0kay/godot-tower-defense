@@ -127,3 +127,8 @@ When done, please provide:
 2. **Files changed** and a short overview of how to add Stasis or another new effect later.
 3. **Test results:** which commands/scenes ran, pass/fail evidence and any unverified items.
 4. **Known limitations / deferred work** (e.g. DoT scheduling, save serialization, shader polish, bosses).
+
+
+## Follow-up ST1 — 2026-10-18
+
+The earlier instruction to defer Stasis applied to CT1–CT3. User-authorized ST1 now implements it separately; Cryo retains permanent 33% Slow, Energy damage and unslowed/nonimmune-only targeting. Freeze coexists with Slow, temporarily gates movement, and expiry restores Slow. See ../StasisTower/README.md and ../../../ENEMIES/StatusEffects/README.md. Original pass instructions are preserved above.

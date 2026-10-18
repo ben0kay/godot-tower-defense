@@ -1,0 +1,16 @@
+// Named total XP thresholds mirror the current offensive rank curve, independently editable by tower type.
+using System.Collections.Generic;
+using static TowerRank;
+
+public static class StasisTowerRanks
+{
+    #region Stasis Definition
+
+    public static IReadOnlyList<TowerRankDefinition> Rows { get; } = TowerRankController.Define(
+        new(Standard,      0, 0.00f, 0.00f, 0.00f),
+        new(Veteran,    1000, 0.02f, 0.01f, 0.02f),
+        new(Enhanced,   3000, 0.04f, 0.02f, 0.04f),
+        new(Superior,   7000, 0.06f, 0.03f, 0.06f),
+        new(Legendary, 15000, 0.08f, 0.04f, 0.08f));
+    #endregion
+}

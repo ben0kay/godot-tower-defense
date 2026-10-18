@@ -35,3 +35,8 @@ AmmunitionStats adds absolute capacity and per-launch/per-second cost to the sam
 Cryo CT1–CT3 adds optional `SlowStats` to working/final snapshots. Complete level rows author the fraction; all eight stages preserve it, Stage07 clamps finite values to 0–0.99 and Stage08 publishes it. Current rank bonuses affect damage/range only. Cryo previews and combat read this same effective capability. No research is activated.
 
 HD2 adds optional `HeatStats` to the existing working/final snapshots. Each weapon row can opt in independently; current authored defaults are null. Stage07 sanitizes capacity/rates/restart threshold. Runtime heat/latches are instance state, never stat values; ticks do not rebuild FinalStats. See ../Conditions/README.md. HD3 shows current heat and cached current/next thermal values in a tooltip without extra permanent stat rows.
+
+
+## Stasis Freeze capability — 2026-10-18
+
+Optional FreezeStats(DurationSeconds) is appended to working/final records, preserving existing positional callers. The eight stages retain it; Stage07 clamps nonfinite/negative seconds to zero and Stage08 publishes it. Stasis snapshots the effective duration at launch and presents that same duration in Inspector and upgrade comparisons. Ranks currently change damage/range/HP without scaling Freeze duration. See Offensive/StasisTower/README.md.

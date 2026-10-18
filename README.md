@@ -1,3 +1,9 @@
+## Stasis Tower — 2026-10-18
+
+Green Stasis is available in the Offensive build tray: low-rate Energy projectiles temporarily stop unfrozen, nonimmune enemies. Cryo slow persists underneath and returns on expiration. Initial test balance: 350 Credits, 3-second stop, one shot every 5 seconds. See `TOWERS/Offensive/StasisTower/README.md`.
+
+---
+
 ## Campaign hub — 2026-10-17
 
 Campaign now displays profile progression with LEVELS and RESEARCH. LEVELS opens the existing two-mission chooser; both mission buttons launch the same battlefields. Results returns to Campaign, and Research remains between missions. See UI/Menus/Campaign/Levels/README.md.
