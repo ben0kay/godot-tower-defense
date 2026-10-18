@@ -1,3 +1,15 @@
+## Portal/Citadel editor grid snapping — 2026-10-18 (implemented)
+
+Portal and Citadel remain reusable scenes. Shared `[Tool] WorldObjectFootprint` now snaps their roots to the enclosing map's `Terrain/Passable` cell centers when entering the editor tree or moving/duplicating them. Default tiles give centers `32 + 64*n`. It uses the actual TileMapLayer conversion, including tile size and transforms, rather than hardcoding 64px or enabling the editor's global snap. The Citadel root still anchors the upper-left cell of its 3×3 footprint, not its visual center.
+
+**Usage:** build C# once, open a Level scene and drag/duplicate a Portal or Citadel normally. Leave **Editor Placement → Snap To Grid In Editor** enabled (default). Disable per instance for deliberate free placement; enabling it again snaps immediately. Existing off-grid instances align when opened in the editor; save the level to retain the corrected positions. No authored map coordinates or tile cells were rewritten by this implementation. Standalone Portal/Citadel scenes have no enclosing map and keep their original local origin.
+
+Only the root position changes. SpawnExit/ApproachPoints local offsets, footprint size, portal SizeMultiplier, route links, rotation and scale are untouched. No snapping executes during gameplay and no process/physics loop is added; editor transform events are coalesced into deferred corrections. A custom map must expose `Terrain/Passable` with a valid TileSet under an ancestor, matching the existing map structure. Moving a root without such a layer leaves it free rather than assuming an incorrect grid.
+
+Verification: C# build, headless actual-tool editor and runtime checks cover both real scenes, negative coordinates, opt-out/re-enable, 80px tiles, transformed parents/maps, duplication, retained child offsets and standalone origins. See `TESTS/World/EditorGridSnap.md`. Existing planning/history below is retained.
+
+---
+
 # WORLD / GRID
 
 `WorldGrid.cs` is the single cached gameplay grid plus a transparent, viewport-limited debug overlay. Default dimensions remain 100×80 cells at 64 px, configured in `WORLD/DefaultWorldConfig.tres`.
