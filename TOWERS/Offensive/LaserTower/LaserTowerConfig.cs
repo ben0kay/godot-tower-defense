@@ -4,6 +4,7 @@ using Godot;
 [GlobalClass]
 public partial class LaserTowerConfig : TowerConfig, ITowerTargetingPolicy
 {
+    #region Authored Settings
     public override System.Collections.Generic.IReadOnlyList<TowerRankDefinition> Ranks => LaserTowerRanks.Rows;
     // =========================================================
     // C# tables are the sole authored source of combat values and construction/upgrade prices.
@@ -18,6 +19,7 @@ public partial class LaserTowerConfig : TowerConfig, ITowerTargetingPolicy
     [Export] public bool RotateWhileTracking { get; set; } = true;
     [ExportGroup("Targeting")]
     [Export] public TowerTargeting.Priority TargetPriority { get; set; } = TowerTargeting.Priority.First;
+    [Export] public TowerTargeting.Preference TargetPreference { get; set; } = TowerTargeting.Preference.Shielded;
     public override string InspectorTargetPriorityLabel => TargetPriority.ToString();
 
     // Level-one C# tuning accessors forward directly to its snapshot; they are not Inspector sources.
@@ -33,6 +35,9 @@ public partial class LaserTowerConfig : TowerConfig, ITowerTargetingPolicy
     public bool OverrideHullCoefficient { get => Levels[0].Stats.Weapon.Value.OverrideHull; set => SetLevelStats(1, Levels[0].Stats with { Weapon = Levels[0].Stats.Weapon.Value with { OverrideHull = value } }); }
     public float HullCoefficient { get => Levels[0].Stats.Weapon.Value.HullCoefficient; set => SetLevelStats(1, Levels[0].Stats with { Weapon = Levels[0].Stats.Weapon.Value with { HullCoefficient = value } }); }
 
+    #endregion
+
+    #region Resolution and Presentation
     // =========================================================
     // Explicitly clone runtime rows/recipes while keeping authored defaults separate.
     public override LaserTowerConfig CreateInstanceCopy() => (LaserTowerConfig)base.CreateInstanceCopy();
@@ -56,7 +61,7 @@ public partial class LaserTowerConfig : TowerConfig, ITowerTargetingPolicy
         var defaults = DamageResolver.DefaultProfile.Coefficients(final.Weapon.Value.Type);
         float shield = final.Weapon.Value.OverrideShield ? final.Weapon.Value.ShieldCoefficient : defaults.Shield;
         float hull = final.Weapon.Value.OverrideHull ? final.Weapon.Value.HullCoefficient : defaults.Hull;
-        return $"Range: {final.RangePixels:0} px\nDPS: {final.Beam.Value.DamagePerSecond:0.##} base/s\nDamage type: {final.Weapon.Value.Type}\nShield: {shield:0.00}x / Hull: {hull:0.00}x\nShield Penetration: {final.ShieldPenetration * 100:0.##}%\nTargeting: {TargetPriority}";
+        return $"Range: {final.RangePixels:0} px\nDPS: {final.Beam.Value.DamagePerSecond:0.##} base/s\nDamage type: {final.Weapon.Value.Type}\nShield: {shield:0.00}x / Hull: {hull:0.00}x\nShield Penetration: {final.ShieldPenetration * 100:0.##}%\nTargeting: {TargetPriority} · Preference: {TargetPreference}";
     }
     // =========================================================
     // Paid next-tier preview compares the exact cached/resolved capability values.
@@ -71,4 +76,5 @@ public partial class LaserTowerConfig : TowerConfig, ITowerTargetingPolicy
         if (now.TargetSearchInterval != future.TargetSearchInterval) changes += $"Search: {now.TargetSearchInterval:0.##} → {future.TargetSearchInterval:0.##}s\n";
         return changes;
     }
+    #endregion
 }

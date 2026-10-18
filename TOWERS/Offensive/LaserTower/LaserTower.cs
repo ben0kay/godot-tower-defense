@@ -89,7 +89,7 @@ public partial class LaserTower : TowerBase
         _searchTimer -= (float)delta;
         if (_searchTimer <= 0)
         {
-            SetTarget(TowerTargeting.Find(_registry, GlobalPosition, FinalStats.RangePixels, Config.TargetPriority));
+            SetTarget(TowerTargeting.Find(_registry, GlobalPosition, FinalStats.RangePixels, Config.TargetPriority, preference: Config.TargetPreference));
             _searchTimer = FinalStats.TargetSearchInterval;
         }
         if (!TowerTargeting.Valid(_target, GlobalPosition, FinalStats.RangePixels) || FinalStats.Beam.Value.DamagePerSecond <= 0)

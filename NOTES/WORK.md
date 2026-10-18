@@ -1,3 +1,15 @@
+## Laser shield preference — implemented 2026-10-18
+
+Laser configs now expose **Targeting → TargetPreference**, default **Shielded** (None opts out). This preference is separate from First/Last/Closest/Farthest/Strongest/Weakest: choose eligible in-range enemies with **CurrentShield > 0** first, apply the chosen mode within that group, and fall back to ordinary eligible targets when no preferred candidate qualifies. First/Last retain full remaining-journey distance across portals; Strongest/Weakest retain current hull + shield scoring and stable registration-order ties.
+
+TowerTargeting.Find accepts an optional preference after its existing required-effect argument. One existing spatial traversal ranks preference tiers before ordinary scores; no second scan/list allocation, new per-frame loop or tower-local pathfinding. Other towers default to None. Eligibility/range/finite-route checks still run before preferences; Cryo's required-effect filter is unchanged. Laser reacquires on its existing staggered interval, including after shield depletion. Damage/beam/ammo/heat/rank values are unchanged.
+
+Future stealth preference can add a real matching rule here once stealth/detection exists; it must not bypass detection/eligibility. No speculative stealth flag, detector or UI button is implemented now. The latest HP/ammo Inspector bars and compact-rank visual commit is preserved.
+
+Validation: .NET SDK build (zero warnings/errors); ShieldTargetingChecks passed, including real Laser acquisition/opt-out/config isolation, six-mode preference/fallback, actual two-portal First/Last, shared route-query budget/RNG invariants and 500-enemy route sharing. PlacementHudChecks and CompactInspectorChecks also passed against the latest HP/ammo-bar Inspector revision. See TESTS/Towers/ShieldTargeting.md.
+
+---
+
 ## Elite mk.1 plain heavy interceptor — 2026-10-17
 
 - [x] Added `Types/Enemy006` (`elite_mk1`) as a new inherited plain enemy, 80×60 SVG, 1,000 hull HP, 250 optional shields, 100px/s, 24px radius, 5 Citadel damage and 10 Credits.
@@ -352,5 +364,6 @@ PV3 automated/resources/documentation work was already included in the tracer/mu
 ## Barrel origins / flash visibility follow-up — 2026-10-17
 
 Blaster migrated from center launch to its actual barrel-tip marker with a shared tower-owned orange flash preset. Battle/Machine Gun/Sniper/Cryo already use real muzzle markers; Laser uses its beam muzzle and Shockwave intentionally remains centered. Shared flashes now have first-process presentation protection, a bright hold/linear fade, larger/longer presets and draw above projectiles. Preserves8c7ab2e's20% Battle/Machine Gun rate balance. See TESTS/Towers/ProjectileVisuals.md for regression evidence and pending desktop appearance review.
+
 
 

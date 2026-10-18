@@ -43,6 +43,7 @@ public static class JourneyTargetingChecks
         Require(TowerTargeting.Find(f.Spawns.Registry, origin, 4096, TowerTargeting.Priority.First) == directShip
             && TowerTargeting.Find(f.Spawns.Registry, origin, 4096, TowerTargeting.Priority.Last) == checkpointShip,
             "First/Last compare the full estimated journey across portals");
+        ShieldPreference(f, checkpointShip, directShip, origin);
         for (int i = 0; i < 1000; i++) TowerTargeting.Find(f.Spawns.Registry, origin, 4096, TowerTargeting.Priority.Last);
         Require(calculations == paths.TotalCalculations && random.State == rng, "Target scoring does no A* and consumes no wave RNG");
         float before = checkpointShip.RemainingJourneyDistance;
@@ -109,6 +110,28 @@ public static class JourneyTargetingChecks
         EnemyPortal Portal(string name, Vector2I cell)
         { var portal = new EnemyPortal { Name = name }; portal.AddChild(new Marker2D { Name = "SpawnExit" }); grid.Level.AddChild(portal); portal.GlobalPosition = grid.CellToWorldCenter(cell); return portal; }
     }
+
+    #region Shield Preference
+    // =========================================================
+    // Use actual finite routes from two portals; preference cannot bypass eligibility or change mode scoring.
+    private static void ShieldPreference(AmmoLoopFixture f, Enemy checkpoint, Enemy direct, Vector2 origin)
+    {
+        float maximum = checkpoint.Definition.MaxShield;
+        checkpoint.Definition.MaxShield = Math.Max(maximum, 20); checkpoint.RestoreShield(20);
+        foreach (TowerTargeting.Priority mode in Enum.GetValues<TowerTargeting.Priority>())
+            Require(TowerTargeting.Find(f.Spawns.Registry, origin, 4096, mode, preference: TowerTargeting.Preference.Shielded) == checkpoint,
+                "Only shielded eligible ship wins every mode: " + mode);
+        direct.RestoreShield(20);
+        Require(TowerTargeting.Find(f.Spawns.Registry, origin, 4096, TowerTargeting.Priority.First, preference: TowerTargeting.Preference.Shielded) == direct &&
+            TowerTargeting.Find(f.Spawns.Registry, origin, 4096, TowerTargeting.Priority.Last, preference: TowerTargeting.Preference.Shielded) == checkpoint,
+            "First/Last shielded still compare full journeys");
+        checkpoint.TakeDamage(20); direct.TakeDamage(20);
+        foreach (TowerTargeting.Priority mode in Enum.GetValues<TowerTargeting.Priority>())
+            Require(TowerTargeting.Find(f.Spawns.Registry, origin, 4096, mode, preference: TowerTargeting.Preference.Shielded) ==
+                TowerTargeting.Find(f.Spawns.Registry, origin, 4096, mode), "Shield depletion falls back to ordinary " + mode);
+        checkpoint.Definition.MaxShield = maximum;
+    }
+    #endregion
 
     // =========================================================
     // Optional queries use the same configured combined count cap, yielding after every native call.
