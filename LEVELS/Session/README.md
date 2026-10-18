@@ -48,3 +48,8 @@ E3A offspring now publish wave provenance before initialization through the same
 ## Planned mission XP and time telemetry (NOT IMPLEMENTED)
 
 P1/P2 of [the Player XP/Research pass](../../SYSTEMS/Progression/PLAYER_XP_RESEARCH_FOUNDATION_PASS.md) add an authored XP baseline per level, optional target completion time, lightweight **unpaused mission duration**, deterministic bonuses/penalties, and exactly-once profile-wide XP awarding from the **existing** frozen mission outcome. Preserve wave provenance, E3A offspring and existing R1 arbitration. No reward logic belongs in the Results UI.
+
+
+## MC2 any-objective defeat
+
+CitadelSession initializes/subscribes every authored objective and emits AnyDestroyed once; LevelSessionController uses that event and checks AnyIsDestroyed during victory arbitration. Arrival damage routes only to Enemy.AssignedCitadel. The existing outcome latch, reward ticket, snapshot and Results lifecycle remain sole owners; no second award path or combined HP pool. A defeat snapshot uses a destroyed objective's HP. Multi-objective health presentation/expanded result details remain MC3 work.

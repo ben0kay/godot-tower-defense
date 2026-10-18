@@ -6,9 +6,17 @@ using System.Diagnostics;
 
 public partial class NavigationGrid : Node
 {
+    #region Shared Goals and Lifecycle
     public WorldGrid Grid { get; private set; }
     public int Revision => Grid.NavigationRevision;
     public readonly List<Vector2I> Goals = new();
+    public readonly List<CitadelDestination> Destinations = new();
+    public CitadelDestination SingleDestination => Destinations.Count == 1 ? Destinations[0] : null;
+    // =========================================================
+    // Missing/retired multi-objective identities never default to a different Citadel.
+    public IReadOnlyList<Vector2I> GoalsFor(CitadelDestination destination) => destination == null
+        ? SingleDestination?.Goals ?? (IReadOnlyList<Vector2I>)System.Array.Empty<Vector2I>()
+        : destination.Available ? destination.Goals : System.Array.Empty<Vector2I>();
     [Export] public EnemyMasterConfig Config { get; set; }
     public int CostRevision { get; private set; }
     public int CongestionRevision => _crowdRevision;
@@ -65,7 +73,7 @@ public partial class NavigationGrid : Node
     internal void ReleasePreview()
     {
         foreach (Profile profile in _profiles) profile.AStar.Dispose();
-        _profiles.Clear(); Free();
+        _profiles.Clear(); foreach (var destination in Destinations) destination.Dispose(); Free();
     }
 
     // =========================================================
@@ -84,15 +92,7 @@ public partial class NavigationGrid : Node
                 _solid[y * Grid.Config.WidthCells + x] = solid;
                 foreach (Profile profile in _profiles) profile.AStar.SetPointSolid(cell, solid);
             }
-        Goals.Clear();
-        Node approaches = Grid.Level.Citadel?.GetNodeOrNull<Node>("ApproachPoints");
-        if (approaches != null)
-            foreach (Node child in approaches.GetChildren())
-                if (child is Marker2D marker)
-                {
-                    Vector2I cell = Grid.WorldToCell(marker.GlobalPosition);
-                    if (!Grid.BlocksEnemies(cell) && !Goals.Contains(cell)) Goals.Add(cell);
-                }
+        RefreshGoals();
         _revision = Revision;
         LastGridUpdateMilliseconds = Stopwatch.GetElapsedTime(started).TotalMilliseconds;
     }
@@ -130,17 +130,36 @@ public partial class NavigationGrid : Node
     // Goals are a few authored markers, so incremental changes never scan the whole map.
     private void RefreshGoals()
     {
-        Goals.Clear();
-        Node approaches = Grid.Level.Citadel?.GetNodeOrNull<Node>("ApproachPoints");
-        if (approaches == null) return;
-        foreach (Node child in approaches.GetChildren())
-            if (child is Marker2D marker)
-            {
-                Vector2I cell = Grid.WorldToCell(marker.GlobalPosition);
-                if (!Grid.BlocksEnemies(cell) && !Goals.Contains(cell)) Goals.Add(cell);
-            }
+        if (Destinations.Count == 1 && GodotObject.IsInstanceValid(Destinations[0].Root) && Grid.Level.Citadels.Count == 1 && Destinations[0].Root == Grid.Level.Citadels[0])
+        {
+            var only = Destinations[0]; only.Goals.Clear();
+            Node markers = only.Root.GetNodeOrNull<Node>("ApproachPoints");
+            if (markers != null) foreach (Node child in markers.GetChildren())
+                if (child is Marker2D marker) { var cell = Grid.WorldToCell(marker.GlobalPosition); if (!Grid.BlocksEnemies(cell) && !only.Goals.Contains(cell)) only.Goals.Add(cell); }
+            Goals.Clear(); Goals.AddRange(only.Goals); return;
+        }
+        foreach (var destination in Destinations) destination.Registered = false;
+        List<CitadelDestination> ordered = new();
+        foreach (Node2D root in Grid.Level.Citadels)
+        {
+            if (!GodotObject.IsInstanceValid(root)) continue;
+            CitadelDestination destination = Destinations.Find(d => d.Root == root) ?? new(Grid.Level, root);
+            destination.Registered = true; destination.Goals.Clear(); ordered.Add(destination);
+            Node approaches = root.GetNodeOrNull<Node>("ApproachPoints");
+            if (approaches != null) foreach (Node child in approaches.GetChildren())
+                if (child is Marker2D marker)
+                {
+                    Vector2I cell = Grid.WorldToCell(marker.GlobalPosition);
+                    if (!Grid.BlocksEnemies(cell) && !destination.Goals.Contains(cell)) destination.Goals.Add(cell);
+                }
+        }
+        Destinations.Clear(); Destinations.AddRange(ordered);
+        Goals.Clear(); if (Destinations.Count > 0) Goals.AddRange(Destinations[0].Goals);
     }
 
+    #endregion
+
+    #region Shared Route Calculations
     // =========================================================
     // One actual A* calculation; PathRequestManager bounds calls per physics frame.
     public Vector2[] FindPath(Vector2 position, Vector2I goal) => FindPath(position, goal, 0, out _);
@@ -294,6 +313,9 @@ public partial class NavigationGrid : Node
         profile.CrowdRevision = _crowdRevision; profile.Influence = influence;
     }
 
+    #endregion
+
+    #region Clearance and Connectivity
     // =========================================================
     // Circle-vs-cell clearance protects continuous movement and placement near ships.
     public bool HasClearance(Vector2 position, float radius, Vector2I? extraBlock = null) =>
@@ -360,7 +382,12 @@ public partial class NavigationGrid : Node
     // =========================================================
     // Death-release clearance validates connectivity to the inherited next checkpoint, not only the Citadel.
     public bool[] ReachableTo(Vector2[] targets) => Flood(default, targets);
-    private bool[] Flood(Rect2I proposal, Vector2[] targets)
+    // =========================================================
+    // Destination-specific proposal flood reuses the same buffers; callers consume before the next flood.
+    public bool[] ReachableFor(CitadelDestination destination, Rect2I proposal = default, float radius = 0)
+    { PlacementFloodCount++; return Flood(proposal, null, GoalsFor(destination), radius); }
+    public bool[] ReachableTo(Vector2[] targets, Rect2I proposal) => Flood(proposal, targets);
+    private bool[] Flood(Rect2I proposal, Vector2[] targets, IReadOnlyList<Vector2I> goals = null, float radius = 0)
     {
         Refresh();
         int width = Grid.Config.WidthCells, count = width * Grid.Config.HeightCells;
@@ -368,11 +395,13 @@ public partial class NavigationGrid : Node
         { _floodVisited = new bool[count]; _floodQueue = new int[count]; }
         System.Array.Clear(_floodVisited);
         int head = 0, tail = 0;
-        int destinations = targets?.Length ?? Goals.Count;
+        goals ??= Goals;
+        int destinations = targets?.Length ?? goals.Count;
         for (int i = 0; i < destinations; i++)
         {
-            Vector2I goal = targets == null ? Goals[i] : Grid.WorldToCell(targets[i]);
-            if (Grid.IsInsideMap(goal) && !Grid.BlocksEnemies(goal) && !proposal.HasPoint(goal))
+            Vector2I goal = targets == null ? goals[i] : Grid.WorldToCell(targets[i]);
+            if (Grid.IsInsideMap(goal) && !Grid.BlocksEnemies(goal) && !proposal.HasPoint(goal)
+                && (radius <= 0 || HasClearance(Grid.CellToWorldCenter(goal), radius, proposal)))
             {
                 int index = goal.Y * width + goal.X;
                 if (_floodVisited[index]) continue;
@@ -392,10 +421,49 @@ public partial class NavigationGrid : Node
         void Visit(int index)
         {
             if (_floodVisited[index] || _solid[index] || proposal.HasPoint(new Vector2I(index % width, index / width))) return;
+            if (radius > 0 && !HasClearance(Grid.CellToWorldCenter(new(index % width, index / width)), radius, proposal)) return;
             _floodVisited[index] = true; _floodQueue[tail++] = index;
         }
         return _floodVisited;
     }
+
+    // =========================================================
+    // One component map per radius/revision/proposal distinguishes disconnected approach regions.
+    // Callers retain this event-time result across all sources/ships; no per-enemy flood or A*.
+    public int[] ConnectedComponents(Rect2I proposal = default, float radius = 0)
+    {
+        Refresh(); int width = Grid.Config.WidthCells, count = width * Grid.Config.HeightCells;
+        int[] labels = new int[count]; _floodQueue ??= new int[count]; int component = 0;
+        for (int start = 0; start < count; start++)
+        {
+            if (labels[start] != 0) continue;
+            int head = 0, tail = 0;
+            if (!Open(start)) { labels[start] = -1; continue; }
+            labels[start] = ++component; _floodQueue[tail++] = start;
+            while (head < tail)
+            {
+                int index = _floodQueue[head++], x = index % width;
+                if (x > 0) Visit(index - 1); if (x + 1 < width) Visit(index + 1);
+                if (index >= width) Visit(index - width); if (index + width < count) Visit(index + width);
+            }
+            void Visit(int index)
+            {
+                if (labels[index] != 0) return;
+                if (!Open(index)) { labels[index] = -1; return; }
+                labels[index] = component; _floodQueue[tail++] = index;
+            }
+        }
+        return labels;
+        bool Open(int index)
+        {
+            Vector2I cell = new(index % width, index / width);
+            return !_solid[index] && !proposal.HasPoint(cell) && (radius <= 0 || HasClearance(Grid.CellToWorldCenter(cell), radius, proposal));
+        }
+    }
+    // =========================================================
+    // Constant-time component reads: zero means outside/blocked, never a usable region.
+    public int ComponentAt(int[] labels, Vector2 position)
+    { Vector2I cell = Grid.WorldToCell(position); return Grid.IsInsideMap(cell) ? System.Math.Max(0, labels[cell.Y * Grid.Config.WidthCells + cell.X]) : 0; }
 
     // =========================================================
     // Shared bounds-safe query into a connectivity result.
@@ -404,5 +472,6 @@ public partial class NavigationGrid : Node
 
     // =========================================================
     // Release the native pathfinding resource with the world.
-    public override void _ExitTree() { if (GodotObject.IsInstanceValid(Grid)) { Grid.NavigationChanged -= OnGridChanged; Grid.NavigationBatchChanged -= OnGridBatchChanged; } foreach (Profile profile in _profiles) profile.AStar.Dispose(); }
+    public override void _ExitTree() { foreach (var destination in Destinations) destination.Dispose(); if (GodotObject.IsInstanceValid(Grid)) { Grid.NavigationChanged -= OnGridChanged; Grid.NavigationBatchChanged -= OnGridBatchChanged; } foreach (Profile profile in _profiles) profile.AStar.Dispose(); }
+    #endregion
 }

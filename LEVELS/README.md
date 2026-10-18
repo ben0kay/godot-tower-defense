@@ -80,3 +80,8 @@ Each level's `LevelConfig` now provides **Destination / Citadel Max Health**. Se
 ## Interactive Terrain
 
 Terrain/Interactive now exposes raised Foundation (source0 atlas1,0) and Lava (source1 atlas0,0). The74 saved Level001 platforms migrated without changing art/buildability/blocking; Template exposes the same palette. Lava is passable/nonbuildable and uses World/InteractiveTiles.LavaConfig for immediate entry plus periodic exposure damage. No Lava was arbitrarily painted into the current playable map. Use WorldGrid.RebuildTerrain after runtime edits; hazard-only changes avoid unnecessary navigation rebuilds. See WORLD/TERRAIN/Interactive/README.md and TESTS/Terrain/InteractiveTerrainMigration.md.
+
+
+## Multiple Citadel authoring — MC1/MC2
+
+LevelConfig / Destination / CitadelPaths is an optional ordered array relative to WorldLevel. Empty preserves legacy CitadelPath. Each reference requires a CitadelHealth child named Health and ApproachPoints markers; additional actual Citadels are discovered. Authored order breaks neutral path-length ties. CitadelMaxHealth currently initializes each independent objective with deployment research applied. Citadel roster changes require a new level session; terrain/goal rebuilds refresh future-source assignments but existing enemies retain their identity. Multi-objective maps must use portals; MapEdges disabled, Both portal-only. See WORLD/OBJECTIVES/Citadel/README.md. No existing saved map or wave was edited.

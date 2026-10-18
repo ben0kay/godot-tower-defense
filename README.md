@@ -1,3 +1,9 @@
+## Multiple Citadel foundation — MC1/MC2 (2026-10-18)
+
+Levels can author multiple independently damageable Citadels with cached fixed portal destinations. Routing, checkpoints, children, placement protection and any-Citadel defeat respect those identities. Single-Citadel maps bypass destination comparisons. Existing gameplay maps/UI are unchanged; multi-Citadel HUD/F3 presentation remains MC3. See `WORLD/OBJECTIVES/Citadel/README.md`.
+
+---
+
 ## Stasis Tower — 2026-10-18
 
 Green Stasis is available in the Offensive build tray: low-rate Energy projectiles temporarily stop unfrozen, nonimmune enemies. Cryo slow persists underneath and returns on expiration. Initial test balance: 350 Credits, 3-second stop, one shot every 5 seconds. See `TOWERS/Offensive/StasisTower/README.md`.

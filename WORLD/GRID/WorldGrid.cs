@@ -41,6 +41,7 @@ public partial class WorldGrid : Node2D
 
     #region Terrain and Occupancy
     private readonly List<Vector2I> _approaches = new();
+    private int _objectiveStamp;
     private bool[] _buildable, _terrainBlocked, _occupied, _reserved, _painted;
     public int NavigationRevision { get; private set; }
     public event Action<Vector2I?, bool> NavigationChanged;
@@ -71,12 +72,19 @@ public partial class WorldGrid : Node2D
         ReadLayer(Level.Passable, false);
         if (Level.Interactive != null) ReadLayer(Level.Interactive, null);
         ReadLayer(Level.Impassable, true); // Impassable overrides Passable, including build permission.
+        Level.CaptureCitadels();
         ReadFootprints(Level);
         List<Vector2I> approaches = new();
-        Node points = Level.Citadel?.GetNodeOrNull<Node>("ApproachPoints");
-        if (points != null) foreach (Node child in points.GetChildren())
-            if (child is Marker2D marker) approaches.Add(WorldToCell(marker.GlobalPosition));
-        bool navigationChanged = NavigationRevision == 0 || approaches.Count != _approaches.Count;
+        foreach (Node2D citadel in Level.Citadels)
+        {
+            Node points = citadel.GetNodeOrNull<Node>("ApproachPoints");
+            if (points != null) foreach (Node child in points.GetChildren())
+                if (child is Marker2D marker) approaches.Add(WorldToCell(marker.GlobalPosition));
+        }
+        HashCode objectives = new(); foreach (Node2D root in Level.Citadels) objectives.Add(root.GetInstanceId());
+        int stamp = objectives.ToHashCode();
+        bool navigationChanged = NavigationRevision == 0 || stamp != _objectiveStamp || approaches.Count != _approaches.Count;
+        _objectiveStamp = stamp;
         for (int i = 0; i < approaches.Count && !navigationChanged; i++) navigationChanged = approaches[i] != _approaches[i];
         _approaches.Clear(); _approaches.AddRange(approaches);
         for (int i = 0; i < previous.Length && !navigationChanged; i++) navigationChanged = previous[i] != _terrainBlocked[i];

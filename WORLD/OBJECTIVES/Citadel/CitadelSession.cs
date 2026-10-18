@@ -6,6 +6,12 @@ public partial class CitadelSession : Node
 {
     #region Dependencies
     public CitadelHealth Health { get; private set; }
+    public System.Collections.Generic.IReadOnlyList<CitadelDestination> Objectives { get; private set; }
+    public event System.Action AnyDestroyed;
+    public bool AnyIsDestroyed { get { foreach (var objective in Objectives) if (!objective.Available || objective.Health.IsDestroyed) return true; return false; } }
+    public CitadelHealth ResultHealth { get { foreach (var objective in Objectives) if (objective.Available && objective.Health.IsDestroyed) return objective.Health; return Health; } }
+    private bool _destroyed;
+
     public ResearchDeployment Research { get; private set; } = ResearchDeployment.None;
     private EnemyRegistry _registry;
     private GameplayHUD _hud;
@@ -21,14 +27,18 @@ public partial class CitadelSession : Node
         WorldLevel level = GetNode<WorldGrid>("../World/Grid").Level;
         _registry = GetNode<EnemyRegistry>("../World/EnemySystems/Registry");
         _hud = GetNode<GameplayHUD>("../UI/GameplayHUD");
-        Health = level.Citadel?.GetNodeOrNull<CitadelHealth>("Health");
-        if (Health == null || level.Settings == null)
-            throw new System.InvalidOperationException("The active level needs a Citadel/Health child and LevelConfig.");
-
+        var nav = GetNode<NavigationGrid>("../World/EnemySystems/Navigation"); nav.Refresh();
+        Objectives = nav.Destinations.ToArray();
+        if (Objectives.Count == 0) throw new System.InvalidOperationException("The active level needs at least one valid Citadel.");
+        Health = Objectives[0].Health;
         Health.HealthChanged += UpdateHud;
         _registry.EnemyArrived += OnEnemyArrived;
         Research = ResearchService.CaptureDeployment();
-        Health.Initialize(Research.CitadelMaximum(level.Settings.CitadelMaxHealth));
+        foreach (var objective in Objectives)
+        {
+            objective.Health.Initialize(Research.CitadelMaximum(level.Settings.CitadelMaxHealth));
+            objective.Health.Destroyed += OnDestroyed;
+        }
     }
 
     // =========================================================
@@ -37,6 +47,7 @@ public partial class CitadelSession : Node
     {
         if (GodotObject.IsInstanceValid(_registry)) _registry.EnemyArrived -= OnEnemyArrived;
         if (GodotObject.IsInstanceValid(Health)) Health.HealthChanged -= UpdateHud;
+        if (Objectives != null) foreach (var objective in Objectives) if (GodotObject.IsInstanceValid(objective.Health)) objective.Health.Destroyed -= OnDestroyed;
     }
     #endregion
 
@@ -45,9 +56,13 @@ public partial class CitadelSession : Node
     // CitadelDamage is per enemy type; killed enemies never emit EnemyArrived.
     private void OnEnemyArrived(Enemy enemy)
     {
-        if (GodotObject.IsInstanceValid(Health))
-            Health.TakeDamage(enemy?.Definition?.CitadelDamage ?? 0);
+        var destination = enemy?.AssignedCitadel;
+        if (destination?.Available == true) destination.Health.TakeDamage(enemy.Definition?.CitadelDamage ?? 0);
     }
+
+    // =========================================================
+    // One session event feeds the existing outcome arbiter, regardless of how many objectives are destroyed.
+    private void OnDestroyed() { if (_destroyed) return; _destroyed = true; AnyDestroyed?.Invoke(); }
 
     // =========================================================
     // The HUD only displays authoritative HP; the Citadel owns the changing health.

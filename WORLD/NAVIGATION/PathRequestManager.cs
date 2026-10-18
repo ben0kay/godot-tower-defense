@@ -178,7 +178,9 @@ public partial class PathRequestManager : Node
                 request.Targets = movement.HeadingToCheckpoint ? movement.CheckpointTargets() : null;
                 request.GoalIndex = 0; request.HasOrigin = false; request.Best = System.Array.Empty<Vector2>(); request.Length = float.PositiveInfinity;
             }
-            int targetCount = request.Targets?.Length ?? Navigation.Goals.Count;
+            var goals = Navigation.GoalsFor(movement.Enemy.AssignedCitadel);
+            int targetCount = request.Targets?.Length ?? goals.Count;
+            if (movement.Enemy.AssignedCitadel?.Available != true) { targetCount = 0; request.Best = System.Array.Empty<Vector2>(); }
             if (request.GoalIndex < targetCount)
             {
                 if (!request.HasOrigin) { request.Origin = movement.Enemy.GlobalPosition; request.HasOrigin = true; }
@@ -186,7 +188,7 @@ public partial class PathRequestManager : Node
                 Vector2[] route = request.Targets != null
                     ? CheckpointRoute.Find(Navigation, request.Origin, request.Targets[request.GoalIndex++], movement.RouteProfile,
                         movement.Enemy.Definition.RadiusPixels, out length)
-                    : Navigation.FindPath(request.Origin, Navigation.Goals[request.GoalIndex++], movement.RouteProfile, out length);
+                    : Navigation.FindPath(request.Origin, goals[request.GoalIndex++], movement.RouteProfile, out length);
                 LastFrameAStarMilliseconds += Navigation.LastAStarMilliseconds;
                 LastFrameCalculations++; TotalCalculations++; request.LastServed = _serviceOrder++;
                 request.Length = Navigation.RouteCost(request.Origin, request.Best, movement.RouteProfile);

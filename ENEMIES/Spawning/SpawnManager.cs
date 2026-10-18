@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 public partial class SpawnManager : Node
 {
+    #region Services and Sources
+    public PortalCitadelAssignments CitadelAssignments { get; private set; }
+    private bool _reassignCitadels = true;
+    private bool[] _sourceReachable;
     public event System.Action<Enemy> WaveEnemyCreated;
     public DeathReleaseQueue DeathReleases { get; private set; }
     internal WaveManager WaveOwner { get; set; }
@@ -32,12 +36,13 @@ public partial class SpawnManager : Node
         _ships = GetNode<Node2D>("../../Enemies");
         Paths.Navigation.Grid.TerrainRebuilt += InvalidateSources;
         DeathReleases = new DeathReleaseQueue { Name = "DeathReleases" }; AddChild(DeathReleases);
+        CitadelAssignments = new(Paths.Navigation);
         RefreshSources();
     }
 
     // =========================================================
     // Explicit level edits can change portal/edge policy without changing walkability or repathing enemies.
-    private void InvalidateSources() => _cachedRevision = -1;
+    private void InvalidateSources() { _cachedRevision = -1; _reassignCitadels = true; }
     // =========================================================
     // Release the level edit subscription with its spawning service.
     public override void _ExitTree()
@@ -89,7 +94,7 @@ public partial class SpawnManager : Node
                 { _entries.Add(exit.GlobalPosition); _portalPaths.Add(path.ToString()); _portalObjects.Add(portal); }
             }
         _portalCount = _entries.Count;
-        if (settings.SpawnMode != LevelConfig.SpawnSourceMode.Portals)
+        if (settings.SpawnMode != LevelConfig.SpawnSourceMode.Portals && nav.Destinations.Count == 1)
         {
             for (int x = 0; x < grid.Config.WidthCells; x++)
             {
@@ -102,14 +107,24 @@ public partial class SpawnManager : Node
                 if (settings.AllowedEdges.HasFlag(LevelConfig.MapEdge.Right)) _entries.Add(grid.CellToWorldCenter(new(grid.Config.WidthCells - 1, y)));
             }
         }
+        if (nav.Destinations.Count > 1 && settings.SpawnMode != LevelConfig.SpawnSourceMode.Portals)
+            GD.PushWarning("Multi-Citadel edge spawning is disabled; author portals for this level.");
+        if (_reassignCitadels) { CitadelAssignments.Capture(_portalObjects, _entries); _reassignCitadels = false; }
+        if (_sourceReachable == null || _sourceReachable.Length != _entries.Count) _sourceReachable = new bool[_entries.Count];
+        for (int i = 0; i < _entries.Count; i++)
+            _sourceReachable[i] = nav.Destinations.Count == 1 ? nav.IsReachable(_reachable, grid.WorldToCell(_entries[i]))
+                : i < _portalCount && CitadelAssignments.CanSpawn(_portalObjects[i], _entries[i], 0);
         for (int i = 0; i < _portalCount; i++)
-            if (!nav.IsReachable(_reachable, grid.WorldToCell(_entries[i])) || !nav.HasClearance(_entries[i], 0f))
+            if (!_sourceReachable[i] || !nav.HasClearance(_entries[i], 0f))
                 GD.PushWarning("Portal SpawnExit is blocked or cannot reach the Citadel: " + _portalPaths[i]);
         if (nav.Goals.Count == 0)
             GD.PushWarning("No usable Citadel approach markers; enemies cannot find a destination.");
         _cachedRevision = nav.Revision;
     }
 
+    #endregion
+
+    #region Spawn Delivery
     // =========================================================
     // Debug defaults to portals; future waves may use every source permitted by LevelConfig.
     public Enemy Spawn(PackedScene scene, bool portalOnly = false)
@@ -123,28 +138,18 @@ public partial class SpawnManager : Node
         if (!FitsNavigation(ship)) { ship.Free(); return null; }
         List<Vector2> sources = _entries;
         List<Node2D> portals = _portalObjects;
-        if (portalOnly)
+        int sourceCount = portalOnly ? _portalCount : sources.Count;
+        for (int i = 0; i < sourceCount; i++)
         {
-            sources = new(); portals = new();
-            if (grid.Level.Settings.SpawnMode != LevelConfig.SpawnSourceMode.MapEdges)
-                foreach (NodePath path in grid.Level.Settings.ActivePortals)
-                {
-                    Node2D portal = grid.Level.GetNodeOrNull<Node2D>(path);
-                    Marker2D exit = portal?.GetNodeOrNull<Marker2D>("SpawnExit");
-                    if (exit != null) { sources.Add(exit.GlobalPosition); portals.Add(portal); }
-                }
-        }
-        for (int i = 0; i < sources.Count; i++)
-        {
-            Vector2 position = sources[(_sourceIndex + i) % sources.Count];
-            if (!nav.IsReachable(_reachable, grid.WorldToCell(position))
+            Vector2 position = sources[(_sourceIndex + i) % sourceCount];
+            if (!SourceUsable((_sourceIndex + i) % sourceCount, ship.Definition.RadiusPixels)
                 || !nav.HasClearance(position, ship.Definition.RadiusPixels)) continue;
-            int source = (_sourceIndex + i) % sources.Count;
+            int source = (_sourceIndex + i) % sourceCount;
             if (portalOnly || source < _portalCount) position = OffsetPortal(position, ship.Definition.RadiusPixels, _spawnRandom, portals[source]);
-            _sourceIndex = (_sourceIndex + i + 1) % sources.Count;
+            _sourceIndex = (_sourceIndex + i + 1) % sourceCount;
             _ships.AddChild(ship); ship.GlobalPosition = position;
             EnemyPortal chosenPortal = portalOnly || source < _portalCount ? portals[source] as EnemyPortal : null;
-            ship.Initialize(Registry, Paths, checkpoint: chosenPortal?.ResolveCheckpoint(), requiresCheckpoint: chosenPortal?.RequiresCheckpoint == true); LastMessage = "Spawned " + ship.Definition.DisplayName;
+            ship.Initialize(Registry, Paths, checkpoint: chosenPortal?.ResolveCheckpoint(), requiresCheckpoint: chosenPortal?.RequiresCheckpoint == true, assignedCitadel: source < _portalCount ? CitadelAssignments.For(portals[source]) : nav.SingleDestination); LastMessage = "Spawned " + ship.Definition.DisplayName;
             return ship;
         }
         ship.Free(); LastMessage = "No permitted reachable spawn exit; check tiles and Citadel approach points.";
@@ -171,7 +176,7 @@ public partial class SpawnManager : Node
             // If any eligible portal was found, Both mode ignores all map-edge candidates.
             if (!portal && chosen >= 0 && chosen < _portalCount) break;
             Vector2 position = _entries[i];
-            if (!nav.IsReachable(_reachable, nav.Grid.WorldToCell(position))
+            if (!SourceUsable(i, ship.Definition.RadiusPixels)
                 || !nav.HasClearance(position, ship.Definition.RadiusPixels)) continue;
             eligible++;
             if (random.RandiRange(1, eligible) == 1) chosen = i;
@@ -188,7 +193,7 @@ public partial class SpawnManager : Node
         _ships.AddChild(ship); ship.GlobalPosition = spawn;
         EnemyPortal chosenPortal = chosen < _portalCount ? _portalObjects[chosen] as EnemyPortal : null;
         WaveEnemyCreated?.Invoke(ship);
-        ship.Initialize(Registry, Paths, spawnWithShield, chosenPortal?.ResolveCheckpoint(), chosenPortal?.RequiresCheckpoint == true); LastMessage = "Wave spawned " + ship.Definition.DisplayName;
+        ship.Initialize(Registry, Paths, spawnWithShield, chosenPortal?.ResolveCheckpoint(), chosenPortal?.RequiresCheckpoint == true, assignedCitadel: chosen < _portalCount ? CitadelAssignments.For(_portalObjects[chosen]) : nav.SingleDestination); LastMessage = "Wave spawned " + ship.Definition.DisplayName;
         return ship;
     }
 
@@ -207,7 +212,13 @@ public partial class SpawnManager : Node
             { LastMessage = "Death release skipped: invalid required checkpoint."; return null; }
             reachable = nav.ReachableTo(route.Checkpoint.Targets(nav, radius));
         }
-        else { RefreshSources(); reachable = _reachable; }
+        else { RefreshSources(); reachable = nav.Destinations.Count == 1 ? _reachable : nav.ReachableFor(job.Destination, radius: radius); }
+        if (job.Destination?.Available != true) return null;
+        if (nav.Destinations.Count > 1)
+        {
+            reachable = nav.ReachableFor(job.Destination, radius: radius);
+
+        }
         Vector2? valid = null;
         for (int attempt = 0; attempt < job.Attempts; attempt++)
         {
@@ -216,7 +227,15 @@ public partial class SpawnManager : Node
             float angle = Mathf.Tau * (job.Index + .15f + jitter * .5f) / job.Count;
             float distance = job.Radius * (attempt == job.Attempts - 1 ? 0 : (0.55f + jitter * .45f) * (1f - (float)attempt / job.Attempts));
             Vector2 position = job.Position + Vector2.FromAngle(angle) * distance;
-            if (nav.IsReachable(reachable, nav.Grid.WorldToCell(position)) && nav.HasClearance(position, radius)) { valid = position; break; }
+            if (!nav.IsReachable(reachable, nav.Grid.WorldToCell(position)) || !nav.HasClearance(position, radius)) continue;
+            if (nav.Destinations.Count > 1 || job.Route is { Required: true, Complete: false })
+            {
+                var labels = CitadelAssignments.Connectivity(radius); int component = nav.ComponentAt(labels, position);
+                if (!PortalCitadelAssignments.GoalInComponent(nav, job.Destination, labels, component)) continue;
+                if (job.Route is { Required: true, Complete: false } obligations &&
+                    !PortalCitadelAssignments.CheckpointsInComponent(nav, labels, component, obligations.Checkpoint, obligations.Network, radius)) continue;
+            }
+            valid = position; break;
         }
         if (!valid.HasValue) { LastMessage = "Death release skipped: no safe reachable local position."; return null; }
         Enemy child = null;
@@ -224,7 +243,7 @@ public partial class SpawnManager : Node
         {
             child = job.Scene.Instantiate<Enemy>(); _ships.AddChild(child); child.GlobalPosition = valid.Value;
             job.Reservation?.Attach(child);
-            child.Initialize(Registry, Paths, job.Shield, routeHandoff: job.Route, generation: job.Generation);
+            child.Initialize(Registry, Paths, job.Shield, routeHandoff: job.Route, generation: job.Generation, assignedCitadel: job.Destination);
             LastMessage = "Released " + child.Definition.DisplayName; return child;
         }
         catch (System.Exception error)
@@ -234,6 +253,11 @@ public partial class SpawnManager : Node
             LastMessage = "Death release creation failed: " + error.Message; GD.PushWarning(LastMessage); return null;
         }
     }
+
+    // =========================================================
+    // Single-Citadel spawns retain the old cached connectivity path; multi uses cached source/radius validation.
+    private bool SourceUsable(int source, float radius) => _sourceReachable[source] &&
+        (Paths.Navigation.Destinations.Count == 1 ? Paths.Navigation.SingleDestination.Available : source < _portalCount && CitadelAssignments.CanSpawn(_portalObjects[source], _entries[source], radius));
 
     // =========================================================
     // Small portal-only variation; validate radius, connectivity and the segment back to center.
@@ -248,12 +272,15 @@ public partial class SpawnManager : Node
         {
             Vector2 localOffset = new(random.RandfRange(-offset, offset), random.RandfRange(-offset, offset));
             Vector2 point = center + (GodotObject.IsInstanceValid(portal) ? portal.GlobalTransform.BasisXform(localOffset) : localOffset);
-            if (nav.IsReachable(_reachable, nav.Grid.WorldToCell(point))
+            if ((nav.Destinations.Count > 1 || nav.IsReachable(_reachable, nav.Grid.WorldToCell(point)))
                 && nav.HasClearance(point, radius) && nav.SegmentClear(center, point, radius)) return point;
         }
         return center;
     }
 
+    #endregion
+
+    #region Placement Validation
     // =========================================================
     // Click-only route preservation: protect active ships and every currently usable source.
     public double LastPlacementValidationMilliseconds { get; private set; }
@@ -282,6 +309,7 @@ public partial class SpawnManager : Node
             if (!nav.HasClearance(enemy.GlobalPosition, enemy.Definition.RadiusPixels, proposal))
                 return "An enemy is too close to this cell.";
         if (nav.Grid.BlocksEnemies(cell)) return "";
+        if (nav.Destinations.Count > 1 || HasCheckpointObligations()) return ValidateAssignedRoutes(proposal);
         bool[] after = nav.ReachableWithout(proposal);
         foreach (Vector2 position in _entries)
         {
@@ -294,4 +322,63 @@ public partial class SpawnManager : Node
                 return "This tower would trap an active enemy.";
         return "";
     }
+    #endregion
+
+    #region Assigned Route Placement
+    // =========================================================
+    // Only levels with mandatory checkpoint routes need the extended single-objective validation.
+    private bool HasCheckpointObligations()
+    {
+        foreach (var portal in _portalObjects) if (portal is EnemyPortal typed && typed.RequiresCheckpoint) return true;
+        foreach (var enemy in Registry.Living) if (enemy.Movement.HeadingToCheckpoint) return true;
+        return false;
+    }
+    // =========================================================
+    // Share clearance-component floods across sources/ships of the same destination and radius per click.
+    private string ValidateAssignedRoutes(Rect2I proposal)
+    {
+        NavigationGrid nav = Paths.Navigation;
+        Dictionary<float, int[]> regions = new();
+        HashSet<(int, RouteCheckpoint, CheckpointNetwork, float)> checkedChains = new();
+        int[] Region(float radius)
+        {
+            if (!regions.TryGetValue(radius, out var labels)) regions[radius] = labels = nav.ConnectedComponents(proposal, radius);
+            return labels;
+        }
+        bool Chain(float radius, int component, RouteCheckpoint root, CheckpointNetwork network)
+        {
+            var key = (component, root, network, radius);
+            if (!checkedChains.Add(key)) return true;
+            return PortalCitadelAssignments.CheckpointsInComponent(nav, Region(radius), component, root, network, radius, proposal);
+        }
+        for (int i = 0; i < _portalCount; i++)
+        {
+            if (!_sourceReachable[i]) continue;
+            var destination = CitadelAssignments.For(_portalObjects[i]);
+            int[] labels = Region(0); int component = nav.ComponentAt(labels, _entries[i]);
+            if (!PortalCitadelAssignments.GoalInComponent(nav, destination, labels, component))
+                return "This tower would seal a portal's assigned Citadel route.";
+            if (_portalObjects[i] is EnemyPortal portal && portal.RequiresCheckpoint)
+            {
+                var root = portal.ResolveCheckpoint();
+                if (!Chain(0, component, root, CheckpointNetwork.Capture(root))) return "This tower would seal a required checkpoint route.";
+            }
+        }
+        for (int i = _portalCount; i < _entries.Count; i++)
+            if (_sourceReachable[i] && !PortalCitadelAssignments.GoalInComponent(nav, nav.SingleDestination, Region(0), nav.ComponentAt(Region(0), _entries[i])))
+                return "This tower would seal an edge entry route.";
+        foreach (Enemy enemy in Registry.Living)
+        {
+            var destination = enemy.AssignedCitadel; float radius = enemy.Definition.RadiusPixels;
+            int[] labels = Region(radius); int component = nav.ComponentAt(labels, enemy.GlobalPosition);
+            if (!PortalCitadelAssignments.GoalInComponent(nav, destination, labels, component))
+                return "This tower would trap an enemy away from its assigned Citadel.";
+            var movement = enemy.Movement;
+            if (movement.HeadingToCheckpoint && !Chain(radius, component, movement.Checkpoint, movement.CapturedNetwork))
+                return "This tower would seal an enemy's remaining checkpoint chain.";
+        }
+        return "";
+    }
+    #endregion
+
 }

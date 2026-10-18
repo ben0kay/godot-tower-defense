@@ -17,13 +17,14 @@ public sealed class JourneyEstimateCache : IDisposable
     internal sealed class Edge
     {
         internal RouteCheckpoint From, To;
+        internal CitadelDestination Destination;
         internal int Profile, Goal;
         internal float Radius, BestCost = float.PositiveInfinity, Distance = float.PositiveInfinity;
         internal bool Complete;
         internal readonly List<Plan> Users = new();
     }
     private readonly NavigationGrid _nav;
-    private readonly Dictionary<(RouteCheckpoint, RouteCheckpoint, int, float), Edge> _edges = new();
+    private readonly Dictionary<(RouteCheckpoint, RouteCheckpoint, int, float, CitadelDestination), Edge> _edges = new();
     private readonly Dictionary<RouteCheckpoint, Action> _observed = new();
     private readonly HashSet<Plan> _plans = new();
     private readonly Queue<Edge> _pending = new();
@@ -34,8 +35,9 @@ public sealed class JourneyEstimateCache : IDisposable
 
     // =========================================================
     // Follow already-captured links using the exact independent branch formula; never advance any RNG.
-    public Plan Attach(CheckpointNetwork network, RouteCheckpoint checkpoint, uint seed, int completed, int profile, float radius)
+    public Plan Attach(CheckpointNetwork network, RouteCheckpoint checkpoint, uint seed, int completed, int profile, float radius, CitadelDestination destination = null)
     {
+        destination ??= _nav.SingleDestination;
         profile = profile == NavigationGrid.NeutralProfile ? profile : ((profile % _nav.SharedProfileCount) + _nav.SharedProfileCount) % _nav.SharedProfileCount;
         Plan plan = new(); _plans.Add(plan);
         if (network == null || network.Error.Length > 0) { plan.Broken = true; return plan; }
@@ -45,12 +47,12 @@ public sealed class JourneyEstimateCache : IDisposable
             if (!GodotObject.IsInstanceValid(from)) { plan.Broken = true; break; }
             RouteCheckpoint to = network.Next(from, seed, completed++, out string error);
             if (error.Length > 0) { plan.Broken = true; break; }
-            var key = (from, to, profile, radius);
+            var key = (from, to, profile, radius, destination);
             if (!_edges.TryGetValue(key, out Edge edge))
             {
                 // Bound optional estimation memory; unavailable estimates cannot win First or Last.
                 if (_edges.Count >= 4096) { plan.Broken = true; break; }
-                edge = new() { From = from, To = to, Profile = profile, Radius = radius };
+                edge = new() { From = from, To = to, Profile = profile, Radius = radius, Destination = destination };
                 _edges.Add(key, edge); _pending.Enqueue(edge); Observe(from); if (to != null) Observe(to);
             }
             if (edge.Users.Count == 0 && edge.Complete && !float.IsFinite(edge.Distance))
@@ -104,12 +106,13 @@ public sealed class JourneyEstimateCache : IDisposable
             || (edge.To != null && !GodotObject.IsInstanceValid(edge.To))) { Complete(edge); return false; }
         Vector2[] starts = edge.From.Targets(_nav, edge.Radius);
         Vector2[] targets = edge.To == null ? null : edge.To.Targets(_nav, edge.Radius);
-        int count = targets?.Length ?? _nav.Goals.Count;
+        var goals = _nav.GoalsFor(edge.Destination);
+        int count = edge.Destination?.Available == true ? targets?.Length ?? goals.Count : 0;
         if (starts.Length == 0 || edge.Goal >= count) { Complete(edge); return false; }
         Vector2 start = starts[0]; float cost;
         Vector2[] points = targets != null
             ? CheckpointRoute.Find(_nav, start, targets[edge.Goal++], edge.Profile, edge.Radius, out cost)
-            : _nav.FindPath(start, _nav.Goals[edge.Goal++], edge.Profile, out cost);
+            : _nav.FindPath(start, goals[edge.Goal++], edge.Profile, out cost);
         if (points.Length > 0 && cost < edge.BestCost && Clear(start, points, edge.Radius))
         {
             if (edge.To != null) points = CheckpointRoute.ToEntry(edge.To, start, points);

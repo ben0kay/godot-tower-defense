@@ -19,3 +19,8 @@ At-position spawning tries a bounded deterministic radial scatter with shrinking
 WaveManager reserves PendingDeathSpawns while the parent is still owned. A child attaches to ownership and publishes wave-stat provenance before Initialize (including entry Lava deaths), then its pending slot retires. Completion requires scheduled=0, alive=0 AND pending=0. PlannedRemaining still counts authored entries only. F2/unowned jobs remain unowned. Configure cancels that wave's jobs/reservations immediately; unload retires all work. External enemy removal resolves ownership but is not a kill/reward/release.
 
 See `Spawning/README.md`, `LEVELS/Waves/README.md`, `Types/Transporter/README.md` and `TESTS/Enemies/DeathSpawn.md`. E3B weapons, tower durability, further generations, research and saving are not included.
+
+
+## MC1 destination inheritance
+
+DeathReleaseJob always snapshots parent.AssignedCitadel separately from optional checkpoint handoff. InheritCheckpointProgress=false only opts out of checkpoint obligations, never Citadel identity. Local probes/clearance validate the inherited destination; removed/unreachable destinations fail safely. Captured handoffs also retain destination for direct users. Children never choose a new target based on release proximity.

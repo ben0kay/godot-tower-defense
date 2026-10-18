@@ -15,6 +15,7 @@ public partial class EnemyMovement : Node
     private int _checkpointStamp, _destinationSerial;
     public int CompletedCheckpointCount { get; private set; }
     private CheckpointNetwork _checkpointNetwork;
+    internal CheckpointNetwork CapturedNetwork => _checkpointNetwork;
     private string _checkpointError = "";
     // =========================================================
     // Radius-aware target snapshots are shared by checkpoint geometry, never recomputed per enemy tick.
@@ -30,7 +31,7 @@ public partial class EnemyMovement : Node
     private bool _allowOffsets, _allowDiversity;
     public Enemy Enemy { get; private set; }
     private JourneyEstimateCache.Plan _journey;
-    public float RemainingJourneyDistance => !_fullAudit && _dirtyCells.Count == 0 && float.IsFinite(RemainingPathDistance)
+    public float RemainingJourneyDistance => Enemy.AssignedCitadel?.Available == true && !_fullAudit && _dirtyCells.Count == 0 && float.IsFinite(RemainingPathDistance)
         ? !HeadingToCheckpoint ? RemainingPathDistance
             : _paths.Journeys.IsCurrent
                 ? RemainingPathDistance + (_journey?.Distance ?? float.PositiveInfinity) : float.PositiveInfinity
@@ -90,7 +91,7 @@ public partial class EnemyMovement : Node
     // =========================================================
     // Capture only remaining destination obligations, never physical waypoints, movement permissions or path seeds.
     public EnemyRouteHandoff CaptureRouteHandoff() => new(Checkpoint, RequiresCheckpoint, CheckpointCompleted,
-        CompletedCheckpointCount, _checkpointNetwork, _checkpointError);
+        CompletedCheckpointCount, _checkpointNetwork, _checkpointError, Enemy.AssignedCitadel);
 
     // =========================================================
     // Queue a replacement while retaining safe old movement; stop only on immediate danger.
@@ -135,7 +136,7 @@ public partial class EnemyMovement : Node
         _paths.RegisterRoute(this); UpdateDistance();
         _paths.Journeys.Detach(_journey);
         _journey = HeadingToCheckpoint ? _paths.Journeys.Attach(_checkpointNetwork, Checkpoint, CorridorSeed,
-            CompletedCheckpointCount, RouteProfile, Enemy.Definition.RadiusPixels) : null;
+            CompletedCheckpointCount, RouteProfile, Enemy.Definition.RadiusPixels, Enemy.AssignedCitadel) : null;
     }
 
     // =========================================================
@@ -261,7 +262,7 @@ public partial class EnemyMovement : Node
     // Check immediate swept clearance every tick; audits never trigger A* on valid routes.
     public override void _PhysicsProcess(double delta)
     {
-        if (!Enemy.IsAlive) return;
+        if (!Enemy.IsAlive || Enemy.AssignedCitadel?.Available != true) return;
         if (HeadingToCheckpoint)
         {
             if (_checkpointError.Length == 0 && GodotObject.IsInstanceValid(Checkpoint) && Checkpoint.Contains(Enemy.GlobalPosition)

@@ -23,6 +23,7 @@ public partial class LevelConfig : Resource
     [Export] public string WaveSetId { get; set; } = "";
 
     [ExportGroup("Destination")]
+    [Export] public Godot.Collections.Array<NodePath> CitadelPaths { get; set; } = new();
     [Export(PropertyHint.Range, "1,1000000,1")] public int CitadelMaxHealth { get; set; } = 1000;
     [Export] public NodePath CitadelPath { get; set; } = new("Objectives/Citadel");
 }

@@ -36,3 +36,8 @@ Both debug and authored wave spawns inspect only the actual selected EnemyPortal
 Spawning owns one DeathReleaseQueue child, inactive when empty. Optional DeathSpawn components enqueue finite jobs only on hull kills. SpawnDeathChild validates bounded local scatter against actual child radius and required checkpoint/Citadel connectivity before any scene enters the world. It never selects a portal/map edge, consumes wave RNG, bypasses blocked positions or spawns over MaxActiveEnemies. Partial failures retire slots; no indefinite retries. Shared frame budget defaults to2 attempts; queued jobs default-cap1024, with Inspector settings on EnemyMasterConfig. See `Abilities/DeathSpawn/README.md`.
 
 WaveManager now claims authored enemies from WaveEnemyCreated before Initialize, enabling entry-hazard carriers to reserve releases. Successfully created wave offspring also emit that provenance before initialization so R1 official counters include them. F2 offspring do not. A successful child enters wave ownership before its pending slot retires. Captured remaining checkpoint obligations initialize before its first path request, with its own movement settings.
+
+
+## Fixed Citadel ownership — MC1/MC2
+
+SpawnManager owns PortalCitadelAssignments. It resolves source destinations at setup/explicit TerrainRebuilt only; ordinary occupancy revisions invalidate source/radius reachability without reassigning sources. Single objective bypasses comparisons. Debug/wave spawns pass AssignedCitadel into Enemy.Initialize; unknown/unreachable multi-objective sources refuse spawn. Multi-Citadel edge mode is disabled. See WORLD/OBJECTIVES/Citadel/README.md for neutral, checkpoint and clearance policies.

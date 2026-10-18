@@ -16,6 +16,7 @@ public partial class Enemy : Node2D
     public int SpawnGeneration { get; private set; }
     public event Action<Enemy> Initialized;
     public EnemyRegistry Registry => _registry;
+    public CitadelDestination AssignedCitadel { get; private set; }
     #region Status Effects
     private EnemyStatusEffects _statuses;
     private TimedStatusScheduler _statusClock;
@@ -83,8 +84,9 @@ public partial class Enemy : Node2D
 
     // =========================================================
     // Called by SpawnManager after adding the scene, using world-scoped services.
-    public void Initialize(EnemyRegistry registry, PathRequestManager paths, bool spawnWithShield = false, RouteCheckpoint checkpoint = null, bool requiresCheckpoint = false, EnemyRouteHandoff routeHandoff = null, int generation = 0)
+    public void Initialize(EnemyRegistry registry, PathRequestManager paths, bool spawnWithShield = false, RouteCheckpoint checkpoint = null, bool requiresCheckpoint = false, EnemyRouteHandoff routeHandoff = null, int generation = 0, CitadelDestination assignedCitadel = null)
     {
+        AssignedCitadel = routeHandoff?.Destination ?? assignedCitadel ?? paths.Navigation.SingleDestination;
         ClearStatuses();
         SpawnGeneration = generation; _registry = registry; Health = Mathf.Max(1f, Definition.MaxHealth); IsAlive = true;
         CurrentShield = spawnWithShield && float.IsFinite(Definition.MaxShield)

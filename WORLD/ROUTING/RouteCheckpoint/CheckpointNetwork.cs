@@ -60,6 +60,24 @@ public sealed class CheckpointNetwork
     public static int Choice(uint seed, int completedCount, int count) => count <= 1 ? 0
         : (int)(CorridorPreference.Hash(seed ^ unchecked((uint)(completedCount + 1) * 0x9e3779b9u) ^ 0xb5297a4du) % (uint)count);
 
+    #region Destination Connectivity
+    // =========================================================
+    // Read-only captured links for setup aggregation; callers cannot reroll or rewrite branch choices.
+    public System.Collections.Generic.IReadOnlyList<RouteCheckpoint> Successors(RouteCheckpoint node) =>
+        _next.TryGetValue(node, out var links) ? links : System.Array.Empty<RouteCheckpoint>();
+    // =========================================================
+    // Placement checks all still-possible captured branches, never re-reading edited authored links.
+    public bool Remaining(RouteCheckpoint root, HashSet<RouteCheckpoint> result)
+    {
+        if (Error.Length > 0 || !GodotObject.IsInstanceValid(root)) return false;
+        if (!result.Add(root)) return true;
+        if (!_next.TryGetValue(root, out var links)) return false;
+        foreach (var next in links) if (!Remaining(next, result)) return false;
+        return true;
+    }
+
+    #endregion
+
     // =========================================================
     // Preview/overlay invalidation only. Live enemies retain their captured links through retries and edits.
     public bool Unchanged()

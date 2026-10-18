@@ -1,0 +1,34 @@
+// Stable session destination identity; cached approach cells share the existing navigation/profile pool.
+using Godot;
+using System.Collections.Generic;
+public sealed class CitadelDestination : System.IDisposable
+{
+    #region Identity and Cached Goals
+    public string Id { get; }
+    public Node2D Root { get; }
+    public CitadelHealth Health { get; }
+    internal bool Registered = true;
+    private bool _live;
+    public bool Available => Registered && _live;
+    public readonly List<Vector2I> Goals = new();
+    // =========================================================
+    // Relative scene paths remain stable for authoring; enemies retain this object across occupancy edits.
+    internal CitadelDestination(WorldLevel level, Node2D root)
+    {
+        Root = root; Id = level.GetPathTo(root).ToString(); Health = root.GetNode<CitadelHealth>("Health");
+        _live = root.IsInsideTree() && Health.IsInsideTree();
+        Root.TreeExiting += Retire; Health.TreeExiting += Retire;
+    }
+    // =========================================================
+    // Cached lifecycle availability keeps enemy ticks and tower scoring free of native objective scans.
+    private void Retire() => Dispose();
+    // =========================================================
+    // Preview pools and level teardown release subscriptions; a removed identity never revives or redirects.
+    public void Dispose()
+    {
+        _live = false;
+        if (GodotObject.IsInstanceValid(Root)) Root.TreeExiting -= Retire;
+        if (GodotObject.IsInstanceValid(Health)) Health.TreeExiting -= Retire;
+    }
+    #endregion
+}

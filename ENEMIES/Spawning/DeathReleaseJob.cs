@@ -12,12 +12,14 @@ internal sealed class DeathReleaseJob
     internal readonly uint Seed;
     internal readonly ulong FirstPhysicsFrame;
     internal readonly EnemyRouteHandoff Route;
+    internal readonly CitadelDestination Destination;
     internal readonly DeathSpawnReservation Reservation;
     internal bool Cancelled;
     internal int Index;
     internal double Delay;
     internal DeathReleaseJob(Enemy parent, DeathSpawnConfig config, PackedScene scene, EnemyDefinition definition, uint seed, DeathSpawnReservation reservation)
     {
+        Destination = parent.AssignedCitadel;
         FirstPhysicsFrame = Engine.GetPhysicsFrames() + 1;
         Position = parent.GlobalPosition; Scene = scene; Definition = definition; Count = config.ChildCount;
         Attempts = config.MaxPositionAttemptsPerChild; Interval = config.SpawnIntervalSeconds; Radius = config.ScatterRadiusPixels;

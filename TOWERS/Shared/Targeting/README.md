@@ -43,3 +43,8 @@ Verification: `TESTS/UI/InspectorTargetingChecks.tscn`, `TESTS/Navigation/Journe
 ## Stasis eligibility — ST1
 
 Stasis passes RequiredEffect=Freeze to the existing eligibility hook. Already-frozen and Freeze-immune enemies are removed before mode scoring, including First/Last full journey estimates. Cryo Slow is independent and does not exclude Stasis targets. No eligible target means wait; after expiry the enemy qualifies again. This is a strict eligibility rule (like Cryo), distinct from Laser shield preference with fallback.
+
+
+## MC2 cross-Citadel journeys
+
+The selector itself is unchanged. Enemy.RemainingJourneyDistance now reflects its fixed assigned Citadel, including destination-keyed checkpoint tails. First/Last remain global physical remaining-distance comparisons, not preferred-objective selection; shield preference and Slow/Freeze eligibility still precede ordinary mode scoring. Retired destination estimates cannot win First/Last.

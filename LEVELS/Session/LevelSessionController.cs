@@ -19,6 +19,7 @@ public partial class LevelSessionController : Node
     public string NextScenePath { get; private set; }
     private WaveManager _waves;
     private CitadelHealth _health;
+    private CitadelSession _citadels;
     private SpawnManager _spawns;
     private EnemyRegistry _registry;
     private LevelResults _results;
@@ -37,7 +38,7 @@ public partial class LevelSessionController : Node
     public override void _Ready()
     {
         ProcessMode = ProcessModeEnum.Always; SetProcess(false); SetPhysicsProcess(false);
-        _waves = GetNode<WaveManager>("../Waves"); _health = GetNode<CitadelSession>("../CitadelSession").Health;
+        _waves = GetNode<WaveManager>("../Waves"); _citadels = GetNode<CitadelSession>("../CitadelSession"); _health = _citadels.Health;
         _spawns = GetNode<SpawnManager>("../World/EnemySystems/Spawning"); _registry = _spawns.Registry;
         _results = GetNode<LevelResults>("../LevelResults"); _pause = GetNode<PauseMenu>("../PauseMenu");
         _hud = GetNode<GameplayHUD>("../UI/GameplayHUD"); _input = GetNode<GameInput>("/root/GameInput");
@@ -49,11 +50,11 @@ public partial class LevelSessionController : Node
         if (!string.IsNullOrEmpty(_rewardProfileId)) PrepareReward();
         _spawns.WaveEnemyCreated += TrackWaveEnemy;
         _registry.EnemyKilled += CountKill; _registry.EnemyArrived += CountBreach;
-        _health.Destroyed += Defeat; _waves.WaveCompleted += OnWaveCompleted;
+        _citadels.AnyDestroyed += Defeat; _waves.WaveCompleted += OnWaveCompleted;
         _results.RetryRequested += Retry; _results.NextLevelRequested += NextLevel;
         _results.MenuRequested += ReturnToCampaign; _results.ExitGameRequested += ExitGame;
         _results.RewardRetryRequested += RetryReward;
-        if (_health.CurrentHealth == 0) Defeat(); else QueueVictoryIfComplete();
+        if (_citadels.AnyIsDestroyed) Defeat(); else QueueVictoryIfComplete();
     }
 
     // =========================================================
@@ -90,7 +91,7 @@ public partial class LevelSessionController : Node
         _victoryQueued = false;
         if (!GodotObject.IsInstanceValid(this) || !IsInsideTree() || State != LevelSessionState.Playing || _waves.TotalWaves == 0
             || _waves.State != WaveManager.WaveState.AllWavesComplete) return;
-        if (_health.CurrentHealth <= 0) { Defeat(); return; }
+        if (_citadels.AnyIsDestroyed) { Defeat(); return; }
         State = LevelSessionState.Victory;
         Capture(); Freeze(); Present();
     }
@@ -108,7 +109,7 @@ public partial class LevelSessionController : Node
         Outcome = State == LevelSessionState.Victory ? LevelOutcome.Victory : LevelOutcome.Defeat,
         LevelName = _levelName, EnemiesKilled = _killed, EnemiesBreached = _breached,
         WavesCompleted = _waves.CompletedWaves, TotalWaves = _waves.TotalWaves,
-        CitadelHealth = _health.CurrentHealth, CitadelMaxHealth = _health.MaxHealth,
+        CitadelHealth = _citadels.ResultHealth.CurrentHealth, CitadelMaxHealth = _citadels.ResultHealth.MaxHealth,
         TowersPlaced = RunStats.TowersPlaced, TowersConstructed = RunStats.TowersConstructed,
         UpgradesPurchased = RunStats.UpgradesPurchased, MissionSeconds = RunStats.MissionSeconds
     };
@@ -187,7 +188,7 @@ public partial class LevelSessionController : Node
     {
         if (GodotObject.IsInstanceValid(_spawns)) _spawns.WaveEnemyCreated -= TrackWaveEnemy;
         if (GodotObject.IsInstanceValid(_registry)) { _registry.EnemyKilled -= CountKill; _registry.EnemyArrived -= CountBreach; }
-        if (GodotObject.IsInstanceValid(_health)) _health.Destroyed -= Defeat;
+        if (GodotObject.IsInstanceValid(_citadels)) _citadels.AnyDestroyed -= Defeat;
         if (GodotObject.IsInstanceValid(_waves)) _waves.WaveCompleted -= OnWaveCompleted;
         foreach (var pair in _waveEnemies) if (GodotObject.IsInstanceValid(pair.Key)) pair.Key.TreeExiting -= pair.Value;
         _waveEnemies.Clear();
