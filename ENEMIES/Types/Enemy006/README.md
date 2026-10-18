@@ -22,6 +22,6 @@ Fast, heavily armored elite enemy, inspired by the original GameMaker Elite mk.1
 
 The elite has a distinct right-facing swept-wing, plated metallic SVG with turquoise core and amber exhaust. Like other authored types, it **inherits `ENEMIES/Shared/GenericEnemy.tscn`** and contributes **no new scripts, abilities, per-tick checks, or shield regeneration**. The shared DefenseBar adjusts for the new sprite height.
 
-Registered in `ENEMIES/DefaultEnemyCatalog.tres` as the seventh catalog scene, after Big mk.1. F2 cycles to it as the **seventh successful spawn**; F3 route preview lists it automatically. For waves use `Enemy("elite_mk1")` unshielded or `Enemy("elite_mk1", shield: true)` to start with 250 shield points, the shared aura and shield bar. **Existing Level001/Level002 wave compositions remain unchanged.** This is intentionally provisional playtest balance.
+Registered in `ENEMIES/DefaultEnemyCatalog.tres` as the seventh catalog scene, after Big mk.1. F2 cycles to it as the **seventh successful spawn**; F3 route preview lists it automatically. For waves use `Enemy("elite_mk1")` unshielded or `Enemy("elite_mk1", shield: true)` to start with 250 shield points, the shared aura and shield bar. **Existing Level001/Level020 wave compositions remain unchanged.** This is intentionally provisional playtest balance.
 
 The catalog regression covers authored stats, real portal spawn, SVG size, optional shield damage/depletion, credited kill and Citadel arrival; Godot .NET runtime/visual verification remains pending.

@@ -10,7 +10,7 @@ public static class MenuNavigation
     public const string LevelsScene = "res://UI/Menus/Campaign/Levels/LevelSelectionMenu.tscn";
     public const string ResearchScene = "res://UI/Menus/Campaign/Research/ResearchMenu.tscn";
     public const string Level001Scene = "res://Main.tscn";
-    public const string Level002Scene = "res://MainLevel002.tscn";
+    public const string Level020Scene = "res://MainLevel020.tscn";
 
     // =========================================================
     // Unpause before leaving a menu, restoring the previous pause state on a failed transition.

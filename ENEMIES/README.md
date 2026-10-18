@@ -187,7 +187,7 @@ These names are the *intended resource contract*, not required exact implementat
 - Standard child HP, shield *capacity*, movement speed, death reward, XP attribution, normal arrival/Citadel damage and other optional abilities remain owned by **the child type**. The transporter receives only its own death reward once; children earn their own rewards if subsequently killed. No free XP for merely releasing them.
 - Use **`MaxSpawnGenerations=1`** for the first pass, even if the chosen child type also has DeathSpawn; prevent recursive cascade and cap-breaking loops. Subsequent generations are explicit, separately tested future behavior.
 
-#### Checkpoint route inheritance (important for current Level002 routing)
+#### Checkpoint route inheritance (important for current Level020 routing)
 
 Transporters spawned from portals can now be routed through **required checkpoint areas and branch/merge chains**. On death, their children should by default continue the **remaining required route**, not reset to the starting checkpoint or bypass the whole chain.
 

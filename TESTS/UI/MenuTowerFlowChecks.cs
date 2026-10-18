@@ -37,7 +37,7 @@ public partial class MenuTowerFlowChecks : Node
             await Geometry(campaign);
             ButtonFor(campaign, "LEVELS").EmitSignal(Button.SignalName.Pressed);
             LevelSelectionMenu levels = await Scene<LevelSelectionMenu>();
-            Require(ButtonFor(levels, "PLAY LEVEL 002") != null && ProfileStore.Selected == fixture, "Levels offers both existing missions for the same profile");
+            Require(ButtonFor(levels, "PLAY LEVEL 020") != null && ProfileStore.Selected == fixture, "Levels offers both existing missions for the same profile");
             await Geometry(levels);
             ButtonFor(levels, "BACK TO CAMPAIGN").EmitSignal(Button.SignalName.Pressed);
             campaign = await Scene<CampaignMenu>();

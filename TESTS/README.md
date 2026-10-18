@@ -221,13 +221,13 @@ Observed Lava stress sample:500 active occupants, four due hits each (2000 typed
 
 Resumed verification after rebasing onto3c1c759: direct C# compilation and EnemyIntegrationChecks, MenuTowerFlowChecks, CorridorNavigationChecks and PlacementPerformanceChecks all exited0. The complete repeated-world corridor suite passes with the explicit fixture-resource cleanup; no navigation assertion was removed. New economy/vision/per-enemy movement planning notes remain preserved.
 
-## Level002 five-portal maze
+## Level020 five-portal maze
 
-`Level002Checks.Run()` verifies the authored 100×80 TileMap geometry, five configured portals, Citadel approaches, representative one- and three-cell-wide corridors, buildable solid Foundation walls, passable ground, all five portal-to-Citadel routes and the four registered level002 test waves. Launch via Campaign → Play Level 002 or F6 on `MainLevel002.tscn`. The existing standalone Level001 integration path remains unchanged.
+`Level020Checks.Run()` verifies the authored 100×80 TileMap geometry, five configured portals, Citadel approaches, representative one- and three-cell-wide corridors, buildable solid Foundation walls, passable ground, all five portal-to-Citadel routes and the four registered level020 test waves. Launch via Campaign → Play Level 020 or F6 on `MainLevel020.tscn`. The existing standalone Level001 integration path remains unchanged.
 
 ## Route preview
 
-Run `RoutePreviewChecks.tscn` for the F3 debug controls, ALL portals, 1–50 paths per portal, private diversity settings up to 16 weighted profiles, and bounded deterministic planning on both campaign levels, including 500-ship isolation. See `Navigation/RoutePreview.md` for usage, timings and the independently reproduced upstream Level002 map-test failure.
+Run `RoutePreviewChecks.tscn` for the F3 debug controls, ALL portals, 1–50 paths per portal, private diversity settings up to 16 weighted profiles, and bounded deterministic planning on both campaign levels, including 500-ship isolation. See `Navigation/RoutePreview.md` for usage, timings and the independently reproduced upstream Level020 map-test failure.
 
 ## Required portal checkpoints
 
@@ -249,7 +249,7 @@ Completed: ordered and uniformly branching checkpoint graphs, full-chain F3 prev
 
 Moved 100 root-level test scripts/scenes/UID sidecars/reports into the system folders above. Existing fixture paths remain under Towers. All moved C# files were compared against their originals: only literal file-path replacements changed; assertions and fixture logic are unchanged. UID contents are identical. Relocated scene dependencies resolve and no old test-file paths remain in repository text files.
 
-Direct Roslyn compilation passed. From their new paths, PauseControlsChecks, MenuTowerFlowChecks, RoutePreviewChecks, CheckpointChecks, CorridorNavigationChecks, PlacementPerformanceChecks and SpatialQueryBenchmarks exited0. The unmodified integration runner launches from Integration but still exits1 at the existing Level002 painted-tile-count assertion; this cleanup neither changes nor suppresses it. The standard SDK build limitation documented in UI/PauseControls.md remains; no test script splitting or gameplay C# changes were made.
+Direct Roslyn compilation passed. From their new paths, PauseControlsChecks, MenuTowerFlowChecks, RoutePreviewChecks, CheckpointChecks, CorridorNavigationChecks, PlacementPerformanceChecks and SpatialQueryBenchmarks exited0. The unmodified integration runner launches from Integration but still exits1 at the existing Level020 painted-tile-count assertion; this cleanup neither changes nor suppresses it. The standard SDK build limitation documented in UI/PauseControls.md remains; no test script splitting or gameplay C# changes were made.
 
 ## Mission Debrief R1
 

@@ -23,7 +23,7 @@ LevelArtwork exposes Level, FinishedTexture, UpgradeTexture and UpgradeProgress.
 
 All production/test C# compiled successfully with Roslyn4.11 and matching Godot source generation/reference assemblies. Editor asset import succeeded. ConstructionChecks (including C1–C3/paid upgrade regressions), GenericEnemyChecks, AmmunitionLoopChecks, FootprintChecks, HudCategoryChecks, MenuTowerFlowChecks, PauseControlsChecks and ResultsChecks exited0. Existing combat checks include beams, instantaneous splash, swept shockwaves, shields and500-enemy scenarios; style isolation still passes after keeping authored presentation resources shared.
 
-Standard `dotnet build --no-restore` aborted before compilation in this host's SDK CLI (`Win32Exception`, `Process.GetStat`/`StartTime`). The full unmodified EnemyIntegrationChecks still fails the existing Level002 painted-terrain assertion, then exits139 during native shutdown. Neither is reported as a pass; no map assertions were weakened.
+Standard `dotnet build --no-restore` aborted before compilation in this host's SDK CLI (`Win32Exception`, `Process.GetStat`/`StartTime`). The full unmodified EnemyIntegrationChecks still fails the existing Level020 painted-terrain assertion, then exits139 during native shutdown. Neither is reported as a pass; no map assertions were weakened.
 
 Desktop Godot visual QA was unavailable. The SVG asset review and headless texture/geometry checks do not establish actual viewport appearance.
 

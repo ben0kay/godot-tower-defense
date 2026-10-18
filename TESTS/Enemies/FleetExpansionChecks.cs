@@ -16,7 +16,7 @@ public partial class FleetExpansionChecks : Node
         {
             using (DeathSpawnFixture f = new(this)) CheckDefinitionsAndSpawns(f);
             await SubsystemBattlefield.DrainFreedFixtures(this);
-            foreach (string scene in new[] { MenuNavigation.Level001Scene, MenuNavigation.Level002Scene })
+            foreach (string scene in new[] { MenuNavigation.Level001Scene, MenuNavigation.Level020Scene })
             {
                 using DeathSpawnFixture f = new(this, scene);
                 Enemy carrier = f.Parent(true, "heavy_transporter_mk1");

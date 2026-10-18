@@ -1,3 +1,13 @@
+## Level002 moved to Level020; fresh Level002 design map — 2026-10-18
+
+The Five Gates is now `LEVELS/Level020/Level020.tscn`, with `Level020Config.tres`, `Level020Waves.cs` and WaveSetId `level020`. Its terrain, object layout, wave composition and balance are preserved. Its standalone launcher/world variant are `MainLevel020.tscn` / `WORLD/WorldLevel020.tscn`; Campaign labels/launches Level020 and PlayableLevelCatalog registers numeric ID20. Scene/script UID sidecars are retained across renames. Tests and current documentation reference the moved map.
+
+Fresh `LEVELS/Level002/Level002.tscn` is copied from the current LevelTemplate with a new root name and independent `Level002Config.tres` copied from DefaultLevelConfig. Empty terrain layers and template background/Portal/Citadel/checkpoint overlay are retained. The template itself is unchanged. Open this scene in Godot's 2D editor to design it. It has no authored waves or playable launcher yet and is not offered as a finished Campaign mission. Add those when the map is ready. Results cannot skip the missing playable Level002 to reach Level020; Level001's Next is disabled for now. Level020 remains available directly from Campaign and F6 on MainLevel020.
+
+Earlier Level002/Five Gates references in historical notes below refer to the map now called Level020. No old design plan or map content was removed. Verification: see `TESTS/Integration/LevelReorganization.md`.
+
+---
+
 ## Multi-Citadel HUD and F3 — MC3 (2026-10-18)
 
 Two or more Citadels now divide the top-center HUD into equal-width health meters in one horizontal row. Single-Citadel layout is preserved. F3 previews and labels each portal's cached assigned destination, including secondary Citadels and checkpoint chains. Existing maps remain unchanged. See `UI/GameplayHUD/TopBar/README.md` and `TESTS/UI/MultiCitadelHud.md`; desktop appearance review remains.
@@ -36,13 +46,13 @@ Permanent player research now has a first playable foundation: Campaign → RESE
 
 ---
 
-A 2D top-down sci-fi tower-defense game in Godot 4.7.x. Editable Level001 and five-portal Level002 maps, enemy spawning and A* routing, finite manual waves, Battle/Laser/Blaster combat, shared instant area damage, wallet/kill credits, Citadel HP and the eight-stage tower-stat foundation are implemented.
+A 2D top-down sci-fi tower-defense game in Godot 4.7.x. Editable Level001 and five-portal Level020 maps, enemy spawning and A* routing, finite manual waves, Battle/Laser/Blaster combat, shared instant area damage, wallet/kill credits, Citadel HP and the eight-stage tower-stat foundation are implemented.
 
 ## Launch
 
-Build C# in the Godot .NET editor, then press **F5**. The project starts at **Boot**, where you create/select a local profile. Select **Campaign** in Main Menu, then **Play Level 001** or **Play Level 002** to enter the selected battlefield. Profiles persist to Godot `user://Profiles/profiles.json` (versioned JSON with backup recovery). **Campaign/gameplay saves are not yet implemented**: each deployment starts a fresh level session.
+Build C# in the Godot .NET editor, then press **F5**. The project starts at **Boot**, where you create/select a local profile. Select **Campaign** in Main Menu, then **Play Level 001** or **Play Level 020** to enter the selected battlefield. Profiles persist to Godot `user://Profiles/profiles.json` (versioned JSON with backup recovery). **Campaign/gameplay saves are not yet implemented**: each deployment starts a fresh level session.
 
-For rapid map or combat testing, open `Main.tscn` (Level001) or `MainLevel002.tscn` (Level002) and press **F6** (Run Current Scene). This bypasses profile/menus and remains valid for headless integration checks.
+For rapid map or combat testing, open `Main.tscn` (Level001) or `MainLevel020.tscn` (Level020) and press **F6** (Run Current Scene). This bypasses profile/menus and remains valid for headless integration checks.
 
 ## Game controls
 

@@ -18,7 +18,7 @@ public partial class RoutePreviewChecks : Node
             PathRequestManager assignment = new() { Config = sixteen };
             try { for (int i = 0; i < 32; i++) Require(assignment.AssignProfile() == i % 16, "Production assignment cycles all sixteen profile IDs"); }
             finally { assignment.Free(); sixteen.Dispose(); }
-            foreach (string scene in new[] { "Main.tscn", "MainLevel002.tscn" }) await CheckLevel(scene);
+            foreach (string scene in new[] { "Main.tscn", "MainLevel020.tscn" }) await CheckLevel(scene);
             GD.Print("PASS: F3 preview UI, deterministic raw/refined paths, budgets, neutral comparison, duplicate reporting, input cancellation and gameplay isolation on both levels");
             await SubsystemBattlefield.DrainFreedFixtures(this); GetTree().Quit();
         }

@@ -57,7 +57,7 @@ public partial class ResearchMenuChecks : Node
             Require(ProgressionService.GetCurrent().PurchasedResearchIds.Length == 1 && ProgressionService.GetCurrent().UnspentResearchPoints == 0, "Repeated UI purchase cannot charge twice");
             // Read through a fresh store instance to emulate application restart without cached state.
             storeField.SetValue(null, new ProgressionStore(root));
-            foreach (string scene in new[] { MenuNavigation.Level001Scene, MenuNavigation.Level002Scene })
+            foreach (string scene in new[] { MenuNavigation.Level001Scene, MenuNavigation.Level020Scene })
             {
                 using AmmoLoopFixture f = new(this, scene);
                 int authored = f.Main.GetNode<WorldGrid>("World/Grid").Level.Settings.CitadelMaxHealth;

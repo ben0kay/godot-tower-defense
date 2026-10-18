@@ -1,6 +1,6 @@
 ## Fleet expansion and enemy families — 2026-10-18 (implemented)
 
-Six new inherited enemy types bring the catalog to **13**. Each has independent SVG, Definition, stable Mk.1 ID and editable balance. Existing seven IDs/stats and authored Level001/Level002 waves are preserved. F2 cycles all 13; F3 picks up the same catalog. The previous seven-ship artwork sheet remains a historical preview of that art pass.
+Six new inherited enemy types bring the catalog to **13**. Each has independent SVG, Definition, stable Mk.1 ID and editable balance. Existing seven IDs/stats and authored Level001/Level020 waves are preserved. F2 cycles all 13; F3 picks up the same catalog. The previous seven-ship artwork sheet remains a historical preview of that art pass.
 
 | New ship / ID | Family | Hull | Shield capacity | Speed px/s | Citadel damage | Kill Credits |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |

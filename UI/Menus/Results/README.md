@@ -29,7 +29,7 @@ R0's shared visual foundation is now connected to real mission outcomes in both 
 
 ## Ownership and lifecycle
 
-- `LevelResults.tscn` remains the shared Always-processing CanvasLayer at layer 150, hidden until presented. Both `Main.tscn` and `MainLevel002.tscn` instance it; saved previews remain off.
+- `LevelResults.tscn` remains the shared Always-processing CanvasLayer at layer 150, hidden until presented. Both `Main.tscn` and `MainLevel020.tscn` instance it; saved previews remain off.
 - `LevelResults.cs` owns presentation and guarded button intentions only: sequential stat/XP-placeholder reveals, Skip Reveal, outcome accents, disabled Details and navigation errors. It never decides victory, awards XP or pauses gameplay.
 - `LEVELS/Session/LevelSessionController.cs` owns Playing/Victory/Defeat, basic wave-only tallies, one immutable `LevelResultSnapshot`, battlefield pause and navigation. No autoload or per-frame outcome polling.
 - `LEVELS/Session/PlayableLevelCatalog.cs` resolves the immediately following three-digit level through explicit playable launcher registrations, with scene existence/shape validation. A raw map is never a next-level destination.
@@ -49,7 +49,7 @@ R0's shared visual foundation is now connected to real mission outcomes in both 
 
 ## Adding a playable level
 
-Register its numeric ID and existing battlefield launcher in `PlayableLevelCatalog.Entries`; keep the shared World/Waves/CitadelSession/LevelSession/LevelResults structure. Current registrations: Level001 → `res://Main.tscn`, Level002 → `res://MainLevel002.tscn`. Level002 currently has no next playable level. IDs progress 009 → 010 and 099 → 100; 999 has no supported successor. Missing immediate levels are not skipped.
+Register its numeric ID and existing battlefield launcher in `PlayableLevelCatalog.Entries`; keep the shared World/Waves/CitadelSession/LevelSession/LevelResults structure. Current registrations: Level001 → `res://Main.tscn`, Level020 → `res://MainLevel020.tscn`. Level020 currently has no next playable level. IDs progress 009 → 010 and 099 → 100; 999 has no supported successor. Missing immediate levels are not skipped.
 
 ## Remaining passes
 

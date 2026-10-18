@@ -4,7 +4,7 @@
 
 ## Why this is needed
 
-Example Level002: five widely separated enemy portals are in an open western area; the eastern half is a maze with several long, parallel routes, some three cells wide and some just one cell. All enemies must reach a Citadel on the east.
+Example Level020: five widely separated enemy portals are in an open western area; the eastern half is a maze with several long, parallel routes, some three cells wide and some just one cell. All enemies must reach a Citadel on the east.
 
 The current **Path Diversity** system uses multiple deterministic, smoothly weighted A* route profiles across the **entire map**, not a portal-relative route restriction. With strong weights, a ship from the **top** portal may choose a long detour to enter a **bottom** maze corridor. This can be technically valid but visually illogical.
 
@@ -33,7 +33,7 @@ The user has requested **two features**: (1) a path-simulation/debug overlay, an
 
 ### Implemented first-pass controls
 
-Load Main/Level001 or MainLevel002/Campaign Level002 normally, then press **F3**. Choose a registered active portal, catalog enemy type, **1–50 paths per portal**, and **Final Refined** (default) or **Raw A***. Click **Simulate Paths**. Toggle the white neutral-shortest comparison; use **Clear Paths** or F3 to remove the lines. F3 closes both panel and overlay and cancels pending work. No gameplay enemies are spawned.
+Load Main/Level001 or MainLevel020/Campaign Level020 normally, then press **F3**. Choose a registered active portal, catalog enemy type, **1–50 paths per portal**, and **Final Refined** (default) or **Raw A***. Click **Simulate Paths**. Toggle the white neutral-shortest comparison; use **Clear Paths** or F3 to remove the lines. F3 closes both panel and overlay and cancels pending work. No gameplay enemies are spawned.
 
 Colored samples show profile ID, physical distance, percentage difference from neutral and exact duplicate labels. The neutral baseline uses the same start/approach goals and radius with unweighted costs and no refinements. Samples use preview-only deterministic seeds and offsets; they illustrate plans, not exact spawn jitter, future traffic or timing. Start is the selected portal's real centered SpawnExit. Congestion is frozen when Simulate is pressed; live crowd updates cannot change a batch halfway through.
 
@@ -129,7 +129,7 @@ This order helps debug each feature separately. Combining them in one Codex chan
 
 ## What Codex should deliver when requested
 
-A clear, reproducible **route-preview debug mode** plus **optional portal-associated checkpoint regions**, with self-contained small reusable files, Inspector authoring, tests, and brief updates to `ENEMIES/Movement/README.md` and `WORLD/PORTALS/EnemyPortal/README.md`. Do **not** refactor the entire enemy navigation system or alter existing Level001/Level002 art/waves just to add the feature.
+A clear, reproducible **route-preview debug mode** plus **optional portal-associated checkpoint regions**, with self-contained small reusable files, Inspector authoring, tests, and brief updates to `ENEMIES/Movement/README.md` and `WORLD/PORTALS/EnemyPortal/README.md`. Do **not** refactor the entire enemy navigation system or alter existing Level001/Level020 art/waves just to add the feature.
 
 **Route preview and required checkpoints are implemented and tested.** See `TESTS/Navigation/RoutePreview.md` for actual verification and known upstream issues.
 

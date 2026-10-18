@@ -41,7 +41,7 @@ public partial class BattleResearchChecks : Node
             var deployment = ResearchService.CaptureDeployment();
             Require(deployment.ForTower("battle").DamagePercent == 5 && before.ForTower("battle").DamagePercent == 0 &&
                 deployment.ForTower("laser").DamagePercent == 0 && deployment.CitadelMaximum(1000) == 1000, "Frozen, type-scoped snapshot survives disk reload without unrelated bonuses");
-            foreach (string path in new[] { MenuNavigation.Level001Scene, MenuNavigation.Level002Scene }) await Battlefield(path);
+            foreach (string path in new[] { MenuNavigation.Level001Scene, MenuNavigation.Level020Scene }) await Battlefield(path);
             ProfileStore.Select(b.Id);
             using (AmmoLoopFixture f = new(this)) Require(f.Purchase<BattleTower>("battle").FinalStats.DamagePerShot == 30, "Other profile remains neutral");
             ProfileStore.ClearSelection();

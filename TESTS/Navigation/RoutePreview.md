@@ -4,7 +4,7 @@ Expanded 2026-10-15 on GitHub base `9e0cb0f`, Godot 4.7.2 Mono / .NET 8. Rebased
 
 ## Try it
 
-Load a campaign level normally (or F6 Main/MainLevel002). Press **F3**. Choose one portal or **ALL PORTALS**, a catalog enemy type, **1–50 paths per portal**, and Final Refined / Raw A*. Click **Simulate Paths**. White shows unweighted shortest routing; colored portal families show sample paths. The scrollable legend reports profile, distance overhead, duplicate samples and unique routes per portal. Clear Paths or F3 cancels/removes everything. Isolated map-only F6 scenes without world services have no panel.
+Load a campaign level normally (or F6 Main/MainLevel020). Press **F3**. Choose one portal or **ALL PORTALS**, a catalog enemy type, **1–50 paths per portal**, and Final Refined / Raw A*. Click **Simulate Paths**. White shows unweighted shortest routing; colored portal families show sample paths. The scrollable legend reports profile, distance overhead, duplicate samples and unique routes per portal. Clear Paths or F3 cancels/removes everything. Isolated map-only F6 scenes without world services have no panel.
 
 ### Preview-only settings
 
@@ -26,8 +26,8 @@ ALL uses **50 per portal**, not 50 spread across the map: five portals can show 
 - `CorridorNavigationChecks.tscn`: exit 0, all existing geometry, MovementPermissionChecks and twelve 100/500 × straight/winding × 0/50/100% cases.
 - `MenuTowerFlowChecks.tscn`: exit 0, Boot/Main/Campaign, tower build and paid upgrade flow.
 - `PlacementPerformanceChecks.tscn`: exit 0 for 100/500.
-- Unmodified `EnemyIntegrationChecks.tscn`: fails at the existing `Level002Checks` painted-tile-count assertion. This was independently reproduced on untouched `3470c61` during the first overlay pass; subsequent GitHub changes before this pass are planning docs only. No map or map-test assertions are changed here.
-- Diagnostic run with only the `Level002Checks.Run()` invocation temporarily skipped: exit 0; all remaining combat, spatial, terrain, waves, ranks and navigation checks passed (final 31 integration checks, including SwarmNavigationChecks/RepathMovementChecks/SmoothRepathChecks). Original source call was restored immediately after diagnostic compilation and the final production binary rebuilt. This is not a clean unmodified full-suite pass.
+- Unmodified `EnemyIntegrationChecks.tscn`: fails at the existing `Level020Checks` painted-tile-count assertion. This was independently reproduced on untouched `3470c61` during the first overlay pass; subsequent GitHub changes before this pass are planning docs only. No map or map-test assertions are changed here.
+- Diagnostic run with only the `Level020Checks.Run()` invocation temporarily skipped: exit 0; all remaining combat, spatial, terrain, waves, ranks and navigation checks passed (final 31 integration checks, including SwarmNavigationChecks/RepathMovementChecks/SmoothRepathChecks). Original source call was restored immediately after diagnostic compilation and the final production binary rebuilt. This is not a clean unmodified full-suite pass.
 - `git diff --check`: passed.
 
 No manual graphical playtest is claimed. Expected existing missing-catalog fallback warnings remain.
@@ -39,9 +39,9 @@ Headless CPU totals, distributed over bounded preview steps, including private-g
 | Scenario | Samples | Queries | Total CPU work |
 | --- | --- | --- | --- |
 | Level001, ALL | 2 portals × 50 | 102 | 124.14 ms |
-| Level002, ALL | 5 portals × 50 | 1,020 | 1,657.02 ms |
+| Level020, ALL | 5 portals × 50 | 1,020 | 1,657.02 ms |
 | Level001, ALL with 500 live enemies | 2 portals × 50 | 102 | 122.45 ms |
-| Level002, ALL with 500 live enemies | 5 portals × 50 | 1,020 | 1,494.24 ms |
+| Level020, ALL with 500 live enemies | 5 portals × 50 | 1,020 | 1,494.24 ms |
 
 Live path queues/calculation counters remain unchanged during these runs. Weighted grid preparation happens on Simulate; no private grids are constructed per sample. Legend/draw caches update when a sample finishes, rather than after every goal query. Large batches still have noticeable total debug work and can overrun the soft limit on individual searches; they are deliberately spread across frames.
 

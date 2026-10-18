@@ -10,7 +10,7 @@ internal static class ConstructionPlacementChecks
     // Real placement claims/charges once and remains selectable without changing navigation on completion.
     internal static void Run(Node runner)
     {
-        foreach (string scene in new[] { "res://Main.tscn", "res://MainLevel002.tscn" })
+        foreach (string scene in new[] { "res://Main.tscn", "res://MainLevel020.tscn" })
         using (AmmoLoopFixture f = new(runner, scene))
         {
             ConstructionWorkManager clock = f.Main.GetNode<ConstructionWorkManager>("World/ConstructionWork");

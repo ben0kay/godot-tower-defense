@@ -18,10 +18,10 @@ internal static class ResultsNavigationChecks
             Require(PlayableLevelCatalog.FollowingName(pair.Item1) == pair.Item2, "Zero-padded next ID " + pair.Item1);
         foreach (string invalid in new[] { "Level000", "Level999", "level001", "Level1", "Level1000", "Level/001", "Level-01" })
             Require(PlayableLevelCatalog.FollowingName(invalid) == null, "Reject malformed/out-of-range ID " + invalid);
-        Require(PlayableLevelCatalog.NextScene("Level001") == MenuNavigation.Level002Scene && PlayableLevelCatalog.NextScene("Level002") == null,
-            "Only the existing next registered launcher resolves");
-        Require(PlayableLevelCatalog.IsPlayable(MenuNavigation.Level001Scene) && PlayableLevelCatalog.IsPlayable(MenuNavigation.Level002Scene)
-            && !PlayableLevelCatalog.IsPlayable("res://LEVELS/Level002/Level002.tscn"), "Map scenes cannot masquerade as battlefields");
+        Require(PlayableLevelCatalog.NextScene("Level001") == null && PlayableLevelCatalog.NextScene("Level020") == null,
+            "Unfinished Level002 and missing Level021 cannot resolve; Level020 is never skipped to");
+        Require(PlayableLevelCatalog.IsPlayable(MenuNavigation.Level001Scene) && PlayableLevelCatalog.IsPlayable(MenuNavigation.Level020Scene)
+            && !PlayableLevelCatalog.IsPlayable("res://LEVELS/Level020/Level020.tscn"), "Map scenes cannot masquerade as battlefields");
         SceneTree tree = owner.GetTree(); tree.CurrentScene = null;
         PlayerProfile profile = new() { Id = Guid.NewGuid().ToString("N"), Name = "Results fixture" };
         typeof(ProfileStore).GetField("_profiles", BindingFlags.Static | BindingFlags.NonPublic).SetValue(null, new List<PlayerProfile> { profile });
@@ -41,15 +41,17 @@ internal static class ResultsNavigationChecks
         Require(retry != main && retry.SceneFilePath == MenuNavigation.Level001Scene && !tree.Paused
             && retry.GetNode<LevelSessionController>("LevelSession").State == LevelSessionState.Playing,
             "Retry replaces the actual current launcher, unpaused and fresh");
-        // A single real final kill must route directly to the registered Level002 battlefield.
+        // A win cannot skip the unfinished Level002; the preserved Level020 is still directly playable.
         WaveManager waves = retry.GetNode<WaveManager>("Waves"); SpawnManager spawns = retry.GetNode<SpawnManager>("World/EnemySystems/Spawning");
         waves.Configure(new[] { WaveBuilder.Wave(1, WaveBuilder.Batch(1, 0, 0, WaveBuilder.Enemy("basic_mk1"))) }, spawns.Catalog.ToSceneMap());
         Require(waves.StartWave(), "Navigation fixture starts a real wave"); spawns.Registry.Living[0].TakeDamage(999999);
         await owner.ToSignal(tree, SceneTree.SignalName.ProcessFrame);
-        results = retry.GetNode<LevelResults>("LevelResults"); results.SkipReveal(); results.PrimaryButton.EmitSignal(Button.SignalName.Pressed);
+        results = retry.GetNode<LevelResults>("LevelResults"); results.SkipReveal();
+        Require(results.PrimaryButton.Disabled, "Level001 cannot advance into the unfinished map or skip to Level020");
+        MenuNavigation.Open(owner, MenuNavigation.Level020Scene);
         Node next = await Scene<Node2D>(owner);
-        Require(next.SceneFilePath == MenuNavigation.Level002Scene && !tree.Paused && next.GetNode<CitadelSession>("CitadelSession").Health.CurrentHealth > 0,
-            "Next loads MainLevel002.tscn directly, never the raw map");
+        Require(next.SceneFilePath == MenuNavigation.Level020Scene && !tree.Paused && next.GetNode<CitadelSession>("CitadelSession").Health.CurrentHealth > 0,
+            "Direct Level020 launch loads its renamed battlefield, never the raw map");
         // Menu action works without needing a further level.
         waves = next.GetNode<WaveManager>("Waves"); spawns = next.GetNode<SpawnManager>("World/EnemySystems/Spawning");
         waves.Configure(new[] { WaveBuilder.Wave(1, WaveBuilder.Batch(1, 0, 0, WaveBuilder.Enemy("basic_mk1"))) }, spawns.Catalog.ToSceneMap());
@@ -61,12 +63,12 @@ internal static class ResultsNavigationChecks
         CampaignMenu campaign = await Scene<CampaignMenu>(owner);
         Require(campaign.FindChildren("*", "Label", true, false).OfType<Label>().Any(label => label.Text.Contains("PLAYER LEVEL 2")), "Campaign displays progression earned from actual mission wins");
         Require(!tree.Paused && owner.GetNode<GameInput>("/root/GameInput").BindingCount == 0, "Menu exits unpaused with no stale gameplay/results bindings");
-        ProfileStore.ClearSelection(); MenuNavigation.Open(owner, MenuNavigation.Level002Scene);
+        ProfileStore.ClearSelection(); MenuNavigation.Open(owner, MenuNavigation.Level020Scene);
         Node direct = await Scene<Node2D>(owner); direct.GetNode<CitadelSession>("CitadelSession").Health.TakeDamage(int.MaxValue);
         await owner.ToSignal(tree, SceneTree.SignalName.ProcessFrame);
         results = direct.GetNode<LevelResults>("LevelResults"); results.SkipReveal(); results.PrimaryButton.EmitSignal(Button.SignalName.Pressed);
         direct = await Scene<Node2D>(owner);
-        Require(direct.SceneFilePath == MenuNavigation.Level002Scene && !tree.Paused, "Level002 Retry also reloads its current playable launcher");
+        Require(direct.SceneFilePath == MenuNavigation.Level020Scene && !tree.Paused, "Level020 Retry also reloads its current playable launcher");
         direct.GetNode<CitadelSession>("CitadelSession").Health.TakeDamage(int.MaxValue);
         await owner.ToSignal(tree, SceneTree.SignalName.ProcessFrame);
         results = direct.GetNode<LevelResults>("LevelResults"); results.SkipReveal(); ButtonFor(results, "RETURN TO CAMPAIGN").EmitSignal(Button.SignalName.Pressed);

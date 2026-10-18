@@ -124,7 +124,7 @@ internal static class TimedUpgradeChecks
     // Both real launchers finish a positive timed upgrade through Godot physics, without explicit clock advances.
     private static async Task Automatic(Node runner)
     {
-        foreach (string scene in new[] { "res://Main.tscn", "res://MainLevel002.tscn" })
+        foreach (string scene in new[] { "res://Main.tscn", "res://MainLevel020.tscn" })
         using (AmmoLoopFixture f = new(runner, scene))
         {
             BattleTower tower = f.Add<BattleTower>("battle", new(2200, 2000)); tower.NextUpgrade.WorkSeconds = .05;

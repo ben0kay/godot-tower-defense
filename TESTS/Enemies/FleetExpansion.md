@@ -8,7 +8,7 @@ Verified with Godot 4.7.2 / .NET 8:
 - 13 registered definitions, valid family values, rejection of invalid enum values; each new type spawns at a real portal with its own authored family, health, speed and art size.
 - Normal spawns start unshielded; Shield Frigate starts at 350 SP when wave-opted, uses the shared aura and absorbs damage before hull.
 - Hull hits, once-only kill rewards, once-only Citadel damage and no carrier payload on arrival.
-- Heavy Transporter reserves both payloads before removal, releases six Drones plus four Interceptors under existing queue budgets, transfers wave ownership and destination, and blocks victory until every child is defeated. Verified on both Level001 and Level002 with actual results snapshots (11 kills).
+- Heavy Transporter reserves both payloads before removal, releases six Drones plus four Interceptors under existing queue budgets, transfers wave ownership and destination, and blocks victory until every child is defeated. Verified on both Level001 and Level020 with actual results snapshots (11 kills).
 - Existing `DeathSpawnChecks.tscn` passes, including original Transporter, routing, pause, limits, unload cancellation and 500-active scheduling checks.
 
 The broader `EnemyIntegrationChecks.tscn` stops at `TowerCatalogChecks`: “Actual passive selection has safe no-upgrades Inspector”. The same assertion fails on unchanged base commit `3b076aa`; this is an existing unrelated failure and that suite is not reported as passing. Existing default-tower-catalog recovery warnings also occur in the baseline fixtures.

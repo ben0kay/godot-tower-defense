@@ -1,3 +1,13 @@
+## Level002 moved to Level020; fresh Level002 design map — 2026-10-18
+
+The Five Gates is now `LEVELS/Level020/Level020.tscn`, with `Level020Config.tres`, `Level020Waves.cs` and WaveSetId `level020`. Its terrain, object layout, wave composition and balance are preserved. Its standalone launcher/world variant are `MainLevel020.tscn` / `WORLD/WorldLevel020.tscn`; Campaign labels/launches Level020 and PlayableLevelCatalog registers numeric ID20. Scene/script UID sidecars are retained across renames. Tests and current documentation reference the moved map.
+
+Fresh `LEVELS/Level002/Level002.tscn` is copied from the current LevelTemplate with a new root name and independent `Level002Config.tres` copied from DefaultLevelConfig. Empty terrain layers and template background/Portal/Citadel/checkpoint overlay are retained. The template itself is unchanged. Open this scene in Godot's 2D editor to design it. It has no authored waves or playable launcher yet and is not offered as a finished Campaign mission. Add those when the map is ready. Results cannot skip the missing playable Level002 to reach Level020; Level001's Next is disabled for now. Level020 remains available directly from Campaign and F6 on MainLevel020.
+
+Earlier Level002/Five Gates references in historical notes below refer to the map now called Level020. No old design plan or map content was removed. Verification: see `TESTS/Integration/LevelReorganization.md`.
+
+---
+
 ## Mission XP foundation — 2026-10-17
 
 LevelConfig now exposes Player XP Rewards: VictoryBaseXP and DefeatBaseXP, provisional500/0 on both playable levels. Session captures these at deployment; reward math/persistence live in SYSTEMS/Progression/Missions, not enemies/waves.
@@ -7,13 +17,13 @@ LevelConfig now exposes Player XP Rewards: VictoryBaseXP and DefeatBaseXP, provi
 # LEVELS — Authored Maps, Settings and Waves
 
 - `Level001/Level001.tscn`: the original terrain/placement test map, mounted as `World/Level` by `WORLD/World.tscn`.
-- `Level002/Level002.tscn`: **The Five Gates**, a 100×80 map with five left-side portals, large western open ground and an eastern buildable-Foundation maze. See `Level002/README.md`; playable via Campaign → Play Level 002 or `MainLevel002.tscn`.
+- `Level020/Level020.tscn`: **The Five Gates**, a 100×80 map with five left-side portals, large western open ground and an eastern buildable-Foundation maze. See `Level020/README.md`; playable via Campaign → Play Level 020 or `MainLevel020.tscn`.
 - `LevelTemplate.tscn`: empty paint-ready scene with a Citadel and shared TileSet; defaults to MapEdges and requires no Portal.
 - `WorldLevel.cs`: typed scene root exposing terrain layers, level settings and destination.
 - `LevelConfig.cs`: Inspector-editable Resource with Starting Resources / StartingCredits, `SpawnMode` (Portals / MapEdges / Both), `AllowedEdges`, root-relative `ActivePortals` NodePaths and `CitadelPath`.
 - `DefaultLevelConfig.tres`: template defaults. Duplicate/make unique the settings resource for each new level.
 
-Open a level in the 2D editor and paint Passable/Impassable/Decorations. Save and press F5 to test the game. For Level001/Level002 use their existing Campaign buttons or the corresponding `Main.tscn` / `MainLevel002.tscn` launch scenes. The latter uses `WORLD/WorldLevel002.tscn`, keeping the child node named `Level` and leaving the original World scene untouched. A shared loader may replace these launch variants later. Do not copy the camera/HUD/tower controller into individual maps.
+Open a level in the 2D editor and paint Passable/Impassable/Decorations. Save and press F5 to test the game. For Level001/Level020 use their existing Campaign buttons or the corresponding `Main.tscn` / `MainLevel020.tscn` launch scenes. The latter uses `WORLD/WorldLevel020.tscn`, keeping the child node named `Level` and leaving the original World scene untouched. A shared loader may replace these launch variants later. Do not copy the camera/HUD/tower controller into individual maps.
 
 `WorldMasterConfig` remains the single source for map dimensions and cell size: default 100×80, 64 px. Paint within those bounds. The shared TileSet is 64 px; its size must match the configured grid. Keep terrain layers aligned to the world grid without arbitrary scaling/rotation.
 
@@ -25,7 +35,7 @@ Spawning lives in ENEMIES; the shared wave scheduler/catalog live in LEVELS/Wave
 Select the active level settings .tres and edit Starting Resources / Starting Credits. Level001Config.tres starts at 1,000; DefaultLevelConfig.tres starts at 0. Main/Economy loads this value into a fresh session wallet and pushes it to the HUD. Changing settings during play does not refill the wallet; restart the level to apply saved starting values. Credits are currently the only starting resource; optional tower material costs already use shared ResourceCost entries.
 
 ## Wave sets
-LevelConfig / Waves / WaveSetId references a C# wave set in LEVELS/Waves/WaveCatalog.cs. Level001 uses `level001`; Level002 uses `level002`; the empty default disables waves. Wave timing/counts are edited in LEVELS/Level001/Level001Waves.cs, not large Inspector arrays. Unknown set IDs show a setup error; there is no implicit fallback. ActivePortals remains the authoritative allowed-source list.
+LevelConfig / Waves / WaveSetId references a C# wave set in LEVELS/Waves/WaveCatalog.cs. Level001 uses `level001`; Level020 uses `level020`; the empty default disables waves. Wave timing/counts are edited in LEVELS/Level001/Level001Waves.cs, not large Inspector arrays. Unknown set IDs show a setup error; there is no implicit fallback. ActivePortals remains the authoritative allowed-source list.
 
 
 ## Folder ownership

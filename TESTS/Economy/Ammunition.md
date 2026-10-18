@@ -34,7 +34,7 @@ A further automatic real-physics fixture enables the actual production/dispatch/
 - CheckpointChecks: **exit0**, required regions, chains/branching and500-enemy scheduling.
 - CorridorNavigationChecks: **exit0**, movement permissions and all straight/winding100/500-enemy cases.
 - PlacementPerformanceChecks: **exit0**,100/500-enemy scenarios.
-- Unmodified EnemyIntegrationChecks: **exit1 at the existing Level002 painted-tile-count assertion**. No map tiles or that assertion were changed. A diagnostic build skipping only Level002Checks.Run passed the remaining31 integration checks, including existing weapon, rank/XP, shield/hull, instant AoE, swept Shockwave, terrain, economy and navigation checks. The original source was restored before the final production compilation. This is not an unmodified full-suite pass.
+- Unmodified EnemyIntegrationChecks: **exit1 at the existing Level020 painted-tile-count assertion**. No map tiles or that assertion were changed. A diagnostic build skipping only Level020Checks.Run passed the remaining31 integration checks, including existing weapon, rank/XP, shield/hull, instant AoE, swept Shockwave, terrain, economy and navigation checks. The original source was restored before the final production compilation. This is not an unmodified full-suite pass.
 - New SVG assets imported successfully and actual building/drone scenes instantiate. The headless editor still reports missing .NET SDK8.0.31/Microsoft.Build. Standard `dotnet build --no-restore` is blocked by the container's missing NuGet.Protocol dependency. Neither standard SDK nor editor build success is claimed.
 
 Existing DefaultTowerCatalog fallback warnings remain. No campaign/profile writes occur.

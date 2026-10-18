@@ -42,7 +42,7 @@ Final benchmark:100,000 warmed single-active-tower timer ticks **40ms,0 managed 
 | CheckpointChecks | PASS |
 | CorridorNavigationChecks | PASS |
 
-`EnemyIntegrationChecks` was attempted: it still fails before reaching its linked HD1/HD2 group at the existing Level002 assertion, “The western open ground and eastern maze are fully painted” (exit1). No map/assertion changes were made to conceal that blocker. The new group has its own actual-world standalone runner.
+`EnemyIntegrationChecks` was attempted: it still fails before reaching its linked HD1/HD2 group at the existing Level020 assertion, “The western open ground and eastern maze are fully painted” (exit1). No map/assertion changes were made to conceal that blocker. The new group has its own actual-world standalone runner.
 
 ## Remaining
 

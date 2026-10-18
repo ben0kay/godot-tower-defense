@@ -25,7 +25,7 @@ Godot4.7.2 Mono, .NET8.0.31/Roslyn4.11:
 - Standard `dotnet build --no-restore` failed before compilation: host SDK could not load `NuGet.Protocol, Version=6.11.2.1`. This is not reported as a successful SDK build.
 - ConstructionChecks (including existing TowerUpgradeChecks), FootprintChecks, AmmunitionLoopChecks, GenericEnemyChecks, DeathSpawnChecks, MenuTowerFlowChecks, HudCategoryChecks, PauseControlsChecks, ResultsChecks and CorridorNavigationChecks: exit0.
 - GenericEnemyChecks covers catalog/shields, ShieldEmitter, waves/portals/Citadel, area damage, Laser30/60/120Hz, Blaster instantaneous impacts and Shockwave swept gameplay. DeathSpawn covers both actual launchers, wave/results ownership, checkpoint handoffs and500-active stress.
-- Full unmodified EnemyIntegrationChecks still fails the preexisting Level002 map assertion: “The western open ground and eastern maze are fully painted”, followed by native shutdown exit139. No map data/assertions were modified to bypass it.
+- Full unmodified EnemyIntegrationChecks still fails the preexisting Level020 map assertion: “The western open ground and eastern maze are fully painted”, followed by native shutdown exit139. No map data/assertions were modified to bypass it.
 - An earlier MenuTowerFlow run printed PASS but exited139 during shutdown; not counted as a pass. The final run with the test-only finalization barrier exited0.
 - No desktop visual playtest performed. Current finished SVG artwork remains visible while construction runs; C3 progress UI and C4 authored SVG stages/sparks are deliberately not implemented.
 

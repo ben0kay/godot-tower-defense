@@ -18,7 +18,7 @@ Godot4.7.2 Mono, .NET8.0.31, Roslyn4.11:
 - DeathSpawnChecks: exit0, including both launchers, final-carrier results, wave reservations, checkpoint handoffs, shield policy, caps, lifecycle and500-active stress.
 - CorridorNavigationChecks: exit0, including48 mixed movement-permission combinations, A* budget/clearance/repath and100/500-enemy fixtures.
 - CheckpointChecks and ResultsChecks: exit0.
-- Unmodified EnemyIntegrationChecks: blocked by the existing Level002 painted-terrain assertion, then native shutdown exit139. This is a failed full-suite run, not a pass. No map assertion or gameplay test was weakened to bypass it.
+- Unmodified EnemyIntegrationChecks: blocked by the existing Level020 painted-terrain assertion, then native shutdown exit139. This is a failed full-suite run, not a pass. No map assertion or gameplay test was weakened to bypass it.
 - Editor import completed for newly pulled artwork. Desktop Inspector editing/visual playfeel was not manually inspected; native inherited scenes and propagation are validated by actual scene loading/instantiation.
 
 ## Before/after construction measurements

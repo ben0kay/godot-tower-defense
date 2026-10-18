@@ -46,7 +46,7 @@ F3 samples full chains with the same selection helper. It labels each sample's c
 
 ## Above-tile editor diagram
 
-Level001, Level002 and LevelTemplate now include `Debug/CheckpointOverlay`, a shared `[Tool]` CheckpointDesignOverlay. Its **absolute ZIndex4090** draws circles/labels/arrows above tiles, independent of marker placement in the scene tree. Standalone RouteCheckpoint.tscn also has absolute ZIndex4000 as a fallback when no overlay exists. No tile data, placed checkpoint coordinates or portal links are changed by adding the owner.
+Level001, Level020 and LevelTemplate now include `Debug/CheckpointOverlay`, a shared `[Tool]` CheckpointDesignOverlay. Its **absolute ZIndex4090** draws circles/labels/arrows above tiles, independent of marker placement in the scene tree. Standalone RouteCheckpoint.tscn also has absolute ZIndex4000 as a fallback when no overlay exists. No tile data, placed checkpoint coordinates or portal links are changed by adding the owner.
 
 - Circles have faint fills and bright outlines, labelled with node names.
 - Arrows connect each portal's SpawnExit to its first checkpoint and every checkpoint to all Next Checkpoints.

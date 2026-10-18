@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="PackedScene" path="res://WORLD/WorldLevel002.tscn" id="1_world"]
+[ext_resource type="PackedScene" path="res://WORLD/WorldLevel020.tscn" id="1_world"]
 [ext_resource type="PackedScene" path="res://CAMERA/CameraRig.tscn" id="2_camera"]
 [ext_resource type="PackedScene" path="res://UI/GameplayHUD/GameplayHUD.tscn" id="4_hud"]
 [ext_resource type="Script" uid="uid://dkqleio3114br" path="res://TOWERS/Placement/TowerPlacementController.cs" id="5_place"]

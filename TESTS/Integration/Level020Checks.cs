@@ -1,22 +1,22 @@
-// Authored Level002 scene and tile connectivity contract; tests static map content without mutating Main/Level001.
+// Authored Level020 scene and tile connectivity contract; tests static map content without mutating Main/Level001.
 using Godot;
 using System;
 using System.Collections.Generic;
 
-public static class Level002Checks
+public static class Level020Checks
 {
     // =========================================================
     // Verify editor-authored tiles and portals before they become a live world grid.
     public static void Run()
     {
-        PackedScene packed = GD.Load<PackedScene>("res://LEVELS/Level002/Level002.tscn");
-        Require(packed != null, "Level002 scene loads");
+        PackedScene packed = GD.Load<PackedScene>("res://LEVELS/Level020/Level020.tscn");
+        Require(packed != null, "Level020 scene loads");
         WorldLevel level = packed.Instantiate<WorldLevel>();
         try
         {
-            Require(level.Settings != null && level.Settings.WaveSetId == "level002" &&
+            Require(level.Settings != null && level.Settings.WaveSetId == "level020" &&
                 level.Settings.ActivePortals.Count == 5 && level.Settings.StartingCredits == 1700,
-                "Level002 has independent wave set, wallet, five portals");
+                "Level020 has independent wave set, wallet, five portals");
             var ground = new HashSet<Vector2I>(level.Passable.GetUsedCells());
             var walls = new HashSet<Vector2I>(level.Impassable.GetUsedCells());
             var foundation = new HashSet<Vector2I>(level.Interactive.GetUsedCells());
@@ -51,8 +51,8 @@ public static class Level002Checks
                 Require(start.X < 20 && ground.Contains(start) && CanReach(start, approaches, blocked),
                     "Each west portal reaches the east Citadel through the labyrinth: " + path);
             }
-            Require(WaveCatalog.GetWaves("level002").Length == 4, "Level002 four authored mixed waves");
-            GD.Print("PASS: Level002 five-portal painted western field/eastern buildable maze and walkable Citadel routes");
+            Require(WaveCatalog.GetWaves("level020").Length == 4, "Level020 four authored mixed waves");
+            GD.Print("PASS: Level020 five-portal painted western field/eastern buildable maze and walkable Citadel routes");
         }
         finally { level.Free(); }
     }

@@ -30,7 +30,7 @@ Spacing is tighter without changing font sizes. The busy upgrade status is alrea
 
 Only selected towers have heat/disable UI subscriptions. Close/switch/unload detach them; deferred callbacks guard controller/HUD/tower lifetime and read the latest selection. Heat notifications update only the condition card/header; cached upgrade snapshots are never re-resolved from a heat event. Cooling events are bounded by the existing shared clock and notifications coalesce within a frame. No all-tower UI polling was added.
 
-Manual normal-zoom artwork/readability approval remains pending; headless layout does not establish pixel appearance. Full EnemyIntegrationChecks was not rerun for this presentation-only follow-up; its previously documented Level002 terrain assertion remains outside scope. No EMP attack, power grid, cooling particles/audio, save state or new heat balance was introduced.
+Manual normal-zoom artwork/readability approval remains pending; headless layout does not establish pixel appearance. Full EnemyIntegrationChecks was not rerun for this presentation-only follow-up; its previously documented Level020 terrain assertion remains outside scope. No EMP attack, power grid, cooling particles/audio, save state or new heat balance was introduced.
 
 All nine listed runners were rerun successfully after the rebase; combined C# compilation also passed.
 

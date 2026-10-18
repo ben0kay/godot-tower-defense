@@ -44,7 +44,7 @@ Renderer: fixed 32 slots; 100 immediate emissions overwrite 68 slots without gro
 | ResultsChecks | PASS |
 | SpatialQueryBenchmarks | COMPLETED exit0: existing paired sparse/dense and extreme-teleport benchmark; not a new FPS claim |
 | InspectorTargetingChecks | INCOMPLETE: spatial oracle and rank/XP groups pass, then native `gchandle.is_released()` / thread notification crash; isolated retry also aborts |
-| EnemyIntegrationChecks | FAILS at existing Level002 terrain assertion: “The western open ground and eastern maze are fully painted”, then shutdown exit139; new linked visual group is not reached |
+| EnemyIntegrationChecks | FAILS at existing Level020 terrain assertion: “The western open ground and eastern maze are fully painted”, then shutdown exit139; new linked visual group is not reached |
 
 No unrelated terrain or native-resource cleanup changes were made to hide these failures. The focused production-world runner executes the new visual group independently of the full-suite blocker.
 

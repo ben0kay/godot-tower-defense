@@ -1,3 +1,13 @@
+## Level002 moved to Level020; fresh Level002 design map — 2026-10-18
+
+The Five Gates is now `LEVELS/Level020/Level020.tscn`, with `Level020Config.tres`, `Level020Waves.cs` and WaveSetId `level020`. Its terrain, object layout, wave composition and balance are preserved. Its standalone launcher/world variant are `MainLevel020.tscn` / `WORLD/WorldLevel020.tscn`; Campaign labels/launches Level020 and PlayableLevelCatalog registers numeric ID20. Scene/script UID sidecars are retained across renames. Tests and current documentation reference the moved map.
+
+Fresh `LEVELS/Level002/Level002.tscn` is copied from the current LevelTemplate with a new root name and independent `Level002Config.tres` copied from DefaultLevelConfig. Empty terrain layers and template background/Portal/Citadel/checkpoint overlay are retained. The template itself is unchanged. Open this scene in Godot's 2D editor to design it. It has no authored waves or playable launcher yet and is not offered as a finished Campaign mission. Add those when the map is ready. Results cannot skip the missing playable Level002 to reach Level020; Level001's Next is disabled for now. Level020 remains available directly from Campaign and F6 on MainLevel020.
+
+Earlier Level002/Five Gates references in historical notes below refer to the map now called Level020. No old design plan or map content was removed. Verification: see `TESTS/Integration/LevelReorganization.md`.
+
+---
+
 ## Mission XP connection — implemented 2026-10-17
 
 User approved a provisional, tunable mission-to-profile XP loop before finalized scoring. **This amendment supersedes older statements that missions never grant XP; preserve the original P1–P5/R4 design below as future scope.**
@@ -25,7 +35,7 @@ Research affects only deployment initialization: CitadelSession resolves authore
 
 ---
 
-`LevelSessionController.cs` is a small level-owned coordinator shared by `Main.tscn` and `MainLevel002.tscn`. State is Playing, Victory or Defeat. It caches sibling services once and uses events; there are no per-frame outcome checks or scene searches.
+`LevelSessionController.cs` is a small level-owned coordinator shared by `Main.tscn` and `MainLevel020.tscn`. State is Playing, Victory or Defeat. It caches sibling services once and uses events; there are no per-frame outcome checks or scene searches.
 
 ## Outcome arbitration
 
@@ -37,7 +47,7 @@ One final `LevelResultSnapshot` is immutable after capture. Basic counters use a
 
 The controller closes the build tray/cancels its ghost, transfers pause ownership from PauseMenu, binds Escape/Ctrl at results priority 200 and pauses gameplay. LevelResults processes Always above the battlefield. Escape skips reveal/dismisses errors; Ctrl cannot build; F11 remains global. Navigation is unavailable before reveal finishes/Skip. Unload removes callbacks and bindings and releases results-owned pause.
 
-`PlayableLevelCatalog.cs` centralizes explicit launcher registration and strict three-digit level IDs. Level001 launches Main.tscn; Level002 launches MainLevel002.tscn. Only an existing registered immediate next battlefield with the shared service shape is eligible; map existence alone is insufficient. Extend the Entries table when a real new launcher is ready. Missing-next keeps the primary action disabled. Retry reloads the current launcher; shared MenuNavigation handles menu/profileless Boot redirection and pause restoration on failed scene changes. Exit Game releases pause before quitting.
+`PlayableLevelCatalog.cs` centralizes explicit launcher registration and strict three-digit level IDs. Level001 launches Main.tscn; Level020 launches MainLevel020.tscn. Only an existing registered immediate next battlefield with the shared service shape is eligible; map existence alone is insufficient. Extend the Entries table when a real new launcher is ready. Missing-next keeps the primary action disabled. Retry reloads the current launcher; shared MenuNavigation handles menu/profileless Boot redirection and pause restoration on failed scene changes. Exit Game releases pause before quitting.
 
 ## Scope and future work
 

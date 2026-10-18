@@ -10,7 +10,7 @@ public static class PlayableLevelCatalog
     private static readonly Entry[] Entries =
     {
         new(1, MenuNavigation.Level001Scene),
-        new(2, MenuNavigation.Level002Scene),
+        new(20, MenuNavigation.Level020Scene),
     };
 
     // =========================================================

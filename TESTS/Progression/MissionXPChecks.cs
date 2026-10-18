@@ -26,7 +26,7 @@ public partial class MissionXPChecks : Node
             var b = new PlayerProfile { Id = Guid.NewGuid().ToString("N"), Name = "Mission B" };
             profiles.SetValue(null, new List<PlayerProfile> { a, b }); storeField.SetValue(null, new ProgressionStore(root));
             ProfileStore.Select(a.Id);
-            foreach (string scene in new[] { MenuNavigation.Level001Scene, MenuNavigation.Level002Scene })
+            foreach (string scene in new[] { MenuNavigation.Level001Scene, MenuNavigation.Level020Scene })
             {
                 long before = ProgressionService.GetCurrent().LifetimePlayerXP;
                 using MissionFixture f = new(this, scene);

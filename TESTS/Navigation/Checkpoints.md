@@ -23,7 +23,7 @@ Implemented against GitHub base `2867a3b` on 2026-10-15 with Godot4.7.2 Mono/.NE
 - CorridorNavigationChecks: exit0 including MovementPermissionChecks and all twelve straight/winding,100/500,0/50/100% cases.
 - MenuTowerFlowChecks: exit0, actual Boot/Main/Campaign flow, construction and paid upgrade.
 - PlacementPerformanceChecks: exit0,100/500.
-- Unmodified EnemyIntegrationChecks: still stops on the pre-existing Level002 painted-tile-count assertion, reproduced independently before this pass. No map or assertion is changed here. A diagnostic run skips only Level002Checks.Run to execute the remaining checks; the original call is restored before final compilation. The diagnostic completed with exit0 and all remaining31 integration checks passed, including SwarmNavigationChecks, RepathMovementChecks and SmoothRepathChecks. This is not an unmodified full-suite pass.
+- Unmodified EnemyIntegrationChecks: still stops on the pre-existing Level020 painted-tile-count assertion, reproduced independently before this pass. No map or assertion is changed here. A diagnostic run skips only Level020Checks.Run to execute the remaining checks; the original call is restored before final compilation. The diagnostic completed with exit0 and all remaining31 integration checks passed, including SwarmNavigationChecks, RepathMovementChecks and SmoothRepathChecks. This is not an unmodified full-suite pass.
 
 Standard SDK/MSBuild remains blocked by the container's missing NuGet.Protocol dependency verified in the preceding pass. Actual .NET Godot headless scenes run successfully with the directly compiled assembly. No manual graphical editor playtest is claimed. Expected existing missing-catalog fallback warnings remain.
 

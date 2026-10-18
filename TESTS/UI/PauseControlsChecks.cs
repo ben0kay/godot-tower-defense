@@ -40,7 +40,7 @@ public partial class PauseControlsChecks : Node
                 KeyPress(Key.Ctrl); KeyPress(Key.Escape);
                 Require(_input.BindingCount == 0 && !GetTree().Paused, "No gameplay bindings in " + path);
             }
-            foreach (string level in new[] { MenuNavigation.Level001Scene, MenuNavigation.Level002Scene })
+            foreach (string level in new[] { MenuNavigation.Level001Scene, MenuNavigation.Level020Scene })
             {
                 MenuNavigation.Open(this, level); Node2D scene = await Scene<Node2D>();
                 GameplayHUD hud = scene.GetNode<GameplayHUD>("UI/GameplayHUD");

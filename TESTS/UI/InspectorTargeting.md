@@ -22,7 +22,7 @@ The old rank test expected2000XP after1000+14000+500; corrected to15500, matchin
 
 ## Outstanding verification / inherited blockers
 
-- Full EnemyIntegrationChecks stops at the unchanged Level002 assertion **“The western open ground and eastern maze are fully painted”**, then native shutdown exits139. The standalone groups above provide executed coverage; do not claim the full suite passed.
+- Full EnemyIntegrationChecks stops at the unchanged Level020 assertion **“The western open ground and eastern maze are fully painted”**, then native shutdown exits139. The standalone groups above provide executed coverage; do not claim the full suite passed.
 - One ResultsChecks run encountered native `gchandle.is_released()` / catalog-loading failure (exit134); an isolated rerun passed exit0. No speculative production fix was made for this intermittent native/runtime failure.
 - No desktop display is available here. Manual visual/playfeel review, screenshots, hover/focus appearance and reading comfort remain pending. Headless geometry cannot approve aesthetics. Very small windows below the tested sizes may need a separate responsive layout.
 - Estimates deliberately exclude First/Last while pending/invalid; heavy continuous movement work can delay optional tails. Downstream distance is approximate because circle entry, future offsets/congestion and dynamic buildings are not known exactly. No live route is rewritten to make an estimate exact. See `TOWERS/Shared/Targeting/README.md` for the canonical-point policy and4096-edge safety cap.

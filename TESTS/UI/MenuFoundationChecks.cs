@@ -10,9 +10,9 @@ public static class MenuFoundationChecks
     public static void Run(Node main)
     {
         Require(MenuNavigation.Level001Scene == "res://Main.tscn", "Campaign keeps the original Main.tscn");
-        Require(MenuNavigation.Level002Scene == "res://MainLevel002.tscn" && ResourceLoader.Exists(MenuNavigation.Level002Scene),
-            "Campaign exposes the playable Level002 launch scene");
-        Level002Checks.Run();
+        Require(MenuNavigation.Level020Scene == "res://MainLevel020.tscn" && ResourceLoader.Exists(MenuNavigation.Level020Scene),
+            "Campaign exposes the playable Level020 launch scene");
+        Level020Checks.Run();
         foreach (string scenePath in new[] {
             MenuNavigation.BootScene, MenuNavigation.MainScene, MenuNavigation.CampaignScene, MenuNavigation.LevelsScene })
         {

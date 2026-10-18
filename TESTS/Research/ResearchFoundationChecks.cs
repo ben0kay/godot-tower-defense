@@ -18,7 +18,7 @@ public partial class ResearchFoundationChecks : Node
         {
             ProfileStore.ClearSelection();
             PureResearch(); GraphGeometry();
-            foreach (string scene in new[] { MenuNavigation.Level001Scene, MenuNavigation.Level002Scene })
+            foreach (string scene in new[] { MenuNavigation.Level001Scene, MenuNavigation.Level020Scene })
                 await Telemetry(scene);
             await SubsystemBattlefield.DrainFreedFixtures(this);
             GD.Print("ResearchFoundationChecks: PASS catalog, purchase, v1 migration, persistence, graph and both-map telemetry");

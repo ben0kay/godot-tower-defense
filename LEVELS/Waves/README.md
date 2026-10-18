@@ -118,7 +118,7 @@ Wave scheduling helpers live in **LEVELS/Waves/**; authored encounters live besi
 | LEVELS/Waves/ | WaveManager.cs, WaveDefinition.cs (including batch/entry/builder types), WaveCatalog.cs, Authoring.md and this README |
 | LEVELS/Debug/ | Shared level debug controller and README |
 
-Future levels keep their own Level002Waves.cs beside Level002.tscn and settings, then register their WaveSetId in WaveCatalog. All maps reuse the shared scheduler/data helpers; enemy scenes, spawning and movement remain under ENEMIES.
+Future levels keep their own Level020Waves.cs beside Level020.tscn and settings, then register their WaveSetId in WaveCatalog. All maps reuse the shared scheduler/data helpers; enemy scenes, spawning and movement remain under ENEMIES.
 
 ### Ownership boundaries
 

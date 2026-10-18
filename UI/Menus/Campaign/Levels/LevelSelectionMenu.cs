@@ -27,11 +27,11 @@ public partial class LevelSelectionMenu : Control
         Button play = UIButtonFactory.Create("PLAY LEVEL 001", () => Navigate(MenuNavigation.Level001Scene),
             UIButtonStyle.Action, 64f);
         content.AddChild(play);
-        content.AddChild(UIButtonFactory.Label("LEVEL 002  —  THE FIVE GATES", 17));
+        content.AddChild(UIButtonFactory.Label("LEVEL 020  —  THE FIVE GATES", 17));
         Label mazeDetails = UIButtonFactory.Label("Five western portals. Open staging ground and a sprawling eastern maze with multiple paths.", 14);
         mazeDetails.AutowrapMode = TextServer.AutowrapMode.WordSmart;
         content.AddChild(mazeDetails);
-        content.AddChild(UIButtonFactory.Create("PLAY LEVEL 002", () => Navigate(MenuNavigation.Level002Scene),
+        content.AddChild(UIButtonFactory.Create("PLAY LEVEL 020", () => Navigate(MenuNavigation.Level020Scene),
             UIButtonStyle.Action, 64f));
         content.AddChild(UIButtonFactory.Create("BACK TO CAMPAIGN",
             () => Navigate(MenuNavigation.CampaignScene), UIButtonStyle.Compact));

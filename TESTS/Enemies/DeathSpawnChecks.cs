@@ -27,7 +27,7 @@ public partial class DeathSpawnChecks : Node
     // Final carrier kill must never win before its reserved releases and actual offspring have resolved.
     private async Task FinalCarrier()
     {
-        foreach (string scene in new[] { MenuNavigation.Level001Scene, MenuNavigation.Level002Scene })
+        foreach (string scene in new[] { MenuNavigation.Level001Scene, MenuNavigation.Level020Scene })
         {
             using DeathSpawnFixture f = new(this, scene);
             Enemy parent = f.Parent(true); Vector2 death = parent.GlobalPosition;

@@ -75,7 +75,7 @@ public static class CheckpointChainChecks
             int refreshes = overlay.RefreshCount; overlay.RefreshNow(); Require(overlay.RefreshCount == refreshes, "Unchanged design drawing stays cached");
             e.GlobalPosition += new Vector2(1, 0); overlay.RefreshNow(); Require(overlay.RefreshCount > refreshes && nav.Revision == revision, "Moving a marker redraws without navigation changes"); e.GlobalPosition = position;
             overlay.SetRuntimeVisible(false); Require(!overlay.IsProcessing(), "Design overlay has no hidden runtime work");
-            foreach (string scene in new[] { "Level001/Level001", "Level002/Level002", "LevelTemplate" })
+            foreach (string scene in new[] { "Level001/Level001", "Level020/Level020", "LevelTemplate" })
             {
                 Node root = GD.Load<PackedScene>($"res://LEVELS/{scene}.tscn").Instantiate();
                 try { var owner = root.GetNode<CheckpointDesignOverlay>("Debug/CheckpointOverlay"); Require(owner.ZIndex == 4090 && !owner.ZAsRelative, "All authored/template scenes draw above tiles"); }

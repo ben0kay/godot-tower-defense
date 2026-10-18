@@ -1,7 +1,7 @@
-// Level002: four mixed test waves for a sprawling five-portal maze.
+// Level020: four mixed test waves for a sprawling five-portal maze.
 using static WaveBuilder;
 
-public static class Level002Waves
+public static class Level020Waves
 {
     // =========================================================
     // All portals are eligible for each unpinned spawn; customize counts/timing freely.

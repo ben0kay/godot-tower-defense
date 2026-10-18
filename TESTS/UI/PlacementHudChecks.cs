@@ -15,7 +15,7 @@ public partial class PlacementHudChecks : Node
         try
         {
             ProfileStore.ClearSelection();
-            foreach (string path in new[] { MenuNavigation.Level001Scene, MenuNavigation.Level002Scene }) await Run(path);
+            foreach (string path in new[] { MenuNavigation.Level001Scene, MenuNavigation.Level020Scene }) await Run(path);
             await PreviewLayout();
             await StableBuildTray();
             await SubsystemBattlefield.DrainFreedFixtures(this);

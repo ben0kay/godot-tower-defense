@@ -19,6 +19,6 @@ C# compilation passed with Roslyn 4.11, actual .NET8/GodotSharp references and G
 
 Passed headless (exit 0): CryoTowerChecks, GenericEnemyChecks (including Laser, Blaster instant AoE and Shockwave), ConstructionChecks (C1–C4 pilot and existing paid upgrades), CorridorNavigationChecks (permissions, routing and 100/500-enemy benchmarks), AmmunitionLoopChecks, FootprintChecks, HudCategoryChecks, CheckpointChecks, RoutePreviewChecks, ResultsChecks, PauseControlsChecks and MenuTowerFlowChecks.
 
-Unmodified full EnemyIntegrationChecks fails the pre-existing Level002 assertion **“The western open ground and eastern maze are fully painted”**, then encounters native shutdown exit139. It does not reach the Cryo group. Saved level art and that unrelated assertion were not changed. Production scene fallback-catalog warnings are existing and nonfatal.
+Unmodified full EnemyIntegrationChecks fails the pre-existing Level020 assertion **“The western open ground and eastern maze are fully painted”**, then encounters native shutdown exit139. It does not reach the Cryo group. Saved level art and that unrelated assertion were not changed. Production scene fallback-catalog warnings are existing and nonfatal.
 
 SVG artwork rendered and inspected separately. Interactive desktop playfeel, colour visibility against all terrain, and manual Cryo combat viewing remain unverified on this headless host. Freeze/Stasis, timed scheduling, DoT, research and saves are deferred; their documented future contracts are not executable feature claims.

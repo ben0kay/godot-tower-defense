@@ -65,7 +65,7 @@ public partial class AmmunitionLoopChecks : Node
             }
             DeliverySafetyChecks.Run(this);
             await LiveLoop();
-            using (AmmoLoopFixture second = new(this, "res://MainLevel002.tscn"))
+            using (AmmoLoopFixture second = new(this, "res://MainLevel020.tscn"))
                 Require(second.Hud.GetBuildButton("ammo_factory") != null && second.Hud.GetBuildButton("ammo_depot") != null && second.Logistics != null,
                     "Both levels expose buildable ammunition pipeline");
             GD.Print("PASS: purchased factory/depot/Battle, production pause/resume, both visible physical legs, 900 real shots, 10% demand, arrival-only refill, Inspector and conservation");
