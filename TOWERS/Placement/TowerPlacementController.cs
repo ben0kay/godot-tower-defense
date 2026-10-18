@@ -369,7 +369,7 @@ public partial class TowerPlacementController : Node2D
                 DescribeTower($"Grid cell: {_selected.GridCell.X}, {_selected.GridCell.Y}"),
                 _selected.AuthoredConfig.Description + "\nConstruction paid.", newSelection: true);
             _hud.SetTargetPriorityDetails(_selected.AuthoredConfig.InspectorTargetPriorityLabel);
-            _hud.SetRankDetails(_selected); _hud.SetRuntimeDetails(_selected.DescribeInspectionRuntime()); _hud.SetWorkDetails(_selected); _hud.SetConditionDetails(_selected);
+            _hud.SetRankDetails(_selected); _hud.SetDefenseDetails(_selected); _hud.SetWorkDetails(_selected); _hud.SetConditionDetails(_selected);
         }
         RefreshUpgradePreview();
         QueueRedraw();
@@ -394,7 +394,7 @@ public partial class TowerPlacementController : Node2D
         if (_hud.IsInspectionVisible) _hud.ShowTowerDetails(_selected.AuthoredConfig.DisplayName, (_selected.Definition?.Category.ToString() ?? "Tower") + " / Placed",
             DescribeTower($"Grid cell: {_selected.GridCell.X}, {_selected.GridCell.Y}"),
             _selected.AuthoredConfig.Description + "\nConstruction paid.");
-        if (_hud.IsInspectionVisible) { _hud.SetTargetPriorityDetails(_selected.AuthoredConfig.InspectorTargetPriorityLabel); _hud.SetRankDetails(_selected); _hud.SetRuntimeDetails(_selected.DescribeInspectionRuntime()); _hud.SetWorkDetails(_selected); _hud.SetConditionDetails(_selected); RefreshUpgradePreview(); }
+        if (_hud.IsInspectionVisible) { _hud.SetTargetPriorityDetails(_selected.AuthoredConfig.InspectorTargetPriorityLabel); _hud.SetRankDetails(_selected); _hud.SetDefenseDetails(_selected); _hud.SetWorkDetails(_selected); _hud.SetConditionDetails(_selected); RefreshUpgradePreview(); }
         QueueRedraw();
     }
 
@@ -463,7 +463,7 @@ public partial class TowerPlacementController : Node2D
         _runtimeRefreshQueued = true; Callable.From(() =>
         {
             _runtimeRefreshQueued = false;
-            if (GodotObject.IsInstanceValid(_selected) && _hud.IsInspectionVisible) _hud.SetRuntimeDetails(_selected.DescribeInspectionRuntime());
+            if (GodotObject.IsInstanceValid(_selected) && _hud.IsInspectionVisible) _hud.SetDefenseDetails(_selected);
         }).CallDeferred();
     }
 

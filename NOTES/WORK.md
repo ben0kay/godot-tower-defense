@@ -59,6 +59,14 @@ Authoring/ownership: SYSTEMS/Progression/Missions/README.md. Validation: TESTS/P
 
 # WORK — Consolidated Outstanding Implementation Backlog
 
+## Inspector HP/ammo meters and compact earned rank (2026-10-17)
+
+- [x] Add right-side Health and optional Ammo progress meters from the selected tower's existing runtime state/events; leave Heat and targeting intact.
+- [x] Remove Ammo Capacity left stat row and redundant rank heading, replace with one Combat Rank label, add earned rank to the tower title.
+- [ ] Godot headless geometry and desktop visual test still pending; preserve the 560×330 Inspector target and verify maximum-level/hot tower edge cases.
+
+---
+
 ## Big mk.1 visual enlargement — 2026-10-17
 
 - [x] Enlarged `big_mk1` artwork from **96×72 to 112×120 px**. Kept the original heavy hull with uniform scale and added large upper/lower plated wings (3.5× Enemy001 width, 5× height). The medium Bulwark stays 64×48.

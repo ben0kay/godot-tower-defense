@@ -49,7 +49,9 @@ public partial class GameplayHUD : Control
     private Control _inspectorBody;
     private TowerFinalStats _comparisonNow, _comparisonNext;
     private CreditGainIndicator _creditGain;
-    private ProgressBar _healthBar, _experienceBar;
+    private ProgressBar _healthBar, _experienceBar, _towerHealthBar, _towerAmmoBar;
+    private Label _towerHealthText, _towerAmmoText;
+    private VBoxContainer _defenseMeters;
     private VBoxContainer _rankSection, _workSection, _conditionSection;
     private Label _heatText, _disableReasons;
     private ProgressBar _heatBar;
@@ -113,6 +115,9 @@ public partial class GameplayHUD : Control
         _conditionSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/Columns/Side/Conditions");
         _heatText = _conditionSection.GetNode<Label>("HeatText"); _heatBar = _conditionSection.GetNode<ProgressBar>("HeatBar");
         _disableReasons = GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Main/DisableReasons");
+        _defenseMeters = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/Columns/Side/DefenseMeters");
+        _towerHealthText = _defenseMeters.GetNode<Label>("HealthText"); _towerHealthBar = _defenseMeters.GetNode<ProgressBar>("HealthBar");
+        _towerAmmoText = _defenseMeters.GetNode<Label>("AmmoText"); _towerAmmoBar = _defenseMeters.GetNode<ProgressBar>("AmmoBar");
         _rankSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/Columns/Side/RankSection");
         _rankLabel = _rankSection.GetNode<Label>("Rank");
         _experienceText = _rankSection.GetNode<Label>("ExperienceText");
@@ -299,7 +304,7 @@ public partial class GameplayHUD : Control
         bool preview = category.EndsWith("Build Preview", StringComparison.Ordinal) || category == "Placement rejected";
         _buildPreview = preview;
         SetRuntimeDetails(""); SetWorkDetails(null); SetConditionDetails(null); SetUpgradeComparison(null, null); SetUpgradeDetails("", "", false);
-        _targetSection.Hide(); _rankSection.Hide();
+        _targetSection.Hide(); _rankSection.Hide(); _defenseMeters.Hide();
         _towerName.Text = name; _towerName.TooltipText = category + "\n" + notes + "\n" + stats;
         _towerCategory.Text = "";
         _towerStats.Text = stats; _towerNotes.Text = notes;
@@ -361,6 +366,27 @@ public partial class GameplayHUD : Control
     { _runtimeStats.Text = text; RefreshDetailsVisibility(); }
 
     // =========================================================
+    // Display actual per-instance HP and ammunition through compact, event-driven meters.
+    // Preserve the logistical status line; do not repeat numerical HP/ammo in RuntimeStats.
+    public void SetDefenseDetails(TowerBase tower)
+    {
+        if (!GodotObject.IsInstanceValid(tower) || _buildPreview) { _defenseMeters.Hide(); SetRuntimeDetails(""); return; }
+        _defenseMeters.Show();
+        _towerHealthText.Text = $"HP: {tower.Health:0.#} / {tower.MaxHealth:0.#}";
+        _towerHealthBar.MaxValue = Mathf.Max(1, tower.MaxHealth); _towerHealthBar.Value = tower.Health;
+        var stock = tower.Ammunition?.Inventory;
+        _towerAmmoText.Visible = _towerAmmoBar.Visible = stock != null;
+        if (stock != null)
+        {
+            _towerAmmoText.Text = $"Ammo: {stock.Amount:N0} / {stock.Capacity:N0}";
+            _towerAmmoBar.MaxValue = Mathf.Max(1, stock.Capacity); _towerAmmoBar.Value = stock.Amount;
+        }
+        string status = tower.DescribeRuntime();
+        int separator = status.LastIndexOf('\n');
+        SetRuntimeDetails(separator >= 0 ? status[(separator + 1)..] : status);
+    }
+
+    // =========================================================
     // Selected-only events update this compact card; never resolve stats or poll every tower/frame.
     public void SetConditionDetails(TowerBase tower)
     {
@@ -412,7 +438,8 @@ public partial class GameplayHUD : Control
     public void SetWorkDetails(TowerBase tower)
     {
         if (!GodotObject.IsInstanceValid(tower)) { _workSection.Hide(); return; }
-        _towerName.Text = tower.AuthoredConfig.DisplayName + " · Lv " + tower.UpgradeLevel;
+        _towerName.Text = tower.AuthoredConfig.DisplayName + " · Lv " + tower.UpgradeLevel
+            + " (" + tower.CurrentRank.Rank + ")";
         _towerCategory.Text = "Footprint: " + (tower.Definition?.Footprint ?? Vector2I.One).X + "×" + (tower.Definition?.Footprint ?? Vector2I.One).Y;
         _workStatus.Text = tower.WorkPhase switch
         {
@@ -435,7 +462,8 @@ public partial class GameplayHUD : Control
         TowerRankDefinition current = tower.CurrentRank;
         TowerRankDefinition? next = tower.NextRank;
         double total = tower.RankProgress.TotalXp;
-        _rankLabel.Text = $"{current.Rank}";
+        _rankLabel.Text = $"Combat Rank: {current.Rank}";
+        _towerName.Text = tower.AuthoredConfig.DisplayName + " · Lv " + tower.UpgradeLevel + " (" + current.Rank + ")";
         _experienceText.TooltipText = $"Total combat XP: {total:0.##}. Earned rank is independent of paid tower levels.";
         _rankBonuses.Text = $"Damage +{current.DamageBonus * 100:0.##}% · Range +{current.RangeBonus * 100:0.##}% · HP +{current.HpBonus * 100:0.##}%";
         _experienceBar.MinValue = 0;
@@ -765,7 +793,6 @@ public partial class GameplayHUD : Control
         _upgradeTitle.AddThemeColorOverride("font_color", Config.AccentColor);
         _targetValue.AddThemeColorOverride("font_color", Config.TextColor);
         _targetSection.GetNode<Label>("TargetHeading").AddThemeColorOverride("font_color", Config.AccentColor);
-        _rankSection.GetNode<Label>("RankHeading").AddThemeColorOverride("font_color", Config.AccentColor);
 
         UIButtonFactory.Apply(_upgradeButton, UIButtonStyle.Action, Config);
         UIButtonFactory.Apply(_startWave, UIButtonStyle.Action, Config);
@@ -776,6 +803,12 @@ public partial class GameplayHUD : Control
         Label[] primary = { _wave, _credits, _core, _towerName };
         foreach (Label label in primary) label.AddThemeColorOverride("font_color", Config.TextColor);
 
+        _towerHealthBar.AddThemeStyleboxOverride("fill", new StyleBoxFlat { BgColor = Config.HealthHealthyColor });
+        _towerHealthBar.AddThemeStyleboxOverride("background", new StyleBoxFlat { BgColor = Config.ButtonColor });
+        _towerAmmoBar.AddThemeStyleboxOverride("fill", new StyleBoxFlat { BgColor = Config.AccentColor });
+        _towerAmmoBar.AddThemeStyleboxOverride("background", new StyleBoxFlat { BgColor = Config.ButtonColor });
+        _towerHealthText.AddThemeColorOverride("font_color", Config.MutedTextColor);
+        _towerAmmoText.AddThemeColorOverride("font_color", Config.MutedTextColor);
         _experienceBar.AddThemeStyleboxOverride("fill", new StyleBoxFlat { BgColor = Config.AccentColor });
         _experienceBar.AddThemeStyleboxOverride("background", new StyleBoxFlat { BgColor = Config.ButtonColor });
         _workBar.AddThemeStyleboxOverride("fill", new StyleBoxFlat { BgColor = Config.AccentColor });

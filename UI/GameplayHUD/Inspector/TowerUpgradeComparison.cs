@@ -60,7 +60,6 @@ public static class TowerUpgradeComparison
         if (current.Ammunition.HasValue && next.Ammunition.HasValue)
         {
             AmmunitionStats a = current.Ammunition.Value, b = next.Ammunition.Value;
-            Add(rows, "Ammo Capacity", a.Capacity, b.Capacity, 0);
             if (a.PerShot > 0 || b.PerShot > 0) Add(rows, "Ammo / Shot", a.PerShot, b.PerShot, 0, false);
             if (a.PerSecond > 0 || b.PerSecond > 0) Add(rows, "Ammo / s", a.PerSecond, b.PerSecond, 2, false);
         }

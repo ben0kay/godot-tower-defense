@@ -115,7 +115,7 @@ layout_mode = 2
 [node name="Side" type="VBoxContainer" parent="Insets/Body/Columns"]
 layout_mode = 2
 custom_minimum_size = Vector2(210, 0)
-theme_override_constants/separation = 6
+theme_override_constants/separation = 3
 
 [node name="TargetSection" type="VBoxContainer" parent="Insets/Body/Columns/Side"]
 layout_mode = 2
@@ -147,15 +147,10 @@ theme_override_constants/separation = 3
 [node name="Divider" type="HSeparator" parent="Insets/Body/Columns/Side/RankSection"]
 layout_mode = 2
 
-[node name="RankHeading" type="Label" parent="Insets/Body/Columns/Side/RankSection"]
-layout_mode = 2
-text = "COMBAT RANK · EARNED XP"
-theme_override_font_sizes/font_size = 11
-
 [node name="Rank" type="Label" parent="Insets/Body/Columns/Side/RankSection"]
 layout_mode = 2
-text = "Standard"
-theme_override_font_sizes/font_size = 13
+text = "Combat Rank: Standard"
+theme_override_font_sizes/font_size = 12
 
 [node name="ExperienceBar" type="ProgressBar" parent="Insets/Body/Columns/Side/RankSection"]
 layout_mode = 2
@@ -174,6 +169,33 @@ layout_mode = 2
 text = ""
 theme_override_font_sizes/font_size = 11
 autowrap_mode = 3
+
+[node name="DefenseMeters" type="VBoxContainer" parent="Insets/Body/Columns/Side"]
+layout_mode = 2
+visible = false
+theme_override_constants/separation = 2
+
+[node name="HealthText" type="Label" parent="Insets/Body/Columns/Side/DefenseMeters"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+
+[node name="HealthBar" type="ProgressBar" parent="Insets/Body/Columns/Side/DefenseMeters"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 6)
+show_percentage = false
+mouse_filter = 2
+step = 0.01
+
+[node name="AmmoText" type="Label" parent="Insets/Body/Columns/Side/DefenseMeters"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+
+[node name="AmmoBar" type="ProgressBar" parent="Insets/Body/Columns/Side/DefenseMeters"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 6)
+show_percentage = false
+mouse_filter = 2
+step = 1
 
 [node name="Conditions" type="VBoxContainer" parent="Insets/Body/Columns/Side"]
 layout_mode = 2
