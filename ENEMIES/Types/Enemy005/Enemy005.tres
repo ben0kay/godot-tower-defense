@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1")
 EnemyId = "big_mk1"
+Family = 6
 DisplayName = "Big mk.1"
 MaxHealth = 1000.0
 MaxShield = 200.0

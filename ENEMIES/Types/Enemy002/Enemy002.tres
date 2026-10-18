@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 EnemyId = "scout_mk1"
+Family = 1
 DisplayName = "Swift Interceptor"
 MaxHealth = 30.0
 MaxShield = 40.0

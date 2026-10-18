@@ -3,6 +3,7 @@
 [resource]
 script = ExtResource("1")
 EnemyId = "shield_emitter_mk1"
+Family = 5
 DisplayName = "Shield Generator"
 MaxHealth = 100.0
 MaxShield = 80.0

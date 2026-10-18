@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://ENEMIES/Shared/EnemyDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+EnemyId = "shield_frigate_mk1"
+DisplayName = "Shield Frigate"
+Family = 3
+MaxHealth = 120.0
+MaxShield = 350.0
+MoveSpeed = 65.0
+RadiusPixels = 20.0
+TurnSpeed = 8.0
+CitadelDamage = 3
+KillRewardCredits = 9
+DeathExplosionMultiplier = 1.0

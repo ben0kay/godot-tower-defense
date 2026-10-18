@@ -24,3 +24,7 @@ See `Spawning/README.md`, `LEVELS/Waves/README.md`, `Types/Transporter/README.md
 ## MC1 destination inheritance
 
 DeathReleaseJob always snapshots parent.AssignedCitadel separately from optional checkpoint handoff. InheritCheckpointProgress=false only opts out of checkpoint obligations, never Citadel identity. Local probes/clearance validate the inherited destination; removed/unreachable destinations fail safely. Captured handoffs also retain destination for direct users. Children never choose a new target based on release proximity.
+
+## Heavy Transporter mixed payload — 2026-10-18
+
+HeavyTransporter authors two independent instances of this existing component under Abilities, each with its own local config: six `basic_mk1` and four `scout_mk1`. Both enqueue/reserve before Removed and share normal queue budgets; no changes to the component, queue or original carrier defaults. FleetExpansionChecks exercises final-carrier wave completion on both maps.

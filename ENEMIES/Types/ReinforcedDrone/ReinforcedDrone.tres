@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://ENEMIES/Shared/EnemyDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+EnemyId = "reinforced_drone_mk1"
+DisplayName = "Reinforced Drone"
+Family = 0
+MaxHealth = 110.0
+MaxShield = 20.0
+MoveSpeed = 100.0
+RadiusPixels = 14.0
+TurnSpeed = 8.0
+CitadelDamage = 2
+KillRewardCredits = 4
+DeathExplosionMultiplier = 1.0

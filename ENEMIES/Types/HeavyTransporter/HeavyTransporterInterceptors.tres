@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="DeathSpawnConfig" load_steps=2 format=3]
+[ext_resource type="Script" path="res://ENEMIES/Abilities/DeathSpawn/DeathSpawnConfig.cs" id="1"]
+[resource]
+script = ExtResource("1")
+ChildEnemyId = "scout_mk1"
+ChildCount = 4
+SpawnIntervalSeconds = 0.16
+ScatterRadiusPixels = 56.0

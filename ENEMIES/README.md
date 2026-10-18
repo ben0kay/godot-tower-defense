@@ -1,3 +1,9 @@
+## Fleet families and six new types — 2026-10-18
+
+The catalog now holds 13 ships. All definitions expose **Identity / Family** through the stable `EnemyFamily` enum. This is role metadata, independent of Mk progression and future threat tiers. New types reuse GenericEnemy; Heavy Transporter reuses two DeathSpawn jobs for six Drones + four Interceptors. Full balance, family mappings, shield opt-in and future work are in `ENEMIES/Types/README.md` (repository root). Historical counts/plans below are retained.
+
+---
+
 ## Enemy hull artwork refresh — 2026-10-18
 
 The seven registered hull SVGs now use distinct hostile alien-machine silhouettes, including a bulbous Transporter. Native art sizes and every gameplay setting remain unchanged. See `Types/ART_DIRECTION.md` and `Types/ARTWORK_PREVIEW.png` for the visual guide and native-render verification.

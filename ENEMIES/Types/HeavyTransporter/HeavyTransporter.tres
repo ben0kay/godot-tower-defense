@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://ENEMIES/Shared/EnemyDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+EnemyId = "heavy_transporter_mk1"
+DisplayName = "Heavy Transporter"
+Family = 4
+MaxHealth = 1400.0
+MaxShield = 0.0
+MoveSpeed = 35.0
+RadiusPixels = 24.0
+TurnSpeed = 4.0
+CitadelDamage = 8
+KillRewardCredits = 25
+DeathExplosionMultiplier = 1.6

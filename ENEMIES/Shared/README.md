@@ -1,3 +1,9 @@
+## Fleet families and six new types — 2026-10-18
+
+The catalog now holds 13 ships. All definitions expose **Identity / Family** through the stable `EnemyFamily` enum. This is role metadata, independent of Mk progression and future threat tiers. New types reuse GenericEnemy; Heavy Transporter reuses two DeathSpawn jobs for six Drones + four Interceptors. Full balance, family mappings, shield opt-in and future work are in `ENEMIES/Types/README.md` (repository root). Historical counts/plans below are retained.
+
+---
+
 # Shared enemies
 
 `EnemyDefinition` is the Inspector-editable per-type resource. `Enemy` owns health, alive/dead/arrived state and removal. `EnemyRegistry` owns authoritative per-world living membership plus the shared `EnemySpatialIndex` used by targeting, instant areas and timed wavefronts; no scene-tree rescans. Ships use lightweight Node2D roots with one movement helper and Sprite2D.

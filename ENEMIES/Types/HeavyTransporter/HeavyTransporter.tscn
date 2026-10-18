@@ -1,0 +1,22 @@
+[gd_scene load_steps=7 format=3]
+[ext_resource type="PackedScene" path="res://ENEMIES/Shared/GenericEnemy.tscn" id="1"]
+[ext_resource type="Resource" path="res://ENEMIES/Types/HeavyTransporter/HeavyTransporter.tres" id="2"]
+[ext_resource type="Texture2D" path="res://ENEMIES/Types/HeavyTransporter/Artwork/heavy_transporter_mk1.svg" id="3"]
+[ext_resource type="Script" path="res://ENEMIES/Abilities/DeathSpawn/DeathSpawn.cs" id="4"]
+[ext_resource type="Resource" path="res://ENEMIES/Types/HeavyTransporter/HeavyTransporterDrones.tres" id="5"]
+[ext_resource type="Resource" path="res://ENEMIES/Types/HeavyTransporter/HeavyTransporterInterceptors.tres" id="6"]
+
+[node name="HeavyTransporter" instance=ExtResource("1")]
+Definition = ExtResource("2")
+[node name="Sprite" parent="." index="0"]
+texture = ExtResource("3")
+
+[node name="Abilities" type="Node" parent="."]
+
+[node name="ReleaseDrones" type="Node" parent="Abilities"]
+script = ExtResource("4")
+Config = ExtResource("5")
+
+[node name="ReleaseInterceptors" type="Node" parent="Abilities"]
+script = ExtResource("4")
+Config = ExtResource("6")

@@ -4,6 +4,7 @@
 [resource]
 script = ExtResource("1")
 EnemyId = "medium_mk1"
+Family = 2
 DisplayName = "Bulwark Drone"
 MaxHealth = 160.0
 MaxShield = 0.0
