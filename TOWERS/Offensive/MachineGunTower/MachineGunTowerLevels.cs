@@ -16,9 +16,9 @@ public static class MachineGunTowerLevels
     // Optional named MaxHealth column is absolute per level; 100 is provisional baseline balance.
     private static readonly Row[] Rows =
     {
-        new(1, 300, 4, 7, 14.4f, 262.9f, 1221.875f, 288, 1200, 1),
-        new(2, 200, 5, 8, 14.88f, 272.8f, 1221.875f, 288, 1200, 1),
-        new(3, 300, 6, 9, 15.36f, 283.8f, 1221.875f, 288, 1200, 1),
+        new(1, 300, 4, 7, 14.4f, 262.9f, 2443.75f, 288, 1200, 1),
+        new(2, 200, 5, 8, 14.88f, 272.8f, 2443.75f, 288, 1200, 1),
+        new(3, 300, 6, 9, 15.36f, 283.8f, 2443.75f, 288, 1200, 1),
     };
 
     // =========================================================

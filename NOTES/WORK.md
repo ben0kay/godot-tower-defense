@@ -1,3 +1,11 @@
+## Battle, Machine Gun and Sniper doubled projectile speed — 2026-10-18 (CODE COMPLETE; runtime test pending)
+
+- [x] Doubled purchased levels 1–3 for all three: Battle **1,150→2,300 px/s**, Machine Gun **1,221.875→2,443.75 px/s**, Sniper **1,495→2,990 px/s**. No other combat stats or shared projectile collision logic changed.
+- [x] Updated exact-value regression expectations in `TESTS/Towers/TowerStatChecks.cs` and `MultiBarrelTowerChecks.cs`, plus the offensive tower READMEs.
+- [ ] Run Godot .NET compilation and headless `TESTS/Integration/EnemyIntegrationChecks.tscn`, `TESTS/Towers/ProjectileVisualChecks.tscn` (and usual gameplay checks). These checks were not run by the GitHub editing environment.
+
+---
+
 ## Terrain Edges visual system — scaffold complete; Codex rendering pending (2026-10-18)
 
 - [x] Add `WORLD/TERRAIN/Edges/` material/config resources, default-disabled controller/renderer hooks, pure neighbour masks, source2 Mars profiles and integration test foundation.
