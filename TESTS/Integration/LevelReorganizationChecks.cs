@@ -18,17 +18,16 @@ public partial class LevelReorganizationChecks : Node
             {
                 Require(fresh.Name == "Level002" && fresh.Settings.ResourcePath == "res://LEVELS/Level002/Level002Config.tres"
                     && fresh.Settings != template.Settings, "New Level002 has independent identity and settings");
-                Require(fresh.Passable.GetUsedCells().Count == 0 && fresh.Impassable.GetUsedCells().Count == 0
-                    && fresh.Interactive.GetUsedCells().Count == 0 && fresh.Decorations.GetUsedCells().Count == 0,
-                    "Fresh map contains no Five Gates terrain");
-                Require(fresh.GetNode("Portals").GetChildCount() == template.GetNode("Portals").GetChildCount()
-                    && fresh.GetNodeOrNull<Node>("Objectives/Citadel") != null && string.IsNullOrEmpty(fresh.Settings.WaveSetId),
-                    "Template objects retained without borrowing old waves");
+                Require(fresh.Passable.GetUsedCells().Count > 0,
+                    "Level002 contains the independently authored tutorial terrain");
+                Require(fresh.GetNode("Portals").GetChildCount() == 2
+                    && fresh.GetNodeOrNull<Node>("Objectives/Citadel") != null && fresh.Settings.WaveSetId == "level002",
+                    "Tutorial objects and independent waves are assigned");
             }
             finally { fresh.Free(); template.Free(); }
-            Require(PlayableLevelCatalog.NextScene("Level001") == null && PlayableLevelCatalog.NextScene("Level020") == null
+            Require(PlayableLevelCatalog.NextScene("Level001") == MenuNavigation.Level002Scene && PlayableLevelCatalog.NextScene("Level020") == null
                 && !PlayableLevelCatalog.IsPlayable("res://LEVELS/Level002/Level002.tscn"),
-                "Unfinished map is not playable and progression never skips to Level020");
+                "Only the Level002 launcher is playable; raw maps are not and Level020 is never skipped to");
             using (MissionFixture fixture = new(this, MenuNavigation.Level020Scene))
             {
                 WorldLevel map = fixture.Spawns.Paths.Navigation.Grid.Level;

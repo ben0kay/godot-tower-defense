@@ -1,3 +1,9 @@
+## Playable Level002 tutorial — 2026-10-18
+
+Campaign now offers Level001, the newly painted **Level002** (four gentle unshielded waves), and preserved Level020. Open `MainLevel002.tscn` for direct F6 play. Level001 Next advances to002; no level skips to020. See `LEVELS/Level002/README.md` for exact composition/settings. Earlier unfinished-Level002 notes below are historical.
+
+---
+
 ## Level002 moved to Level020; fresh Level002 design map — 2026-10-18
 
 The Five Gates is now `LEVELS/Level020/Level020.tscn`, with `Level020Config.tres`, `Level020Waves.cs` and WaveSetId `level020`. Its terrain, object layout, wave composition and balance are preserved. Its standalone launcher/world variant are `MainLevel020.tscn` / `WORLD/WorldLevel020.tscn`; Campaign labels/launches Level020 and PlayableLevelCatalog registers numeric ID20. Scene/script UID sidecars are retained across renames. Tests and current documentation reference the moved map.

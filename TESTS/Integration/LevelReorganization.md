@@ -1,3 +1,9 @@
+## Tutorial follow-up — 2026-10-18
+
+Level002 has since been painted and registered as a playable four-wave tutorial. Current migration assertions now verify its own terrain, two portals, wave set and Level001→002 registration while continuing to preserve Level020 independently. The empty/unplayable-map expectations below describe the earlier rename pass. See Level002TutorialChecks for the real four-wave fixture.
+
+---
+
 # Level002 → Level020 reorganization — 2026-10-18
 
 Verified with Godot .NET 4.7.2 and .NET 8:

@@ -27,6 +27,12 @@ public partial class LevelSelectionMenu : Control
         Button play = UIButtonFactory.Create("PLAY LEVEL 001", () => Navigate(MenuNavigation.Level001Scene),
             UIButtonStyle.Action, 64f);
         content.AddChild(play);
+        content.AddChild(UIButtonFactory.Label("LEVEL 002  —  FIRST CONTACT", 17));
+        Label tutorialDetails = UIButtonFactory.Label("Four gentle waves: Standard Drones, Swift Interceptors and Bulwarks.", 14);
+        tutorialDetails.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        content.AddChild(tutorialDetails);
+        content.AddChild(UIButtonFactory.Create("PLAY LEVEL 002", () => Navigate(MenuNavigation.Level002Scene),
+            UIButtonStyle.Action, 64f));
         content.AddChild(UIButtonFactory.Label("LEVEL 020  —  THE FIVE GATES", 17));
         Label mazeDetails = UIButtonFactory.Label("Five western portals. Open staging ground and a sprawling eastern maze with multiple paths.", 14);
         mazeDetails.AutowrapMode = TextServer.AutowrapMode.WordSmart;

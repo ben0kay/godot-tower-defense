@@ -12,6 +12,7 @@ public static class WaveCatalog
     {
         "" => Array.Empty<WaveDefinition>(),
         "level001" => Level001Waves.Create(),
+        "level002" => Level002Waves.Create(),
         "level020" => Level020Waves.Create(),
         _ => throw new ArgumentException("Unknown WaveSetId: " + id)
     };

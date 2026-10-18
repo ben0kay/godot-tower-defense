@@ -43,7 +43,7 @@ internal static class MissionOutcomeChecks
             Require(f.Results.ActionsAvailable && tree.Paused && !f.Pause.IsOpen, "Escape skips reveal only, never resumes");
             parent.GetViewport().PushInput(new InputEventKey { Keycode = Key.F11, Pressed = true });
             Require(parent.GetViewport().IsInputHandled(), "Global F11 remains responsive in results");
-            Require(f.Results.PrimaryButton.Text == "NEXT LEVEL" && f.Results.PrimaryButton.Disabled,
+            Require(f.Results.PrimaryButton.Text == "NEXT LEVEL" && f.Results.PrimaryButton.Disabled == (path == MenuNavigation.Level020Scene),
                 "Victory primary reflects actual next playable launcher");
             Require(f.Results.DetailsButton.Disabled && f.Results.DetailsButton.TooltipText.Contains("coming soon"), "Details remains disabled after Skip");
             Require(f.Results.FindChildren("*", "Label", true, false).OfType<Label>().Count(label => label.Text == "—") == 2

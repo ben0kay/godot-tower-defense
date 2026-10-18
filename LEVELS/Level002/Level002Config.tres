@@ -4,8 +4,11 @@
 
 [resource]
 script = ExtResource("1")
-SpawnMode = 1
+SpawnMode = 0
 AllowedEdges = 4
 CitadelPath = NodePath("Objectives/Citadel")
-StartingCredits = 0
+StartingCredits = 1000
 CitadelMaxHealth = 1000
+
+ActivePortals = Array[NodePath]([NodePath("Portals/EnemyPortal1"), NodePath("Portals/EnemyPortal2")])
+WaveSetId = "level002"

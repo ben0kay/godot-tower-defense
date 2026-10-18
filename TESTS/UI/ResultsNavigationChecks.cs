@@ -18,8 +18,8 @@ internal static class ResultsNavigationChecks
             Require(PlayableLevelCatalog.FollowingName(pair.Item1) == pair.Item2, "Zero-padded next ID " + pair.Item1);
         foreach (string invalid in new[] { "Level000", "Level999", "level001", "Level1", "Level1000", "Level/001", "Level-01" })
             Require(PlayableLevelCatalog.FollowingName(invalid) == null, "Reject malformed/out-of-range ID " + invalid);
-        Require(PlayableLevelCatalog.NextScene("Level001") == null && PlayableLevelCatalog.NextScene("Level020") == null,
-            "Unfinished Level002 and missing Level021 cannot resolve; Level020 is never skipped to");
+        Require(PlayableLevelCatalog.NextScene("Level001") == MenuNavigation.Level002Scene && PlayableLevelCatalog.NextScene("Level020") == null,
+            "Level002 resolves after Level001; Level020 still has no immediate successor");
         Require(PlayableLevelCatalog.IsPlayable(MenuNavigation.Level001Scene) && PlayableLevelCatalog.IsPlayable(MenuNavigation.Level020Scene)
             && !PlayableLevelCatalog.IsPlayable("res://LEVELS/Level020/Level020.tscn"), "Map scenes cannot masquerade as battlefields");
         SceneTree tree = owner.GetTree(); tree.CurrentScene = null;
@@ -47,11 +47,11 @@ internal static class ResultsNavigationChecks
         Require(waves.StartWave(), "Navigation fixture starts a real wave"); spawns.Registry.Living[0].TakeDamage(999999);
         await owner.ToSignal(tree, SceneTree.SignalName.ProcessFrame);
         results = retry.GetNode<LevelResults>("LevelResults"); results.SkipReveal();
-        Require(results.PrimaryButton.Disabled, "Level001 cannot advance into the unfinished map or skip to Level020");
-        MenuNavigation.Open(owner, MenuNavigation.Level020Scene);
+        Require(!results.PrimaryButton.Disabled, "Level001 advances to the playable tutorial Level002");
+        results.PrimaryButton.EmitSignal(Button.SignalName.Pressed);
         Node next = await Scene<Node2D>(owner);
-        Require(next.SceneFilePath == MenuNavigation.Level020Scene && !tree.Paused && next.GetNode<CitadelSession>("CitadelSession").Health.CurrentHealth > 0,
-            "Direct Level020 launch loads its renamed battlefield, never the raw map");
+        Require(next.SceneFilePath == MenuNavigation.Level002Scene && !tree.Paused && next.GetNode<CitadelSession>("CitadelSession").Health.CurrentHealth > 0,
+            "Next loads the tutorial Level002 battlefield, never the raw map");
         // Menu action works without needing a further level.
         waves = next.GetNode<WaveManager>("Waves"); spawns = next.GetNode<SpawnManager>("World/EnemySystems/Spawning");
         waves.Configure(new[] { WaveBuilder.Wave(1, WaveBuilder.Batch(1, 0, 0, WaveBuilder.Enemy("basic_mk1"))) }, spawns.Catalog.ToSceneMap());
