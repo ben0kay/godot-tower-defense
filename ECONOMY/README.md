@@ -33,3 +33,8 @@ TESTS/Economy/EconomyChecks.cs runs inside EnemyIntegrationChecks.tscn, covering
 **Kill rewards are implemented:** `EnemyDefinition.KillRewardCredits` sets the amount per enemy type; `Enemy001.tres` sets **3 Credits**. `EnemyRegistry.EnemyKilled` emits only on a real kill and the session wallet grants credits through `Grant`, which pushes the updated balance to the HUD. F2 and wave kills both qualify; Citadel arrivals do not. Awards obey the wallet's max balance, and repeated hits after death cannot pay twice.
 
 Income/resource producers, wave-completion rewards, upgrades, selling/refunds and economy saving remain future passes. All can reuse this wallet/cost model; no duplicate tower-specific payment service is needed.
+
+
+## Planned shared credit producers (Codex handoff)
+
+See [Production/README.md](Production/README.md) for the full source-verified old-Citadel behavior and CP1–CP3 implementation plan: a reusable plain C# producer/buffer, independent click-collect Citadels (only accumulate while a wave is active), and a kill-attribution-based Adaptable Resource Generator. Wallet `Grant` and current HUD feedback remain authoritative; this is **not implemented**.

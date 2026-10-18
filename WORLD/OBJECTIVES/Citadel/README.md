@@ -119,3 +119,8 @@ A level can contain **two or more independently damageable Citadels**. Each regi
 Follow \`NOTES/CodePreferences.md\`: simple reusable code, explanatory script header, \`// =========================================================\` before methods, sensible \`#region\` organization and Inspector-friendly config, update relevant READMEs. Avoid extra per-enemy nodes, per-frame goal scans and wholesale refactors. Implement in **small reviewable MC1/MC2/MC3 phases** and use **one GitHub commit per implementation job**.
 
 **Done only when:** multiple independently damageable Citadels function in an authored test mission; every spawn gets its portal's cached fixed destination; normal varied movement, mandatory checkpoints and DeathSpawn inheritance respect that destination; First/Last compares remaining journeys correctly; tower placement cannot cut the assigned route; independent HP/HUD and one-time defeat work; and existing one-Citadel levels/test suites still pass.
+
+
+## Planned click-to-collect Citadel Credits (CP1; NOT IMPLEMENTED)
+
+Detailed shared mechanics and implementation checklist: [`ECONOMY/Production/README.md`](../../../ECONOMY/Production/README.md). Verified old GameMaker code uses per-Citadel **80 Credits capacity, +10 every 2 seconds, active-wave-only**, click to collect; its collection function resets **all** Citadels at once. **New design instead uses independent buffers and collection per Citadel**, shared wallet `Grant`, existing wave pause/start/clear states, and an event-driven green credit meter without duplicating the Citadel health system or intercepting unrelated build/select clicks. Don't mistake the older childhood notes' 40/15s for the final coded old-game values.
