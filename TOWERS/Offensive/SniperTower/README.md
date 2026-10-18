@@ -1,12 +1,14 @@
 # Sniper Tower — one-muzzle long-range Kinetic weapon
 
+**Latest projectile-speed update (2026-10-18):** All three purchased levels now use **2,990 px/s** guided tracers, exactly double the prior **1,495 px/s**. Damage, rate, ammunition, targeting, costs and heat are unchanged. The table below also includes pre-existing range rebalances.
+
 Implemented via the shared `TOWERS/Shared/Weapons/MultiBarrel/ProjectileTurretBase.cs`; no bespoke targeting loop or HUD changes. The authored config enforces `Single` muzzle firing. Its one `Marker2D` sits at `TurretPivot/Muzzles/MuzzleA`; projectile launches from the barrel tip, follows the existing guided `BasicProjectile`, uses typed Kinetic shield/hull damage and standard tower XP. The scene is a 1×1 offensive tower available through `TOWERS/DefaultTowerCatalog.tres`.
 
 | Purchased level | Credits (build/upgrade) | Damage/bullet | Total bullets/s | Range | Bullet speed | Penetration |
 |---|---:|---:|---:|---:|---:|---:|
-| 1 | 325 | 80 | 0.35 | 515 px | 1,300 px/s | 15% |
-| 2 | 225 | 88 | 0.37 | 524 px | 1,300 px/s | 15% |
-| 3 | 325 | 96 | 0.40 | 534 px | 1,300 px/s | 15% |
+| 1 | 325 | 80 | 0.35 | 566.5 px | 2,990 px/s | 15% |
+| 2 | 225 | 88 | 0.37 | 576.4 px | 2,990 px/s | 15% |
+| 3 | 325 | 96 | 0.40 | 587.4 px | 2,990 px/s | 15% |
 
 Ranks: Standard 0, Veteran 1,000, Enhanced 3,000, Superior 7,000, Legendary 15,000 total XP with the existing rank damage/range percentages. Ammo: 600 local capacity, 1 round per bullet; normal physical logistics can resupply it.
 

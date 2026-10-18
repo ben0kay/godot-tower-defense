@@ -1,12 +1,14 @@
 # Machine Gun Tower — two sequential barrels
 
+**Latest projectile-speed update (2026-10-18):** All purchased levels now launch at **2,443.75 px/s**, exactly double the immediately previous **1,221.875 px/s**. No changes to shots/s, ammunition, range, damage, costs, heat or alternating muzzle behaviour. The table below also includes pre-existing range updates. Older +25% speed and firing-rate notes further below are historical, not the current speed.
+
 A 1×1 offensive tower with one aim target and **two independently positioned muzzles**. `TurretPivot/Muzzles/MuzzleA` and `MuzzleB` are Marker2D nodes at -9/+9 horizontal and -25 vertical local coordinates. The single shared `ProjectileTurretBase` launches guided Kinetic bullets from **A → B → A → B**, with `BarrelFireController` advancing only after a successful funded shot.
 
 | Purchased level | Credits (build/upgrade) | Damage/bullet | Total bullets/s | Range | Projectile speed |
 |---|---:|---:|---:|---:|---:|
-| 1 | 300 | 7 | 14.4 | 239 px | 1062.5 px/s |
-| 2 | 200 | 8 | 14.88 | 248 px | 1062.5 px/s |
-| 3 | 300 | 9 | 15.36 | 258 px | 1062.5 px/s |
+| 1 | 300 | 7 | 14.4 | 262.9 px | 2443.75 px/s |
+| 2 | 200 | 8 | 14.88 | 272.8 px | 2443.75 px/s |
+| 3 | 300 | 9 | 15.36 | 283.8 px | 2443.75 px/s |
 
 Rate applies to **both barrels combined**: 14.4 total shots/s means ~7.2 shots/s per barrel; it is not 6 per barrel. Ammo reserve 1,200, consumption 1 per bullet (from physical shared logistics). No shield penetration; ordinary Kinetic damage coefficients apply. Standard → Veteran → Enhanced → Superior → Legendary use the normal 0/1,000/3,000/7,000/15,000 total XP table. Paid level and earned rank remain independent.
 

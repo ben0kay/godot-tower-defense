@@ -16,9 +16,9 @@ public static class SniperTowerLevels
     // Optional named MaxHealth column is absolute per level; 100 is provisional baseline balance.
     private static readonly Row[] Rows =
     {
-        new(1, 325, 4, 80, .35f, 566.5f, 1495, 162, 600, 1),
-        new(2, 225, 5, 88, .37f, 576.4f, 1495, 162, 600, 1),
-        new(3, 325, 6, 96, .40f, 587.4f, 1495, 162, 600, 1),
+        new(1, 325, 4, 80, .35f, 566.5f, 2990, 162, 600, 1),
+        new(2, 225, 5, 88, .37f, 576.4f, 2990, 162, 600, 1),
+        new(3, 325, 6, 96, .40f, 587.4f, 2990, 162, 600, 1),
     };
 
     // =========================================================

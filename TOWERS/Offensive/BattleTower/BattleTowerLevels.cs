@@ -16,9 +16,9 @@ public static class BattleTowerLevels
     // Optional named MaxHealth column is absolute per level; 100 is provisional baseline balance.
     private static readonly Row[] Rows =
     {
-        new(1, 200, 3, 30, 1.68f, 323.4f, 1150, 216, 12, 0.15f, 0.05f, 1000, 1),
-        new(2, 150, 4, 33, 1.764f, 334.4f, 1150, 216, 12, 0.15f, 0.05f, 1000, 1),
-        new(3, 250, 5, 36, 1.848f, 344.3f, 1150, 216, 12, 0.15f, 0.05f, 1000, 1),
+        new(1, 200, 3, 30, 1.68f, 323.4f, 2300, 216, 12, 0.15f, 0.05f, 1000, 1),
+        new(2, 150, 4, 33, 1.764f, 334.4f, 2300, 216, 12, 0.15f, 0.05f, 1000, 1),
+        new(3, 250, 5, 36, 1.848f, 344.3f, 2300, 216, 12, 0.15f, 0.05f, 1000, 1),
     };
 
     // =========================================================

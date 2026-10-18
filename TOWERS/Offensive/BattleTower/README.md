@@ -12,15 +12,17 @@ Research does not alter authored *Levels.cs values, attack rate, heat timing, am
 
 Ctrl → Battle Tower → place on route-safe terrain. First targets the shortest remaining path; Closest targets nearest. Shared turret aiming rotates the child visual toward the target, leaving the grid root fixed. Fire requires a living in-range aligned lock and elapsed cooldown; zero rate disables firing. Guided shots originate at the barrel-tip marker and retain launch-time damage/penetration.
 
+**Projectile-speed update (2026-10-18):** Battle Tower's authored projectile speed is now **2,300 px/s** at all three levels, exactly double its previous 1,150 px/s. Only projectile speed changed in the level code; the table below also reflects already-existing range/turn rebalances. No change to attack rate, damage, ammunition, heat, cost or turret mechanics.
+
 ## Level data
 
 **Edit `BattleTowerLevels.cs`**, the sole authored source of all level-dependent numbers and credit prices. Each labeled typed row is complete; adding Level 4 means adding another consecutive row. Changing Level 2 never changes Level 3.
 
 | Level | Build/upgrade price | Damage | Shots/s | Range | Projectile speed | Turn | Aim | Search | Penetration |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | 200 | 30 | 1.68 | 294px | 1000px/s | 180°/s | 12° | .15s | 5% |
-| 2 | 150 | 33 | 1.764 | 304px | 1000px/s | 180°/s | 12° | .15s | 5% |
-| 3 | 250 | 36 | 1.848 | 313px | 1000px/s | 180°/s | 12° | .15s | 5% |
+| 1 | 200 | 30 | 1.68 | 323.4px | 2300px/s | 216°/s | 12° | .15s | 5% |
+| 2 | 150 | 33 | 1.764 | 334.4px | 2300px/s | 216°/s | 12° | .15s | 5% |
+| 3 | 250 | 36 | 1.848 | 344.3px | 2300px/s | 216°/s | 12° | .15s | 5% |
 
 DefaultBattleTowerConfig.tres retains Inspector identity, target priority and RotateWhileTracking; scene/definition retain artwork and registration. Combat stats/prices are no longer numeric .tres exports. Each placed tower gets private runtime rows/recipes. C# Level 1 convenience accessors edit row 1 only; use SetLevelStats(level, snapshot) for another row.
 

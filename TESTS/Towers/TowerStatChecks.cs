@@ -112,9 +112,9 @@ public static class TowerStatChecks
     {
         BattleTowerConfig battle = new(); LaserTowerConfig laser = new(); BlasterCannonConfig blaster = new();
         TowerFinalStats[] battleExpected = {
-            new(323.4f, 1.68f, 30, 1150, 216, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
-            new(334.4f, 1.764f, 33, 1150, 216, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
-            new(344.3f, 1.848f, 36, 1150, 216, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)) };
+            new(323.4f, 1.68f, 30, 2300, 216, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
+            new(334.4f, 1.764f, 33, 2300, 216, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
+            new(344.3f, 1.848f, 36, 2300, 216, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)) };
         TowerFinalStats[] laserExpected = {
             new(323.4f, 0, 0, 1, 216, 12, .15f, new BeamStats(12), Weapon: new(DamageType.Energy, true, 6, true, .15f), Ammunition: new(1000, 0, 2)),
             new(334.4f, 0, 0, 1, 216, 12, .15f, new BeamStats(14), Weapon: new(DamageType.Energy, true, 6, true, .15f), Ammunition: new(1000, 0, 2)) };
@@ -156,7 +156,7 @@ public static class TowerStatChecks
             new[] { 440f, 462f, 484f }, new[] { 262.9f, 272.8f, 283.8f },
             new[] { 262.9f, 272.8f, 283.8f }, new[] { 253f, 262.9f } };
         float[] turns = { 216f, 216f, 216f, 288f, 162f, 264f, 216f, 216f, 0f };
-        float[] speeds = { 1150f, 1f, 575f, 1221.875f, 1495f, 0f, 747.5f, 747.5f, 1f };
+        float[] speeds = { 2300f, 1f, 575f, 2443.75f, 2990f, 0f, 747.5f, 747.5f, 1f };
         float[] rocketSpeeds = { 575f, 598f, 621f };
         for (int t = 0; t < towers.Length; t++)
         {

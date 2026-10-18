@@ -1,3 +1,9 @@
+## Projectile speeds doubled for Battle, Machine Gun and Sniper — 2026-10-18
+
+Battle **1,150 → 2,300 px/s**, Machine Gun **1,221.875 → 2,443.75 px/s**, Sniper **1,495 → 2,990 px/s** across all three purchased levels each. Only the authored projectile-speed field changed for these tower types; attack rate, damage, range, rank, costs and ammo remain intact. Exact stat test baselines were updated accordingly. The earlier +15% general projectile rebalance below is historical and is superseded for these three towers.
+
+---
+
 ## Offensive turret rebalance — 2026-10-18
 
 **Latest authored values** (superseding the historical range-only rebalance section below): every purchased level of **all nine offensive tower types** has **10% more range**. Eight aimed towers have **20% faster rotation**; the stationary Shockwave Tower has no rotation. The seven projectile weapons (Battle, Blaster, Machine Gun, Sniper, Rocket, Cryo, Stasis) have **15% faster projectile travel speed** at all levels. Laser is a continuous beam (no projectile), and Shockwave emits a travelling radial front rather than a launched projectile; its expansion speed remains unchanged, while its maximum damaging radius gets the 10% range increase.
