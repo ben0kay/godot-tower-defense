@@ -1,3 +1,13 @@
+## Multiple Citadels per level — MC1–MC3 (PLANNED, Codex)
+
+**Detailed implementation specification:** [`WORLD/OBJECTIVES/Citadel/README.md`](../WORLD/OBJECTIVES/Citadel/README.md#planned--mc1mc3-multiple-citadels-with-fixed-portal-destinations). **NOT IMPLEMENTED.** Do not mark complete before integration/visual tests.
+
+- [ ] **MC1:** Add multiple per-level Citadel goals/HP and cached neutral **shortest navigable path** assignments **per portal → one Citadel**, resolved at level setup. Enemy destination is fixed at spawn; no per-enemy Citadel selection, no per-Citadel AStar grid, no target switching on blockage. Existing single-Citadel levels must stay compatible. Decide and test checkpoint-branch, size-clearance and map-edge policies; Transporter children inherit target.
+- [ ] **MC2:** Extend path/repath/checkpoint and tower-placement connectivity to the **assigned** Citadel; keep corridor diversity/offsets and existing First/Last = smallest/largest `RemainingJourneyDistance` to **each enemy's own target** across Citadels. One destroyed Citadel triggers single mission defeat in initial design.
+- [ ] **MC3:** Independent Citadel HP/HUD, F3 portal→Citadel display, new two-Citadel test fixture, regression coverage (single Citadel, portals/checkpoints/DeathSpawn, building, waves, First/Last, Results/research, 500+ enemies) and Godot headless/F5 verification. Do not change current maps/waves until authored separately.
+
+---
+
 ## Stasis ST1 — implemented 2026-10-18
 
 Green-themed Stasis is now a catalog-registered Offensive Energy projectile tower. It uses the existing shared muzzle/projectile, construction, physical ammo, hull HP, purchased-level, earned-rank, stat pipeline and Inspector paths. No Inspector layout changes. Targets must be unfrozen and Freeze-nonimmune; all six selected modes score only those eligible candidates. If none qualify, wait with no damage-only fallback. Cryo-slowed enemies remain eligible. Existing in-flight shots can refresh Freeze with maximum remaining/new duration, never additive duration.
