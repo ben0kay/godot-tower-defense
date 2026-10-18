@@ -23,6 +23,7 @@ z_index = -20
 [node name="Stars" type="Node2D" parent="SpaceBackground" unique_id=2028579996]
 
 [node name="Space" type="Sprite2D" parent="SpaceBackground/Stars" unique_id=1191861450]
+position = Vector2(93, 7)
 scale = Vector2(4, 4)
 texture = ExtResource("1_p5ed7")
 centered = false
@@ -48,7 +49,7 @@ tile_set = ExtResource("2_decorations")
 [node name="Portals" type="Node2D" parent="." unique_id=219222935]
 
 [node name="EnemyPortal1" parent="Portals" unique_id=1721559982 instance=ExtResource("5_portal")]
-position = Vector2(3404, 2597)
+position = Vector2(3424, 2592)
 
 [node name="Objectives" type="Node2D" parent="." unique_id=1539156350]
 
