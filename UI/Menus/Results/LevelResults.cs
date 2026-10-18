@@ -16,6 +16,10 @@ public partial class LevelResults : CanvasLayer
     [Export(PropertyHint.Range, "0,1,0.05")] public float StatGapSeconds { get; set; } = 0.10f;
     [Export] public bool PreviewOnReady { get; set; } = false;
 
+    [ExportGroup("Debrief Layout")]
+    [Export(PropertyHint.Range, "660,1500,10")] public float PanelWidthPixels { get; set; } = 1020f;
+    [Export(PropertyHint.Range, "500,1100,10")] public float PanelHeightPixels { get; set; } = 900f;
+
     public bool IsOpen => _screen?.Visible == true;
     public bool ActionsAvailable { get; private set; }
     public Button PrimaryButton => _primary;
@@ -49,16 +53,20 @@ public partial class LevelResults : CanvasLayer
         _screen = new Control { Name = "Screen", MouseFilter = Control.MouseFilterEnum.Stop };
         AddChild(_screen);
         _screen.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
-        VBoxContainer content = MenuLayout.Create(_screen, "MISSION DEBRIEF", "LEVEL RESULTS", 660f);
+        VBoxContainer content = MenuLayout.Create(_screen, "MISSION DEBRIEF", "LEVEL RESULTS", PanelWidthPixels);
+        content.AddThemeConstantOverride("separation", 8);
         _screen.GetChild<ColorRect>(0).Color = new Color(0.01f, 0.03f, 0.05f, 0.87f);
         _frame = (PanelContainer)content.GetParent();
+        _screen.Resized += FitDebriefToViewport;
+        FitDebriefToViewport();
         _heading = content.GetChild<Label>(0);
         _subtitle = content.GetChild<Label>(1);
 
         _skip = UIButtonFactory.Create("SKIP REVEAL", SkipReveal, UIButtonStyle.Compact, 30f, palette);
         content.AddChild(_skip);
 
-        ScrollContainer statScroll = new() { CustomMinimumSize = new Vector2(0, 220),
+        ScrollContainer statScroll = new() { Name = "MissionStatsScroll", CustomMinimumSize = new Vector2(0, 90),
+            SizeFlagsVertical = Control.SizeFlags.ExpandFill,
             HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled,
             VerticalScrollMode = ScrollContainer.ScrollMode.Auto };
         content.AddChild(statScroll);
@@ -101,6 +109,17 @@ public partial class LevelResults : CanvasLayer
 
         _screen.Hide();
         if (PreviewOnReady) ShowPreview();
+    }
+
+    // =========================================================
+    // Prefer a large full-results card on desktop; cap both dimensions inside the 24px menu margins.
+    // The stat scroller takes any extra height, falling back to scrolling only in short viewports.
+    private void FitDebriefToViewport()
+    {
+        if (_frame == null) return;
+        Vector2 viewport = _screen.Size;
+        _frame.CustomMinimumSize = new Vector2(Mathf.Min(PanelWidthPixels, Mathf.Max(0f, viewport.X - 48f)),
+            Mathf.Min(PanelHeightPixels, Mathf.Max(0f, viewport.Y - 48f)));
     }
 
     // =========================================================

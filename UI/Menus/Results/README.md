@@ -1,3 +1,9 @@
+## Larger responsive Mission Debrief — 2026-10-18
+
+The end-of-level Results card now targets **1020×900** at desktop resolution (previous width660 with a short220px minimum stat region). `LevelResults.cs` exposes `PanelWidthPixels` and `PanelHeightPixels` in its **Debrief Layout** Inspector group. Each dimension is clamped to the viewport minus the shared menu's24px margin on either side, so smaller windows keep the card centered and in bounds. The ten-stats ScrollContainer now expands to fill remaining vertical space instead of remaining a short, permanently scrollable list. At full-height desktop resolutions all10 stat rows should be visible without scrolling; compact windows may scroll as required. The stat reveal/Skip, mission XP, victory/defeat accents and navigation are unchanged, and `MenuLayout` stays shared with the other menus. `MissionXPChecks.Geometry` covers large and compact viewport bounds plus full-size scrollbar visibility. Runtime visual/headless verification is pending.
+
+---
+
 ## Mission XP connection — implemented 2026-10-17
 
 User approved a provisional, tunable mission-to-profile XP loop before finalized scoring. **This amendment supersedes older statements that missions never grant XP; preserve the original P1–P5/R4 design below as future scope.**

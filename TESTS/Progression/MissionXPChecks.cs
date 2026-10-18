@@ -123,12 +123,19 @@ public partial class MissionXPChecks : Node
     {
         Control screen = results.GetNode<Control>("Screen");
         var frame = (PanelContainer)typeof(LevelResults).GetField("_frame", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(results);
+        ScrollContainer statScroll = (ScrollContainer)frame.FindChild("MissionStatsScroll", true, false);
+        Require(statScroll != null, "Results exposes its scrollable stat area for responsive checks");
         screen.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.TopLeft);
         foreach (Vector2 size in new[] { new Vector2(1920,1080), new Vector2(1366,768), new Vector2(960,540) })
         {
             screen.Size = size; await Frames(); Rect2 rect = frame.GetGlobalRect(), bounds = screen.GetGlobalRect();
             Require(rect.Position.X >= bounds.Position.X - 1 && rect.Position.Y >= bounds.Position.Y - 1 &&
                 rect.End.X <= bounds.End.X + 1 && rect.End.Y <= bounds.End.Y + 1, "Results XP frame fits " + size + ": " + rect);
+            Require(rect.Size.X >= Mathf.Min(1020f, size.X - 48f) - 1f &&
+                rect.Size.Y >= Mathf.Min(900f, size.Y - 48f) - 1f,
+                "Results expands to viewport-aware debrief dimensions at " + size + ": " + rect);
+            if (size.Y >= 900f)
+                Require(!statScroll.GetVScrollBar().Visible, "Full-size desktop debrief shows all ten mission stats without scrolling");
         }
     }
     // =========================================================
