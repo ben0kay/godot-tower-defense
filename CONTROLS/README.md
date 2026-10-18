@@ -1,3 +1,9 @@
+## Performance overlay — F4
+
+All playable launchers now mount the isolated `DEBUG/PerformanceOverlay.cs`. Its own pause-aware F4 handler ignores OS repeat, consumes only its configured key, and creates no GameInput scoped binding. F2/F3 remain LevelDebugController responsibilities. See DEBUG/README.md from the repository root.
+
+---
+
 # CONTROLS — Global and contextual shortcuts
 
 Implemented: `GameInput.cs` is one always-processing Autoload at `/root/GameInput`, registered in `project.godot`. It routes named Input Map actions without implementing gameplay, menus, camera or combat. Defaults are registered once at startup if an action does not already exist; future authored/rebound actions are preserved.

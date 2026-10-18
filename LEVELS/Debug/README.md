@@ -1,3 +1,13 @@
+## F4 performance overlay + Level002 F2 repair — 2026-10-18
+
+`DEBUG/PerformanceOverlay.cs` is one isolated self-building CanvasLayer script, mounted on all three playable launchers. F4 toggles a debug-build-only panel below top HUD/existing map diagnostics, with throttled frame/engine timing, enemy/projectile-node counts, bounded navigation peak windows/queues and render counters. Click-through, pause-responsive, cached read-only service access; hidden sampling stops. Inspector settings live on the overlay node. See `DEBUG/README.md` for metric meanings and thresholds.
+
+Level002's Debug node and LevelTemplate lacked LevelDebugController/HUD wiring, so F2/F3 were absent there. Both now instance reusable `LEVELS/Debug/LevelDebugTools.tscn`; checkpoint-overlay children and map artwork/coordinates remain intact. Missing optional HUD no longer aborts controller setup. Failed catalog F2 attempts warn with SpawnManager.LastMessage while retaining the next enemy index. Raw map-only F6 still intentionally has no world services: use MainLevel002.tscn F6 or Campaign for gameplay spawning.
+
+Verification: C# build and `TESTS/Debug/PerformanceOverlayChecks.tscn`; detailed scope is in `TESTS/Debug/README.md`. Existing user changes to economy, terrain and tower stats are preserved. Earlier plans/history below remain intact.
+
+---
+
 # Level debug helpers
 
 Level001 owns `Debug` -> `HUD` -> `Info`. The parent uses `LevelDebugController` and exposes `Enabled`, `SpawnKey` (F2), `EnemyScene` (legacy/fallback), and `PortalOnly` (true).

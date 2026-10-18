@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3]
+[ext_resource type="Script" path="res://LEVELS/Debug/LevelDebugController.cs" id="1"]
+[ext_resource type="Script" path="res://WORLD/GRID/GridDebugOverlay.cs" id="2"]
+[node name="Debug" type="Node"]
+script = ExtResource("1")
+[node name="HUD" type="CanvasLayer" parent="."]
+[node name="Info" type="Label" parent="HUD"]
+offset_left = 16.0
+offset_top = 62.0
+offset_right = 1250.0
+offset_bottom = 185.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.68, 0.91, 0.96, 0.86)
+theme_override_font_sizes/font_size = 14
+script = ExtResource("2")

@@ -3,6 +3,7 @@ using Godot;
 
 public partial class LevelDebugController : Node
 {
+    #region Configuration
     [ExportGroup("Debug Spawning")]
     private bool _enabled = true;
     [Export] public bool Enabled
@@ -28,6 +29,9 @@ public partial class LevelDebugController : Node
     public RoutePreviewOverlay RoutePreview { get; private set; }
     private SpawnManager _spawns;
     private int _nextEnemyIndex;
+    #endregion
+
+    #region Lifecycle and Shortcuts
 
     // =========================================================
     // Deferred lookup allows the live world's grid/services to finish their startup first.
@@ -38,7 +42,8 @@ public partial class LevelDebugController : Node
     private void ConnectServices()
     {
         _spawns = GetNodeOrNull<SpawnManager>("../../EnemySystems/Spawning");
-        GetNode<CanvasLayer>("HUD").Visible = Enabled && _spawns != null;
+        CanvasLayer hud = GetNodeOrNull<CanvasLayer>("HUD");
+        if (hud != null) hud.Visible = Enabled && _spawns != null;
         SetProcessUnhandledKeyInput(Enabled && _spawns != null);
         if (Enabled && _spawns != null)
         {
@@ -63,9 +68,11 @@ public partial class LevelDebugController : Node
             int index = _nextEnemyIndex % scenes.Count;
             if (_spawns.Spawn(scenes[index], PortalOnly) != null)
                 _nextEnemyIndex = (index + 1) % scenes.Count;
+            else GD.PushWarning("F2 spawn rejected: " + _spawns.LastMessage);
         }
         else if (EnemyScene != null) _spawns.Spawn(EnemyScene, PortalOnly);
 
         GetViewport().SetInputAsHandled();
     }
+    #endregion
 }

@@ -1,3 +1,9 @@
+## Performance overlay and F2 tools — 2026-10-18
+
+**F4** toggles the new click-through performance panel in debug builds on all playable battlefields. The contained script and settings guide live in `DEBUG/`. Level002/template now include the shared F2 spawn/F3 route-preview tools; use Campaign or a Main launcher for gameplay rather than running the raw map alone. See `LEVELS/Debug/README.md`.
+
+---
+
 ## Terrain Edges scaffold — opt-in visual foundation (2026-10-18)
 
 `WORLD/TERRAIN/Edges/` now defines editable edge-style resources, Mars material mappings, an on-demand material cache and a pure 8-neighbour mask. This is a foundation for Codex, **not live corner smoothing**: renderer draws nothing; existing levels and artwork are unchanged. See [the Codex handoff](WORLD/TERRAIN/Edges/IMPLEMENTATION_PLAN.md).

@@ -11,6 +11,8 @@
 [ext_resource type="PackedScene" path="res://WORLD/OBJECTIVES/Citadel/Citadel.tscn" id="6_citadel"]
 [ext_resource type="Script" uid="uid://ceof7q2uqyh1q" path="res://WORLD/ROUTING/CheckpointDesignOverlay.cs" id="checkpoint_overlay"]
 
+[ext_resource type="PackedScene" path="res://LEVELS/Debug/LevelDebugTools.tscn" id="debug_tools"]
+
 [node name="LevelTemplate" type="Node2D" unique_id=864740696]
 script = ExtResource("3_root")
 Settings = ExtResource("4_config")
@@ -56,7 +58,7 @@ position = Vector2(3424, 2592)
 [node name="Citadel" parent="Objectives" unique_id=1303919540 instance=ExtResource("6_citadel")]
 position = Vector2(3872, 2528)
 
-[node name="Debug" type="Node" parent="." unique_id=1467647758]
+[node name="Debug" parent="." unique_id=1467647758 instance=ExtResource("debug_tools")]
 
 [node name="CheckpointOverlay" type="Node2D" parent="Debug" unique_id=2072394971]
 z_index = 4090
