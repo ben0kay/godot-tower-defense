@@ -1,3 +1,9 @@
+## Current artwork — alien robotic pass (2026-10-18)
+
+**Tusked assault cruiser**, right-facing, native **64×48px**. Broad armored side nacelles, forward cleaving tusks, ribbed plates and an amber round reactor. Artwork only: stable identity, scenes, gameplay/ability settings and navigation clearance are unchanged. Earlier art/color descriptions below are historical. See `../ART_DIRECTION.md` for fleet-wide conventions and the review sheet.
+
+---
+
 # Enemy004 — Bulwark Drone (`medium_mk1`)
 
 First **medium-sized plain enemy**, developed after Enemy001/Enemy002. Its numbered scene/resource/art filenames mark **development order**, not wave appearance order. Its stable gameplay key is `medium_mk1`; its player-facing name is `Bulwark Drone`.

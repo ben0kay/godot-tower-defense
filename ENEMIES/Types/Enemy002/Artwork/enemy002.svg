@@ -1,1 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="28" height="18" viewBox="0 0 28 18"><path d="M2 3 27 9 2 15 7 9Z" fill="#587595" stroke="#acdbe8" stroke-width="1.5"/><path d="M12 7 22 9 12 11Z" fill="#ffce70"/><path d="M2 7 6 9 2 11" fill="#60d3ee"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="28" height="18" viewBox="0 0 28 18">
+<!-- Right-facing alien robotic hull; baked vector lighting only. Keep native canvas and forward axis. -->
+<defs>
+  <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#53626e"/><stop offset=".25" stop-color="#263440"/><stop offset=".56" stop-color="#111a23"/><stop offset="1" stop-color="#070c12"/></linearGradient>
+  <linearGradient id="plate" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#78858d"/><stop offset=".17" stop-color="#3b4b57"/><stop offset=".6" stop-color="#19242e"/><stop offset="1" stop-color="#0d151d"/></linearGradient>
+  <linearGradient id="core" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#18d9ff"/><stop offset=".5" stop-color="#d1fdff"/><stop offset="1" stop-color="#18d9ff"/></linearGradient>
+</defs>
+<g transform="translate(0 0) scale(0.28 0.18)" stroke-linejoin="round" stroke-linecap="round">
+<!-- Small, open-tailed hooked interceptor: three separated rear prongs -->
+<path d="M5 4 65 22 42 31 23 26 34 43 34 57 23 74 42 69 65 78 5 96 16 66 9 50 16 34Z" fill="url(#hull)" stroke="#718893" stroke-width="1.8"/>
+<path d="M10 9 51 23 26 21Z M10 91 51 77 26 79Z" fill="#596d78"/>
+<path d="M20 45 63 34 97 50 63 66 20 55 8 50Z" fill="url(#plate)" stroke="#8699a3" stroke-width="1.8"/>
+<path d="M34 45 64 41 83 50 64 59 34 55 25 50Z" fill="#08141d"/>
+<path d="M43 47 66 45 77 50 66 55 43 53Z" fill="#11bfe1" opacity=".65"/>
+<path d="M45 49 67 48 73 50 67 52 45 51Z" fill="#b4f8ff"/>
+<path d="M24 30 34 37 M24 70 34 63" stroke="#f44627" stroke-width="3"/>
+
+</g>
+</svg>

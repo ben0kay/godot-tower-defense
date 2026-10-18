@@ -1,3 +1,9 @@
+## Current artwork — alien robotic pass (2026-10-18)
+
+**Bulbous armored carrier**, right-facing, native **112×72px**. Full rounded cargo hull, segmented curved armor, swept fins and a long recessed red launch spine, inspired by the supplied ballooned-carrier reference. Artwork only: stable identity, scenes, gameplay/ability settings and navigation clearance are unchanged. Earlier art/color descriptions below are historical. See `../ART_DIRECTION.md` for fleet-wide conventions and the review sheet.
+
+---
+
 # Transporter — E3A playable carrier
 
 Stable catalog ID **transporter_mk1**, display name **Transporter**. Large amber cargo-vessel SVG **112×72px**, **500 hull**, **45px/s**, **24px navigation radius**, no shield capacity, **15 Credits** on kill and **5 Citadel damage**. These are editable playtest defaults in Transporter.tres, not shared engine constants. The artwork is deliberately larger than the collision disc; routing still requires radius below half a grid cell. No expanded large-unit navigation model is claimed.

@@ -1,3 +1,9 @@
+## Current artwork — alien robotic pass (2026-10-18)
+
+**Forked strike drone**, right-facing, native **32×24px**. Narrow plated body, split rear stabilizers and a recessed orange-red attack slit. Artwork only: stable identity, scenes, gameplay/ability settings and navigation clearance are unchanged. Earlier art/color descriptions below are historical. See `../ART_DIRECTION.md` for fleet-wide conventions and the review sheet.
+
+---
+
 # Enemy001 asset — Standard Drone (`basic_mk1`)
 
 The numbered asset filename remains for development history. **EnemyId** is `basic_mk1` and **DisplayName** is `Standard Drone`, independently of wave order. `Enemy001.tscn` uses Shared/Enemy.cs, a Sprite2D and Movement/EnemyMovement.cs. `Artwork/enemy001.svg` is a replaceable small top-down placeholder facing right.

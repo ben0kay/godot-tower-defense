@@ -1,3 +1,9 @@
+## Current artwork — alien robotic pass (2026-10-18)
+
+**Four-lance capital warship**, right-facing, native **112×120px**. Tall independent lance wings/nacelles, armored center spine, blue reactor and recessed surface machinery. Artwork only: stable identity, scenes, gameplay/ability settings and navigation clearance are unchanged. Earlier art/color descriptions below are historical. See `../ART_DIRECTION.md` for fleet-wide conventions and the review sheet.
+
+---
+
 # Enemy005 — Big mk.1 (`big_mk1`)
 
 A **large, slow, high-durability plain enemy** inspired by the original GameMaker `o_enemy_005` / `Big mk.1`. It deliberately has **no new AI/abilities** and uses the existing inherited `ENEMIES/Shared/GenericEnemy.tscn`: shared movement, targeting/registry, hull + shield bars, optional shield aura, Citadel damage, rewards and death explosion.

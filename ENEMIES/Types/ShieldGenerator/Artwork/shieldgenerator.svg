@@ -1,1 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="40" height="32" viewBox="0 0 40 32"><path d="M4 5 30 5 38 16 30 27 4 27 8 16Z" fill="#274957" stroke="#90e0df" stroke-width="2"/><circle cx="18" cy="16" r="9" fill="#295d68" stroke="#59c8e9" stroke-width="2"/><circle cx="18" cy="16" r="4" fill="#b5ffff"/><path d="M30 12 36 16 30 20" fill="#98d7e3"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="32" viewBox="0 0 40 32">
+<!-- Right-facing alien robotic hull; baked vector lighting only. Keep native canvas and forward axis. -->
+<defs>
+  <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#53626e"/><stop offset=".25" stop-color="#263440"/><stop offset=".56" stop-color="#111a23"/><stop offset="1" stop-color="#070c12"/></linearGradient>
+  <linearGradient id="plate" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#78858d"/><stop offset=".17" stop-color="#3b4b57"/><stop offset=".6" stop-color="#19242e"/><stop offset="1" stop-color="#0d151d"/></linearGradient>
+  <linearGradient id="core" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#b699f2"/><stop offset=".5" stop-color="#f4e8ff"/><stop offset="1" stop-color="#b699f2"/></linearGradient>
+</defs>
+<g transform="translate(0 0) scale(0.4 0.32)" stroke-linejoin="round" stroke-linecap="round">
+<!-- Rounded reactor chassis with a split projection fork: support craft, not another arrow fighter -->
+<path d="M4 14 29 7 39 21 36 36 21 38Z M4 86 29 93 39 79 36 64 21 62Z" fill="url(#hull)" stroke="#738a99" stroke-width="1.4"/>
+<path d="M17 11 29 12 32 24 22 27Z M17 89 29 88 32 76 22 73Z" fill="url(#plate)"/>
+<path d="M57 21 80 23 97 34 77 36 69 45 59 41Z M57 79 80 77 97 66 77 64 69 55 59 59Z" fill="url(#plate)" stroke="#8f9ea8" stroke-width="1.3"/>
+<path d="M80 25 92 32 M80 75 92 68" stroke="#caa6fa" stroke-width="2"/>
+<path d="M13 40Q20 20 41 22Q67 19 75 40L82 50 75 60Q67 81 41 78Q20 80 13 60L7 50Z" fill="url(#hull)" stroke="#a2b1b7" stroke-width="1.2"/>
+<ellipse cx="44" cy="50" rx="24" ry="23" fill="#0b1420" stroke="#51667a" stroke-width="1.3"/>
+<path d="M25 39Q30 30 41 29 M25 61Q30 70 41 71 M53 30Q63 35 65 44 M53 70Q63 65 65 56" fill="none" stroke="#7b8896" stroke-width="3"/>
+<ellipse cx="44" cy="50" rx="15" ry="16" fill="#543781" stroke="#b291e0" stroke-width=".8"/>
+<ellipse cx="44" cy="50" rx="9" ry="10" fill="url(#core)"/>
+<path d="M42 35 42 43 35 48 M56 54 49 54 44 63 M29 53 36 53 39 48" fill="none" stroke="#202638" stroke-width="3.2"/>
+<circle cx="44" cy="50" r="3" fill="#e8d7ff"/>
+<path d="M10 43V57" stroke="#f57b40" stroke-width="2.8"/>
+
+</g>
+</svg>

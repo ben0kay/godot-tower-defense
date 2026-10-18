@@ -1,3 +1,9 @@
+## Current artwork — alien robotic pass (2026-10-18)
+
+**Split-fork projection craft**, right-facing, native **40×32px**. Rounded physical reactor housing, split forward emitters and short stabilizer fins; violet core distinguishes this support craft from the fighters. Artwork only: stable identity, scenes, gameplay/ability settings and navigation clearance are unchanged. Earlier art/color descriptions below are historical. See `../ART_DIRECTION.md` for fleet-wide conventions and the review sheet.
+
+---
+
 # ShieldGenerator — first optional support enemy
 
 DefaultEnemyCatalog registers the stable `shield_emitter_mk1` ID; `ShieldGenerator` remains the development asset name. The scene reuses Enemy and EnemyMovement with teal 40×32 placeholder art, Movement, hull DefenseBar and Abilities/ShieldEmitter. Provisional EnemyDefinition balance: 100 hull,80 optional shield capacity,70px/s,16px radius,2 Citadel damage,5 kill Credits. Default spawns have no starting shield; shield:true starts full. AffectSelf=false means this generator initially protects allies rather than replenishing itself.

@@ -1,1 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="24" viewBox="0 0 32 24"><path d="M3 5 L13 7 L29 12 L13 17 L3 19 L7 12 Z" fill="#ad3f48" stroke="#ed9190" stroke-width="1.5"/><path d="M13 9 L23 12 L13 15 Z" fill="#b5f2fc"/><path d="M2 9 L7 10 L7 14 L2 15 Z" fill="#ffba59"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="24" viewBox="0 0 32 24">
+<!-- Right-facing alien robotic hull; baked vector lighting only. Keep native canvas and forward axis. -->
+<defs>
+  <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#53626e"/><stop offset=".25" stop-color="#263440"/><stop offset=".56" stop-color="#111a23"/><stop offset="1" stop-color="#070c12"/></linearGradient>
+  <linearGradient id="plate" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#78858d"/><stop offset=".17" stop-color="#3b4b57"/><stop offset=".6" stop-color="#19242e"/><stop offset="1" stop-color="#0d151d"/></linearGradient>
+  <linearGradient id="core" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ff4a26"/><stop offset=".5" stop-color="#ffe3b6"/><stop offset="1" stop-color="#ff4a26"/></linearGradient>
+</defs>
+<g transform="translate(0 0) scale(0.32 0.24)" stroke-linejoin="round" stroke-linecap="round">
+<!-- Forked drone chassis / swept stabilizers -->
+<path d="M5 8 37 24 64 29 96 50 64 71 37 76 5 92 13 62 4 50 13 38Z" fill="url(#hull)" stroke="#74808a" stroke-width="2"/>
+<path d="M9 13 34 29 26 38 16 35Z M9 87 34 71 26 62 16 65Z" fill="#485761"/>
+<path d="M23 37 54 31 84 50 54 69 23 63 15 50Z" fill="#080e15" stroke="#536370" stroke-width="1.6"/>
+<path d="M30 38 56 36 76 48 35 45Z M30 62 56 64 76 52 35 55Z" fill="url(#plate)"/>
+<path d="M35 47 66 47 76 50 66 53 35 53 29 50Z" fill="#ff391c" opacity=".45"/>
+<path d="M37 49 67 49 72 50 67 51 37 51Z" fill="#ffd7a5"/>
+<path d="M16 42V58 M21 44V56" stroke="#ff5d30" stroke-width="2.3"/>
+<path d="M51 30 66 34 81 44 M51 70 66 66 81 56" fill="none" stroke="#96a2a6" stroke-width="1"/>
+
+</g>
+</svg>

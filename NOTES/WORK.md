@@ -1,3 +1,13 @@
+## Alien robotic fleet artwork — 2026-10-18
+
+Replaced the seven existing enemy SVG hulls with original vector interpretations of the supplied dark alien-spacecraft references. Emphasis is on silhouette and exposed machinery rather than repeating one arrow shape with different colors: forked strike drone, tiny hooked interceptor, broad tusked assault cruiser, large four-lance warship, curved talon-wing Elite, bulbous armored Transporter and rounded split-fork Shield Generator. Dark layered metal, restrained edge highlights and recessed reactors keep them readable against space. Reference screenshot borders/backgrounds are not part of the artwork; uploaded bitmaps are not embedded.
+
+All SVG file paths, native width/height/viewBox and right-facing (+X) convention are retained. No scene transforms, definitions, IDs, collision/navigation radii, health, shields, movement, rewards, abilities, waves or shared shield/status visuals changed. The Shield Generator's circular center is physical reactor/projector machinery, not a baked shield aura. Small hulls remain small; the Transporter retains its existing 112×72 canvas and Big mk.1 its 112×120 canvas. Gradients and layered plates are rasterized at asset import; no blur filters, shaders, extra nodes or per-frame effect processing were added.
+
+Validation: all seven assets parsed and rasterized successfully with Godot 4.7.2's native SVG renderer at their exact original dimensions; reviewed at enlarged and native-relative scale. No C# changes, so no unrelated gameplay suite/build was needed. Desktop in-game style/readability is still subjective and can be tuned after review. The review sheet enlarges each hull independently and lists native dimensions; it is documentation, not a gameplay texture reference. See `ENEMIES/Types/ARTWORK_PREVIEW.png` and `ENEMIES/Types/ART_DIRECTION.md`. This visual update supersedes earlier placeholder/color descriptions while retaining their historical gameplay notes.
+
+---
+
 ## MC3 HUD + F3 — implemented 2026-10-18
 
 Multiple Citadels now share **one horizontal row** in the top-center HUD: equal-width cells for two, four or more objectives, never stacked vertically. A one-Citadel level keeps the original nodes/layout/SetCitadelHealth behavior. Each multi meter shows its stable CITADEL number, independent current/max HP, threshold-colored fill and damage-only animation/flash. Zero values and maximum resets are supported; rebind/unload disconnect model events and stop old tweens. The full Citadel number/HP is available in each cell's tooltip. No HUD health polling or gameplay authority is introduced.

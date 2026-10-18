@@ -1,3 +1,9 @@
+## Current artwork — alien robotic pass (2026-10-18)
+
+**Talon-wing predator**, right-facing, native **80×60px**. Curved forward-reaching attack blades around a separate narrow fuselage, violet reactor and twin forward rails. Artwork only: stable identity, scenes, gameplay/ability settings and navigation clearance are unchanged. Earlier art/color descriptions below are historical. See `../ART_DIRECTION.md` for fleet-wide conventions and the review sheet.
+
+---
+
 # Enemy006 — Elite mk.1 (`elite_mk1`)
 
 Fast, heavily armored elite enemy, inspired by the original GameMaker Elite mk.1 but balanced as requested for the new Godot TD: **Big mk.1-level hull health, Basic mk.1 movement speed, and artwork a little larger than the medium Bulwark.**

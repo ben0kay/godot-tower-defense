@@ -1,3 +1,9 @@
+## Enemy hull artwork refresh — 2026-10-18
+
+The seven registered hull SVGs now use distinct hostile alien-machine silhouettes, including a bulbous Transporter. Native art sizes and every gameplay setting remain unchanged. See `Types/ART_DIRECTION.md` and `Types/ARTWORK_PREVIEW.png` for the visual guide and native-render verification.
+
+---
+
 ## Tower hull prerequisite — implemented 2026-10-17
 
 Shared tower HP/damage/destruction and existing DefenseBar reuse are implemented in TOWERS/Shared/Durability, including all nine registered weapon/economy types. Destruction clears selection, occupancy/navigation, work and logistics without refunds. This supersedes the missing-hull prerequisite in E3B below; E3B attacks/target selection still require a separate pass and are not enabled here. Tower shields and repair producers remain deferred.

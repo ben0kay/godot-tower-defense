@@ -1,1 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="112" height="72" viewBox="-56 -36 112 72"><path d="M-48-27H20L52 0 20 27H-48L-39 0Z" fill="#182a38" stroke="#ffc56a" stroke-width="3"/><path d="M-31-20H16L34 0 16 20H-31Z" fill="#5a4733" stroke="#c58946" stroke-width="2"/><path d="M-25-19V19M-7-19V19M11-19V19" stroke="#d9a05d" stroke-width="3"/><path d="M28-8L42 0 28 8Z" fill="#8be7ed"/><path d="M-48-17H-55M-48 17H-55" stroke="#65d8ee" stroke-width="5"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="112" height="72" viewBox="-56 -36 112 72">
+<!-- Right-facing alien robotic hull; baked vector lighting only. Keep native canvas and forward axis. -->
+<defs>
+  <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#53626e"/><stop offset=".25" stop-color="#263440"/><stop offset=".56" stop-color="#111a23"/><stop offset="1" stop-color="#070c12"/></linearGradient>
+  <linearGradient id="plate" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#78858d"/><stop offset=".17" stop-color="#3b4b57"/><stop offset=".6" stop-color="#19242e"/><stop offset="1" stop-color="#0d151d"/></linearGradient>
+  <linearGradient id="core" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ff3026"/><stop offset=".5" stop-color="#ffc4a5"/><stop offset="1" stop-color="#ff3026"/></linearGradient>
+</defs>
+<g transform="translate(-56 -36) scale(1.12 0.72)" stroke-linejoin="round" stroke-linecap="round">
+<!-- Bulbous armored carrier: rounded cargo vaults, swept fins and inset red launch spine -->
+<path d="M8 6 33 11 53 24 34 30 16 25Z M8 94 33 89 53 76 34 70 16 75Z M66 7 84 17 91 31 78 28Z M66 93 84 83 91 69 78 72Z" fill="url(#hull)" stroke="#7c858b" stroke-width="1.3"/>
+<path d="M13 10 32 16 43 24 27 22Z M13 90 32 84 43 76 27 78Z M72 13 82 21 85 27Z M72 87 82 79 85 73Z" fill="#5d3033"/>
+<path d="M8 38C10 17 35 12 56 16S86 31 91 42L98 50 91 58C86 69 77 80 56 84S10 83 8 62L3 50Z" fill="url(#hull)" stroke="#889198" stroke-width="1.3"/>
+<path d="M13 37C22 20 43 17 57 22S78 32 81 39L63 38 39 32Z M13 63C22 80 43 83 57 78S78 68 81 61L63 62 39 68Z" fill="url(#plate)"/>
+<path d="M26 23Q20 30 20 39 M40 19Q32 28 32 36 M57 22Q48 29 48 36 M26 77Q20 70 20 61 M40 81Q32 72 32 64 M57 78Q48 71 48 64" fill="none" stroke="#090f15" stroke-width="1.5"/>
+<path d="M14 42Q44 31 71 42L91 46 96 50 91 54 71 58Q44 69 14 58L9 50Z" fill="#070e15" stroke="#53626e" stroke-width="1"/>
+<path d="M17 46 47 40 65 43 73 50 65 57 47 60 17 54 13 50Z" fill="#ef251d" opacity=".45"/>
+<path d="M23 48 48 44 63 46 68 50 63 54 48 56 23 52Z" fill="url(#core)"/>
+<path d="M28 45V55 M39 43V57 M50 44V56 M60 45V55" stroke="#202731" stroke-width="2.5"/>
+<path d="M74 42 88 47V53L74 58 80 50Z" fill="url(#plate)"/>
+<path d="M9 43 5 45V55L9 57 M12 45V55" fill="none" stroke="#ff572f" stroke-width="2"/>
+<path d="M25 27Q43 20 57 26 M25 73Q43 80 57 74" fill="none" stroke="#92a0a5" stroke-width=".8" opacity=".7"/>
+<path d="M80 34 86 40 M80 66 86 60" stroke="#ff3c26" stroke-width="1.5"/>
+
+</g>
+</svg>
