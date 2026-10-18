@@ -10,7 +10,9 @@
 
 
 - **Full verified-source specification:** [`ECONOMY/Production/README.md`](../ECONOMY/Production/README.md). Existing `EconomyManager.Grant` / HUD rewards must remain authoritative. This is **not implemented**.
-- [ ] **CP1** reusable plain producer/buffer; **per-Citadel** 80-cap / +10 every 2s from coded old GameMaker baseline, **active-wave only**, click to collect, independent multi-Citadel meter/buffer, wallet success/failure/overflow, pause and double-click safety.
+- [x] **CP1A (backend code pushed; runtime verification pending):** reusable plain CreditBuffer/production timer; independent Citadel 80-cap / +10 every 2s, wave-active-only generation, pause and destruction gating, collection API through the authoritative wallet and test runner authored.
+- [ ] **CP1B:** clickable physical Citadels and matching top-centre individual HUD cells, green buffer meter/amount per Citadel, placement/input safety and UI tests.
+- [ ] **CP1A validation:** compile Godot .NET and run TESTS/Economy/CitadelCreditChecks.tscn; record actual results.
 - [ ] **CP2** `TOWERS/Economy/AdaptableResourceGenerator/`, gains from real kills credited to other towers inside its radius (prefer event-based attribution, no frame scans), buffered reward + Inspector collection, adjustable balance/limits and no duplicate kill payout.
 - [ ] **CP3 (optional later)** integrate planned passive Resource Tower and research modifiers (`Generator.2`, `New Interest`) into the same helper, not separate wallet code. Confirm original old notes vs runtime values before balance work.
 - [ ] Add tests for phase-specific UI, multi-Citadel independence, wave pause/clear, kill attribution/overlapping ARGs and existing economy regressions. One commit per implementation job.

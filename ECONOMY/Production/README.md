@@ -1,6 +1,16 @@
-# Credit producers — shared mechanic (PLANNED / Codex handoff)
+# Credit producers — shared mechanic (CP1A BACKEND; CP1B–CP3 PLANNED)
 
-**Status: design only; NOT implemented.** This is a reusable economy mechanic for (1) click-to-collect Citadel income and (2) the **Adaptable Resource Generator** (ARG), with an easy path for the existing planned passive **Resource Tower / Resource Generator**. Do not silently change existing gameplay when implementing.
+**Status:** CP1A backend code is implemented; runtime verification pending. World/HUD collection (CP1B), Adaptable Resource Generator (CP2) and passive Resource Tower/research (CP3) are NOT implemented. This is a reusable economy mechanic for (1) click-to-collect Citadel income and (2) the **Adaptable Resource Generator** (ARG), with an easy path for the existing planned passive **Resource Tower / Resource Generator**. Do not silently change existing gameplay when implementing.
+
+## CP1A credit buffers and Citadel production — implemented in code 2026-10-18
+
+- **New reusable helpers:** `ECONOMY/Production/CreditBuffer.cs` (capped per-instance storage, mutation event, idempotent all-or-nothing collection through `EconomyManager.Grant`) and `CreditProductionTimer.cs` (seconds-based bounded production, fractional progress frozen between waves, no stored backlog at capacity). Both are plain C# objects: no additional nodes or per-enemy state.
+- **CitadelSession integration:** Inspector-exported **Citadel Credit Production** settings default to legacy coded **80 capacity, +10 Credits every 2 seconds**. Each `CitadelDestination` gets independent buffer+clock. `WaveManager.Changed` enables ticking only for `Spawning`, `SpawnBlocked` or `WaitingForClear`; `Ready`, `Completed` and `AllWavesComplete` suspend production. SceneTree pause and defeated/destroyed objectives also suspend it. Already stored Credits persist between waves.
+- **Backend API for CP1B:** `CitadelSession.CreditsFor(destination)` exposes that Citadel's buffer and its `Changed(current,capacity)` event. `TryCollectCredits(destination)` checks live session/objective, uses the existing wallet and HUD reward notification, and empties only that buffer **after a successful grant**. Wallet-cap failure leaves balance untouched. **No world clicks or HUD meters/buttons are connected yet**.
+- **Tests authored:** `TESTS/Economy/CitadelCreditChecks.tscn` checks pure helpers and actual Main wave/collection, pause, wallet overflow, repeated/reentrant collection, wave completion and independent two-Citadel production/collection. **Godot .NET build and headless test execution have not been performed in this editing environment**; run them before declaring the pass verified.
+- **Future:** CP1B attaches real world and top-centre Citadel HUD click surfaces, green buffer indicators and responsive multi-Citadel presentation. CP2 ARG and CP3 passive Resource Tower remain entirely planned.
+
+---
 
 ## Source material (keep history distinct from the proposed Godot design)
 

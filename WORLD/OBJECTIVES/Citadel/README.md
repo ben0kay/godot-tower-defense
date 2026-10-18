@@ -1,3 +1,11 @@
+## CP1A — Citadel Credits backend implemented 2026-10-18 (runtime verification pending)
+
+CitadelSession owns **one independent CreditBuffer and CreditProductionTimer per stable CitadelDestination**, without changing the scene's health nodes, navigation or current top-centre HUD. Inspector-exported Citadel Credit Production values default to **80 stored Credits**, **+10 every 2 seconds**. The timer runs only during WaveManager's Spawning/SpawnBlocked/WaitingForClear, freezes between waves and on game pause, and stops on mission-ending destruction. `CreditsFor(destination)` exposes the buffer's event for forthcoming visual displays; `TryCollectCredits(destination)` collects only the selected Citadel, via the existing EconomyManager/Rewards, and preserves uncollected Credits if the wallet refuses a grant.
+
+**This is backend-only.** Clicking the world Citadel or its corresponding top-centre health panel will NOT collect yet; those interaction surfaces and green credit meters are CP1B. Headless regression scene `TESTS/Economy/CitadelCreditChecks.tscn` is authored but not yet executed; desktop visuals are not assessed. See `ECONOMY/Production/README.md`.
+
+---
+
 ## CP1 collection UX refinement (PLANNED, 2026-10-18)
 
 Each Citadel should have **two equivalent clickable collection surfaces**: (1) its actual world-space Citadel and (2) **its own top-centre health HUD cell**, which gains a compact, distinct green stored-Credits bar/number. Both call the **same Citadel-specific collection method**. Buffers, timers and indicators remain completely separate for multiple Citadels; collecting one never drains others. Existing multi-Citadel HUD stays **one horizontal row**, with responsive dimensions and no health meter regression. Events refresh both displays; no per-frame polling or double grants. Collect even between waves if already stored, but **only produce while a wave runs**. See [CP1 interaction decision](../../../ECONOMY/Production/README.md#cp1-interaction-decision--collect-from-world-citadel-or-its-top-centre-hud-cell-2026-10-18-planned). Not implemented.
