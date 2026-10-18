@@ -42,7 +42,7 @@ public partial class SpawnManager : Node
 
     // =========================================================
     // Explicit level edits can change portal/edge policy without changing walkability or repathing enemies.
-    private void InvalidateSources() { _cachedRevision = -1; _reassignCitadels = true; }
+    private void InvalidateSources() { _cachedRevision = -1; _reassignCitadels = true; if (IsNodeReady()) RefreshSources(); }
     // =========================================================
     // Release the level edit subscription with its spawning service.
     public override void _ExitTree()

@@ -1,3 +1,9 @@
+## Multi-Citadel HUD and F3 — MC3 (2026-10-18)
+
+Two or more Citadels now divide the top-center HUD into equal-width health meters in one horizontal row. Single-Citadel layout is preserved. F3 previews and labels each portal's cached assigned destination, including secondary Citadels and checkpoint chains. Existing maps remain unchanged. See `UI/GameplayHUD/TopBar/README.md` and `TESTS/UI/MultiCitadelHud.md`; desktop appearance review remains.
+
+---
+
 ## Multiple Citadel foundation — MC1/MC2 (2026-10-18)
 
 Levels can author multiple independently damageable Citadels with cached fixed portal destinations. Routing, checkpoints, children, placement protection and any-Citadel defeat respect those identities. Single-Citadel maps bypass destination comparisons. Existing gameplay maps/UI are unchanged; multi-Citadel HUD/F3 presentation remains MC3. See `WORLD/OBJECTIVES/Citadel/README.md`.

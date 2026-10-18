@@ -89,3 +89,8 @@ Multiple independently damageable Citadels now have stable session destination o
 **Placement/outcomes:** click-time validation shares component maps per radius, protects each usable portal's assigned goal, all remaining mandatory checkpoint branches and live enemy clearance/remaining obligations. It cannot accept a different reachable Citadel as a substitute. Losing any objective emits a single session event into the existing LevelSessionController defeat/Results/mission-XP lifecycle. Results uses the failed objective's HP, never an aggregate pool that hides failure. Existing HUD still shows the primary Citadel; independent multi-objective HUD/F3 destination labels and desktop visual verification are MC3 work. Existing Level001/Level002 maps, waves and Inspector layouts were not changed.
 
 See TESTS/Navigation/MultiCitadel.md for executed checks, measured setup/batch behavior and limitations. Original MC1–MC3 instructions below are retained; this status supersedes their earlier NOT IMPLEMENTED wording.
+
+
+## MC3 preview destinations
+
+RoutePreviewJob accepts an optional final CitadelDestination. F3 always supplies the cached live identity, captures only its goal cells, and uses a private preview navigation pool for calculations. Direct legacy single-Citadel callers keep their existing default API. Multi-Citadel jobs without an explicit destination have no goals and report failure, rather than silently previewing Citadel 1. All live destination goals/availability participate in the overlay input stamp. No live AStar/profiles/assignment work is performed by F3.

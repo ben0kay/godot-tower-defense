@@ -7,7 +7,7 @@ using static AmmoLoopFixture;
 public partial class MultiCitadelChecks : Node
 {
     #region Fixture
-    private sealed class Fixture : IDisposable
+    internal sealed class Fixture : IDisposable
     {
         internal readonly Node Main;
         internal readonly WorldGrid Grid;
@@ -15,7 +15,7 @@ public partial class MultiCitadelChecks : Node
         internal readonly CitadelSession Session;
         internal readonly Node2D First, Second;
         internal readonly PathRequestManager Paths;
-        internal Fixture(Node owner, bool checkpoint = false, bool detour = false, bool keepResults = false)
+        internal Fixture(Node owner, bool checkpoint = false, bool detour = false, bool keepResults = false, int citadelCount = 2)
         {
             Main = GD.Load<PackedScene>("res://Main.tscn").Instantiate();
             if (!keepResults) SubsystemBattlefield.DetachSession(Main);
@@ -32,6 +32,12 @@ public partial class MultiCitadelChecks : Node
             First = level.GetNode<Node2D>(level.Settings.CitadelPath); First.Position = At(28,7);
             Second = GD.Load<PackedScene>("res://WORLD/OBJECTIVES/Citadel/Citadel.tscn").Instantiate<Node2D>();
             Second.Name = "MCSecond"; level.GetNode("Objectives").AddChild(Second); Second.Position = At(28,15);
+            for (int i = 2; i < citadelCount; i++)
+            {
+                Node2D extra = GD.Load<PackedScene>("res://WORLD/OBJECTIVES/Citadel/Citadel.tscn").Instantiate<Node2D>();
+                extra.Name = "MCExtra" + (i + 1); level.GetNode("Objectives").AddChild(extra); extra.Position = At(32 + (i - 2) * 4, 7);
+                foreach (Node2D point in extra.GetNode("ApproachPoints").GetChildren()) point.Position = At(27, i % 2 == 0 ? 8 : 16) - extra.Position;
+            }
             foreach (var pair in new[] { (First, At(27,8)), (Second, At(27,16)) })
                 foreach (Node2D point in pair.Item1.GetNode("ApproachPoints").GetChildren()) point.Position = pair.Item2 - pair.Item1.Position;
             // Explicit authored order also proves the legacy path still works when the array is empty elsewhere.

@@ -11,3 +11,8 @@ MC3 remains open: multiple HP bars/labels, destination-aware F3 visualization, b
 Connected-component regression: the same assigned Citadel has valid approaches on both sides of a proposed disconnection. A mandatory checkpoint on the other side cannot be treated as reachable just because a different approach is reachable. Placement rejects it, and an out-of-band blocker causes source/radius validation to refuse spawn. Component maps are computed once per radius/revision or placement proposal, then shared across sources and live enemies.
 
 Final validation: .NET SDK build passed with zero warnings/errors. MultiCitadelChecks, CheckpointChecks, DeathSpawnChecks, ResultsChecks, PlacementHudChecks, CompactInspectorChecks, StasisTowerChecks and ShieldTargetingChecks passed with no gameplay-runner ERROR lines. In the concurrent eight-runner batch the new fixture measured 6.56 ms setup and 148.9 ms total 500-enemy spawn/drain (host contention), still six initial selection queries and zero per-spawn comparisons. Earlier isolated runs were faster as listed above.
+
+
+## MC3 follow-up
+
+The previous primary-only HUD/F3 limitation is resolved by MC3. See TESTS/UI/MultiCitadelHud.md for horizontal one/two/four-objective HUD checks, actual assigned preview endpoints, cancellation/isolation and remaining desktop-review limits. The shared fixture now accepts an optional objective count for UI tests; normal MC1/MC2 checks still use two Citadels and three sources.

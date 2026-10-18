@@ -7,7 +7,9 @@ using System.Linq;
 
 public sealed class RoutePreviewJob
 {
+    #region Captured Inputs
     public sealed record Result(int Sample, int Profile, Vector2[] Points, float Length, int DuplicateOf, Vector2? CheckpointEntry = null, Vector2[] CheckpointEntries = null, string[] CheckpointNames = null);
+    public CitadelDestination Destination { get; }
     public readonly List<Result> Results = new();
     public Vector2[] Neutral { get; private set; } = Array.Empty<Vector2>();
     public float NeutralLength { get; private set; }
@@ -32,7 +34,7 @@ public sealed class RoutePreviewJob
     private readonly List<Vector2> _prefix = new(), _entries = new();
     private readonly List<string> _names = new();
     public bool HasBranches => _network?.HasBranches == true;
-    public bool NetworkUnchanged => _network == null || _network.Unchanged();
+    public bool NetworkUnchanged => (Destination == null || Destination.Available) && (_network == null || _network.Unchanged());
     private bool _searchingCheckpoint, _checkpointFailed;
     private Vector2 _legStart;
     public RouteCheckpoint Checkpoint => _checkpoint;
@@ -43,14 +45,15 @@ public sealed class RoutePreviewJob
 
     // =========================================================
     // Capture inputs without duplicating script resources or consuming gameplay assignment streams.
-    public RoutePreviewJob(NavigationGrid nav, EnemyDefinition enemy, Vector2 start, int count, bool refined, RouteCheckpoint checkpoint = null, bool requiresCheckpoint = false)
+    public RoutePreviewJob(NavigationGrid nav, EnemyDefinition enemy, Vector2 start, int count, bool refined, RouteCheckpoint checkpoint = null, bool requiresCheckpoint = false, CitadelDestination destination = null)
     {
+        Destination = destination;
         _checkpoint = checkpoint; _required = requiresCheckpoint || checkpoint != null;
         _network = _required ? CheckpointNetwork.Capture(checkpoint) : null;
         _nav = nav; _config = nav.Config; nav.Refresh(); _start = start; _radius = enemy.RadiusPixels;
         _refined = refined; _offsets = enemy.AllowPathOffsets; _corridors = enemy.AllowCorridorVariation;
         _diversity = enemy.AllowPathDiversity; _count = Mathf.Clamp(count, 1, 50);
-        _goals = nav.Goals.ToArray(); _revision = nav.Revision; _costRevision = nav.CostRevision;
+        _goals = destination != null ? nav.GoalsFor(destination).ToArray() : nav.SingleDestination != null ? nav.Goals.ToArray() : Array.Empty<Vector2I>(); _revision = nav.Revision; _costRevision = nav.CostRevision;
         _settings = SettingsHash(_config); _crowdRevision = nav.CongestionRevision;
         if (!float.IsFinite(_radius) || _radius <= 0 || _radius >= nav.Grid.Config.CellSize * 0.5f)
         { Cancel("Enemy radius does not fit the shared navigation model."); return; }
@@ -66,6 +69,9 @@ public sealed class RoutePreviewJob
         ResetStage();
     }
 
+    #endregion
+
+    #region Budgeted Planning
     // =========================================================
     // Separate debug count/time limits; one native query plus refinement is an indivisible soft-budget item.
     public void Step(int maxCalculations = 1, double maxMilliseconds = 1)
@@ -225,4 +231,5 @@ public sealed class RoutePreviewJob
         h.Add(c.EnableCorridorVariation); h.Add(c.CorridorVariationPercent); h.Add(c.CorridorVariationStrength); h.Add(c.CorridorVariationSpacingCells);
         return h.ToHashCode();
     }
+    #endregion
 }

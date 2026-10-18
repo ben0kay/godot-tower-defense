@@ -31,7 +31,7 @@ public partial class CitadelSession : Node
         Objectives = nav.Destinations.ToArray();
         if (Objectives.Count == 0) throw new System.InvalidOperationException("The active level needs at least one valid Citadel.");
         Health = Objectives[0].Health;
-        Health.HealthChanged += UpdateHud;
+        if (Objectives.Count == 1) Health.HealthChanged += UpdateHud;
         _registry.EnemyArrived += OnEnemyArrived;
         Research = ResearchService.CaptureDeployment();
         foreach (var objective in Objectives)
@@ -39,6 +39,7 @@ public partial class CitadelSession : Node
             objective.Health.Initialize(Research.CitadelMaximum(level.Settings.CitadelMaxHealth));
             objective.Health.Destroyed += OnDestroyed;
         }
+        _hud.BindCitadels(Objectives);
     }
 
     // =========================================================

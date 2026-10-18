@@ -1,0 +1,11 @@
+# MC3 horizontal Citadel HUD and assigned F3 previews
+
+Run `res://TESTS/UI/MultiCitadelHudChecks.tscn` in Godot .NET. Uses the production HUD, CitadelHealth events, model identities, F3 overlay/private route planner and the MC1/MC2 runtime fixture, expanded to optionally author four independent Citadels. Campaign maps/waves are untouched.
+
+Verified: original one-Citadel hierarchy/display remains; two/four cells have equal widths, identical Y positions, contained bars, true center alignment and no overlap with Credits/Wave at 1920×1080, 1366×768 and 960×540. Damage changes only its objective, healthy/critical colors remain independent, zero HP reaches zero fill, max resets publish full new health, and rebinding removes the old row/subscriptions.
+
+F3 checks: three cached source assignments; ALL PORTALS raw/refined production routing to each assigned objective; matching CITADEL 1/2 legend; secondary goal changes cancel cached output; preview creates no enemies, live requests/calculations, live profiles or destination-selection queries. Existing RoutePreviewChecks also passes both gameplay launchers, neutral/raw/refined/duplicate and checkpoint cases, private 16-profile overrides, count/time limits and 50 samples per portal with 500 live enemies. MultiCitadelChecks retains 500-enemy fixed-assignment and cross-objective routing/placement/death/outcome checks.
+
+Final focused validation: SDK/MSBuild compilation; MultiCitadelHudChecks, RoutePreviewChecks, MultiCitadelChecks, CheckpointChecks, ResultsChecks, MissionXPChecks, PlacementHudChecks and CompactInspectorChecks passed with no gameplay-runner ERROR lines. No whole-suite pass claimed. This host intermittently fails dotnet CLI/MSBuild startup process inspection; retrying direct SDK MSBuild works. Headless editor import has the previously recorded GodotTools/MSBuild startup limitation.
+
+Manual review remains: desktop rendered appearance, readability at gameplay zoom, and route/identity colors. Headless checks inspect real Control bounds/state and routing output; they are not rendered screenshots or FPS benchmarks. Extremely high Citadel counts/large HP strings can truncate text; tooltip retains full identity/HP. No vertical wrapping is implemented. Original broad MC3 verification checklist remains available in WORLD/OBJECTIVES/Citadel/README.md.

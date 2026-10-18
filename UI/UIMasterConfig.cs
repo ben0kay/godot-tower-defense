@@ -20,6 +20,8 @@ public partial class UIMasterConfig : Resource
     [ExportGroup("Top Status")]
     [Export] public int StatusFontSize { get; set; } = 16;
     [Export] public int StatusGapPixels { get; set; } = 16;
+    [Export] public int MultiCitadelBlockWidth { get; set; } = 560;
+    [Export] public int CitadelCellGap { get; set; } = 6;
     [Export] public int CitadelBlockWidth { get; set; } = 280;
     [Export] public int CitadelBarWidth { get; set; } = 220;
     [Export] public int CitadelBarHeight { get; set; } = 5;

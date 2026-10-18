@@ -59,6 +59,7 @@ public partial class GameplayHUD : Control
     private ProgressBar _workBar;
     private Label _workStatus, _workTime;
     private Label _rankLabel, _experienceText, _rankBonuses;
+    private CitadelHudRow _citadelRow;
     private Tween _citadelBarTween, _citadelFlashTween, _wavePulseTween;
     private int _targetCredits, _previousCitadelHealth = -1, _previousCitadelMax, _previousWave;
     private double _displayCredits, _creditStart, _creditElapsed;
@@ -662,6 +663,18 @@ public partial class GameplayHUD : Control
     }
 
     // =========================================================
+    // Multi-objective presentation has one horizontal row; legacy single-Citadel nodes/APIs remain intact.
+    public void BindCitadels(System.Collections.Generic.IReadOnlyList<CitadelDestination> objectives)
+    {
+        if (_citadelRow != null) { _citadelRow.Free(); _citadelRow = null; }
+        _topBar.GetNode<Control>("Status/Citadel").Visible = objectives.Count <= 1;
+        if (objectives.Count <= 1) { LayoutStatus(); return; }
+        _citadelRow = new CitadelHudRow { Name = "CitadelRow" };
+        _topBar.GetNode("Status").AddChild(_citadelRow); _citadelRow.Configure(Config, objectives);
+        _topBar.GetNode<Control>("Status/Citadel").Hide(); LayoutStatus();
+    }
+
+    // =========================================================
     // Preserve existing callers while naming the physical objective correctly.
     public void SetCoreHealth(int current, int maximum) => SetCitadelHealth(current, maximum);
 
@@ -758,7 +771,7 @@ public partial class GameplayHUD : Control
         Control status = _topBar.GetNode<Control>("Status");
         float width = status.Size.X, height = status.Size.Y;
         float margin = Mathf.Min(Config.EdgeMargin, width * 0.05f);
-        float centerWidth = Mathf.Min(Config.CitadelBlockWidth, width * 0.46f);
+        float centerWidth = Mathf.Min(_citadelRow == null ? Config.CitadelBlockWidth : Config.MultiCitadelBlockWidth, width * 0.46f);
         float sideWidth = Mathf.Max(0f, (width - centerWidth) * 0.5f - margin - Config.StatusGapPixels);
         _credits.Position = new Vector2(margin, 0); _credits.Size = new Vector2(sideWidth, height);
         _wave.Position = new Vector2(width - margin - sideWidth, 0); _wave.Size = new Vector2(sideWidth, height);
@@ -766,6 +779,7 @@ public partial class GameplayHUD : Control
         Control center = status.GetNode<Control>("Citadel");
         center.Position = new Vector2((width - centerWidth) * 0.5f, 0);
         center.Size = new Vector2(centerWidth, height);
+        if (_citadelRow != null) { _citadelRow.Position = center.Position; _citadelRow.Size = center.Size; }
         int fontSize = Mathf.Clamp((int)(Config.StatusFontSize * Mathf.Min(1f, width / 900f)), 10, Config.StatusFontSize);
         foreach (Label label in new[] { _credits, _core, _wave }) label.AddThemeFontSizeOverride("font_size", fontSize);
         _creditGain.AddThemeFontSizeOverride("font_size", Mathf.Max(10, fontSize - 2));
@@ -844,3 +858,4 @@ public partial class GameplayHUD : Control
 
     #endregion
 }
+

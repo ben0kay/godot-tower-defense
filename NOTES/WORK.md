@@ -1,4 +1,18 @@
-## MC1 + MC2 — implemented 2026-10-18; MC3 remains pending
+## MC3 HUD + F3 — implemented 2026-10-18
+
+Multiple Citadels now share **one horizontal row** in the top-center HUD: equal-width cells for two, four or more objectives, never stacked vertically. A one-Citadel level keeps the original nodes/layout/SetCitadelHealth behavior. Each multi meter shows its stable CITADEL number, independent current/max HP, threshold-colored fill and damage-only animation/flash. Zero values and maximum resets are supported; rebind/unload disconnect model events and stop old tweens. The full Citadel number/HP is available in each cell's tooltip. No HUD health polling or gameplay authority is introduced.
+
+UIMasterConfig exposes MultiCitadelBlockWidth (560 default) and CitadelCellGap (6), alongside existing bar height/palette/timing settings. The center remains viewport-centered and capped to the existing responsive center zone (46% of width); Credits and Wave retain separate side zones. Short cells truncate text rather than wrap into extra rows. Very large counts/HP values can require the tooltip for full text. Existing Inspector/build tray geometry is unchanged.
+
+F3 now passes each portal's **actual cached live Citadel identity** into RoutePreviewJob. Raw/refined paths, neutral comparisons and required checkpoint chains end at that assigned objective, not the primary Citadel. Legend/source labels show portal → CITADEL N; destination approach markers and one label per objective use the same stable identity colors/numbers as the HUD. ALL PORTALS keeps the existing shared preview query/time budget and private profile pool. Missing assignments appear as UNASSIGNED diagnostics with no invented fallback route. All destination goals/availability and cached assignments participate in invalidation, including secondary objectives. Closing/Clear releases private preview resources only.
+
+Explicit TerrainRebuilt now refreshes source assignments during the authoring rebuild itself, so F3 reads current cached ownership without triggering a live assignment calculation. Ordinary tower occupancy still cannot reassign portals, and preview settings/simulation never spawn enemies or alter live route queues/profile pools/random streams.
+
+Validation: compiled with the installed .NET SDK/MSBuild; MultiCitadelHudChecks passed one/two/four objective presentation at 1920×1080, 1366×768 and 960×540, independent HP/colors/zero/maximum reset, rebind, actual assigned F3 endpoints, secondary-goal invalidation and live-state isolation. Existing RoutePreviewChecks (both maps/raw/refined/checkpoints/50 samples/500 enemies), MultiCitadelChecks, CheckpointChecks, ResultsChecks, MissionXPChecks, PlacementHudChecks and CompactInspectorChecks passed. See TESTS/UI/MultiCitadelHud.md. Desktop rendered appearance/playfeel still needs user review; headless geometry checks are not a screenshot or full-suite/FPS claim. Existing gameplay maps/waves were not changed. This amendment supersedes earlier MC3-pending/primary-only-preview statements without deleting the original pass plan.
+
+---
+
+## MC1 + MC2 — implemented 2026-10-18; MC3 HUD/F3 now implemented; desktop review pending
 
 Multiple independently damageable Citadels now have stable session destination objects. LevelConfig exposes ordered CitadelPaths; an empty array preserves CitadelPath. Actual additional Health/ApproachPoints Citadels are discovered in authored child order so a second objective is not silently ignored. WorldGrid reserves all physical footprints/approaches. All objectives currently share the level's authored CitadelMaxHealth, but own separate health state; the existing deployment research percentage initializes each one. Changing/adding the Citadel roster requires restarting the level. Geometry/terrain rebuilds can refresh goals and assignments for future spawns; already spawned enemies and released children keep their original identities. Removing an assigned objective retires it: enemies stop, stale distance scores become unavailable, and there is no redirect to another objective.
 
@@ -14,13 +28,13 @@ See TESTS/Navigation/MultiCitadel.md for executed checks, measured setup/batch b
 
 ---
 
-## Multiple Citadels per level — MC1/MC2 implemented; MC3 pending
+## Multiple Citadels per level — MC1/MC2 and MC3 HUD/F3 implemented; desktop review pending
 
-**Detailed implementation specification:** [`WORLD/OBJECTIVES/Citadel/README.md`](../WORLD/OBJECTIVES/Citadel/README.md#planned--mc1mc3-multiple-citadels-with-fixed-portal-destinations). **MC1/MC2 implemented with headless integration tests. MC3 HUD/F3 and desktop visual checks remain pending.**
+**Detailed implementation specification:** [`WORLD/OBJECTIVES/Citadel/README.md`](../WORLD/OBJECTIVES/Citadel/README.md#planned--mc1mc3-multiple-citadels-with-fixed-portal-destinations). **MC1/MC2 and MC3 HUD/F3 implemented with headless integration tests. Desktop visual review remains pending.**
 
 - [x] **MC1:** Add multiple per-level Citadel goals/HP and cached neutral **shortest navigable path** assignments **per portal → one Citadel**, resolved at level setup. Enemy destination is fixed at spawn; no per-enemy Citadel selection, no per-Citadel AStar grid, no target switching on blockage. Existing single-Citadel levels must stay compatible. Decide and test checkpoint-branch, size-clearance and map-edge policies; Transporter children inherit target.
 - [x] **MC2:** Extend path/repath/checkpoint and tower-placement connectivity to the **assigned** Citadel; keep corridor diversity/offsets and existing First/Last = smallest/largest `RemainingJourneyDistance` to **each enemy's own target** across Citadels. One destroyed Citadel triggers single mission defeat in initial design.
-- [ ] **MC3:** Independent Citadel HP/HUD, F3 portal→Citadel display, new two-Citadel test fixture, regression coverage (single Citadel, portals/checkpoints/DeathSpawn, building, waves, First/Last, Results/research, 500+ enemies) and Godot headless/F5 verification. Do not change current maps/waves until authored separately.
+- [x] **MC3 HUD/F3 implementation:** Independent Citadel HP/HUD, F3 portal→Citadel display, new two-Citadel test fixture, regression coverage (single Citadel, portals/checkpoints/DeathSpawn, building, waves, First/Last, Results/research, 500+ enemies) and Godot headless/F5 verification. Do not change current maps/waves until authored separately.
 
 ---
 

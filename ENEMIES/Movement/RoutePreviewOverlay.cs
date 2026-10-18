@@ -16,7 +16,8 @@ public partial class RoutePreviewOverlay : Node2D
     private NavigationGrid _nav, _previewNav;
     private EnemyMasterConfig _previewSettings;
     public IReadOnlyList<RoutePreviewJob> PortalJobs => _plans.Select(p => p.Job).ToArray();
-    private sealed record Plan(string Portal, Vector2 Start, RoutePreviewJob Job, int ColorIndex);
+    private sealed record Plan(string Portal, Vector2 Start, RoutePreviewJob Job, int ColorIndex, CitadelDestination Destination)
+    { public string DestinationLabel => Destination?.Available == true ? Destination.DisplayName : "UNASSIGNED"; }
     private readonly List<Plan> _plans = new();
     private int _planIndex;
     private CheckButton _diversity;
@@ -173,9 +174,11 @@ public partial class RoutePreviewOverlay : Node2D
         {
             Vector2 start = _exits[index].GlobalPosition;
             EnemyPortal portal = _exits[index].GetParent() as EnemyPortal;
+            CitadelDestination destination = _spawns.CitadelAssignments.For(_exits[index].GetParent() as Node2D);
             RoutePreviewJob job = new(_previewNav, _definitions[_enemies.Selected], start, (int)_count.Value, _mode.Selected == 0,
-                portal?.ResolveCheckpoint(), portal?.RequiresCheckpoint == true);
-            _plans.Add(new(_portals.GetItemText(index), start, job, index));
+                portal?.ResolveCheckpoint(), portal?.RequiresCheckpoint == true, destination);
+            if (destination?.Available != true) job.Cancel("Portal has no valid cached Citadel assignment. Check level setup.");
+            _plans.Add(new(_portals.GetItemText(index), start, job, index, destination));
         }
         _planIndex = 0; Job = _plans[0].Job;
         _inputStamp = InputStamp(); UpdateLegend(); QueueRedraw();
@@ -205,10 +208,12 @@ public partial class RoutePreviewOverlay : Node2D
         h.Add(RoutePreviewJob.SettingsHash(_previewSettings));
         h.Add(_nav.Grid.Level.Settings.SpawnMode);
         foreach (NodePath path in _nav.Grid.Level.Settings.ActivePortals) h.Add(path.ToString());
-        foreach (Vector2I goal in _nav.Goals) h.Add(goal);
+        foreach (var destination in _nav.Destinations)
+        { h.Add(destination.Id); h.Add(destination.Available); foreach (var goal in destination.Goals) h.Add(goal); }
         foreach (Marker2D exit in _exits)
         {
             h.Add(GodotObject.IsInstanceValid(exit) ? exit.GlobalPosition : Vector2.Inf);
+            if (GodotObject.IsInstanceValid(exit)) h.Add(_spawns.CitadelAssignments.For(exit.GetParent() as Node2D)?.Id);
             if (GodotObject.IsInstanceValid(exit) && exit.GetParent() is EnemyPortal portal)
             { h.Add(portal.CheckpointPath.ToString()); RouteCheckpoint checkpoint = portal.ResolveCheckpoint();
                 if (GodotObject.IsInstanceValid(checkpoint)) h.Add(checkpoint.GeometryStamp); }
@@ -244,8 +249,8 @@ public partial class RoutePreviewOverlay : Node2D
             RoutePreviewJob job = plan.Job;
             int unique = job.Results.Count(r => r.DuplicateOf == 0);
             string portalColor = PortalColor(plan.ColorIndex).ToHtml(false);
-            text.AppendLine($"[color=#{portalColor}]{plan.Portal} · {job.Results.Count}/{(int)_count.Value} paths · {unique} unique · {job.Failed} failed[/color]");
-            if (job.RequiresCheckpoint) text.AppendLine("Required checkpoint chain → Citadel");
+            text.AppendLine($"[color=#{portalColor}]{plan.Portal} → {plan.DestinationLabel} · {job.Results.Count}/{(int)_count.Value} paths · {unique} unique · {job.Failed} failed[/color]");
+            if (job.RequiresCheckpoint) text.AppendLine($"Required checkpoint chain → {plan.DestinationLabel}");
             if (job.HasBranches) text.AppendLine("Branch choices vary by sample; distances are not compared across different chains.");
             if (job.Neutral.Length > 0) text.AppendLine($"{(job.HasBranches ? "Neutral example chain" : job.RequiresCheckpoint ? "Neutral staged baseline" : "Neutral shortest")}: {job.NeutralLength:0} px");
             if (job.Results.Count == 0) text.AppendLine(job.Message);
@@ -257,7 +262,7 @@ public partial class RoutePreviewOverlay : Node2D
                 text.AppendLine($"[color=#{SampleColor(plan.ColorIndex, r.Sample).ToHtml(false)}]#{r.Sample} · {(r.Profile < 0 ? "neutral" : "profile " + r.Profile)} · {r.Length:0}px{extra}{duplicate}{chain}[/color]");
             }
         }
-        text.Append("Portal SpawnExit → Citadel. Spawn spread/timing not simulated.");
+        text.Append("Portal SpawnExit → cached assigned Citadel. Spawn spread/timing not simulated.");
         _legend.Text = text.ToString();
     }
     #endregion
@@ -276,12 +281,16 @@ public partial class RoutePreviewOverlay : Node2D
                 if (result.CheckpointEntries != null)
                     foreach (Vector2 entry in result.CheckpointEntries) DrawCircle(ToLocal(entry), 4, PortalColor(plan.ColorIndex));
             DrawCircle(ToLocal(plan.Start), 7, PortalColor(plan.ColorIndex));
-            DrawString(ThemeDB.FallbackFont, ToLocal(plan.Start) + new Vector2(10, -10), plan.Portal, fontSize: 16);
+            DrawString(ThemeDB.FallbackFont, ToLocal(plan.Start) + new Vector2(10, -10), $"{plan.Portal} → {plan.DestinationLabel}", fontSize: 16);
         }
-        foreach (Vector2I goal in _nav.Goals)
+        foreach (var destination in _nav.Destinations)
         {
-            Vector2 point = ToLocal(_nav.Grid.CellToWorldCenter(goal)); DrawCircle(point, 6, Colors.White);
-            DrawString(ThemeDB.FallbackFont, point + new Vector2(10, -10), "CITADEL", fontSize: 16);
+            if (!destination.Available) continue;
+            Vector2 center = Vector2.Zero;
+            foreach (Vector2I goal in destination.Goals)
+            { Vector2 point = ToLocal(_nav.Grid.CellToWorldCenter(goal)); center += point; DrawCircle(point, 6, destination.DisplayColor); }
+            center = destination.Goals.Count > 0 ? center / destination.Goals.Count : ToLocal(destination.Root.GlobalPosition);
+            DrawString(ThemeDB.FallbackFont, center + new Vector2(10, -10), destination.DisplayName, fontSize: 16, modulate: destination.DisplayColor);
         }
     }
     // =========================================================

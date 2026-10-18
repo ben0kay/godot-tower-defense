@@ -41,3 +41,8 @@ WaveManager now claims authored enemies from WaveEnemyCreated before Initialize,
 ## Fixed Citadel ownership — MC1/MC2
 
 SpawnManager owns PortalCitadelAssignments. It resolves source destinations at setup/explicit TerrainRebuilt only; ordinary occupancy revisions invalidate source/radius reachability without reassigning sources. Single objective bypasses comparisons. Debug/wave spawns pass AssignedCitadel into Enemy.Initialize; unknown/unreachable multi-objective sources refuse spawn. Multi-Citadel edge mode is disabled. See WORLD/OBJECTIVES/Citadel/README.md for neutral, checkpoint and clearance policies.
+
+
+## MC3 authoring-rebuild timing
+
+TerrainRebuilt now completes RefreshSources immediately when the spawning service is ready. This is the explicit authoring rebuild path already allowed to recompute assignments; it keeps F3's read of cached destinations current before another spawn. Initial setup and ordinary occupancy behavior are unchanged. F3 itself never calls RefreshSources or chooses a destination.

@@ -1,4 +1,18 @@
-## MC1 + MC2 — implemented 2026-10-18; MC3 remains pending
+## MC3 HUD + F3 — implemented 2026-10-18
+
+Multiple Citadels now share **one horizontal row** in the top-center HUD: equal-width cells for two, four or more objectives, never stacked vertically. A one-Citadel level keeps the original nodes/layout/SetCitadelHealth behavior. Each multi meter shows its stable CITADEL number, independent current/max HP, threshold-colored fill and damage-only animation/flash. Zero values and maximum resets are supported; rebind/unload disconnect model events and stop old tweens. The full Citadel number/HP is available in each cell's tooltip. No HUD health polling or gameplay authority is introduced.
+
+UIMasterConfig exposes MultiCitadelBlockWidth (560 default) and CitadelCellGap (6), alongside existing bar height/palette/timing settings. The center remains viewport-centered and capped to the existing responsive center zone (46% of width); Credits and Wave retain separate side zones. Short cells truncate text rather than wrap into extra rows. Very large counts/HP values can require the tooltip for full text. Existing Inspector/build tray geometry is unchanged.
+
+F3 now passes each portal's **actual cached live Citadel identity** into RoutePreviewJob. Raw/refined paths, neutral comparisons and required checkpoint chains end at that assigned objective, not the primary Citadel. Legend/source labels show portal → CITADEL N; destination approach markers and one label per objective use the same stable identity colors/numbers as the HUD. ALL PORTALS keeps the existing shared preview query/time budget and private profile pool. Missing assignments appear as UNASSIGNED diagnostics with no invented fallback route. All destination goals/availability and cached assignments participate in invalidation, including secondary objectives. Closing/Clear releases private preview resources only.
+
+Explicit TerrainRebuilt now refreshes source assignments during the authoring rebuild itself, so F3 reads current cached ownership without triggering a live assignment calculation. Ordinary tower occupancy still cannot reassign portals, and preview settings/simulation never spawn enemies or alter live route queues/profile pools/random streams.
+
+Validation: compiled with the installed .NET SDK/MSBuild; MultiCitadelHudChecks passed one/two/four objective presentation at 1920×1080, 1366×768 and 960×540, independent HP/colors/zero/maximum reset, rebind, actual assigned F3 endpoints, secondary-goal invalidation and live-state isolation. Existing RoutePreviewChecks (both maps/raw/refined/checkpoints/50 samples/500 enemies), MultiCitadelChecks, CheckpointChecks, ResultsChecks, MissionXPChecks, PlacementHudChecks and CompactInspectorChecks passed. See TESTS/UI/MultiCitadelHud.md. Desktop rendered appearance/playfeel still needs user review; headless geometry checks are not a screenshot or full-suite/FPS claim. Existing gameplay maps/waves were not changed. This amendment supersedes earlier MC3-pending/primary-only-preview statements without deleting the original pass plan.
+
+---
+
+## MC1 + MC2 — implemented 2026-10-18; MC3 HUD/F3 now implemented; desktop review pending
 
 Multiple independently damageable Citadels now have stable session destination objects. LevelConfig exposes ordered CitadelPaths; an empty array preserves CitadelPath. Actual additional Health/ApproachPoints Citadels are discovered in authored child order so a second objective is not silently ignored. WorldGrid reserves all physical footprints/approaches. All objectives currently share the level's authored CitadelMaxHealth, but own separate health state; the existing deployment research percentage initializes each one. Changing/adding the Citadel roster requires restarting the level. Geometry/terrain rebuilds can refresh goals and assignments for future spawns; already spawned enemies and released children keep their original identities. Removing an assigned objective retires it: enemies stop, stale distance scores become unavailable, and there is no redirect to another objective.
 
@@ -36,7 +50,7 @@ The reusable `CitadelSession.cs` is attached to `Main.tscn/CitadelSession`. It r
 
 ## PLANNED — MC1–MC3: Multiple Citadels with fixed portal destinations
 
-**Status: MC1/MC2 implemented; MC3 pending.** The original accepted design brief is retained below; the current policy/verification update at the top is authoritative. Preserve all currently working single-Citadel levels, route/checkpoint features and targeting behavior. Do not treat this section as completed functionality.
+**Status: MC1/MC2 and MC3 HUD/F3 implemented; desktop review pending.** The original accepted design brief is retained below; the current policy/verification update at the top is authoritative. Preserve all currently working single-Citadel levels, route/checkpoint features and targeting behavior. Do not treat this section as completed functionality.
 
 ### Core gameplay contract
 
@@ -88,9 +102,9 @@ A level can contain **two or more independently damageable Citadels**. Each regi
 
 ### MC3 — HUD, authoring preview and verification
 
-- [ ] Update the HUD to display **each Citadel's HP** with legible labels and adapt to two or more objectives, while preserving the single-Citadel layout and existing profile/research Citadel HP bonus semantics. Define whether the research percentage affects every Citadel (proposed yes), and test it.
-- [ ] F3 Route Preview: show destination assignment per portal (e.g. colored destination routes/labels) alongside existing weighted corridor/path and checkpoint visualization; no extra simulation spawning or gameplay navigation mutation.
-- [ ] Create a **new** two-Citadel test level/fixture; do not move/modify the existing Level001/Level002 Citadel(s) or gameplay waves as a side effect of foundational support.
+- [x] Update the HUD to display **each Citadel's HP** with legible labels and adapt to two or more objectives, while preserving the single-Citadel layout and existing profile/research Citadel HP bonus semantics. Define whether the research percentage affects every Citadel (proposed yes), and test it.
+- [x] F3 Route Preview: show destination assignment per portal (e.g. colored destination routes/labels) alongside existing weighted corridor/path and checkpoint visualization; no extra simulation spawning or gameplay navigation mutation.
+- [x] Create a **new** two-Citadel test level/fixture; do not move/modify the existing Level001/Level002 Citadel(s) or gameplay waves as a side effect of foundational support.
 - [ ] Regression coverage: single-Citadel backward compatibility; one/two/three portal assignments; equal-cost tie; blocked/no valid destination; multiple approach points; neutral shortest navigable-vs-Euclidean selection; checkpoint chains and deterministic branching; portal/edge sources; shielded/unshielded enemies; Transporter children; F2 and wave spawns; dynamic tower placements; occupied/narrow corridors; per-Citadel arrival and destruction; cross-Citadel First/Last; HUD/research/Results; unload/restart/reload and performance with 500+ enemies.
 - [ ] Headless Godot .NET tests plus F5 visual inspection. Record actual passes/failures and measured path setup/runtime overhead in \`TESTS/\`; do not claim these checks completed before execution.
 
