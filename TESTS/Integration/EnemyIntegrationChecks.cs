@@ -52,6 +52,7 @@ public partial class EnemyIntegrationChecks : Node
             AmmoFoundationChecks.Run();
             TowerStatChecks.Run(_battle);
             await TowerUpgradeChecks.Run(_battle);
+            TerrainEdgeFoundationChecks.Run();
             TerrainCategoryChecks.Run(_grid);
             InteractiveTerrainChecks.Run(_battle, _spawns, _grid);
             PortalSpawnChecks.Run(_grid, _spawns);

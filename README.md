@@ -1,3 +1,9 @@
+## Terrain Edges scaffold — opt-in visual foundation (2026-10-18)
+
+`WORLD/TERRAIN/Edges/` now defines editable edge-style resources, Mars material mappings, an on-demand material cache and a pure 8-neighbour mask. This is a foundation for Codex, **not live corner smoothing**: renderer draws nothing; existing levels and artwork are unchanged. See [the Codex handoff](WORLD/TERRAIN/Edges/IMPLEMENTATION_PLAN.md).
+
+---
+
 ## Playable Level002 tutorial — 2026-10-18
 
 Campaign now offers Level001, the newly painted **Level002** (four gentle unshielded waves), and preserved Level020. Open `MainLevel002.tscn` for direct F6 play. Level001 Next advances to002; no level skips to020. See `LEVELS/Level002/README.md` for exact composition/settings. Earlier unfinished-Level002 notes below are historical.

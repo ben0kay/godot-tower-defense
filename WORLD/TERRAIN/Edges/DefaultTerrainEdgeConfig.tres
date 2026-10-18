@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="TerrainEdgeMasterConfig" load_steps=4 format=3]
+[ext_resource type="Script" path="res://WORLD/TERRAIN/Edges/TerrainEdgeMasterConfig.cs" id="1"]
+[ext_resource type="Resource" path="res://WORLD/TERRAIN/Edges/Profiles/MarsDustEdge.tres" id="2"]
+[ext_resource type="Resource" path="res://WORLD/TERRAIN/Edges/Profiles/MarsRockEdge.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+Enabled = false
+VariationSeed = 1337
+Profiles = Array[Resource]([ExtResource("2"), ExtResource("3")])

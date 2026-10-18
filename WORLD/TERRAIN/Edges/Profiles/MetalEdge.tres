@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TerrainEdgeProfile" load_steps=2 format=3]
+[ext_resource type="Script" path="res://WORLD/TERRAIN/Edges/TerrainEdgeProfile.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+MaterialId = "metal_floor"
+Layer = 0
+SourceId = 1
+AtlasCells = Array[Vector2i]([Vector2i(2, 0), Vector2i(3, 0)])
+Shape = 2
+CornerSoftness = 0.0
+Irregularity = 0.0
+Variation = 0.0
+EdgeTint = Color(0.35, 0.57, 0.68, 1)

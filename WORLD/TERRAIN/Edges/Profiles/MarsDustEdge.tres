@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TerrainEdgeProfile" load_steps=2 format=3]
+[ext_resource type="Script" path="res://WORLD/TERRAIN/Edges/TerrainEdgeProfile.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+MaterialId = "mars_dust"
+Layer = 0
+SourceId = 2
+AtlasCells = Array[Vector2i]([Vector2i(0, 0)])
+Shape = 0
+CornerSoftness = 0.7
+Irregularity = 0.3
+Variation = 0.25
+EdgeTint = Color(0.88, 0.60, 0.37, 1)

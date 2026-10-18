@@ -1,3 +1,9 @@
+## Terrain Edges scaffold (2026-10-18)
+
+`Edges/` now contains dormant, Inspector-editable material profiles, an eight-neighbour mask helper, an explicit `TerrainRebuilt`-based material cache controller, and a renderer hook. **Nothing draws or attaches yet**; all edge visuals and the current Mars SVG bleed fix are pending. Start with [Edges README](Edges/README.md) and give Codex the [phased implementation plan](Edges/IMPLEMENTATION_PLAN.md). No changes to the grid/navigation/TileSet metadata or existing map art.
+
+---
+
 ## Mars terrain tiles (2026-10-18)
 
 The new `Tiles/Mars/mars_ground_atlas.svg` adds **bright walkable/nonbuildable dust** and **dark impassable/nonbuildable rock** via source2 in the existing Passable/Impassable palettes. Artwork is a separate expandable 64px-cell vector atlas, not a replacement for any metal/old desert tiles. Nothing is painted into levels automatically; see `TileSets/README.md` and `Tiles/Mars/README.md`.

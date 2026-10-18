@@ -14,3 +14,7 @@ Paint **dust on Terrain/Passable**, not on the cosmetic-only Decorations layer, 
 Expand the vector atlas in whole 64px cells (e.g. width192 for a third variant) and add a new `N:0/0 = 0` entry under the corresponding `TileSetAtlasSource` in the category palette, with gameplay metadata on that tile. If you need many variants, add another row of 64px cells (adjust SVG height) or a dedicated source for each Mars material family. Retain old source IDs and coordinates; **do not renumber 0/1/2** or change previously painted tiles. Every variation can remain independently playable/buildable based on its TileData, without any WorldGrid or pathfinding changes.
 
 These are two initial hand-authored tiles, not automatic terrain transitions or procedural tile picking. Future auto-tiling, transitions, noise variants, and biomes may be added separately; editing the SVG alone does not add new palette cells.
+
+## Edge styling (planned, not enabled)
+
+The optional profile resources `../../Edges/Profiles/MarsDustEdge.tres` and `MarsRockEdge.tres` declare visual materials for later organic transitions. `../../Edges/DefaultTerrainEdgeConfig.tres` stays disabled and no scene uses the renderer yet. The known dust/rock SVG overflow and visible tiling bands are **not fixed by the scaffold**: see [Edges/IMPLEMENTATION_PLAN.md](../../Edges/IMPLEMENTATION_PLAN.md), E1 then E2. Gameplay flags and existing painted coordinates remain authoritative.

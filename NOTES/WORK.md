@@ -1,3 +1,13 @@
+## Terrain Edges visual system — scaffold complete; Codex rendering pending (2026-10-18)
+
+- [x] Add `WORLD/TERRAIN/Edges/` material/config resources, default-disabled controller/renderer hooks, pure neighbour masks, source2 Mars profiles and integration test foundation.
+- [ ] **E1:** Correct Mars atlas cross-cell rock overflow, dark vertical slit artifacts and repeating dirt bands (art only).
+- [ ] **E2:** Implement actual masked/organic Mars Dust outer and inner corners, one world-scoped opt-in cached renderer and visual/performance tests. Original opaque square tile pixels **must be masked or replaced**, not merely outlined.
+- [ ] **E3:** Extend jagged rock, metal and mixed-material transitions; add variants without changing gameplay metadata or established source IDs.
+- Codex specification: [Terrain Edges implementation plan](../WORLD/TERRAIN/Edges/IMPLEMENTATION_PLAN.md). Do not mark E1–E3 complete until tested in Godot.
+
+---
+
 ## Shared Credits production + Citadel collection + ARG — CP1–CP3 (PLANNED, Codex)
 
 ### CP1 input/UI addition — 2026-10-18 (PLANNED, Codex)
