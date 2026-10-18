@@ -1,6 +1,21 @@
-# Credit producers — shared mechanic (CP1A BACKEND; CP1B–CP3 PLANNED)
+# Credit producers — shared mechanic (CP1A + CP1B CODE; CP2–CP3 PLANNED)
 
-**Status:** CP1A backend code is implemented; runtime verification pending. World/HUD collection (CP1B), Adaptable Resource Generator (CP2) and passive Resource Tower/research (CP3) are NOT implemented. This is a reusable economy mechanic for (1) click-to-collect Citadel income and (2) the **Adaptable Resource Generator** (ARG), with an easy path for the existing planned passive **Resource Tower / Resource Generator**. Do not silently change existing gameplay when implementing.
+**Status:** CP1A and CP1B are implemented in code; .NET/Godot headless and desktop verification pending. Adaptable Resource Generator (CP2) and passive Resource Tower/research (CP3) remain NOT implemented. This is a reusable economy mechanic for (1) click-to-collect Citadel income and (2) the **Adaptable Resource Generator** (ARG), with an easy path for the existing planned passive **Resource Tower / Resource Generator**. Do not silently change existing gameplay when implementing.
+
+## CP1B — World + HUD Citadel Credit collection (code implemented 2026-10-18; runtime review pending)
+
+CP1B now exposes the same session-owned `CreditBuffer` in **two clickable places per Citadel**: the physical 3×3 Citadel footprint and that objective's top-centre health panel. Neither surface stores/spends Credits itself; both call `CitadelSession.TryCollectCredits(CitadelDestination)`. Collection is independent per objective, permitted between waves with accumulated Credits, and rejects empty/retired/destroyed/paused/outcome-locked states or full wallet without draining the buffer. It reuses `EconomyManager.Grant` and its existing gain popup; no second reward path exists.
+
+- **World:** `TowerPlacementController.HandleWorldClick` checks the authored `WorldObjectFootprint` only when not placing a tower; matched clicks are consumed before tower inspection. Per-Citadel `CitadelCreditDisplay` is a lightweight, mouse-transparent green text/bar beneath each physical Citadel, driven by that buffer's `Changed` event.
+- **Single objective:** `GameplayHUD` keeps `TopBar/Status/Citadel/Health` and `Bar` unchanged, adds `Credits` and `CreditBar` children under the existing center cell and connects its click/focus handler to the active Citadel.
+- **Multiple objectives:** `CitadelHudRow` keeps equal-width horizontally arranged cells with the original HP bar/tween; each cell additionally shows a green `Credits` label and `CreditBar` and independently handles left click/keyboard collect. Existing center/side zones and wave controls are not relocated. The top-centre HUD can collect from offscreen Citadels; per-buffer signals update only the corresponding visuals, without polling.
+- Both world and HUD representations show the same values as each other immediately after production or collection. Rebinding/unloading disconnects per-buffer listeners and input callbacks; no leaking references or per-Citadel production nodes were added.
+- Regression runner `TESTS/UI/CitadelCollectionChecks.tscn` is authored for actual Main and two/four-Citadel fixtures: world collection, HUD collection, independent balances, rejected wallet cap, one-time payout, empty click, rebind and world/HUD model visual synchronization.
+- **Verification pending:** C# compile, Godot headless runner and desktop visual/input test, especially 960px widths and overlap with other HUD controls. These have **not** been executed here. CP1A's existing backend regression also still needs execution. If test/UI review finds issues, fix before declaring CP1B verified.
+
+**Still planned:** CP2 Adaptable Resource Generator; CP3 passive Resource Tower/research. Historical source values and CP1 foundation details remain below.
+
+---
 
 ## CP1A credit buffers and Citadel production — implemented in code 2026-10-18
 

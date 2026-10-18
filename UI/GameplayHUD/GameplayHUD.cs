@@ -60,6 +60,11 @@ public partial class GameplayHUD : Control
     private Label _workStatus, _workTime;
     private Label _rankLabel, _experienceText, _rankBonuses;
     private CitadelHudRow _citadelRow;
+    private CitadelSession _creditSession;
+    private CitadelDestination _singleDestination;
+    private CreditBuffer _singleBuffer;
+    private Label _singleCredits;
+    private ProgressBar _singleCreditBar;
     private Tween _citadelBarTween, _citadelFlashTween, _wavePulseTween;
     private int _targetCredits, _previousCitadelHealth = -1, _previousCitadelMax, _previousWave;
     private double _displayCredits, _creditStart, _creditElapsed;
@@ -128,6 +133,7 @@ public partial class GameplayHUD : Control
         _startWave = GetNode<Button>("TopBar/Status/StartWave");
         _startWave.Pressed += () => EmitSignal(SignalName.WaveStartRequested);
         _healthBar = GetNode<ProgressBar>("TopBar/Status/Citadel/Bar");
+        SetupSingleCitadelCredits();
         _topBar.GetNode<Control>("Status").Resized += LayoutStatus;
         _upgradeInfo = GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeInfo");
         _upgradeButton = GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeButton");
@@ -149,6 +155,7 @@ public partial class GameplayHUD : Control
     public override void _ExitTree()
     {
         if (GodotObject.IsInstanceValid(_input)) _input.Unbind(this);
+        if (_singleBuffer != null) _singleBuffer.Changed -= UpdateSingleCredits;
     }
 
     // =========================================================
@@ -663,15 +670,58 @@ public partial class GameplayHUD : Control
     }
 
     // =========================================================
-    // Multi-objective presentation has one horizontal row; legacy single-Citadel nodes/APIs remain intact.
-    public void BindCitadels(System.Collections.Generic.IReadOnlyList<CitadelDestination> objectives)
+    // Build a small green storage meter below the existing single-Citadel HP bar, preserving the old nodes.
+    private void SetupSingleCitadelCredits()
+    {
+        Control center = _topBar.GetNode<Control>("Status/Citadel");
+        center.MouseFilter = MouseFilterEnum.Stop; center.FocusMode = FocusModeEnum.All;
+        center.GuiInput += input =>
+        {
+            if (input is InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: true })
+            { _creditSession?.TryCollectCredits(_singleDestination); center.AcceptEvent(); }
+            else if (input is InputEventKey { Pressed: true, Echo: false } key && key.Keycode is Key.Enter or Key.KpEnter or Key.Space)
+            { _creditSession?.TryCollectCredits(_singleDestination); center.AcceptEvent(); }
+        };
+        _core.AddThemeFontSizeOverride("font_size", 13);
+        _singleCredits = new Label { Name = "Credits", HorizontalAlignment = HorizontalAlignment.Center,
+            TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis, MouseFilter = MouseFilterEnum.Ignore };
+        _singleCredits.AddThemeColorOverride("font_color", Config.CreditRewardColor);
+        _singleCredits.AddThemeFontSizeOverride("font_size", 10); center.AddChild(_singleCredits);
+        _singleCreditBar = new ProgressBar { Name = "CreditBar", ShowPercentage = false,
+            MouseFilter = MouseFilterEnum.Ignore, CustomMinimumSize = new Vector2(0, 3) };
+        _singleCreditBar.AddThemeStyleboxOverride("background", new StyleBoxFlat { BgColor = Config.PanelColor });
+        _singleCreditBar.AddThemeStyleboxOverride("fill", new StyleBoxFlat { BgColor = Config.CreditRewardColor });
+        center.AddChild(_singleCreditBar);
+        UpdateSingleCredits(0, 0);
+    }
+
+    // =========================================================
+    // Reuse the current multi-Citadel row; both HUD configurations collect from the same session buffers.
+    public void BindCitadels(System.Collections.Generic.IReadOnlyList<CitadelDestination> objectives, CitadelSession session = null)
     {
         if (_citadelRow != null) { _citadelRow.Free(); _citadelRow = null; }
+        if (_singleBuffer != null) _singleBuffer.Changed -= UpdateSingleCredits;
+        _creditSession = session ?? _creditSession;
+        _singleDestination = objectives.Count == 1 ? objectives[0] : null;
+        _singleBuffer = _singleDestination == null ? null : _creditSession?.CreditsFor(_singleDestination);
+        if (_singleBuffer != null) _singleBuffer.Changed += UpdateSingleCredits;
+        UpdateSingleCredits(_singleBuffer?.Current ?? 0, _singleBuffer?.Capacity ?? 0);
         _topBar.GetNode<Control>("Status/Citadel").Visible = objectives.Count <= 1;
         if (objectives.Count <= 1) { LayoutStatus(); return; }
         _citadelRow = new CitadelHudRow { Name = "CitadelRow" };
-        _topBar.GetNode("Status").AddChild(_citadelRow); _citadelRow.Configure(Config, objectives);
+        _topBar.GetNode("Status").AddChild(_citadelRow); _citadelRow.Configure(Config, objectives, _creditSession);
         _topBar.GetNode<Control>("Status/Citadel").Hide(); LayoutStatus();
+    }
+
+    // =========================================================
+    // Only this buffer changes the single-Citadel Credits meter and tooltip; the HP display is unchanged.
+    private void UpdateSingleCredits(int current, int capacity)
+    {
+        if (_singleCredits == null || _singleCreditBar == null) return;
+        _singleCredits.Text = $"CREDITS  {current:N0} / {capacity:N0}";
+        _singleCreditBar.Value = capacity > 0 ? 100.0 * current / capacity : 0;
+        Control center = _topBar.GetNode<Control>("Status/Citadel");
+        center.TooltipText = $"Citadel Credits: {current:N0} / {capacity:N0}\nClick to collect from this Citadel";
     }
 
     // =========================================================
@@ -781,7 +831,8 @@ public partial class GameplayHUD : Control
         center.Size = new Vector2(centerWidth, height);
         if (_citadelRow != null) { _citadelRow.Position = center.Position; _citadelRow.Size = center.Size; }
         int fontSize = Mathf.Clamp((int)(Config.StatusFontSize * Mathf.Min(1f, width / 900f)), 10, Config.StatusFontSize);
-        foreach (Label label in new[] { _credits, _core, _wave }) label.AddThemeFontSizeOverride("font_size", fontSize);
+        foreach (Label label in new[] { _credits, _wave }) label.AddThemeFontSizeOverride("font_size", fontSize);
+        _core.AddThemeFontSizeOverride("font_size", Mathf.Max(10, fontSize - 3));
         _creditGain.AddThemeFontSizeOverride("font_size", Mathf.Max(10, fontSize - 2));
         LayoutCreditFeedback();
         float buttonWidth = Mathf.Min(140f, sideWidth);

@@ -33,12 +33,12 @@ public partial class CitadelSession : Node
     }
 
     // =========================================================
-    // CP1B world/HUD click targets will query the same authoritative per-Citadel buffer.
+    // Both physical and HUD Citadel click targets query the same authoritative per-Citadel buffer.
     public CreditBuffer CreditsFor(CitadelDestination destination) =>
         destination != null && _income.TryGetValue(destination, out Income income) ? income.Buffer : null;
 
     // =========================================================
-    // A collect command is available for CP1B; no gameplay input consumes it in CP1A.
+    // World Citadel and its HUD cell collect through the same command; wallet failure preserves storage.
     public bool TryCollectCredits(CitadelDestination destination)
     {
         if (_destroyed || GetTree().Paused || (_levelSession != null && _levelSession.State != LevelSessionState.Playing)
@@ -79,7 +79,12 @@ public partial class CitadelSession : Node
             objective.Health.Destroyed += OnDestroyed;
             _income.Add(objective, new Income(CreditBufferCapacity, CreditsPerCycle, CreditCycleSeconds));
         }
-        _hud.BindCitadels(Objectives);
+        _hud.BindCitadels(Objectives, this);
+        foreach (var objective in Objectives)
+        {
+            var display = new CitadelCreditDisplay { Name = "CreditDisplay", Position = new Vector2(-8, 166), Size = new Vector2(144, 24) };
+            objective.Root.AddChild(display); display.Bind(_income[objective].Buffer);
+        }
         RefreshProductionClock();
     }
 

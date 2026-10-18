@@ -1,3 +1,11 @@
+## CP1B collection UI — code implemented 2026-10-18 (verification pending)
+
+**World Citadel click + matching top-centre health HUD click** now call the same per-objective `TryCollectCredits` wallet command. Every Citadel has an independently event-updated green world Credit label/bar and a green HUD bar/amount inside its existing health panel (single legacy layout or one horizontal multi-objective row). Only the clicked Citadel pays; collection is still possible between waves, although no new Credits are generated then. Tower placement has click precedence, so Citadel clicks never sneak in during construction placement. Existing HP bars/route gameplay/kill rewards are unaffected.
+
+Added `CitadelCreditDisplay.cs`, reusable `CitadelHudRow` meter binding and an isolated `TESTS/UI/CitadelCollectionChecks.tscn` runner. Code is committed for testing; **Godot/.NET compilation, headless tests and desktop presentation review are pending**. Refer to `ECONOMY/Production/README.md` for CP1A/CP1B contract and CP2/CP3 plans.
+
+---
+
 ## CP1A — Citadel Credits backend implemented 2026-10-18 (runtime verification pending)
 
 CitadelSession owns **one independent CreditBuffer and CreditProductionTimer per stable CitadelDestination**, without changing the scene's health nodes, navigation or current top-centre HUD. Inspector-exported Citadel Credit Production values default to **80 stored Credits**, **+10 every 2 seconds**. The timer runs only during WaveManager's Spawning/SpawnBlocked/WaitingForClear, freezes between waves and on game pause, and stops on mission-ending destruction. `CreditsFor(destination)` exposes the buffer's event for forthcoming visual displays; `TryCollectCredits(destination)` collects only the selected Citadel, via the existing EconomyManager/Rewards, and preserves uncollected Credits if the wallet refuses a grant.

@@ -17,3 +17,8 @@ See [HUD category/layout verification](HudCategories.md) for tabs, compact scrol
 `HeatInspectorChecks.tscn` covers HD3 real heat/disable events, threshold cooling, repeated reason counts, heatless towers, selection/close/reselect, pause, paid capacity changes, queued callback unload and560×330 target worst-state geometry. See HeatInspector.md for executed regression results and manual QA limits.
 
 The 560px/relocated Heat update is committed but its Godot headless and desktop visual reruns are **pending**; historical verification records document the earlier 620px geometry.
+
+
+## CP1B Citadel click-to-collect (code authored, unverified)
+
+`CitadelCollectionChecks.tscn` verifies single/two/four Citadel model/view identity, green buffer bars on the world Citadel and each top-centre HUD health cell, collection from either surface, no double award, wallet-cap refusal, and rebinding. Built on existing `MissionFixture`/`MultiCitadelChecks.Fixture` with no authored level changes. C# build, headless test run and desktop input/layout verification have **not** been performed yet; see `ECONOMY/Production/README.md`.

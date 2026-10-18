@@ -1,3 +1,11 @@
+## CP1B: Citadel collection widgets (code implemented 2026-10-18; runtime validation pending)
+
+The original top-centre Citadel health area now includes a green stored Credits label/bar. Clicking that cell collects only the matching Citadel's saved income via `CitadelSession.TryCollectCredits`. The multi-Citadel row keeps individual health/credit meters side-by-side; each cell is clickable/focusable, and individual per-buffer events update amounts (no HUD polling). The clickable world Citadel routes through the existing tower placement input and displays the same buffer in its own green bar. A failed wallet grant does not empty the display. The single-Citadel legacy `Health` and `Bar` nodes remain for current integrations.
+
+See `TESTS/UI/CitadelCollectionChecks.tscn` for authored regression tests. **Compile, headless execution and real rendered/clickable verification remain pending.** See `ECONOMY/Production/README.md` for acceptance details.
+
+---
+
 ## Planned CP1: clickable Citadel credit meters (NOT IMPLEMENTED)
 
 The current top-centre health panels are **not yet Credit collection buttons**. CP1 will add a small separate green stored-Credits bar/amount to **each existing Citadel health cell** and allow clicking that cell to collect Credits from its own Citadel, matching clicking the corresponding world Citadel. No second top bar, no shared/pooled Credit buffer, no health/status binding changes, and no overlapping Wave/Credits hitboxes. All visual bindings come from one per-Citadel `CreditBuffer`; collection uses the same authoritative wallet-grant action for either click source. Preserve one-row responsiveness/labels and test multiple objectives and small displays. See [ECONOMY/Production/README.md](../../../ECONOMY/Production/README.md#cp1-interaction-decision--collect-from-world-citadel-or-its-top-centre-hud-cell-2026-10-18-planned).

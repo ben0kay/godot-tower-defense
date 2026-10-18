@@ -242,8 +242,27 @@ public partial class TowerPlacementController : Node2D
     {
         if (!_placing && Engine.GetProcessFrames() == _placedInputFrame) return;
         if (_placing) TryPlace(cell);
+        else if (TryCollectCitadelAt(cell)) return;
         else if (_placedTowers.TryGetValue(cell, out TowerBase tower)) SelectTower(tower);
         else { SelectTower(null); _browsingBuild = false; _hud.ClearInspection(); }
+    }
+
+    // =========================================================
+    // A physical Citadel footprint is one click target for its own Credits, never another objective's.
+    // Return true even when empty/full wallet so the click cannot also select/clear a tower.
+    public bool TryCollectCitadelAt(Vector2I cell)
+    {
+        if (_placing) return false;
+        CitadelSession session = GetNode<CitadelSession>("../CitadelSession");
+        foreach (CitadelDestination destination in session.Objectives)
+        {
+            if (!destination.Available || destination.Root is not WorldObjectFootprint footprint) continue;
+            Vector2I origin = _grid.WorldToCell(footprint.GlobalPosition);
+            if (!new Rect2I(origin, footprint.SizeCells).HasPoint(cell)) continue;
+            session.TryCollectCredits(destination);
+            return true;
+        }
+        return false;
     }
 
     // =========================================================
