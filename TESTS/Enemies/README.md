@@ -6,3 +6,6 @@
 
 
 `TESTS/Integration/EnemyCatalogChecks.cs` now also verifies Big mk.1 (Enemy005): original-inspired balance, real catalog and portal spawn, 112×120 art, no abilities, extra shared DefenseBar clearance, unshielded debug state, optional 200-point wave shields, shield-only hits and normal 10-Credit kill. Godot runtime verification remains to be run.
+
+
+`TESTS/Integration/EnemyCatalogChecks.cs` also checks Elite mk.1: authored balance/registration, 80×60 SVG, unshielded F2-compatible spawn, hull hits, one-time 10-credit kill, wave-opt-in 250 shields, shared aura/bars and five Citadel arrival damage. Runtime verification pending.

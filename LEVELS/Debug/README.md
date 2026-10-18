@@ -12,7 +12,8 @@ Each actual F2 press spawns the next scene registered in `ENEMIES/DefaultEnemyCa
 4. Enemy004 asset — `medium_mk1` / Bulwark Drone
 5. Transporter asset — `transporter_mk1` / Transporter
 6. Enemy005 asset — `big_mk1` / Big mk.1
-7. Enemy001 asset again, repeating
+7. Enemy006 asset — `elite_mk1` / Elite mk.1
+8. Enemy001 asset again, repeating
 
 New enemy types participate automatically when you add their scenes to the catalog. The debug controller uses the production `SpawnManager.Spawn(scene, PortalOnly)` method, so normal collision/clearance, navigation, portal rules and active-enemy limits still apply.
 

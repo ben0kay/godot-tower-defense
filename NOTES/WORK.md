@@ -1,3 +1,12 @@
+## Elite mk.1 plain heavy interceptor — 2026-10-17
+
+- [x] Added `Types/Enemy006` (`elite_mk1`) as a new inherited plain enemy, 80×60 SVG, 1,000 hull HP, 250 optional shields, 100px/s, 24px radius, 5 Citadel damage and 10 Credits.
+- [x] Registered in the default catalog after Big mk.1 for F2/F3/waves, with no changes to Level001/Level002 waves, shared enemies, navigation, abilities or combat.
+- [x] Updated catalog integration checks and enemy documentation in the same commit.
+- [ ] Godot .NET compilation/headless catalog suite and in-game silhouette, shield FX and F2 route test pending.
+
+---
+
 ## Stable two-row build browser — 2026-10-17
 
 - Ctrl opening now clears the old tower selection and shows the **empty Inspector shell immediately**. Hover/focus fills the same reserved panel with existing build details/cost/affordability; no tile can be displaced by the panel appearing.

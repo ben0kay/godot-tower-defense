@@ -1,5 +1,7 @@
 # Enemy types
 
+**Elite mk.1:** `Enemy006/` adds an 80×60 fast, heavily armored enemy (`elite_mk1`) with 1,000 HP, 250 optional shields, 100px/s and 10 kill Credits. It inherits `GenericEnemy.tscn` and is in the default catalog; existing waves are unchanged. See [Enemy006/README.md](Enemy006/README.md).
+
 **Heavy Big mk.1:** `Enemy005/` is a 112×120 plated heavyweight ship with ID `big_mk1`, 1,000 HP, 200 optional shields, 80 px/s speed, 5 Citadel damage and 10 Credits. Inherits `Shared/GenericEnemy.tscn` with no unique scripts or abilities. See [Enemy005](Enemy005/README.md). Its shields remain wave-opt-in, not permanently enabled.
 
 

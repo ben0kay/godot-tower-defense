@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="60" viewBox="0 0 80 60">
+  <defs>
+    <linearGradient id="eliteArmor" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a0b2bd"/><stop offset=".5" stop-color="#536978"/><stop offset="1" stop-color="#263645"/>
+    </linearGradient>
+    <linearGradient id="eliteCore" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#266079"/><stop offset=".58" stop-color="#86e8f0"/><stop offset="1" stop-color="#d2ffff"/>
+    </linearGradient>
+  </defs>
+  <!-- Elite mk.1: fast, armored swept-fin ship, facing right (+X) like all inherited enemy artwork. -->
+  <path d="M4 30 L14 22 L22 8 L38 4 L54 11 L71 23 L78 30 L71 37 L54 49 L38 56 L22 52 L14 38 Z"
+        fill="#192734" stroke="#a5b8c2" stroke-width="1.6" stroke-linejoin="round"/>
+  <!-- Segmented wings are deliberately sharper/slimmer than Big mk.1's heavy slab armor. -->
+  <path d="M12 23 L28 13 L40 8 L55 15 L68 24 L48 22 L30 25 L20 29 Z"
+        fill="url(#eliteArmor)" stroke="#b9cbd0" stroke-width="1.2"/>
+  <path d="M12 37 L28 47 L40 52 L55 45 L68 36 L48 38 L30 35 L20 31 Z"
+        fill="url(#eliteArmor)" stroke="#b9cbd0" stroke-width="1.2"/>
+  <path d="M24 18 L38 15 L53 20 L43 22 L30 25 Z M24 42 L38 45 L53 40 L43 38 L30 35 Z"
+        fill="#243a4a" stroke="#7999a8" stroke-width=".9"/>
+  <path d="M17 27 L36 20 L57 23 L73 30 L57 37 L36 40 L17 33 L22 30 Z"
+        fill="#3b5365" stroke="#d0dee0" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- Narrow luminous reactor and armored pointed bow. -->
+  <path d="M34 27 L52 25 L62 30 L52 35 L34 33 L38 30 Z"
+        fill="#142d3c" stroke="#85bbca" stroke-width="1"/>
+  <path d="M39 28 L52 27 L57 30 L52 33 L39 32 Z" fill="url(#eliteCore)"/>
+  <path d="M60 24 L74 30 L60 36 L66 30 Z" fill="#1d303e" stroke="#c2d2d4" stroke-width="1.1"/>
+  <!-- Elite gold accents and three slim amber drives. -->
+  <path d="M25 15 L35 13 M25 45 L35 47 M62 24 L69 27 M62 36 L69 33"
+        fill="none" stroke="#f3c178" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M4 22 L14 23 L14 27 L4 26 Z M2 28 L14 28 L14 32 L2 32 Z M4 34 L14 33 L14 37 L4 38 Z"
+        fill="#273846" stroke="#a5b5ba" stroke-width=".8"/>
+  <path d="M3 23 L10 23.5 L10 26 L3 25.5 Z M1 29 L10 29 L10 31 L1 31 Z M3 35 L10 34.5 L10 37 L3 37 Z"
+        fill="#ffad5b" stroke="#ffde9f" stroke-width=".5"/>
+</svg>

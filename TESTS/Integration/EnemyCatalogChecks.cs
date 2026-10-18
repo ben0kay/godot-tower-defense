@@ -131,9 +131,50 @@ public static class EnemyCatalogChecks
         Require(shieldedBig.CurrentShield == 0 && shieldedBig.Health == 1000 && !stacked.ShieldVisible,
             "Shield depletion retains full hull and removes only the shield meter");
         shieldedBig.TakeDamage(1500);
+        // =========================================================
+        // Elite mk.1 uses the ordinary inherited enemy scene and the existing shields/credits pipeline.
+        EnemyDefinition eliteData = GD.Load<EnemyDefinition>("res://ENEMIES/Types/Enemy006/Enemy006.tres");
+        Require(eliteData.EnemyId == "elite_mk1" && eliteData.DisplayName == "Elite mk.1"
+            && eliteData.MaxHealth == 1000 && eliteData.MaxShield == 250 && eliteData.MoveSpeed == 100
+            && eliteData.RadiusPixels == 24 && eliteData.TurnSpeed == 6
+            && eliteData.CitadelDamage == 5 && eliteData.KillRewardCredits == 10
+            && catalog.Find("elite_mk1") == scenes["elite_mk1"],
+            "Elite mk.1 has independent fast-heavy authored balance and registered scene");
+        Enemy elite = spawns.Spawn("elite_mk1", true);
+        Require(elite != null && elite.Health == 1000 && elite.CurrentShield == 0
+            && spawns.Paths.Navigation.HasClearance(elite.GlobalPosition, elite.Definition.RadiusPixels),
+            "Elite mk.1 debug/normal spawn starts unshielded at a valid portal");
+        elite.Movement.SetPhysicsProcess(false);
+        Texture2D eliteArt = elite.GetNode<Sprite2D>("Sprite").Texture;
+        Require(eliteArt != null && eliteArt.GetWidth() == 80 && eliteArt.GetHeight() == 60
+            && elite.GetNodeOrNull<Node>("Abilities") == null,
+            "Elite artwork is larger than Bulwark, smaller than Big, without special ability nodes");
+        elite.TakeDamage(250);
+        Require(elite.Health == 750 && elite.CurrentShield == 0, "Elite unshielded hull takes normal damage");
+        int eliteCredits = wallet.GetBalance(wallet.CreditsResource);
+        elite.TakeDamage(1000);
+        Require(!elite.IsAlive && wallet.GetBalance(wallet.CreditsResource) == eliteCredits + 10,
+            "Elite kill awards 10 Credits exactly once");
+        Enemy shieldedElite = spawns.SpawnWave("elite_mk1", new RandomNumberGenerator { Seed = 21 }, spawnWithShield: true);
+        Require(shieldedElite != null && shieldedElite.Health == 1000 && shieldedElite.CurrentShield == 250,
+            "Wave-opted Elite begins with full 250-point shields");
+        shieldedElite.Movement.SetPhysicsProcess(false);
+        DefenseBar eliteBar = shieldedElite.GetNode<DefenseBar>("DefenseBar");
+        Require(eliteBar.ShieldVisible && eliteBar.HullVisible && shieldedElite.GetNodeOrNull<ShieldVisual>("ShieldVisual") != null,
+            "Elite reuses common shield aura and stacked meters");
+        shieldedElite.TakeDamage(100);
+        Require(shieldedElite.CurrentShield == 150 && shieldedElite.Health == 1000
+            && Mathf.IsEqualApprox(eliteBar.ShieldFraction, 0.6f),
+            "Elite shield-only hits reduce shield meter, not hull");
+        shieldedElite.TakeDamage(150);
+        Require(shieldedElite.CurrentShield == 0 && shieldedElite.Health == 1000 && !eliteBar.ShieldVisible,
+            "Elite shield breaks without damaging hull");
+        int eliteArrivalHp = health.CurrentHealth;
+        shieldedElite.Arrive();
+        Require(health.CurrentHealth == eliteArrivalHp - 5, "Elite arrival damages Citadel by five");
         waves.Configure(WaveCatalog.GetWaves(spawns.Paths.Navigation.Grid.Level.Settings.WaveSetId), scenes);
         wallet.Initialize(spawns.Paths.Navigation.Grid.Level.Settings); health.Initialize(health.MaxHealth);
-        GD.Print("PASS: enemy catalog validation, Big mk.1 plain/shielded heavy behavior, inherited artwork/bars, waves/portals and oversized spawn rejection");
+        GD.Print("PASS: enemy catalog validation, Big/Elite plain and shielded behavior, inherited artwork/bars, waves/portals and oversized spawn rejection");
     }
     // =========================================================
     // Create invalid/oversized setup fixtures without altering shared authored resources.

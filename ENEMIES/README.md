@@ -4,6 +4,8 @@ Shared tower HP/damage/destruction and existing DefenseBar reuse are implemented
 
 # ENEMIES — Enemy Ships, Navigation, Spawning, Waves and Targeting Integration
 
+**Elite mk.1 added:** `Types/Enemy006/` is a 80×60 swift, durable (`elite_mk1`) plain enemy with 1,000 hull, 250 optional shield capacity, 100px/s and 10 Credits, registered for F2/F3 and wave authoring. No new abilities or changes to authored level waves. See [Enemy006](Types/Enemy006/README.md).
+
 This top-level folder owns **enemy gameplay mechanics** in the Godot 4 C#/.NET space tower-defense project. Enemy001 is the first working **basic test ship**, intentionally named `Enemy001` internally rather than `ScoutShip`. Its scene uses shared `Enemy.cs` and `EnemyMovement.cs` rather than a unique gameplay script. This is the baseline future types should reuse.
 
 **Earlier medium plain type:** `Types/Enemy004/` adds the medium-sized **Bulwark Drone**: development asset `Enemy004.tscn`, stable ID `medium_mk1`, display name `Bulwark Drone`, 64×48 art, 160 HP, 75 px/s, 22px navigation radius, 7 Credits. Registered in the catalog for F2 and wave authoring; not added to Level001's actual waves. No special ability or new behavior is attached. See `Types/Enemy004/README.md`.
