@@ -1,8 +1,7 @@
 [gd_resource type="TileSet" format=3 uid="uid://dbryu0fnchy4x"]
 
 [ext_resource type="Texture2D" uid="uid://dkyx0lp88jisq" path="res://WORLD/TERRAIN/Tiles/Metal/prototype_atlas.svg" id="1"]
-
-[ext_resource type="Texture2D" path="res://WORLD/TERRAIN/Tiles/Metal/new_metal_terrain_atlas.webp" id="2_new_metal"]
+[ext_resource type="Texture2D" uid="uid://d2r6ixwlpitj5" path="res://WORLD/TERRAIN/Tiles/Metal/new_metal_terrain_atlas.webp" id="2_new_metal"]
 
 [sub_resource type="TileSetAtlasSource" id="Atlas"]
 texture = ExtResource("1")

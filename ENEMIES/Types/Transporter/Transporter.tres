@@ -1,16 +1,15 @@
-[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=2 format=3]
-[ext_resource type="Script" path="res://ENEMIES/Shared/EnemyDefinition.cs" id="1"]
+[gd_resource type="Resource" script_class="EnemyDefinition" format=3 uid="uid://da4jpotfk8p4q"]
+
+[ext_resource type="Script" uid="uid://d4cax7p5ep4fd" path="res://ENEMIES/Shared/EnemyDefinition.cs" id="1"]
 
 [resource]
 script = ExtResource("1")
 EnemyId = "transporter_mk1"
-Family = 4
 DisplayName = "Transporter"
 MaxHealth = 500.0
-MaxShield = 0.0
 MoveSpeed = 45.0
-RadiusPixels = 24.0
-TurnSpeed = 5.5
 CitadelDamage = 5
 KillRewardCredits = 15
 DeathExplosionMultiplier = 1.35
+RadiusPixels = 24.0
+TurnSpeed = 5.5
