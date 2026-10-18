@@ -1,3 +1,9 @@
+## CP1 collection UX refinement (PLANNED, 2026-10-18)
+
+Each Citadel should have **two equivalent clickable collection surfaces**: (1) its actual world-space Citadel and (2) **its own top-centre health HUD cell**, which gains a compact, distinct green stored-Credits bar/number. Both call the **same Citadel-specific collection method**. Buffers, timers and indicators remain completely separate for multiple Citadels; collecting one never drains others. Existing multi-Citadel HUD stays **one horizontal row**, with responsive dimensions and no health meter regression. Events refresh both displays; no per-frame polling or double grants. Collect even between waves if already stored, but **only produce while a wave runs**. See [CP1 interaction decision](../../../ECONOMY/Production/README.md#cp1-interaction-decision--collect-from-world-citadel-or-its-top-centre-hud-cell-2026-10-18-planned). Not implemented.
+
+---
+
 ## Automatic editor placement — 2026-10-18
 
 This scene now inherits editor-only cell-center snapping from `WorldObjectFootprint`. Build C#, then drag or duplicate instances within a map normally. **Editor Placement → Snap To Grid In Editor** defaults on; disable it for intentional free placement. Uses the map's actual `Terrain/Passable` TileSet and transforms. Child-marker offsets and footprint settings are preserved; standalone asset origins and gameplay movement remain unchanged. Off-grid saved instances align when opened in the editor; save the level to persist that correction. See `WORLD/GRID/README.md` from the repository root for full authoring behavior.

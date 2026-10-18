@@ -1,3 +1,9 @@
+## Planned CP1: clickable Citadel credit meters (NOT IMPLEMENTED)
+
+The current top-centre health panels are **not yet Credit collection buttons**. CP1 will add a small separate green stored-Credits bar/amount to **each existing Citadel health cell** and allow clicking that cell to collect Credits from its own Citadel, matching clicking the corresponding world Citadel. No second top bar, no shared/pooled Credit buffer, no health/status binding changes, and no overlapping Wave/Credits hitboxes. All visual bindings come from one per-Citadel `CreditBuffer`; collection uses the same authoritative wallet-grant action for either click source. Preserve one-row responsiveness/labels and test multiple objectives and small displays. See [ECONOMY/Production/README.md](../../../ECONOMY/Production/README.md#cp1-interaction-decision--collect-from-world-citadel-or-its-top-centre-hud-cell-2026-10-18-planned).
+
+---
+
 ## MC3 HUD + F3 — implemented 2026-10-18
 
 Multiple Citadels now share **one horizontal row** in the top-center HUD: equal-width cells for two, four or more objectives, never stacked vertically. A one-Citadel level keeps the original nodes/layout/SetCitadelHealth behavior. Each multi meter shows its stable CITADEL number, independent current/max HP, threshold-colored fill and damage-only animation/flash. Zero values and maximum resets are supported; rebind/unload disconnect model events and stop old tweens. The full Citadel number/HP is available in each cell's tooltip. No HUD health polling or gameplay authority is introduced.

@@ -1,5 +1,14 @@
 ## Shared Credits production + Citadel collection + ARG — CP1–CP3 (PLANNED, Codex)
 
+### CP1 input/UI addition — 2026-10-18 (PLANNED, Codex)
+
+- [ ] Actual **world Citadel click** and **its matching top-centre health HUD cell click** both collect **that Citadel's** stored Credits via one shared credit-buffer / wallet command.
+- [ ] Add a **small green Credit bar/amount inside each current health HUD cell** (keep existing one-row responsive multi-Citadel health panels); bind to per-Citadel buffer change events. Both world and HUD representations update immediately.
+- [ ] Multiple Citadels: each buffer independently collects; no collecting others, no double payout, no world placement/selection conflicts. Collected Credits may be claimed between waves although only generated during active waves. Tests for one/two/four Citadels, wallet cap, paused wave, empty bar and responsive HUD.
+- [ ] Detailed acceptance criteria: [`ECONOMY/Production/README.md`](../ECONOMY/Production/README.md#cp1-interaction-decision--collect-from-world-citadel-or-its-top-centre-hud-cell-2026-10-18-planned). **Do not mark implemented yet.**
+
+
+
 - **Full verified-source specification:** [`ECONOMY/Production/README.md`](../ECONOMY/Production/README.md). Existing `EconomyManager.Grant` / HUD rewards must remain authoritative. This is **not implemented**.
 - [ ] **CP1** reusable plain producer/buffer; **per-Citadel** 80-cap / +10 every 2s from coded old GameMaker baseline, **active-wave only**, click to collect, independent multi-Citadel meter/buffer, wallet success/failure/overflow, pause and double-click safety.
 - [ ] **CP2** `TOWERS/Economy/AdaptableResourceGenerator/`, gains from real kills credited to other towers inside its radius (prefer event-based attribution, no frame scans), buffered reward + Inspector collection, adjustable balance/limits and no duplicate kill payout.
