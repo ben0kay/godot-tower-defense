@@ -72,29 +72,29 @@ tile_set = ExtResource("5_decorations")
 [node name="Portals" type="Node2D" parent="." unique_id=392524588]
 
 [node name="EnemyPortal01" parent="Portals" unique_id=1274959124 instance=ExtResource("8_portal")]
-position = Vector2(647, 448)
+position = Vector2(672, 483)
 CheckpointPath = NodePath("../../Checkpoints/CheckPoint1a")
 
 [node name="EnemyPortal02" parent="Portals" unique_id=791619454 instance=ExtResource("8_portal")]
-position = Vector2(864, 1568)
+position = Vector2(864, 1571)
 SizeMultiplier = 1.15
 
 [node name="EnemyPortal03" parent="Portals" unique_id=1070409360 instance=ExtResource("8_portal")]
-position = Vector2(480, 2464)
+position = Vector2(544, 2467)
 SizeMultiplier = 0.9
 
 [node name="EnemyPortal04" parent="Portals" unique_id=2120615218 instance=ExtResource("8_portal")]
-position = Vector2(1056, 3424)
+position = Vector2(800, 3427)
 SizeMultiplier = 1.1
 
 [node name="EnemyPortal05" parent="Portals" unique_id=128335065 instance=ExtResource("8_portal")]
-position = Vector2(608, 4448)
+position = Vector2(416, 4515)
 CheckpointPath = NodePath("../../Checkpoints/CheckPoint5a")
 
 [node name="Objectives" type="Node2D" parent="." unique_id=343975502]
 
 [node name="Citadel" parent="Objectives" unique_id=97552924 instance=ExtResource("9_citadel")]
-position = Vector2(5792, 2528)
+position = Vector2(5792, 2531)
 
 [node name="Debug" type="Node" parent="." unique_id=1262761477]
 script = ExtResource("10_debug")
