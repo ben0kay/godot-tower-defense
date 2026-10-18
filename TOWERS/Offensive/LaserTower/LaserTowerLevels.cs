@@ -16,8 +16,8 @@ public static class LaserTowerLevels
     // Optional named MaxHealth column is absolute per level; 100 is provisional baseline balance.
     private static readonly Row[] Rows =
     {
-        new(1, 250, 4, 12, 294, 180, 12, 0.15f, 0, DamageType.Energy, true, 6, true, 0.15f, 1000, 2f),
-        new(2, 175, 5, 14, 304, 180, 12, 0.15f, 0, DamageType.Energy, true, 6, true, 0.15f, 1000, 2f),
+        new(1, 250, 4, 12, 323.4f, 216, 12, 0.15f, 0, DamageType.Energy, true, 6, true, 0.15f, 1000, 2f),
+        new(2, 175, 5, 14, 334.4f, 216, 12, 0.15f, 0, DamageType.Energy, true, 6, true, 0.15f, 1000, 2f),
     };
 
     // =========================================================

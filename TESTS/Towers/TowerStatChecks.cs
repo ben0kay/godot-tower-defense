@@ -9,6 +9,7 @@ public static class TowerStatChecks
     public static void Run(Node battle)
     {
         ExplicitLevels();
+        AllTowerBalanceRows();
         BattleTowerConfig defaults = GD.Load<BattleTowerConfig>("res://TOWERS/Offensive/BattleTower/DefaultBattleTowerConfig.tres");
         TowerStatTrace trace = new();
         TowerFinalStats baseline = TowerStatPipeline.Resolve(defaults, trace);
@@ -111,15 +112,15 @@ public static class TowerStatChecks
     {
         BattleTowerConfig battle = new(); LaserTowerConfig laser = new(); BlasterCannonConfig blaster = new();
         TowerFinalStats[] battleExpected = {
-            new(294, 1.68f, 30, 1000, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
-            new(304, 1.764f, 33, 1000, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
-            new(313, 1.848f, 36, 1000, 180, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)) };
+            new(323.4f, 1.68f, 30, 1150, 216, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
+            new(334.4f, 1.764f, 33, 1150, 216, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
+            new(344.3f, 1.848f, 36, 1150, 216, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)) };
         TowerFinalStats[] laserExpected = {
-            new(294, 0, 0, 1, 180, 12, .15f, new BeamStats(12), Weapon: new(DamageType.Energy, true, 6, true, .15f), Ammunition: new(1000, 0, 2)),
-            new(304, 0, 0, 1, 180, 12, .15f, new BeamStats(14), Weapon: new(DamageType.Energy, true, 6, true, .15f), Ammunition: new(1000, 0, 2)) };
+            new(323.4f, 0, 0, 1, 216, 12, .15f, new BeamStats(12), Weapon: new(DamageType.Energy, true, 6, true, .15f), Ammunition: new(1000, 0, 2)),
+            new(334.4f, 0, 0, 1, 216, 12, .15f, new BeamStats(14), Weapon: new(DamageType.Energy, true, 6, true, .15f), Ammunition: new(1000, 0, 2)) };
         TowerFinalStats[] blasterExpected = {
-            new(294, .5f, 60, 500, 180, 12, .15f, Area: new(80, .25f), Weapon: new(DamageType.Explosive, false, 1, false, 1), Ammunition: new(600, 3)),
-            new(304, .5f, 66, 500, 180, 12, .15f, Area: new(88, .25f), Weapon: new(DamageType.Explosive, false, 1, false, 1), Ammunition: new(600, 3)) };
+            new(323.4f, .5f, 60, 575, 216, 12, .15f, Area: new(80, .25f), Weapon: new(DamageType.Explosive, false, 1, false, 1), Ammunition: new(600, 3)),
+            new(334.4f, .5f, 66, 575, 216, 12, .15f, Area: new(88, .25f), Weapon: new(DamageType.Explosive, false, 1, false, 1), Ammunition: new(600, 3)) };
         CheckRows(battle, battleExpected, new[] { 200, 150, 250 });
         CheckRows(laser, laserExpected, new[] { 250, 175 });
         CheckRows(blaster, blasterExpected, new[] { 300, 200 });
@@ -139,6 +140,41 @@ public static class TowerStatChecks
             catch (ArgumentOutOfRangeException) { }
         }
         GD.Print("PASS: exact complete Battle1–3/Laser1–2/Blaster1–2 stats and costs, row independence and append-only expansion");
+    }
+
+    // =========================================================
+    // Check every purchased row's new authored range, turn and projectile values.
+    // Laser's beam and Shockwave's expanding pulse are intentionally not travelling projectiles.
+    private static void AllTowerBalanceRows()
+    {
+        TowerConfig[] towers = { new BattleTowerConfig(), new LaserTowerConfig(), new BlasterCannonConfig(),
+            new MachineGunTowerConfig(), new SniperTowerConfig(), new RocketTowerConfig(),
+            new CryoTowerConfig(), new StasisTowerConfig(), new ShockwaveTowerConfig() };
+        float[][] ranges = {
+            new[] { 323.4f, 334.4f, 344.3f }, new[] { 323.4f, 334.4f }, new[] { 323.4f, 334.4f },
+            new[] { 262.9f, 272.8f, 283.8f }, new[] { 566.5f, 576.4f, 587.4f },
+            new[] { 440f, 462f, 484f }, new[] { 262.9f, 272.8f, 283.8f },
+            new[] { 262.9f, 272.8f, 283.8f }, new[] { 253f, 262.9f } };
+        float[] turns = { 216f, 216f, 216f, 288f, 162f, 264f, 216f, 216f, 0f };
+        float[] speeds = { 1150f, 1f, 575f, 1221.875f, 1495f, 0f, 747.5f, 747.5f, 1f };
+        float[] rocketSpeeds = { 575f, 598f, 621f };
+        for (int t = 0; t < towers.Length; t++)
+        {
+            Require(towers[t].Levels.Count == ranges[t].Length, "Each offensive weapon retains its authored level count");
+            for (int i = 0; i < ranges[t].Length; i++)
+            {
+                TowerFinalStats actual = towers[t].ResolveStats(i + 1);
+                Require(Mathf.IsEqualApprox(actual.RangePixels, ranges[t][i]) &&
+                    Mathf.IsEqualApprox(actual.RotationSpeedDegrees, turns[t]),
+                    "Range and turret rotation increase on every purchased level");
+                float speed = t == 5 ? rocketSpeeds[i] : speeds[t];
+                Require(Mathf.IsEqualApprox(actual.ProjectileSpeed, speed),
+                    "Projectile travel speed increases only for projectile weapons");
+                if (t == 8)
+                    Require(actual.Shockwave.Value.ExpansionSpeedPixelsPerSecond == (i == 0 ? 250 : 260),
+                        "Shockwave's radial expansion speed is unchanged");
+            }
+        }
     }
 
     // =========================================================

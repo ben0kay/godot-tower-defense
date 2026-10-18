@@ -16,8 +16,8 @@ public static class BlasterCannonLevels
     // Optional named MaxHealth column is absolute per level; 100 is provisional baseline balance.
     private static readonly Row[] Rows =
     {
-        new(1, 300, 5, 60, 0.5f, 294, 500, 180, 12, 0.15f, 0, 80, 0.25f, DamageType.Explosive, false, 1, false, 1, 600, 3),
-        new(2, 200, 6, 66, 0.5f, 304, 500, 180, 12, 0.15f, 0, 88, 0.25f, DamageType.Explosive, false, 1, false, 1, 600, 3),
+        new(1, 300, 5, 60, 0.5f, 323.4f, 575, 216, 12, 0.15f, 0, 80, 0.25f, DamageType.Explosive, false, 1, false, 1, 600, 3),
+        new(2, 200, 6, 66, 0.5f, 334.4f, 575, 216, 12, 0.15f, 0, 88, 0.25f, DamageType.Explosive, false, 1, false, 1, 600, 3),
     };
 
     // =========================================================

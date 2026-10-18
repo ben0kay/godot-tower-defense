@@ -1,3 +1,13 @@
+## Offensive turret rebalance — 2026-10-18
+
+**Latest authored values** (superseding the historical range-only rebalance section below): every purchased level of **all nine offensive tower types** has **10% more range**. Eight aimed towers have **20% faster rotation**; the stationary Shockwave Tower has no rotation. The seven projectile weapons (Battle, Blaster, Machine Gun, Sniper, Rocket, Cryo, Stasis) have **15% faster projectile travel speed** at all levels. Laser is a continuous beam (no projectile), and Shockwave emits a travelling radial front rather than a launched projectile; its expansion speed remains unchanged, while its maximum damaging radius gets the 10% range increase.
+
+Only absolute `*TowerLevels.cs` row values changed: there is **no extra modifier stage** and existing rank/research bonuses apply afterward. Rocket's fixed rotation value rises from 220 to 264 degrees/second. Fractional range/speed values retain precise percentage increases. Damage, rate, Credits, construction, ammo, shield penetration, status strength/duration, Blaster/Rocket splash radius and Shockwave expansion speed remain unchanged.
+
+The selected Inspector, paid-level previews and actual targeting derive from the same cached final stats. The shared pipeline/targeting/navigation code is untouched. `TowerStatChecks.AllTowerBalanceRows` covers all 23 levels, including the beam/radial exceptions, and historical exact-value assertions were updated. Godot headless/desktop verification is pending.
+
+---
+
 # Offensive towers
 
 ## Range rebalance — 2026-10-17

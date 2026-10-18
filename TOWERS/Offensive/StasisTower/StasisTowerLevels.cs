@@ -19,9 +19,9 @@ public static class StasisTowerLevels
     // Optional named MaxHealth column is absolute per level; 100 is provisional baseline balance.
     private static readonly Row[] Rows =
     {
-        new(1, 350, 4, 10, .20f, 239, 650, 180, 3f, 600, 1),
-        new(2, 225, 5, 11, .21f, 248, 650, 180, 3.25f, 600, 1),
-        new(3, 300, 6, 12, .22f, 258, 650, 180, 3.5f, 600, 1),
+        new(1, 350, 4, 10, .20f, 262.9f, 747.5f, 216, 3f, 600, 1),
+        new(2, 225, 5, 11, .21f, 272.8f, 747.5f, 216, 3.25f, 600, 1),
+        new(3, 300, 6, 12, .22f, 283.8f, 747.5f, 216, 3.5f, 600, 1),
     };
     // =========================================================
     // Changing one purchased level never modifies another level or another placed tower.

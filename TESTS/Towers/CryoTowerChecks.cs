@@ -42,12 +42,12 @@ public partial class CryoTowerChecks : Node
             "Cryo is a catalog-driven Offensive HUD choice");
         var authored = (CryoTowerConfig)definition.DefaultConfig;
         int[] damage = { 10, 11, 12 }, costs = { 250, 175, 250 };
-        float[] rate = { .5f, .52f, .54f }, range = { 239, 248, 258 };
+        float[] rate = { .5f, .52f, .54f }, range = { 262.9f, 272.8f, 283.8f };
         for (int i = 0; i < 3; i++)
         {
             TowerFinalStats s = authored.ResolveStats(i + 1);
             Require(s.DamagePerShot == damage[i] && s.ShotsPerSecond == rate[i] && s.RangePixels == range[i]
-                && s.ProjectileSpeed == 650 && s.Slow == new SlowStats(.33f) && s.ShieldPenetration == 0
+                && s.ProjectileSpeed == 747.5f && s.Slow == new SlowStats(.33f) && s.ShieldPenetration == 0
                 && s.Weapon.Value.Type == DamageType.Energy && s.Ammunition == new AmmunitionStats(600, 1)
                 && authored.Levels[i].Costs[0].Amount == costs[i], "Absolute Cryo level " + (i + 1));
         }

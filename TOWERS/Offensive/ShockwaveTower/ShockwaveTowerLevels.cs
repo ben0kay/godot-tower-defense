@@ -7,7 +7,7 @@ public static class ShockwaveTowerLevels
         float Edge, float Penetration, DamageType Type, bool ShieldOverride, float Shield, bool HullOverride, float Hull, int AmmoCapacity, int AmmoPerShot, HeatStats? Heat = null, float MaxHealth = 100)
     {
         // =========================================================
-        // Radius uses shared RangePixels; only this weapon's optional wave capability carries timing/damage.
+        // Radius uses shared RangePixels; pulse expansion speed is independent of projectile speed.
         public TowerLevel Create() => new(Level, Cost, new TowerStatBlock(Radius, 0, 0, 1, 0, 0, .15f,
             ShieldPenetration: Penetration, Weapon: new(Type, ShieldOverride, Shield, HullOverride, Hull),
             Shockwave: new(Damage, Speed, Interval, Edge), Ammunition: new(AmmoCapacity, AmmoPerShot)) with { Heat = Heat, MaxHealth = MaxHealth }, WorkSeconds);
@@ -18,8 +18,8 @@ public static class ShockwaveTowerLevels
     // Optional named MaxHealth column is absolute per level; 100 is provisional baseline balance.
     private static readonly Row[] Rows =
     {
-        new(1, 350, 5, 40, 230, 250, 4.0f, .25f, 0, DamageType.Energy, false, 1, false, 1, 400, 5),
-        new(2, 225, 6, 44, 239, 260, 3.9f, .25f, 0, DamageType.Energy, false, 1, false, 1, 400, 5),
+        new(1, 350, 5, 40, 253, 250, 4.0f, .25f, 0, DamageType.Energy, false, 1, false, 1, 400, 5),
+        new(2, 225, 6, 44, 262.9f, 260, 3.9f, .25f, 0, DamageType.Energy, false, 1, false, 1, 400, 5),
     };
 
     // =========================================================

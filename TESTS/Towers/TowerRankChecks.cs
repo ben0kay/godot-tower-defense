@@ -55,7 +55,7 @@ public static class TowerRankChecks
             TowerRankController.AwardExperience(fractional, 14000);
             Require(fractional.CurrentRank.Rank == TowerRank.Legendary && fractional.NextRank == null && stats == 2, "One award traverses all remaining ranks with one rebuild");
             Require(fractional.UpgradeLevel == 1 && fractional.FinalStats.DamagePerShot == 32, "Level1/Legendary applies only8% total with integer rounding");
-            Near(fractional.FinalStats.RangePixels, 294 * 1.04, "Legendary total range bonus is4%, not cumulative10%");
+            Near(fractional.FinalStats.RangePixels, 323.4f * 1.04f, "Legendary total range bonus is4%, not cumulative10%");
             TowerRankController.AwardExperience(fractional, 500);
             Require(stats == 2 && fractional.RankProgress.TotalXp == 15500, "Maximum rank retains XP without repeated stat rebuilding");
             foreach (double bad in new[] { -1, 0, double.NaN, double.PositiveInfinity }) TowerRankController.AwardExperience(fractional, bad);
@@ -74,7 +74,7 @@ public static class TowerRankChecks
                 "Rank damage scales splash payload; blast radius/falloff and penetration remain separate");
             var shock = TowerStatPipeline.Resolve(new ShockwaveTowerConfig(), 1, rank: custom);
             Near(shock.Shockwave.Value.DamagePerWave, 60, "Rank scales float timed-wave damage");
-            Near(shock.RangePixels, 287.5f, "Rank range scales wave maximum radius");
+            Near(shock.RangePixels, 316.25f, "Rank range scales wave maximum radius");
             Require(shock.Shockwave.Value.IntervalSeconds == 4 && shock.Shockwave.Value.ExpansionSpeedPixelsPerSecond == 250, "Rank does not invent cooldown/speed/HP changes");
             var alternative = TowerRankController.Define(new(TowerRank.Standard, 0, 0, 0, 0), new(TowerRank.Veteran, 50, .1f, .1f, 0),
                 new(TowerRank.Enhanced, 150, .2f, .2f, 0), new(TowerRank.Superior, 350, .3f, .3f, 0), new(TowerRank.Legendary, 750, .4f, .4f, 0));
@@ -212,7 +212,7 @@ public static class TowerRankChecks
                 "Paid next-level preview includes current Veteran bonuses");
             Require(tower.UpgradeLevel == 2 && tower.RankProgress.TotalXp == 1000 && tower.CurrentRank.Rank == TowerRank.Veteran,
                 "Purchased level never resets rank or accumulated XP");
-            Near(tower.FinalStats.RangePixels, 304 * 1.01, "Rank applies after full purchased row selection");
+            Near(tower.FinalStats.RangePixels, 334.4f * 1.01f, "Rank applies after full purchased row selection");
             TowerRankController.AwardExperience(tower, 2000);
             Require(ConstructionTestClock.PurchaseAndFinish(tower, wallet, placement.Settings, 2, out _) && tower.FinalStats.DamagePerShot == 37,
                 "Level3 Enhanced rounds36×1.04 once");
