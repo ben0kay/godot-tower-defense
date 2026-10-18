@@ -1,3 +1,9 @@
+## Mars terrain tiles (2026-10-18)
+
+The new `Tiles/Mars/mars_ground_atlas.svg` adds **bright walkable/nonbuildable dust** and **dark impassable/nonbuildable rock** via source2 in the existing Passable/Impassable palettes. Artwork is a separate expandable 64px-cell vector atlas, not a replacement for any metal/old desert tiles. Nothing is painted into levels automatically; see `TileSets/README.md` and `Tiles/Mars/README.md`.
+
+---
+
 # Terrain — category-filtered authoring
 
 Levels expose Terrain/Passable, Impassable, Interactive and Decorations TileMapLayers with matching TileSets under TileSets/. Passable contains metal/dirt floors; Impassable contains structural walls/rocks; Interactive contains raised Foundation and Lava; Decorations contains cosmetic decals. Boolean can_build/blocks_enemies rules are independent of appearance. Empty space is passable/unbuildable; decorations contribute no rules.

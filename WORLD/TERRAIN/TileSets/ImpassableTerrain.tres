@@ -3,6 +3,8 @@
 [ext_resource type="Texture2D" uid="uid://dkyx0lp88jisq" path="res://WORLD/TERRAIN/Tiles/Metal/prototype_atlas.svg" id="1"]
 [ext_resource type="Texture2D" uid="uid://d2r6ixwlpitj5" path="res://WORLD/TERRAIN/Tiles/Metal/new_metal_terrain_atlas.webp" id="2_new_metal"]
 
+[ext_resource type="Texture2D" path="res://WORLD/TERRAIN/Tiles/Mars/mars_ground_atlas.svg" id="3_mars"]
+
 [sub_resource type="TileSetAtlasSource" id="Atlas"]
 texture = ExtResource("1")
 texture_region_size = Vector2i(64, 64)
@@ -20,6 +22,12 @@ texture_region_size = Vector2i(64, 64)
 1:0/0 = 0
 1:0/0/custom_data_1 = true
 
+[sub_resource type="TileSetAtlasSource" id="MarsRock"]
+texture = ExtResource("3_mars")
+texture_region_size = Vector2i(64, 64)
+1:0/0 = 0
+1:0/0/custom_data_1 = true
+
 [resource]
 tile_size = Vector2i(64, 64)
 custom_data_layer_0/name = "can_build"
@@ -28,3 +36,4 @@ custom_data_layer_1/name = "blocks_enemies"
 custom_data_layer_1/type = 1
 sources/0 = SubResource("Atlas")
 sources/1 = SubResource("NewMetalWalls")
+sources/2 = SubResource("MarsRock")

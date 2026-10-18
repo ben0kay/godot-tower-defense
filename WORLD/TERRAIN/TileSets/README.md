@@ -1,3 +1,9 @@
+## Mars desert/rock terrain — additive 2026-10-18
+
+New editable `Tiles/Mars/mars_ground_atlas.svg` is a separate 128×64 vector source, registered as **source 2** in both Passable and Impassable palettes. Dust (0,0) is passable/unbuildable and dark rugged Mars rock (1,0) is impassable/unbuildable. `source 0` prototype and `source 1` metal art, metadata and authored map cells remain unchanged. See [Mars tiles](../Tiles/Mars/README.md) to add 64px variations without replacing existing coordinates. WorldGrid consumes ordinary cached Boolean rules; no extra runtime logic.
+
+---
+
 # Terrain palettes
 
 Each level's matching TileMapLayer selects a category resource:
