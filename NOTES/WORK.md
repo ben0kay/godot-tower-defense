@@ -1,3 +1,14 @@
+## Visual atmosphere / reusable shader presets — VE1–VE4 (PLANNED, 2026-10-19)
+
+- **Codex design and source review:** [`WORLD/BACKGROUNDS/README.md`](../WORLD/BACKGROUNDS/README.md#proposed-level-atmosphere-and-shader-presets--ve1ve4-planned). **None of VE1–VE4 has been implemented by this documentation job.** Existing levels use the same static `Stars/level001_space.svg`; the `Nebulae`/`Planets` groups are empty. Existing Terrain Edges are a separate disabled scaffold.
+- [ ] **VE1:** reusable gentle star-twinkle overlay, slow nebula drift and optional controlled parallax, Inspector-editable `CalmSpace` preset; retain current static background when disabled.
+- [ ] **VE2:** shader/preset-backed subtle Portal core/rim movement and Citadel reactor glow; optional spawn/credit/health event pulses that do not change input or gameplay.
+- [ ] **VE3:** sparse opt-in animated metal/foundation corridor lighting, correct atlas UV/material isolation, `IndustrialBlue`/`IndustrialAmber` presets. Prioritize Level020 without repainting existing maps.
+- [ ] **VE4:** localized faint Mars dust wisps/industrial accents, distinct from the unfinished Terrain Edges E1–E3 mask renderer; keep camera feedback separate.
+- [ ] Test atmosphere off/on on Level001/002/020 and template, Godot shader loading, near/far zoom and 500+ enemy performance; one commit per VE implementation job. No per-tile nodes or per-frame full-map rebuilds.
+
+---
+
 ## ARG automatic income correction — 2026-10-19
 
 ARG eligible kills now grant Credits directly to the existing wallet: no collection button, stored income or storage limit. The Resource Tower and Citadels retain manual collection. A single mouse-transparent green floating number beside each ARG combines rapid successful payouts (+1 → +2 → +5), then floats/fades away after a quiet interval (default 0.8s). Popup duration/color are editable on ARG config. Higher tiers still earn 2/3 per eligible kill. Full-wallet rejection displays no false income and is not banked. Existing kill eligibility, pause/construction/upgrade gates and ordinary kill rewards/XP remain intact. ARG previews omit unused storage. Earlier buffered-ARG descriptions below are historical and superseded by this correction.
