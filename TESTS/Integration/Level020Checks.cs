@@ -2,6 +2,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public static class Level020Checks
 {
@@ -51,10 +52,45 @@ public static class Level020Checks
                 Require(start.X < 20 && ground.Contains(start) && CanReach(start, approaches, blocked),
                     "Each west portal reaches the east Citadel through the labyrinth: " + path);
             }
-            Require(WaveCatalog.GetWaves("level020").Length == 4, "Level020 four authored mixed waves");
+            VerifySevenWaveAssault();
             GD.Print("PASS: Level020 five-portal painted western field/eastern buildable maze and walkable Citadel routes");
         }
         finally { level.Free(); }
+    }
+
+    // =========================================================
+    // Seven-wave content contract: hordes first, escort carriers second, major armoured threats last.
+    // Validate real enemy scene/catalog IDs rather than assuming weight entries resolve at runtime.
+    private static void VerifySevenWaveAssault()
+    {
+        WaveDefinition[] waves = WaveCatalog.GetWaves("level020");
+        Require(waves.Length == 7 && waves.Select(w => w.Number).SequenceEqual(Enumerable.Range(1, 7)),
+            "The Five Gates defines seven consecutive waves");
+        Require(waves.Select(w => w.Batches.Sum(b => b.Count)).SequenceEqual(new[] { 52, 68, 80, 72, 72, 60, 58 }),
+            "Authored enemy counts progress from light swarms to the heavy finale");
+        WaveCatalog.Validate(waves, WaveCatalog.LoadScenes());
+
+        string[] light = { "basic_mk1", "scout_mk1", "racer_mk1", "reinforced_drone_mk1" };
+        Require(waves.Take(2).SelectMany(w => w.Batches).SelectMany(b => b.Entries)
+            .All(e => light.Contains(e.EnemyId)), "Waves 1-2 consist of small ships only");
+        Require(waves[2].Batches.SelectMany(b => b.Entries).Any(e => e.EnemyId == "medium_mk1")
+            && waves.Take(3).SelectMany(w => w.Batches).SelectMany(b => b.Entries)
+                .All(e => e.EnemyId != "transporter_mk1" && e.EnemyId != "heavy_transporter_mk1"),
+            "Wave 3 adds defensive escorts before transports arrive");
+        Require(waves[3].Batches.SelectMany(b => b.Entries).Any(e => e.EnemyId == "transporter_mk1")
+            && waves[4].Batches.SelectMany(b => b.Entries).Any(e => e.EnemyId == "heavy_transporter_mk1")
+            && waves[5].Batches.SelectMany(b => b.Entries).Any(e => e.EnemyId == "heavy_bulwark_mk1" || e.EnemyId == "big_mk1"),
+            "Waves 4-6 progressively introduce carriers, then the armoured fleet");
+        Require(waves.Take(6).SelectMany(w => w.Batches).SelectMany(b => b.Entries)
+                .All(e => e.EnemyId != "cruiser_mk1")
+            && waves[6].Batches.Last().Entries.Any(e => e.EnemyId == "cruiser_mk1" && e.SpawnWithShield),
+            "Shielded Cruisers are reserved for the wave-7 finale");
+        var rng = new RandomNumberGenerator { Seed = 20 };
+        var finale = WaveCatalog.Compose(waves[6].Batches.Last(), rng);
+        Require(finale.Count(e => e.EnemyId == "cruiser_mk1" && e.SpawnWithShield) == 2,
+            "Final batch guarantees exactly two shielded Cruisers");
+        Require(waves.SelectMany(w => w.Batches).SelectMany(b => b.Entries).All(e => e.Portal == ""),
+            "All waves retain random eligible distribution across the five level portals");
     }
 
     // =========================================================

@@ -34,7 +34,7 @@ public partial class LevelReorganizationChecks : Node
                 Require(map.SceneFilePath == "res://LEVELS/Level020/Level020.tscn"
                     && PlayableLevelCatalog.Identify(fixture.Main, map) == "Level020"
                     && map.Settings.WaveSetId == "level020" && map.Settings.ActivePortals.Count == 5
-                    && WaveCatalog.GetWaves("level020").Length == 4, "Renamed launcher loads and identifies Level020");
+                    && WaveCatalog.GetWaves("level020").Length == 7, "Renamed launcher loads and identifies seven-wave Level020");
                 Require(fixture.Spawns.Spawn("basic_mk1", true) != null, "Preserved Five Gates still spawns through a valid portal");
             }
             GD.Print("PASS: Level020 preserved terrain/config/waves/launcher, fresh independent Level002 and gap-safe progression");

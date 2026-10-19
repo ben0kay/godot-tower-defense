@@ -1,3 +1,12 @@
+## Level020 waves expanded to seven (2026-10-19)
+
+- [x] Level020: authored 7-wave Five Gates assault, **52/68/80/72/72/60/58** ships, beginning with small hordes; regular/heavy Transporters in waves4–5; big armoured enemies and a pair of shielded Cruisers in wave7.
+- [x] Level020-specific validation covers real catalogue IDs, seven totals, tier introduction, two guaranteed final Cruisers and unrestricted use of the five configured portals.
+- [ ] Desktop balance/playtest and headless Godot suite pending. Existing wave scheduler, Level020 layout/settings, and other levels unchanged.
+- Documentation: [Level020/README.md](../LEVELS/Level020/README.md).
+
+---
+
 ## Lightweight data-driven levels — implemented 2026-10-19
 
 Shared `LEVELS/Runtime/Battlefield.tscn` + `WORLD/World.tscn` replace per-level service copies. Existing Main launchers and World variants are thin compatibility shortcuts; F6 paths stay valid. Each level now has a MissionDefinition resource and the Campaign roster is `LEVELS/Catalog/DefaultMissionCatalog.tres`. Menu number/title/description/map are data, with a bounded scrollable mission list. New missions deploy/retry directly from their resource; no per-level launcher/world or menu/catalog code is required. Next advances only to the immediate enabled number.
