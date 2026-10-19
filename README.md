@@ -1,3 +1,9 @@
+## Resource Tower and Adaptable Resource Generator — 2026-10-19
+
+The Ctrl **Economy** tray now includes two muted-green Credit producers, each with three paid tiers and an Inspector **Collect Credits** action. Resource Tower earns periodically during active waves; ARG earns from credited kills by nearby offensive towers. Existing Citadel income/collection is retained. Balance and tuning: `ECONOMY/Production/README.md`; verification/known baseline test failures: `TESTS/Economy/CreditTowers.md`.
+
+---
+
 ## Performance overlay and F2 tools — 2026-10-18
 
 **F4** toggles the new click-through performance panel in debug builds on all playable battlefields. The contained script and settings guide live in `DEBUG/`. Level002/template now include the shared F2 spawn/F3 route-preview tools; use Campaign or a Main launcher for gameplay rather than running the raw map alone. See `LEVELS/Debug/README.md`.

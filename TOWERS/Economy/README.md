@@ -1,3 +1,9 @@
+## Credit economy towers — CP2/CP3 (2026-10-19)
+
+Resource Tower (2×2 periodic active-wave income) and Adaptable Resource Generator (1×1 nearby killing-tower income) are now available under Economy. Each has three paid tiers, independent capped storage and Inspector collection, using the existing wallet and shared production helpers. See `ECONOMY/Production/README.md` from the repository root for balance/settings and deferred research. Earlier planned status below is historical.
+
+---
+
 # Economy Towers
 
 Player-placeable income, production, storage and power-generating structures. Buildings are registered through the existing tower catalog/placement authority; a structure does **not** need weapon targeting or combat stats merely because it is placeable.

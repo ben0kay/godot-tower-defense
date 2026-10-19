@@ -17,6 +17,7 @@ public partial class EnemyRegistry : Node
     public int KilledCount { get; private set; }
     public int ArrivedCount { get; private set; }
     public event Action<Enemy> EnemyKilled;
+    public event Action<Enemy, DamageSource> AttributedKill;
     public event Action<Enemy> EnemyUnregistered;
     public event Action<Enemy> EnemyArrived;
 
@@ -64,7 +65,7 @@ public partial class EnemyRegistry : Node
 
     // =========================================================
     // World unload releases index history, membership and reusable query storage together.
-    public override void _ExitTree() { _living.Clear(); _members.Clear(); _queryBuffers.Clear(); _spatial = null; EnemyUnregistered = null; }
+    public override void _ExitTree() { _living.Clear(); _members.Clear(); _queryBuffers.Clear(); _spatial = null; EnemyUnregistered = null; AttributedKill = null; }
 
     // =========================================================
     // Emit kill-only notifications after an enemy leaves the living registry.
@@ -73,6 +74,7 @@ public partial class EnemyRegistry : Node
     {
         if (arrived) { ArrivedCount++; EnemyArrived?.Invoke(enemy); return; }
         KilledCount++;
+        AttributedKill?.Invoke(enemy, enemy.KillingSource); // Before wave completion: the final kill remains eligible.
         EnemyKilled?.Invoke(enemy);
     }
 }

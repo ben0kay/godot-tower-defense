@@ -84,6 +84,9 @@ public partial class GameplayHUD : Control
     public TowerDefinition.TowerCategory? BuildCategory { get; private set; }
     public Button GetBuildCategoryButton(string category) => _categoryButtons.GetValueOrDefault(category);
 
+    private Button _collectCredits;
+    private CreditProducerTower _creditProducer;
+
     #region Lifecycle
     // =========================================================
     // Cache child scenes once and prepare a HUD that works without a player actor.
@@ -124,6 +127,11 @@ public partial class GameplayHUD : Control
         _defenseMeters = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/Columns/Side/DefenseMeters");
         _towerHealthText = _defenseMeters.GetNode<Label>("HealthText"); _towerHealthBar = _defenseMeters.GetNode<ProgressBar>("HealthBar");
         _towerAmmoText = _defenseMeters.GetNode<Label>("AmmoText"); _towerAmmoBar = _defenseMeters.GetNode<ProgressBar>("AmmoBar");
+        _collectCredits = UIButtonFactory.Create("COLLECT CREDITS", () =>
+        {
+            if (GodotObject.IsInstanceValid(_creditProducer)) { _creditProducer.TryCollect(); SetDefenseDetails(_creditProducer); }
+        }, UIButtonStyle.Compact, 24, Config);
+        _collectCredits.Name = "CollectCredits"; _collectCredits.Hide(); _defenseMeters.AddChild(_collectCredits);
         _rankSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/Columns/Side/RankSection");
         _rankLabel = _rankSection.GetNode<Label>("Rank");
         _experienceText = _rankSection.GetNode<Label>("ExperienceText");
@@ -378,7 +386,15 @@ public partial class GameplayHUD : Control
     // Preserve the logistical status line; do not repeat numerical HP/ammo in RuntimeStats.
     public void SetDefenseDetails(TowerBase tower)
     {
-        if (!GodotObject.IsInstanceValid(tower) || _buildPreview) { _defenseMeters.Hide(); SetRuntimeDetails(""); return; }
+        _creditProducer = tower as CreditProducerTower;
+        if (!GodotObject.IsInstanceValid(tower) || _buildPreview) { _creditProducer = null; _collectCredits.Hide(); _defenseMeters.Hide(); SetRuntimeDetails(""); return; }
+        _collectCredits.Visible = _creditProducer != null;
+        if (_creditProducer != null)
+        {
+            _collectCredits.Text = $"COLLECT {_creditProducer.Buffer?.Current ?? 0} CREDITS";
+            _collectCredits.Disabled = !_creditProducer.CanCollect;
+            _collectCredits.TooltipText = "Requires room for the entire stored amount. A full wallet leaves storage untouched.";
+        }
         _defenseMeters.Show();
         _towerHealthText.Text = $"HP: {tower.Health:0.#} / {tower.MaxHealth:0.#}";
         _towerHealthBar.MaxValue = Mathf.Max(1, tower.MaxHealth); _towerHealthBar.Value = tower.Health;

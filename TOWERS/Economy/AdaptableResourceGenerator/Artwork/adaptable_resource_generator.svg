@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 64 64">
+<defs><linearGradient id="hull" x2=".3" y2="1"><stop stop-color="#4d6350"/><stop offset="1" stop-color="#1c3026"/></linearGradient></defs>
+<path d="M8 18L18 8H46L56 18V46L46 56H18L8 46Z" fill="url(#hull)" stroke="#7b8c6c" stroke-width="2"/>
+<circle cx="32" cy="32" r="17" fill="#182a22" stroke="#637f5e" stroke-width="3"/>
+<circle cx="32" cy="32" r="8" fill="#87956c" stroke="#bac09a"/>
+<path d="M8 28H18M46 28H56M8 37H18M46 37H56M28 8V17M37 8V17M28 47V56M37 47V56" stroke="#a1ab82" stroke-width="3"/>
+<path d="M27 27L37 37M37 27L27 37" stroke="#344a35" stroke-width="2"/></svg>

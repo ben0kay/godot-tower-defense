@@ -13,6 +13,7 @@ public partial class Enemy : Node2D
     public float RemainingPathDistance => Movement?.RemainingPathDistance ?? float.PositiveInfinity;
     public event Action<Enemy> Removed;
     public event Action<Enemy> KilledBeforeRemoval;
+    public DamageSource KillingSource { get; private set; }
     public int SpawnGeneration { get; private set; }
     public event Action<Enemy> Initialized;
     public EnemyRegistry Registry => _registry;
@@ -177,6 +178,7 @@ public partial class Enemy : Node2D
         }
         float oldShield = CurrentShield;
         CurrentShield = result.Shield; Health = result.Health;
+        if (oldHealth > 0 && Health <= 0) KillingSource = source;
         if (CurrentShield != oldShield) SyncShieldVisual(oldShield, CurrentShield);
         if (Health != oldHealth)
         {

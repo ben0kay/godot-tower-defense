@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="ResourceTowerConfig" load_steps=6 format=3]
+[ext_resource type="Script" path="res://TOWERS/Economy/ResourceTower/ResourceTowerConfig.cs" id="1"]
+[ext_resource type="Script" path="res://TOWERS/Economy/Shared/CreditProduction/CreditProducerLevel.cs" id="2"]
+
+[sub_resource type="Resource" id="Tier1"]
+script = ExtResource("2")
+Price = 350
+Capacity = 100
+CreditsPerKill = 0
+CreditsPerCycle = 10
+CycleSeconds = 5.0
+RangePixels = 0.0
+HullHealth = 150.0
+WorkSeconds = 2.0
+
+[sub_resource type="Resource" id="Tier2"]
+script = ExtResource("2")
+Price = 250
+Capacity = 150
+CreditsPerKill = 0
+CreditsPerCycle = 15
+CycleSeconds = 5.0
+RangePixels = 0.0
+HullHealth = 200.0
+WorkSeconds = 2.0
+
+[sub_resource type="Resource" id="Tier3"]
+script = ExtResource("2")
+Price = 350
+Capacity = 200
+CreditsPerKill = 0
+CreditsPerCycle = 20
+CycleSeconds = 5.0
+RangePixels = 0.0
+HullHealth = 250.0
+WorkSeconds = 2.0
+
+[resource]
+script = ExtResource("1")
+ProductionLevels = Array[ExtResource("2")]([SubResource("Tier1"), SubResource("Tier2"), SubResource("Tier3")])

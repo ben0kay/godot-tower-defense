@@ -15,17 +15,17 @@ public sealed class DamageSource
     public bool TryGetRules(out TowerMasterConfig rules)
     {
         rules = null;
-        if (!TryOwner(out TowerBase tower)) return false;
+        if (!TryGetTower(out TowerBase tower)) return false;
         rules = tower.ExperienceRules; return GodotObject.IsInstanceValid(rules);
     }
 
     // =========================================================
     // Recheck at publication: a kill callback may have removed the originating tower.
     public void Credit(double experience)
-    { if (TryOwner(out TowerBase tower)) TowerRankController.AwardExperience(tower, experience); }
+    { if (TryGetTower(out TowerBase tower)) TowerRankController.AwardExperience(tower, experience); }
 
     // =========================================================
     // Native lifetime, tree membership and deferred deletion all count; weak identity is never reassigned.
-    private bool TryOwner(out TowerBase tower) => _owner.TryGetTarget(out tower)
+    public bool TryGetTower(out TowerBase tower) => _owner.TryGetTarget(out tower)
         && GodotObject.IsInstanceValid(tower) && tower.IsInsideTree() && !tower.IsQueuedForDeletion();
 }

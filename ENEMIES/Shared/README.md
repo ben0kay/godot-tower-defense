@@ -75,3 +75,7 @@ Enemy exposes HasStatus, CanReceiveStatus, ApplyStatus and EffectiveMoveSpeed. L
 ## Stasis follow-up — 2026-10-18
 
 ST1 now implements independent timed Freeze alongside permanent Slow. Freeze gates movement to zero and expires via an active-only, pause-aware world scheduler; any prior Slow remains. Both tower targeting rules exclude their own active effect and explicit immunity. See `ENEMIES/StatusEffects/README.md` and `TOWERS/Offensive/StasisTower/README.md` from the repository root. Older deferred-Stasis statements are historical.
+
+## Lethal attribution for economy support
+
+Enemy.KillingSource captures the lethal DamageInfo.Source immediately before the once-only Finish path. EnemyRegistry.AttributedKill dispatches that token before ordinary EnemyKilled subscribers, so final-wave income resolves while the wave is still active. No nearby-source guessing or last-nonlethal-hit fallback. The token has a weak owner; arrivals/unattributed environmental kills provide no eligible tower. Existing EnemyKilled rewards and tower XP remain unchanged.

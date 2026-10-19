@@ -4,7 +4,7 @@ using System;
 public sealed class CreditBuffer
 {
     #region Balance and Notifications
-    public int Capacity { get; }
+    public int Capacity { get; private set; }
     public int Current { get; private set; }
     public bool IsFull => Current == Capacity;
     public event Action<int, int> Changed;
@@ -17,6 +17,15 @@ public sealed class CreditBuffer
     {
         if (capacity <= 0) throw new ArgumentOutOfRangeException(nameof(capacity));
         Capacity = capacity;
+    }
+
+    // =========================================================
+    // Economy upgrades can enlarge storage without losing pending income; shrinking below stock rejects.
+    public void ResizeCapacity(int capacity)
+    {
+        if (capacity < 1 || capacity < Current) throw new ArgumentOutOfRangeException(nameof(capacity));
+        if (capacity == Capacity) return;
+        Capacity = capacity; Changed?.Invoke(Current, Capacity);
     }
 
     // =========================================================

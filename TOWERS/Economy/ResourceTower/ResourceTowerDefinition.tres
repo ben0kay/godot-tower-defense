@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TowerDefinition" load_steps=5 format=3]
+[ext_resource type="Script" path="res://TOWERS/Shared/TowerDefinition.cs" id="1"]
+[ext_resource type="PackedScene" path="res://TOWERS/Economy/ResourceTower/ResourceTower.tscn" id="2"]
+[ext_resource type="Resource" path="res://TOWERS/Economy/ResourceTower/DefaultResourceTowerConfig.tres" id="3"]
+[ext_resource type="Texture2D" path="res://TOWERS/Economy/ResourceTower/Artwork/resource_tower.svg" id="4"]
+[resource]
+script = ExtResource("1")
+TowerId = "resource_tower"
+Category = 2
+Scene = ExtResource("2")
+DefaultConfig = ExtResource("3")
+Icon = ExtResource("4")
+Footprint = Vector2i(2, 2)
