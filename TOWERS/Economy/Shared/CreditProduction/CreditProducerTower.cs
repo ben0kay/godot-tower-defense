@@ -9,10 +9,11 @@ public abstract partial class CreditProducerTower : TowerBase
     protected CreditProducerConfig ProducerConfig => (CreditProducerConfig)AuthoredConfig;
     public override List<TowerLevel> Levels => AuthoredConfig.Levels;
     protected WaveManager Waves;
-    private EconomyManager _wallet;
+    protected EconomyManager Wallet;
+    public virtual bool UsesManualCollection => true;
     private LevelSessionController _session;
     private CreditProductionTimer _timer;
-    public bool CanCollect => Buffer?.Current > 0 && Available && !IsBusy;
+    public bool CanCollect => UsesManualCollection && Buffer?.Current > 0 && Available && !IsBusy;
     protected bool Available => IsInsideTree() && !IsQueuedForDeletion() && CanOperate && !GetTree().Paused
         && _session?.State == LevelSessionState.Playing;
     protected bool CanProduce => Available && !IsBusy && (!ProducerConfig.ActiveWavesOnly || Waves?.State is
@@ -31,7 +32,7 @@ public abstract partial class CreditProducerTower : TowerBase
     {
         ProducerConfig.PrepareLevels(); FinalStats = ResolveLevel(UpgradeLevel);
         Node battle = GetParent()?.GetParent()?.GetParent();
-        _wallet = battle?.GetNodeOrNull<EconomyManager>("Economy");
+        Wallet = battle?.GetNodeOrNull<EconomyManager>("Economy");
         _session = battle?.GetNodeOrNull<LevelSessionController>("LevelSession");
         Waves = battle?.GetNodeOrNull<WaveManager>("Waves");
         Buffer = new CreditBuffer(FinalStats.Production.Value.Capacity); Buffer.Changed += OnBufferChanged;
@@ -58,8 +59,8 @@ public abstract partial class CreditProducerTower : TowerBase
     // The Inspector button calls one idempotent wallet-backed action; full-wallet rejection preserves storage.
     public bool TryCollect()
     {
-        if (!CanCollect || !GodotObject.IsInstanceValid(_wallet)) return false;
-        return Buffer.TryCollect(_wallet, _wallet.CreditsResource);
+        if (!CanCollect || !GodotObject.IsInstanceValid(Wallet)) return false;
+        return Buffer.TryCollect(Wallet, Wallet.CreditsResource);
     }
 
     // =========================================================

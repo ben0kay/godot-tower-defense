@@ -44,7 +44,7 @@ public abstract partial class CreditProducerConfig : TowerConfig
     public override string DescribeStats(TowerFinalStats final)
     {
         if (final?.Production is not CreditProductionStats p) return "Credit producer";
-        return p.PerKill > 0 ? $"Income: {p.PerKill} Credits / eligible kill\nKilling tower range: {final.RangePixels:0}px\nStorage: {p.Capacity}"
+        return p.PerKill > 0 ? $"Income: {p.PerKill} Credits / eligible kill\nKilling tower range: {final.RangePixels:0}px\nPaid automatically to wallet"
             : $"Income: {p.PerCycle} Credits / {p.CycleSeconds:0.#}s\nStorage: {p.Capacity}";
     }
 }

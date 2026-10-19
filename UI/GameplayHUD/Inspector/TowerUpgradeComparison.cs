@@ -18,7 +18,7 @@ public static class TowerUpgradeComparison
         if (current.MaxHealth != next.MaxHealth) Add(rows, "Max HP", current.MaxHealth, next.MaxHealth, 1);
         if (current.Production is CreditProductionStats income && next.Production is CreditProductionStats future)
         {
-            Add(rows, "Storage", income.Capacity, future.Capacity, 0);
+            if (income.PerCycle > 0 || future.PerCycle > 0) Add(rows, "Storage", income.Capacity, future.Capacity, 0);
             if (income.PerKill > 0 || future.PerKill > 0)
             { Add(rows, "Credits / kill", income.PerKill, future.PerKill, 0); Add(rows, "Source range (px)", current.RangePixels, next.RangePixels, 0); }
             if (income.PerCycle > 0 || future.PerCycle > 0)

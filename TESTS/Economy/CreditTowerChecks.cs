@@ -91,28 +91,43 @@ public partial class CreditTowerChecks : Node
         double expectedXp = victim.Definition.KillRewardCredits * (killer.ExperienceRules.DamageXpMultiplier + killer.ExperienceRules.KillXpMultiplier);
         int beforeWallet = f.Wallet.GetBalance(f.Wallet.CreditsResource);
         victim.ApplyDamage(new DamageInfo(99999, DamageType.Kinetic, source: killer.DamageSource)); victim.TakeDamage(99999);
-        Require(arg.Buffer.Current == 1 && second.Buffer.Current == 1 && f.Wallet.GetBalance(f.Wallet.CreditsResource) == beforeWallet + victim.Definition.KillRewardCredits,
+        Require(arg.EarnedCredits == 1 && second.EarnedCredits == 1 && f.Wallet.GetBalance(f.Wallet.CreditsResource) == beforeWallet + victim.Definition.KillRewardCredits + 2,
             "Each eligible ARG earns once from the killing tower; victim location is irrelevant and ordinary reward unchanged");
         Require(Math.Abs(killer.RankProgress.TotalXp - xp - expectedXp) < .0001, "Attributed kill retains the exact ordinary tower damage/kill XP budget");
+        Require(arg.DisplayedIncome == 1 && !arg.TryCollect() && arg.Buffer.Current == 0, "ARG pays directly, without collectible storage");
+        f.Hud.SetDefenseDetails(arg);
+        Require(!f.Hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Side/DefenseMeters/CollectCredits").Visible,
+            "ARG Inspector has no collection action");
+        int savedWallet = f.Wallet.GetBalance(f.Wallet.CreditsResource);
+        f.Wallet.Grant(f.Wallet.CreditsResource, f.Wallet.Config.MaxBalancePerResource - savedWallet);
+        victim = f.Target(arg.GlobalPosition); victim.ApplyDamage(new DamageInfo(99999, DamageType.Kinetic, source: killer.DamageSource));
+        Require(arg.EarnedCredits == 1 && arg.DisplayedIncome == 1 && arg.Buffer.Current == 0,
+            "Rejected full-wallet income creates neither popup gains nor stored stock");
+        f.Wallet.Initialize(f.Spawns.Paths.Navigation.Grid.Level.Settings); f.Wallet.Grant(f.Wallet.CreditsResource, 10000);
+        Require(!TowerUpgradeComparison.Build(arg.FinalStats, arg.ResolveLevel(2)).Any(r => r.Name == "Storage"),
+            "ARG upgrade preview omits unused storage");
+        arg._Process(0.2);
         killer.GlobalPosition = arg.GlobalPosition + new Vector2(1000, 0);
         victim = f.Target(arg.GlobalPosition); victim.ApplyDamage(new DamageInfo(99999, DamageType.Kinetic, source: killer.DamageSource));
-        Require(arg.Buffer.Current == 1, "Nearby victim does not qualify a distant killing tower");
-        victim = f.Target(arg.GlobalPosition); victim.TakeDamage(99999); Require(arg.Buffer.Current == 1, "Unattributed kill earns no ARG income");
+        Require(arg.EarnedCredits == 1, "Nearby victim does not qualify a distant killing tower");
+        victim = f.Target(arg.GlobalPosition); victim.TakeDamage(99999); Require(arg.EarnedCredits == 1, "Unattributed kill earns no ARG income");
         killer.GlobalPosition = arg.GlobalPosition;
         var handle = arg.ApplyDisable(TowerDisableReason.EMP);
         victim = f.Target(arg.GlobalPosition); victim.ApplyDamage(new DamageInfo(99999, DamageType.Kinetic, source: killer.DamageSource));
-        Require(arg.Buffer.Current == 1 && second.Buffer.Current == 2, "Disabled ARG stops independently"); arg.RemoveDisable(handle);
+        Require(arg.EarnedCredits == 1 && second.EarnedCredits == 2, "Disabled ARG stops independently"); arg.RemoveDisable(handle);
         Require(ConstructionTestClock.PurchaseAndFinish(arg, f.Wallet, f.Placement.Settings, 1, out string error), "ARG paid upgrade: " + error);
-        Require(arg.Buffer.Current == 1 && arg.Buffer.Capacity == 150 && arg.FinalStats.Production.Value.PerKill == 2
-            && arg.InspectionRange == 288, "ARG upgrade changes yield/range without discarding stored income");
+        Require(arg.EarnedCredits == 1 && arg.FinalStats.Production.Value.PerKill == 2
+            && arg.InspectionRange == 288, "ARG upgrade changes yield/range with direct wallet income");
         DamageSource stale = killer.DamageSource; killer.QueueFree();
         victim = f.Target(arg.GlobalPosition); victim.ApplyDamage(new DamageInfo(99999, DamageType.Kinetic, source: stale));
-        Require(arg.Buffer.Current == 1, "Queued-for-removal source cannot earn income");
+        Require(arg.EarnedCredits == 1, "Queued-for-removal source cannot earn income");
         killer = f.Add<BattleTower>("battle", arg.GlobalPosition);
-        CreditBuffer destroyedBuffer = second.Buffer; int destroyedStock = destroyedBuffer.Current;
+        long destroyedStock = second.EarnedCredits;
         second.ApplyDamage(new DamageInfo(99999, DamageType.Kinetic));
         final.ApplyDamage(new DamageInfo(99999, DamageType.Kinetic, source: killer.DamageSource));
-        Require(arg.Buffer.Current == 3 && destroyedBuffer.Current == destroyedStock, "Destroyed ARG stops; the final owned wave kill is credited before completion gates close");
+        Require(arg.EarnedCredits == 3 && second.EarnedCredits == destroyedStock, "Destroyed ARG stops; the final owned wave kill is credited before completion gates close");
+        Require(arg.DisplayedIncome == 3, "Rapid payouts share one accumulated floating total");
+        arg._Process(2); Require(arg.DisplayedIncome == 0, "Quiet expiry clears the floating total");
         await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         Require(!arg.TryCollect(), "Mission result blocks collection from stale gameplay UI");
     }

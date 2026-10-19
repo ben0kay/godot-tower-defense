@@ -1,3 +1,9 @@
+## ARG automatic income correction — 2026-10-19
+
+ARG eligible kills now grant Credits directly to the existing wallet: no collection button, stored income or storage limit. The Resource Tower and Citadels retain manual collection. A single mouse-transparent green floating number beside each ARG combines rapid successful payouts (+1 → +2 → +5), then floats/fades away after a quiet interval (default 0.8s). Popup duration/color are editable on ARG config. Higher tiers still earn 2/3 per eligible kill. Full-wallet rejection displays no false income and is not banked. Existing kill eligibility, pause/construction/upgrade gates and ordinary kill rewards/XP remain intact. ARG previews omit unused storage. Earlier buffered-ARG descriptions below are historical and superseded by this correction.
+
+---
+
 ## Resource Tower and Adaptable Resource Generator — 2026-10-19
 
 The Ctrl **Economy** tray now includes two muted-green Credit producers, each with three paid tiers and an Inspector **Collect Credits** action. Resource Tower earns periodically during active waves; ARG earns from credited kills by nearby offensive towers. Existing Citadel income/collection is retained. Balance and tuning: `ECONOMY/Production/README.md`; verification/known baseline test failures: `TESTS/Economy/CreditTowers.md`.

@@ -386,7 +386,7 @@ public partial class GameplayHUD : Control
     // Preserve the logistical status line; do not repeat numerical HP/ammo in RuntimeStats.
     public void SetDefenseDetails(TowerBase tower)
     {
-        _creditProducer = tower as CreditProducerTower;
+        _creditProducer = tower is CreditProducerTower producer && producer.UsesManualCollection ? producer : null;
         if (!GodotObject.IsInstanceValid(tower) || _buildPreview) { _creditProducer = null; _collectCredits.Hide(); _defenseMeters.Hide(); SetRuntimeDetails(""); return; }
         _collectCredits.Visible = _creditProducer != null;
         if (_creditProducer != null)
