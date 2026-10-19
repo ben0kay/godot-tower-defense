@@ -118,6 +118,21 @@ public partial class StasisTowerChecks : Node
         Enemy enemy = f.Spawns.Spawn(GD.Load<PackedScene>("res://ENEMIES/Types/Enemy001/Enemy001.tscn")); Disable(enemy);
         for (int i = 0; f.Spawns.Paths.PendingCount > 0 && i < 300; i++) f.Spawns.Paths._PhysicsProcess(1.0 / 60);
         enemy.ApplyStatus(new(StatusEffectId.Freeze, 0, 1)); enemy.ApplyStatus(new(StatusEffectId.Slow, .33f));
+        // Stasis stops the movement callback; an initially hidden bar must align as soon as damage reveals it.
+        DefenseBar bar = enemy.GetNode<DefenseBar>("DefenseBar");
+        Require(!bar.Visible, "Full-health unshielded enemy starts without a visible DefenseBar");
+        foreach (float heading in new[] { Mathf.Pi * .5f, -Mathf.Pi * .5f })
+        {
+            enemy.Rotation = heading;
+            enemy.TakeDamage(1f);
+            Require(bar.Visible && Mathf.IsEqualApprox(bar.Rotation, -heading)
+                && Mathf.IsZeroApprox(bar.GlobalRotation)
+                && Mathf.Abs(bar.GlobalPosition.X - enemy.GlobalPosition.X) < .01f
+                && bar.GlobalPosition.Y < enemy.GlobalPosition.Y,
+                "Frozen upward/downward-facing enemy keeps newly visible HP bar horizontal and above the ship");
+            // A second damaged state should be handled without spawning another DefenseBar.
+            if (heading > 0) { bar.SetHealth(enemy.Definition.MaxHealth, enemy.Definition.MaxHealth); Require(!bar.Visible, "Restored full hull hides the bar"); }
+        }
         Vector2 start = enemy.GlobalPosition; float distance = enemy.RemainingPathDistance;
         int pending = f.Spawns.Paths.PendingCount;
         enemy.Movement._PhysicsProcess(.01);

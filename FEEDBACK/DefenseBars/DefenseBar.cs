@@ -68,14 +68,18 @@ public partial class DefenseBar : Node2D
     }
 
     // =========================================================
-    // Respect the shared feedback switch for both meters.
+    // Respect the shared feedback switch; align a newly revealed meter even if movement is frozen.
+    // Ongoing moving enemies still use their existing movement-based counter-rotation callback.
     private void RefreshVisibility()
     {
+        bool wasVisible = Visible;
         ShieldVisible = _hullAlive && ShieldFraction > 0f;
         HullVisible = _hullAlive && (HealthFraction < 1f || ShieldVisible);
         Visible = Style != null && (MasterConfig == null || MasterConfig.DefenseBarsEnabled)
             && (HullVisible || ShieldVisible);
-        if (Visible) QueueRedraw();
+        if (!Visible) return;
+        if (!wasVisible && GetParent() is Node2D owner) AlignWithOwner(owner.Rotation);
+        QueueRedraw();
     }
     #endregion
 

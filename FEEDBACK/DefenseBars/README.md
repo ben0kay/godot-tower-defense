@@ -1,3 +1,11 @@
+## Frozen-enemy bar orientation fix (2026-10-18)
+
+A previously hidden DefenseBar now counter-rotates itself **when damage or restored shields first make it visible**, using its owning Node2D's current angle. Stasis/Freeze stops `EnemyMovement`, so the normal movement callback could not align a newly revealed HP bar until the enemy resumed walking. The bar therefore appeared turned sideways/on top of upward-facing enemies. Aligning on the hidden→visible transition keeps it horizontal and positioned above the hull, with no polling, new nodes, separate Stasis code or change to gameplay; moving enemies still align through their existing movement callback. This shared correction covers every damageable enemy/tower that reuses DefenseBar.
+
+See `TESTS/Towers/StasisTowerChecks.cs` for sideways headings while frozen and appearance-at-impact assertions. Godot runtime execution remains to be verified.
+
+---
+
 ## Tower reuse — implemented 2026-10-17
 
 All registered towers/structures now attach this exact shared DefenseBar scene through TOWERS/Shared/Durability. Hull changes drive SetHealth and fixed-root alignment; full healthy towers have no visible meter, and damaged towers share the enemy colors/width policy. Footprint height sets bar clearance. Tower shield mechanics remain deferred. See TOWERS/Shared/Durability/README.md.
