@@ -1,0 +1,20 @@
+# Creating another playable level
+
+Your design workflow stays the same: duplicate LevelTemplate.tscn into a LevelXXX folder, then paint its tiles and place/snapped Portals and Citadels in Godot. This pass changes the runtime wiring, not map painting.
+
+| File in the level folder | Responsibility |
+| --- | --- |
+| Level003.tscn | Your painted map and authored world objects |
+| Level003Config.tres | Independent starting funds, Citadel HP, portal settings, XP and wave recipe reference |
+| Level003Waves.cs | Optional concise C# wave recipe, still edited by Codex |
+| Level003Mission.tres | Number/title/menu description and map file path |
+
+1. Duplicate the template into `LEVELS/Level003/Level003.tscn`. Duplicate DefaultLevelConfig into Level003Config.tres and assign it to the map's Settings. Keep each map's config independent.
+2. Paint and place objects normally. Set active Portal paths and Citadel references on the config as before. Preview plain maps in the editor; gameplay needs the shared battlefield.
+3. For waves, copy a LevelXXXWaves.cs recipe, rename its class, preserve the WaveSetSource base and Build method, and edit Create() batches. Compile C# once. On Level003Config / Waves / WaveSource, create that new recipe resource. Give WaveSetId a unique descriptive ID for compatibility tools (e.g. level003). No WaveCatalog switch registration is required. An empty ID and empty WaveSource disables waves for an unfinished map.
+4. Create a MissionDefinition resource saved as Level003Mission.tres. Set Number=3, Title, Description and MapScenePath=Level003.tscn. Leave LegacyLauncher empty. Keep Enabled off while the draft is unfinished.
+5. Add that resource to `LEVELS/Catalog/DefaultMissionCatalog.tres` / Missions and enable it when ready. Campaign builds its scrollable list from this roster. Deploy to play with the shared services.
+
+No new WORLD/WorldLevel003, MainLevel003, menu button code or C# catalog case is required. Number controls sorting and mission identity; resource-array order is not progression. Next Level only advances to the immediate enabled number: 002 cannot skip a missing003 and jump to020. Retry reloads the same mission with fresh world/wallet/waves. Menu title/description are data too.
+
+The three existing launchers remain F6 shortcuts. An optional new shortcut can inherit `LEVELS/Runtime/Battlefield.tscn` and assign Mission; it contains no duplicate service tree. Wave batches remain C# intentionally; this is not a visual wave editor. Existing maps, settings values, authored waves and progression/save formats were preserved.

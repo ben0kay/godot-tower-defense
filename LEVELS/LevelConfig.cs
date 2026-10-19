@@ -20,6 +20,7 @@ public partial class LevelConfig : Resource
     [Export] public Godot.Collections.Array<NodePath> ActivePortals { get; set; } = new();
 
     [ExportGroup("Waves")]
+    [Export] public WaveSetSource WaveSource { get; set; }
     [Export] public string WaveSetId { get; set; } = "";
 
     [ExportGroup("Destination")]

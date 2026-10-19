@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="MissionDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://LEVELS/Catalog/MissionDefinition.cs" id="1"]
+[resource]
+script = ExtResource("1")
+Number = 1
+Title = "DEFEND THE CITADEL"
+Description = "Initial combat test map with compact routes."
+MapScenePath = "res://LEVELS/Level001/Level001.tscn"
+LegacyLauncher = "res://Main.tscn"

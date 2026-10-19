@@ -11,7 +11,7 @@ public sealed class CitadelDestination : System.IDisposable
     public Node2D Root { get; }
     public CitadelHealth Health { get; }
     internal bool Registered = true;
-    private bool _live;
+    private bool _live, _disposed;
     public bool Available => Registered && _live;
     public readonly List<Vector2I> Goals = new();
     // =========================================================
@@ -30,7 +30,8 @@ public sealed class CitadelDestination : System.IDisposable
     // Preview pools and level teardown release subscriptions; a removed identity never revives or redirects.
     public void Dispose()
     {
-        _live = false;
+        if (_disposed) return;
+        _disposed = true; _live = false;
         if (GodotObject.IsInstanceValid(Root)) Root.TreeExiting -= Retire;
         if (GodotObject.IsInstanceValid(Health)) Health.TreeExiting -= Retire;
     }

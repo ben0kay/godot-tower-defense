@@ -1,8 +1,13 @@
 // Level020: four mixed test waves for a sprawling five-portal maze.
+using Godot;
 using static WaveBuilder;
 
-public static class Level020Waves
+[GlobalClass]
+public partial class Level020Waves : WaveSetSource
 {
+    // =========================================================
+    // Assign this resource to LevelConfig without adding a wave-catalog switch entry.
+    public override WaveDefinition[] Build() => Create();
     // =========================================================
     // All portals are eligible for each unpinned spawn; customize counts/timing freely.
     public static WaveDefinition[] Create() =>

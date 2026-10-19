@@ -19,6 +19,7 @@ public partial class MultiCitadelChecks : Node
         {
             Main = GD.Load<PackedScene>("res://Main.tscn").Instantiate();
             if (!keepResults) SubsystemBattlefield.DetachSession(Main);
+            ((BattlefieldLauncher)Main).PrepareMap();
             WorldLevel level = Main.GetNode<WorldLevel>("World/Level");
             level.Settings = (LevelConfig)level.Settings.Duplicate(true);
             level.Settings.SpawnMode = LevelConfig.SpawnSourceMode.Portals;

@@ -1,9 +1,14 @@
 // Level002 tutorial: four small, unshielded waves introduce baseline, speed, then durability.
 // The third plain enemy is Bulwark (medium_mk1 / Enemy004), not a nonexistent Enemy003 asset.
+using Godot;
 using static WaveBuilder;
 
-public static class Level002Waves
+[GlobalClass]
+public partial class Level002Waves : WaveSetSource
 {
+    // =========================================================
+    // Assign this resource to LevelConfig without adding a wave-catalog switch entry.
+    public override WaveDefinition[] Build() => Create();
     #region Tutorial Encounters
     // =========================================================
     // Manual wave starts leave unlimited building time; both authored portals remain eligible.

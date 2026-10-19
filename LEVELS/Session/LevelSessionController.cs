@@ -43,7 +43,8 @@ public partial class LevelSessionController : Node
         _results = GetNode<LevelResults>("../LevelResults"); _pause = GetNode<PauseMenu>("../PauseMenu");
         _hud = GetNode<GameplayHUD>("../UI/GameplayHUD"); _input = GetNode<GameInput>("/root/GameInput");
         RunStats = new LevelRunStats { Name = "RunStats" }; AddChild(RunStats);
-        _scenePath = GetParent().SceneFilePath;
+        _scenePath = GetParent() is BattlefieldLauncher launcher && launcher.Mission != null
+            ? launcher.Mission.LaunchPath : GetParent().SceneFilePath;
         _levelName = PlayableLevelCatalog.Identify(GetParent(), _spawns.Paths.Navigation.Grid.Level);
         _levelConfig = _spawns.Paths.Navigation.Grid.Level.Settings;
         _rewardProfileId = GetNode<CitadelSession>("../CitadelSession").Research.ProfileId;
@@ -176,7 +177,7 @@ public partial class LevelSessionController : Node
         _navigating = true;
         try
         {
-            if (string.IsNullOrEmpty(scene) || !ResourceLoader.Exists(scene, "PackedScene")) throw new InvalidOperationException("Mission scene is unavailable.");
+            if (string.IsNullOrEmpty(scene) || !ResourceLoader.Exists(scene)) throw new InvalidOperationException("Mission scene is unavailable.");
             MenuNavigation.Open(this, scene);
         }
         catch (Exception error) { _navigating = false; _results.ShowNavigationError(error.Message); }

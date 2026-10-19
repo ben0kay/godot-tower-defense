@@ -1,9 +1,14 @@
 // Level001 playtest encounters: escalating standard, shielded, fast and tougher enemies.
 // Shields are explicit per entry; Enemy001's 20-point capacity does not affect ordinary spawns.
+using Godot;
 using static WaveBuilder;
 
-public static class Level001Waves
+[GlobalClass]
+public partial class Level001Waves : WaveSetSource
 {
+    // =========================================================
+    // Assign this resource to LevelConfig without adding a wave-catalog switch entry.
+    public override WaveDefinition[] Build() => Create();
 	// =========================================================
 	// Three modest escalating waves; no Shield Generator here (no support shield restoration).
 	public static WaveDefinition[] Create() =>

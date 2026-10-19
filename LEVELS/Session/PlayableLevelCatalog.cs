@@ -1,25 +1,18 @@
 // Explicit playable launchers: map existence alone never authorizes next-level navigation.
 using Godot;
 using System;
-using System.Collections.Generic;
 
 public static class PlayableLevelCatalog
 {
-    private readonly record struct Entry(int Number, string Scene);
-    // Add one launcher here when a new playable battlefield is ready; maps alone are not entries.
-    private static readonly Entry[] Entries =
-    {
-        new(1, MenuNavigation.Level001Scene),
-        new(2, MenuNavigation.Level002Scene),
-        new(20, MenuNavigation.Level020Scene),
-    };
+    public static MissionDefinition[] Entries => MissionCatalog.Default.Entries();
 
     // =========================================================
     // Scene identity handles the Level001 Main.tscn exception; map identity supports future registered launchers.
     public static string Identify(Node battlefield, WorldLevel map)
     {
-        foreach (Entry entry in Entries)
-            if (entry.Scene == battlefield.SceneFilePath) return $"Level{entry.Number:000}";
+        if (battlefield is BattlefieldLauncher launcher && launcher.Mission != null) return launcher.Mission.LevelId;
+        foreach (MissionDefinition entry in Entries)
+            if (entry.LaunchPath == battlefield.SceneFilePath) return entry.LevelId;
         string name = map.SceneFilePath.GetFile().GetBaseName();
         return TryNumber(name, out _) ? name : "UNKNOWN SECTOR";
     }
@@ -45,22 +38,29 @@ public static class PlayableLevelCatalog
     {
         string next = FollowingName(level);
         if (!TryNumber(next, out int number)) return null;
-        foreach (Entry entry in Entries)
-            if (entry.Number == number && IsPlayable(entry.Scene)) return entry.Scene;
+        foreach (MissionDefinition entry in Entries)
+            if (entry.Number == number && IsPlayable(entry.LaunchPath)) return entry.LaunchPath;
         return null;
     }
 
     // =========================================================
-    // Validate launcher shape once at navigation time without instantiating worlds or running Ready callbacks.
+    // Validate inherited launcher shape off-tree without running gameplay Ready callbacks.
     public static bool IsPlayable(string path)
     {
-        if (string.IsNullOrEmpty(path) || !ResourceLoader.Exists(path, "PackedScene")) return false;
-        SceneState state = GD.Load<PackedScene>(path).GetState();
-        if (state.GetNodeType(0) != "Node2D") return false;
-        HashSet<string> children = new();
-        for (int i = 1; i < state.GetNodeCount(); i++)
-            if (state.GetNodePath(i).GetNameCount() == 2) children.Add(state.GetNodeName(i).ToString());
-        return children.Contains("World") && children.Contains("Waves") && children.Contains("CitadelSession")
-            && children.Contains("LevelSession") && children.Contains("LevelResults");
+        if (string.IsNullOrEmpty(path) || !ResourceLoader.Exists(path)) return false;
+        if (path.EndsWith(".tres", StringComparison.Ordinal))
+        {
+            try { var mission = GD.Load<MissionDefinition>(path); if (mission == null || !mission.Enabled) return false; mission.Validate(); return true; }
+            catch { return false; }
+        }
+        if (!ResourceLoader.Exists(path, "PackedScene")) return false;
+        Node root = GD.Load<PackedScene>(path).Instantiate();
+        try
+        {
+            return root is Node2D && root.GetNodeOrNull<Node>("World") != null && root.GetNodeOrNull<Node>("Waves") != null
+                && root.GetNodeOrNull<Node>("CitadelSession") != null && root.GetNodeOrNull<Node>("LevelSession") != null
+                && root.GetNodeOrNull<Node>("LevelResults") != null;
+        }
+        finally { root.Free(); }
     }
 }

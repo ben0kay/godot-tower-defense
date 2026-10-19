@@ -43,8 +43,8 @@ public partial class WaveManager : Node
         _hud.WaveStartRequested += OnStartRequested;
         try
         {
-            string set = _spawns.Paths.Navigation.Grid.Level.Settings.WaveSetId;
-            Configure(WaveCatalog.GetWaves(set), _spawns.Catalog.ToSceneMap());
+            LevelConfig settings = _spawns.Paths.Navigation.Grid.Level.Settings;
+            Configure(WaveCatalog.GetWaves(settings), _spawns.Catalog.ToSceneMap());
         }
         catch (Exception exception) { SetError(exception.Message); }
     }

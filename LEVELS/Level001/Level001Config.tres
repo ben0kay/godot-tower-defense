@@ -2,6 +2,10 @@
 
 [ext_resource type="Script" uid="uid://d3rj1iimghlhl" path="res://LEVELS/LevelConfig.cs" id="1"]
 
+[ext_resource type="Script" path="res://LEVELS/Level001/Level001Waves.cs" id="waves_script"]
+[sub_resource type="Resource" id="wave_source"]
+script = ExtResource("waves_script")
+
 [resource]
 script = ExtResource("1")
 VictoryBaseXP = 500
@@ -9,3 +13,4 @@ DefeatBaseXP = 0
 StartingCredits = 1000
 ActivePortals = Array[NodePath]([NodePath("Portals/EnemyPortal"), NodePath("Portals/EnemyPortal2")])
 WaveSetId = "level001"
+WaveSource = SubResource("wave_source")

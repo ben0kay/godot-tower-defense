@@ -1,3 +1,7 @@
+## Lightweight level authoring — 2026-10-19
+
+Run `res://TESTS/Integration/MissionCatalogChecks.tscn` for catalog-only mission registration, shared map/wave setup and real resource-only deployment/retry. Evidence and existing baseline navigation-fixture limitation: `TESTS/Integration/LightweightLevels.md`.
+
 # Headless gameplay checks
 
 ## Research-first extension — 2026-10-17

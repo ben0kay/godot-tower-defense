@@ -20,7 +20,22 @@ public static class MenuNavigation
         SceneTree tree = context.GetTree();
         bool paused = tree.Paused;
         tree.Paused = false;
-        Error result = tree.ChangeSceneToFile(scene);
+        Error result;
+        try
+        {
+            if (scene.EndsWith(".tres", StringComparison.Ordinal))
+            {
+                MissionDefinition mission = GD.Load<MissionDefinition>(scene);
+                if (mission == null || !mission.Enabled) throw new InvalidOperationException("Mission is unavailable.");
+                mission.Validate();
+                BattlefieldLauncher instance = GD.Load<PackedScene>("res://LEVELS/Runtime/Battlefield.tscn").Instantiate<BattlefieldLauncher>();
+                instance.Mission = mission;
+                result = tree.ChangeSceneToNode(instance);
+                if (result != Error.Ok) instance.Free();
+            }
+            else result = tree.ChangeSceneToFile(scene);
+        }
+        catch { tree.Paused = paused; throw; }
         if (result == Error.Ok) return;
         tree.Paused = paused;
         throw new InvalidOperationException($"Could not open {scene}: {result}");

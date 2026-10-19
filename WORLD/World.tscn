@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://WORLD/GRID/WorldGrid.cs" id="1_script"]
 [ext_resource type="Resource" path="res://WORLD/DefaultWorldConfig.tres" id="2_config"]
@@ -20,9 +20,12 @@
 
 [ext_resource type="Script" path="res://TOWERS/Shared/Construction/ConstructionWorkManager.cs" id="14_work"]
 
-[node name="World" type="Node2D"]
+[ext_resource type="Script" path="res://LEVELS/Runtime/WorldMapLoader.cs" id="loader"]
 
-[node name="Level" parent="." instance=ExtResource("3_level")]
+[node name="World" type="Node2D"]
+script = ExtResource("loader")
+MapScene = ExtResource("3_level")
+
 
 [node name="Grid" type="Node2D" parent="."]
 z_index = 1

@@ -20,31 +20,26 @@ public partial class LevelSelectionMenu : Control
         if (ProfileStore.Selected == null) { MenuNavigation.ReturnToBoot(this); return; }
         VBoxContainer content = MenuLayout.Create(this, "LEVELS",
             "Commander " + ProfileStore.Selected.Name + "  /  Choose a mission", PanelWidth);
-        content.AddChild(UIButtonFactory.Label("LEVEL 001  —  DEFEND THE CITADEL", 17));
-        Label details = UIButtonFactory.Label("Initial combat test map with compact routes.", 14);
-        details.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-        content.AddChild(details);
-        Button play = UIButtonFactory.Create("PLAY LEVEL 001", () => Navigate(MenuNavigation.Level001Scene),
-            UIButtonStyle.Action, 64f);
-        content.AddChild(play);
-        content.AddChild(UIButtonFactory.Label("LEVEL 002  —  FIRST CONTACT", 17));
-        Label tutorialDetails = UIButtonFactory.Label("Four gentle waves: Standard Drones, Swift Interceptors and Bulwarks.", 14);
-        tutorialDetails.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-        content.AddChild(tutorialDetails);
-        content.AddChild(UIButtonFactory.Create("PLAY LEVEL 002", () => Navigate(MenuNavigation.Level002Scene),
-            UIButtonStyle.Action, 64f));
-        content.AddChild(UIButtonFactory.Label("LEVEL 020  —  THE FIVE GATES", 17));
-        Label mazeDetails = UIButtonFactory.Label("Five western portals. Open staging ground and a sprawling eastern maze with multiple paths.", 14);
-        mazeDetails.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-        content.AddChild(mazeDetails);
-        content.AddChild(UIButtonFactory.Create("PLAY LEVEL 020", () => Navigate(MenuNavigation.Level020Scene),
-            UIButtonStyle.Action, 64f));
+        ScrollContainer scroll = new() { CustomMinimumSize = new Vector2(0, 280),
+            HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
+        content.AddChild(scroll);
+        VBoxContainer missions = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        missions.AddThemeConstantOverride("separation", 12); scroll.AddChild(missions);
+        Button play = null;
+        foreach (MissionDefinition mission in PlayableLevelCatalog.Entries)
+        {
+            missions.AddChild(UIButtonFactory.Label($"LEVEL {mission.Number:000}  —  {mission.Title}", 17));
+            Label details = UIButtonFactory.Label(mission.Description, 14);
+            details.AutowrapMode = TextServer.AutowrapMode.WordSmart; missions.AddChild(details);
+            Button button = UIButtonFactory.Create($"PLAY LEVEL {mission.Number:000}", () => Navigate(mission.LaunchPath), UIButtonStyle.Action, 64f);
+            missions.AddChild(button); play ??= button;
+        }
         content.AddChild(UIButtonFactory.Create("BACK TO CAMPAIGN",
             () => Navigate(MenuNavigation.CampaignScene), UIButtonStyle.Compact));
         _errorDialog = new AcceptDialog { Title = "Could not launch" };
         AddChild(_errorDialog);
         UIButtonFactory.Apply(_errorDialog.GetOkButton(), UIButtonStyle.Action);
-        play.GrabFocus();
+        play?.GrabFocus();
     }
     #endregion
 

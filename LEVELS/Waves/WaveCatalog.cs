@@ -8,14 +8,27 @@ public static class WaveCatalog
 {
     // =========================================================
     // Empty means waves disabled for this map; unknown nonempty IDs never fall back.
-    public static WaveDefinition[] GetWaves(string id) => id switch
+    public static WaveDefinition[] GetWaves(LevelConfig config) => config.WaveSource?.Build() ?? GetWaves(config.WaveSetId);
+
+    // =========================================================
+    // Compatibility lookup for existing fixtures/tools; recipes are registered by mission data, not switches.
+    public static WaveDefinition[] GetWaves(string id)
     {
-        "" => Array.Empty<WaveDefinition>(),
-        "level001" => Level001Waves.Create(),
-        "level002" => Level002Waves.Create(),
-        "level020" => Level020Waves.Create(),
-        _ => throw new ArgumentException("Unknown WaveSetId: " + id)
-    };
+        if (string.IsNullOrEmpty(id)) return Array.Empty<WaveDefinition>();
+        WaveSetSource source = null;
+        foreach (MissionDefinition mission in PlayableLevelCatalog.Entries)
+        {
+            WorldLevel map = mission.MapScene.Instantiate<WorldLevel>();
+            try
+            {
+                if (map.Settings.WaveSetId != id) continue;
+                if (source != null) throw new ArgumentException("Duplicate WaveSetId: " + id);
+                source = map.Settings.WaveSource ?? throw new ArgumentException("Missing WaveSource: " + id);
+            }
+            finally { map.Free(); }
+        }
+        return source?.Build() ?? throw new ArgumentException("Unknown WaveSetId: " + id);
+    }
 
     // =========================================================
     // Load once during setup, never once per spawn.

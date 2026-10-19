@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="MissionDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://LEVELS/Catalog/MissionDefinition.cs" id="1"]
+[resource]
+script = ExtResource("1")
+Number = 20
+Title = "THE FIVE GATES"
+Description = "Five western portals. Open staging ground and a sprawling eastern maze with multiple paths."
+MapScenePath = "res://LEVELS/Level020/Level020.tscn"
+LegacyLauncher = "res://MainLevel020.tscn"
