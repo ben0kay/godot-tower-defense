@@ -78,11 +78,14 @@ public partial class EnemyWeaponMount : Node2D
     private void Stop()
     {
         _running = false; Target = null; Aligned = false; _registry = null; _scratch.Clear(); _search = 0;
-        ResetWeapon(); SetPhysicsProcess(false);
+        ResetWeapon(); OnMountStopped(); SetPhysicsProcess(false);
     }
     // =========================================================
     // Specialized cadence has no timer nodes and is reset whenever its mount changes lifecycle.
     protected virtual void ResetWeapon() { }
+    // =========================================================
+    // Optional transient presentation can reset on lifecycle changes without cancelling already-delivered world shots.
+    protected virtual void OnMountStopped() { }
     // =========================================================
     // Disconnect both host events regardless of enemy-versus-component teardown ordering.
     public override void _ExitTree()

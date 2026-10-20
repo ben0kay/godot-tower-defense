@@ -1,3 +1,9 @@
+## EG3 Gunner Drone — source implemented (2026-10-20)
+
+The14th catalog entry, gunner_drone_mk1, is F2/F3 available with separate64×48 hull and24×40 up-facing gun art, an independent gun pivot/real muzzle and dedicated small red tracer/warm flash presets. Enemy004 is the medium-size reference. It reuses GenericEnemy movement/status/stealth and EG1/EG2 aiming/bullets/tower damage. Existing13 types remain unarmed; no authored wave changes. Provisional180HP,75px/s,8 Credits,22px radius, family Drone. See Types/GunnerDrone/README.md. Build/runtime/visual acceptance remains pending; earlier no-Gunner statements below are historical.
+
+---
+
 ## EG2 hostile bullet delivery — source implemented (2026-10-20)
 
 Optional EnemyMinigun mounts now use one world-owned EnemyBulletSystem/Renderer with retained shot slots, straight travel, swept first-tower-footprint collision and shared Kinetic damage. Source death does not cancel emitted rounds; bullets cannot damage enemies, Citadels or terrain in this pass. Existing enemy scenes, catalog/F2 and waves remain unchanged/unarmed. Gunner Drone and its type-specific red/flash art remain EG3; profiling remains EG4. See Projectiles/README.md. Build/runtime/desktop verification remains pending; older EG1-only entries below are historical.

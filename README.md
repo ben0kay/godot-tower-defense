@@ -1,3 +1,7 @@
+### EG3 Gunner Drone — source implemented (2026-10-20)
+
+F2/catalog now includes Gunner Drone: a distinct64×48 hull matching medium Enemy004's size, separate rotating gun SVG, small muted-red tracers and tiny orange-red accepted-shot flashes. It keeps routing while shooting nearby towers via EG1/EG2. Normal waves remain unchanged. New scene and balance: [GunnerDrone](ENEMIES/Types/GunnerDrone/README.md). Build/runtime/visual verification remains pending because execution was unavailable; EG4 profiling is still future work.
+
 ### EG2 hostile bullet foundation — source implemented (2026-10-20)
 
 Enemy minigun mounts can now launch straight world-owned bullets that sweep against living tower footprints and apply existing Kinetic tower damage. One retained shot buffer and renderer replace per-bullet scene nodes; pause, lifetime, overflow and source-removal handling are included. Generic muted-red tracer appearance and budgets are Inspector editable. Existing enemies/waves remain unarmed; Gunner Drone/F2/art is EG3, benchmarking is EG4. Build/runtime/visual verification remains pending because execution was unavailable. See [enemy bullets](ENEMIES/Projectiles/README.md).

@@ -8,15 +8,19 @@ public partial class EnemyMinigun : EnemyWeaponMount
     private double _burstSeconds, _restSeconds, _burst, _rest, _cooldown, _lifetime;
     private ProjectileVisualSnapshot? _visual;
     private EnemyBulletSystem _bullets;
+    private WeaponVisualRenderer _visuals;
+    private MuzzleFlashSnapshot? _flash;
     public long ShotRequests { get; private set; }
     public event Action<EnemyShotRequest> ShotRequested;
     // =========================================================
     // Capture the specialized source once; untyped or invalid configs cannot start a minigun.
     protected override bool CaptureAdditionalSettings()
     {
-        _bullets = null; _visual = null;
+        _bullets = null; _visual = null; _flash = null; _visuals = null;
         if (Config is not EnemyMinigunConfig minigun || !minigun.TryCaptureBurst(out _burstSeconds, out _restSeconds)) return false;
         _lifetime = minigun.BulletLifetimeSeconds; _visual = minigun.ProjectileVisual?.Capture();
+        _flash = minigun.MuzzleFlash?.Capture();
+        _visuals = GetNodeOrNull<WeaponVisualRenderer>("WeaponVisuals");
         _bullets = OwnerEnemy.Registry.GetNodeOrNull<EnemyBulletSystem>("../../EnemyBullets");
         return true;
     }
@@ -37,7 +41,11 @@ public partial class EnemyMinigun : EnemyWeaponMount
             if (direction.IsFinite() && direction.LengthSquared() > .5f)
             {
                 EnemyShotRequest request = new(Muzzle.GlobalPosition, direction, Settings.Damage, Settings.BulletSpeed, _lifetime, _visual);
-                if (_bullets.TrySpawn(request)) { ShotRequests++; ShotRequested?.Invoke(request); }
+                if (_bullets.TrySpawn(request))
+                {
+                    if (_flash.HasValue && GodotObject.IsInstanceValid(_visuals)) _visuals.FlashAt(Muzzle, _flash.Value);
+                    ShotRequests++; ShotRequested?.Invoke(request);
+                }
                 _cooldown = 1.0 / Settings.ShotsPerSecond;
             }
         }
@@ -45,7 +53,11 @@ public partial class EnemyMinigun : EnemyWeaponMount
         if (_burst == 0) _rest = _restSeconds;
     }
     // =========================================================
+    // Stop only the gun's transient presentation; world-owned bullets must keep travelling.
+    protected override void OnMountStopped()
+    { if (GodotObject.IsInstanceValid(_visuals)) _visuals.ClearFlashes(); }
+    // =========================================================
     // A world-delivery subscriber must not survive this optional component's lifetime.
-    public override void _ExitTree() { ShotRequested = null; _bullets = null; base._ExitTree(); }
+    public override void _ExitTree() { ShotRequested = null; _bullets = null; base._ExitTree(); _visuals = null; _flash = null; }
     #endregion
 }

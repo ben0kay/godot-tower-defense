@@ -1,3 +1,17 @@
+## EG3 — medium-size Gunner Drone — source implemented (2026-10-20)
+
+The catalog now appends gunner_drone_mk1 as its14th entry. Existing F2 cycling/F3 catalog selection discovers it without new input code. Authored Level001/002/020 waves are unchanged. The actual medium reference is Enemy004/Bulwark Drone: new gunner hull is64×48 with22px navigation radius, a distinct hostile gunship silhouette and a **separate gunner_minigun.svg**. GunnerDrone inherits GenericEnemy, retaining shared movement/health/status/stealth/DefenseBar behavior.
+
+Sprite/Weapons(Node2D)/Minigun contains an independently rotating TurretPivot/GunSprite/Muzzle; the physical barrel-tip marker is(0,-18) on the up-facing24×40 gun asset. Initial pivot points right like the hull. Mounting the weapon branch beneath Sprite naturally inherits existing stealth Modulate alpha without polling or changing unarmed enemies. Navigation/root rotation remains independent of gun aiming.
+
+DefaultEnemyMinigun.tres supplies range260px,6 shots/s,1.5s bursts/1s rest,240deg/s aim,2 Kinetic damage and1200px/s straight bullets with2.5s lifetime. Dedicated Inspector-editable tracer/flash presets use7×1.3px muted coral-red tracers, faint deep-red glow, no bright tip and a5×3px orange-red flash lasting65ms. No random spread is introduced; shots follow actual barrel direction. New independent hull playtest balance:180HP,0shield,75px/s,2 Citadel damage,8 Credits; family Drone. These are provisional values.
+
+Only accepted central bullet launches flash. EnemyMinigun captures its optional flash snapshot and uses the existing bounded WeaponVisualRenderer through a snapshot overload; no per-shot nodes/timers are added. Mount disable/reinitialize/removal clears its transient flashes; world-owned emitted bullets continue. Other tower flash call sites retain the same API/behavior.
+
+**Verification:** focused GunnerDroneChecks covers catalog/F2, medium size, split assets/muzzle, accepted flashes, tower HP loss, source removal, snapshot isolation, stealth ancestry, Freeze and overflow. Existing fleet count expectation is updated to14. Static source/resource/scene checks only; no execution environment was available, so import/build/headless/runtime, actual visible1–10-drone firefights and zoomed readability remain pending. EG4 profiling/multi-gun work remains planned. Earlier EG1/EG2-only/no-Gunner entries below are retained as history and superseded by this entry.
+
+---
+
 ## EG2 — centralized hostile bullets — source implemented (2026-10-20)
 
 World/EnemyBullets now owns a fixed-capacity dense shot buffer and one active-only physics callback; World/EnemyBulletRenderer draws those same live shots at projectile depth. No per-bullet Node2D, physics body, Tween or Timer is created. EnemyMinigun submits real barrel-tip requests directly to this world service; ShotRequested now observes accepted launches. Sources and targets are never retained in bullet state, so emitted rounds survive shooter death/removal.

@@ -7,6 +7,7 @@ public partial class EnemyMinigunConfig : EnemyWeaponConfig
     #region Bullet Presentation and Lifetime
     [ExportGroup("Bullet Delivery")]
     [Export] public ProjectileVisualStyle ProjectileVisual { get; set; }
+    [Export] public MuzzleFlashStyle MuzzleFlash { get; set; }
     [Export] public double BulletLifetimeSeconds { get; set; } = 2.5;
     #endregion
 

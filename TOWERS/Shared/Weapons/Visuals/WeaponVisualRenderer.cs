@@ -27,7 +27,13 @@ public partial class WeaponVisualRenderer : Node2D
     public void FlashAt(Marker2D muzzle, MuzzleFlashStyle style)
     {
         if (!GodotObject.IsInstanceValid(muzzle) || !GodotObject.IsInstanceValid(style)) return;
-        MuzzleFlashSnapshot snapshot = style.Capture(); if (!snapshot.Enabled || snapshot.Opacity <= 0) return;
+        FlashAt(muzzle, style.Capture());
+    }
+    // =========================================================
+    // Optional enemy weapons capture appearance on initialization; share the renderer without retaining mutable presets.
+    public void FlashAt(Marker2D muzzle, MuzzleFlashSnapshot snapshot)
+    {
+        if (!GodotObject.IsInstanceValid(muzzle) || !snapshot.Enabled || snapshot.Opacity <= 0) return;
         Vector2 position = ToLocal(muzzle.GlobalPosition);
         Vector2 forward = (ToLocal(muzzle.GlobalPosition - muzzle.GlobalTransform.Y) - position).Normalized();
         int slot;
@@ -36,6 +42,13 @@ public partial class WeaponVisualRenderer : Node2D
         _flashes[slot] = new() { Position = position, Forward = forward, Fresh = true, Style = snapshot };
         LastFlashPosition = position; LastFlashStyle = snapshot; TotalFlashes++;
         SetProcess(true); QueueRedraw();
+    }
+    // =========================================================
+    // Optional component lifecycle clears its own transient flashes without altering aim or lifetime counters.
+    public void ClearFlashes()
+    {
+        if (_count == 0) return;
+        System.Array.Clear(_flashes, 0, _count); _count = _overflow = 0; SetProcess(false); QueueRedraw();
     }
     // =========================================================
     // Aiming follows barrel forward toward target distance, not a fake hitscan or a damaging beam.

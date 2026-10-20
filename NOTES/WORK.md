@@ -1,3 +1,13 @@
+## EG3 — medium Gunner Drone / split art / F2 — source implemented (2026-10-20)
+
+Added the14th catalog entry gunner_drone_mk1, inherited GenericEnemy scene, independent definition,64×48 hostile hull SVG and separate24×40 rotating gun SVG with real(0,-18) muzzle. Medium reference confirmed as Enemy004/Bulwark Drone, not Enemy002. Default minigun and dedicated small muted-red tracer/orange-red flash presets are editable resources. F2/F3 discover the appended entry through the existing catalog; authored Level001/002/020 waves and13 prior enemy types are unchanged/unarmed.
+
+New ship provisional settings: Drone family,180HP,0shield,75px/s,22px radius,2 Citadel damage,8 Credits. Gun:260px,6/s,1.5s burst/1s rest,2 Kinetic,1200px/s,2.5s lifetime. Hull follows existing navigation while its gun aims independently; placing the gun branch beneath the hull Sprite carries stealth alpha naturally. Only accepted central shots emit tiny flashes through the existing bounded renderer; disable/reinitialize/removal clears flashes without cancelling world bullets.
+
+Added GunnerDroneChecks, updated fleet count expectation and relevant feature/debug docs. Static source/resource/scene checks only. **Godot import/.NET build, headless/runtime tests, manual1–10-gunner firefights and visual approval remain pending because execution was unavailable.** EG4 performance profiling/multi-gun preparation remains planned. Existing EG1–EG4 checklists below are retained as acceptance history; earlier no-Gunner statements are superseded by this source implementation entry.
+
+---
+
 ## EG2 — world-owned hostile bullets / tower hits — source implemented (2026-10-20)
 
 Added EnemyBulletSystem, EnemyBulletData, EnemyBulletRenderer and EnemyProjectileMasterConfig/default preset. World owns one fixed-capacity retained buffer, active-only physics loop and drawing surface. Optional EnemyMinigun now submits actual muzzle-tip straight shots; accepted shots are observed by ShotRequested, with captured lifetime/visual data. Sources/targets are not retained by bullets; source death/removal cannot cancel emitted rounds.

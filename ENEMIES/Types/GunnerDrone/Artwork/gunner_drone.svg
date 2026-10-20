@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="48" viewBox="0 0 64 48">
+<!-- Right-facing 64x48 gunship hull; the independent minigun is a separate SVG/scene child. -->
+<defs>
+ <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#71808a"/><stop offset=".25" stop-color="#34424d"/><stop offset=".6" stop-color="#1a242e"/><stop offset="1" stop-color="#090f16"/></linearGradient>
+ <linearGradient id="wing" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#50616d"/><stop offset=".5" stop-color="#1b2934"/><stop offset="1" stop-color="#0a1119"/></linearGradient>
+ <linearGradient id="engine"><stop stop-color="#ffad82"/><stop offset=".4" stop-color="#c94b3e"/><stop offset="1" stop-color="#512324"/></linearGradient>
+</defs>
+<g stroke-linejoin="round" stroke-linecap="round">
+ <path d="M7 5L28 3 45 10 58 7 53 17 36 20 12 16Z M7 43L28 45 45 38 58 41 53 31 36 28 12 32Z" fill="url(#wing)" stroke="#788691" stroke-width="1"/>
+ <path d="M12 7L28 6 40 11 28 13 13 12Z M12 41L28 42 40 37 28 35 13 36Z" fill="#485965"/>
+ <path d="M18 6L21 13M28 6L31 13M18 42L21 35M28 42L31 35" stroke="#111c25" stroke-width="2"/>
+ <path d="M9 14L26 11 43 15 61 24 43 33 26 37 9 34 3 27V21Z" fill="url(#hull)" stroke="#91a0aa" stroke-width="1.2"/>
+ <path d="M18 16L31 14 43 18 51 24 43 30 31 34 18 32 12 24Z" fill="#16232d" stroke="#536674"/>
+ <path d="M44 18L57 24 44 30 48 24Z" fill="#85929a"/>
+ <path d="M46 21L53 24 46 27" fill="none" stroke="#df7161" stroke-width="1.5"/>
+ <path d="M5 17H11V31H5Z" fill="#0a1017" stroke="#3c4b57"/>
+ <path d="M6 19H9V29H6Z" fill="url(#engine)"/>
+ <path d="M10 8L14 9M10 40L14 39M37 9L42 11M37 39L42 37" stroke="#d16a59" stroke-width="1.5"/>
+ <circle cx="30" cy="24" r="9.5" fill="#0c151e" stroke="#71838f" stroke-width="1.4"/>
+ <circle cx="30" cy="24" r="6.5" fill="#263743" stroke="#3a4d5c"/>
+ <path d="M18 18L22 16M18 30L22 32M35 15L40 17M35 33L40 31" stroke="#9babb4" stroke-width=".8"/>
+</g>
+</svg>

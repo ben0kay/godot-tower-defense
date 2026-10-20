@@ -1,0 +1,33 @@
+[gd_scene load_steps=8 format=3]
+[ext_resource type="PackedScene" path="res://ENEMIES/Shared/GenericEnemy.tscn" id="base"]
+[ext_resource type="Resource" path="res://ENEMIES/Types/GunnerDrone/GunnerDrone.tres" id="definition"]
+[ext_resource type="Texture2D" path="res://ENEMIES/Types/GunnerDrone/Artwork/gunner_drone.svg" id="hull"]
+[ext_resource type="Texture2D" path="res://ENEMIES/Types/GunnerDrone/Artwork/gunner_minigun.svg" id="gun"]
+[ext_resource type="Script" path="res://ENEMIES/Weapons/Minigun/EnemyMinigun.cs" id="weapon"]
+[ext_resource type="Resource" path="res://ENEMIES/Weapons/Minigun/DefaultEnemyMinigun.tres" id="config"]
+[ext_resource type="Script" path="res://TOWERS/Shared/Weapons/Visuals/WeaponVisualRenderer.cs" id="visuals"]
+
+[node name="GunnerDrone" instance=ExtResource("base")]
+Definition = ExtResource("definition")
+
+[node name="Sprite" parent="." index="0"]
+texture = ExtResource("hull")
+
+[node name="Weapons" type="Node2D" parent="Sprite"]
+
+[node name="Minigun" type="Node2D" parent="Sprite/Weapons"]
+script = ExtResource("weapon")
+Config = ExtResource("config")
+
+[node name="TurretPivot" type="Node2D" parent="Sprite/Weapons/Minigun"]
+position = Vector2(-2, 0)
+rotation = 1.5707964
+
+[node name="GunSprite" type="Sprite2D" parent="Sprite/Weapons/Minigun/TurretPivot"]
+texture = ExtResource("gun")
+
+[node name="Muzzle" type="Marker2D" parent="Sprite/Weapons/Minigun/TurretPivot/GunSprite"]
+position = Vector2(0, -18)
+
+[node name="WeaponVisuals" type="Node2D" parent="Sprite/Weapons/Minigun"]
+script = ExtResource("visuals")

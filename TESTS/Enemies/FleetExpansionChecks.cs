@@ -40,7 +40,7 @@ public partial class FleetExpansionChecks : Node
                     && f.Mission.Session.Snapshot.EnemiesKilled == 11, "Victory accounts for carrier and all ten children");
             }
             await SubsystemBattlefield.DrainFreedFixtures(this);
-            GD.Print("PASS: fleet families, all 13 catalog ships, new hulls/shields/rewards/arrival and mixed carrier victory on both maps");
+            GD.Print("PASS: fleet families, all 14 catalog ships, new hulls/shields/rewards/arrival and mixed carrier victory on both maps");
             GetTree().Quit();
         }
         catch (Exception error) { GD.PushError(error.ToString()); GetTree().Paused = false; GetTree().Quit(1); }
@@ -53,7 +53,7 @@ public partial class FleetExpansionChecks : Node
     private static void CheckDefinitionsAndSpawns(DeathSpawnFixture f)
     {
         var map = f.Spawns.Catalog.ToSceneMap();
-        Require(map.Count == 13, "Seven existing and six additional types are registered");
+        Require(map.Count == 14, "Thirteen existing types and the EG3 Gunner Drone are registered");
         foreach (var pair in map)
         {
             EnemyDefinition data = f.Spawns.Catalog.DefinitionFor(pair.Key);

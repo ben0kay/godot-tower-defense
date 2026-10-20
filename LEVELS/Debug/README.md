@@ -1,3 +1,7 @@
+## EG3 F2 entry — 2026-10-20
+
+DefaultEnemyCatalog now appends Gunner Drone(gunner_drone_mk1) as entry14. Existing F2 cycles it after Heavy Transporter, retaining all previous indices; F3 uses the same catalog. The new ship follows normal routes and attacks nearby placed towers with its separate rotating minigun. No debug key handling or authored waves changed. Run a gameplay launcher/Campaign, not the raw map alone. Build/runtime/manual visual acceptance is pending.
+
 ## F4 performance overlay + Level002 F2 repair — 2026-10-18
 
 `DEBUG/PerformanceOverlay.cs` is one isolated self-building CanvasLayer script, mounted on all three playable launchers. F4 toggles a debug-build-only panel below top HUD/existing map diagnostics, with throttled frame/engine timing, enemy/projectile-node counts, bounded navigation peak windows/queues and render counters. Click-through, pause-responsive, cached read-only service access; hidden sampling stops. Inspector settings live on the overlay node. See `DEBUG/README.md` for metric meanings and thresholds.

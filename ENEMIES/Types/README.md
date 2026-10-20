@@ -1,3 +1,7 @@
+## Gunner Drone — EG3 (2026-10-20, source implementation)
+
+Catalog/F2 count is now14. GunnerDrone/gunner_drone_mk1 inherits GenericEnemy and adds an optional enemy minigun with independent hull/gun SVGs. Its64×48 hull matches Enemy004/Bulwark Drone's size; shape is distinct. Provisional Drone family,180HP,0shield,75px/s,22px radius,2 Citadel damage,8 Credits. Gun defaults:260px range,6 bullets/s,1.5s burst/1s rest,2 Kinetic damage,1200px/s. All13 previous entries stay unchanged/unarmed and existing waves omit the new gunner. See GunnerDrone/README.md. Godot build/runtime and visual acceptance remain pending; previous13-ship counts below record earlier fleet history.
+
 ## Fleet expansion and enemy families — 2026-10-18 (implemented)
 
 Six new inherited enemy types bring the catalog to **13**. Each has independent SVG, Definition, stable Mk.1 ID and editable balance. Existing seven IDs/stats and authored Level001/Level020 waves are preserved. F2 cycles all 13; F3 picks up the same catalog. The previous seven-ship artwork sheet remains a historical preview of that art pass.

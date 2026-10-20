@@ -1,3 +1,22 @@
+## EG3 Gunner Drone verification — 2026-10-20
+
+Added GunnerDroneChecks.cs/.tscn for actual14-entry catalog/F2 cycling, ordinary types remaining unarmed, unchanged authored wave membership, medium Enemy00464×48 size, separate gun SVG/muzzle, real independent aiming, small red visual snapshots, accepted-shot flashes, actual tower HP loss, cooldown/overflow flash rejection, captured presets, source lifetime, stealth alpha inheritance and Freeze. FleetExpansionChecks now expects14 entries. No tests were executed: no execution environment was available. Static source/reference review only; build/headless/manual visuals and throughput remain pending.
+
+After importing/building in Godot .NET, run:
+
+```sh
+dotnet build
+godot --headless --path . res://TESTS/EnemyWeapons/GunnerDroneChecks.tscn
+godot --headless --path . res://TESTS/EnemyWeapons/EnemyWeaponChecks.tscn
+godot --headless --path . res://TESTS/EnemyWeapons/EnemyBulletChecks.tscn
+godot --headless --path . res://TESTS/Towers/ProjectileVisualChecks.tscn
+godot --headless --path . res://TESTS/Enemies/FleetExpansionChecks.tscn
+```
+
+Manual: F2 through14 entries on a playable map, spawn1–10 gunners, place towers near the route and watch moving hulls/independent guns, actual barrel-tip7×1.3px coral tracers, tiny5×3px warm flashes, misses, tower HP/death and shooter death with surviving shots. Check pause, Freeze, selection/cleanup and normal camera zoom readability. Current normal waves must remain unchanged. EG4 benchmark testing remains separate. Earlier EG1/EG2-only status is historical.
+
+---
+
 ## EG2 verification record — 2026-10-20
 
 EnemyBulletChecks.cs/.tscn now covers pure swept rectangle geometry; fast first-tower hits; multi-cell edges; successive bullets after lethal destruction; actual shared Kinetic HP loss; misses after target relocation; inclusive lifetime endpoint; expiry beyond lifetime; pause/malformed launch and delta guards; exact transformed-grid clipping; real mounted launch; source death independence; null friendly XP; capacity overflow/slot reuse; immutable/sanitized visuals; counters and no per-bullet scene children.

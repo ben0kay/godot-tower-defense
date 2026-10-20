@@ -1,3 +1,7 @@
+## EG3 enemy flash reuse — 2026-10-20
+
+WeaponVisualRenderer now also accepts FlashAt(Marker2D, MuzzleFlashSnapshot) so optional enemy miniguns can retain spawn/config-captured appearance. Existing FlashAt(Marker2D, MuzzleFlashStyle) delegates through the same code and keeps tower behavior. ClearFlashes releases transient slots and sleeps without altering aim or counters. Only accepted hostile shots call this renderer; capacity-rejected shots do not flash. No per-shot objects/timers or unrelated tower scene changes. Build/runtime verification remains pending.
+
 # Projectile and muzzle presentation — PV1/PV2
 
 Implemented shared visual-only tracer/flash resources. Weapon damage, targeting, ammo, XP, cadence and the eight-stage combat stat pipeline remain their existing owners. Battle now launches from its real barrel-tip marker rather than its center. Blaster's splash and travelling Shockwave delivery are separate and unchanged.

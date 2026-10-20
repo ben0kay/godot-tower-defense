@@ -1,3 +1,7 @@
+## EG3 producer — 2026-10-20
+
+Gunner Drone is now the first real catalog/F2 enemy using the EG2 world-owned system. Its separate hull/gun scene and dedicated tracer/flash resources live under Types/GunnerDrone and Weapons/Minigun. No new bullet ownership, collision, capacity, damage or per-shot nodes were introduced by EG3. Existing normal waves remain unchanged. Actual1–10-gunner visible testing remains pending because execution was unavailable. Older no-Gunner wording below is historical.
+
 # Central hostile bullets — EG2
 
 EnemyBulletSystem.cs owns one world-scoped dense fixed-capacity array of EnemyBulletData structs. EnemyBulletRenderer.cs draws that same array; bullets have no nodes, bodies, timers, tweens, shooter references or target references. EnemyShotRequest is the shared immutable input. EnemyMinigun caches the world service and TrySpawn returns whether capacity/validation accepted a real launch. ShotRequested observes accepted shots; no subscriber is needed to fire.

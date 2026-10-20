@@ -1,3 +1,7 @@
+## EG3 authored minigun and flash — 2026-10-20
+
+DefaultEnemyMinigun.tres is now assigned to the actual Gunner Drone. Visuals/EnemyMinigunTracer.tres and EnemyMinigunMuzzleFlash.tres provide dedicated7×1.3px muted-red tracers and5×3px65ms warm flashes. EnemyMinigunConfig.MuzzleFlash is optional and captured per initialize/config assignment alongside ProjectileVisual. A WeaponVisuals child uses the existing bounded WeaponVisualRenderer; only an accepted central shot flashes. No renderer child is added automatically to plain enemies or synthetic mounts without one. Stop/reinitialize/disable clears flash slots, not world bullets. Presets remain read-only; no random spread is added. The new scene/art/F2 registration is EG3 source-complete; build/runtime/visual acceptance is pending. Older type/flash-deferred text below is historical.
+
 ## EG2 delivery — source implemented (2026-10-20)
 
 EnemyMinigun caches World/EnemyBullets on initialization/config capture, then submits one real shot attempt per cadence opportunity. Accepted launches increment ShotRequests and publish ShotRequested as an observation event. Overflow never queues delayed catch-up bullets. Shots remain owned by the world after this gun/host exits. Missing delivery service cannot create a fake hit.
