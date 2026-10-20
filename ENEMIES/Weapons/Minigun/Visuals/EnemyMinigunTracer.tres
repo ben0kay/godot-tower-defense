@@ -4,9 +4,7 @@
 
 [resource]
 script = ExtResource("visual")
-LengthPixels = 10.0
-CoreThicknessPixels = 1.5
-GlowWidthMultiplier = 2.0
+GlowWidthMultiplier = 3.0
 CoreColor = Color(1, 0.702, 0.671, 1)
 BodyColor = Color(0.937, 0.4, 0.38, 1)
 GlowColor = Color(0.784, 0.196, 0.196, 0.18)

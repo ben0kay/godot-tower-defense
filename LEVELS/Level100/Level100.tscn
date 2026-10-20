@@ -6,7 +6,7 @@
 [ext_resource type="TileSet" uid="uid://cx81pmlj50tpq" path="res://WORLD/TERRAIN/TileSets/InteractiveTerrain.tres" id="2_interactive"]
 [ext_resource type="TileSet" uid="uid://dbryu0fnchy4x" path="res://WORLD/TERRAIN/TileSets/PassableTerrain.tres" id="2_passable"]
 [ext_resource type="Script" uid="uid://cxu0tg3s3btvh" path="res://LEVELS/WorldLevel.cs" id="3_root"]
-[ext_resource type="Resource" path="res://LEVELS/Level100/Level100Config.tres" id="4_config"]
+[ext_resource type="Resource" uid="uid://0rks3mnsx7ag" path="res://LEVELS/Level100/Level100Config.tres" id="4_config"]
 [ext_resource type="PackedScene" path="res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn" id="5_portal"]
 [ext_resource type="PackedScene" path="res://WORLD/OBJECTIVES/Citadel/Citadel.tscn" id="6_citadel"]
 [ext_resource type="Script" uid="uid://ceof7q2uqyh1q" path="res://WORLD/ROUTING/CheckpointDesignOverlay.cs" id="checkpoint_overlay"]
