@@ -315,7 +315,8 @@ public partial class EnemyMovement : Node
             if (GodotObject.IsInstanceValid(Enemy.Terrain) && Enemy.Terrain.LavaCellCount > 0
                 && !Enemy.Terrain.Traverse(Enemy, previous, nextPosition, segmentSeconds, terrainElapsed)) return;
             terrainElapsed += segmentSeconds;
-            Enemy.SetMovementPosition(nextPosition); Enemy.Registry.UpdatePosition(Enemy); Enemy.UpdateDefenseBarTransform(); travel -= distance;
+            // SetMovementPosition publishes spatial/reveal updates through Enemy's transform notifications.
+            Enemy.SetMovementPosition(nextPosition); Enemy.UpdateDefenseBarTransform(); travel -= distance;
             if (reachesCheckpoint) { CompleteCheckpoint(); return; }
             if (nextPosition == target) _next++; else break;
         }

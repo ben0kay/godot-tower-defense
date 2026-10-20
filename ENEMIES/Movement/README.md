@@ -1,3 +1,7 @@
+## PF1 — notification-owned movement updates (source implemented; unverified)
+
+EnemyMovement no longer explicitly updates the registry after SetMovementPosition; Enemy's existing local/global transform notifications retain spatial indexing and reveal callbacks. Clearance, terrain traversal and swept history remain unchanged. See `TESTS/Performance/MovementRegistryChecks.tscn` and `NOTES/AGENT_FINDINGS/Performance.md`. Build, runtime regressions and timing measurements could not run because the execution environment was unavailable. No measured speedup is claimed.
+
 ## MC3 HUD + F3 — implemented 2026-10-18
 
 Multiple Citadels now share **one horizontal row** in the top-center HUD: equal-width cells for two, four or more objectives, never stacked vertically. A one-Citadel level keeps the original nodes/layout/SetCitadelHealth behavior. Each multi meter shows its stable CITADEL number, independent current/max HP, threshold-colored fill and damage-only animation/flash. Zero values and maximum resets are supported; rebind/unload disconnect model events and stop old tweens. The full Citadel number/HP is available in each cell's tooltip. No HUD health polling or gameplay authority is introduced.

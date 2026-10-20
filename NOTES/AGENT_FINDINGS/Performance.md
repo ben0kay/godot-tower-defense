@@ -1,6 +1,20 @@
+## PF1 source change — 2026-10-20 (runtime verification pending)
+
+User explicitly chose PF1 after the screenshot/static investigation; PF0 repeatable desktop timing remains pending and was not treated as a blocker to this narrow source change.
+
+Removed only the explicit post-`SetMovementPosition` registry update in `EnemyMovement`. `Enemy.Initialize` enables local and global transform notifications; `Enemy._Notification` retains registry updates for movement, direct teleports and ancestor transform changes. The `_terrainMovement` early return occurs **after** the registry update, so terrain traversal semantics are preserved. No clearance checks, routes, waves, spawn counts, corridor settings or subscriber logic were changed.
+
+The old explicit call repeated a registry lookup/native position read and could repeat `EnemyPositionChanged` dispatch. `EnemySpatialIndex.Move` already skips equal positions, so this is not a claim that two full bucket moves happened. Local/global notifications may both fire; PF1 does not suppress either or impose an exactly-one callback contract.
+
+Added standalone `TESTS/Performance/MovementRegistryChecks.tscn`: synchronous notification-only queries/listeners for same-cell/cross-cell moves and teleports; real cached-route movement with clearance; active swept-wave history; live stealth beacon entry/exit; ancestor-transform propagation; arrival/free membership; and three alternating paired timing/callback runs emulating the old extra call. It reports raw timings rather than asserting a speedup.
+
+**Execution status:** source review only. No usable execution environment was available for this job. C# build, Godot import, new fixture, existing integration/spatial/stealth/wavefront suites and before/after timings were **not run**. No FPS gain or completed runtime acceptance is claimed. PF1 remains pending runtime verification; stop here before PF2.
+
+Required follow-up after C# build/import: run `TESTS/Performance/MovementRegistryChecks.tscn`, `TESTS/Performance/SpatialQueryBenchmarks.tscn`, `TESTS/Integration/EnemyIntegrationChecks.tscn`, `TESTS/Stealth/StealthChecks.tscn` and `TESTS/Navigation/CorridorNavigationChecks.tscn`. Record actual results, paired callback/timing output and comparable desktop Level100 measurements when available. If notification-only coverage fails, restore the explicit call rather than shipping stale spatial/reveal state.
+
 # Level 100 performance investigation — Codex handoff
 
-**Status (2026-10-20): DIAGNOSIS ONLY / ALL PERFORMANCE PASSES PENDING.** This document is a proposed implementation sequence, not evidence that any optimization below has been implemented, built, benchmarked or proven. Preserve the original screenshot-based agent diagnosis under **Original agent findings**. Before coding, re-read the latest repository HEAD: some guidance can predate newer features.
+**Status (2026-10-20): PF1 SOURCE CHANGE PREPARED; RUNTIME VERIFICATION PENDING.** PF1 source work is recorded below. The remaining sequence is proposed; runtime performance and regression acceptance have not been established. Preserve the original screenshot-based agent diagnosis under **Original agent findings**. Before coding, re-read the latest repository HEAD: some guidance can predate newer features.
 
 ## Intent and observed problem
 
@@ -81,7 +95,7 @@ Run headless/integration regressions that exist at HEAD, including `TESTS/Integr
 | Pass | Status | Outcome/evidence |
 |---|---|---|
 | PF0 — Baseline | NOT STARTED | Screenshot is a clue, not a controlled benchmark |
-| PF1 — Registry duplicate fix | NOT STARTED | Candidate source-level duplication confirmed; test before removal |
+| PF1 — Registry duplicate fix | SOURCE IMPLEMENTED / VERIFICATION PENDING | Explicit post-move call removed; notification/consumer fixture added; build/runtime/timings unavailable |
 | PF2 — Instrumentation | NOT STARTED | Debug-only measurements proposed |
 | PF3 — Isolate bottleneck | NOT STARTED | Compare matched workloads/settings; no shipped balance changes |
 | PF4 — Measured optimization | BLOCKED ON PF2/PF3 | Choose one evidence-backed improvement |

@@ -1,3 +1,7 @@
+## PF1 — duplicate movement update source change (2026-10-20; runtime verification pending)
+
+Removed the explicit post-move registry update; existing Enemy transform notifications retain ownership. Added focused movement/query/listener/swept-history/stealth/ancestor/removal checks and a paired callback/timing diagnostic. Execution environment unavailable: build, Godot tests and timings NOT RUN; no measured FPS gain claimed. PF0 remains pending; user explicitly requested proceeding with PF1. PF1 runtime acceptance remains pending; PF2–PF5 are unchanged. Details: `NOTES/AGENT_FINDINGS/Performance.md` and `TESTS/Performance/MovementRegistry.md`. Historical notes below are preserved.
+
 ## Profile welcome voice cue (2026-10-20; implementation pushed, playback pending)
 
 - [x] Confirmed user's latest GitHub commit adds binary `AUDIO/VoiceAssistant/Welcome_Commander.mp3`.

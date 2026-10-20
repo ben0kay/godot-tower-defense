@@ -1,3 +1,7 @@
+## PF1 — notification-owned movement updates (source implemented; unverified)
+
+EnemyMovement no longer explicitly updates the registry after SetMovementPosition; Enemy's existing local/global transform notifications retain spatial indexing and reveal callbacks. Clearance, terrain traversal and swept history remain unchanged. See `TESTS/Performance/MovementRegistryChecks.tscn` and `NOTES/AGENT_FINDINGS/Performance.md`. Build, runtime regressions and timing measurements could not run because the execution environment was unavailable. No measured speedup is claimed.
+
 ## SE1 — stealth enemies and reveal beacon — implemented 2026-10-20 UTC
 
 Waves may now author `Enemy("basic_mk1", stealth: true)` independently of `shield: true`. Default spawns remain ordinary; no existing wave/map was changed. Stealth ships render at30% alpha, revealed ships at100%, with configurable/dimmed defense feedback that composes with Cryo/Stasis. All aimed towers share detection filtering and cached-lock validation; private TowerConfig.CanDetectStealth opts a specialist in without globally revealing enemies. Existing attacks already emitted, splash and untargeted Shockwave remain able to damage hidden ships (stealth is targeting, not immunity).
