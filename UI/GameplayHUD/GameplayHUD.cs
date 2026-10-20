@@ -245,11 +245,11 @@ public partial class GameplayHUD : Control
             string id = definition.TowerId;
             Button button = UIButtonFactory.Create(definition.DisplayName + "\n" + definition.Category + " · " +
                 TowerPresentation.DescribeResourceCosts(definition.DefaultConfig.ConstructionCosts),
-                () => EmitSignal(SignalName.TowerChoiceRequested, id), UIButtonStyle.TowerTile, height: 65f, config: Config);
+                () => EmitSignal(SignalName.TowerChoiceRequested, id), UIButtonStyle.TowerTile, height: 56f, config: Config);
             button.MouseEntered += () => { if (!IsPlacementPresentation && _trayOpen && !_suppressRestoredHover) EmitSignal(SignalName.TowerPreviewRequested, id); };
             button.FocusEntered += () => { if (!IsPlacementPresentation && _trayOpen) EmitSignal(SignalName.TowerPreviewRequested, id); };
             button.Name = "Tower_" + entries.GetChildCount();
-            button.CustomMinimumSize = new Vector2(Config.TowerButtonWidth, 65f);
+            button.CustomMinimumSize = new Vector2(Config.TowerButtonWidth, 56f);
             button.TooltipText = definition.Description;
             button.Icon = definition.Icon;
             button.ExpandIcon = true;
@@ -811,8 +811,9 @@ public partial class GameplayHUD : Control
         LayoutStatus();
         _bottomArea.OffsetLeft = Config.EdgeMargin;
         _bottomArea.OffsetRight = -Config.EdgeMargin;
-        _bottomArea.OffsetTop = -(Config.BottomBarHeight + Config.EdgeMargin);
-        _bottomArea.OffsetBottom = -Config.EdgeMargin;
+        // Both panels share a true bottom edge; the taller Inspector may grow upward for dense content.
+        _bottomArea.OffsetTop = -Mathf.Max(Config.BottomBarHeight, Config.InspectorHeight);
+        _bottomArea.OffsetBottom = 0f;
         Control slot = GetNode<Control>("BottomArea/TraySlot");
         float inspectorWidth = Mathf.Min(Config.InspectorWidth, Mathf.Max(200, Size.X - Config.EdgeMargin * 2));
         float trayWidth = Mathf.Max(0, Size.X - Config.EdgeMargin * 2 - inspectorWidth - _bottomArea.GetThemeConstant("separation"));

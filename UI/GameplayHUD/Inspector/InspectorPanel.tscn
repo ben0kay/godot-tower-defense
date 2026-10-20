@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://UI/GameplayHUD/Inspector/TowerUpgradeGrid.cs" id="1_grid"]
 
 [node name="Inspector" type="PanelContainer"]
-custom_minimum_size = Vector2(560, 330)
+custom_minimum_size = Vector2(560, 252)
 size_flags_vertical = 8
 mouse_filter = 0
 

@@ -1,3 +1,12 @@
+## Bottom-docked build tray and Inspector — 2026-10-19 (code complete; tests pending)
+
+- [x] UI-only: both panels flush to the bottom of the viewport with existing side margins; tray nominal **260 → 224px**, Inspector **330 → 252px** while retaining the same 560px Inspector width. Panel content may expand the Inspector upward instead of clipping.
+- [x] Build catalog still shows two horizontally scrollable rows with 56px tower buttons, slightly smaller padding and preserved category/hover/selection handling.
+- [x] Updated responsive layout expectations in `TESTS/UI/PlacementHudChecks.cs`, `HudCategoryChecks.cs`, `TESTS/Towers/TowerUpgradeChecks.cs` and docs in `UI/GameplayHUD/`.
+- [ ] Godot/.NET build and tests: PlacementHudChecks, TowerUpgradeChecks, CompactInspectorChecks, HeatInspectorChecks, HudCategoryChecks; visually check 1920×1080, 1366×768 and 960×540, including two rows, category tabs, Inspector dense states and Ctrl transitions.
+
+---
+
 ## Level020 setup-error repair — 2026-10-20 UTC
 
 The seven-wave content update had changed Level020Waves back to a static class, breaking the serialized LevelConfig.WaveSource contract from the shared-level pass. Restored [GlobalClass] Resource inheritance (WaveSetSource) and Build() → Create(); all seven wave definitions, map and settings are retained. Recipes assigned in LevelConfig must remain resource classes; preserve the wrapper when editing batches. Added TESTS/Integration/Level020WaveSetupChecks.tscn to load the actual saved resource and launcher, assert seven Ready waves and successfully start wave1. C# build (zero warnings/errors) and this headless regression passed.

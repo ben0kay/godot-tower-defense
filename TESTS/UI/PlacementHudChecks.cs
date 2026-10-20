@@ -32,7 +32,7 @@ public partial class PlacementHudChecks : Node
         using AmmoLoopFixture f = new(this);
         f.Hud.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.TopLeft); f.Hud.SetTowerBarOpen(true, true);
         Control panel = f.Hud.GetNode<Control>("BottomArea/Inspector");
-        Require(f.Hud.Config.InspectorWidth == 560 && f.Hud.Config.InspectorHeight == 330, "Latest Inspector defaults retained");
+        Require(f.Hud.Config.InspectorWidth == 560 && f.Hud.Config.InspectorHeight == 252, "Latest Inspector defaults retained");
         foreach (Vector2I viewport in new[] { new Vector2I(1920, 1080), new Vector2I(1366, 768), new Vector2I(960, 540) })
         {
             f.Hud.Size = viewport;
@@ -46,7 +46,7 @@ public partial class PlacementHudChecks : Node
                     panel.GetGlobalRect().End.Y <= f.Hud.GetGlobalRect().End.Y + 1, "Basic build preview respects resized Inspector for " + definition.TowerId + " at " + viewport);
             }
         }
-        GD.Print("PASS: build previews for all catalog types fit the existing560x330 Inspector at1920x1080,1366x768,960x540");
+        GD.Print("PASS: build previews for all catalog types fit the content-sized, bottom-aligned Inspector at1920x1080,1366x768,960x540");
     }
 
     #region Stable Build Tray Regression
@@ -68,6 +68,13 @@ public partial class PlacementHudChecks : Node
             await SettleTray();
             Require(panel.Visible && !body.Visible && !hud.IsInspectionVisible, "Ctrl opening shows blank reserved shell");
             Require(Math.Abs(tray.Size.Y - hud.Config.BottomBarHeight) < .01f, "Two rows fit configured tray height");
+            Require(hud.Config.BottomBarHeight == 224 && hud.Config.InspectorHeight == 252,
+                "Compact tray/Inspector defaults are enabled");
+            Require(Math.Abs(tray.GetGlobalRect().End.Y - hud.GetGlobalRect().End.Y) < 1.1f
+                && Math.Abs(panel.GetGlobalRect().End.Y - hud.GetGlobalRect().End.Y) < 1.1f,
+                "Both bottom panels touch the viewport bottom at " + size);
+            Require(panel.Size.Y <= 253f && tray.Size.Y <= 225f,
+                "Blank Inspector shell and tray have no old oversized vertical reservation");
             Rect2 before = tray.GetGlobalRect(); Button rocket = hud.GetBuildButton("rocket");
             Require(rocket != null, "Actual Rocket build entry exists");
             hud._Input(new InputEventMouseMotion { Relative = Vector2.One });
@@ -75,7 +82,8 @@ public partial class PlacementHudChecks : Node
             Require(body.Visible && tray.GetGlobalRect() == before && before.End.X <= panel.GetGlobalRect().Position.X,
                 "Hover cannot move tray or cover Rocket at " + size);
             Require(entries.Columns == (f.Placement.Catalog.Definitions.Count(d => d.Available) + 1) / 2 &&
-                entries.Size.Y <= 138 && scroll.GetVScrollBar().Visible == false, "Two rows with horizontal overflow only");
+                entries.Size.Y <= 121 && scroll.GetVScrollBar().Visible == false
+                && scroll.Size.Y >= entries.Size.Y + (scroll.GetHScrollBar().Visible ? scroll.GetHScrollBar().Size.Y : 0), "Compact two-row buttons and horizontal scrollbar fit vertically");
             scroll.EnsureControlVisible(rocket); await SettleTray();
             Vector2 cursor = rocket.GetGlobalRect().GetCenter();
             GetViewport().PushInput(new InputEventMouseMotion { Position = cursor, GlobalPosition = cursor, Relative = Vector2.One });
@@ -94,7 +102,7 @@ public partial class PlacementHudChecks : Node
             many.Definitions.Add(new TowerDefinition { TowerId = "tray-layout-" + n, Scene = source.Scene,
                 DefaultConfig = source.DefaultConfig, Icon = source.Icon, Category = source.Category });
         many.Rebuild(); hud.BindCatalog(many); await SettleTray();
-        Require(entries.Columns == 20 && entries.Size.Y <= 138 && scroll.GetHScrollBar().MaxValue > scroll.Size.X,
+        Require(entries.Columns == 20 && entries.Size.Y <= 121 && scroll.GetHScrollBar().MaxValue > scroll.Size.X,
             "Forty entries remain two rows and overflow horizontally");
         scroll.EnsureControlVisible(hud.GetBuildButton("tray-layout-39")); await SettleTray();
         Require(scroll.ScrollHorizontal > 0 && tray.GetGlobalRect().End.X <= panel.GetGlobalRect().Position.X, "Final tile scrolls into reserved tray");

@@ -6,9 +6,9 @@ mouse_filter = 0
 [node name="Insets" type="MarginContainer" parent="."]
 layout_mode = 2
 theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 10
+theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 10
+theme_override_constants/margin_bottom = 8
 
 [node name="Tray" type="VBoxContainer" parent="Insets"]
 layout_mode = 2
@@ -43,7 +43,7 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="Scroll" type="ScrollContainer" parent="Insets/Tray"]
-custom_minimum_size = Vector2(0, 150)
+custom_minimum_size = Vector2(0, 138)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3

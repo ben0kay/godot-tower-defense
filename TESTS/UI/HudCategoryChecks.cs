@@ -49,7 +49,9 @@ public partial class HudCategoryChecks : Node
                 Control tray = hud.GetNode<Control>("BottomArea/TraySlot/TowerBar");
                 Require(inspector.GetNode("Insets") is MarginContainer && inspector.GetNode("Insets") is not ScrollContainer,
                     "Inspector has no scrolling container");
-                Require(Mathf.IsEqualApprox(tray.Size.Y, hud.Config.BottomBarHeight) && inspector.GetGlobalRect().End.Y <= hud.GetGlobalRect().End.Y + 1,
+                Require(Mathf.IsEqualApprox(tray.Size.Y, hud.Config.BottomBarHeight)
+                    && Mathf.Abs(inspector.GetGlobalRect().End.Y - hud.GetGlobalRect().End.Y) < 1.1f
+                    && Mathf.Abs(tray.GetGlobalRect().End.Y - hud.GetGlobalRect().End.Y) < 1.1f,
                     "Compact Inspector stays onscreen while category tray retains its configured height");
                 Require(inspector.Size.X >= hud.Config.InspectorWidth - 1 && inspector.GetNode<Button>("Insets/Body/Columns/Main/UpgradeButton").IsVisibleInTree(),
                     "Upgrade action is directly visible without scrolling");
