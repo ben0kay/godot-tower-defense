@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 public static class MachineGunTowerLevels
 {
-    private readonly record struct Row(int Level, int Credits, double WorkSeconds, int Damage, float Rate, float Range, float Speed, float Turn, int AmmoCapacity, int AmmoPerShot, HeatStats? Heat = null, float MaxHealth = 1000)
+    private readonly record struct Row(int Level, int Credits, double WorkSeconds, int Damage, float Rate, float Range, float Speed, float Turn, int AmmoCapacity, int AmmoPerShot, HeatStats? Heat = null, float MaxHealth = 1000, float SpreadDegrees = 0)
     {
         // =========================================================
         // One bullet per sequential attack; the two muzzles never double total authored fire rate.
         public TowerLevel Create() => new(Level, Credits, new TowerStatBlock(Range, Rate, Damage, Speed, Turn, 12f, .12f,
-            ShieldPenetration: 0f, Ammunition: new(AmmoCapacity, AmmoPerShot)) with { Heat = Heat, MaxHealth = MaxHealth }, WorkSeconds);
+            ShieldPenetration: 0f, Ammunition: new(AmmoCapacity, AmmoPerShot)) with { Heat = Heat, MaxHealth = MaxHealth, Handling = new(SpreadDegrees) }, WorkSeconds);
     }
 
     // Level | Cost | WorkSeconds | Damage | TotalBulletsPerSecond | RangePx | ProjectilePxS | TurnDegS | AmmoCapacity | AmmoPerBullet
@@ -16,9 +16,9 @@ public static class MachineGunTowerLevels
     // Optional named MaxHealth column is absolute per level; Level 1 is 1,000 HP; each paid tier adds 5% to the previous absolute HP.
     private static readonly Row[] Rows =
     {
-        new(1, 300, 4, 7, 14.4f, 262.9f, 2443.75f, 288, 1200, 1),
-        new(2, 200, 5, 8, 14.88f, 272.8f, 2443.75f, 288, 1200, 1, MaxHealth: 1050f),
-        new(3, 300, 6, 9, 15.36f, 283.8f, 2443.75f, 288, 1200, 1, MaxHealth: 1102.5f),
+        new(1, 300, 4, 7, 14.4f, 262.9f, 2443.75f, 288, 1200, 1, SpreadDegrees: 5f),
+        new(2, 200, 5, 8, 14.88f, 272.8f, 2443.75f, 288, 1200, 1, MaxHealth: 1050f, SpreadDegrees: 4.5f),
+        new(3, 300, 6, 9, 15.36f, 283.8f, 2443.75f, 288, 1200, 1, MaxHealth: 1102.5f, SpreadDegrees: 4f),
     };
 
     // =========================================================

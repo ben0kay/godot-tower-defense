@@ -1,3 +1,7 @@
+## PA3 projectile handling
+
+Existing level rows author ±2.5/2/1.5° launch spread. Selected rank totals reduce spread by 0/5/10/15/20%; reductions are not accumulated across ranks. Each emitted shot snapshots effective handling and samples once at its real muzzle. Straight is the default; see the shared projectile accuracy plan. Existing damage, cadence, ammunition and recoil values are retained.
+
 ## Combined R1/R2 recoil
 
 Finished artwork uses fixed BaseSprite plus TurretPivot/RecoilRoot/Sprite; the muzzle is at TurretPivot/RecoilRoot/Muzzles/MuzzleA. Recoil runs only after a funded projectile/flash launch. Visual settings live in Visuals/BattleRecoilStyle.tres; no balance or cadence settings changed. ConstructionSprite retains the original composite for build stages/custom monolithic artwork. See [shared recoil notes](../../Shared/Weapons/Recoil/README.md). Runtime verification is pending.

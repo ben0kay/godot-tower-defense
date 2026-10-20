@@ -1,3 +1,7 @@
+## Projectile handling update (PA1–PA3)
+
+Optional immutable handling now carries launch spread and explicit Straight/Homing guidance through level → selected rank → captured research → safety → final snapshots. Projectile towers default to straight physical shots; splash uses a fixed launch destination. See `TOWERS/Shared/Projectiles/PROJECTILE_GUIDANCE_ACCURACY_PLAN.md` for implementation decisions and retained pass history.
+
 ### Gunner Drone handling polish — 2026-10-20
 
 Gunner now holds valid targets for1s, searches every0.2s when idle, fires continuously at6/s, and uses small rounded-front/tapered-tail red energy streaks. All three are data-driven; travelling bullets and Kinetic damage remain intact. Import/build and the three focused enemy-weapon headless checks passed. Desktop visual approval remains pending. See ENEMIES/Weapons/README.md and TESTS/EnemyWeapons/README.md.

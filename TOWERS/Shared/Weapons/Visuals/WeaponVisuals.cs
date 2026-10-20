@@ -9,5 +9,5 @@ public static class WeaponVisuals
     // =========================================================
     // Called only after ammunition funds this projectile. The bullet remains independent of its source tower.
     public static void Present(BasicProjectile bullet, Marker2D muzzle, IProjectileVisualConfig config, WeaponVisualRenderer renderer)
-    { bullet.LaunchFrom(muzzle.GlobalPosition); renderer.FlashAt(muzzle, config?.MuzzleFlash); }
+    { bullet.LaunchFrom(muzzle.GlobalPosition, -muzzle.GlobalTransform.Y); renderer.FlashAt(muzzle, config?.MuzzleFlash); }
 }

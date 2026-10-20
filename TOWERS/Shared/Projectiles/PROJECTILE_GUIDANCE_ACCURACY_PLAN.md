@@ -1,3 +1,26 @@
+## Validation recorded 2026-10-20
+
+- `dotnet build --no-restore`: PASS, zero warnings/errors (Godot .NET 4.7.2, .NET 8 toolchain). Godot headless editor import completed.
+- Headless `TESTS/Towers/ProjectileAccuracyChecks.tscn`: PASS; deterministic handling/rank/research/preview, launch spread, moving/removed target, clipped lifetime, swept first contact/status, explicit homing, splash and spatial budget.
+- `TESTS/Towers/TowerConditionsChecks.tscn`: PASS (all seven weapons, heat/disable/pause and beam timing).
+- `TESTS/Stealth/StealthChecks.tscn`: PASS (detection/locks/beacons/lifecycle and aimed weapons).
+- Existing full `TowerRecoilChecks` fails at Rollout line181 (`Single`: no projectile). `BattleResearchChecks` fails paid battlefield setup (`Could not purchase battle`). `ProjectileVisualChecks` passes the multi-barrel/Sniper checks then fails Cryo paid placement (`Could not purchase cryo`). All three exact failures were reproduced in a separately rebuilt unchanged `98feb5e` worktree.
+- `AmmunitionLoopChecks` passes foundations then fails the preexisting `Ammo Capacity` inspector-row assertion. The same assertion and stack location were reproduced on the separately rebuilt unchanged `98feb5e` baseline.
+- Swept query benchmark: 1 nearby candidate among 201 enemies; 1,000 warmed calls measured 96,000 managed bytes in this runtime. No result buffers/collections or physics nodes are created per query; the regression budgets 128 bytes/call for runtime overhead. This is a bounded allocation budget, not a claim of zero allocation or a full-game FPS benchmark.
+- Exact blast geometry fixtures explicitly set zero spread; guided lifecycle fixtures explicitly request Homing. Production spread remains authored. Desktop visual/balance review remains pending (PA4 manual QA).
+
+## PA1–PA3 implemented — 2026-10-20
+
+Projectile towers now author optional `ProjectileHandlingStats` in their absolute level rows. Stage03 applies the selected rank total spread reduction (0/5/10/15/20%), Stage04 accepts captured future precision/homing bonuses, and Stage07 clamps invalid inputs. No new research purchase or unlock was added; existing Battle damage research remains active.
+
+Basic rounds sample spread once from actual muzzle forward, fly straight by default, and use the shared enemy spatial index plus exact swept circle contact to hit the first living physical recipient (including hidden enemies). They survive original-target movement/removal and expire after five seconds. Explicit Homing remains available with lost-target cleanup. The registry retains a conservative maximum authored spawn radius until world teardown; enemy radii are spawn definitions, not dynamically resized collision bodies.
+
+Splash rounds preserve launch-time target distance and rotate that destination once by spread. Zero-spread Rockets retain the exact original destination. Splash damage/status still occurs once through the existing area-blast path. Rocket explicitly rejects the future global homing seam. Laser, Shockwave, enemy weapons, recoil, ammunition, heat and firing cadence retain their existing systems.
+
+Authoring: Battle 2.5/2/1.5°, Machine Gun 5/4.5/4°, Sniper .5/.4/.25°, Blaster 1/.75°, Rocket 1.5/1.25/1°, Cryo and Stasis 1/.75/.5°. These are half angles, sampled uniformly over ±spread per emitted shot. Inspector upgrade comparison treats lower spread as better.
+
+Validation runner: `TESTS/Towers/ProjectileAccuracyChecks.tscn`. Desktop visual/play balance review remains a manual follow-up. The original plan below is retained as historical instructions; PA4 desktop visual/balance QA remains pending; automated checks and documentation accompany these passes. Research purchase/unlock features remain separate future work.
+
 # Projectile guidance, weapon spread and rank/research accuracy — Codex handoff
 
 **Status: PLANNED — documentation only. No gameplay implementation in this pass.**

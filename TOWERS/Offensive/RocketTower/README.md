@@ -1,3 +1,7 @@
+## PA3 projectile handling
+
+Existing level rows author ±1.5/1.25/1° launch spread. Selected rank totals reduce spread by 0/5/10/15/20%; reductions are not accumulated across ranks. Each emitted shot snapshots effective handling and samples once at its real muzzle. Straight is the default; see the shared projectile accuracy plan. Existing damage, cadence, ammunition and recoil values are retained.
+
 ## Recoil presentation — 2026-10-20
 
 Fixed BaseSprite and rotating TurretPivot/RecoilRoot/Sprite now split the finished artwork; Muzzles travel with that assembly. The original composite SVG remains the catalog/ghost icon. The scene's Recoil node assigns Visuals/RocketTowerRecoil.tres (Enabled, kick distance/duration, return duration, maximum accumulated offset). Each funded shot/volley snapshots its launch and flash before moving the gun. Generic disabling/destruction resets the pose; idle controllers sleep. Selection colors base and gun. Combat balance, upgrades, construction gates and targeting are unchanged. Runtime/build/visual verification is pending. See [shared recoil notes](../../Shared/Weapons/Recoil/README.md).

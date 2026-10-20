@@ -19,7 +19,7 @@ public static class TowerRankController
         {
             var row = rows[i];
             if (row.Rank != (TowerRank)i || !double.IsFinite(row.TotalXp) || row.TotalXp <= previous
-                || (i == 0 && row.TotalXp != 0) || !ValidBonus(row.DamageBonus) || !ValidBonus(row.RangeBonus) || !ValidBonus(row.HpBonus))
+                || (i == 0 && row.TotalXp != 0) || !ValidBonus(row.DamageBonus) || !ValidBonus(row.RangeBonus) || !ValidBonus(row.HpBonus) || !ValidBonus(row.ProjectileSpreadReductionFraction) || row.ProjectileSpreadReductionFraction > 1)
                 throw new ArgumentException("Rank rows must have ordered names, increasing finite XP and nonnegative finite bonuses.");
             previous = row.TotalXp;
         }

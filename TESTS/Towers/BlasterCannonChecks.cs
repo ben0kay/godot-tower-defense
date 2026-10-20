@@ -149,7 +149,7 @@ public static class BlasterCannonChecks
         Vector2 original = new(2000, 2000), latest = original + new Vector2(32, 0);
         Enemy target = Spawn(spawns, original), survivor = Spawn(spawns, latest);
         SplashProjectile shot = new();
-        shot.Initialize(target, spawns.Registry, original, 128, new(20, DamageType.Explosive), new(80, 0.25f), main.GetNode<Node2D>("World/Effects"));
+        shot.Initialize(target, spawns.Registry, original, 128, new(20, DamageType.Explosive), new(80, 0.25f), main.GetNode<Node2D>("World/Effects"), trackTarget: true);
         main.GetNode("World/Projectiles").AddChild(shot); shot.SetPhysicsProcess(false); shot.GlobalPosition = original + new Vector2(0, 128);
         shot._PhysicsProcess(0.25); target.GlobalPosition = latest;
         if (exit == "death") target.TakeDamage(1000);
@@ -250,6 +250,9 @@ public static class BlasterCannonChecks
     {
         BlasterCannon tower = definition.Scene.Instantiate<BlasterCannon>(); tower.InitializeDefinition(definition);
         tower.Config.TargetPriority = TowerTargeting.Priority.Closest; tower.Config.AimToleranceDegrees = 180;
+        // Exact falloff/lifecycle fixtures isolate blast behavior from separately tested launch dispersion.
+        for (int i = 1; i <= tower.Config.Levels.Count; i++)
+            tower.Config.SetLevelStats(i, tower.Config.Levels[i - 1].Stats with { Handling = new(0) });
         main.GetNode("World/Towers").AddChild(tower); tower.SetPhysicsProcess(false); tower.GlobalPosition = position; return tower;
     }
 

@@ -8,6 +8,7 @@ public partial class EnemyRegistry : Node
     [ExportGroup("Spatial Queries")]
     [Export(PropertyHint.Range, "16,512,16")] public float SpatialCellSize { get; set; } = 128;
     private EnemySpatialIndex _spatial;
+    public float ProjectileRadiusPadding { get; private set; }
     private EnemySpatialIndex Spatial => _spatial ??= new(SpatialCellSize);
     private readonly Stack<List<EnemySpatialIndex.Neighbor>> _queryBuffers = new();
     public int LastQueryCandidates => Spatial.CandidatesExamined;
@@ -25,7 +26,7 @@ public partial class EnemyRegistry : Node
 
     // =========================================================
     // Register once; enemies unregister immediately on death or arrival.
-    public void Register(Enemy enemy) { if (_members.Add(enemy)) { _living.Add(enemy); Spatial.Add(enemy); EnemyRegistered?.Invoke(enemy); } }
+    public void Register(Enemy enemy) { if (_members.Add(enemy)) { if (float.IsFinite(enemy.Definition.RadiusPixels)) ProjectileRadiusPadding = Math.Max(ProjectileRadiusPadding, enemy.Definition.RadiusPixels); _living.Add(enemy); Spatial.Add(enemy); EnemyRegistered?.Invoke(enemy); } }
 
     // =========================================================
     // Exit-tree cleanup is idempotent and does not count an outcome twice.
@@ -68,7 +69,7 @@ public partial class EnemyRegistry : Node
 
     // =========================================================
     // World unload releases index history, membership and reusable query storage together.
-    public override void _ExitTree() { _living.Clear(); _members.Clear(); _queryBuffers.Clear(); _spatial = null; EnemyUnregistered = null; EnemyRegistered = null; EnemyPositionChanged = null; AttributedKill = null; }
+    public override void _ExitTree() { _living.Clear(); _members.Clear(); _queryBuffers.Clear(); _spatial = null; ProjectileRadiusPadding = 0; EnemyUnregistered = null; EnemyRegistered = null; EnemyPositionChanged = null; AttributedKill = null; }
 
     // =========================================================
     // Emit kill-only notifications after an enemy leaves the living registry.

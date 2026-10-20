@@ -9,10 +9,11 @@ public static class TowerRanksStage
     {
         if (!context.Rank.HasValue) return stats;
         TowerRankDefinition rank = context.Rank.Value;
-        if (rank.DamageBonus == 0 && rank.RangeBonus == 0 && rank.HpBonus == 0) return stats;
+        if (rank.DamageBonus == 0 && rank.RangeBonus == 0 && rank.HpBonus == 0 && rank.ProjectileSpreadReductionFraction == 0) return stats;
         double damage = 1 + (double)rank.DamageBonus, range = 1 + (double)rank.RangeBonus;
         return stats with
         {
+            Handling = stats.Handling.HasValue ? stats.Handling.Value with { SpreadDegrees = stats.Handling.Value.SpreadDegrees * (1 - ProjectileHandlingStats.Fraction(rank.ProjectileSpreadReductionFraction)) } : null,
             DamagePerShot = (int)Math.Clamp(Math.Round(stats.DamagePerShot * damage), 0, int.MaxValue),
             RangePixels = Scale(stats.RangePixels, range),
             MaxHealth = Scale(stats.MaxHealth, 1 + (double)rank.HpBonus),

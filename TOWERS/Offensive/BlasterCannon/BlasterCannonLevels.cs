@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 public static class BlasterCannonLevels
 {
-    private readonly record struct Row(int Level, int Credits, double WorkSeconds, int Damage, float Rate, float Range, float Speed, float Turn, float Aim, float Search, float Penetration, float Radius, float Edge, DamageType Type, bool ShieldOverride, float Shield, bool HullOverride, float Hull, int AmmoCapacity, int AmmoPerShot, HeatStats? Heat = null, float MaxHealth = 1000)
+    private readonly record struct Row(int Level, int Credits, double WorkSeconds, int Damage, float Rate, float Range, float Speed, float Turn, float Aim, float Search, float Penetration, float Radius, float Edge, DamageType Type, bool ShieldOverride, float Shield, bool HullOverride, float Hull, int AmmoCapacity, int AmmoPerShot, HeatStats? Heat = null, float MaxHealth = 1000, float SpreadDegrees = 0)
     {
         // =========================================================
         // Adapt only this weapon's capabilities into the common eight-stage working snapshot.
-        public TowerLevel Create() => new(Level, Credits, new TowerStatBlock(Range, Rate, Damage, Speed, Turn, Aim, Search, ShieldPenetration: Penetration, Area: new(Radius, Edge), Weapon: new(Type, ShieldOverride, Shield, HullOverride, Hull), Ammunition: new(AmmoCapacity, AmmoPerShot)) with { Heat = Heat, MaxHealth = MaxHealth }, WorkSeconds);
+        public TowerLevel Create() => new(Level, Credits, new TowerStatBlock(Range, Rate, Damage, Speed, Turn, Aim, Search, ShieldPenetration: Penetration, Area: new(Radius, Edge), Weapon: new(Type, ShieldOverride, Shield, HullOverride, Hull), Ammunition: new(AmmoCapacity, AmmoPerShot)) with { Heat = Heat, MaxHealth = MaxHealth, Handling = new(SpreadDegrees) }, WorkSeconds);
     }
 
     // Level | Cost | WorkSeconds | Damage | Rate | RangePx | SpeedPxS | TurnDegS | AimDeg | SearchS | Pen | RadiusPx | EdgeFrac | Type | ShieldOn | Shield | HullOn | Hull | AmmoCapacity | AmmoPerShot
@@ -16,8 +16,8 @@ public static class BlasterCannonLevels
     // Optional named MaxHealth column is absolute per level; Level 1 is 1,000 HP; each paid tier adds 5% to the previous absolute HP.
     private static readonly Row[] Rows =
     {
-        new(1, 300, 5, 60, 0.5f, 323.4f, 575, 216, 12, 0.15f, 0, 80, 0.25f, DamageType.Explosive, false, 1, false, 1, 600, 3),
-        new(2, 200, 6, 66, 0.5f, 334.4f, 575, 216, 12, 0.15f, 0, 88, 0.25f, DamageType.Explosive, false, 1, false, 1, 600, 3, MaxHealth: 1050f),
+        new(1, 300, 5, 60, 0.5f, 323.4f, 575, 216, 12, 0.15f, 0, 80, 0.25f, DamageType.Explosive, false, 1, false, 1, 600, 3, SpreadDegrees: 1f),
+        new(2, 200, 6, 66, 0.5f, 334.4f, 575, 216, 12, 0.15f, 0, 88, 0.25f, DamageType.Explosive, false, 1, false, 1, 600, 3, MaxHealth: 1050f, SpreadDegrees: 0.75f),
     };
 
     // =========================================================

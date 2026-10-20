@@ -97,8 +97,8 @@ public partial class RocketTower : TowerBase
         Marker2D muzzle = _barrels.MuzzleIndex(BarrelFireMode.Sequential, 0) == 0 ? _muzzleA : _muzzleB;
         SplashProjectile bullet = new() { ProjectileColor = new Color(0.33f, 0.88f, 1f) };
         bullet.Initialize(_target, _registry, _target.GlobalPosition, FinalStats.ProjectileSpeed,
-            hit, FinalStats.Area.Value, _effects, style: Config.ImpactStyle, trackTarget: false);
-        _projectiles.AddChild(bullet); bullet.GlobalPosition = muzzle.GlobalPosition;
+            hit, FinalStats.Area.Value, _effects, style: Config.ImpactStyle, trackTarget: false, handling: FinalStats.Handling);
+        _projectiles.AddChild(bullet); bullet.LaunchFrom(muzzle.GlobalPosition);
         _visuals.FlashAt(muzzle, Config.MuzzleFlash);
         _recoil.Kick(); // Projectile and flash snapshot the barrel before cosmetic recoil.
         _barrels.Commit(BarrelFireMode.Sequential);

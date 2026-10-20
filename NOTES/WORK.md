@@ -1,3 +1,7 @@
+## Projectile accuracy: PA1–PA3 implemented (2026-10-20)
+
+Straight launch-time spread, swept first physical enemy contact, fixed-distance splash destinations, level/rank authoring and dormant research handling seams are implemented. See `TOWERS/Shared/Projectiles/PROJECTILE_GUIDANCE_ACCURACY_PLAN.md` and `TESTS/Towers/ProjectileAccuracy.md`. PA4 desktop visual/balance QA remains pending; automated tests and documentation are included with this implementation. Existing notes below are retained.
+
 ## NP2 top-right tactical narrator — implemented in source (2026-10-20; test run pending)
 
 - [x] **NP1 (confirmed by user):** standard `WAVE NN INCOMING` major banner on every accepted manual wave start.

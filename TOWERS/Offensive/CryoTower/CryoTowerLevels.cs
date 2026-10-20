@@ -4,22 +4,22 @@ using System.Collections.Generic;
 public static class CryoTowerLevels
 {
     private readonly record struct Row(int Level, int Credits, double WorkSeconds, int Damage, float Rate,
-        float Range, float Speed, float Turn, float Slow, int AmmoCapacity, int AmmoPerShot, HeatStats? Heat = null, float MaxHealth = 1000)
+        float Range, float Speed, float Turn, float Slow, int AmmoCapacity, int AmmoPerShot, HeatStats? Heat = null, float MaxHealth = 1000, float SpreadDegrees = 0)
     {
         // =========================================================
         // Rank modifies damage/range later; Slow remains the selected row's absolute strength.
         public TowerLevel Create() => new(Level, Credits, new TowerStatBlock(Range, Rate, Damage, Speed, Turn, 8, .15f,
             Weapon: new(DamageType.Energy, false, 1, false, 1), Ammunition: new(AmmoCapacity, AmmoPerShot),
-            Slow: new(Slow)) with { Heat = Heat, MaxHealth = MaxHealth }, WorkSeconds);
+            Slow: new(Slow)) with { Heat = Heat, MaxHealth = MaxHealth, Handling = new(SpreadDegrees) }, WorkSeconds);
     }
     // Level | Cost | WorkSeconds | Damage | Shots/s | RangePx | ProjectilePx/s | TurnDeg/s | Slow | AmmoCapacity | Ammo/shot
     // Optional final named column: Heat: new(Capacity, PerShot, PerBeamSecond, CoolingPerSecond, RestartFraction).
     // Optional named MaxHealth column is absolute per level; Level 1 is 1,000 HP; each paid tier adds 5% to the previous absolute HP.
     private static readonly Row[] Rows =
     {
-        new(1, 250, 4, 10, .50f, 262.9f, 747.5f, 216, .33f, 600, 1),
-        new(2, 175, 5, 11, .52f, 272.8f, 747.5f, 216, .33f, 600, 1, MaxHealth: 1050f),
-        new(3, 250, 6, 12, .54f, 283.8f, 747.5f, 216, .33f, 600, 1, MaxHealth: 1102.5f),
+        new(1, 250, 4, 10, .50f, 262.9f, 747.5f, 216, .33f, 600, 1, SpreadDegrees: 1f),
+        new(2, 175, 5, 11, .52f, 272.8f, 747.5f, 216, .33f, 600, 1, MaxHealth: 1050f, SpreadDegrees: 0.75f),
+        new(3, 250, 6, 12, .54f, 283.8f, 747.5f, 216, .33f, 600, 1, MaxHealth: 1102.5f, SpreadDegrees: 0.5f),
     };
     // =========================================================
     // Changing one purchased level never modifies another level or another placed tower.

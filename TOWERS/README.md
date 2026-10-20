@@ -1,3 +1,7 @@
+## Projectile handling update (PA1–PA3)
+
+Optional immutable handling now carries launch spread and explicit Straight/Homing guidance through level → selected rank → captured research → safety → final snapshots. Projectile towers default to straight physical shots; splash uses a fixed launch destination. See `TOWERS/Shared/Projectiles/PROJECTILE_GUIDANCE_ACCURACY_PLAN.md` for implementation decisions and retained pass history.
+
 ## Stealth Beacon — SE1 (2026-10-20 UTC)
 
 A new registered Utility tower reveals enemies inside its radius, while ordinary aimed towers reject effective stealth unless their private config enables CanDetectStealth. See `Utility/StealthBeacon/README.md` and `Shared/Detection/README.md`. Existing layouts, waves and offensive balance are unchanged.

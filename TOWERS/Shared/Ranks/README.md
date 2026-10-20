@@ -1,3 +1,7 @@
+## Projectile handling update (PA1–PA3)
+
+Optional immutable handling now carries launch spread and explicit Straight/Homing guidance through level → selected rank → captured research → safety → final snapshots. Projectile towers default to straight physical shots; splash uses a fixed launch destination. See `TOWERS/Shared/Projectiles/PROJECTILE_GUIDANCE_ACCURACY_PLAN.md` for implementation decisions and retained pass history.
+
 # Named tower ranks and combat XP — implemented
 
 Purchased **Level** and earned **Rank** are independent. TowerBase owns its UpgradeLevel and private TowerRankProgress. Buying a level never resets total XP or named rank, and earning a rank never buys a level or spends Credits. Standard defaults reproduce all previous baseline stats.

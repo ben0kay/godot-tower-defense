@@ -1,3 +1,7 @@
+## Projectile handling update (PA1–PA3)
+
+Optional immutable handling now carries launch spread and explicit Straight/Homing guidance through level → selected rank → captured research → safety → final snapshots. Projectile towers default to straight physical shots; splash uses a fixed launch destination. See `TOWERS/Shared/Projectiles/PROJECTILE_GUIDANCE_ACCURACY_PLAN.md` for implementation decisions and retained pass history.
+
 # Basic projectiles
 
 `BasicProjectile.cs` is a visible guided bullet with speed/damage initialized by its weapon. It tracks its selected living target, hits using travel distance plus target radius and expires after five seconds or when its target dies/arrives. Bullets do not collide with terrain in this first combat test. They can finish travel after an enemy leaves tower range; range constrains target acquisition and firing.

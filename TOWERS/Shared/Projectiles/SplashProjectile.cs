@@ -1,9 +1,10 @@
-// Guided impact delivery with launch-snapshotted payload; lost targets retain their final known point.
+// Straight-by-default splash delivery: one sampled destination, original flight distance, optional explicit guided tracking.
 using Godot;
 using System;
 
 public partial class SplashProjectile : Node2D
 {
+    #region Splash Delivery
     private Enemy _target;
     private EnemyRegistry _registry;
     private Node2D _effects;
@@ -11,7 +12,12 @@ public partial class SplashProjectile : Node2D
     private DamageInfo _hit;
     private AreaBlastStats _blast;
     private ShockwaveStyle _style;
-    private float _speed, _life;
+    private float _speed;
+    private double _life;
+    private ProjectileHandlingStats _handling;
+    private bool _launched;
+    public Vector2 ImpactPoint => _impact;
+    public ProjectileHandlingStats Handling => _handling;
     private bool _initialized, _finished, _trackTarget = true;
     public Color ProjectileColor { get; set; } = new(1f, 0.55f, 0.15f);
     public bool HasDetonated { get; private set; }
@@ -20,7 +26,7 @@ public partial class SplashProjectile : Node2D
     // =========================================================
     // Values are immutable copies; the projectile retains no tower or mutable config reference.
     public void Initialize(Enemy target, EnemyRegistry registry, Vector2 lastKnownImpact, float speed,
-        DamageInfo hit, AreaBlastStats blast, Node2D effects = null, float lifetime = 5f, ShockwaveStyle style = null, bool trackTarget = true)
+        DamageInfo hit, AreaBlastStats blast, Node2D effects = null, float lifetime = 5f, ShockwaveStyle style = null, bool trackTarget = false, ProjectileHandlingStats? handling = null)
     {
         if (_initialized) throw new InvalidOperationException("Projectile is already initialized.");
         AreaDamage.Validate(blast.RadiusPixels, blast.EdgeDamageFraction);
@@ -30,21 +36,36 @@ public partial class SplashProjectile : Node2D
             throw new ArgumentOutOfRangeException(nameof(speed));
         _registry = registry; _effects = effects; _impact = lastKnownImpact; _speed = speed; _life = lifetime;
         _hit = hit; _blast = blast; _style = style == null ? null : (ShockwaveStyle)style.Duplicate(true); _initialized = true;
-        _trackTarget = trackTarget;
+        _handling = ProjectileHandlingStats.Sanitize(handling ?? new(0, trackTarget ? ProjectileGuidance.Homing : ProjectileGuidance.Straight));
+        _trackTarget = _handling.Guidance == ProjectileGuidance.Homing;
         if (_trackTarget && GodotObject.IsInstanceValid(target) && target.IsAlive && target.IsInsideTree() && !target.IsQueuedForDeletion())
         { _target = target; _target.Removed += OnTargetRemoved; _target.TreeExiting += OnTargetExiting; }
     }
 
     // =========================================================
+    // Fixed-distance splash: rotate the initial target-point vector once; zero spread preserves the exact old destination.
+    public void LaunchFrom(Vector2 position, float? spreadSample = null)
+    {
+        if (_launched) return;
+        if (!position.IsFinite()) { Finish(); return; }
+        GlobalPosition = position;
+        Vector2 vector = _impact - position;
+        Vector2 direction = ProjectileLaunch.Direction(vector, _handling.SpreadDegrees, spreadSample);
+        if (!_trackTarget && _handling.SpreadDegrees > 0) _impact = position + direction * vector.Length();
+        GlobalRotation = direction.Angle(); _launched = true;
+    }
+    // =========================================================
     // No registry queries during travel. Contact is the exact destination point, not an extra direct hit.
     public override void _PhysicsProcess(double delta)
     {
-        if (!_initialized || _finished || !IsInsideTree() || IsQueuedForDeletion() || !double.IsFinite(delta) || delta <= 0) return;
-        _life -= (float)delta;
+        if (!_initialized || _finished || !IsInsideTree() || IsQueuedForDeletion() || GetTree().Paused || !double.IsFinite(delta) || delta <= 0) return;
+        if (!_launched) LaunchFrom(GlobalPosition);
+        if (_finished) return;
         if (_life <= 0 || !GodotObject.IsInstanceValid(_registry) || !_registry.IsInsideTree() || _registry.IsQueuedForDeletion())
         { Finish(); return; }
         if (_trackTarget) CaptureTargetPosition();
-        float step = (float)Math.Min(float.MaxValue, _speed * delta);
+        double seconds = Math.Min(delta, _life);
+        float step = (float)Math.Min(float.MaxValue, _speed * seconds);
         if (GlobalPosition.DistanceTo(_impact) <= step)
         {
             GlobalPosition = _impact; _finished = true; HasDetonated = true; DetachTarget();
@@ -56,7 +77,10 @@ public partial class SplashProjectile : Node2D
             finally { QueueFree(); }
             return;
         }
-        GlobalPosition = GlobalPosition.MoveToward(_impact, step);
+        Vector2 direction = _impact - GlobalPosition;
+        if (direction.LengthSquared() > .0001f) GlobalRotation = direction.Angle();
+        GlobalPosition = GlobalPosition.MoveToward(_impact, step); _life -= seconds;
+        if (_life <= 0) Finish();
     }
 
     // =========================================================
@@ -96,4 +120,5 @@ public partial class SplashProjectile : Node2D
     // Lightweight native projectile artwork; presentation has no effect on blast selection.
     public override void _Draw()
     { DrawCircle(Vector2.Zero, 5f, ProjectileColor); DrawCircle(Vector2.Zero, 2f, Colors.White); }
+    #endregion
 }

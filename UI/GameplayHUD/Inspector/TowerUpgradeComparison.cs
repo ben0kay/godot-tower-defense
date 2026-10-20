@@ -37,6 +37,7 @@ public static class TowerUpgradeComparison
             Add(rows, "Fire Rate (/s)", current.ShotsPerSecond, next.ShotsPerSecond, 2);
             Add(rows, "Projectile (px/s)", current.ProjectileSpeed, next.ProjectileSpeed, 1);
         }
+        if (current.Handling.HasValue && next.Handling.HasValue) Add(rows, "Spread (±deg)", current.Handling.Value.SpreadDegrees, next.Handling.Value.SpreadDegrees, 2, false);
         if (current.Slow.HasValue && next.Slow.HasValue) Add(rows, "Slow (%)", current.Slow.Value.Fraction * 100d, next.Slow.Value.Fraction * 100d, 1);
         if (current.Area.HasValue && next.Area.HasValue)
         {

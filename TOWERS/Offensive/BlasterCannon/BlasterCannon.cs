@@ -92,8 +92,8 @@ public partial class BlasterCannon : TowerBase
         DamageInfo hit = Config.CreateHit(FinalStats, DamageSource);
         SplashProjectile bullet = new();
         bullet.Initialize(_target, _registry, _target.GlobalPosition, FinalStats.ProjectileSpeed,
-            hit, FinalStats.Area.Value, _effects, style: Config.ImpactStyle);
-        _projectiles.AddChild(bullet); bullet.GlobalPosition = _muzzle.GlobalPosition;
+            hit, FinalStats.Area.Value, _effects, style: Config.ImpactStyle, handling: FinalStats.Handling);
+        _projectiles.AddChild(bullet); bullet.LaunchFrom(_muzzle.GlobalPosition);
         _visuals.FlashAt(_muzzle, Config.MuzzleFlash);
         _recoil.Kick(); // Projectile and flash snapshot the barrel before cosmetic recoil.
         _shotTimer = 1f / FinalStats.ShotsPerSecond;

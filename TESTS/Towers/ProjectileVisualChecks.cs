@@ -50,7 +50,7 @@ public partial class ProjectileVisualChecks : Node
         shot.LaunchFrom(enemy.GlobalPosition - new Vector2(1000, 0)); Disable(shot); hp = enemy.Health;
         shot._PhysicsProcess(5); Require(shot.IsQueuedForDeletion() && enemy.Health == hp && shot.VisualSnapshot == null,
             "Legacy fallback retains five-second expiry without damage"); f.ClearProjectiles();
-        shot = new(); shot.Initialize(enemy, 100, 5); f.Main.GetNode("World/Projectiles").AddChild(shot); Disable(shot);
+        shot = new(); shot.Initialize(enemy, 100, new DamageInfo(5, DamageType.Kinetic), handling: new(0, ProjectileGuidance.Homing)); f.Main.GetNode("World/Projectiles").AddChild(shot); Disable(shot);
         enemy.Free(); shot._PhysicsProcess(.01); Require(shot.IsQueuedForDeletion(), "Removed targets clean up safely"); f.ClearProjectiles();
     }
 
@@ -150,7 +150,7 @@ public partial class ProjectileVisualChecks : Node
     {
         Enemy enemy = f.Target(new(2000, 2000));
         using ProjectileVisualStyle style = new() { LengthPixels = 100, CoreColor = Colors.Red };
-        BasicProjectile shot = new(); shot.Initialize(enemy, 100, new DamageInfo(5, DamageType.Kinetic), visual: style);
+        BasicProjectile shot = new(); shot.Initialize(enemy, 100, new DamageInfo(5, DamageType.Kinetic), visual: style, handling: new(0, ProjectileGuidance.Homing));
         f.Main.GetNode("World/Projectiles").AddChild(shot); shot.LaunchFrom(new(1800, 2000)); Disable(shot);
         var snapshot = shot.VisualSnapshot; style.LengthPixels = 1; style.CoreColor = Colors.Blue;
         float hp = enemy.Health; shot._PhysicsProcess(.01);
