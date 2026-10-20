@@ -1,3 +1,8 @@
+## Continuous default fire — 2026-10-20
+
+DefaultEnemyMinigun now explicitly sets UseBursts=false:6 shots/s continuously while a valid target is aligned. BurstSeconds/RestSeconds remain available only through explicit UseBursts opt-in. Bounded fractional cooldown carry preserves cadence and never emits catch-up volleys. The default also sets LockedTargetSearchSeconds=1 and TargetSearchSeconds=0.2. Visuals/EnemyMinigunTracer.tres now opts into9px tapered energy streaks; bullets remain unguided Kinetic rounds. The previous burst/rest description below is retained as history. Build and focused enemy checks passed; desktop appearance still needs review.
+---
+
 ## EG3 authored minigun and flash — 2026-10-20
 
 DefaultEnemyMinigun.tres is now assigned to the actual Gunner Drone. Visuals/EnemyMinigunTracer.tres and EnemyMinigunMuzzleFlash.tres provide dedicated7×1.3px muted-red tracers and5×3px65ms warm flashes. EnemyMinigunConfig.MuzzleFlash is optional and captured per initialize/config assignment alongside ProjectileVisual. A WeaponVisuals child uses the existing bounded WeaponVisualRenderer; only an accepted central shot flashes. No renderer child is added automatically to plain enemies or synthetic mounts without one. Stop/reinitialize/disable clears flash slots, not world bullets. Presets remain read-only; no random spread is added. The new scene/art/F2 registration is EG3 source-complete; build/runtime/visual acceptance is pending. Older type/flash-deferred text below is historical.

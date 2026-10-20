@@ -1,3 +1,8 @@
+### Gunner Drone handling polish — 2026-10-20
+
+Gunner now holds valid targets for1s, searches every0.2s when idle, fires continuously at6/s, and uses small rounded-front/tapered-tail red energy streaks. All three are data-driven; travelling bullets and Kinetic damage remain intact. Import/build and the three focused enemy-weapon headless checks passed. Desktop visual approval remains pending. See ENEMIES/Weapons/README.md and TESTS/EnemyWeapons/README.md.
+---
+
 ### EG3 Gunner Drone — source implemented (2026-10-20)
 
 F2/catalog now includes Gunner Drone: a distinct64×48 hull matching medium Enemy004's size, separate rotating gun SVG, small muted-red tracers and tiny orange-red accepted-shot flashes. It keeps routing while shooting nearby towers via EG1/EG2. Normal waves remain unchanged. New scene and balance: [GunnerDrone](ENEMIES/Types/GunnerDrone/README.md). Build/runtime/visual verification remains pending because execution was unavailable; EG4 profiling is still future work.

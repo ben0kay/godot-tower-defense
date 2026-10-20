@@ -1,3 +1,17 @@
+## Gunner polish verification — 2026-10-20
+
+Executed with the local Godot4.7.2 .NET runtime and .NET8 SDK, using its local NuGet feed:
+
+- Godot headless editor import: passed.
+- dotnet build: passed,0 warnings/0 errors.
+- EnemyWeaponChecks.tscn: passed (including new TargetHold and continuous-fire windows).
+- EnemyBulletChecks.tscn: passed (including retained tapered geometry and existing real swept damage).
+- GunnerDroneChecks.tscn: passed (updated energy-style snapshot, actual F2 cycle, flashes and tower HP loss).
+- ProjectileVisualChecks.tscn: weapon/visual and multi-barrel sections passed; runner failed at Could not purchase cryo. The identical failure was reproduced on untouched baseline582eb89; this is not a regression from these changes.
+
+Existing startup warnings about the missing configured EnemyPortal2 SpawnExit and tower-catalog fallback were printed. No desktop visual approval or EG4 throughput profiling is claimed. Older records saying execution was unavailable describe prior passes, not these runs.
+---
+
 ## EG3 Gunner Drone verification — 2026-10-20
 
 Added GunnerDroneChecks.cs/.tscn for actual14-entry catalog/F2 cycling, ordinary types remaining unarmed, unchanged authored wave membership, medium Enemy00464×48 size, separate gun SVG/muzzle, real independent aiming, small red visual snapshots, accepted-shot flashes, actual tower HP loss, cooldown/overflow flash rejection, captured presets, source lifetime, stealth alpha inheritance and Freeze. FleetExpansionChecks now expects14 entries. No tests were executed: no execution environment was available. Static source/reference review only; build/headless/manual visuals and throughput remain pending.

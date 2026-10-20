@@ -1,3 +1,8 @@
+## Separate locked/idle searches — 2026-10-20
+
+EnemyWeaponConfig now captures TargetSearchSeconds(default0.2) and LockedTargetSearchSeconds(default1). A successful query starts the full locked interval. Cached locks are still validated each tick; invalid locks clear immediately and reduce the next query delay to the idle interval. No all-tower scan, extra timer, navigation modification or per-tick allocation is added. TargetHold in EnemyWeaponChecks passes with a closer challenger, a full hold, range loss and destruction.
+---
+
 ## EG2 delivery update — 2026-10-20
 
 EnemyShotRequest now lives in this Shared folder and optionally carries a lifetime and immutable ProjectileVisualSnapshot. Actual accepted minigun requests go directly to the world-owned EnemyBulletSystem; ShotRequested observes accepted launches rather than acting as the delivery subscriber. Source/target references are absent from bullet state. Navigation and mount acquisition remain unchanged. See ../../Projectiles/README.md. Earlier EG1-only delivery-seam wording below is historical.

@@ -6,6 +6,8 @@
 script = ExtResource("config")
 RangePixels = 260.0
 TargetSearchSeconds = 0.2
+LockedTargetSearchSeconds = 1.0
+UseBursts = false
 RotationSpeedDegrees = 240.0
 AimToleranceDegrees = 6.0
 DamagePerBullet = 2.0

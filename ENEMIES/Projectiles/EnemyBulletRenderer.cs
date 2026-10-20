@@ -4,6 +4,8 @@ using Godot;
 public partial class EnemyBulletRenderer : Node2D
 {
     private EnemyBulletSystem _system;
+    private readonly Vector2[] _streak = new Vector2[EnemyEnergyStreakGeometry.VertexCount];
+    private readonly Color[] _colors = new Color[EnemyEnergyStreakGeometry.VertexCount];
     #region Drawing Lifetime
     // =========================================================
     // The world simulation explicitly binds this surface; drawing never owns damage, expiry or offscreen culling.
@@ -31,6 +33,12 @@ public partial class EnemyBulletRenderer : Node2D
                 DrawTextureRect(visual.Texture, new Rect2(-visual.Length, -visual.Width * .5f, visual.Length, visual.Width), false, visual.Body);
                 DrawSetTransformMatrix(worldToLocal);
             }
+            else if (visual.Tapered)
+            {
+                if (visual.Glow.A > 0) DrawEnergy(bullet, 1, visual.GlowWidth, visual.Glow);
+                DrawEnergy(bullet, 1, 1, visual.Body);
+                DrawEnergy(bullet, .85f, .55f, visual.Core);
+            }
             else
             {
                 if (visual.Glow.A > 0) DrawLine(tail, head, visual.Glow, visual.Width * visual.GlowWidth, true);
@@ -40,6 +48,13 @@ public partial class EnemyBulletRenderer : Node2D
             if (visual.BrightTip) DrawLine(head - bullet.Direction * visual.Width * 1.5f, head, visual.Core, visual.Width * 1.2f, true);
         }
         DrawSetTransformMatrix(Transform2D.Identity);
+    }
+    // =========================================================
+    // Reuse one pair of polygon/color buffers for every glow/body/core pass; shape never changes hit geometry.
+    private void DrawEnergy(EnemyBulletData bullet, float lengthScale, float widthScale, Color color)
+    {
+        EnemyEnergyStreakGeometry.Fill(bullet.Position, bullet.Direction, bullet.Visual, lengthScale, widthScale, color, _streak, _colors);
+        DrawPolygon(_streak, _colors);
     }
     // =========================================================
     // Surface teardown releases the world simulation wrapper regardless of sibling exit order.

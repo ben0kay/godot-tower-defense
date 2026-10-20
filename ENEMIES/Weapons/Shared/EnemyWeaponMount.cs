@@ -111,11 +111,14 @@ public partial class EnemyWeaponMount : Node2D
         { Stop(); return; }
         if (!_host.GlobalPosition.IsFinite() || !_pivot.GlobalPosition.IsFinite() || !_muzzle.GlobalPosition.IsFinite())
         { Target = null; Aligned = false; ResetWeapon(); return; }
+        // A lost lock never waits out the longer hold interval; validate cheaply without a spatial search.
+        if (Target != null && !EnemyTowerTargeting.Valid(_registry, Target, _pivot.GlobalPosition, _settings.Range))
+        { Target = null; Aligned = false; ResetWeapon(); _search = System.Math.Min(_search, _settings.SearchSeconds); }
         _search -= delta;
         if (_search <= 0)
         {
             Target = EnemyTowerTargeting.Closest(_registry, _pivot.GlobalPosition, _settings.Range, _scratch);
-            TargetQueries++; LastCandidates = _registry.LastCandidates; _search = _settings.SearchSeconds;
+            TargetQueries++; LastCandidates = _registry.LastCandidates; _search = Target != null ? _settings.LockedSearchSeconds : _settings.SearchSeconds;
         }
         if (!EnemyTowerTargeting.Valid(_registry, Target, _pivot.GlobalPosition, _settings.Range))
         { Target = null; Aligned = false; ResetWeapon(); return; }

@@ -1,3 +1,8 @@
+## Optional tapered drawing — 2026-10-20
+
+EnemyBulletRenderer can draw ProjectileVisualSnapshot.Tapered using EnemyEnergyStreakGeometry and one retained pair of9-point/color arrays. HeadWidthMultiplier, TailWidthFraction and TailOpacity control the rounded nose/thin fading tail; geometry ends exactly at the real bullet position. Glow/body/core passes reuse buffers. Tapered defaults false, preserving the prior line/texture paths and friendly rendering. Sanitization includes new fields; no collision, damage, lifetime or ownership calculation depends on shape. EnemyBulletChecks passes geometry in horizontal, vertical and diagonal directions, plus the existing real swept-damage checks. Desktop render QA remains pending.
+---
+
 ## EG3 producer — 2026-10-20
 
 Gunner Drone is now the first real catalog/F2 enemy using the EG2 world-owned system. Its separate hull/gun scene and dedicated tracer/flash resources live under Types/GunnerDrone and Weapons/Minigun. No new bullet ownership, collision, capacity, damage or per-shot nodes were introduced by EG3. Existing normal waves remain unchanged. Actual1–10-gunner visible testing remains pending because execution was unavailable. Older no-Gunner wording below is historical.

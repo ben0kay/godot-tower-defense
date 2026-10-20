@@ -1,3 +1,8 @@
+## Current handling — 2026-10-20
+
+Continuous6/s firing is now default (UseBursts=false), with1s closest-target reconsideration while locked and0.2s idle searches. Invalid targets still drop immediately. Dedicated red tracers now have a rounded fuller front and thin fading tail:9px length,1.5px nominal width,1.25 head multiplier. Hull/gun art, normal routing, damage type and authored wave membership are unchanged. Build and GunnerDroneChecks/F2 passed headless; normal-zoom visible playtesting remains pending. Old burst/rectangular tracer settings below are historical.
+---
+
 # Gunner Drone — EG3
 
 Stable ID gunner_drone_mk1; family Drone. GenericEnemy inherited scene, optional enemy minigun, no unique enemy gameplay script. Appended to DefaultEnemyCatalog as entry14, so F2/F3 pick it up automatically. Current Level001/002/020 waves omit it.

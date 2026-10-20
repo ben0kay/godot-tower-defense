@@ -1,6 +1,7 @@
 // EG2 focused checks: swept first-footprint damage, straight misses, source lifetime, budgets, pause and renderer ownership.
 using Godot;
 using System;
+using System.Linq;
 using static AmmoLoopFixture;
 
 public partial class EnemyBulletChecks : Node
@@ -29,6 +30,18 @@ public partial class EnemyBulletChecks : Node
     // Pure slab checks include exact tangency, starts inside, parallel misses and stationary contact.
     private static void Geometry()
     {
+        using ProjectileVisualStyle energy = new() { Tapered = true, LengthPixels = 9, CoreThicknessPixels = 1.5f };
+        var style = energy.Capture(); var points = new Vector2[EnemyEnergyStreakGeometry.VertexCount];
+        var colors = new Color[EnemyEnergyStreakGeometry.VertexCount];
+        foreach (Vector2 direction in new[] { Vector2.Right, Vector2.Up, new Vector2(1, 1).Normalized() })
+        {
+            Vector2 head = new(20, 30);
+            EnemyEnergyStreakGeometry.Fill(head, direction, style, 1, 1, Colors.Red, points, colors);
+            Require(points[4] == head && points.All(p => p.IsFinite() && (p - head).Dot(direction) <= .0001f),
+                "Rounded nose ends at the actual moving bullet, with tail behind its direction");
+            Require(points[0].DistanceTo(points[8]) < points[2].DistanceTo(points[6]) && colors[0].A < colors[2].A,
+                "Energy streak has a thin fading tail and fuller rounded front");
+        }
         Rect2 rect = new(10, 10, 20, 30);
         Require(TowerFootprintCollision.SegmentRect(new(0, 20), new(1000, 20), rect, out double fraction)
             && Math.Abs(fraction - .01) < 1e-10, "Fast segment returns first entry, not final position");

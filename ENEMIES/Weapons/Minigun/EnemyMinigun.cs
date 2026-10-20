@@ -1,4 +1,4 @@
-// Optional burst clock delivers real unguided shots to the shared world system; emitted bullets outlive this gun.
+// Optional continuous/burst clock delivers real unguided shots to the shared world system; emitted bullets outlive this gun.
 using Godot;
 using System;
 
@@ -6,6 +6,7 @@ public partial class EnemyMinigun : EnemyWeaponMount
 {
     #region Private Cadence
     private double _burstSeconds, _restSeconds, _burst, _rest, _cooldown, _lifetime;
+    private bool _useBursts;
     private ProjectileVisualSnapshot? _visual;
     private EnemyBulletSystem _bullets;
     private WeaponVisualRenderer _visuals;
@@ -18,6 +19,7 @@ public partial class EnemyMinigun : EnemyWeaponMount
     {
         _bullets = null; _visual = null; _flash = null; _visuals = null;
         if (Config is not EnemyMinigunConfig minigun || !minigun.TryCaptureBurst(out _burstSeconds, out _restSeconds)) return false;
+        _useBursts = minigun.UseBursts;
         _lifetime = minigun.BulletLifetimeSeconds; _visual = minigun.ProjectileVisual?.Capture();
         _flash = minigun.MuzzleFlash?.Capture();
         _visuals = GetNodeOrNull<WeaponVisualRenderer>("WeaponVisuals");
@@ -31,10 +33,11 @@ public partial class EnemyMinigun : EnemyWeaponMount
     // One launch attempt at most per tick; overflow consumes its cadence opportunity and never queues catch-up fire.
     protected override void OnAimReady(double delta)
     {
-        if (_rest > 0) { _rest = Math.Max(0, _rest - delta); return; }
-        if (_burst <= 0) _burst = _burstSeconds;
-        bool canRequest = _cooldown <= delta;
-        _cooldown = Math.Max(0, _cooldown - delta);
+        if (_useBursts && _rest > 0) { _rest = Math.Max(0, _rest - delta); return; }
+        if (_useBursts && _burst <= 0) _burst = _burstSeconds;
+        // Carry only a bounded fractional-frame remainder: steady cadence, one attempt maximum after a hitch.
+        _cooldown = Math.Max(-Math.Min(delta, .05), _cooldown - delta);
+        bool canRequest = _cooldown <= 1e-9;
         if (canRequest && GodotObject.IsInstanceValid(_bullets))
         {
             Vector2 direction = -Muzzle.GlobalTransform.Y.Normalized();
@@ -46,11 +49,14 @@ public partial class EnemyMinigun : EnemyWeaponMount
                     if (_flash.HasValue && GodotObject.IsInstanceValid(_visuals)) _visuals.FlashAt(Muzzle, _flash.Value);
                     ShotRequests++; ShotRequested?.Invoke(request);
                 }
-                _cooldown = 1.0 / Settings.ShotsPerSecond;
+                _cooldown = Math.Max(0, 1.0 / Settings.ShotsPerSecond + _cooldown);
             }
         }
-        _burst = Math.Max(0, _burst - delta);
-        if (_burst == 0) _rest = _restSeconds;
+        if (_useBursts)
+        {
+            _burst = Math.Max(0, _burst - delta);
+            if (_burst == 0) _rest = _restSeconds;
+        }
     }
     // =========================================================
     // Stop only the gun's transient presentation; world-owned bullets must keep travelling.

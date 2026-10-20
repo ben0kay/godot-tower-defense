@@ -17,7 +17,7 @@ public partial class EnemyWeaponChecks : Node
             using (AmmoLoopFixture f = new(this))
             {
                 SubsystemBattlefield.DetachSession(f.Main);
-                Index(f); Mount(f); Cadence(f); Optional(f);
+                Index(f); Mount(f); TargetHold(f); Cadence(f); Optional(f);
                 using AmmoLoopFixture other = new(this);
                 SubsystemBattlefield.DetachSession(other.Main);
                 Require(other.Main.GetNode<TowerRegistry>("World/TowerRegistry").Count == 0, "Worlds do not share tower membership");
@@ -129,6 +129,33 @@ public partial class EnemyWeaponChecks : Node
     }
     #endregion
 
+    #region Target Hold
+    // =========================================================
+    // A valid lock is held for a full second despite closer candidates; invalid locks resume the short idle schedule.
+    private static void TargetHold(AmmoLoopFixture f)
+    {
+        using EnemyWeaponConfig config = new() { LockedTargetSearchSeconds = 1, TargetSearchSeconds = .2, RotationSpeedDegrees = 1000 };
+        var (enemy, mount, _) = Create(f, config);
+        BattleTower a = f.Add<BattleTower>("battle", new(2000, 2000));
+        BattleTower b = f.Add<BattleTower>("battle", new(2200, 2064));
+        mount._PhysicsProcess(1);
+        Require(mount.Target == a && Math.Abs(mount.SearchRemaining - 1) < .0001, "Acquisition starts a full one-second hold");
+        int queries = mount.TargetQueries;
+        b.GlobalPosition = new(2000, 2032); b.ForceUpdateTransform();
+        for (int i = 0; i < 9; i++) mount._PhysicsProcess(.1);
+        Require(mount.Target == a && mount.TargetQueries == queries, "Closer tower cannot cause jitter during the hold");
+        mount._PhysicsProcess(.11);
+        Require(mount.Target == b && mount.TargetQueries == queries + 1, "Closest target is reconsidered after one second");
+        b.GlobalPosition += new Vector2(2000, 0); b.ForceUpdateTransform();
+        mount._PhysicsProcess(.001);
+        Require(mount.Target == null && mount.SearchRemaining <= .2, "Range loss clears immediately and bounds idle delay");
+        mount._PhysicsProcess(.2); Require(mount.Target == a, "Idle search promptly reacquires");
+        a.ApplyDamage(new DamageInfo(99999, DamageType.Kinetic)); mount._PhysicsProcess(.001);
+        Require(mount.Target == null && mount.SearchRemaining <= .2, "Dead target also drops before the hold ends");
+        enemy.Free(); a.Free(); b.Free();
+    }
+    #endregion
+
     #region Minigun Seam and Opt In
     // =========================================================
     // EG2 now consumes the same burst requests; this fixture keeps world simulation paused for timing assertions.
@@ -140,21 +167,22 @@ public partial class EnemyWeaponChecks : Node
         BattleTower tower = f.Add<BattleTower>("battle", new(2000, 2000));
         int requests = 0; EnemyShotRequest last = default; float hp = tower.Health;
         gun.ShotRequested += request => { requests++; last = request; };
-        for (int i = 0; i < 90; i++) gun._PhysicsProcess(1.0 / 60);
-        Require(requests >= 7 && requests <= 9 && last.Direction.IsEqualApprox(Vector2.Up)
-            && last.Origin == gun.GetNode<Marker2D>("TurretPivot/GunSprite/Muzzle").GlobalPosition,
-            "Staggered 1.5s burst has bounded cadence and real barrel-tip straight direction");
-        for (int i = 0; i < 20; i++) gun._PhysicsProcess(1.0 / 60);
-        int resting = requests;
-        for (int i = 0; i < 20; i++) gun._PhysicsProcess(1.0 / 60);
-        Require(requests == resting && tower.Health == hp && f.Main.GetNode("World/Projectiles").GetChildCount() == 0
-            && f.Main.GetNode<EnemyBulletSystem>("World/EnemyBullets").ActiveCount == requests,
-            "Burst rest is quiet; accepted requests create only central slots, with no launch-time damage");
+        for (int second = 0; second < 4; second++)
+        {
+            int before = requests;
+            for (int i = 0; i < 60; i++) gun._PhysicsProcess(1.0 / 60);
+            Require(requests - before >= 5 && requests - before <= 7, "Continuous fire has no burst/rest gap in any one-second window");
+        }
+        Require(last.Direction.IsEqualApprox(Vector2.Up) && last.Origin == gun.GetNode<Marker2D>("TurretPivot/GunSprite/Muzzle").GlobalPosition,
+            "Continuous shots still leave the real barrel tip");
+        Require(tower.Health == hp && f.Main.GetNode<EnemyBulletSystem>("World/EnemyBullets").ActiveCount == requests,
+            "Shots use central slots and never apply launch-time damage");
+        int held = requests;
         enemy.GetTree().Paused = true; gun._PhysicsProcess(100); enemy.GetTree().Paused = false;
-        Require(requests == resting, "Paused gun emits no requests");
-        gun.Enabled = false; gun._PhysicsProcess(100); Require(requests == resting, "Disabled gun emits no requests");
+        Require(requests == held, "Paused gun emits no requests");
+        gun.Enabled = false; gun._PhysicsProcess(100); Require(requests == held, "Disabled gun emits no requests");
         gun.Enabled = true; gun._PhysicsProcess(10);
-        Require(requests <= resting + 1, "Large delta never emits an unbounded catch-up burst");
+        Require(requests <= held + 1, "Large delta never emits an unbounded catch-up burst");
         enemy.Arrive(); gun._PhysicsProcess(100); Require(!gun.Running, "Removed source cannot request more fire");
         enemy.Free(); tower.Free();
     }

@@ -108,7 +108,7 @@ public partial class GunnerDroneChecks : Node
         Require(ship.Transform == hull && ship.Movement == movement && shot.Position.IsEqualApprox(muzzle.GlobalPosition)
             && shot.Direction.IsEqualApprox(-muzzle.GlobalTransform.Y.Normalized()) && tower.Health == hp,
             "Gun aims while hull/navigation ownership and launch-time HP remain unchanged");
-        Require(shot.Visual.Length == 7 && Mathf.IsEqualApprox(shot.Visual.Width, 1.3f) && !shot.Visual.BrightTip
+        Require(shot.Visual.Tapered && shot.Visual.Length == 9 && Mathf.IsEqualApprox(shot.Visual.Width, 1.5f) && !shot.Visual.BrightTip
             && shot.Visual.Body.R > shot.Visual.Body.G && renderer.TotalFlashes == 1
             && renderer.ToGlobal(renderer.LastFlashPosition).IsEqualApprox(muzzle.GlobalPosition)
             && renderer.LastFlashStyle.Length == 5 && renderer.LastFlashStyle.Duration < .08f,
@@ -123,7 +123,7 @@ public partial class GunnerDroneChecks : Node
         gun.Config = settings;
         settings.MuzzleFlash.LengthPixels = 30; settings.ProjectileVisual.LengthPixels = 50;
         gun._PhysicsProcess(1);
-        Require(renderer.LastFlashStyle.Length == 5 && bullets.Snapshot(0).Visual.Length == 7,
+        Require(renderer.LastFlashStyle.Length == 5 && bullets.Snapshot(0).Visual.Length == 9,
             "Spawn-captured visual snapshots ignore later edits to mutable source clones");
         gun.Enabled = false;
         Require(renderer.ActiveFlashes == 0 && !renderer.IsProcessing() && bullets.ActiveCount == 1,

@@ -1,3 +1,15 @@
+## Gunner handling and energy streak polish — 2026-10-20
+
+Gunner Drone now holds valid tower targets for1s between closest-target reconsiderations; no-target acquisition remains staggered at0.2s. Dead, removed, queued or out-of-range locks clear immediately and cap the next search delay at0.2s. TargetSearchSeconds and LockedTargetSearchSeconds are separate validated, spawn-captured Inspector settings. Pause still freezes both clocks; navigation is unchanged.
+
+Default minigun fire is continuous at6 shots/s while aligned, with no burst/rest gaps. UseBursts defaults false; explicit opt-in preserves the existing BurstSeconds/RestSeconds capability for future weapons. Fractional cooldown remainder is bounded so cadence stays steady without a hitch catch-up volley. Only accepted bullets flash; existing pause, Freeze, target/aim gates, damage and lifetime behavior remain intact.
+
+The dedicated enemy tracer preset now selects a small9px tapered energy streak with1.5px nominal width,1.25 head multiplier,0.08 tail width fraction/opacity and the same coral-red palette/faint glow. A rounded fuller nose ends at the actual bullet position; its thin tail fades behind travel direction. ProjectileVisualStyle captures the optional taper values; EnemyBulletRenderer reuses retained9-vertex/color buffers for glow/body/core passes. Default Tapered=false preserves existing straight tracers/friendly visuals. This remains a travelling, missable Kinetic projectile, not a hitscan beam or damage-type change.
+
+Validation: Godot4.7.2 .NET import and C# build succeeded; EnemyWeaponChecks, EnemyBulletChecks and GunnerDroneChecks passed headless, including one-second target holds, prompt target loss, continuous per-second firing windows, tapered geometry, F2 and real damage. Broader ProjectileVisualChecks passed its weapon/visual sections but failed at the existing Cryo placement fixture; the same failure was reproduced on untouched baseline582eb89. Normal-zoom desktop visual approval and EG4 profiling remain pending. Older burst/0.2s lock/rectangular7px descriptions below are historical and superseded here.
+
+---
+
 ## EG3 — medium Gunner Drone / split art / F2 — source implemented (2026-10-20)
 
 Added the14th catalog entry gunner_drone_mk1, inherited GenericEnemy scene, independent definition,64×48 hostile hull SVG and separate24×40 rotating gun SVG with real(0,-18) muzzle. Medium reference confirmed as Enemy004/Bulwark Drone, not Enemy002. Default minigun and dedicated small muted-red tracer/orange-red flash presets are editable resources. F2/F3 discover the appended entry through the existing catalog; authored Level001/002/020 waves and13 prior enemy types are unchanged/unarmed.

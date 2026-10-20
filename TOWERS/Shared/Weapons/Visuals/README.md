@@ -1,3 +1,8 @@
+## Hostile energy-streak snapshot options — 2026-10-20
+
+ProjectileVisualStyle/Snapshot append optional Tapered, TailWidthFraction, TailOpacity and HeadWidthMultiplier fields for the centralized hostile renderer. Defaults preserve original straight tracers and existing snapshot constructor call sites. Capture clamps new numeric values; EnemyBulletSystem sanitizes direct requests too. Friendly projectile rendering/configs remain unchanged. Shape affects presentation only. Build and focused enemy checks passed; broader ProjectileVisualChecks retains an unrelated Cryo placement-fixture failure tracked in TESTS/EnemyWeapons/README.md.
+---
+
 ## EG3 enemy flash reuse — 2026-10-20
 
 WeaponVisualRenderer now also accepts FlashAt(Marker2D, MuzzleFlashSnapshot) so optional enemy miniguns can retain spawn/config-captured appearance. Existing FlashAt(Marker2D, MuzzleFlashStyle) delegates through the same code and keeps tower behavior. ClearFlashes releases transient slots and sleeps without altering aim or counters. Only accepted hostile shots call this renderer; capacity-rejected shots do not flash. No per-shot objects/timers or unrelated tower scene changes. Build/runtime verification remains pending.

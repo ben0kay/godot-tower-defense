@@ -74,7 +74,9 @@ public partial class EnemyBulletSystem : Node
         WeaponVisualMath.Safe(visual.Length, 1, 128), WeaponVisualMath.Safe(visual.Width, .1f, 12),
         WeaponVisualMath.Safe(visual.GlowWidth, 1, 4), WeaponVisualMath.Color(visual.Core),
         WeaponVisualMath.Color(visual.Body), WeaponVisualMath.Color(visual.Glow), visual.BrightTip,
-        GodotObject.IsInstanceValid(visual.Texture) ? visual.Texture : null);
+        GodotObject.IsInstanceValid(visual.Texture) ? visual.Texture : null, visual.Tapered,
+        WeaponVisualMath.Safe(visual.TailWidthFraction, 0, 1), WeaponVisualMath.Safe(visual.TailOpacity, 0, 1),
+        WeaponVisualMath.Safe(visual.HeadWidthMultiplier, 1, 2));
     // =========================================================
     // A world may explicitly reset bullets for a restart; source death/removal must never call this.
     public void Clear()

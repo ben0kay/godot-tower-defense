@@ -1,4 +1,4 @@
-// Minigun burst/rest extension; source resources remain read-only while each mount captures private timing values.
+// Minigun continuous/optional-burst settings; source resources remain read-only while each mount captures private timing values.
 using Godot;
 
 [GlobalClass]
@@ -13,6 +13,7 @@ public partial class EnemyMinigunConfig : EnemyWeaponConfig
 
     #region Burst Timing
     [ExportGroup("Minigun Burst")]
+    [Export] public bool UseBursts { get; set; } = false;
     [Export] public double BurstSeconds { get; set; } = 1.5;
     [Export] public double RestSeconds { get; set; } = 1;
     // =========================================================
