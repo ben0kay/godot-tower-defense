@@ -1,3 +1,9 @@
+## Violet portal artwork — 2026-10-20
+
+`EnemyPortal.tscn` now uses a cached `Sprite2D` referencing `Visuals/PortalViolet.svg` instead of its old cyan Polygon2D placeholder. The new texture contains a violet spiral, metallic outer ring and softly shaded central glow; it is **static**, with no procedural per-frame drawing or gameplay-affecting animation. `Visuals` remains the existing size-multiplied child, so the current portal-size Inspector slider continues to scale the entire texture. `SpawnExit`, editor snapping, collision footprint, routes, wave spawning and portal size-dependent spawn spread remain unchanged. To replace artwork, edit the SVG under this portal's `Visuals/` folder.
+
+---
+
 ## Automatic editor placement — 2026-10-18
 
 This scene now inherits editor-only cell-center snapping from `WorldObjectFootprint`. Build C#, then drag or duplicate instances within a map normally. **Editor Placement → Snap To Grid In Editor** defaults on; disable it for intentional free placement. Uses the map's actual `Terrain/Passable` TileSet and transforms. Child-marker offsets and footprint settings are preserved; standalone asset origins and gameplay movement remain unchanged. Off-grid saved instances align when opened in the editor; save the level to persist that correction. See `WORLD/GRID/README.md` from the repository root for full authoring behavior.
