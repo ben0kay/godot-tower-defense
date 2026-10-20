@@ -1,25 +1,42 @@
-Overall
-Your navigation is already designed with scale in mind: enemies share a small pool of A* profiles rather than owning separate grids, path requests and route validation are budgeted centrally, and tower placement updates navigation incrementally. The 500-enemy tests also check safe movement and repathing. That’s a solid foundation.
+Read skill `analyzing-dotnet-performance`
+Completed with input: {"skill":"analyzing-dotnet-performance"}
 
-The main scaling risks I see are tower and area-attack scans over the entire enemy registry, followed by queue bookkeeping when many routes need work at once. The documented benchmarks are headless navigation tests; they don’t establish performance with hundreds of active towers and attacks.
+I’ll trace the frame/physics workload indicated by the screenshot—enemy updates, tower targeting/projectiles, pathfinding, and rendering—then prioritize anything that scales with 160+ enemies and many towers.
 
-Areas to watch
-Tower target searches are O(towers × enemies).
-Battle, Laser, and Blaster towers periodically call TowerTargeting.Find, which loops over every living enemy and filters by range. The searches are staggered, which helps smooth spikes, but each tower still scans the whole registry. At high tower counts, this is the most likely recurring cost. A shared spatial index—queried by tower range—could also serve area effects. See TowerTargeting.cs and BattleTower.cs.
 
-Area attacks can repeat those full-registry scans.
-Each splash impact checks the living-enemy list, and each active shockwave scans it every physics tick. That makes a busy fight potentially scale with active attacks × enemies, not just enemy count. If shockwave or splash towers become common, this is a strong case for the same spatial index. See AreaDamage.cs and ShockwaveEmitter.cs.
+## Diagnosis
 
-Large path-request backlogs have extra linear work.
-A* calculations have strict per-frame count limits and a soft time limit, but choosing the next request scans the pending-request list. Repeating that selection—and removing from the list—adds work as the backlog grows. It’s worth profiling during mass repaths or large initial waves before changing the data structure; the current bounded list may be fine at your usual limits. See PathRequestManager.cs and PathRequestManager.cs.
+This looks **primarily CPU/physics-bound**, with 165 live enemies and multiple active towers—not primarily an A* problem. The screenshot reports **physics at 24.95 ms** and **process at 12.73 ms**. By comparison, navigation’s peak is 10.45 ms, its A* peak is 1.65 ms, and its route-audit peak is only 0.08 ms, with both queues empty. Those navigation peaks may cause occasional hitches, but don’t look like the sustained bottleneck in this snapshot.
 
-The shipped corridor-variation setting conflicts with the documented default.
-The README and performance note describe corridor variation as off by default, but the world loads DefaultEnemyConfig.tres, which explicitly enables it. The performance report measured about 4–5 ms maximum path frames at 500 enemies with 50% selection, and up to about 13 ms at 100% in its test fixtures. Those are isolated headless measurements—not full-game frame times—but the setting discrepancy means the measured “off” case may not represent normal play. The conflicting default is also documented in ENEMIES/README.md and CorridorPerformance.md.
+### Most likely contributors
 
-Validate attack load and rendering together.
-The path and movement measurements are encouraging, but they don’t include a tower-heavy combat scene, rendering, or combined attack effects. A useful next benchmark would vary both enemy and tower counts, recording target-scan time, active projectile/shockwave counts, frame-time percentiles, and worst-case spikes.
+1. **Per-enemy movement work scales with every active enemy.** Each enemy has its own physics callback, and each moving enemy checks route corners and runs swept clearance sampling before moving. At a typical 60 Hz, 165 enemies means roughly 9,900 movement callbacks per second, before tower and projectile processing. See `EnemyMovement._PhysicsProcess` and `NavigationGrid.SegmentClear`.
 
-What’s already in good shape
-Movement caches routes and checks them incrementally; it does not run A* every tick. Swept clearance still runs during movement for safety, while route audits are staggered. The navigation tests report roughly 1–2 ms maximum movement time for 500 enemies in their headless fixtures. Wave spawning is also capped at two attempts per frame by default; separately, the tests note that manually creating a batch of 500 enemies can take about 32 ms, so avoiding synchronous mass-spawn bursts remains important. See EnemyMovement.cs, ../../TESTS/Performance/NavigationPerformance.md, and WaveManager.cs.
+2. **There’s a redundant spatial-index update on each move.** Movement explicitly calls `Registry.UpdatePosition` after setting the enemy’s position, but the transform notification already calls it. The extra call can also repeat position-change event work when listeners are active. See `EnemyMovement` and `Enemy._Notification`. This is the clearest small optimization I found.
 
-Bottom line: navigation itself looks well structured for hundreds of enemies. I’d prioritize measuring tower target acquisition and repeated area-effect scans under load, then reconcile the corridor-variation default with the performance guidance. No code was modified.
+3. **Wave 5 is deliberately a heavy stress test.** It schedules 500 ships, with the mixed-enemy batches spawning every 54–60 ms. That readily creates the 160+ active-enemy load you saw. Reducing batch counts or slowing their intervals is the most direct way to improve this level without changing simulation code. See `Level100Waves wave 5`.
+
+4. **Towers add more physics callbacks and targeting work.** Tower target searches are periodic and use the spatial index rather than scanning every enemy, which is good. Still, many active towers add per-tick aiming/firing work and repeated local queries. See `TowerTargeting.Find` and the `BattleTower physics loop`.
+
+5. **Rendering is worth checking, but is less clearly the main cause.** The screenshot shows 2,165 render objects and 369 draw calls. That’s substantial scene/render complexity, though the high reported physics time points more strongly to CPU simulation. Compare performance with effects and enemy visuals reduced to see whether rendering is also contributing.
+
+### What I’d try first
+
+- Remove the redundant registry update, then compare the same wave.
+- For Level 100, slow or reduce wave spawns to test how much cost tracks active enemy count.
+- If it remains slow, profile the enemy movement callback and clearance checks before weakening route-safety checks. Longer term, batching movement updates could reduce per-node callback overhead.
+- Use Godot’s profiler to capture a steady section of the wave. The screenshot’s **16.4 ms frame average** does not line up with **27 FPS** (about 37 ms/frame), though the process and physics figures sum to roughly that slower rate; the sampling windows may differ.
+
+**Targeted scan checklist:** Hot-path string/memory patterns: 9 matching lines; LINQ patterns: 0; regex patterns: 0; three sealed helper-class declarations found. I didn’t find LINQ or regex work in the reviewed per-frame movement/targeting paths.
+
+I haven’t changed code; this is a static diagnosis from the screenshot and source, not a runtime profile. I’d treat the duplicated update as the first surgical fix, but the main performance lever is likely reducing or batching work across the active enemies.
+
+| Area | Assessment |
+|---|---|
+| Enemy movement / physics callbacks | Most likely sustained cost |
+| Duplicate spatial-index update | Clear, small optimization |
+| Level 100 spawn rate and active count | Strong direct load lever |
+| Navigation / route audits | Some peaks, but not the apparent sustained cause |
+| Rendering | Secondary possibility to measure |
+
+> These findings are based on a screenshot and code inspection; profiling on the same hardware and build is needed to confirm the exact cost breakdown.
