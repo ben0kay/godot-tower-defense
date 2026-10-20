@@ -1,6 +1,6 @@
 ## PF2 profiling — 2026-10-20
 
-The F4 performance panel now supports optional subsystem CPU timings: Shift+F4 toggles profiling, F8 saves a report. The older top-left grid debug readout is removed; F2/F3 remain. Profiling defaults off. See `DEBUG/README.md` for controls, nested timing meanings and report location, and `TESTS/Debug/PF2.md` for actual verification.
+The F4 performance panel now supports optional subsystem CPU timings: Shift+F4 toggles profiling, F5 saves a report. The older top-left grid debug readout is removed; F2/F3 remain. Profiling defaults off. See `DEBUG/README.md` for controls, nested timing meanings and report location, and `TESTS/Debug/PF2.md` for actual verification.
 
 ## Projectile handling update (PA1–PA3)
 

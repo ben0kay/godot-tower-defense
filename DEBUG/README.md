@@ -1,6 +1,6 @@
 ## PF2 subsystem measurements — 2026-10-20
 
-F4 keeps the normal performance panel; **Shift+F4** starts/stops optional C# subsystem profiling. **F8** prints and saves the retained report to Godot `user://Debug/pf2-*.txt` (the absolute path is printed). Profiling defaults off. Hiding F4 stops profiling; reopening starts a fresh capture if it was enabled. Pause adds no physics samples; reports remain available. Leaving the battlefield clears the active capture. Only one battlefield captures at a time; owner filtering prevents another test world's calls from entering it.
+F4 keeps the normal performance panel; **Shift+F4** starts/stops optional C# subsystem profiling. **F5** prints and saves the retained report to Godot `user://Debug/pf2-*.txt` (the absolute path is printed). Profiling defaults off. Hiding F4 stops profiling; reopening starts a fresh capture if it was enabled. Pause adds no physics samples; reports remain available. Leaving the battlefield clears the active capture. Only one battlefield captures at a time; owner filtering prevents another test world's calls from entering it.
 
 The old top-left `GridDebugOverlay` Info labels, script and formatting loop are removed. F2 catalog spawning, F3 route preview, checkpoint design overlays and normal gameplay controls remain. The F4 panel now sits directly below the top HUD and scales to the free space above the lower HUD; all Controls remain click-through.
 
@@ -22,7 +22,7 @@ Observer bookkeeping is a **partial** measurement: entry/filtering and recording
 
 ### How to investigate Level100
 
-At the same zoom/resolution/build and comparable enemy/tower counts, capture a quiet movement interval, then heavy combat, then a spawn/repath burst. Wait for the window to fill before F8. Save an OFF baseline using normal F4 counters/Godot profiler, then compare ON. Use stride2/4 if detailed hooks noticeably affect timing; record the stride and do not compare unlike sampling as equivalent. Do not change authored waves or disable clearance to make timings look better. PF3 selects the bottleneck after these measurements; no optimization or FPS improvement is implied by installing PF2.
+At the same zoom/resolution/build and comparable enemy/tower counts, capture a quiet movement interval, then heavy combat, then a spawn/repath burst. Wait for the window to fill before F5. Save an OFF baseline using normal F4 counters/Godot profiler, then compare ON. Use stride2/4 if detailed hooks noticeably affect timing; record the stride and do not compare unlike sampling as equivalent. Do not change authored waves or disable clearance to make timings look better. PF3 selects the bottleneck after these measurements; no optimization or FPS improvement is implied by installing PF2.
 
 Automated validation: `TESTS/Debug/SubsystemProfilerChecks.tscn` and `PerformanceOverlayChecks.tscn`. Actual execution results are recorded in `TESTS/Debug/PF2.md`.
 

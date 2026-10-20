@@ -1,6 +1,6 @@
 ## PF2 debug update (2026-10-20)
 
-Optional subsystem timing hooks feed the existing F4 panel (Shift+F4 toggles profiling; F8 saves a report). Old GridDebugOverlay/Info labels are retired; F2/F3 remain. See `DEBUG/README.md` for inclusive timing semantics, fixed sample storage and validation details. Historical notes below remain as reference.
+Optional subsystem timing hooks feed the existing F4 panel (Shift+F4 toggles profiling; F5 saves a report). Old GridDebugOverlay/Info labels are retired; F2/F3 remain. See `DEBUG/README.md` for inclusive timing semantics, fixed sample storage and validation details. Historical notes below remain as reference.
 
 ## Portal/Citadel editor grid snapping — 2026-10-18 (implemented)
 

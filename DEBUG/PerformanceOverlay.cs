@@ -81,7 +81,7 @@ public partial class PerformanceOverlay : CanvasLayer
         if (!_allowed || input is not InputEventKey key || !key.Pressed || key.Echo) return;
         if (key.Keycode == ToggleKey && key.ShiftPressed) SetProfiling(!(_profiler?.Running ?? false));
         else if (key.Keycode == ToggleKey) SetOverlayVisible(!Visible);
-        else if (key.Keycode == Key.F8) DumpProfile();
+        else if (key.Keycode == Key.F5) DumpProfile();
         else return;
         GetViewport().SetInputAsHandled();
     }
@@ -182,7 +182,7 @@ public partial class PerformanceOverlay : CanvasLayer
         int pending = paths ? _paths.PendingCount : 0;
         Write(5, paths ? $"Path queue {pending} · audit queue {_paths.PendingValidationCount} · audit peak {_validationPeak:0.00}ms" : "Route validation N/A", Pressure(pending, QueueWarning, QueueCritical));
         Write(6, _headless ? "Rendering N/A (headless)" : $"Draw calls {Performance.GetMonitor(Performance.Monitor.RenderTotalDrawCallsInFrame):0} · render objects {Performance.GetMonitor(Performance.Monitor.RenderTotalObjectsInFrame):0}", Normal);
-        Write(7, "Shift+F4: profile " + (_profiler?.Running == true ? "ON" : "OFF") + " · F8: save report", new Color("#9aafbd"));
+        Write(7, "Shift+F4: profile " + (_profiler?.Running == true ? "ON" : "OFF") + " · F5: save report", new Color("#9aafbd"));
         for (int i = 8; i < _rows.Length; i++) _rows[i].Visible = _profileRequested;
         if (_profileRequested && _profiler != null)
         {

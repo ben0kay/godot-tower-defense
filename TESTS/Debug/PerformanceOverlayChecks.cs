@@ -61,7 +61,7 @@ public partial class PerformanceOverlayChecks : Node
                             "Scaled panel avoids the lower HUD on small viewports");
                 }
                 Require(rows[19].Visible && rows[20].Text.Contains("overlap"), "Expanded profiling rows remain readable and explain overlap");
-                if (scene == MenuNavigation.Level001Scene) overlay._Input(new InputEventKey { Keycode = Key.F8, Pressed = true });
+                if (scene == MenuNavigation.Level001Scene) overlay._Input(new InputEventKey { Keycode = Key.F5, Pressed = true });
                 int bindings = GetNode<GameInput>("/root/GameInput").BindingCount;
                 overlay._Input(new InputEventKey { Keycode = Key.F4, Pressed = true, Echo = true });
                 Require(overlay.Visible, "OS repeat does not toggle");

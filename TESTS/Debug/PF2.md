@@ -1,3 +1,7 @@
+## Report shortcut correction
+
+The report shortcut is now F5 because F8 is reserved by the Godot editor to stop the running game. The overlay hint, input check, focused regression input and usage notes were updated together.
+
 # PF2 verification — 2026-10-20
 
 Source base: `015ed7d` (unchanged baseline rebuilt separately). Godot4.7.2 Mono and .NET8 on the execution container. These are headless correctness/diagnostic runs, not the user's desktop Level100 workload.
@@ -11,7 +15,7 @@ Run each scene with `Godot --headless --path . TESTS/<scene>.tscn`:
 | Scene | Result |
 |---|---|
 | Debug/SubsystemProfilerChecks | PASS: per-tick aggregation, idle-zero inclusion, rolling eviction, selected-tick stride, nested inclusive timing, foreign-world rejection, pause/stop/unload, default-off and warmed allocation checks; actual registry/targeting/clearance/projectile hooks |
-| Debug/PerformanceOverlayChecks | PASS on Main/Level002/Level020: retired Info absent, F2/F3 retained, default-off, Shift+F4 capture, early/late physics samples, expanded-panel resize and click-through, paused hide/reopen freshness, F8 report actually saved |
+| Debug/PerformanceOverlayChecks | PASS on Main/Level002/Level020: retired Info absent, F2/F3 retained, default-off, Shift+F4 capture, early/late physics samples, expanded-panel resize and click-through, paused hide/reopen freshness, F5 report actually saved |
 | Performance/MovementRegistryChecks | PASS: actual movement, synchronous spatial/target queries, live reveal, swept history, ancestor transforms, arrival/free and paired callback diagnostic |
 | Towers/ProjectileAccuracyChecks | PASS |
 | Towers/TowerConditionsChecks | PASS (weapons/heat/disable/pause) |

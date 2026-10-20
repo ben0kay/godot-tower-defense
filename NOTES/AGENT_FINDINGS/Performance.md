@@ -1,6 +1,6 @@
 ## PF2 implementation — 2026-10-20
 
-User approved PF2 and removal of the old grid Info overlay. Optional timing scopes now feed F4; Shift+F4 starts/stops, F8 prints/saves reports. Default off, fixed rolling physics samples, inclusive overlap labels and world/lifecycle guards. Old Info nodes/script removed; F2/F3 retained. Actual build/headless results and remaining desktop overhead/workload measurements: `TESTS/Debug/PF2.md`. This implements the measurement tooling, not a measured diagnosis or FPS gain. Earlier PF1-only stopping instructions below describe the prior job.
+User approved PF2 and removal of the old grid Info overlay. Optional timing scopes now feed F4; Shift+F4 starts/stops, F5 prints/saves reports. Default off, fixed rolling physics samples, inclusive overlap labels and world/lifecycle guards. Old Info nodes/script removed; F2/F3 retained. Actual build/headless results and remaining desktop overhead/workload measurements: `TESTS/Debug/PF2.md`. This implements the measurement tooling, not a measured diagnosis or FPS gain. Earlier PF1-only stopping instructions below describe the prior job.
 
 ## PF1 source change — 2026-10-20 (runtime verification pending)
 
