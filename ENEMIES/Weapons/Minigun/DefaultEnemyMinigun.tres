@@ -1,20 +1,10 @@
-[gd_resource type="Resource" script_class="EnemyMinigunConfig" load_steps=4 format=3]
-[ext_resource type="Script" path="res://ENEMIES/Weapons/Minigun/EnemyMinigunConfig.cs" id="config"]
-[ext_resource type="Resource" path="res://ENEMIES/Weapons/Minigun/Visuals/EnemyMinigunTracer.tres" id="tracer"]
+[gd_resource type="Resource" script_class="EnemyMinigunConfig" format=3 uid="uid://ksqt5k8a841f"]
+
+[ext_resource type="Script" uid="uid://6nomm8dcqelx" path="res://ENEMIES/Weapons/Minigun/EnemyMinigunConfig.cs" id="config"]
 [ext_resource type="Resource" path="res://ENEMIES/Weapons/Minigun/Visuals/EnemyMinigunMuzzleFlash.tres" id="flash"]
+[ext_resource type="Resource" uid="uid://bk0af31thdhry" path="res://ENEMIES/Weapons/Minigun/Visuals/EnemyMinigunTracer.tres" id="tracer"]
+
 [resource]
 script = ExtResource("config")
-RangePixels = 260.0
-TargetSearchSeconds = 0.2
-LockedTargetSearchSeconds = 1.0
-UseBursts = false
-RotationSpeedDegrees = 240.0
-AimToleranceDegrees = 6.0
-DamagePerBullet = 2.0
-BulletSpeedPixels = 1200.0
-ShotsPerSecond = 6.0
-BurstSeconds = 1.5
-RestSeconds = 1.0
-BulletLifetimeSeconds = 2.5
 ProjectileVisual = ExtResource("tracer")
 MuzzleFlash = ExtResource("flash")

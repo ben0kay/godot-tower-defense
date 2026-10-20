@@ -1,16 +1,14 @@
 [gd_resource type="Resource" script_class="LevelConfig" format=3 uid="uid://vxivrh6h6iwx"]
 
 [ext_resource type="Script" uid="uid://d3rj1iimghlhl" path="res://LEVELS/LevelConfig.cs" id="1"]
+[ext_resource type="Script" uid="uid://dlaxl8mlh0k62" path="res://LEVELS/Level001/Level001Waves.cs" id="waves_script"]
 
-[ext_resource type="Script" path="res://LEVELS/Level001/Level001Waves.cs" id="waves_script"]
 [sub_resource type="Resource" id="wave_source"]
 script = ExtResource("waves_script")
 
 [resource]
 script = ExtResource("1")
-VictoryBaseXP = 500
-DefeatBaseXP = 0
 StartingCredits = 1000
 ActivePortals = Array[NodePath]([NodePath("Portals/EnemyPortal"), NodePath("Portals/EnemyPortal2")])
-WaveSetId = "level001"
 WaveSource = SubResource("wave_source")
+WaveSetId = "level001"
