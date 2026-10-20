@@ -58,6 +58,7 @@ public partial class SplashProjectile : Node2D
     // No registry queries during travel. Contact is the exact destination point, not an extra direct hit.
     public override void _PhysicsProcess(double delta)
     {
+        using var pf2 = SubsystemProfiler.Measure(this, ProfileCategory.Projectiles);
         if (!_initialized || _finished || !IsInsideTree() || IsQueuedForDeletion() || GetTree().Paused || !double.IsFinite(delta) || delta <= 0) return;
         if (!_launched) LaunchFrom(GlobalPosition);
         if (_finished) return;

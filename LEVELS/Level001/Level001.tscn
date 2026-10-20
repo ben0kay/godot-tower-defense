@@ -11,7 +11,6 @@
 [ext_resource type="PackedScene" path="res://WORLD/OBJECTIVES/Citadel/Citadel.tscn" id="6_citadel"]
 [ext_resource type="Script" uid="uid://x78ylg3dne5d" path="res://LEVELS/Debug/LevelDebugController.cs" id="7_debug"]
 [ext_resource type="PackedScene" path="res://ENEMIES/Types/Enemy001/Enemy001.tscn" id="8_enemy"]
-[ext_resource type="Script" uid="uid://cvogctvds5c0a" path="res://WORLD/GRID/GridDebugOverlay.cs" id="9_info"]
 [ext_resource type="Script" uid="uid://ceof7q2uqyh1q" path="res://WORLD/ROUTING/CheckpointDesignOverlay.cs" id="checkpoint_overlay"]
 
 [node name="Level001" type="Node2D" unique_id=864740696]
@@ -62,17 +61,6 @@ position = Vector2(3872, 2528)
 [node name="Debug" type="Node" parent="." unique_id=1405070056]
 script = ExtResource("7_debug")
 EnemyScene = ExtResource("8_enemy")
-
-[node name="HUD" type="CanvasLayer" parent="Debug" unique_id=1519549444]
-
-[node name="Info" type="Label" parent="Debug/HUD" unique_id=1434904208]
-offset_left = 16.0
-offset_top = 62.0
-offset_right = 1250.0
-offset_bottom = 185.0
-theme_override_colors/font_color = Color(0.68, 0.91, 0.96, 0.86)
-theme_override_font_sizes/font_size = 14
-script = ExtResource("9_info")
 
 [node name="CheckpointOverlay" type="Node2D" parent="Debug" unique_id=1950778630]
 z_index = 4090

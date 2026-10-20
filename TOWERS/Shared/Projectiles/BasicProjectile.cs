@@ -51,6 +51,7 @@ public partial class BasicProjectile : Node2D
     // Straight rounds ignore former target death/range; homing remains an explicit capability with target-loss cleanup.
     public override void _PhysicsProcess(double delta)
     {
+        using var pf2 = SubsystemProfiler.Measure(this, ProfileCategory.Projectiles);
         if (_impacted || IsQueuedForDeletion() || !IsInsideTree() || GetTree().Paused || !double.IsFinite(delta) || delta <= 0) return;
         if (!GodotObject.IsInstanceValid(_registry) || !_registry.IsInsideTree() || _registry.IsQueuedForDeletion()) { QueueFree(); return; }
         if (!_launched) LaunchFrom(GlobalPosition);

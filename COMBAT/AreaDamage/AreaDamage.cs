@@ -33,6 +33,7 @@ public static class AreaDamage
     // EnemyRegistry guarantees uniqueness. The return value counts eligible dispatched hits, including zero damage.
     public static int ApplyInstant(Vector2 impact, float radius, DamageInfo source, float edgeFraction, EnemyRegistry registry)
     {
+        using var pf2 = SubsystemProfiler.Measure(registry, ProfileCategory.AreaDamage);
         Validate(radius, edgeFraction);
         if (!float.IsFinite(impact.X) || !float.IsFinite(impact.Y)) throw new ArgumentOutOfRangeException(nameof(impact));
         if (!GodotObject.IsInstanceValid(registry)) throw new ArgumentNullException(nameof(registry));

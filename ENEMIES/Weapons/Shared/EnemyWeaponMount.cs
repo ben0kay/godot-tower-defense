@@ -101,6 +101,7 @@ public partial class EnemyWeaponMount : Node2D
     // At most one acquisition per interval/tick, including target loss and large deltas; cached locks are revalidated.
     public override void _PhysicsProcess(double delta)
     {
+        using var pf2 = SubsystemProfiler.Measure(this, ProfileCategory.EnemyGuns);
         if (IsQueuedForDeletion()) { Stop(); return; }
         if (!_running || !double.IsFinite(delta) || delta <= 0 || !IsInsideTree() || GetTree().Paused) return;
         if (!GodotObject.IsInstanceValid(_host) || !_host.IsAlive || !_host.IsInsideTree() || _host.IsQueuedForDeletion()

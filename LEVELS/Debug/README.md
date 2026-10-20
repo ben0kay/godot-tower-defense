@@ -1,3 +1,7 @@
+## PF2 debug update (2026-10-20)
+
+Optional subsystem timing hooks feed the existing F4 panel (Shift+F4 toggles profiling; F8 saves a report). Old GridDebugOverlay/Info labels are retired; F2/F3 remain. See `DEBUG/README.md` for inclusive timing semantics, fixed sample storage and validation details. Historical notes below remain as reference.
+
 ## EG3 F2 entry — 2026-10-20
 
 DefaultEnemyCatalog now appends Gunner Drone(gunner_drone_mk1) as entry14. Existing F2 cycles it after Heavy Transporter, retaining all previous indices; F3 uses the same catalog. The new ship follows normal routes and attacks nearby placed towers with its separate rotating minigun. No debug key handling or authored waves changed. Run a gameplay launcher/Campaign, not the raw map alone. Build/runtime/manual visual acceptance is pending.

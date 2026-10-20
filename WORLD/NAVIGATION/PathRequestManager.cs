@@ -160,6 +160,7 @@ public partial class PathRequestManager : Node
     // Time limit is soft: an individual native A* call cannot be interrupted, then work yields.
     public override void _PhysicsProcess(double delta)
     {
+        using var pf2 = SubsystemProfiler.Measure(this, ProfileCategory.PathWork);
         Navigation.Refresh(); Navigation.UpdateCongestion(delta); ProcessValidations(); Journeys.Refresh();
         LastFrameJourneyCalculations = 0;
         long started = Stopwatch.GetTimestamp(); LastFrameCalculations = 0; LastFrameAStarMilliseconds = 0;

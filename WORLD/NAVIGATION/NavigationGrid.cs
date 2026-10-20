@@ -174,7 +174,8 @@ public partial class NavigationGrid : Node
         Profile profile = ResolveProfile(profileId);
         ApplyCrowd(profile);
         long calculationStarted = Stopwatch.GetTimestamp();
-        Godot.Collections.Array<Vector2I> cells = profile.AStar.GetIdPath(start, goal);
+        Godot.Collections.Array<Vector2I> cells;
+        using (SubsystemProfiler.Measure(this, ProfileCategory.AStar)) cells = profile.AStar.GetIdPath(start, goal);
         LastAStarMilliseconds = Stopwatch.GetElapsedTime(calculationStarted).TotalMilliseconds;
         Vector2[] points = new Vector2[cells.Count];
         if (cells.Count == 0) return points;
@@ -345,6 +346,7 @@ public partial class NavigationGrid : Node
     // Sample the swept segment, including both endpoints, to prevent high-speed tunneling.
     public bool SegmentClear(Vector2 from, Vector2 to, float radius)
     {
+        using var pf2 = SubsystemProfiler.Measure(this, ProfileCategory.Clearance);
         int steps = Mathf.Max(1, Mathf.CeilToInt(from.DistanceTo(to) / Mathf.Max(1f, radius * 0.5f)));
         for (int i = 0; i <= steps; i++)
             if (!HasClearance(from.Lerp(to, (float)i / steps), radius)) return false;

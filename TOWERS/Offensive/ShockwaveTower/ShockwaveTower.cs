@@ -55,6 +55,7 @@ public partial class ShockwaveTower : TowerBase
     // Emit immediately, then periodically even without targets; do not burst missed intervals after a hitch.
     public override void _PhysicsProcess(double delta)
     {
+        using var pf2 = SubsystemProfiler.Measure(this, ProfileCategory.Towers);
         if (!CanAttack) return;
         if (!Enabled || FinalStats?.Shockwave == null || !IsInsideTree() || IsQueuedForDeletion()
             || !double.IsFinite(delta) || delta <= 0 || !GodotObject.IsInstanceValid(_registry)

@@ -83,6 +83,7 @@ public partial class LaserTower : TowerBase
     // Periodically choose First/Closest; aligned valid lock deals float base DPS times physics delta.
     public override void _PhysicsProcess(double delta)
     {
+        using var pf2 = SubsystemProfiler.Measure(this, ProfileCategory.Towers);
         if (!CanAttack) return;
         if (!Enabled || FinalStats == null || _registry == null || !double.IsFinite(delta) || delta <= 0)
         { ClearBeam(); return; }

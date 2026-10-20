@@ -49,7 +49,11 @@ public partial class EnemyRegistry : Node
     // =========================================================
     // Transform notifications also cover explicit teleports and editor/debug repositioning.
     public void UpdatePosition(Enemy enemy)
-    { _spatial?.Move(enemy, enemy.GlobalPosition); if (EnemyPositionChanged != null && _members.Contains(enemy)) EnemyPositionChanged.Invoke(enemy); }
+    {
+        using var pf2 = SubsystemProfiler.Measure(this, ProfileCategory.Registry);
+        _spatial?.Move(enemy, enemy.GlobalPosition);
+        if (EnemyPositionChanged != null && _members.Contains(enemy)) EnemyPositionChanged.Invoke(enemy);
+    }
     // =========================================================
     // Shared pooled buffers remain safe when a damage callback starts another query.
     internal List<EnemySpatialIndex.Neighbor> RentQueryBuffer() => _queryBuffers.Count > 0 ? _queryBuffers.Pop() : new();

@@ -49,6 +49,7 @@ public partial class ShockwaveEmitter : Node2D
     // Query nearby swept bounds, stage crossings, then dispatch after enumeration so deaths/removals cannot corrupt it.
     public override void _PhysicsProcess(double delta)
     {
+        using var pf2 = SubsystemProfiler.Measure(this, ProfileCategory.Projectiles);
         if (!_initialized || _finished || !IsInsideTree() || IsQueuedForDeletion() || !double.IsFinite(delta) || delta <= 0) return;
         if (!GodotObject.IsInstanceValid(_registry) || !_registry.IsInsideTree() || _registry.IsQueuedForDeletion())
         { Finish(); return; }

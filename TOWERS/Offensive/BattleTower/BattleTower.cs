@@ -84,6 +84,7 @@ public partial class BattleTower : TowerBase
     // Refresh First periodically to allow overtaking, checking cached range between searches.
     public override void _PhysicsProcess(double delta)
     {
+        using var pf2 = SubsystemProfiler.Measure(this, ProfileCategory.Towers);
         if (!CanAttack) return;
         if (FinalStats == null) return;
         _searchTimer -= (float)delta; _shotTimer = Mathf.Max(-Mathf.Min((float)delta, .05f), _shotTimer - (float)delta);

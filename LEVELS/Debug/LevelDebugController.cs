@@ -14,8 +14,6 @@ public partial class LevelDebugController : Node
             _enabled = value;
             if (!value && RoutePreview?.IsOpen == true) RoutePreview.Toggle();
             if (!IsInsideTree()) return;
-            CanvasLayer hud = GetNodeOrNull<CanvasLayer>("HUD");
-            if (hud != null) hud.Visible = value && _spawns != null;
             SetProcessUnhandledKeyInput(value && _spawns != null);
         }
     }
@@ -42,8 +40,6 @@ public partial class LevelDebugController : Node
     private void ConnectServices()
     {
         _spawns = GetNodeOrNull<SpawnManager>("../../EnemySystems/Spawning");
-        CanvasLayer hud = GetNodeOrNull<CanvasLayer>("HUD");
-        if (hud != null) hud.Visible = Enabled && _spawns != null;
         SetProcessUnhandledKeyInput(Enabled && _spawns != null);
         if (Enabled && _spawns != null)
         {

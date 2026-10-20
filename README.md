@@ -1,3 +1,7 @@
+## PF2 profiling — 2026-10-20
+
+The F4 performance panel now supports optional subsystem CPU timings: Shift+F4 toggles profiling, F8 saves a report. The older top-left grid debug readout is removed; F2/F3 remain. Profiling defaults off. See `DEBUG/README.md` for controls, nested timing meanings and report location, and `TESTS/Debug/PF2.md` for actual verification.
+
 ## Projectile handling update (PA1–PA3)
 
 Optional immutable handling now carries launch spread and explicit Straight/Homing guidance through level → selected rank → captured research → safety → final snapshots. Projectile towers default to straight physical shots; splash uses a fixed launch destination. See `TOWERS/Shared/Projectiles/PROJECTILE_GUIDANCE_ACCURACY_PLAN.md` for implementation decisions and retained pass history.

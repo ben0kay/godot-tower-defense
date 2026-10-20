@@ -106,6 +106,7 @@ public partial class EnemyMovement : Node
     // A* assignment builds safe offset waypoints once and updates shared dependency indexing.
     public void AcceptPath(Vector2[] route, int revision)
     {
+        using var pf2 = SubsystemProfiler.Measure(this, ProfileCategory.Refinement);
         _waiting = false;
         if (HeadingToCheckpoint && (_checkpointError.Length > 0 || !GodotObject.IsInstanceValid(Checkpoint) || route.Length > 0 && !Checkpoint.Contains(route[^1])))
             route = System.Array.Empty<Vector2>();
@@ -262,6 +263,7 @@ public partial class EnemyMovement : Node
     // Check immediate swept clearance every tick; audits never trigger A* on valid routes.
     public override void _PhysicsProcess(double delta)
     {
+        using var pf2 = SubsystemProfiler.Measure(this, ProfileCategory.Movement);
         if (!Enemy.IsAlive || Enemy.AssignedCitadel?.Available != true) return;
         if (HeadingToCheckpoint)
         {

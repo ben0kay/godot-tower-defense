@@ -15,6 +15,7 @@ public static class TowerTargeting
     // Search only living enemies in firing range; stale/failed paths cannot win First.
     public static Enemy Find(EnemyRegistry registry, Vector2 position, float range, Priority priority, StatusEffectId? requiredEffect = null, Preference preference = Preference.None, bool detectsStealth = false)
     {
+        using var pf2 = SubsystemProfiler.Measure(registry, ProfileCategory.Targeting);
         if (!Enum.IsDefined(preference)) throw new ArgumentOutOfRangeException(nameof(preference));
         if (!Enum.IsDefined(priority)) throw new ArgumentOutOfRangeException(nameof(priority));
         if (!float.IsFinite(range) || range < 0) throw new ArgumentOutOfRangeException(nameof(range));

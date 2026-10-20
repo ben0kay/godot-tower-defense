@@ -1,3 +1,7 @@
+## PF2 debug update (2026-10-20)
+
+Optional subsystem timing hooks feed the existing F4 panel (Shift+F4 toggles profiling; F8 saves a report). Old GridDebugOverlay/Info labels are retired; F2/F3 remain. See `DEBUG/README.md` for inclusive timing semantics, fixed sample storage and validation details. Historical notes below remain as reference.
+
 ## Projectile handling update (PA1–PA3)
 
 Optional immutable handling now carries launch spread and explicit Straight/Homing guidance through level → selected rank → captured research → safety → final snapshots. Projectile towers default to straight physical shots; splash uses a fixed launch destination. See `TOWERS/Shared/Projectiles/PROJECTILE_GUIDANCE_ACCURACY_PLAN.md` for implementation decisions and retained pass history.

@@ -96,6 +96,7 @@ public abstract partial class ProjectileTurretBase : TowerBase
     // One target, one turret rotation, one cooldown; no per-barrel searches or running muzzle nodes.
     public override void _PhysicsProcess(double delta)
     {
+        using var pf2 = SubsystemProfiler.Measure(this, ProfileCategory.Towers);
         if (!CanAttack || Config == null || FinalStats == null || _registry == null || _projectiles == null
             || !double.IsFinite(delta) || delta <= 0)
         { _visuals?.SetAim(null, Vector2.Zero, 0, null, false); return; }

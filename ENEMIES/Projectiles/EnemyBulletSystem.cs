@@ -93,6 +93,7 @@ public partial class EnemyBulletSystem : Node
     // Clip travel to remaining lifetime, resolve earliest footprint once, then swap-remove without allocating.
     public void Advance(double delta)
     {
+        using var pf2 = SubsystemProfiler.Measure(this, ProfileCategory.Projectiles);
         if (_advancing || _count == 0 || !double.IsFinite(delta) || delta <= 0 || !IsInsideTree()
             || IsQueuedForDeletion() || GetTree().Paused) return;
         if (!GodotObject.IsInstanceValid(_towers) || !_towers.IsInsideTree() || _towers.IsQueuedForDeletion()) { Clear(); return; }

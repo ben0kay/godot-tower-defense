@@ -80,6 +80,7 @@ public partial class RocketTower : TowerBase
     // Refresh First periodically to allow overtaking, checking cached range between searches.
     public override void _PhysicsProcess(double delta)
     {
+        using var pf2 = SubsystemProfiler.Measure(this, ProfileCategory.Towers);
         if (!CanAttack) return;
         if (FinalStats?.Area == null || !double.IsFinite(delta) || delta <= 0 || !IsInsideTree()) return;
         _searchTimer -= (float)delta; _shotTimer = Mathf.Max(0f, _shotTimer - (float)delta);

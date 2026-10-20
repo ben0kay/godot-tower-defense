@@ -1,3 +1,7 @@
+## PF2 implementation — 2026-10-20
+
+User approved PF2 and removal of the old grid Info overlay. Optional timing scopes now feed F4; Shift+F4 starts/stops, F8 prints/saves reports. Default off, fixed rolling physics samples, inclusive overlap labels and world/lifecycle guards. Old Info nodes/script removed; F2/F3 retained. Actual build/headless results and remaining desktop overhead/workload measurements: `TESTS/Debug/PF2.md`. This implements the measurement tooling, not a measured diagnosis or FPS gain. Earlier PF1-only stopping instructions below describe the prior job.
+
 ## PF1 source change — 2026-10-20 (runtime verification pending)
 
 User explicitly chose PF1 after the screenshot/static investigation; PF0 repeatable desktop timing remains pending and was not treated as a blocker to this narrow source change.
@@ -96,7 +100,7 @@ Run headless/integration regressions that exist at HEAD, including `TESTS/Integr
 |---|---|---|
 | PF0 — Baseline | NOT STARTED | Screenshot is a clue, not a controlled benchmark |
 | PF1 — Registry duplicate fix | SOURCE IMPLEMENTED / VERIFICATION PENDING | Explicit post-move call removed; notification/consumer fixture added; build/runtime/timings unavailable |
-| PF2 — Instrumentation | NOT STARTED | Debug-only measurements proposed |
+| PF2 — Instrumentation | IMPLEMENTED; TARGET-WORKLOAD MEASUREMENTS PENDING | F4 optional subsystem timings/report; see DEBUG/README.md and TESTS/Debug/PF2.md |
 | PF3 — Isolate bottleneck | NOT STARTED | Compare matched workloads/settings; no shipped balance changes |
 | PF4 — Measured optimization | BLOCKED ON PF2/PF3 | Choose one evidence-backed improvement |
 | PF5 — Verification | NOT STARTED | No measured FPS gain claimed |

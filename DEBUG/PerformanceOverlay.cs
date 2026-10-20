@@ -19,11 +19,21 @@ public partial class PerformanceOverlay : CanvasLayer
     [Export] public int QueueWarning { get; set; } = 32;
     [Export] public int QueueCritical { get; set; } = 128;
     private PanelContainer _panel;
-    private readonly Label[] _rows = new Label[8];
+    private readonly Label[] _rows = new Label[21];
     private PathRequestManager _paths;
     private EnemyRegistry _enemies;
     private Node _projectiles;
-    private Control _topBar, _legacyInfo, _bottomArea;
+    private Control _topBar, _bottomArea;
+    private Node _towers;
+    private EnemyBulletSystem _hostile;
+    private SubsystemProfiler _profiler;
+    private bool _profileRequested;
+    [ExportGroup("Subsystem Profiling (debug only)")]
+    [Export] public bool ProfileOnStart { get; set; } = false;
+    [Export(PropertyHint.Range, "30,1200,30")] public int ProfileWindowTicks { get; set; } = 300;
+    [Export(PropertyHint.Range, "1,60,1")] public int ProfileEveryTicks { get; set; } = 1;
+    [Export] public string BuildLabel { get; set; } = "PF2 development build; record commit SHA when comparing";
+    public SubsystemProfiler Profiler => _profiler;
     private double _refresh, _peakAge, _frameTotal, _framePeak, _pathPeak, _astarPeak, _validationPeak;
     private int _frames, _queryPeak;
     private ulong _lastFrameUsec;
@@ -36,7 +46,7 @@ public partial class PerformanceOverlay : CanvasLayer
     // One instance belongs to each battlefield; release exports allocate no UI by default.
     public override void _Ready()
     {
-        ProcessMode = ProcessModeEnum.Always; Layer = 20;
+        ProcessMode = ProcessModeEnum.Always; Layer = 20; ProcessPhysicsPriority = int.MaxValue;
         _allowed = !DebugBuildsOnly || OS.IsDebugBuild();
         SetProcess(false); SetPhysicsProcess(false); SetProcessInput(_allowed);
         if (!_allowed) { Hide(); return; }
@@ -56,7 +66,11 @@ public partial class PerformanceOverlay : CanvasLayer
         _projectiles = battle.GetNodeOrNull<Node>("World/Projectiles");
         _topBar = battle.GetNodeOrNull<Control>("UI/GameplayHUD/TopBar");
         _bottomArea = battle.GetNodeOrNull<Control>("UI/GameplayHUD/BottomArea");
-        _legacyInfo = battle.GetNodeOrNull<Control>("World/Level/Debug/HUD/Info");
+        _towers = battle.GetNodeOrNull<Node>("World/Towers");
+        _hostile = battle.GetNodeOrNull<EnemyBulletSystem>("World/EnemyBullets");
+        _profiler = new SubsystemProfiler { Name = "SubsystemProfiler" }; AddChild(_profiler);
+        _profiler.Initialize(battle.GetNodeOrNull<Node>("World"), ProfileWindowTicks);
+        _profiler.SampleEveryTicks = ProfileEveryTicks; _profileRequested = ProfileOnStart;
         SetOverlayVisible(ShowOnStart);
     }
 
@@ -64,8 +78,12 @@ public partial class PerformanceOverlay : CanvasLayer
     // F4 is independent of focused controls and pause/results; repeat events cannot flicker visibility.
     public override void _Input(InputEvent input)
     {
-        if (!_allowed || input is not InputEventKey key || !key.Pressed || key.Echo || key.Keycode != ToggleKey) return;
-        SetOverlayVisible(!Visible); GetViewport().SetInputAsHandled();
+        if (!_allowed || input is not InputEventKey key || !key.Pressed || key.Echo) return;
+        if (key.Keycode == ToggleKey && key.ShiftPressed) SetProfiling(!(_profiler?.Running ?? false));
+        else if (key.Keycode == ToggleKey) SetOverlayVisible(!Visible);
+        else if (key.Keycode == Key.F8) DumpProfile();
+        else return;
+        GetViewport().SetInputAsHandled();
     }
 
     // =========================================================
@@ -76,8 +94,41 @@ public partial class PerformanceOverlay : CanvasLayer
         Visible = visible; SetProcess(visible); SetPhysicsProcess(visible);
         _lastFrameUsec = 0; _refresh = _peakAge = _frameTotal = 0; _frames = 0;
         ResetPeaks();
+        if (!visible) _profiler?.Stop();
+        else if (_profileRequested) _profiler?.Start();
         if (visible && _panel != null) RefreshDisplay();
     }
+    #endregion
+
+    #region Profiling Controls
+    // =========================================================
+    // Explicit profiling is independent of ordinary F4 visibility; hidden captures always stop.
+    public void SetProfiling(bool enabled)
+    {
+        if (!_allowed || _profiler == null) return;
+        if (enabled && !Visible) SetOverlayVisible(true);
+        _profileRequested = enabled; _profiler.SampleEveryTicks = ProfileEveryTicks;
+        if (enabled) _profiler.Start(); else _profiler.Stop();
+        RefreshDisplay();
+    }
+    // =========================================================
+    // Capture only on demand; report workload and hardware alongside CPU observations, never infer GPU utilization.
+    public void DumpProfile()
+    {
+        if (_profiler == null) return;
+        var camera = GetParent().GetNodeOrNull<CameraController>("CameraRig");
+        string context = $"build={BuildLabel}; battlefield={GetParent().SceneFilePath}; level={_paths?.Navigation.Grid.Level.SceneFilePath}; enemies={_enemies?.Living.Count ?? 0}; towers={_towers?.GetChildCount() ?? 0}; projectileNodes={_projectiles?.GetChildCount() ?? 0}; hostileBullets={_hostile?.ActiveCount ?? 0}; zoom={camera?.ZoomLevel}; viewport={GetViewport().GetVisibleRect().Size}; maxFps={Engine.MaxFps}; fps={Engine.GetFramesPerSecond()}; processMs={Performance.GetMonitor(Performance.Monitor.TimeProcess) * 1000:0.000}; physicsMs={Performance.GetMonitor(Performance.Monitor.TimePhysicsProcess) * 1000:0.000}; headless={_headless}; CPU={OS.GetProcessorName()}; threads={OS.GetProcessorCount()}; OS={OS.GetName()}; pathQueue={_paths?.PendingCount}; GPU timing=unmeasured";
+        string report = _profiler.Report(context); GD.Print(report);
+        DirAccess.MakeDirRecursiveAbsolute("user://Debug");
+        string path = $"user://Debug/pf2-{System.DateTime.UtcNow:yyyyMMdd-HHmmss-fff}.txt";
+        using var file = FileAccess.Open(path, FileAccess.ModeFlags.Write);
+        if (file == null) GD.PushWarning("PF2 report could not be saved: " + FileAccess.GetOpenError());
+        else { file.StoreString(report); GD.Print("PF2 report saved: " + ProjectSettings.GlobalizePath(path)); }
+    }
+    // =========================================================
+    // Clear the active capture before the scene-owned UI disappears.
+    public override void _ExitTree() => _profiler?.Stop();
+
     #endregion
 
     #region Sampling
@@ -101,6 +152,7 @@ public partial class PerformanceOverlay : CanvasLayer
     // Read after the world path manager's physics tick so brief query/validation spikes are retained.
     public override void _PhysicsProcess(double delta)
     {
+        _profiler?.EndTick();
         if (GetTree().Paused || !GodotObject.IsInstanceValid(_paths)) return;
         _queryPeak = System.Math.Max(_queryPeak, _paths.LastFrameCalculations);
         _pathPeak = System.Math.Max(_pathPeak, _paths.LastPathfindingMilliseconds);
@@ -124,13 +176,24 @@ public partial class PerformanceOverlay : CanvasLayer
         Write(2, $"Engine process {Performance.GetMonitor(Performance.Monitor.TimeProcess) * 1000:0.00}ms · physics {Performance.GetMonitor(Performance.Monitor.TimePhysicsProcess) * 1000:0.00}ms", Normal);
         string enemies = GodotObject.IsInstanceValid(_enemies) ? _enemies.Living.Count.ToString() : "N/A";
         string projectiles = GodotObject.IsInstanceValid(_projectiles) ? _projectiles.GetChildCount().ToString() : "N/A";
-        Write(3, $"Enemies {enemies} · projectile nodes {projectiles}", Normal);
+        Write(3, $"Enemies {enemies} · projectile nodes {projectiles} · towers {_towers?.GetChildCount() ?? 0} · hostile bullets {_hostile?.ActiveCount ?? 0}", Normal);
         double budget = paths ? _paths.Config?.MaxPathfindingMillisecondsPerFrame ?? 0 : 0;
         Write(4, paths ? $"Path peak {_pathPeak:0.00}ms · A* {_astarPeak:0.00}ms · queries {_queryPeak}" : "Navigation N/A", budget > 0 ? Pressure(_pathPeak, budget, budget * 2) : Normal);
         int pending = paths ? _paths.PendingCount : 0;
         Write(5, paths ? $"Path queue {pending} · audit queue {_paths.PendingValidationCount} · audit peak {_validationPeak:0.00}ms" : "Route validation N/A", Pressure(pending, QueueWarning, QueueCritical));
         Write(6, _headless ? "Rendering N/A (headless)" : $"Draw calls {Performance.GetMonitor(Performance.Monitor.RenderTotalDrawCallsInFrame):0} · render objects {Performance.GetMonitor(Performance.Monitor.RenderTotalObjectsInFrame):0}", Normal);
-        Write(7, $"Peaks: {Mathf.Max(1, PeakWindowSeconds):0.#}s windows · colors indicate pressure", new Color("#9aafbd"));
+        Write(7, "Shift+F4: profile " + (_profiler?.Running == true ? "ON" : "OFF") + " · F8: save report", new Color("#9aafbd"));
+        for (int i = 8; i < _rows.Length; i++) _rows[i].Visible = _profileRequested;
+        if (_profileRequested && _profiler != null)
+        {
+            for (int i = 0; i < SubsystemProfiler.CategoryCount; i++)
+            {
+                var r = _profiler.Read((ProfileCategory)i);
+                Write(8 + i, $"{SubsystemProfiler.Names[i]}  {r.Mean:0.00} / {r.P95:0.00} / {r.Peak:0.00}ms · {r.Calls} calls", Normal);
+            }
+            Write(19, $"Mean / p95 / peak per sampled tick · n={_profiler.Samples} · stride={ProfileEveryTicks}", Normal);
+            Write(20, $"Nested rows overlap · observer {_profiler.BookkeepingMeanMs:0.000}ms/tick (partial)", Warning);
+        }
         LayoutPanel();
     }
     #endregion
@@ -160,7 +223,6 @@ public partial class PerformanceOverlay : CanvasLayer
     {
         float margin = Mathf.Max(4, EdgeMargin), top = margin;
         if (GodotObject.IsInstanceValid(_topBar) && _topBar.IsVisibleInTree()) top = Mathf.Max(top, _topBar.GetGlobalRect().End.Y + margin);
-        if (GodotObject.IsInstanceValid(_legacyInfo) && _legacyInfo.IsVisibleInTree()) top = Mathf.Max(top, _legacyInfo.GetGlobalRect().End.Y + margin);
         Vector2 viewport = GetViewport().GetVisibleRect().Size;
         float bottom = viewport.Y - margin;
         if (GodotObject.IsInstanceValid(_bottomArea) && _bottomArea.IsVisibleInTree() && _bottomArea.Size.Y > 0)
