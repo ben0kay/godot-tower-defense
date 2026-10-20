@@ -1,3 +1,7 @@
+## Optional split finished visuals
+
+TowerConstructionVisuals.FinishedVisualPaths optionally lists cached CanvasItem layers alongside SpritePath's composite overlay. Existing presenters with an empty list retain their original visibility behavior. The original composite finished texture selects split layers; authored construction/custom monolithic tier or upgrade textures select the overlay. PresentationChanged fires only when this mode changes. Battle uses this to retain all existing construction art while showing its fixed base and recoiling gun after completion. Custom composite artwork suspends split recoil; it is not automatically partitioned.
+
 # Shared construction — C1–C3 and Battle-only C4 artwork implemented
 
 Paid placements now occupy their complete footprint immediately, take authored time to build, and become operational once. Payment still uses the existing atomic wallet callback; invalid construction setup, scene/index failures and failed placement roll back cells, nodes and work before payment. Construction completion does not alter occupancy or navigation. Directly instantiated scenes remain operational unless placement explicitly starts construction.

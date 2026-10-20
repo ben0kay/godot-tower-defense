@@ -6,12 +6,14 @@
 
 [ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/Visuals/BattleTracerStyle.tres" id="pv_tracer"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/Visuals/BattleMuzzleFlashStyle.tres" id="pv_flash"]
+[ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/Visuals/BattleRecoilStyle.tres" id="recoil"]
 [resource]
 script = ExtResource("1")
 ConstructionArt = ExtResource("2_art")
 
 ProjectileVisual = ExtResource("pv_tracer")
 MuzzleFlash = ExtResource("pv_flash")
+Recoil = ExtResource("recoil")
 
 HeatEnabled = true
 OverheatAfterMinutes = 3.0

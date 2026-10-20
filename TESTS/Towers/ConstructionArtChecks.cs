@@ -22,7 +22,7 @@ internal static class ConstructionArtChecks
     {
         using AmmoLoopFixture f = new(runner);
         BattleTower tower = f.Purchase<BattleTower>("battle", false);
-        Sprite2D sprite = tower.GetNode<Sprite2D>("TurretPivot/Sprite"); var transform = sprite.Transform; Color tint = sprite.Modulate;
+        Sprite2D sprite = tower.GetNode<Sprite2D>(BattleTower.ConstructionSpritePath); var transform = sprite.Transform; Color tint = sprite.Modulate;
         var visual = tower.GetNode<TowerConstructionVisuals>("ConstructionVisuals");
         var clock = f.Main.GetNode<ConstructionWorkManager>("World/ConstructionWork");
         var stats = tower.FinalStats; int revision = f.Spawns.Paths.Navigation.Grid.NavigationRevision;
@@ -40,7 +40,7 @@ internal static class ConstructionArtChecks
         Require(sprite.Transform == transform && sprite.Modulate == tint && tower.FinalStats == stats && tower.RankProgress.TotalXp == 0
             && f.Wallet.GetBalance(f.Wallet.CreditsResource) == 800 && f.Spawns.Paths.Navigation.Grid.NavigationRevision == revision, "Art never changes placement, selection, stats, XP or payment");
         BattleTower direct = f.Add<BattleTower>("battle", new(2200, 2000));
-        Require(direct.GetNode<Sprite2D>("TurretPivot/Sprite").Texture == Original && direct.GetNode<TowerConstructionVisuals>("ConstructionVisuals").TextureChanges == 0
+        Require(direct.GetNode<Sprite2D>(BattleTower.ConstructionSpritePath).Texture == Original && direct.GetNode<TowerConstructionVisuals>("ConstructionVisuals").TextureChanges == 0
             && direct.Config.ConstructionArt == tower.Config.ConstructionArt && direct.Config.Levels[0] != tower.Config.Levels[0], "Loaded art resources shared, mutable numeric rows private, direct instances remain finished");
         f.Hud.GetBuildButton("battle").EmitSignal(Button.SignalName.Pressed);
         Require(f.Placement.GetNode<Sprite2D>("PlacementGhost").Texture == Original, "Ghost keeps finished icon, not construction art");
@@ -61,7 +61,7 @@ internal static class ConstructionArtChecks
         foreach (TowerConstructionArt profile in new TowerConstructionArt[] { null, new() })
         {
             BattleTower tower = Create(f, profile, true);
-            Require(tower.GetNode<Sprite2D>("TurretPivot/Sprite").Texture == Original && tower.IsBusy, "Null/empty style retains gameplay and normal image");
+            Require(tower.GetNode<Sprite2D>(BattleTower.ConstructionSpritePath).Texture == Original && tower.IsBusy, "Null/empty style retains gameplay and normal image");
             f.Main.GetNode<ConstructionWorkManager>("World/ConstructionWork").Advance(3);
             Require(tower.IsOperational, "Missing art never delays completion");
         }
@@ -74,7 +74,7 @@ internal static class ConstructionArtChecks
         using AmmoLoopFixture f = new(runner);
         TowerConstructionArt art = new() { LevelArtwork = new() { new() { Level = 2, UpgradeProgress = .5f,
             UpgradeTexture = Texture("stage1_frame"), FinishedTexture = Texture("stage2_assembly") } } };
-        BattleTower tower = Create(f, art, false); Sprite2D sprite = tower.GetNode<Sprite2D>("TurretPivot/Sprite");
+        BattleTower tower = Create(f, art, false); Sprite2D sprite = tower.GetNode<Sprite2D>(BattleTower.ConstructionSpritePath);
         var clock = f.Main.GetNode<ConstructionWorkManager>("World/ConstructionWork");
         Require(TowerUpgradeController.TryUpgrade(tower, f.Wallet, f.Placement.Settings, 1, out _) && sprite.Texture == Original, "Upgrade begins with old completed artwork");
         clock.Advance(1.9); Require(sprite.Texture == Original, "No intermediate image before its configured threshold");
@@ -82,13 +82,15 @@ internal static class ConstructionArtChecks
         f.Target(tower.GlobalPosition + new Vector2(0, -64)); tower._PhysicsProcess(1);
         Require(tower.Ammunition.Inventory.Amount == 999 && sprite.GetParent<Node2D>().Rotation == 0, "Working turret still aims/fires during optional transition art");
         clock.Advance(2); Require(sprite.Texture == Texture("stage2_assembly") && tower.UpgradeLevel == 2, "Final level2 image applies at actual completion");
+        Require(sprite.Visible && !tower.GetNode<Sprite2D>("BaseSprite").Visible && !tower.GetNode<Node2D>("TurretPivot/RecoilRoot").Visible
+            && !tower.GetNode<TowerRecoilController>("Recoil").Active, "Custom composite art shows alone and suspends split recoil");
         Require(TowerUpgradeController.TryUpgrade(tower, f.Wallet, f.Placement.Settings, 2, out _), "Next tier starts");
         clock.Advance(5);
         Require(tower.UpgradeLevel == 3 && sprite.Texture == Texture("stage2_assembly"), "Unassigned next tier retains previous completed art, not Level1 or transition");
         BattleTower instant = Create(f, art, false); instant.NextUpgrade.WorkSeconds = 0;
         f.Wallet.Initialize(new LevelConfig { StartingCredits = 1000 });
         Require(TowerUpgradeController.TryUpgrade(instant, f.Wallet, f.Placement.Settings, 1, out _)
-            && instant.GetNode<Sprite2D>("TurretPivot/Sprite").Texture == Texture("stage2_assembly"), "Zero-duration upgrade art synchronizes immediately");
+            && instant.GetNode<Sprite2D>(BattleTower.ConstructionSpritePath).Texture == Texture("stage2_assembly"), "Zero-duration upgrade art synchronizes immediately");
     }
 
     // =========================================================
@@ -111,7 +113,7 @@ internal static class ConstructionArtChecks
         TowerConstructionArt sharedArt = staged.Config.ConstructionArt; staged.Free();
         BattleTower tower = Create(f, sharedArt, true); var visual = tower.GetNode<TowerConstructionVisuals>("ConstructionVisuals");
         visual.Free(); clock.Advance(2.2);
-        Require(tower.GetNode<Sprite2D>("TurretPivot/Sprite").Texture == Original && tower.IsBusy, "Removing presenter restores finished image and unsubscribes safely");
+        Require(tower.GetNode<Sprite2D>(BattleTower.ConstructionSpritePath).Texture == Original && tower.IsBusy, "Removing presenter restores finished image and unsubscribes safely");
         tower.Free(); clock.Advance(100); Require(clock.ActiveCount == 0, "Mid-progress unload leaves no job/visual callback behind");
     }
 

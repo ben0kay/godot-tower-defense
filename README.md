@@ -1,3 +1,7 @@
+### Battle recoil pilot — R1 + R2 (2026-10-20)
+
+Battle Tower now has a fixed base and a split recoiling gun/muzzle, configured by an optional shared visual-only preset. Construction stages and composite artwork fallbacks remain supported. Source implementation is complete; Godot import/build/runtime and visual validation are pending. See [recoil notes](TOWERS/Shared/Weapons/Recoil/README.md) and [checks](TESTS/Towers/TowerRecoil.md).
+
 ## SE1 — stealth enemies and reveal beacon — implemented 2026-10-20 UTC
 
 Waves may now author `Enemy("basic_mk1", stealth: true)` independently of `shield: true`. Default spawns remain ordinary; no existing wave/map was changed. Stealth ships render at30% alpha, revealed ships at100%, with configurable/dimmed defense feedback that composes with Cryo/Stasis. All aimed towers share detection filtering and cached-lock validation; private TowerConfig.CanDetectStealth opts a specialist in without globally revealing enemies. Existing attacks already emitted, splash and untargeted Shockwave remain able to damage hidden ships (stealth is targeting, not immunity).

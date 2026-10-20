@@ -1,25 +1,39 @@
 [gd_scene format=3 uid="uid://bxlwom2nrcfvx"]
-
 [ext_resource type="Script" uid="uid://83n5i57bgs4t" path="res://TOWERS/Offensive/BattleTower/BattleTower.cs" id="1_tower"]
 [ext_resource type="Resource" uid="uid://dwkunf5wywb8t" path="res://TOWERS/Offensive/BattleTower/DefaultBattleTowerConfig.tres" id="2_config"]
 [ext_resource type="Texture2D" uid="uid://bt42pdlf0pcb8" path="res://TOWERS/Offensive/BattleTower/Artwork/battle_tower.svg" id="3_art"]
-
 [ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionVisuals.cs" id="4_construction"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BattleTower/Artwork/battle_base.svg" id="base"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BattleTower/Artwork/battle_gun.svg" id="gun"]
+[ext_resource type="Script" path="res://TOWERS/Shared/Weapons/Recoil/TowerRecoilController.cs" id="recoil"]
 
 [node name="BattleTower" type="Node2D" unique_id=1748537888]
 script = ExtResource("1_tower")
 Config = ExtResource("2_config")
 
+[node name="BaseSprite" type="Sprite2D" parent="."]
+texture = ExtResource("base")
+
 [node name="TurretPivot" type="Node2D" parent="." unique_id=400874627]
 
-[node name="Sprite" type="Sprite2D" parent="TurretPivot" unique_id=1618180373]
+[node name="RecoilRoot" type="Node2D" parent="TurretPivot"]
+
+[node name="Sprite" type="Sprite2D" parent="TurretPivot/RecoilRoot" unique_id=1618180373]
+texture = ExtResource("gun")
+
+[node name="Muzzles" type="Node2D" parent="TurretPivot/RecoilRoot"]
+
+[node name="MuzzleA" type="Marker2D" parent="TurretPivot/RecoilRoot/Muzzles"]
+position = Vector2(0, -28.5)
+
+[node name="ConstructionSprite" type="Sprite2D" parent="TurretPivot"]
+visible = false
 texture = ExtResource("3_art")
 
 [node name="ConstructionVisuals" type="Node" parent="."]
 script = ExtResource("4_construction")
-SpritePath = NodePath("../TurretPivot/Sprite")
+SpritePath = NodePath("../TurretPivot/ConstructionSprite")
+FinishedVisualPaths = Array[NodePath]([NodePath("../BaseSprite"), NodePath("../TurretPivot/RecoilRoot")])
 
-[node name="Muzzles" type="Node2D" parent="TurretPivot"]
-
-[node name="MuzzleA" type="Marker2D" parent="TurretPivot/Muzzles"]
-position = Vector2(0, -28.5)
+[node name="Recoil" type="Node" parent="."]
+script = ExtResource("recoil")

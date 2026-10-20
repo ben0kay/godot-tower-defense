@@ -1,3 +1,7 @@
+## Combined R1/R2 recoil
+
+Finished artwork uses fixed BaseSprite plus TurretPivot/RecoilRoot/Sprite; the muzzle is at TurretPivot/RecoilRoot/Muzzles/MuzzleA. Recoil runs only after a funded projectile/flash launch. Visual settings live in Visuals/BattleRecoilStyle.tres; no balance or cadence settings changed. ConstructionSprite retains the original composite for build stages/custom monolithic artwork. See [shared recoil notes](../../Shared/Weapons/Recoil/README.md). Runtime verification is pending.
+
 ## Planned shared recoil preview — Battle only (2026-10-20)
 
 **Not implemented yet.** Codex should follow [Shared Weapons/Recoil/README.md](../../Shared/Weapons/Recoil/README.md) to create reusable lightweight kick/return mechanics and a Battle-only editable style. For the first preview preserve `TurretPivot/Sprite`, `TurretPivot/Muzzles/MuzzleA`, selection tint and `ConstructionVisuals.SpritePath`; trigger recoil only after a real projectile launch, without moving the root/aim pivot. Splitting the current one-piece SVG into fixed base + independently recoiling turret is a separately planned R2 stage.

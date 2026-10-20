@@ -1,3 +1,11 @@
+## R1 + R2 — combined Battle recoil source implementation (2026-10-20)
+
+User approved combining both passes: fixed base, split gun and attached recoiling muzzle, with one optional shared controller/style and a Battle-only preset. Source implementation, regression fixtures and documentation are complete; **Godot import/build/tests and normal-zoom visual approval remain pending**, not passed. No combat balance values or other tower scenes were changed. Existing construction art remains an overlay; optional monolithic custom tier/upgrade artwork retains that fallback with split recoil suspended. See [recoil implementation notes](../TOWERS/Shared/Weapons/Recoil/README.md) and [verification instructions](../TESTS/Towers/TowerRecoil.md).
+
+The older “NOT implemented” R1 entry below is retained as planning history and superseded by this combined-pass entry. R1/R2 need runtime validation before acceptance; broader tower rollout remains future work.
+
+---
+
 ## Recoil pilot for Battle Tower — Codex plan, NOT implemented (2026-10-20)
 
 The planned reusable, optional projectile recoil system is specified in [TOWERS/Shared/Weapons/Recoil/README.md](../TOWERS/Shared/Weapons/Recoil/README.md). Codex R1: create shared `TowerRecoilController`/`TowerRecoilStyle`, author one Inspector-editable Battle preset, trigger only on an actual funded Battle shot **after muzzle launch/flash**, keep all existing sprite/muzzle/construction paths and other towers untouched, and add regressions. First preview may lightly offset the existing composite Battle SVG; *fixed base + split gun* is an explicit later R2 art pass, not yet authorized. No implementation exists until Codex completes R1.

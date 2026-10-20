@@ -1,3 +1,17 @@
+## R1 + R2 — Battle Tower recoil implemented (2026-10-20)
+
+Combined passes are implemented in source; Godot import, C# build, runtime checks and visual approval are **not yet verified** because the execution environment was unavailable. The original R1/R2 plan below is retained as history; its separate-pass and whole-sprite preview wording is superseded by this combined implementation.
+
+Battle Tower alone opts in. A stationary BaseSprite and rotating TurretPivot/RecoilRoot/Sprite replace the finished composite. RecoilRoot also owns Muzzles/MuzzleA, so subsequent shots launch from the actual barrel tip. Each funded shot snapshots its projectile and flash before triggering recoil; emitted effects do not follow later barrel movement. Aim, footprint, targeting, damage, ammunition, heat, cooldowns, tier/rank and research calculations retain their existing logic.
+
+The shared TowerRecoilController animates local +Y from a captured rest pose, sleeps when idle and restores the exact pose on completion, disable, removal or style/target replacement. TowerRecoilStyle is Inspector-editable; BattleRecoilStyle.tres defaults to 2px, 0.045s kick, 0.15s return, 4px maximum accumulated offset. Disabled/missing presets remain inert. Live style edits cancel current motion; values are sanitized. There are no per-shot tweens, timers or helper nodes.
+
+Existing construction-stage SVGs remain a separate composite overlay. Default completed tiers use the split base/gun. Optional monolithic upgrade or finished-tier artwork still uses the overlay and suspends split recoil while displayed; future custom recoiling artwork needs matching split layers. The original battle_tower.svg remains the composite/icon. Other tower scene paths remain unchanged.
+
+Verification and manual review instructions: [TowerRecoil.md](../../../../TESTS/Towers/TowerRecoil.md). Existing ConstructionArtChecks and ProjectileVisualChecks have Battle paths updated; their other tower coverage remains intact.
+
+---
+
 # Tower Recoil — shared foundation + Battle-only visual pilot (Codex plan)
 
 > **Status: PLANNED, NOT IMPLEMENTED.** This document is a handoff to Codex. No recoil scripts, scene nodes, style resources, art splits, or animations are implemented by this planning pass. **Only the Battle Tower** should opt into the first implementation. All other towers retain their current visuals until explicitly requested.

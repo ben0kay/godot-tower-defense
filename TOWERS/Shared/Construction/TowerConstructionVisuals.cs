@@ -1,32 +1,42 @@
-// Optional event-driven Sprite2D presenter. No work state, combat, physics, VFX, polling or per-frame node creation.
+// Event-driven construction texture presenter; optional split finished layers preserve existing single-sprite behavior.
 using Godot;
+using System;
+using System.Collections.Generic;
 
 public partial class TowerConstructionVisuals : Node
 {
     [Export] public NodePath SpritePath { get; set; } = new();
+    [Export] public Godot.Collections.Array<NodePath> FinishedVisualPaths { get; set; } = new();
+    private readonly List<CanvasItem> _finished = new();
     private TowerBase _tower;
     private Sprite2D _sprite;
     private TowerConstructionArt _art;
     private Texture2D _original;
     private bool _watchingProgress;
+    private bool? _lastSplit;
     public int TextureChanges { get; private set; }
+    public event Action PresentationChanged;
 
+    #region Presentation Lifecycle
     // =========================================================
-    // Child Ready reads the construction state set before placement; directly instantiated scenes retain final art.
+    // Child Ready reads paid construction state before the tower's Ready; no poll or work-state owner is added.
     public override void _Ready()
     {
         SetProcess(false); SetPhysicsProcess(false);
         _tower = GetParent() as TowerBase;
         _sprite = SpritePath.IsEmpty ? null : GetNodeOrNull<Sprite2D>(SpritePath);
-        _art = _tower?.AuthoredConfig?.ConstructionArt;
-        if (_tower == null || _sprite == null || _art == null) return;
-        _original = _sprite.Texture;
-        _tower.WorkStarted += Refresh; _tower.WorkCompleted += Refresh;
-        Refresh();
+        if (_tower == null || _sprite == null) return;
+        if (FinishedVisualPaths != null) foreach (NodePath path in FinishedVisualPaths)
+        {
+            CanvasItem layer = path.IsEmpty ? null : GetNodeOrNull<CanvasItem>(path);
+            if (layer != null && layer != _sprite && !_finished.Contains(layer)) _finished.Add(layer);
+        }
+        _art = _tower.AuthoredConfig?.ConstructionArt; _original = _sprite.Texture;
+        _tower.WorkStarted += Refresh; _tower.WorkCompleted += Refresh; Refresh();
     }
 
     // =========================================================
-    // Read existing progress only; assign the shared texture reference solely when the visible image changes.
+    // Existing art resolver remains the sole threshold/tier authority; normal upgrades keep old-tier visuals/firing.
     private void Refresh()
     {
         if (!GodotObject.IsInstanceValid(_tower) || !GodotObject.IsInstanceValid(_sprite)) return;
@@ -36,26 +46,44 @@ public partial class TowerConstructionVisuals : Node
             if (busy) _tower.WorkProgressChanged += Refresh; else _tower.WorkProgressChanged -= Refresh;
             _watchingProgress = busy;
         }
-        Texture2D finished = _art.FinishedTexture(_tower.UpgradeLevel, _original);
+        Texture2D finished = _art?.FinishedTexture(_tower.UpgradeLevel, _original) ?? _original;
         Texture2D texture = _tower.WorkPhase switch
         {
-            TowerWorkPhase.Constructing => _art.BuildTexture(_tower.WorkProgress, finished),
-            TowerWorkPhase.Upgrading => _art.UpgradeTexture(_tower.PendingUpgradeLevel, _tower.WorkProgress, finished),
+            TowerWorkPhase.Constructing => _art?.BuildTexture(_tower.WorkProgress, finished) ?? finished,
+            TowerWorkPhase.Upgrading => _art?.UpgradeTexture(_tower.PendingUpgradeLevel, _tower.WorkProgress, finished) ?? finished,
             _ => finished
         };
-        if (_sprite.Texture == texture) return;
-        _sprite.Texture = texture; TextureChanges++;
+        if (_sprite.Texture != texture) { _sprite.Texture = texture; TextureChanges++; }
+        ShowLayers(texture);
     }
 
     // =========================================================
-    // Safe for rollback, mid-work removal and whole-world unloading; no callbacks survive the presenter.
+    // Default finished art uses split layers; authored monolithic stages/custom tier art remain a compatible overlay.
+    private void ShowLayers(Texture2D texture, bool notify = true)
+    {
+        if (_finished.Count == 0) return; // Existing presenters never have their visibility changed.
+        bool split = texture == _original;
+        _sprite.Visible = !split;
+        foreach (CanvasItem layer in _finished) if (GodotObject.IsInstanceValid(layer)) layer.Visible = split;
+        if (_lastSplit == split) return;
+        _lastSplit = split; if (notify) PresentationChanged?.Invoke();
+    }
+
+    // =========================================================
+    // Removing only the presenter restores completed imagery; no work/progress callbacks survive teardown.
     public override void _ExitTree()
     {
-        if (!GodotObject.IsInstanceValid(_tower)) return;
-        _tower.WorkStarted -= Refresh; _tower.WorkCompleted -= Refresh;
-        if (_watchingProgress) _tower.WorkProgressChanged -= Refresh;
-        _watchingProgress = false;
-        // Removing only this optional component must not leave a half-built image stuck on the live tower.
-        if (GodotObject.IsInstanceValid(_sprite) && _art != null) _sprite.Texture = _art.FinishedTexture(_tower.UpgradeLevel, _original);
+        if (GodotObject.IsInstanceValid(_tower))
+        {
+            _tower.WorkStarted -= Refresh; _tower.WorkCompleted -= Refresh;
+            if (_watchingProgress) _tower.WorkProgressChanged -= Refresh;
+            if (GodotObject.IsInstanceValid(_sprite))
+            {
+                _sprite.Texture = _art?.FinishedTexture(_tower.UpgradeLevel, _original) ?? _original;
+                ShowLayers(_sprite.Texture, false);
+            }
+        }
+        _watchingProgress = false; PresentationChanged = null; _finished.Clear();
     }
+    #endregion
 }

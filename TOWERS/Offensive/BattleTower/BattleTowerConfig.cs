@@ -27,6 +27,17 @@ public partial class BattleTowerConfig : TowerConfig, ITowerTargetingPolicy, IPr
     { get => _recoverySeconds; set { if (_recoverySeconds == value) return; _recoverySeconds = value; EmitChanged(); } }
     public override HeatTiming? SustainedHeatTiming => HeatEnabled ? new(OverheatAfterMinutes * 60, OverheatRecoverySeconds) : null;
 
+    #region Recoil Presentation
+    private TowerRecoilStyle _recoil;
+    public event System.Action RecoilStyleChanged;
+    [ExportGroup("Recoil")]
+    [Export] public TowerRecoilStyle Recoil
+    {
+        get => _recoil;
+        set { if (_recoil == value) return; _recoil = value; RecoilStyleChanged?.Invoke(); }
+    }
+    #endregion
+
     [ExportGroup("Weapon Visuals")]
     [Export] public ProjectileVisualStyle ProjectileVisual { get; set; }
     [Export] public MuzzleFlashStyle MuzzleFlash { get; set; }

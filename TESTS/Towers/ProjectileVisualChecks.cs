@@ -60,7 +60,7 @@ public partial class ProjectileVisualChecks : Node
     {
         BattleTower tower = f.Add<BattleTower>("battle", new(2000, 2064));
         Enemy enemy = f.Target(new(2000, 2000));
-        Marker2D muzzle = tower.GetNode<Marker2D>("TurretPivot/Muzzles/MuzzleA");
+        Marker2D muzzle = tower.GetNode<Marker2D>(BattleTower.MuzzlePath);
         var renderer = tower.GetNode<WeaponVisualRenderer>("TurretPivot/WeaponVisuals");
         Require(tower.ValidateScene() && !renderer.IsProcessing() && renderer.ActiveFlashes == 0, "Real Battle muzzle contract and idle renderer");
         int nodes = CountNodes(tower); TowerFinalStats stats = tower.FinalStats;
