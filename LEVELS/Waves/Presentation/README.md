@@ -1,6 +1,18 @@
+## First usable slice — automatic numbered wave banners (2026-10-20)
+
+**Source implementation added, Godot runtime verification pending.** The optional immutable `WavePresentation` / `WaveAlertKind` authoring contract and backwards-compatible `WaveBuilder.Wave(number, Presentation(...), Batch(...))` overload exist. `WaveManager.WaveStarted` fires **once when `StartWave()` is accepted**, before the first existing immediate spawn. A single `WavePresentationController` under the shared `LEVELS/Runtime/Battlefield.tscn` subscribes and sends a **silent top-centre `WAVE 01 INCOMING`** (appropriate number for each wave) through the existing `NotificationManager` major-alert pipeline. Without metadata, every wave gets the standard banner automatically. Omitted text has no narrator UI, and optional `Text`, `Speaker`, `VoiceCueId` are reserved for later NP2 only; no audio plays.
+
+The alert system's existing `ShowMajor(string id)` still serves registered named alerts; an overload `ShowMajor(MajorAlertDefinition)` now accepts *transient*, valid major alerts through the same queue, cooldown and priority rules, avoiding seven permanent catalog entries. Current banner duration is **3 seconds**, with the existing shared major-alert fade/slide timings and pause policy. It is not a pre-wave timer: spawning still begins immediately. A plain existing recipe `Wave(3, Batch(...))` is unchanged and gets a number-only announcement. Level001/002/020 do **not** need their data updated.
+
+The coordinator already supports an optional `WaveAlertKind.None` to suppress a particular banner and optional custom `BannerTitle` / `BannerDescription`, with Heavy/Final/Boss tones; **no level currently sets these overrides.** Do not infer boss status from an enemy ID. The `NotificationManager` queue may delay a banner if another major alert is on screen; it does not interrupt critical higher-priority warnings. This first slice has **no new UI view**, only uses existing major alerts, and remains silent.
+
+Regression assertions were added to `TESTS/Integration/WaveChecks.cs` for default metadata compatibility, number-only banner on first start, immediate spawn and once-only event semantics. **These were not executed in Godot here**; validate build/tests and visual presentation at 1920×1080 and 960×540. Retrying/unloading the battlefield recreates the scoped controller and shared HUD; listeners release on exit. Future NP2 narrator/typewriter + Level020 authored dialogue and NP3 thorough coverage below remain pending.
+
+---
+
 # Wave Presentation — narrator, typewriter transmissions and wave announcements
 
-**Status: PLANNED / NOT IMPLEMENTED (2026-10-20).** This README is an implementation handoff for Codex or a future coding pass. No new C# classes, scene nodes, active wave alerts, dialogue boxes, audio playback, or wave changes have been made as part of this documentation task.
+**Original full design plan (2026-10-20).** NP1's data/event and a small *banner-only* part of NP2 are now source-implemented as described above. The remaining narrator/typewriter/audio plans below are future work; example code and file trees may be historical.
 
 ## Intent
 

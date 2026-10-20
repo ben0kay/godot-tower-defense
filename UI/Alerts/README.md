@@ -1,3 +1,9 @@
+## Live wave banners — first integration (2026-10-20; runtime verification pending)
+
+The shared `LEVELS/Waves/Presentation/WavePresentationController.cs` now requests **one transient `WAVE NN INCOMING` major alert per accepted wave start**. `NotificationManager.ShowMajor(MajorAlertDefinition)` routes these temporary titles through the existing queue, priority, dedupe and pause-aware displays, without changing the existing `ShowMajor(string id)` catalog path. The standard 3-second banner has no audio, narrator/typewriter text or pre-wave delay. See [wave presentation](../../LEVELS/Waves/Presentation/README.md). Godot runtime visual verification remains pending.
+
+---
+
 ## Planned wave-start banners and tactical narration (2026-10-20; not implemented)
 
 A shared presentation handoff lives at [LEVELS/Waves/Presentation/README.md](../../LEVELS/Waves/Presentation/README.md). It proposes default numeric wave banners plus optional warning/final/boss labels and a separate `UI/Narration/` typewriter panel; narration is authored alongside wave batches. **Reuse this NotificationManager's current major-alert queue/priority display** through a new validated one-off alert path; `ShowMajor(string id)` currently requires a registered catalog entry and cannot produce dynamic numeric wave titles by itself. Audio identifiers remain placeholders. No alert runtime/code changed in this documentation pass.

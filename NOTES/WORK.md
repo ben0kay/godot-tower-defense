@@ -1,3 +1,13 @@
+## NP1 / simple NP2 slice — automatic numbered wave banners (2026-10-20; runtime verification pending)
+
+- [x] `WavePresentation` optional authoring metadata + backwards-compatible `Wave()` overload and accepted-start-only `WaveManager.WaveStarted` event.
+- [x] Battlefield-scoped presentation controller and dynamic major alert overload displaying **WAVE NN INCOMING** through existing alert UI, without modifying actual wave batches or scheduling.
+- [x] Regression assertions in the existing `TESTS/Integration/WaveChecks.cs`.
+- [ ] **NP2 remainder:** tactical narrator/typewriter display, audio placeholder delivery and Level020 messages on waves 1/4/6/7; NP3 extended UI/regression checks.
+- [ ] Godot .NET import/build/headless and desktop visual QA. Source committed only, not yet execution-tested. Plan and implemented details: [wave presentation README](../LEVELS/Waves/Presentation/README.md).
+
+---
+
 ## Level100 Five-Gate Swarm stress mission — 2026-10-20 (implemented in source; runtime verification pending)
 
 - [x] New `LEVELS/Level100/` maps all four TileMapLayers empty and includes **five left-side portals** plus one right-side Citadel, for user painting. Mission is selectable from Campaign now, but **does not spawn until you paint navigable terrain** connecting portal(s) to Citadel.

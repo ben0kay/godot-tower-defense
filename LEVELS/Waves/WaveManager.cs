@@ -20,6 +20,7 @@ public partial class WaveManager : Node
     public bool CanStart => (State == WaveState.Ready || State == WaveState.Completed) && _waveIndex + 1 < _waves.Length;
     public string StatusMessage { get; private set; } = "";
     public event Action Changed;
+    public event Action<WaveDefinition> WaveStarted;
     public event Action<int> WaveCompleted;
     private SpawnManager _spawns;
     private GameplayHUD _hud;
@@ -86,7 +87,10 @@ public partial class WaveManager : Node
         PlannedRemaining = _waves[_waveIndex].Batches.Sum(b => b.Count);
         _sequence = WaveCatalog.Compose(_waves[_waveIndex].Batches[0], _random);
         _countdown = 0; StatusMessage = ""; State = WaveState.Spawning;
-        SetPhysicsProcess(true); _startAttemptReserved = true; Publish(); Advance(0, 1);
+        SetPhysicsProcess(true); _startAttemptReserved = true; Publish();
+        // Emit exactly once for an accepted start, before the first immediate spawn attempt.
+        WaveStarted?.Invoke(_waves[_waveIndex]);
+        Advance(0, 1);
         return true;
     }
 

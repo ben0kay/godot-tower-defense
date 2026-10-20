@@ -27,6 +27,7 @@ public partial class NotificationManager : CanvasLayer
     private static readonly HashSet<string> _onceThisSession = new();
     private readonly Dictionary<string, double> _lastDisplayed = new();
     private MajorAlertDefinition _current;
+    public string ActiveMajorTitle => _current?.Title ?? "";
     private double _clock;
     #endregion
 
@@ -124,7 +125,17 @@ public partial class NotificationManager : CanvasLayer
             GD.PushWarning("Unknown notification alert: " + id);
             return false;
         }
+        return ShowMajor(alert);
+    }
 
+    // =========================================================
+    // Transient wave titles enter the same priority/queue pipeline as predefined major alerts.
+    // Per-wave definitions are one-off and never modify a shared .tres catalog resource.
+    public bool ShowMajor(MajorAlertDefinition alert)
+    {
+        if (alert == null || string.IsNullOrWhiteSpace(alert.Id) || string.IsNullOrWhiteSpace(alert.Title))
+            return false;
+        string id = alert.Id;
         if (alert.OncePerSession && _onceThisSession.Contains(id))
             return false;
 

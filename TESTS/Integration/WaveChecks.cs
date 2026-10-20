@@ -16,6 +16,8 @@ public static class WaveChecks
         Button button = hud.GetNode<Button>("TopBar/Status/StartWave");
         Require(manager.State == WaveManager.WaveState.Ready && spawns.Registry.Living.Count == 0 && !button.Disabled,
             "Load prepares waves without spawning; manual start is enabled");
+        NotificationManager alerts = hud.GetNode<NotificationManager>("NotificationManager");
+        Require(string.IsNullOrEmpty(alerts.ActiveMajorTitle), "Loading a mission does not show a wave alert");
         var scenes = WaveCatalog.LoadScenes();
         // =========================================================
         // Playtest wave data must retain authored counts/shield mixes without introducing support regen.
@@ -29,6 +31,14 @@ public static class WaveChecks
                 .All(e => e.EnemyId != "shield_emitter_mk1"),
             "Level001 escalates 38/40/55 enemies with 7/12/18 explicit shields and no shield-restoration generators");
         WaveCatalog.Validate(levelOne, scenes);
+        Require(levelOne.All(w => w.Presentation == null), "Existing levels need no authored wave presentation metadata");
+        WaveDefinition metadata = Wave(6, Presentation(alert: WaveAlertKind.Heavy, bannerTitle: "HEAVY HOSTILES",
+            text: "Commander, consider using Blaster Cannons.", voiceCueId: "wave06"),
+            Batch(1, 0, 0, Enemy("basic_mk1")));
+        Require(metadata.Number == 6 && metadata.Batches[0].Count == 1
+            && metadata.Presentation.Alert == WaveAlertKind.Heavy
+            && metadata.Presentation.VoiceCueId == "wave06",
+            "Optional immutable presentation metadata coexists with the old wave recipe");
         WaveBatch mixed = Batch(20, 0.2, 0, Enemy("a", 80), Enemy("b", 20));
         RandomNumberGenerator rng = new() { Seed = 42 };
         var order = WaveCatalog.Compose(mixed, rng); rng.Seed = 42;
@@ -58,9 +68,15 @@ public static class WaveChecks
             foreach (Enemy ship in spawns.Registry.Living) ship.Movement.SetPhysicsProcess(false);
         }
         void Completed(int wave) => completions++;
-        manager.Changed += Changed; manager.WaveCompleted += Completed;
+        int started = 0;
+        void Started(WaveDefinition wave) { started++; Require(wave.Number == started, "WaveStarted publishes the accepted wave number"); }
+        manager.Changed += Changed; manager.WaveCompleted += Completed; manager.WaveStarted += Started;
         hud.EmitSignal(GameplayHUD.SignalName.WaveStartRequested);
-        Require(manager.AliveCount == 1 && !manager.StartWave() && button.Disabled, "First spawn is immediate; repeated start is rejected");
+        Require(started == 1 && alerts.ActiveMajorTitle == "WAVE 01 INCOMING"
+            && alerts.GetNodeOrNull<Control>("MajorAlerts/ActiveMajorAlert") != null,
+            "Only the first accepted wave start shows the actual numbered major banner");
+        Require(manager.AliveCount == 1 && !manager.StartWave() && started == 1 && button.Disabled,
+            "First spawn is immediate; repeated start produces no extra announcement");
         for (int i = 0; manager.PlannedRemaining > 0 && i < 300; i++) { time += 0.1; manager._PhysicsProcess(0.1); }
         Require(spawnTimes.Count == 35 && Math.Abs(spawnTimes[9] - 0.9) < 0.01 &&
             Math.Abs(spawnTimes[10] - 2.9) < 0.01 && Math.Abs(spawnTimes[14] - 4.1) < 0.01 &&
@@ -74,11 +90,13 @@ public static class WaveChecks
         last.Arrive(); last.Arrive(); last.TakeDamage(10000);
         Require(manager.State == WaveManager.WaveState.Completed && !button.Disabled && completions == 1 &&
             debug.IsAlive, "Arrival resolves once; F2 ships do not delay wave completion");
-        Require(manager.StartWave() && !manager.StartWave(), "Next wave requires a new manual start");
+        Require(manager.StartWave() && started == 2 && !manager.StartWave() && started == 2,
+            "Next accepted wave publishes once; rejected button re-entry publishes nothing");
         spawns.Registry.Living.First(s => s != debug).TakeDamage(10000);
         Require(manager.State == WaveManager.WaveState.AllWavesComplete && completions == 2 && !manager.StartWave() &&
             button.Disabled, "Finite wave set completes once without restarting");
-        manager.Changed -= Changed; manager.WaveCompleted -= Completed; debug.TakeDamage(10000);
+        manager.Changed -= Changed; manager.WaveCompleted -= Completed; manager.WaveStarted -= Started;
+        debug.TakeDamage(10000);
 
         manager.Configure(new[] { Wave(1, Batch(200, 0, 0, Enemy("basic_mk1"))) }, scenes);
         manager.StartWave();

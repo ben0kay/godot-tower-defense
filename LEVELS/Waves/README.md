@@ -1,3 +1,9 @@
+## Automatic wave-start banners — first slice (2026-10-20; runtime verification pending)
+
+Every successful manual wave start now emits one `WaveStarted` event and, via the single shared battlefield `WavePresentationController`, requests a silent **`WAVE 01 INCOMING`** major banner (number advances with the wave). The existing `UI/Alerts/NotificationManager` handles animation/pause/priority; no per-level scene changes, audio, narrator text or delayed spawning. Existing WaveBuilder recipes remain valid, with an optional `Presentation(...)` authoring overload for a later pass. See [Presentation/README.md](Presentation/README.md). Godot compile/headless/visual verification is still pending.
+
+---
+
 ## Wave presentations — implementation plan (2026-10-20; not yet implemented)
 
 The proposed **per-wave optional narrator/typewriter text and default/special wave banners** are fully specified for Codex at [Presentation/README.md](Presentation/README.md). Keep wave text with each level's `Wave(..., Batch(...))` authoring, use a once-per-start `WaveStarted` event and the existing `NotificationManager`, and create one shared NarrationDisplay in the HUD. This is documentation only; no active wave announcements, dialogue or voice playback were added.
