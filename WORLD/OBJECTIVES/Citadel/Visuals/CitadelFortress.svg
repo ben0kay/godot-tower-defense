@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+<defs>
+<linearGradient id="plate" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#899aad"/><stop offset=".48" stop-color="#334656"/><stop offset="1" stop-color="#172937"/></linearGradient>
+<radialGradient id="reactor"><stop stop-color="#e8ffff"/><stop offset=".3" stop-color="#8affec"/><stop offset=".72" stop-color="#16a6b0"/><stop offset="1" stop-color="#063944"/></radialGradient>
+</defs>
+<path d="M49 9H143L183 49V143L143 183H49L9 143V49Z" fill="#0d1a29" stroke="#101c2a" stroke-width="6"/>
+<path d="M51 17H141L175 51V141L141 175H51L17 141V51Z" fill="url(#plate)" stroke="#9aadc0" stroke-width="3"/>
+<path d="M59 31H133L161 59V133L133 161H59L31 133V59Z" fill="#192c3d" stroke="#5f8397" stroke-width="3"/>
+<path d="M60 18H132L137 41H55Z M60 174H132L137 151H55Z M18 60V132L41 137V55Z M174 60V132L151 137V55Z" fill="#3f5567" stroke="#b3c0ca" stroke-width="2"/>
+<path d="M50 50L67 67 M142 50L125 67 M50 142L67 125 M142 142L125 125" stroke="#8da5b7" stroke-width="8"/>
+<path d="M65 52H127L140 65V127L127 140H65L52 127V65Z" fill="#243b4a" stroke="#9baeb6" stroke-width="2"/>
+<path d="M96 43L116 60L132 78L132 114L114 132L78 132L60 114L60 78L78 60Z" fill="#0e222f" stroke="#2b8995" stroke-width="3"/>
+<circle cx="96" cy="96" r="34" fill="#0d2d37" stroke="#a4d8dc" stroke-width="4"/>
+<circle cx="96" cy="96" r="25" fill="url(#reactor)" stroke="#47b8c8" stroke-width="3"/>
+<path d="M96 66L102 86L122 96L102 103L96 124L88 103L68 96L88 88Z" fill="#c5fff6" opacity=".85"/>
+<circle cx="96" cy="96" r="9" fill="#edffff"/>
+<g fill="#122634" stroke="#9bb5c6" stroke-width="3">
+<rect x="38" y="38" width="24" height="24" rx="3"/><rect x="130" y="38" width="24" height="24" rx="3"/>
+<rect x="38" y="130" width="24" height="24" rx="3"/><rect x="130" y="130" width="24" height="24" rx="3"/>
+</g>
+<g fill="#71e2e4"><rect x="46" y="45" width="8" height="10"/><rect x="138" y="45" width="8" height="10"/><rect x="46" y="137" width="8" height="10"/><rect x="138" y="137" width="8" height="10"/></g>
+<path d="M80 22H112 M80 170H112 M22 80V112 M170 80V112" stroke="#61d9e2" stroke-width="4" stroke-linecap="round"/>
+</svg>
