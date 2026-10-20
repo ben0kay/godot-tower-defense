@@ -1,3 +1,9 @@
+## Shared top-right tactical narrator (NP2; 2026-10-20)
+
+`GameplayHUD.tscn` now has one reusable `NarrationDisplay` CanvasLayer (23) alongside its existing `NotificationManager` (22). Its transparent panel anchors to the top-right **below** the Wave/Start top HUD; if there is horizontal overlap with the centred major alert, it stacks below the alert instead. Only explicitly authored wave text shows this box. The standalone `UI/Narration/DefaultNarrationConfig.tres` holds UI tuning and the [narration README](../Narration/README.md) documents behaviour. NP1 wave banners remain unchanged; no audio or tower UI resizing.
+
+---
+
 ## Compact bottom-docked tray and Inspector — 2026-10-19 (code change; runtime verification pending)
 
 The bottom HUD panels now share the **true bottom edge of the gameplay viewport** (0 px exterior bottom offset; side margins remain). Their Inspector-configurable nominal sizes are **224 px build tray** (previously 260) and **252 px Inspector** (previously 330), with unchanged Inspector **560 px** width and unchanged tray/Inspector horizontal division. This trims empty space and exposes more terrain. The Inspector is still a non-scrolling `PanelContainer`: **its natural content minimum may expand it upward for unusually dense upgrade/rank/heat/construction text**, rather than clipping buttons. The left build tray remains an independent fixed-height scroll browser aligned to the same bottom edge.

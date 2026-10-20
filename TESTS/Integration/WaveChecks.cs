@@ -17,7 +17,10 @@ public static class WaveChecks
         Require(manager.State == WaveManager.WaveState.Ready && spawns.Registry.Living.Count == 0 && !button.Disabled,
             "Load prepares waves without spawning; manual start is enabled");
         NotificationManager alerts = hud.GetNode<NotificationManager>("NotificationManager");
-        Require(string.IsNullOrEmpty(alerts.ActiveMajorTitle), "Loading a mission does not show a wave alert");
+        NarrationDisplay narration = hud.GetNode<NarrationDisplay>("NarrationDisplay");
+        Require(!narration.IsActive && string.IsNullOrEmpty(alerts.ActiveMajorTitle),
+            "Loading a mission does not show a narrator or wave alert");
+        NarrationChecks.Run(battle);
         var scenes = WaveCatalog.LoadScenes();
         // =========================================================
         // Playtest wave data must retain authored counts/shield mixes without introducing support regen.
@@ -72,6 +75,7 @@ public static class WaveChecks
         void Started(WaveDefinition wave) { started++; Require(wave.Number == started, "WaveStarted publishes the accepted wave number"); }
         manager.Changed += Changed; manager.WaveCompleted += Completed; manager.WaveStarted += Started;
         hud.EmitSignal(GameplayHUD.SignalName.WaveStartRequested);
+        Require(!narration.IsActive, "A wave without authored text shows the NP1 banner only");
         Require(started == 1 && alerts.ActiveMajorTitle == "WAVE 01 INCOMING"
             && alerts.GetNodeOrNull<Control>("MajorAlerts/ActiveMajorAlert") != null,
             "Only the first accepted wave start shows the actual numbered major banner");

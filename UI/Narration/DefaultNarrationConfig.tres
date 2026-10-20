@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="NarrationConfig" load_steps=2 format=3]
+[ext_resource type="Script" path="res://UI/Narration/NarrationConfig.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+Enabled = true
+CharactersPerSecond = 34.0
+HoldSeconds = 5.0
+FadeInSeconds = 0.18
+FadeOutSeconds = 0.3
+PanelWidth = 390.0
+PanelHeight = 136.0
+RightMargin = 18.0
+TopMargin = 64.0
+AlertClearance = 14.0
