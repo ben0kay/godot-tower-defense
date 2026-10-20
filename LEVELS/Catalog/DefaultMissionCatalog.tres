@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="MissionCatalog" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="MissionCatalog" load_steps=6 format=3]
 [ext_resource type="Script" path="res://LEVELS/Catalog/MissionCatalog.cs" id="1"]
 [ext_resource type="Resource" path="res://LEVELS/Level001/Level001Mission.tres" id="2"]
 [ext_resource type="Resource" path="res://LEVELS/Level002/Level002Mission.tres" id="3"]
 [ext_resource type="Resource" path="res://LEVELS/Level020/Level020Mission.tres" id="4"]
+[ext_resource type="Resource" path="res://LEVELS/Level100/Level100Mission.tres" id="5"]
 [resource]
 script = ExtResource("1")
-Missions = Array[Resource]([ExtResource("2"), ExtResource("3"), ExtResource("4")])
+Missions = Array[Resource]([ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5")])

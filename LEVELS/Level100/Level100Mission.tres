@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="MissionDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://LEVELS/Catalog/MissionDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+Number = 100
+Title = "STRESS TEST — FIVE GATE SWARM"
+Description = "Blank test map to paint. Five grouped waves: 100/200/300/400/500 ships, including 20 armed Gunner Drones each. 100,000 starting Credits."
+MapScenePath = "res://LEVELS/Level100/Level100.tscn"
+Enabled = true

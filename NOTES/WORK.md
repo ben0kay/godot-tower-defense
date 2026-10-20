@@ -1,3 +1,12 @@
+## Level100 Five-Gate Swarm stress mission — 2026-10-20 (implemented in source; runtime verification pending)
+
+- [x] New `LEVELS/Level100/` maps all four TileMapLayers empty and includes **five left-side portals** plus one right-side Citadel, for user painting. Mission is selectable from Campaign now, but **does not spawn until you paint navigable terrain** connecting portal(s) to Citadel.
+- [x] Dedicated Inspector-configured `Level100Waves` recipe: **five manual waves 100/200/300/400/500 = 1,500 scheduled ships**; each wave exactly **20 `gunner_drone_mk1`** in four separated groups of five; mostly small enemy types with rare bigger/shielded threats. No DeathSpawn carrier ships, preserving scheduled count clarity.
+- [x] `StartingCredits=100000`, `CitadelMaxHealth=10000`, existing active-enemy/spawn budgets unchanged; registered in Campaign mission catalog without separate launcher. Updated mission catalog regression and added `TESTS/Integration/Level100StressChecks`.
+- [ ] Godot .NET compile, Level100StressChecks and MissionCatalogChecks; paint the intended routes and test all five actual live waves, F4 frame-time and bullet density. See [Level100/README.md](../LEVELS/Level100/README.md).
+
+---
+
 ## Gunner handling and energy streak polish — 2026-10-20
 
 Gunner Drone now holds valid tower targets for1s between closest-target reconsiderations; no-target acquisition remains staggered at0.2s. Dead, removed, queued or out-of-range locks clear immediately and cap the next search delay at0.2s. TargetSearchSeconds and LockedTargetSearchSeconds are separate validated, spawn-captured Inspector settings. Pause still freezes both clocks; navigation is unchanged.

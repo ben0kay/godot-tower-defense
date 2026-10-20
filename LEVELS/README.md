@@ -1,3 +1,9 @@
+## Level100 — Five-Gate Swarm stress mission (2026-10-20; source complete, not runtime-tested)
+
+Selectable from Campaign as a data-driven new Level100 mission: **100/200/300/400/500** scheduled enemies across five manually started waves, including exactly **20 armed Gunner Drones** distributed through each wave (100 gunners, 1,500 ships in total). Player starts with **100,000 Credits** and the Citadel has **10,000 HP**. **All four tile layers are intentionally completely unpainted**; five repositionable portals are on the left and the Citadel on the right. **Paint connected navigable ground before attempting to start a wave**, otherwise enemy spawning is blocked. There is no extra Main/World launcher or shared enemy balance change. See [Level100 README](Level100/README.md). A dedicated authoring/regression scene exists but was not run here.
+
+---
+
 ## Lightweight data-driven levels — implemented 2026-10-19
 
 Shared `LEVELS/Runtime/Battlefield.tscn` + `WORLD/World.tscn` replace per-level service copies. Existing Main launchers and World variants are thin compatibility shortcuts; F6 paths stay valid. Each level now has a MissionDefinition resource and the Campaign roster is `LEVELS/Catalog/DefaultMissionCatalog.tres`. Menu number/title/description/map are data, with a bounded scrollable mission list. New missions deploy/retry directly from their resource; no per-level launcher/world or menu/catalog code is required. Next advances only to the immediate enabled number.

@@ -18,7 +18,7 @@ public partial class MissionCatalogChecks : Node
         try
         {
             GetTree().CurrentScene = null;
-            Require(catalog.Entries().Select(m => m.Number).SequenceEqual(new[] { 1, 2, 20 }), "Existing campaign order retained");
+            Require(catalog.Entries().Select(m => m.Number).SequenceEqual(new[] { 1, 2, 20, 100 }), "Existing campaign order retained");
             foreach (var mission in catalog.Entries())
             {
                 BattlefieldLauncher root = GD.Load<PackedScene>(mission.LaunchPath).Instantiate<BattlefieldLauncher>();

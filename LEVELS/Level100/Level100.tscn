@@ -1,0 +1,78 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" uid="uid://dtgxtqxxwsmoc" path="res://WORLD/BACKGROUNDS/Stars/level001_space.svg" id="1_p5ed7"]
+[ext_resource type="TileSet" uid="uid://bwnwc1jg7xakk" path="res://WORLD/TERRAIN/TileSets/DecorationTerrain.tres" id="2_decorations"]
+[ext_resource type="TileSet" uid="uid://bxlqc3wy16uoh" path="res://WORLD/TERRAIN/TileSets/ImpassableTerrain.tres" id="2_impassable"]
+[ext_resource type="TileSet" uid="uid://cx81pmlj50tpq" path="res://WORLD/TERRAIN/TileSets/InteractiveTerrain.tres" id="2_interactive"]
+[ext_resource type="TileSet" uid="uid://dbryu0fnchy4x" path="res://WORLD/TERRAIN/TileSets/PassableTerrain.tres" id="2_passable"]
+[ext_resource type="Script" uid="uid://cxu0tg3s3btvh" path="res://LEVELS/WorldLevel.cs" id="3_root"]
+[ext_resource type="Resource" path="res://LEVELS/Level100/Level100Config.tres" id="4_config"]
+[ext_resource type="PackedScene" path="res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn" id="5_portal"]
+[ext_resource type="PackedScene" path="res://WORLD/OBJECTIVES/Citadel/Citadel.tscn" id="6_citadel"]
+[ext_resource type="Script" uid="uid://ceof7q2uqyh1q" path="res://WORLD/ROUTING/CheckpointDesignOverlay.cs" id="checkpoint_overlay"]
+
+[ext_resource type="PackedScene" path="res://LEVELS/Debug/LevelDebugTools.tscn" id="debug_tools"]
+
+[node name="Level100" type="Node2D" unique_id=864740696]
+script = ExtResource("3_root")
+Settings = ExtResource("4_config")
+
+[node name="SpaceBackground" type="Node2D" parent="." unique_id=1825087959]
+z_index = -20
+
+[node name="Nebulae" type="Node2D" parent="SpaceBackground" unique_id=87135791]
+
+[node name="Stars" type="Node2D" parent="SpaceBackground" unique_id=2028579996]
+
+[node name="Space" type="Sprite2D" parent="SpaceBackground/Stars" unique_id=1191861450]
+position = Vector2(93, 7)
+scale = Vector2(4, 4)
+texture = ExtResource("1_p5ed7")
+centered = false
+
+[node name="Planets" type="Node2D" parent="SpaceBackground" unique_id=1684856347]
+
+[node name="Terrain" type="Node2D" parent="." unique_id=833107286]
+
+[node name="Passable" type="TileMapLayer" parent="Terrain" unique_id=1382848671]
+tile_set = ExtResource("2_passable")
+
+[node name="Impassable" type="TileMapLayer" parent="Terrain" unique_id=1176658847]
+tile_set = ExtResource("2_impassable")
+
+[node name="Interactive" type="TileMapLayer" parent="Terrain" unique_id=421031592]
+tile_set = ExtResource("2_interactive")
+
+[node name="Decorations" type="TileMapLayer" parent="Terrain" unique_id=1034975239]
+tile_set = ExtResource("2_decorations")
+
+[node name="Checkpoints" type="Node" parent="." unique_id=1040747550]
+
+[node name="Portals" type="Node2D" parent="." unique_id=219222935]
+
+[node name="EnemyPortal1" parent="Portals" unique_id=1721559982 instance=ExtResource("5_portal")]
+position = Vector2(736, 672)
+
+[node name="EnemyPortal2" parent="Portals" instance=ExtResource("5_portal")]
+position = Vector2(736, 1632)
+
+[node name="EnemyPortal3" parent="Portals" instance=ExtResource("5_portal")]
+position = Vector2(736, 2592)
+
+[node name="EnemyPortal4" parent="Portals" instance=ExtResource("5_portal")]
+position = Vector2(736, 3552)
+
+[node name="EnemyPortal5" parent="Portals" instance=ExtResource("5_portal")]
+position = Vector2(736, 4512)
+
+[node name="Objectives" type="Node2D" parent="." unique_id=1539156350]
+
+[node name="Citadel" parent="Objectives" unique_id=1303919540 instance=ExtResource("6_citadel")]
+position = Vector2(5536, 2592)
+
+[node name="Debug" parent="." unique_id=1467647758 instance=ExtResource("debug_tools")]
+
+[node name="CheckpointOverlay" type="Node2D" parent="Debug" unique_id=2072394971]
+z_index = 4090
+z_as_relative = false
+script = ExtResource("checkpoint_overlay")

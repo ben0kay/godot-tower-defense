@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="LevelConfig" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://LEVELS/LevelConfig.cs" id="1"]
+[ext_resource type="Script" path="res://LEVELS/Level100/Level100Waves.cs" id="waves_script"]
+
+[sub_resource type="Resource" id="wave_source"]
+script = ExtResource("waves_script")
+
+[resource]
+script = ExtResource("1")
+VictoryBaseXP = 500
+DefeatBaseXP = 0
+StartingCredits = 100000
+SpawnMode = 0
+ActivePortals = Array[NodePath]([NodePath("Portals/EnemyPortal1"), NodePath("Portals/EnemyPortal2"), NodePath("Portals/EnemyPortal3"), NodePath("Portals/EnemyPortal4"), NodePath("Portals/EnemyPortal5")])
+WaveSetId = "level100"
+CitadelMaxHealth = 10000
+WaveSource = SubResource("wave_source")
