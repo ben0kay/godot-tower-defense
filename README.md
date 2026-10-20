@@ -1,3 +1,7 @@
+### Offensive projectile recoil rollout — 2026-10-20
+
+Machine Gun, Sniper, Blaster Cannon, Rocket, Cryo and Stasis now join Battle with fixed bases and recoiling gun/muzzle assemblies, each using an editable preset in its Visuals folder. Laser and stationary Shockwave retain their beam/radial effects. Gameplay values and Inspector layout are unchanged. Source/static review completed; Godot import/build/tests and desktop visual verification remain pending. See [recoil notes](TOWERS/Shared/Weapons/Recoil/README.md).
+
 ### Battle recoil pilot — R1 + R2 (2026-10-20)
 
 Battle Tower now has a fixed base and a split recoiling gun/muzzle, configured by an optional shared visual-only preset. Construction stages and composite artwork fallbacks remain supported. Source implementation is complete; Godot import/build/runtime and visual validation are pending. See [recoil notes](TOWERS/Shared/Weapons/Recoil/README.md) and [checks](TESTS/Towers/TowerRecoil.md).

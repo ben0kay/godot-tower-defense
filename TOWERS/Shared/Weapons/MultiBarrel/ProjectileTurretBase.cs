@@ -19,7 +19,8 @@ public abstract partial class ProjectileTurretBase : TowerBase
     private ProjectileTurretConfig _config;
     private bool _initialized;
     private Node2D _pivot, _projectiles;
-    private Sprite2D _sprite;
+    private Sprite2D _sprite, _baseSprite;
+    private TowerRecoilController _recoil;
     private EnemyRegistry _registry;
     private Enemy _target;
     private float _searchTimer, _shotTimer;
@@ -52,8 +53,8 @@ public abstract partial class ProjectileTurretBase : TowerBase
     public override bool ValidateScene()
     {
         Node2D pivot = GetNodeOrNull<Node2D>("TurretPivot");
-        Node2D muzzles = GetNodeOrNull<Node2D>("TurretPivot/Muzzles");
-        if (pivot == null || GetNodeOrNull<Sprite2D>("TurretPivot/Sprite") == null || muzzles == null) return false;
+        Node2D muzzles = GetNodeOrNull<Node2D>("TurretPivot/RecoilRoot/Muzzles");
+        if (pivot == null || GetNodeOrNull<Sprite2D>("TurretPivot/RecoilRoot/Sprite") == null || muzzles == null) return false;
         int count = 0;
         foreach (Node node in muzzles.GetChildren())
         {
@@ -72,8 +73,10 @@ public abstract partial class ProjectileTurretBase : TowerBase
     public override void _Ready()
     {
         _pivot = GetNode<Node2D>("TurretPivot");
-        _sprite = GetNode<Sprite2D>("TurretPivot/Sprite");
-        Node2D holder = GetNode<Node2D>("TurretPivot/Muzzles");
+        _baseSprite = GetNodeOrNull<Sprite2D>("BaseSprite");
+        _recoil = GetNodeOrNull<TowerRecoilController>("Recoil");
+        _sprite = GetNode<Sprite2D>("TurretPivot/RecoilRoot/Sprite");
+        Node2D holder = GetNode<Node2D>("TurretPivot/RecoilRoot/Muzzles");
         foreach (Node node in holder.GetChildren()) if (node is Marker2D muzzle) _muzzles.Add(muzzle);
         _barrels = new BarrelFireController(_muzzles.Count);
         _visuals = WeaponVisuals.Attach(_pivot);
@@ -133,6 +136,7 @@ public abstract partial class ProjectileTurretBase : TowerBase
             _projectiles.AddChild(bullet);
             WeaponVisuals.Present(bullet, muzzle, Config, _visuals);
         }
+        _recoil?.Kick(); // All funded volley origins are captured before the assembly moves.
         _barrels.Commit(mode);
         RecordAttackHeat(count);
         // Preserve fractional frame remainder; never schedule multiple catch-up volleys after a long hitch.
@@ -157,8 +161,9 @@ public abstract partial class ProjectileTurretBase : TowerBase
     // Keep selection visual on the rotating sprite while leaving placement coordinates fixed.
     public override void SetSelected(bool selected)
     {
-        if (GodotObject.IsInstanceValid(_sprite))
-            _sprite.Modulate = selected ? new Color(1f, .9f, .68f) : Colors.White;
+        Color tint = selected ? new Color(1f, .9f, .68f) : Colors.White;
+        if (GodotObject.IsInstanceValid(_sprite)) _sprite.Modulate = tint;
+        if (GodotObject.IsInstanceValid(_baseSprite)) _baseSprite.Modulate = tint;
     }
 
     // =========================================================

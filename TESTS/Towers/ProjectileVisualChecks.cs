@@ -97,7 +97,7 @@ public partial class ProjectileVisualChecks : Node
         for (int i = 0; i < 10; i++)
         {
             gun._PhysicsProcess(.1); BasicProjectile shot = Shot(f);
-            Marker2D marker = gun.GetNode<Marker2D>("TurretPivot/Muzzles/" + (i % 2 == 0 ? "MuzzleA" : "MuzzleB"));
+            Marker2D marker = gun.GetNode<Marker2D>("TurretPivot/RecoilRoot/Muzzles/" + (i % 2 == 0 ? "MuzzleA" : "MuzzleB"));
             Require(shot.GlobalPosition.IsEqualApprox(marker.GlobalPosition)
                 && renderer.ToGlobal(renderer.LastFlashPosition).IsEqualApprox(marker.GlobalPosition), "Bullet and flash share selected A-B marker " + i);
             Require(renderer.TotalFlashes == i + 1 && gun.Ammunition.ConsumedRounds == i + 1, "One flash and one ammo charge per launch");
@@ -122,7 +122,7 @@ public partial class ProjectileVisualChecks : Node
         Require(!renderer.AimVisible && tower.Config.AimLaser.Color.R > tower.Config.AimLaser.Color.G
             && tower.Config.AimLaser.WidthPixels < 1, "Sniper starts idle with subtle red preset");
         Enemy enemy = f.Target(new(2000, 2000)); tower._PhysicsProcess(.25);
-        Marker2D muzzle = tower.GetNode<Marker2D>("TurretPivot/Muzzles/MuzzleA");
+        Marker2D muzzle = tower.GetNode<Marker2D>("TurretPivot/RecoilRoot/Muzzles/MuzzleA");
         Require(renderer.AimVisible && renderer.ToGlobal(renderer.AimStart).IsEqualApprox(muzzle.GlobalPosition), "Aim begins at actual sniper muzzle");
         Vector2 direction = (renderer.ToGlobal(renderer.AimEnd) - muzzle.GlobalPosition).Normalized();
         Require(direction.Dot(-muzzle.GlobalTransform.Y.Normalized()) > .999f, "Aim follows barrel forward, with no doubled rotation");
@@ -179,7 +179,7 @@ public partial class ProjectileVisualChecks : Node
         Enemy enemy = f.Target(new(2000, 2000)); float hp = enemy.Health;
         tower._PhysicsProcess(.25);
         SplashProjectile shot = f.Main.GetNode("World/Projectiles").GetChildren().OfType<SplashProjectile>().Single();
-        Marker2D muzzle = tower.GetNode<Marker2D>("TurretPivot/Muzzles/MuzzleA");
+        Marker2D muzzle = tower.GetNode<Marker2D>("TurretPivot/RecoilRoot/Muzzles/MuzzleA");
         var renderer = tower.GetNode<WeaponVisualRenderer>("TurretPivot/WeaponVisuals");
         Require(tower.ValidateScene() && shot.GlobalPosition.IsEqualApprox(muzzle.GlobalPosition)
             && shot.GlobalPosition != tower.GlobalPosition && renderer.TotalFlashes == 1 && enemy.Health == hp,
@@ -194,7 +194,7 @@ public partial class ProjectileVisualChecks : Node
     {
         SniperTower tower = f.Add<SniperTower>("sniper", new(2000, 2000));
         var renderer = tower.GetNode<WeaponVisualRenderer>("TurretPivot/WeaponVisuals");
-        Marker2D muzzle = tower.GetNode<Marker2D>("TurretPivot/Muzzles/MuzzleA");
+        Marker2D muzzle = tower.GetNode<Marker2D>("TurretPivot/RecoilRoot/Muzzles/MuzzleA");
         var style = tower.Config.MuzzleFlash;
         int nodes = CountNodes(tower);
         for (int i = 0; i < 100; i++) renderer.FlashAt(muzzle, style);

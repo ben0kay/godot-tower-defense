@@ -1,3 +1,24 @@
+## Projectile tower rollout — implemented in source (2026-10-20)
+
+The Battle pilot is now joined by Machine Gun, Sniper, Blaster Cannon, Rocket, Cryo and Stasis. Earlier Battle-only scope below records the pilot and is superseded for these six scenes. Laser keeps its continuous beam; stationary Shockwave keeps its existing radial front. Neither receives directional recoil or artificial rotation.
+
+All seven projectile assemblies use fixed root-level BaseSprite and rotating TurretPivot/RecoilRoot with Sprite plus Muzzles/Marker2D children. Original composite SVGs remain catalog/placement icons. The six new presets live in each tower's Visuals/<Type>Recoil.tres and are assigned to its scene's Recoil node. Select that node to change Style; its TargetPath points to the moving assembly. Battle retains its existing config-owned preset. Shared resources contain tuning only; every placed controller owns independent motion state.
+
+| Tower | Kick px | Kick seconds | Return seconds | Cap px |
+|---|---:|---:|---:|---:|
+| Machine Gun |1.1|0.025|0.075|2.5|
+| Sniper |3|0.045|0.24|4|
+| Blaster Cannon |3.5|0.05|0.24|5|
+| Rocket |1.5|0.045|0.18|3|
+| Cryo |0.9|0.04|0.14|2|
+| Stasis |1.2|0.05|0.20|2.5|
+
+Gun and attached muzzles recoil together after launch/flash snapshots. Shared projectile volleys trigger one assembly impulse after all funded origins are captured; sequential barrel selection and total projectile cadence stay unchanged. Generic disable/destruction notifications cancel immediately; teardown disconnects listeners. Controllers sleep at rest. Root, aim pivot, gameplay stats, heat, ammo and upgrades retain their existing owners.
+
+**Verification:** authored regression checks and static scene/resource checks only; no Godot import/build/runtime or desktop visual verification was possible in this environment. See TESTS/Towers/TowerRecoil.md. Future recoil-enabled construction art for these six towers can use the existing optional composite-overlay presenter, but this rollout adds no new construction stages or tier artwork.
+
+---
+
 ## R1 + R2 — Battle Tower recoil implemented (2026-10-20)
 
 Combined passes are implemented in source; Godot import, C# build, runtime checks and visual approval are **not yet verified** because the execution environment was unavailable. The original R1/R2 plan below is retained as history; its separate-pass and whole-sprite preview wording is superseded by this combined implementation.

@@ -110,7 +110,7 @@ public static class BlasterCannonChecks
         tower._PhysicsProcess(0.2);
         SplashProjectile shot = main.GetNode("World/Projectiles").GetChild<SplashProjectile>(0);
         float travelSeconds = shot.GlobalPosition.DistanceTo(center) / 128f;
-        Require(shot.GlobalPosition.IsEqualApprox(tower.GetNode<Marker2D>("TurretPivot/Muzzles/MuzzleA").GlobalPosition), "Blaster launches at real barrel tip");
+        Require(shot.GlobalPosition.IsEqualApprox(tower.GetNode<Marker2D>("TurretPivot/RecoilRoot/Muzzles/MuzzleA").GlobalPosition), "Blaster launches at real barrel tip");
         Require(!shot.HasDetonated && primary.Health == 60 && half.Health == 60, "Launching never applies immediate direct or area damage");
         tower.Config.ImpactStyle.RingColor = Colors.Green;
         tower.Config.DamagePerShot = 120; tower.Config.BlastRadiusPixels = 200; tower.Config.EdgeDamageFraction = 1;

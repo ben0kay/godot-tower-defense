@@ -1,3 +1,7 @@
+## Recoil presentation — 2026-10-20
+
+Fixed BaseSprite and rotating TurretPivot/RecoilRoot/Sprite now split the finished artwork; Muzzles travel with that assembly. The original composite SVG remains the catalog/ghost icon. The scene's Recoil node assigns Visuals/MachineGunTowerRecoil.tres (Enabled, kick distance/duration, return duration, maximum accumulated offset). Each funded shot/volley snapshots its launch and flash before moving the gun. Generic disabling/destruction resets the pose; idle controllers sleep. Selection colors base and gun. Combat balance, upgrades, construction gates and targeting are unchanged. Runtime/build/visual verification is pending. See [shared recoil notes](../../Shared/Weapons/Recoil/README.md).
+
 # Machine Gun Tower — two sequential barrels
 
 **Latest projectile-speed update (2026-10-18):** All purchased levels now launch at **2,443.75 px/s**, exactly double the immediately previous **1,221.875 px/s**. No changes to shots/s, ammunition, range, damage, costs, heat or alternating muzzle behaviour. The table below also includes pre-existing range updates. Older +25% speed and firing-rate notes further below are historical, not the current speed.

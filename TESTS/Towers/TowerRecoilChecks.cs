@@ -1,4 +1,4 @@
-// R1+R2 regression: pure visual motion plus real funded firing, split artwork, construction and cleanup.
+// Shared recoil regression: Battle pilot plus six projectile assemblies, funded origins, construction and cleanup.
 using Godot;
 using System;
 using System.Linq;
@@ -17,11 +17,11 @@ public partial class TowerRecoilChecks : Node
             Motion();
             using (AmmoLoopFixture f = new(this))
             {
-                OpenTerrain(f); Firing(f); ConstructionAndUpgrades(f); OtherTowers(f);
+                OpenTerrain(f); Firing(f); Rollout(f); ConstructionAndUpgrades(f); OtherTowers(f);
             }
             GetTree().Paused = false;
             await SubsystemBattlefield.DrainFreedFixtures(this);
-            GD.Print("PASS: R1+R2 recoil bounds/recovery, real funded shots and muzzle snapshots, fixed base, construction, upgrades and lifecycle");
+            GD.Print("PASS: shared recoil bounds/recovery, seven projectile assemblies, funded muzzle snapshots, fixed bases, construction, upgrades and lifecycle");
             GetTree().Quit();
         }
         catch (Exception error) { GD.PushError(error.ToString()); GetTree().Paused = false; GetTree().Quit(1); }
@@ -161,14 +161,58 @@ public partial class TowerRecoilChecks : Node
         f.Towers.RemoveChild(tower); tower.Free();
     }
     // =========================================================
-    // R1+R2 must not add recoil to other registered weapons or passive structures.
+    // The six additional projectile assemblies opt in; beam/radial/passive structures remain unaffected.
+    private static void Rollout(AmmoLoopFixture f)
+    {
+        foreach (string id in new[] { "machine_gun", "sniper", "blaster_cannon", "rocket", "cryo", "stasis" })
+        {
+            TowerBase tower = f.Add<TowerBase>(id, new(2000, 2064));
+            Enemy enemy = f.Target(new(2000, 2000));
+            var recoil = tower.GetNode<TowerRecoilController>("Recoil");
+            var moving = tower.GetNode<Node2D>("TurretPivot/RecoilRoot");
+            var basis = tower.GetNode<Sprite2D>("BaseSprite");
+            var pivot = tower.GetNode<Node2D>("TurretPivot");
+            var muzzle = tower.GetNode<Marker2D>("TurretPivot/RecoilRoot/Muzzles/MuzzleA");
+            var renderer = tower.GetNode<WeaponVisualRenderer>("TurretPivot/WeaponVisuals");
+            var placement = tower.Transform; var fixedBase = basis.Transform; var stats = tower.FinalStats;
+            Require(tower.ValidateScene() && !recoil.IsProcessing(), id + " validates and sleeps at rest");
+            Vector2 launch = muzzle.GlobalPosition;
+            tower._PhysicsProcess(1);
+            Node2D shot = f.Main.GetNode("World/Projectiles").GetChildren().OfType<Node2D>().Single();
+            Vector2 flash = renderer.ToGlobal(renderer.LastFlashPosition); var aim = pivot.Transform;
+            Require(recoil.Impulses == 1 && tower.Ammunition.ConsumedRounds == 1 && renderer.TotalFlashes == 1
+                && shot.GlobalPosition.IsEqualApprox(launch), id + " funded shot uses the attached barrel tip");
+            recoil.Advance(recoil.Style.KickSeconds);
+            Require(moving.Position.Y > 0 && muzzle.GlobalPosition != launch
+                && shot.GlobalPosition.IsEqualApprox(launch) && renderer.ToGlobal(renderer.LastFlashPosition).IsEqualApprox(flash)
+                && tower.Transform == placement && basis.Transform == fixedBase && pivot.Transform == aim
+                && ReferenceEquals(stats, tower.FinalStats), id + " only gun/muzzle move; launched effects and combat remain independent");
+            tower._PhysicsProcess(.001); Require(recoil.Impulses == 1, id + " cooldown does not kick");
+            recoil.Style = (TowerRecoilStyle)recoil.Style.Duplicate();
+            Require(!recoil.Active && moving.Position == Vector2.Zero && ReferenceEquals(stats, tower.FinalStats),
+                id + " replacing the scene preset resets only presentation");
+            var handle = tower.ApplyDisable(TowerDisableReason.EMP);
+            Require(!recoil.Active && moving.Position == Vector2.Zero, id + " generic disable restores immediately");
+            tower.RemoveDisable(handle);
+            tower.Ammunition.Inventory.TryConsume(tower.Ammunition.Inventory.Amount);
+            tower._PhysicsProcess(10); Require(recoil.Impulses == 1, id + " empty ammo does not kick");
+            tower.SetSelected(true);
+            Require(basis.Modulate == tower.GetNode<Sprite2D>("TurretPivot/RecoilRoot/Sprite").Modulate, id + " selection colors both layers");
+            recoil.Kick(); recoil.Advance(.01);
+            tower.ApplyDamage(new DamageInfo(99999, DamageType.Kinetic));
+            Require(!recoil.Active && moving.Position == Vector2.Zero, id + " destruction cancels");
+            tower.Free(); enemy.Free(); f.ClearProjectiles();
+        }
+    }
+    // =========================================================
+    // Scene-only adoption must remain explicit, including unplaced catalog instances.
     private static void OtherTowers(AmmoLoopFixture f)
     {
         foreach (TowerDefinition definition in f.Placement.Catalog.Definitions)
         {
-            if (definition.TowerId == "battle") continue;
             Node tower = definition.Scene.Instantiate();
-            Require(!HasRecoil(tower), "Only Battle opts into recoil: " + definition.TowerId);
+            bool expected = tower is BattleTower or ProjectileTurretBase or RocketTower or BlasterCannon;
+            Require(HasRecoil(tower) == expected, "Recoil matches projectile assembly adoption: " + definition.TowerId);
             tower.Free();
         }
     }

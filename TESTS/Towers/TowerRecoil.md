@@ -1,3 +1,13 @@
+## Six-tower rollout — 2026-10-20
+
+TowerRecoilChecks now exercises funded shots for Machine Gun, Sniper, Blaster Cannon, Rocket, Cryo and Stasis as well as the existing Battle pilot checks. It checks attached launch origins, separate flashes, fixed base/aim/root/stats, cooldown/ammo gates, selection and immediate disable/destruction resets. The adoption assertion expects seven projectile assemblies and excludes Laser, Shockwave and passive towers. Existing MultiBarrelTowerChecks, BlasterCannonChecks and ProjectileVisualChecks use the new muzzle paths. The earlier Battle-only text below describes the original pilot.
+
+**Not executed:** Godot import, dotnet build, headless/runtime and visual checks remain pending; source review and static resource/scene-path checks only. After pulling, import new SVGs in the Godot .NET editor and run the commands below. ProjectileVisualChecks also invokes the existing MultiBarrel checks; run Integration/EnemyIntegrationChecks.tscn for broader coverage including Blaster.
+
+Manual review: fire all seven projectile towers in several directions, check Minigun A/B alternation, Sniper aim-line attachment, pause/resume and EMP, selection, initial paid construction and subsequent paid upgrades. Compare Laser and stationary Shockwave before/after to confirm their existing effects/rotation policy. Test disabled/missing/replaced styles. Other six towers have no new construction-stage artwork in this pass; their existing attack gates remain intact.
+
+---
+
 # Battle Tower recoil — R1 + R2 checks
 
 ## Status

@@ -1,3 +1,7 @@
+## Recoil scene contract — 2026-10-20
+
+The four current ProjectileTurretBase scenes (Machine Gun, Sniper, Cryo, Stasis) now put Sprite and Muzzles under TurretPivot/RecoilRoot, with BaseSprite outside the aim pivot. A cached optional Recoil controller receives one impulse after a funded volley snapshots all muzzle origins. Renderer remains under TurretPivot so launched flashes are not dragged by recoil. Existing barrel sequencing, ammo funding and total projectile cadence are retained. Base and gun share selection tint. Earlier Sprite/Muzzles direct-child and no-recoil wording below is historical and superseded by this layout. Presets are assigned on each scene's Recoil node; controller state remains per instance.
+
 # Reusable aimed projectile turrets and muzzle sequencing
 
 `ProjectileTurretBase.cs` is a **single** targeting / aiming / cooldown / ammo / guided bullet loop used by Sniper and Machine Gun Towers. Other existing towers are unchanged. `ProjectileTurretConfig.cs` keeps targeting, rotation and `BarrelFireMode` in their ordinary per-tower config resource. Each weapon owns complete numeric purchased levels and earned rank thresholds under `TOWERS/Offensive/<Type>/`.

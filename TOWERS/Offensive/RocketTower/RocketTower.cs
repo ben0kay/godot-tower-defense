@@ -34,13 +34,15 @@ public partial class RocketTower : TowerBase
     public override bool AcceptsConfig(TowerConfig config) => config is RocketTowerConfig;
     // =========================================================
     // Reject malformed Blaster scenes before occupancy/payment, without imposing this on passive types.
-    public override bool ValidateScene() => GetNodeOrNull<Node2D>("TurretPivot") != null && GetNodeOrNull<Sprite2D>("TurretPivot/Sprite") != null
-        && GetNodeOrNull<Marker2D>("TurretPivot/Muzzles/MuzzleA") != null &&
-        GetNodeOrNull<Marker2D>("TurretPivot/Muzzles/MuzzleB") != null;
+    public override bool ValidateScene() => GetNodeOrNull<Sprite2D>("BaseSprite") != null
+        && GetNodeOrNull<TowerRecoilController>("Recoil") != null && GetNodeOrNull<Node2D>("TurretPivot") != null && GetNodeOrNull<Sprite2D>("TurretPivot/RecoilRoot/Sprite") != null
+        && GetNodeOrNull<Marker2D>("TurretPivot/RecoilRoot/Muzzles/MuzzleA") != null &&
+        GetNodeOrNull<Marker2D>("TurretPivot/RecoilRoot/Muzzles/MuzzleB") != null;
     // =========================================================
     // Per-instance initialization preserves the exported Blaster Config and its change subscriptions.
     protected override void ApplyConfig(TowerConfig config) => Config = (RocketTowerConfig)config;
-    private Sprite2D _sprite;
+    private Sprite2D _sprite, _baseSprite;
+    private TowerRecoilController _recoil;
     private Marker2D _muzzleA, _muzzleB;
     private BarrelFireController _barrels;
     private WeaponVisualRenderer _visuals;
@@ -57,9 +59,11 @@ public partial class RocketTower : TowerBase
     public override void _Ready()
     {
         _turret = GetNode<Node2D>("TurretPivot");
-        _sprite = _turret.GetNode<Sprite2D>("Sprite");
-        _muzzleA = GetNode<Marker2D>("TurretPivot/Muzzles/MuzzleA");
-        _muzzleB = GetNode<Marker2D>("TurretPivot/Muzzles/MuzzleB");
+        _baseSprite = GetNode<Sprite2D>("BaseSprite");
+        _recoil = GetNode<TowerRecoilController>("Recoil");
+        _sprite = _turret.GetNode<Sprite2D>("RecoilRoot/Sprite");
+        _muzzleA = GetNode<Marker2D>("TurretPivot/RecoilRoot/Muzzles/MuzzleA");
+        _muzzleB = GetNode<Marker2D>("TurretPivot/RecoilRoot/Muzzles/MuzzleB");
         _barrels = new BarrelFireController(2);
         _visuals = WeaponVisuals.Attach(_turret);
         SetProcess(false);
@@ -96,6 +100,7 @@ public partial class RocketTower : TowerBase
             hit, FinalStats.Area.Value, _effects, style: Config.ImpactStyle, trackTarget: false);
         _projectiles.AddChild(bullet); bullet.GlobalPosition = muzzle.GlobalPosition;
         _visuals.FlashAt(muzzle, Config.MuzzleFlash);
+        _recoil.Kick(); // Projectile and flash snapshot the barrel before cosmetic recoil.
         _barrels.Commit(BarrelFireMode.Sequential);
         _shotTimer = 1f / FinalStats.ShotsPerSecond;
         RecordAttackHeat();
@@ -128,7 +133,10 @@ public partial class RocketTower : TowerBase
     #region Placement and Selection
     // =========================================================
     // Modulate the existing sprite instead of instantiating selection effects.
-    public override void SetSelected(bool selected) =>
-        _sprite.Modulate = selected ? new Color(1f, 0.9f, 0.68f) : Colors.White;
+    public override void SetSelected(bool selected)
+    {
+        Color tint = selected ? new Color(1f, .9f, .68f) : Colors.White;
+        _sprite.Modulate = tint; _baseSprite.Modulate = tint;
+    }
     #endregion
 }

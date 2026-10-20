@@ -1,3 +1,7 @@
+## Recoil presentation — 2026-10-20
+
+Fixed BaseSprite and rotating TurretPivot/RecoilRoot/Sprite now split the finished artwork; Muzzles travel with that assembly. The original composite SVG remains the catalog/ghost icon. The scene's Recoil node assigns Visuals/RocketTowerRecoil.tres (Enabled, kick distance/duration, return duration, maximum accumulated offset). Each funded shot/volley snapshots its launch and flash before moving the gun. Generic disabling/destruction resets the pose; idle controllers sleep. Selection colors base and gun. Combat balance, upgrades, construction gates and targeting are unchanged. Runtime/build/visual verification is pending. See [shared recoil notes](../../Shared/Weapons/Recoil/README.md).
+
 # Rocket Tower — alternating unguided splash rockets
 
 Registered in `TOWERS/DefaultTowerCatalog.tres` under `rocket` (Offensive, 1×1). Two cyan-accented launch tubes use existing shared `BarrelFireController` in Sequential mode: one rocket per firing interval, alternating muzzle A/B **only after a funded shot**. The fixed root stays still; the turret pivot uses shared aiming/targeting and rank/upgrade/ammunition systems.

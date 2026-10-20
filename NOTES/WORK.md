@@ -1,3 +1,11 @@
+## Offensive projectile recoil rollout — source implemented (2026-10-20)
+
+User approved extending the successful Battle recoil preview. Machine Gun, Sniper, Blaster Cannon, Rocket, Cryo and Stasis now have split fixed bases, recoiling gun/muzzle assemblies and independent Inspector-editable presets using the shared controller. Existing composite icons are retained. Laser and nonrotating Shockwave retain their beam/radial presentations; no forced rotation or directional recoil was added to either. No balance, wave, UI/Inspector resize or progression changes.
+
+Updated regression fixtures cover funded origins, fixed base/aim/root, independent emitted flashes/shots, cooldown/ammo gates, generic disable/destruction and adoption boundaries; older muzzle path assertions are updated. Static resource/path checks completed. **Godot import, C# build, headless tests and desktop visual acceptance remain pending** because no execution environment was available. Historical Battle-only R1/R2 entries below remain as pilot history. See TOWERS/Shared/Weapons/Recoil/README.md and TESTS/Towers/TowerRecoil.md.
+
+---
+
 ## R1 + R2 — combined Battle recoil source implementation (2026-10-20)
 
 User approved combining both passes: fixed base, split gun and attached recoiling muzzle, with one optional shared controller/style and a Battle-only preset. Source implementation, regression fixtures and documentation are complete; **Godot import/build/tests and normal-zoom visual approval remain pending**, not passed. No combat balance values or other tower scenes were changed. Existing construction art remains an overlay; optional monolithic custom tier/upgrade artwork retains that fallback with split recoil suspended. See [recoil implementation notes](../TOWERS/Shared/Weapons/Recoil/README.md) and [verification instructions](../TESTS/Towers/TowerRecoil.md).

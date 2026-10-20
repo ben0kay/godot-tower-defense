@@ -1,3 +1,7 @@
+## Recoil presentation — 2026-10-20
+
+Fixed BaseSprite and rotating TurretPivot/RecoilRoot/Sprite now split the finished artwork; Muzzles travel with that assembly. The original composite SVG remains the catalog/ghost icon. The scene's Recoil node assigns Visuals/SniperTowerRecoil.tres (Enabled, kick distance/duration, return duration, maximum accumulated offset). Each funded shot/volley snapshots its launch and flash before moving the gun. Generic disabling/destruction resets the pose; idle controllers sleep. Selection colors base and gun. Combat balance, upgrades, construction gates and targeting are unchanged. Runtime/build/visual verification is pending. See [shared recoil notes](../../Shared/Weapons/Recoil/README.md).
+
 # Sniper Tower — one-muzzle long-range Kinetic weapon
 
 **Latest projectile-speed update (2026-10-18):** All three purchased levels now use **2,990 px/s** guided tracers, exactly double the prior **1,495 px/s**. Damage, rate, ammunition, targeting, costs and heat are unchanged. The table below also includes pre-existing range rebalances.

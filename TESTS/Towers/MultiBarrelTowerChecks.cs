@@ -76,7 +76,7 @@ public static class MultiBarrelTowerChecks
 
             sniper._PhysicsProcess(.25);
             BasicProjectile shot = projectiles.GetChildren().OfType<BasicProjectile>().Single();
-            Marker2D sniperMuzzle = sniper.GetNode<Marker2D>("TurretPivot/Muzzles/MuzzleA");
+            Marker2D sniperMuzzle = sniper.GetNode<Marker2D>("TurretPivot/RecoilRoot/Muzzles/MuzzleA");
             Near(shot.GlobalPosition, sniperMuzzle.GlobalPosition, "Sniper launches from muzzle tip");
             Require(sniper.Ammunition.Inventory.Amount == 599, "Sniper consumes exactly one round on launch");
             shot.SetPhysicsProcess(false); shot._PhysicsProcess(.2);
@@ -92,8 +92,8 @@ public static class MultiBarrelTowerChecks
             Require(gun.MuzzleCount == 2 && gun.Config.FiringMode == BarrelFireMode.Sequential
                 && gun.Ammunition.Inventory.Amount == 1200 && gun.FinalStats.DamagePerShot == 7 && Mathf.IsEqualApprox(gun.FinalStats.ShotsPerSecond, 14.4f),
                 "Machine Gun starts with two muzzles and a 14.4-bullets-per-second shared attack rate");
-            Marker2D a = gun.GetNode<Marker2D>("TurretPivot/Muzzles/MuzzleA");
-            Marker2D b = gun.GetNode<Marker2D>("TurretPivot/Muzzles/MuzzleB");
+            Marker2D a = gun.GetNode<Marker2D>("TurretPivot/RecoilRoot/Muzzles/MuzzleA");
+            Marker2D b = gun.GetNode<Marker2D>("TurretPivot/RecoilRoot/Muzzles/MuzzleB");
 
             gun._PhysicsProcess(.25);
             gun._PhysicsProcess(.2);
@@ -109,7 +109,7 @@ public static class MultiBarrelTowerChecks
             gun.Config.FiringMode = BarrelFireMode.Simultaneous;
             gun._PhysicsProcess(.4);
             BasicProjectile[] volley = projectiles.GetChildren().OfType<BasicProjectile>().ToArray();
-            Require(volley.Length == 2 && gun.Ammunition.ConsumedRounds == 5,
+            Require(volley.Length == 2 && gun.Ammunition.ConsumedRounds == 5 && gun.GetNode<TowerRecoilController>("Recoil").Impulses == 4,
                 "Simultaneous mode launches two paid projectiles per volley");
             Near(volley[0].GlobalPosition, a.GlobalPosition, "Simultaneous left muzzle");
             Near(volley[1].GlobalPosition, b.GlobalPosition, "Simultaneous right muzzle");

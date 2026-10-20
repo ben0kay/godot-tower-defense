@@ -3,6 +3,17 @@ using Godot;
 
 public partial class TowerRecoilController : Node
 {
+    #region Scene Configuration
+    [Export] public NodePath TargetPath { get; set; } = new();
+    private TowerRecoilStyle _sceneStyle;
+    private TowerBase _owner;
+    [Export] public TowerRecoilStyle Style
+    {
+        get => _sceneStyle;
+        set { if (_sceneStyle == value) return; _sceneStyle = value; if (IsNodeReady() && !TargetPath.IsEmpty) Bind(GetNodeOrNull<Node2D>(TargetPath), value); }
+    }
+    #endregion
+
     #region Instance State
     private Node2D _target;
     private TowerRecoilStyle _style;
@@ -19,7 +30,17 @@ public partial class TowerRecoilController : Node
     #region Binding and Lifetime
     // =========================================================
     // Scene child is present once; worlds without an enabled preset pay no idle animation processing.
-    public override void _Ready() { SetProcess(false); SetPhysicsProcess(false); }
+    public override void _Ready()
+    {
+        SetProcess(false); SetPhysicsProcess(false);
+        if (TargetPath.IsEmpty) return; // Battle retains its existing config-owned explicit binding.
+        Bind(GetNodeOrNull<Node2D>(TargetPath), Style);
+        _owner = GetParent() as TowerBase;
+        if (_owner != null) { _owner.DisableStateChanged += OnOwnerDisabled; _owner.Destroyed += Cancel; }
+    }
+    // =========================================================
+    // Generic disabling is event-driven; no idle polling or dependency on a particular weapon subclass.
+    private void OnOwnerDisabled() { if (_owner.IsDisabled) Cancel(); }
     // =========================================================
     // Replacement restores the previous target before capturing a new baseline, preventing accumulated drift.
     public void Bind(Node2D target, TowerRecoilStyle style)
@@ -50,7 +71,11 @@ public partial class TowerRecoilController : Node
     // =========================================================
     // The target can disappear before its controller; release its connection while it is still valid.
     private void OnTargetExiting() => Unbind();
-    public override void _ExitTree() => Unbind();
+    public override void _ExitTree()
+    {
+        if (GodotObject.IsInstanceValid(_owner)) { _owner.DisableStateChanged -= OnOwnerDisabled; _owner.Destroyed -= Cancel; }
+        _owner = null; Unbind();
+    }
     #endregion
 
     #region Funded Impulses and Motion

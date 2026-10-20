@@ -34,12 +34,14 @@ public partial class BlasterCannon : TowerBase
     public override bool AcceptsConfig(TowerConfig config) => config is BlasterCannonConfig;
     // =========================================================
     // Reject malformed Blaster scenes before occupancy/payment, without imposing this on passive types.
-    public override bool ValidateScene() => GetNodeOrNull<Node2D>("TurretPivot") != null && GetNodeOrNull<Sprite2D>("TurretPivot/Sprite") != null
-        && GetNodeOrNull<Marker2D>("TurretPivot/Muzzles/MuzzleA") != null;
+    public override bool ValidateScene() => GetNodeOrNull<Sprite2D>("BaseSprite") != null
+        && GetNodeOrNull<TowerRecoilController>("Recoil") != null && GetNodeOrNull<Node2D>("TurretPivot") != null && GetNodeOrNull<Sprite2D>("TurretPivot/RecoilRoot/Sprite") != null
+        && GetNodeOrNull<Marker2D>("TurretPivot/RecoilRoot/Muzzles/MuzzleA") != null;
     // =========================================================
     // Per-instance initialization preserves the exported Blaster Config and its change subscriptions.
     protected override void ApplyConfig(TowerConfig config) => Config = (BlasterCannonConfig)config;
-    private Sprite2D _sprite;
+    private Sprite2D _sprite, _baseSprite;
+    private TowerRecoilController _recoil;
     private Marker2D _muzzle;
     private WeaponVisualRenderer _visuals;
     private Node2D _turret;
@@ -55,8 +57,10 @@ public partial class BlasterCannon : TowerBase
     public override void _Ready()
     {
         _turret = GetNode<Node2D>("TurretPivot");
-        _sprite = _turret.GetNode<Sprite2D>("Sprite");
-        _muzzle = GetNode<Marker2D>("TurretPivot/Muzzles/MuzzleA");
+        _baseSprite = GetNode<Sprite2D>("BaseSprite");
+        _recoil = GetNode<TowerRecoilController>("Recoil");
+        _sprite = _turret.GetNode<Sprite2D>("RecoilRoot/Sprite");
+        _muzzle = GetNode<Marker2D>("TurretPivot/RecoilRoot/Muzzles/MuzzleA");
         _visuals = WeaponVisuals.Attach(_turret);
         SetProcess(false);
         _initialized = true;
@@ -91,6 +95,7 @@ public partial class BlasterCannon : TowerBase
             hit, FinalStats.Area.Value, _effects, style: Config.ImpactStyle);
         _projectiles.AddChild(bullet); bullet.GlobalPosition = _muzzle.GlobalPosition;
         _visuals.FlashAt(_muzzle, Config.MuzzleFlash);
+        _recoil.Kick(); // Projectile and flash snapshot the barrel before cosmetic recoil.
         _shotTimer = 1f / FinalStats.ShotsPerSecond;
         RecordAttackHeat();
     }
@@ -122,7 +127,10 @@ public partial class BlasterCannon : TowerBase
     #region Placement and Selection
     // =========================================================
     // Modulate the existing sprite instead of instantiating selection effects.
-    public override void SetSelected(bool selected) =>
-        _sprite.Modulate = selected ? new Color(1f, 0.9f, 0.68f) : Colors.White;
+    public override void SetSelected(bool selected)
+    {
+        Color tint = selected ? new Color(1f, .9f, .68f) : Colors.White;
+        _sprite.Modulate = tint; _baseSprite.Modulate = tint;
+    }
     #endregion
 }

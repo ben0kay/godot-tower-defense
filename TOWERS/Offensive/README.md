@@ -1,3 +1,9 @@
+## Projectile recoil rollout — 2026-10-20
+
+Machine Gun, Sniper, Blaster Cannon, Rocket, Cryo and Stasis now join Battle with split fixed-base/gun artwork and individually editable recoil presets in their Visuals folders. Projectile and flash launch from attached barrel tips before each cosmetic impulse. Laser remains a beam; Shockwave remains stationary with its radial effect. No firing rates, damage, rotation settings, ammo, heat, costs or progression values changed. Source implementation and checks are written; runtime/build/visual verification is pending. See [shared recoil notes](../Shared/Weapons/Recoil/README.md).
+
+---
+
 ## Projectile speeds doubled for Battle, Machine Gun and Sniper — 2026-10-18
 
 Battle **1,150 → 2,300 px/s**, Machine Gun **1,221.875 → 2,443.75 px/s**, Sniper **1,495 → 2,990 px/s** across all three purchased levels each. Only the authored projectile-speed field changed for these tower types; attack rate, damage, range, rank, costs and ammo remain intact. Exact stat test baselines were updated accordingly. The earlier +15% general projectile rebalance below is historical and is superseded for these three towers.
