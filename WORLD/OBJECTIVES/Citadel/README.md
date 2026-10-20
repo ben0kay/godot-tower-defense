@@ -1,3 +1,9 @@
+## Fortress artwork — 2026-10-20
+
+`Citadel.tscn` now uses a cached `Sprite2D` referencing `Visuals/CitadelFortress.svg` instead of the temporary Hull/Core polygons. The top-down armored 192px octagonal fortress is centered at local `(64,64)` to retain the existing 3×3 footprint alignment; its cyan reactor is decorative only. The `WorldObjectFootprint` root, 4 approach markers, health component, label, collision/navigation, clicking and multi-Citadel identity remain untouched. It has no runtime geometry generation or animation. Edit the SVG in this Citadel's `Visuals/` folder to swap it later.
+
+---
+
 ## CP1B collection UI — code implemented 2026-10-18 (verification pending)
 
 **World Citadel click + matching top-centre health HUD click** now call the same per-objective `TryCollectCredits` wallet command. Every Citadel has an independently event-updated green world Credit label/bar and a green HUD bar/amount inside its existing health panel (single legacy layout or one horizontal multi-objective row). Only the clicked Citadel pays; collection is still possible between waves, although no new Credits are generated then. Tower placement has click precedence, so Citadel clicks never sneak in during construction placement. Existing HP bars/route gameplay/kill rewards are unaffected.
