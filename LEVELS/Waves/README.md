@@ -1,3 +1,9 @@
+## NP1 confirmed; NP2 top-right tactical narrator in source (2026-10-20)
+
+The NP1 accepted-wave `WaveStarted` + existing major `WAVE NN INCOMING` banners are implemented and visually approved. NP2 extends the same shared presentation controller to show an **optional top-right typewritten tactical transmission**, authored directly beside a wave's batches. Level020 waves 1,4,6,7 are examples; all others remain banner-only. There is no gameplay, wave timing or voice change. See [Presentation/README.md](Presentation/README.md) and [Narration README](../../UI/Narration/README.md). Build/headless/desktop NP2 verification pending.
+
+---
+
 ## Automatic wave-start banners — first slice (2026-10-20; runtime verification pending)
 
 Every successful manual wave start now emits one `WaveStarted` event and, via the single shared battlefield `WavePresentationController`, requests a silent **`WAVE 01 INCOMING`** major banner (number advances with the wave). The existing `UI/Alerts/NotificationManager` handles animation/pause/priority; no per-level scene changes, audio, narrator text or delayed spawning. Existing WaveBuilder recipes remain valid, with an optional `Presentation(...)` authoring overload for a later pass. See [Presentation/README.md](Presentation/README.md). Godot compile/headless/visual verification is still pending.

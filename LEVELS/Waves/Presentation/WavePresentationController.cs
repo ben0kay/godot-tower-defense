@@ -5,6 +5,7 @@ public partial class WavePresentationController : Node
 {
     private WaveManager _waves;
     private NotificationManager _alerts;
+    private NarrationDisplay _narration;
 
     // =========================================================
     // Battlefield-scoped subscription: works automatically for all authored WaveSetSource missions.
@@ -13,16 +14,19 @@ public partial class WavePresentationController : Node
         SetProcess(false); SetPhysicsProcess(false);
         _waves = GetNodeOrNull<WaveManager>("../Waves");
         _alerts = GetNodeOrNull<NotificationManager>("../UI/GameplayHUD/NotificationManager");
+        _narration = GetNodeOrNull<NarrationDisplay>("../UI/GameplayHUD/NarrationDisplay");
         if (_waves != null) _waves.WaveStarted += OnWaveStarted;
     }
 
     // =========================================================
-    // Present one silent, nonblocking placeholder at each accepted wave start.
-    // Authored text and voice IDs are reserved; narrator display and sound come in NP2.
+    // Route independently: un-narrated waves clear the card; an explicitly suppressed alert can still speak.
     private void OnWaveStarted(WaveDefinition wave)
     {
-        if (wave == null || !GodotObject.IsInstanceValid(_alerts)) return;
+        if (wave == null) return;
         WavePresentation presentation = wave.Presentation;
+        if (GodotObject.IsInstanceValid(_narration))
+            _narration.ShowMessage(presentation?.Text, presentation?.Speaker);
+        if (!GodotObject.IsInstanceValid(_alerts)) return;
         WaveAlertKind kind = presentation?.Alert ?? WaveAlertKind.Standard;
         if (kind == WaveAlertKind.None) return;
         MajorAlertDefinition banner = new()
@@ -53,6 +57,6 @@ public partial class WavePresentationController : Node
     public override void _ExitTree()
     {
         if (GodotObject.IsInstanceValid(_waves)) _waves.WaveStarted -= OnWaveStarted;
-        _waves = null; _alerts = null;
+        _waves = null; _alerts = null; _narration = null;
     }
 }

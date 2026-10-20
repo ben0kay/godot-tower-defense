@@ -1,3 +1,9 @@
+## NP2 narrator alongside NP1 wave banners (2026-10-20)
+
+The existing `NotificationManager` still owns all major wave banners and their priority queue; no new alert engine was added. The shared `LEVELS/Waves/Presentation/WavePresentationController.cs` now also routes wave narration to the **separate** `UI/Narration/NarrationDisplay.tscn` when text is authored. It sits top-right beneath the wave HUD; on narrower screens it moves below the major alert area. No audio, countdowns or changes to ShowMajor APIs. See [Narration README](../Narration/README.md).
+
+---
+
 ## Live wave banners — first integration (2026-10-20; runtime verification pending)
 
 The shared `LEVELS/Waves/Presentation/WavePresentationController.cs` now requests **one transient `WAVE NN INCOMING` major alert per accepted wave start**. `NotificationManager.ShowMajor(MajorAlertDefinition)` routes these temporary titles through the existing queue, priority, dedupe and pause-aware displays, without changing the existing `ShowMajor(string id)` catalog path. The standard 3-second banner has no audio, narrator/typewriter text or pre-wave delay. See [wave presentation](../../LEVELS/Waves/Presentation/README.md). Godot runtime visual verification remains pending.

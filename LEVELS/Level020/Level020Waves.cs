@@ -20,6 +20,9 @@ public partial class Level020Waves : WaveSetSource
     [
         // 1 — First contact: a dense stream of Standard and Swift, with only a couple of fast Racers.
         Wave(1,
+            Presentation(speaker: "TACTICAL COMMAND",
+                text: "Commander, multiple contacts are approaching through the five gates. Prepare your defenses.",
+                voiceCueId: "level020_wave01"),
             Batch(count: 32, interval: 0.18, after: 3,
                 Enemy("basic_mk1", 75), Enemy("scout_mk1", 25)),
             Batch(count: 20, interval: 0.23, after: 0,
@@ -44,6 +47,10 @@ public partial class Level020Waves : WaveSetSource
 
         // 4 — Transporter debut; mixed escort ships and the first opt-in shielded frigates.
         Wave(4,
+            Presentation(alert: WaveAlertKind.Heavy, bannerTitle: "TRANSPORTERS DETECTED",
+                speaker: "TACTICAL COMMAND",
+                text: "Enemy transporters have joined the assault. Expect additional drones when they are destroyed.",
+                voiceCueId: "level020_wave04"),
             Batch(count: 40, interval: 0.19, after: 3,
                 Enemy("basic_mk1", 30), Enemy("scout_mk1", 25),
                 Enemy("reinforced_drone_mk1", 25), Enemy("medium_mk1", 20)),
@@ -68,6 +75,10 @@ public partial class Level020Waves : WaveSetSource
 
         // 6 — Armoured push: Bulwarks, Big/Elite hulls, frigates and heavy carrier escorts.
         Wave(6,
+            Presentation(alert: WaveAlertKind.Heavy, bannerTitle: "HEAVY HOSTILES INCOMING",
+                speaker: "TACTICAL COMMAND",
+                text: "Commander, heavy armor is approaching. Focus your strongest towers on the largest ships.",
+                voiceCueId: "level020_wave06"),
             Batch(count: 30, interval: 0.34, after: 3,
                 Enemy("medium_mk1", 20), Enemy("reinforced_drone_mk1", 20),
                 Enemy("heavy_bulwark_mk1", 30), Enemy("elite_mk1", 20),
@@ -81,6 +92,10 @@ public partial class Level020Waves : WaveSetSource
 
         // 7 — Final assault: large hulls with shield escorts, finishing on two shielded Cruisers.
         Wave(7,
+            Presentation(alert: WaveAlertKind.Final, bannerTitle: "FINAL WAVE INCOMING",
+                speaker: "TACTICAL COMMAND",
+                text: "Commander, massive hostile signatures detected. Protect the Citadel. This is the final assault.",
+                voiceCueId: "level020_wave07"),
             Batch(count: 28, interval: 0.29, after: 3,
                 Enemy("reinforced_drone_mk1", 20), Enemy("medium_mk1", 15),
                 Enemy("heavy_bulwark_mk1", 30), Enemy("elite_mk1", 20, shield: true),

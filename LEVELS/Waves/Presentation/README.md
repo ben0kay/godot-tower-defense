@@ -1,6 +1,14 @@
+## Status — NP1 complete; NP2 narrator foundation implemented in source (2026-10-20)
+
+- **NP1 complete in source:** existing optional `WavePresentation` metadata + `WaveManager.WaveStarted` exactly once for an accepted start. Default `WAVE NN INCOMING` banners use the existing `NotificationManager` major-alert queue. The user has visually confirmed the simple banner looks fine.
+- **NP2 source now added:** one `UI/Narration/NarrationDisplay.tscn` and style Resource, placed **top-right underneath the wave controls**, automatically shifted below the central banner on narrow screens. The NP1 `WavePresentationController` now routes `Speaker` and `Text` independently of the banner. Level020 waves **1,4,6,7** demonstrate tactical text; 2/3/5 remain banner-only. `VoiceCueId` stays metadata only. The scheduler, wave data, enemy counts, and spawn delays were not modified.
+- **Still pending:** Godot/.NET build, headless tests and desktop NP2 visual/layout validation; NP3 extended end-to-end tests, optional skip binding, portraits and future actual audio. See [UI/Narration/README.md](../../../UI/Narration/README.md) for config, layout and tests.
+
+---
+
 ## First usable slice — automatic numbered wave banners (2026-10-20)
 
-**Source implementation added, Godot runtime verification pending.** The optional immutable `WavePresentation` / `WaveAlertKind` authoring contract and backwards-compatible `WaveBuilder.Wave(number, Presentation(...), Batch(...))` overload exist. `WaveManager.WaveStarted` fires **once when `StartWave()` is accepted**, before the first existing immediate spawn. A single `WavePresentationController` under the shared `LEVELS/Runtime/Battlefield.tscn` subscribes and sends a **silent top-centre `WAVE 01 INCOMING`** (appropriate number for each wave) through the existing `NotificationManager` major-alert pipeline. Without metadata, every wave gets the standard banner automatically. Omitted text has no narrator UI, and optional `Text`, `Speaker`, `VoiceCueId` are reserved for later NP2 only; no audio plays.
+**NP1 source implemented and user visually approved; older historical limitations in this section are superseded by the status update above.** The optional immutable `WavePresentation` / `WaveAlertKind` authoring contract and backwards-compatible `WaveBuilder.Wave(number, Presentation(...), Batch(...))` overload exist. `WaveManager.WaveStarted` fires **once when `StartWave()` is accepted**, before the first existing immediate spawn. A single `WavePresentationController` under the shared `LEVELS/Runtime/Battlefield.tscn` subscribes and sends a **silent top-centre `WAVE 01 INCOMING`** (appropriate number for each wave) through the existing `NotificationManager` major-alert pipeline. Without metadata, every wave gets the standard banner automatically. Omitted text has no narrator UI, and optional `Text`, `Speaker`, `VoiceCueId` are reserved for later NP2 only; no audio plays.
 
 The alert system's existing `ShowMajor(string id)` still serves registered named alerts; an overload `ShowMajor(MajorAlertDefinition)` now accepts *transient*, valid major alerts through the same queue, cooldown and priority rules, avoiding seven permanent catalog entries. Current banner duration is **3 seconds**, with the existing shared major-alert fade/slide timings and pause policy. It is not a pre-wave timer: spawning still begins immediately. A plain existing recipe `Wave(3, Batch(...))` is unchanged and gets a number-only announcement. Level001/002/020 do **not** need their data updated.
 
@@ -12,7 +20,7 @@ Regression assertions were added to `TESTS/Integration/WaveChecks.cs` for defaul
 
 # Wave Presentation — narrator, typewriter transmissions and wave announcements
 
-**Original full design plan (2026-10-20).** NP1's data/event and a small *banner-only* part of NP2 are now source-implemented as described above. The remaining narrator/typewriter/audio plans below are future work; example code and file trees may be historical.
+**Original implementation plan (2026-10-20; retained for context).** NP1's data/event and a small *banner-only* part of NP2 are now source-implemented as described above. The remaining narrator/typewriter/audio plans below are future work; example code and file trees may be historical.
 
 ## Intent
 

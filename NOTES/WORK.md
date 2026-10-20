@@ -1,3 +1,14 @@
+## NP2 top-right tactical narrator — implemented in source (2026-10-20; test run pending)
+
+- [x] **NP1 (confirmed by user):** standard `WAVE NN INCOMING` major banner on every accepted manual wave start.
+- [x] Shared `UI/Narration/` display, settings Resource and single HUD instance: animated RichTextLabel typewriter + short hold/fade, processing only while active, top-right below wave controls and stacked clear of centered alert on small viewports.
+- [x] `WavePresentationController` delivers optional text/speaker without touching the alert or scheduler; Level020 waves 1/4/6/7 now author demo messages and future-only voice IDs.
+- [x] Basic UI/authoring integration assertions and documentation.
+- [ ] Godot/.NET build, integration suite and desktop visual review at 1920×1080 and 960×540.
+- [ ] NP3 extended tests and future actual audio/voice, optional skip input, advanced queues/portraits. See [plan](../LEVELS/Waves/Presentation/README.md) and [UI guide](../UI/Narration/README.md).
+
+---
+
 ## 10× tower hulls + 5% max HP per purchased level — 2026-10-20 (source updated; runtime verification pending)
 
 - [x] All **14 playable tower types** receive a 10× base HP rebalance: 9 offensive towers `1000/1050/1102.5` (according to level count); factory/depot `1000`; Resource/ARG `1500/1575/1653.75`; Stealth Beacon `1800`. Saved economy tier resources and code defaults agree.
