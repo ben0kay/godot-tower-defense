@@ -1,3 +1,9 @@
+## Recoil pilot for Battle Tower — Codex plan, NOT implemented (2026-10-20)
+
+The planned reusable, optional projectile recoil system is specified in [TOWERS/Shared/Weapons/Recoil/README.md](../TOWERS/Shared/Weapons/Recoil/README.md). Codex R1: create shared `TowerRecoilController`/`TowerRecoilStyle`, author one Inspector-editable Battle preset, trigger only on an actual funded Battle shot **after muzzle launch/flash**, keep all existing sprite/muzzle/construction paths and other towers untouched, and add regressions. First preview may lightly offset the existing composite Battle SVG; *fixed base + split gun* is an explicit later R2 art pass, not yet authorized. No implementation exists until Codex completes R1.
+
+---
+
 ## SE1 — stealth enemies and reveal beacon — implemented 2026-10-20 UTC
 
 Waves may now author `Enemy("basic_mk1", stealth: true)` independently of `shield: true`. Default spawns remain ordinary; no existing wave/map was changed. Stealth ships render at30% alpha, revealed ships at100%, with configurable/dimmed defense feedback that composes with Cryo/Stasis. All aimed towers share detection filtering and cached-lock validation; private TowerConfig.CanDetectStealth opts a specialist in without globally revealing enemies. Existing attacks already emitted, splash and untargeted Shockwave remain able to damage hidden ships (stealth is targeting, not immunity).

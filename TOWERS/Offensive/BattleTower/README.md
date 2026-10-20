@@ -1,3 +1,9 @@
+## Planned shared recoil preview — Battle only (2026-10-20)
+
+**Not implemented yet.** Codex should follow [Shared Weapons/Recoil/README.md](../../Shared/Weapons/Recoil/README.md) to create reusable lightweight kick/return mechanics and a Battle-only editable style. For the first preview preserve `TurretPivot/Sprite`, `TurretPivot/Muzzles/MuzzleA`, selection tint and `ConstructionVisuals.SpritePath`; trigger recoil only after a real projectile launch, without moving the root/aim pivot. Splitting the current one-piece SVG into fixed base + independently recoiling turret is a separately planned R2 stage.
+
+---
+
 # Battle Tower — explicit levels and guided Kinetic fire
 
 ## Permanent Battle damage research — 2026-10-17

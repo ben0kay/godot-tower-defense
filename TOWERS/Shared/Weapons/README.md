@@ -1,3 +1,9 @@
+## Planned shared recoil pilot — Battle Tower only (2026-10-20)
+
+**Documentation-only plan, not implemented:** [Recoil/README.md](Recoil/README.md) specifies a reusable, active-only visual recoil controller and Inspector style, to be piloted on the existing Battle Tower only. It preserves fired projectile/muzzle timing, targeting, base rotation, construction sprite paths and other towers; true fixed-hull/split-gun art is a later separate pass. Have Codex implement R1 from that README before enabling it in-game.
+
+---
+
 # Weapon aiming
 
 TurretAiming.Track turns an up-facing visual pivot toward a world target and reports alignment. BattleTower calls it before cooldown-based firing. Rotation speed, tolerance and tracking are held in the tower config; the helper owns no target search, damage or economy.
