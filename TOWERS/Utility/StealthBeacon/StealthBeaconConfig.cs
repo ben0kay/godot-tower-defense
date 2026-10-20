@@ -16,7 +16,7 @@ public partial class StealthBeaconConfig : TowerConfig
     public StealthBeaconConfig()
     {
         DisplayName = "Stealth Beacon"; Description = "Reveals stealthed enemies inside its radius for all towers. Leaving the radius restores stealth.";
-        Levels = new() { new(1, 250, new(256, 0, 0, 0, 0, 0, 0, MaxHealth: 180), 2) };
+        Levels = new() { new(1, 250, new(256, 0, 0, 0, 0, 0, 0, MaxHealth: 1800), 2) };
     }
     // =========================================================
     // Bounded radius keeps the reveal index small and rejects malformed setup before payment.

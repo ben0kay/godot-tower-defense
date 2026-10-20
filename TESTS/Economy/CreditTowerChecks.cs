@@ -63,7 +63,7 @@ public partial class CreditTowerChecks : Node
         f.Wallet.Initialize(f.Spawns.Paths.Navigation.Grid.Level.Settings); f.Wallet.Grant(f.Wallet.CreditsResource, 10000);
         Require(ConstructionTestClock.PurchaseAndFinish(resource, f.Wallet, f.Placement.Settings, 1, out string error), "Paid producer upgrade: " + error);
         Require(resource.UpgradeLevel == 2 && resource.Buffer.Capacity == 150 && resource.Buffer.Current == 100
-            && resource.FinalStats.Production.Value.PerCycle == 15 && resource.MaxHealth == 200, "Upgrade preserves stock and applies economy/health snapshot");
+            && resource.FinalStats.Production.Value.PerCycle == 15 && resource.MaxHealth == 1575, "Upgrade preserves stock and applies economy/health snapshot");
         Require(TowerUpgradeComparison.Build(resource.FinalStats, resource.ResolveLevel(3)).Any(r => r.Name == "Credits / cycle")
             && !TowerUpgradeComparison.Build(resource.FinalStats, resource.ResolveLevel(3)).Any(r => r.Name == "Damage"), "Economy preview has production rows, no fake weapon stats");
         resource._PhysicsProcess(5); Require(resource.Buffer.Current == 115, "Upgraded payout uses fresh timer");

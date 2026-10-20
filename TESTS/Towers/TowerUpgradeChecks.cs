@@ -30,6 +30,8 @@ public static class TowerUpgradeChecks
             for (int level = 1; level <= 3; level++)
                 Require(first.ResolveLevel(level).ShieldPenetration == 0.05f, "Purchased tiers never increase base penetration");
             TowerFinalStats preview = first.ResolveLevel(2);
+            Require(first.FinalStats.MaxHealth == 1000 && preview.MaxHealth == 1050,
+                "Paid level2 adds 5% HP on top of the 10x base");
             VerifyTypedComparison();
             Require(preview.DamagePerShot == 33 && Mathf.IsEqualApprox(preview.ShotsPerSecond, 1.764f)
                 && preview.RangePixels == 334.4f && first.FinalStats == initial && first.UpgradeLevel == 1,
@@ -57,7 +59,8 @@ public static class TowerUpgradeChecks
             Button button = hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeButton");
             Label info = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeInfo");
             Require(button.Visible && !button.Disabled && info.Text.Contains("150 Credits") &&
-                UpgradeTableChecks.HasRow(hud, "Damage", "30", "33", "(+3)"), "Inspector shows next tier, typed gain and affordable price");
+                UpgradeTableChecks.HasRow(hud, "Damage", "30", "33", "(+3)")
+                && UpgradeTableChecks.HasRow(hud, "Max HP", "1000", "1050", "(+50)"), "Inspector shows next tier, typed gain and affordable price");
             hud.EmitSignal(GameplayHUD.SignalName.TowerUpgradeRequested); ConstructionTestClock.FinishWork(battle);
             Require(first.UpgradeLevel == 2 && first.FinalStats == preview &&
                 wallet.GetBalance(wallet.CreditsResource) == 250, "Actual HUD upgrade action pays once and matches preview");
@@ -72,6 +75,9 @@ public static class TowerUpgradeChecks
                 "Repeated HUD requests in one frame cannot buy multiple tiers");
             await battle.ToSignal(battle.GetTree(), SceneTree.SignalName.ProcessFrame);
             TowerFinalStats levelThree = first.ResolveLevel(3);
+            Require(Mathf.IsEqualApprox(levelThree.MaxHealth, 1102.5f)
+                && UpgradeTableChecks.HasRow(hud, "Max HP", "1050", "1102.5", "(+52.5)"),
+                "Level3 compounds the second +5% and shows the correct HP gain in Inspector");
             hud.EmitSignal(GameplayHUD.SignalName.TowerUpgradeRequested); ConstructionTestClock.FinishWork(battle);
             Require(first.UpgradeLevel == 3 && first.FinalStats == levelThree &&
                 first.FinalStats.DamagePerShot == 36 && Mathf.IsEqualApprox(first.FinalStats.ShotsPerSecond, 1.848f) &&

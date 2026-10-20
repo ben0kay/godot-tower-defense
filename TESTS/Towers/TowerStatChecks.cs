@@ -112,15 +112,15 @@ public static class TowerStatChecks
     {
         BattleTowerConfig battle = new(); LaserTowerConfig laser = new(); BlasterCannonConfig blaster = new();
         TowerFinalStats[] battleExpected = {
-            new(323.4f, 1.68f, 30, 2300, 216, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
-            new(334.4f, 1.764f, 33, 2300, 216, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)),
-            new(344.3f, 1.848f, 36, 2300, 216, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1)) };
+            new(323.4f, 1.68f, 30, 2300, 216, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1), MaxHealth: 1000f),
+            new(334.4f, 1.764f, 33, 2300, 216, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1), MaxHealth: 1050f),
+            new(344.3f, 1.848f, 36, 2300, 216, 12, .15f, ShieldPenetration: .05f, Ammunition: new(1000, 1), MaxHealth: 1102.5f) };
         TowerFinalStats[] laserExpected = {
-            new(323.4f, 0, 0, 1, 216, 12, .15f, new BeamStats(12), Weapon: new(DamageType.Energy, true, 6, true, .15f), Ammunition: new(1000, 0, 2)),
-            new(334.4f, 0, 0, 1, 216, 12, .15f, new BeamStats(14), Weapon: new(DamageType.Energy, true, 6, true, .15f), Ammunition: new(1000, 0, 2)) };
+            new(323.4f, 0, 0, 1, 216, 12, .15f, new BeamStats(12), Weapon: new(DamageType.Energy, true, 6, true, .15f), Ammunition: new(1000, 0, 2), MaxHealth: 1000f),
+            new(334.4f, 0, 0, 1, 216, 12, .15f, new BeamStats(14), Weapon: new(DamageType.Energy, true, 6, true, .15f), Ammunition: new(1000, 0, 2), MaxHealth: 1050f) };
         TowerFinalStats[] blasterExpected = {
-            new(323.4f, .5f, 60, 575, 216, 12, .15f, Area: new(80, .25f), Weapon: new(DamageType.Explosive, false, 1, false, 1), Ammunition: new(600, 3)),
-            new(334.4f, .5f, 66, 575, 216, 12, .15f, Area: new(88, .25f), Weapon: new(DamageType.Explosive, false, 1, false, 1), Ammunition: new(600, 3)) };
+            new(323.4f, .5f, 60, 575, 216, 12, .15f, Area: new(80, .25f), Weapon: new(DamageType.Explosive, false, 1, false, 1), Ammunition: new(600, 3), MaxHealth: 1000f),
+            new(334.4f, .5f, 66, 575, 216, 12, .15f, Area: new(88, .25f), Weapon: new(DamageType.Explosive, false, 1, false, 1), Ammunition: new(600, 3), MaxHealth: 1050f) };
         CheckRows(battle, battleExpected, new[] { 200, 150, 250 });
         CheckRows(laser, laserExpected, new[] { 250, 175 });
         CheckRows(blaster, blasterExpected, new[] { 300, 200 });
@@ -164,6 +164,9 @@ public static class TowerStatChecks
             for (int i = 0; i < ranges[t].Length; i++)
             {
                 TowerFinalStats actual = towers[t].ResolveStats(i + 1);
+                float expectedHp = i == 0 ? 1000f : i == 1 ? 1050f : 1102.5f;
+                Require(Mathf.IsEqualApprox(actual.MaxHealth, expectedHp),
+                    "All offensive purchased tiers gain exactly 5% compounded max HP");
                 Require(Mathf.IsEqualApprox(actual.RangePixels, ranges[t][i]) &&
                     Mathf.IsEqualApprox(actual.RotationSpeedDegrees, turns[t]),
                     "Range and turret rotation increase on every purchased level");

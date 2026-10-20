@@ -6,7 +6,7 @@ public static class StasisTowerLevels
     #region Stasis Definition
 
     private readonly record struct Row(int Level, int Credits, double WorkSeconds, int Damage, float Rate,
-        float Range, float Speed, float Turn, float Duration, int AmmoCapacity, int AmmoPerShot, HeatStats? Heat = null, float MaxHealth = 100)
+        float Range, float Speed, float Turn, float Duration, int AmmoCapacity, int AmmoPerShot, HeatStats? Heat = null, float MaxHealth = 1000)
     {
         // =========================================================
         // Rank modifies damage/range later; Freeze remains the selected row's absolute duration.
@@ -16,12 +16,12 @@ public static class StasisTowerLevels
     }
     // Level | Cost | WorkSeconds | Damage | Shots/s | RangePx | ProjectilePx/s | TurnDeg/s | Freeze duration seconds | AmmoCapacity | Ammo/shot
     // Optional final named column: Heat: new(Capacity, PerShot, PerBeamSecond, CoolingPerSecond, RestartFraction).
-    // Optional named MaxHealth column is absolute per level; 100 is provisional baseline balance.
+    // Optional named MaxHealth column is absolute per level; Level 1 is 1,000 HP; each paid tier adds 5% to the previous absolute HP.
     private static readonly Row[] Rows =
     {
         new(1, 350, 4, 10, .20f, 262.9f, 747.5f, 216, 3f, 600, 1),
-        new(2, 225, 5, 11, .21f, 272.8f, 747.5f, 216, 3.25f, 600, 1),
-        new(3, 300, 6, 12, .22f, 283.8f, 747.5f, 216, 3.5f, 600, 1),
+        new(2, 225, 5, 11, .21f, 272.8f, 747.5f, 216, 3.25f, 600, 1, MaxHealth: 1050f),
+        new(3, 300, 6, 12, .22f, 283.8f, 747.5f, 216, 3.5f, 600, 1, MaxHealth: 1102.5f),
     };
     // =========================================================
     // Changing one purchased level never modifies another level or another placed tower.

@@ -13,6 +13,7 @@ public partial class TowerHealthChecks : Node
         {
             using AmmoLoopFixture f = new(this);
             SubsystemBattlefield.DetachSession(f.Main);
+            VerifyCatalogDurability(f.Placement.Catalog);
             foreach (float invalid in new[] { 0f, -5f, float.NaN, float.PositiveInfinity })
             {
                 var source = new TowerStatBlock(0, 0, 0, 1, 0, 0, .1f, MaxHealth: invalid);
@@ -24,19 +25,19 @@ public partial class TowerHealthChecks : Node
             foreach (string id in new[] { "battle", "laser", "blaster_cannon", "shockwave", "sniper", "machine_gun", "cryo", "ammo_factory", "ammo_depot" })
             {
                 TowerBase tower = f.Add<TowerBase>(id, new(2000, 2100));
-                Require(tower.Health == 100 && tower.MaxHealth == 100, id + " starts full");
+                Require(tower.Health == 1000 && tower.MaxHealth == 1000, id + " starts full with 10x HP");
                 DefenseBar bar = tower.GetNode<DefenseBar>("DefenseBar");
                 Require(!bar.Visible && !bar.IsProcessing() && !bar.IsPhysicsProcessing(), "Shared undamaged bar has no tick");
                 TowerFinalStats cache = tower.FinalStats;
                 tower.ApplyDamage(new(25, DamageType.Kinetic, hullCoefficientOverride: 1));
-                Require(tower.Health == 75 && bar.Visible && bar.HealthFraction == .75f && !bar.ShieldVisible, "Shared damaged hull-only bar");
+                Require(tower.Health == 975 && bar.Visible && Mathf.IsEqualApprox(bar.HealthFraction, .975f) && !bar.ShieldVisible, "Shared damaged hull-only bar");
                 Require(ReferenceEquals(cache, tower.FinalStats), "Damage does not invalidate weapon cache");
                 Require(bar.Position.Y < -tower.Footprint.Y * 32 && bar.Rotation == 0, "Bar clears footprint above fixed root");
                 GetTree().Paused = true; tower.ApplyDamage(new(10, DamageType.Energy)); tower.RestoreHealth(10); GetTree().Paused = false;
-                Require(tower.Health == 75, "Damage and repair respect pause");
+                Require(tower.Health == 975, "Damage and repair respect pause");
                 tower.ApplyDamage(new(10, DamageType.Energy, hullCoefficientOverride: 2));
-                Require(tower.Health == 55, "Typed shared hull multiplier applied once");
-                tower.RestoreHealth(1000); Require(tower.Health == 100 && !bar.Visible, "Explicit repair caps and hides bar");
+                Require(tower.Health == 955, "Typed shared hull multiplier applied once");
+                tower.RestoreHealth(1000); Require(tower.Health == 1000 && !bar.Visible, "Explicit repair caps and hides bar");
                 tower.ApplyDamage(new(float.MaxValue, DamageType.Explosive, hullCoefficientOverride: 1));
                 Require(tower.IsDestroyed && !bar.Visible && !tower.CanOperate, "All catalog types stop operation on destruction");
                 await Frames();
@@ -44,12 +45,12 @@ public partial class TowerHealthChecks : Node
             BattleTower battle = f.Add<BattleTower>("battle", new(2000,2100));
             battle.ApplyDamage(new(25, DamageType.Kinetic, hullCoefficientOverride: 1));
             TowerRankController.AwardExperience(battle, 1000);
-            float ranked = 100 * (1 + battle.CurrentRank.HpBonus);
+            float ranked = 1000 * (1 + battle.CurrentRank.HpBonus);
             Require(Near(battle.MaxHealth, ranked) && Near(battle.Health, ranked - 25), "Rank HP preserves missing hull");
             var old = battle.Config.Levels[0].Stats;
-            battle.Config.SetLevelStats(1, old with { MaxHealth = 200 });
-            Require(Near(battle.MaxHealth, 200 * (1 + battle.CurrentRank.HpBonus)) && Near(battle.Health, battle.MaxHealth - 25), "Config rebuild does not refill damage");
-            battle.Config.SetLevelStats(2, battle.Config.Levels[1].Stats with { MaxHealth = 300 });
+            battle.Config.SetLevelStats(1, old with { MaxHealth = 2000 });
+            Require(Near(battle.MaxHealth, 2000 * (1 + battle.CurrentRank.HpBonus)) && Near(battle.Health, battle.MaxHealth - 25), "Config rebuild does not refill damage");
+            battle.Config.SetLevelStats(2, battle.Config.Levels[1].Stats with { MaxHealth = 3000 });
             TowerFinalStats preview = battle.ResolveLevel(2);
             Require(TowerUpgradeComparison.Build(battle.FinalStats, preview)[0].Name == "Max HP", "Upgrade exposes HP increase");
             f.Wallet.Initialize(new LevelConfig { StartingCredits = 10000 });
@@ -84,6 +85,34 @@ public partial class TowerHealthChecks : Node
         }
         catch (Exception exception) { GetTree().Paused = false; GD.PushError(exception.ToString()); GetTree().Quit(1); }
     }
+    // =========================================================
+    // Catalog-wide default HP: exactly 10x the old baseline, then +5% of prior max each paid tier.
+    // Read the saved resources as the build menu does, including economy tier .tres and passive configs.
+    private static void VerifyCatalogDurability(TowerCatalog catalog)
+    {
+        foreach (TowerDefinition definition in catalog.Definitions)
+        {
+            if (!definition.Available) continue;
+            TowerConfig config = definition.DefaultConfig;
+            float baseHp = definition.TowerId switch
+            {
+                "resource_tower" or "adaptable_resource_generator" => 1500f,
+                "stealth_beacon" => 1800f,
+                _ => 1000f
+            };
+            Require(Near(config.MaxHealth, baseHp), definition.TowerId + " has the new 10x base health");
+            for (int i = 0; i < config.Levels.Count; i++)
+            {
+                float expected = baseHp * MathF.Pow(1.05f, i);
+                Require(Near(config.Levels[i].Stats.MaxHealth, expected)
+                    && Near(TowerStatPipeline.Resolve(config, i + 1).MaxHealth, expected),
+                    definition.TowerId + " level " + (i + 1) + " has independent absolute +5% HP snapshots");
+            }
+        }
+        TowerConfig passive = new();
+        Require(Near(passive.MaxHealth, 1000), "Generic passive building uses 10x durability fallback");
+    }
+
     // =========================================================
     // Real deferred HUD notifications and QueueFree cleanup settle on the engine event loop.
     private async System.Threading.Tasks.Task Frames()

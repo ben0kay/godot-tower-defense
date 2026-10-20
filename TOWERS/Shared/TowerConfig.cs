@@ -7,7 +7,7 @@ public partial class TowerConfig : Resource
     [ExportGroup("Detection")]
     [Export] public bool CanDetectStealth { get; set; } = false;
 
-    private float _passiveMaxHealth = 100;
+    private float _passiveMaxHealth = 1000;
     [ExportGroup("Durability")]
     [Export(PropertyHint.Range, "1,10000,1,or_greater")]
     public float MaxHealth

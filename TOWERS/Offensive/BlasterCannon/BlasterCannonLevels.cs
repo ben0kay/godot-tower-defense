@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public static class BlasterCannonLevels
 {
-    private readonly record struct Row(int Level, int Credits, double WorkSeconds, int Damage, float Rate, float Range, float Speed, float Turn, float Aim, float Search, float Penetration, float Radius, float Edge, DamageType Type, bool ShieldOverride, float Shield, bool HullOverride, float Hull, int AmmoCapacity, int AmmoPerShot, HeatStats? Heat = null, float MaxHealth = 100)
+    private readonly record struct Row(int Level, int Credits, double WorkSeconds, int Damage, float Rate, float Range, float Speed, float Turn, float Aim, float Search, float Penetration, float Radius, float Edge, DamageType Type, bool ShieldOverride, float Shield, bool HullOverride, float Hull, int AmmoCapacity, int AmmoPerShot, HeatStats? Heat = null, float MaxHealth = 1000)
     {
         // =========================================================
         // Adapt only this weapon's capabilities into the common eight-stage working snapshot.
@@ -13,11 +13,11 @@ public static class BlasterCannonLevels
     // Level | Cost | WorkSeconds | Damage | Rate | RangePx | SpeedPxS | TurnDegS | AimDeg | SearchS | Pen | RadiusPx | EdgeFrac | Type | ShieldOn | Shield | HullOn | Hull | AmmoCapacity | AmmoPerShot
     // Cost is Credits; Pen/EdgeFrac are fractions. Level 1 builds; other rows are upgrade prices.
     // Optional final named column: Heat: new(Capacity, PerShot, PerBeamSecond, CoolingPerSecond, RestartFraction).
-    // Optional named MaxHealth column is absolute per level; 100 is provisional baseline balance.
+    // Optional named MaxHealth column is absolute per level; Level 1 is 1,000 HP; each paid tier adds 5% to the previous absolute HP.
     private static readonly Row[] Rows =
     {
         new(1, 300, 5, 60, 0.5f, 323.4f, 575, 216, 12, 0.15f, 0, 80, 0.25f, DamageType.Explosive, false, 1, false, 1, 600, 3),
-        new(2, 200, 6, 66, 0.5f, 334.4f, 575, 216, 12, 0.15f, 0, 88, 0.25f, DamageType.Explosive, false, 1, false, 1, 600, 3),
+        new(2, 200, 6, 66, 0.5f, 334.4f, 575, 216, 12, 0.15f, 0, 88, 0.25f, DamageType.Explosive, false, 1, false, 1, 600, 3, MaxHealth: 1050f),
     };
 
     // =========================================================

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public static class RocketTowerLevels
 {
     private readonly record struct Row(int Level, int Credits, double WorkSeconds, int Damage, float Rate, float Range,
-        float Speed, float Radius, float Edge, int AmmoCapacity, int AmmoPerShot, float MaxHealth = 100)
+        float Speed, float Radius, float Edge, int AmmoCapacity, int AmmoPerShot, float MaxHealth = 1000)
     {
         // =========================================================
         // Reuse typed Explosive damage and the same AreaBlastStats snapshot as Blaster Cannon.
@@ -13,12 +13,13 @@ public static class RocketTowerLevels
             Ammunition: new(AmmoCapacity, AmmoPerShot), MaxHealth: MaxHealth), WorkSeconds);
     }
 
+    // HP: 1,000 / 1,050 / 1,102.5 at levels 1 / 2 / 3 (absolute authored rows).
     // Level | Credits | BuildSeconds | Damage | TotalRockets/s | RangePx | RocketSpeedPx/s | SplashRadiusPx | EdgeDamage | AmmoCapacity | AmmoPerRocket
     private static readonly Row[] Rows =
     {
         new(1, 350, 5, 12, 2.0f, 440, 575, 42, 0.25f, 800, 1),
-        new(2, 230, 6, 14, 2.2f, 462, 598, 45, 0.25f, 800, 1),
-        new(3, 320, 7, 16, 2.4f, 484, 621, 48, 0.25f, 800, 1),
+        new(2, 230, 6, 14, 2.2f, 462, 598, 45, 0.25f, 800, 1, MaxHealth: 1050f),
+        new(3, 320, 7, 16, 2.4f, 484, 621, 48, 0.25f, 800, 1, MaxHealth: 1102.5f),
     };
 
     // =========================================================

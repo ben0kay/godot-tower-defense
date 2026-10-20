@@ -10,7 +10,7 @@ CreditsPerKill = 0
 CreditsPerCycle = 10
 CycleSeconds = 5.0
 RangePixels = 0.0
-HullHealth = 150.0
+HullHealth = 1500.0
 WorkSeconds = 2.0
 
 [sub_resource type="Resource" id="Tier2"]
@@ -21,7 +21,7 @@ CreditsPerKill = 0
 CreditsPerCycle = 15
 CycleSeconds = 5.0
 RangePixels = 0.0
-HullHealth = 200.0
+HullHealth = 1575.0
 WorkSeconds = 2.0
 
 [sub_resource type="Resource" id="Tier3"]
@@ -32,7 +32,7 @@ CreditsPerKill = 0
 CreditsPerCycle = 20
 CycleSeconds = 5.0
 RangePixels = 0.0
-HullHealth = 250.0
+HullHealth = 1653.75
 WorkSeconds = 2.0
 
 [resource]

@@ -1,3 +1,12 @@
+## 10× tower hulls + 5% max HP per purchased level — 2026-10-20 (source updated; runtime verification pending)
+
+- [x] All **14 playable tower types** receive a 10× base HP rebalance: 9 offensive towers `1000/1050/1102.5` (according to level count); factory/depot `1000`; Resource/ARG `1500/1575/1653.75`; Stealth Beacon `1800`. Saved economy tier resources and code defaults agree.
+- [x] **5% compounding HP increase per paid upgrade**, expressed as full authored absolute tier snapshots and consumed by the existing eight-stage pipeline. Rank HP bonuses continue at Stage03; upgrades preserve missing HP. No new engine, tower stats, ammo, economy, enemy Minigun damage or Citadel HP changes.
+- [x] Regression assertions updated for catalog-wide 10×/tier scaling, live hull/damage/destruction, exact stat snapshots, rank preservation, economy upgrades and visible `Max HP` comparison values.
+- [ ] **Godot/.NET build + tests unexecuted here.** Run `TowerHealthChecks`, `EnemyIntegrationChecks` (TowerStat/Upgrade), `CreditTowerChecks` and visually check damaged-tower upgrade/repair/destruction. See [Shared Durability README](../TOWERS/Shared/Durability/README.md) for balances and semantics.
+
+---
+
 ## NP1 / simple NP2 slice — automatic numbered wave banners (2026-10-20; runtime verification pending)
 
 - [x] `WavePresentation` optional authoring metadata + backwards-compatible `Wave()` overload and accepted-start-only `WaveManager.WaveStarted` event.

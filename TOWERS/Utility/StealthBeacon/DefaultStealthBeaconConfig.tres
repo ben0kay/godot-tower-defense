@@ -3,4 +3,4 @@
 [resource]
 script = ExtResource("1")
 RevealRange = 256.0
-MaxHealth = 180.0
+MaxHealth = 1800.0

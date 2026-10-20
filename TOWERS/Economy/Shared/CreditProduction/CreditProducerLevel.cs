@@ -12,7 +12,7 @@ public partial class CreditProducerLevel : Resource
     [Export] public int CreditsPerCycle { get; set; }
     [Export] public double CycleSeconds { get; set; } = 5;
     [Export] public float RangePixels { get; set; }
-    [Export] public float HullHealth { get; set; } = 150;
+    [Export] public float HullHealth { get; set; } = 1500;
     [Export] public double WorkSeconds { get; set; } = 2;
     #endregion
 

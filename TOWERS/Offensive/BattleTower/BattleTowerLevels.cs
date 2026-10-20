@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public static class BattleTowerLevels
 {
-    private readonly record struct Row(int Level, int Credits, double WorkSeconds, int Damage, float Rate, float Range, float Speed, float Turn, float Aim, float Search, float Penetration, int AmmoCapacity, int AmmoPerShot, HeatStats? Heat = null, float MaxHealth = 100)
+    private readonly record struct Row(int Level, int Credits, double WorkSeconds, int Damage, float Rate, float Range, float Speed, float Turn, float Aim, float Search, float Penetration, int AmmoCapacity, int AmmoPerShot, HeatStats? Heat = null, float MaxHealth = 1000)
     {
         // =========================================================
         // Adapt only this weapon's capabilities into the common eight-stage working snapshot.
@@ -13,12 +13,12 @@ public static class BattleTowerLevels
     // Level | Cost | WorkSeconds | Damage | Rate | RangePx | SpeedPxS | TurnDegS | AimDeg | SearchS | Pen | AmmoCapacity | AmmoPerShot
     // Cost is Credits; Pen/EdgeFrac are fractions. Level 1 builds; other rows are upgrade prices.
     // Optional final named column: Heat: new(Capacity, PerShot, PerBeamSecond, CoolingPerSecond, RestartFraction).
-    // Optional named MaxHealth column is absolute per level; 100 is provisional baseline balance.
+    // Optional named MaxHealth column is absolute per level; Level 1 is 1,000 HP; each paid tier adds 5% to the previous absolute HP.
     private static readonly Row[] Rows =
     {
         new(1, 200, 3, 30, 1.68f, 323.4f, 2300, 216, 12, 0.15f, 0.05f, 1000, 1),
-        new(2, 150, 4, 33, 1.764f, 334.4f, 2300, 216, 12, 0.15f, 0.05f, 1000, 1),
-        new(3, 250, 5, 36, 1.848f, 344.3f, 2300, 216, 12, 0.15f, 0.05f, 1000, 1),
+        new(2, 150, 4, 33, 1.764f, 334.4f, 2300, 216, 12, 0.15f, 0.05f, 1000, 1, MaxHealth: 1050f),
+        new(3, 250, 5, 36, 1.848f, 344.3f, 2300, 216, 12, 0.15f, 0.05f, 1000, 1, MaxHealth: 1102.5f),
     };
 
     // =========================================================

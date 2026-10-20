@@ -38,7 +38,7 @@ public abstract partial class TowerBase
     private void SynchronizeHealth()
     {
         if (IsDestroyed) return;
-        float authored = FinalStats?.MaxHealth ?? AuthoredConfig?.MaxHealth ?? 100;
+        float authored = FinalStats?.MaxHealth ?? AuthoredConfig?.MaxHealth ?? 1000;
         float maximum = float.IsFinite(authored) ? Mathf.Max(1, authored) : 1;
         if (_healthInitialized && MaxHealth == maximum) return;
         float missing = _healthInitialized ? MaxHealth - Health : 0;

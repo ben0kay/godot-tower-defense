@@ -14,8 +14,8 @@ public partial class ResourceTowerConfig : CreditProducerConfig
         ProductionLevels = new()
         {
             new() { Price = 350, Capacity = 100, CreditsPerKill = 0, CreditsPerCycle = 10, RangePixels = 0 },
-            new() { Price = 250, Capacity = 150, CreditsPerKill = 0, CreditsPerCycle = 15, RangePixels = 0, HullHealth = 200 },
-            new() { Price = 350, Capacity = 200, CreditsPerKill = 0, CreditsPerCycle = 20, RangePixels = 0, HullHealth = 250 }
+            new() { Price = 250, Capacity = 150, CreditsPerKill = 0, CreditsPerCycle = 15, RangePixels = 0, HullHealth = 1575 },
+            new() { Price = 350, Capacity = 200, CreditsPerKill = 0, CreditsPerCycle = 20, RangePixels = 0, HullHealth = 1653.75f }
         };
         PrepareLevels();
     }
