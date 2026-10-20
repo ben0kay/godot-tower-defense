@@ -1,3 +1,7 @@
+## EG1 target lookup — 2026-10-20
+
+../Registry now indexes placed/living tower roots and complete footprints for optional enemy weapon targeting. Destroyed immediately unregisters the hull; tree exit releases membership idempotently. Disabled and constructing towers remain valid living targets. This adds no new damage path: actual hostile bullets remain EG2 and must call the existing ApplyDamage(DamageInfo) resolver. Runtime/build verification is pending.
+
 # Tower hull / HP foundation
 
 `TowerBase.Durability.cs` owns per-instance `Health`, `MaxHealth`, `IsDestroyed`, `HealthChanged` and `Destroyed`. All nine registered towers/structures start full. The provisional baseline is **100 HP**; balance is intentionally unfinished.

@@ -1,3 +1,9 @@
+## EG1 enemy weapon foundation — source implementation (2026-10-20)
+
+Optional mounted aiming, staggered nearby-tower targeting and minigun request timing are now present under Weapons/. One World/TowerRegistry tracks living placed footprints. No existing enemy scene, catalog entry, F2 spawn option or authored wave is armed/changed. Actual hostile bullets/damage remain EG2; Gunner Drone and red visual presets remain EG3; performance profiling remains EG4. Build/runtime/desktop acceptance remains pending; earlier documentation-only statements below describe the original plan. See [Weapons/README.md](Weapons/README.md).
+
+---
+
 ## Enemy gunships / small red Minigun tracers — EG1–EG4 (PLANNED, 2026-10-20)
 
 A new **Gunner Drone** is planned as the first armed enemy: it follows its existing Citadel route while independently firing **small, thin, subtly red-tinted unguided tracer bullets** at nearby towers. `ENEMIES/Weapons/README.md` is the authoritative Codex implementation brief: opt-in weapon mounts, spatial tower targeting, centralized bullet simulation and rendering, Inspector presets, F2-only testing, performance constraints and phased tests. **No enemy gun code, visual resources, new catalog enemy or authored wave changes were implemented in the documentation pass.** Existing tower durability and shared Kinetic damage APIs provide the intended foundation.

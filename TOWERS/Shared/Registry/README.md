@@ -1,0 +1,9 @@
+# World tower registry — EG1
+
+World.tscn owns exactly one TowerRegistry sibling of Grid and Towers. It observes direct World/Towers children through ChildEnteredTree/ChildExitingTree, performs one startup discovery for existing roots, and unregisters immediately on hull Destroyed. Previews outside that container do not register. Placement/occupancy/navigation, transactions and selection retain their existing owners; registration changes none of them. A failed placement removed from the world loses membership through the same exit path.
+
+Each entry caches the full multi-cell rectangle centered at the tower root in grid space, transformed to a conservative world AABB. Normal game grids are axis aligned; a rotated grid gets conservative bounds. Optional TowerBase.Spatial notifications update only on root transforms, including SetPlacement/direct position edits; rotating weapon children do not reindex. There is no registry processing tick. Disabled/constructing living structures stay eligible; destroyed, queued, detached or foreign-world structures are rejected.
+
+GetNearby fills caller-owned scratch storage, deduplicates multi-bucket entries, includes exact footprint edges and has no result cap.128px buckets limit ordinary candidate reads; large/sparse queries visit occupied bucket keys rather than looping a huge empty rectangle. Oversized footprints use a bounded overflow list. Insertion order provides deterministic closest-distance ties. TryGetBounds exposes broadphase geometry for EG2; it does not perform collision or damage. EG2 must use an exact footprint solver for transformed grids if supported.
+
+Destroyed/exit/unload disconnect spatial/death/container observers and clear retained buffers. Worlds own independent dictionaries; no static memberships exist. Imported scenes and actual tower lifecycles are covered by authored TESTS/EnemyWeapons fixtures. C# build/runtime verification is pending.

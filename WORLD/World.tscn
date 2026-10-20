@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://WORLD/GRID/WorldGrid.cs" id="1_script"]
 [ext_resource type="Resource" path="res://WORLD/DefaultWorldConfig.tres" id="2_config"]
@@ -21,6 +21,8 @@
 [ext_resource type="Script" path="res://TOWERS/Shared/Construction/ConstructionWorkManager.cs" id="14_work"]
 
 [ext_resource type="Script" path="res://LEVELS/Runtime/WorldMapLoader.cs" id="loader"]
+
+[ext_resource type="Script" path="res://TOWERS/Shared/Registry/TowerRegistry.cs" id="tower_registry"]
 
 [node name="World" type="Node2D"]
 script = ExtResource("loader")
@@ -72,3 +74,6 @@ DroneScene = ExtResource("13_drone")
 
 [node name="ConstructionWork" type="Node" parent="."]
 script = ExtResource("14_work")
+
+[node name="TowerRegistry" type="Node" parent="."]
+script = ExtResource("tower_registry")

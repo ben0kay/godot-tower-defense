@@ -1,3 +1,13 @@
+## EG1 — optional enemy weapons / tower lookup — source implemented (2026-10-20)
+
+Added shared EnemyWeaponConfig/EnemyWeaponMount, EnemyTowerTargeting, EnemyMinigunConfig/EnemyMinigun timing seam, world-owned TowerRegistry and optional tower-root spatial notifications. Full footprints update on membership, relocation and destruction. Closest-center targeting uses staggered spatial queries, deterministic insertion-order ties and cached-lock validity; independent gun heading leaves navigation untouched. Source settings are captured per initialization/config assignment; pause/removal/reuse/invalid config stop or reset private timing safely. Unarmed enemies receive no weapon nodes or callbacks.
+
+EG1 regression fixtures are written, including actual world membership, startup discovery, multi-cell bounds, movement/removal/death, target ties, independent aim, config isolation, pause, lifecycle and burst-request timing. **Godot import, C# build, runtime/headless and desktop verification remain pending: no execution environment was available.** EG1 source is delivered; acceptance checkboxes below stay open until verified.
+
+EG2 hostile bullet simulation/tower hits, EG3 Gunner Drone/F2/small red art presets and EG4 profiling remain planned. Existing enemies/catalog/waves and tower Inspector visuals are unchanged. Original plan below is retained; its blanket “code/tests not yet implemented” statement is historical for EG1. See [implementation notes](../ENEMIES/Weapons/README.md) and [verification](../TESTS/EnemyWeapons/README.md).
+
+---
+
 ## NP1–NP3 — per-wave tactical narrator and wave alerts (PLANNED, 2026-10-20)
 
 Codex handoff: [LEVELS/Waves/Presentation/README.md](../LEVELS/Waves/Presentation/README.md). Existing wave definitions and notification manager are ready to extend, but **the actual wave-start banners, narrator typewriter UI and integration are not implemented yet**.

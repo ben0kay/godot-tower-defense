@@ -1,3 +1,7 @@
+### EG1 enemy weapon foundation — source implemented (2026-10-20)
+
+Optional enemy weapon mounts now acquire nearby living towers through one event-driven spatial TowerRegistry and aim a separate gun pivot while normal routing continues. Minigun burst timing exposes an immutable shot-request seam. Existing enemies remain unarmed; hostile bullets/damage (EG2), Gunner Drone/F2/art (EG3) and profiling (EG4) remain future work. C# build/Godot/runtime tests are pending because execution was unavailable. See [enemy weapons](ENEMIES/Weapons/README.md).
+
 ### Offensive projectile recoil rollout — 2026-10-20
 
 Machine Gun, Sniper, Blaster Cannon, Rocket, Cryo and Stasis now join Battle with fixed bases and recoiling gun/muzzle assemblies, each using an editable preset in its Visuals folder. Laser and stationary Shockwave retain their beam/radial effects. Gameplay values and Inspector layout are unchanged. Source/static review completed; Godot import/build/tests and desktop visual verification remain pending. See [recoil notes](TOWERS/Shared/Weapons/Recoil/README.md).

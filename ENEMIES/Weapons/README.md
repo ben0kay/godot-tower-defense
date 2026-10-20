@@ -1,3 +1,17 @@
+## EG1 — source implemented, runtime verification pending (2026-10-20)
+
+EG1 now supplies optional EnemyWeaponMount/EnemyWeaponConfig, an EnemyMinigun burst/request seam, shared closest-tower targeting and one world-scoped TowerRegistry. The registry observes actual World/Towers membership, root transforms and hull destruction; it caches full multi-cell footprint AABBs, deduplicates spatial candidates and uses a stable insertion serial for exact target ties. Startup discovery supports existing direct/preplaced tower instances. Construction sites and disabled living towers remain eligible; destroyed, queued, detached and foreign-world targets do not.
+
+Only mounted enemies use staggered acquisition/aim callbacks; existing enemy scenes, definitions, catalog, F2 and waves are unchanged. Gun pivots aim independently in world heading while hull/navigation remain owned by EnemyMovement. Validated authored settings are captured per initialization/config assignment; assigning Config or calling RefreshConfiguration explicitly recaptures edits. Pause holds clocks; target loss clears the lock without bypassing its search interval; arrival/death/exit stop the component. Freeze suspends the optional weapon while Slow remains a movement modifier.
+
+**EG2–EG4 remain unimplemented.** ShotRequested is a delivery seam only: EG1 creates no hostile bullets, flashes, gunner art/catalog entry or tower damage. An EG2 world-owned manager will consume EnemyShotRequest (origin, actual forward direction, damage, speed); do not add a guided BasicProjectile or direct fake hit here. No consumer means no shot request is counted. Later firing visuals/styles and spread belong to EG2/EG3.
+
+Component authoring: add EnemyWeaponMount (or EnemyMinigun with EnemyMinigunConfig) as a Node2D descendant of the enemy; group under a **Node2D Weapons** if needed to preserve transform inheritance. Its child TurretPivot contains GunSprite/Muzzle Marker2D. PivotPath and MuzzlePath are relative to the mount and must select descendants. No source scene is armed by EG1. See Shared/README.md, Minigun/README.md, ../../TOWERS/Shared/Registry/README.md and ../../TESTS/EnemyWeapons/README.md.
+
+**Validation status:** source/static reference review only. No execution environment was available, so Godot import, C# compilation, focused headless regressions and desktop behavior remain unverified. EG1 acceptance boxes below remain open pending those checks; the earlier documentation-only status/plan is retained as history and superseded by this implementation entry.
+
+---
+
 # Enemy Weapons — EG1–EG4 Gunner Drone and hostile bullet-hell foundation
 
 **STATUS: APPROVED DESIGN / CODEX IMPLEMENTATION PLAN — NOT IMPLEMENTED (2026-10-20).**
