@@ -1,3 +1,11 @@
+## Right Shift repeat placement — 2026-10-20 (source authored; runtime checks pending)
+
+`TowerPlacementController` tracks physical Right Shift press/release without frame polling or an action toggle. Successful paid LMB placement stays armed with the same catalog definition while held; a successful click after release exits as before. Left Shift has no effect. Same-frame repeat input is rejected; losing window focus clears the modifier. Invalid cells and insufficient Credits retain their normal no-charge behavior.
+
+`PlacementHudChecks` now contains repeated paid tower placements, no same-frame duplication, Right Shift release-to-one-shot and Left Shift isolation on both battlefield fixtures. The local environment has neither Godot nor the .NET executable, so these checks are authored but **not executed**. Run `res://TESTS/UI/PlacementHudChecks.tscn` and verify desktop key handling.
+
+---
+
 ## Compact bottom-docked tray and Inspector — 2026-10-19 (code change; runtime verification pending)
 
 The bottom HUD panels now share the **true bottom edge of the gameplay viewport** (0 px exterior bottom offset; side margins remain). Their Inspector-configurable nominal sizes are **224 px build tray** (previously 260) and **252 px Inspector** (previously 330), with unchanged Inspector **560 px** width and unchanged tray/Inspector horizontal division. This trims empty space and exposes more terrain. The Inspector is still a non-scrolling `PanelContainer`: **its natural content minimum may expand it upward for unusually dense upgrade/rank/heat/construction text**, rather than clipping buttons. The left build tray remains an independent fixed-height scroll browser aligned to the same bottom edge.

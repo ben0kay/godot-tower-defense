@@ -173,5 +173,37 @@ public partial class PlacementHudChecks : Node
         Require(f.Hud.IsInspectionVisible && f.Towers.GetChildCount() == 1, "A separate later click inspects normally");
         f.Hud.SetTowerBarOpen(false, true);
         Require(f.Hud.IsInspectionVisible, "Closing the tray preserves separately inspected placed towers");
+        // =========================================================
+        // Only physical Right Shift permits consecutive paid placements; releasing returns to one-shot.
+        f.Hud.SetTowerBarOpen(true, true);
+        button.EmitSignal(Button.SignalName.Pressed);
+        f.Placement._Input(new InputEventKey { PhysicalKeycode = Key.Shift, Location = KeyLocation.Right, Pressed = true });
+        for (int i = 0; i < 2; i++)
+        {
+            Vector2I next = grid.Level.Passable.GetUsedCells().First(c => f.Spawns.PlacementFailure(c).Length == 0);
+            int before = f.Towers.GetChildCount(), credits = f.Wallet.GetBalance(f.Wallet.CreditsResource);
+            f.Placement.Call("HandleWorldClick", next);
+            Require(f.Towers.GetChildCount() == before + 1 && f.Wallet.GetBalance(f.Wallet.CreditsResource) == credits - 200
+                && f.Placement.IsPlacing && f.Hud.IsPlacementPresentation && !lower.Visible && !f.Hud.IsInspectionVisible,
+                "Held Right Shift keeps the same tower ghost armed after one paid placement");
+            Vector2I another = grid.Level.Passable.GetUsedCells().First(c => f.Spawns.PlacementFailure(c).Length == 0);
+            f.Placement.Call("HandleWorldClick", another);
+            Require(f.Towers.GetChildCount() == before + 1, "Same-frame second click cannot buy twice");
+            await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        }
+        f.Placement._Input(new InputEventKey { PhysicalKeycode = Key.Shift, Location = KeyLocation.Right, Pressed = false });
+        Vector2I finalCell = grid.Level.Passable.GetUsedCells().First(c => f.Spawns.PlacementFailure(c).Length == 0);
+        f.Placement.Call("HandleWorldClick", finalCell);
+        Require(!f.Placement.IsPlacing && lower.Visible && !f.Hud.IsInspectionVisible &&
+            f.Wallet.GetBalance(f.Wallet.CreditsResource) == 200, "Releasing Right Shift makes the next purchase one-shot");
+        await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        f.Wallet.Initialize(new LevelConfig { StartingCredits = 400 });
+        button.EmitSignal(Button.SignalName.Pressed);
+        f.Placement._Input(new InputEventKey { PhysicalKeycode = Key.Shift, Location = KeyLocation.Left, Pressed = true });
+        Vector2I leftCell = grid.Level.Passable.GetUsedCells().First(c => f.Spawns.PlacementFailure(c).Length == 0);
+        f.Placement.Call("HandleWorldClick", leftCell);
+        Require(!f.Placement.IsPlacing && f.Wallet.GetBalance(f.Wallet.CreditsResource) == 200,
+            "Left Shift does not enable repeat placement");
+        f.Placement._Input(new InputEventKey { PhysicalKeycode = Key.Shift, Location = KeyLocation.Left, Pressed = false });
     }
 }
