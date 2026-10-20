@@ -1,3 +1,11 @@
+## Hold Right Shift to keep building — 2026-10-20
+
+Physical Right Shift is a **hold**, not a toggle: while the same tower is armed, Right Shift + LMB places one valid paid tower and keeps its ghost/placement mode active. Release Right Shift and the next successful LMB restores the tray and exits as before. Left Shift is ignored. Rejected cells remain armed; payments, affordability, occupancy/navigation and construction continue through existing transactional rules. Same-frame follow-up clicks cannot double-pay. RMB/Escape/Ctrl and category cancellation are unchanged; focus loss clears the held key. No new Node or global GameInput action.
+
+Added test source for two successive held placements, duplicate-input guard, release-to-one-shot and Left Shift isolation. Godot/.NET runner unavailable here; runtime and visual verification pending.
+
+---
+
 ## Stable two-row build browser — 2026-10-17
 
 - Ctrl opening now clears the old tower selection and shows the **empty Inspector shell immediately**. Hover/focus fills the same reserved panel with existing build details/cost/affordability; no tile can be displaced by the panel appearing.

@@ -35,7 +35,7 @@ public partial class TowerPlacementController : Node2D
     private GameInput _input;
     public bool IsPlacing => _placing;
     public string PreviewFailure => _previewFailure ?? "";
-    private bool _placing, _previewVisible, _previewValid;
+    private bool _placing, _previewVisible, _previewValid, _rightShiftHeld;
     private readonly Dictionary<TowerBase, Action> _placementExits = new();
     private TowerBase _selected;
     private int _displayedUpgradeLevel;
@@ -82,6 +82,11 @@ public partial class TowerPlacementController : Node2D
         _input.Bind(this, GameInput.BackAction, () =>
         { if (!_placing && !_browsingBuild) return false; CancelPlacement(); return true; }, 10);
     }
+
+    // =========================================================
+    // Clear a held modifier when the window loses focus before key-up arrives.
+    public override void _Notification(int what)
+    { if (what == NotificationWMWindowFocusOut || what == NotificationApplicationFocusOut) _rightShiftHeld = false; }
 
     // =========================================================
     // Avoid subscriptions retaining scenes that are no longer alive.
@@ -216,9 +221,13 @@ public partial class TowerPlacementController : Node2D
 
     #region World Input
     // =========================================================
-    // RMB cancels placement even when the cursor is over the build tray or Inspector.
+    // Track physical Right Shift only; Left Shift must never enable repeat placement.
+    // RMB still cancels over the build tray or Inspector.
     public override void _Input(InputEvent input)
     {
+        if (input is InputEventKey key && !key.Echo && key.Location == KeyLocation.Right &&
+            (key.PhysicalKeycode == Key.Shift || key.Keycode == Key.Shift))
+        { _rightShiftHeld = key.Pressed; return; }
         if ((!_placing && !_browsingBuild) || input is not InputEventMouseButton mouse || !mouse.Pressed
             || mouse.ButtonIndex != MouseButton.Right) return;
         CancelPlacement();
@@ -240,7 +249,7 @@ public partial class TowerPlacementController : Node2D
     // One placement press cannot also inspect; a later independent click uses the normal selection path.
     private void HandleWorldClick(Vector2I cell)
     {
-        if (!_placing && Engine.GetProcessFrames() == _placedInputFrame) return;
+        if (Engine.GetProcessFrames() == _placedInputFrame) return;
         if (_placing) TryPlace(cell);
         else if (TryCollectCitadelAt(cell)) return;
         else if (_placedTowers.TryGetValue(cell, out TowerBase tower)) SelectTower(tower);
@@ -287,6 +296,13 @@ public partial class TowerPlacementController : Node2D
         }
         TowerPlaced?.Invoke(tower);
         _placedInputFrame = Engine.GetProcessFrames();
+        if (_rightShiftHeld)
+        {
+            // One committed tower per click; preserve the current catalog type and ghost.
+            _affordable = _economy.CanAfford(_buildDefinition.DefaultConfig.ConstructionCosts);
+            _previewDirty = true; UpdatePreview();
+            return;
+        }
         CancelPlacement(); SelectTower(null); _hud.ClearInspection();
     }
 

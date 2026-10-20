@@ -14,6 +14,8 @@ Implemented: `GameInput.cs` is one always-processing Autoload at `/root/GameInpu
 | `game_build` | Ctrl | GameplayHUD toggles the existing tower tray; Pause consumes it |
 | `game_back` | Escape | Higher-priority modal → active placement cancellation → Pause/resume |
 
+**Physical Right Shift + LMB (hold)** repeats tower placement while held. This is handled locally by `TowerPlacementController`, not a new global GameInput action; Left Shift does not activate it.
+
 F11 remembers windowed/maximized state before fullscreen and restores it on the next press. A fullscreen startup returns to windowed. Release and OS repeat are ignored. F11 is handled in `_Input`; contextual actions use `_UnhandledKeyInput` so focused GUI can consume input first.
 
 ## Scoped ownership
