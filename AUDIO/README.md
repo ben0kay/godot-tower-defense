@@ -1,6 +1,12 @@
+## First imported voice cue: Welcome Commander (2026-10-20; engine QA pending)
+
+Registered the uploaded `VoiceAssistant/Welcome_Commander.mp3` with the shared audio catalog as `voice_profile_welcome`. Boot selection and successful new-profile creation trigger `VoiceAssistant.Say()` through the persistent GameAudio manager; the cue plays during transition into Main Menu. See [VoiceAssistant organization](VoiceAssistant/README.md) for the planned `Cues/Profiles`, `Waves`, `Combat`, `Systems`, `Missions` grouping. No redundant audio manager, profile save change or wave narration/audio hook was added. Godot MP3 import and audible playback require local verification.
+
+---
+
 # AUDIO — Shared Playback, Mixing and Voice Foundation
 
-**Foundation implemented (October 2026); no production audio assets or gameplay sound hooks are installed.** This is the shared audio service, adapted from `ben0kay/isometric-new-2d/AUDIO/` for a camera-controlled, many-tower space defense game. `AUDIO/` owns sound playback and policies; each gameplay feature owns **its own clips and per-sound .tres definitions**. See `NOTES/CodePreferences.md`.
+**Foundation implemented (October 2026). The first recorded voice cue is now registered and requested on valid profile entry; other sound events remain unconnected.** This is the shared audio service, adapted from `ben0kay/isometric-new-2d/AUDIO/` for a camera-controlled, many-tower space defense game. `AUDIO/` owns sound playback and policies; each gameplay feature owns **its own clips and per-sound .tres definitions**. See `NOTES/CodePreferences.md`.
 
 ## Folder ownership
 
@@ -9,7 +15,7 @@
 | `AudioManager.cs / AudioManager.tscn` | Autoloaded central audio authority; pooled playback, one-shots, looping/intermittent emitters, priorities, distance/screen culling and per-owner cooldowns. |
 | `AudioMasterConfig.cs / DefaultAudioConfig.tres` | Global Inspector-editable mixer volumes, voice ducking, budgets, culling, scan interval and pause behavior. |
 | `AudioDefinition.cs` | Per-sound Inspector Resource: stable ID, optional AudioStream, category, mode, priority, polyphony, cooldown, positional rules, volume/pitch and fades. |
-| `AudioCatalog.cs / DefaultAudioCatalog.tres` | Central list of references to definitions **located in feature folders**, indexed by ID on startup. Initially empty. |
+| `AudioCatalog.cs / DefaultAudioCatalog.tres` | Central list of references to definitions **located in feature folders**, indexed by ID on startup. Currently contains the profile greeting definition. |
 | `AudioBuses.tres` | Godot native Master, Music, Ambience, WorldSFX, UI and CompanionVoice buses. |
 | `VoiceAssistant/` | Priority voice queue and interruptible speech playback; no prerecorded lines yet. |
 | `Debug/` | DEBUG-only F9 synthetic sound tester; no WAV/OGG needed. |

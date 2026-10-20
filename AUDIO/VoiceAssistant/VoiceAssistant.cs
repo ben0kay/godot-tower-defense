@@ -9,6 +9,7 @@ public partial class VoiceAssistant : Node
     private string _currentId = "";
     private int _currentPriority;
     private readonly List<AudioDefinition> _waiting = new();
+    public string CurrentCueId => _currentId; // Read-only active cue for UI/test diagnostics.
     #endregion
 
     #region Lifecycle

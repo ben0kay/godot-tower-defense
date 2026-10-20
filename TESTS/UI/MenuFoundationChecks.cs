@@ -23,6 +23,14 @@ public static class MenuFoundationChecks
             root.Free();
         }
 
+        AudioDefinition greeting = GD.Load<AudioDefinition>(
+            "res://AUDIO/VoiceAssistant/Cues/Profiles/WelcomeCommander.tres");
+        Require(greeting?.Id == "voice_profile_welcome" && greeting.Stream != null &&
+            greeting.Mode == GameAudioMode.OneShot && greeting.Category == GameAudioCategory.Voice &&
+            !greeting.Positional,
+            "The recorded profile greeting is registered as a non-positional voice one-shot");
+        Require(AudioManager.Find(main)?.FindSound("voice_profile_welcome") != null,
+            "Persistent GameAudio catalog registers the profile greeting");
         Require(ProfileStore.ValidName("Commander") && !ProfileStore.ValidName("") &&
             !ProfileStore.ValidName(new string('x', 33)) && !ProfileStore.ValidName("bad\nname"),
             "Profile names reject blanks, control characters and oversized input");

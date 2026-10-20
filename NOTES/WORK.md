@@ -1,3 +1,13 @@
+## Profile welcome voice cue (2026-10-20; implementation pushed, playback pending)
+
+- [x] Confirmed user's latest GitHub commit adds binary `AUDIO/VoiceAssistant/Welcome_Commander.mp3`.
+- [x] Registered it as `voice_profile_welcome` in `AUDIO/VoiceAssistant/Cues/Profiles/WelcomeCommander.tres` and the existing `AUDIO/DefaultAudioCatalog.tres`, with native CompanionVoice mixing and queue.
+- [x] Boot saved-profile selection and successfully created new profiles now trigger the greeting before opening Main Menu, without new audio players; test assertions added in MenuFoundation/MenuTowerFlow suites.
+- [x] Documented VoiceAssistant cue organization by Profiles/Waves/Combat/Systems/Missions and retained original MP3 path unchanged.
+- [ ] Godot .NET compile/headless menu checks and **actual audible playback** validation; later connect wave's `VoiceCueId` when voice clips exist.
+
+---
+
 ## Projectile accuracy: PA1–PA3 implemented (2026-10-20)
 
 Straight launch-time spread, swept first physical enemy contact, fixed-distance splash destinations, level/rank authoring and dormant research handling seams are implemented. See `TOWERS/Shared/Projectiles/PROJECTILE_GUIDANCE_ACCURACY_PLAN.md` and `TESTS/Towers/ProjectileAccuracy.md`. PA4 desktop visual/balance QA remains pending; automated tests and documentation are included with this implementation. Existing notes below are retained.

@@ -1,3 +1,9 @@
+## Profile greeting regression (2026-10-20; execution pending)
+
+`MenuFoundationChecks.Run` validates the `WelcomeCommander.tres` voice stream and its presence in the persistent audio catalog. `MenuTowerFlowChecks` now checks that clicking an actual saved-profile button requests `voice_profile_welcome` immediately, before entering Main Menu. Both use existing runners/fixture (no modifications to actual user profiles). Real MP3 audible playback should be checked manually after opening Godot and selecting a profile.
+
+---
+
 # UI tests
 
 ## Placement HUD runner — 2026-10-17

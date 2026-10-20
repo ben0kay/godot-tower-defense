@@ -101,7 +101,12 @@ public partial class BootScreen : Control
     // Only the selected local identity is carried into subsequent menu scenes.
     private void Choose(string id)
     {
-        try { ProfileStore.Select(id); MenuNavigation.Open(this, MenuNavigation.MainScene); }
+        try
+        {
+            ProfileStore.Select(id);
+            PlayProfileGreeting();
+            MenuNavigation.Open(this, MenuNavigation.MainScene);
+        }
         catch (Exception error) { _status.Text = error.Message; }
     }
 
@@ -121,10 +126,16 @@ public partial class BootScreen : Control
         try
         {
             ProfileStore.Create(_nameEntry.Text);
+            PlayProfileGreeting();
             _createDialog.Hide();
             MenuNavigation.Open(this, MenuNavigation.MainScene);
         }
         catch (Exception error) { _nameError.Text = error.Message; }
     }
+    // =========================================================
+    // Use the persistent voice queue before scene navigation removes this Boot node.
+    // Missing/muted sound is optional and never prevents a valid profile choice.
+    private void PlayProfileGreeting() =>
+        AudioManager.Find(this)?.GetNodeOrNull<VoiceAssistant>("VoiceAssistant")?.Say("voice_profile_welcome");
     #endregion
 }

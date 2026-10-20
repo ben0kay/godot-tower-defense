@@ -29,6 +29,8 @@ public partial class MenuTowerFlowChecks : Node
             MenuNavigation.Open(this, MenuNavigation.BootScene);
             BootScreen boot = await Scene<BootScreen>();
             ButtonFor(boot, fixture.Name).EmitSignal(Button.SignalName.Pressed);
+            Require(AudioManager.Instance?.GetNodeOrNull<VoiceAssistant>("VoiceAssistant")?.CurrentCueId ==
+                "voice_profile_welcome", "Selecting a valid profile starts the persistent welcome voice cue");
             MainMenu menu = await Scene<MainMenu>();
             Require(ProfileStore.Selected == fixture, "Boot's real profile action selects its memory-only fixture");
             ButtonFor(menu, "CAMPAIGN").EmitSignal(Button.SignalName.Pressed);

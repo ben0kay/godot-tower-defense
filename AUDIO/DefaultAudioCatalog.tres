@@ -1,6 +1,8 @@
-[gd_resource type="Resource" script_class="AudioCatalog" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="AudioCatalog" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://AUDIO/AudioCatalog.cs" id="1_catalog"]
+[ext_resource type="Resource" path="res://AUDIO/VoiceAssistant/Cues/Profiles/WelcomeCommander.tres" id="2_welcome"]
 
 [resource]
 script = ExtResource("1_catalog")
+Sounds = Array[Resource]([ExtResource("2_welcome")])

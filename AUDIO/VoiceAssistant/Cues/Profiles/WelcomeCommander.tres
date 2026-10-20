@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="AudioDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://AUDIO/AudioDefinition.cs" id="1_definition"]
+[ext_resource type="AudioStream" path="res://AUDIO/VoiceAssistant/Welcome_Commander.mp3" id="2_clip"]
+
+[resource]
+script = ExtResource("1_definition")
+Id = "voice_profile_welcome"
+Stream = ExtResource("2_clip")
+Mode = 0
+Category = 4
+Priority = 50
+CooldownSeconds = 0.0
+MaximumInstances = 1
+Positional = false
+VolumeDb = 0.0
+PitchScale = 1.0
