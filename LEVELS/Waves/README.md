@@ -1,3 +1,9 @@
+## Wave presentations — implementation plan (2026-10-20; not yet implemented)
+
+The proposed **per-wave optional narrator/typewriter text and default/special wave banners** are fully specified for Codex at [Presentation/README.md](Presentation/README.md). Keep wave text with each level's `Wave(..., Batch(...))` authoring, use a once-per-start `WaveStarted` event and the existing `NotificationManager`, and create one shared NarrationDisplay in the HUD. This is documentation only; no active wave announcements, dialogue or voice playback were added.
+
+---
+
 ## Lightweight data-driven levels — implemented 2026-10-19
 
 Shared `LEVELS/Runtime/Battlefield.tscn` + `WORLD/World.tscn` replace per-level service copies. Existing Main launchers and World variants are thin compatibility shortcuts; F6 paths stay valid. Each level now has a MissionDefinition resource and the Campaign roster is `LEVELS/Catalog/DefaultMissionCatalog.tres`. Menu number/title/description/map are data, with a bounded scrollable mission list. New missions deploy/retry directly from their resource; no per-level launcher/world or menu/catalog code is required. Next advances only to the immediate enabled number.

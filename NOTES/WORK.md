@@ -1,3 +1,14 @@
+## NP1–NP3 — per-wave tactical narrator and wave alerts (PLANNED, 2026-10-20)
+
+Codex handoff: [LEVELS/Waves/Presentation/README.md](../LEVELS/Waves/Presentation/README.md). Existing wave definitions and notification manager are ready to extend, but **the actual wave-start banners, narrator typewriter UI and integration are not implemented yet**.
+
+- [ ] **NP1:** optional immutable `WavePresentation` authored beside per-wave enemy batches; backwards-compatible `Wave()` overload and once-only `WaveManager.WaveStarted` event.
+- [ ] **NP2:** shared battlefield presentation controller, dynamic banners through the existing major-alert queue, new configurable/pause-aware tactical NarrationDisplay and optional future voice ID; Level020 text only on waves1/4/6/7.
+- [ ] **NP3:** compatibility, null-text, timing, interruption, pause/retry/unload and UI layout tests; document real runtime verification.
+- No pre-wave countdown, voice playback, combat changes or level composition changes in the first implementation.
+
+---
+
 ## EG1–EG4 — Armed Gunner Drone with muted-red minigun bullets (PLANNED, 2026-10-20)
 
 **Codex handoff:** [`ENEMIES/Weapons/README.md`](../ENEMIES/Weapons/README.md). Design approved; code and tests **not yet implemented**. First hostile weapon: a new F2/catalog Gunner Drone, moving along its assigned route while an independent single minigun attacks nearby placed towers with small **7px-long, 1.3px-thick muted coral-red** unguided tracers and tiny orange-red muzzle flash; editable visual/pacing presets. Regular enemies and authored waves remain unchanged.

@@ -1,3 +1,9 @@
+## Planned wave-start narration and banners (2026-10-20; not implemented)
+
+See [wave presentation Codex handoff](../Waves/Presentation/README.md). The intended demonstration adds short tactical advisor messages to Level020 waves **1, 4, 6 and 7**, including special transporter/heavy/final alerts. Waves **2, 3 and 5** get the default numeric wave banner without narration. **Existing seven-wave batches, enemy counts, spawn behaviour and five portals must remain unchanged.** This is a plan only; current gameplay has no automatically triggered narration.
+
+---
+
 ## Level020 setup-error repair — 2026-10-20 UTC
 
 The seven-wave content update had changed Level020Waves back to a static class, breaking the serialized LevelConfig.WaveSource contract from the shared-level pass. Restored [GlobalClass] Resource inheritance (WaveSetSource) and Build() → Create(); all seven wave definitions, map and settings are retained. Recipes assigned in LevelConfig must remain resource classes; preserve the wrapper when editing batches. Added TESTS/Integration/Level020WaveSetupChecks.tscn to load the actual saved resource and launcher, assert seven Ready waves and successfully start wave1. C# build (zero warnings/errors) and this headless regression passed.
