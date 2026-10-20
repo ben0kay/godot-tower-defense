@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TowerCatalog" load_steps=15 format=3]
+[gd_resource type="Resource" script_class="TowerCatalog" load_steps=16 format=3]
 [ext_resource type="Script" path="res://TOWERS/Shared/TowerCatalog.cs" id="1"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/BattleTowerDefinition.tres" id="2"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/LaserTower/LaserTowerDefinition.tres" id="3"]
@@ -13,6 +13,7 @@
 [ext_resource type="Resource" path="res://TOWERS/Offensive/StasisTower/StasisTowerDefinition.tres" id="stasis"]
 [ext_resource type="Resource" path="res://TOWERS/Economy/ResourceTower/ResourceTowerDefinition.tres" id="resource_income"]
 [ext_resource type="Resource" path="res://TOWERS/Economy/AdaptableResourceGenerator/AdaptableResourceGeneratorDefinition.tres" id="arg_income"]
+[ext_resource type="Resource" path="res://TOWERS/Utility/StealthBeacon/StealthBeaconDefinition.tres" id="stealth_beacon"]
 [resource]
 script = ExtResource("1")
-Definitions = [ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10"), ExtResource("10_rocket"), ExtResource("stasis"), ExtResource("resource_income"), ExtResource("arg_income")]
+Definitions = [ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10"), ExtResource("10_rocket"), ExtResource("stasis"), ExtResource("resource_income"), ExtResource("arg_income"), ExtResource("stealth_beacon")]

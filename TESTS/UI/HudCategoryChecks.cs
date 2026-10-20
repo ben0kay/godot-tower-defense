@@ -18,7 +18,7 @@ public partial class HudCategoryChecks : Node
                 hud.SetTowerBarOpen(true, true);
                 Require(hud.BuildCategory == null && hud.GetBuildCategoryButton("All").ButtonPressed
                     && hud.GetBuildCategoryButton("Offensive") != null && hud.GetBuildCategoryButton("Economy") != null
-                    && hud.GetBuildCategoryButton("Support") == null && hud.GetBuildCategoryButton("Utility") == null, "All default and only populated categories appear");
+                    && hud.GetBuildCategoryButton("Support") == null && hud.GetBuildCategoryButton("Utility") != null && hud.GetBuildButton("stealth_beacon") != null, "All default and only populated categories appear");
                 hud.GetBuildButton("battle").EmitSignal(Button.SignalName.Pressed);
                 Require(f.Placement.IsPlacing, "Build choice begins placement");
                 hud.GetBuildCategoryButton("Economy").EmitSignal(Button.SignalName.Pressed);

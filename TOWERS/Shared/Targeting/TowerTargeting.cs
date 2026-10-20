@@ -13,13 +13,13 @@ public static class TowerTargeting
     #region Spatial Acquisition
     // =========================================================
     // Search only living enemies in firing range; stale/failed paths cannot win First.
-    public static Enemy Find(EnemyRegistry registry, Vector2 position, float range, Priority priority, StatusEffectId? requiredEffect = null, Preference preference = Preference.None)
+    public static Enemy Find(EnemyRegistry registry, Vector2 position, float range, Priority priority, StatusEffectId? requiredEffect = null, Preference preference = Preference.None, bool detectsStealth = false)
     {
         if (!Enum.IsDefined(preference)) throw new ArgumentOutOfRangeException(nameof(preference));
         if (!Enum.IsDefined(priority)) throw new ArgumentOutOfRangeException(nameof(priority));
         if (!float.IsFinite(range) || range < 0) throw new ArgumentOutOfRangeException(nameof(range));
         TargetVisitor visitor = new() { Position = position, RangeSquared = range * range, Mode = priority,
-            Score = Largest(priority) ? float.NegativeInfinity : float.PositiveInfinity, Order = ulong.MaxValue, RequiredEffect = requiredEffect, PreferredGroup = preference };
+            Score = Largest(priority) ? float.NegativeInfinity : float.PositiveInfinity, Order = ulong.MaxValue, RequiredEffect = requiredEffect, PreferredGroup = preference, DetectsStealth = detectsStealth };
         // Preserve the old float-distance inclusive boundary; narrow scoring still uses its exact comparison.
         float queryRange = float.IsFinite(MathF.BitIncrement(range)) ? MathF.BitIncrement(range) : range;
         registry.VisitEnemiesInRadius(position, queryRange, ref visitor);
@@ -39,12 +39,12 @@ public static class TowerTargeting
         public Enemy Best;
         public StatusEffectId? RequiredEffect;
         public Preference PreferredGroup;
-        public bool BestPreferred;
+        public bool BestPreferred, DetectsStealth;
         // =========================================================
         // Strict finite best-score selection plus the original earlier-living-entry tie-break.
         public void Accept(EnemySpatialIndex.Neighbor nearby)
         {
-            if (!Eligible(nearby.Enemy, RequiredEffect)) return;
+            if (!TowerDetection.CanDetect(nearby.Enemy, DetectsStealth) || !Eligible(nearby.Enemy, RequiredEffect)) return;
             float distance = Position.DistanceSquaredTo(nearby.Position);
             if (distance > RangeSquared) return;
             float candidate = Mode switch
@@ -72,8 +72,8 @@ public static class TowerTargeting
 
     // =========================================================
     // Cached targets are checked cheaply between staggered searches.
-    public static bool Valid(Enemy enemy, Vector2 position, float range) =>
-        GodotObject.IsInstanceValid(enemy) && enemy.IsAlive
+    public static bool Valid(Enemy enemy, Vector2 position, float range, bool detectsStealth = false) =>
+        TowerDetection.CanDetect(enemy, detectsStealth)
         && position.DistanceSquaredTo(enemy.GlobalPosition) <= range * range;
     #endregion
 }

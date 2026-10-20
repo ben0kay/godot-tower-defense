@@ -1,0 +1,11 @@
+# SE1 — enemy stealth and temporary reveal
+
+Waves opt in independently of shields: `Enemy("basic_mk1", shield: true, stealth: true)`. Default is false for every existing wave/F2 spawn. The flag passes through immutable WaveEnemyEntry, WaveManager and both SpawnManager.SpawnWave overloads to Enemy.Initialize's appended optional spawnWithStealth argument. EnemyDefinition and shared authored enemy resources are not mutated. Carrier children remain independently configured ordinary spawns; parent stealth does not silently propagate.
+
+Enemy.HasStealth is the underlying capability. Enemy.IsEffectivelyStealthed means that capability exists and its EnemyStealthState has zero reveal sources. Stealth is a separate detection capability, not Slow/Freeze, shield points, damage immunity or a status timer. EnemyStealthState uses stable source identities; AddReveal/RemoveReveal are idempotent and only zero↔one transitions notify presentation. Future non-beacon sources can reuse this contract and must release their own handles.
+
+StealthRevealSystem is one lazy child under the world's EnemyRegistry, created by a beacon. It spatially indexes beacon coverage using256px buckets and uses the existing enemy spatial index once on beacon placement/reactivation/range changes. Enemy registration/transform/removal events update membership; movement tests only nearby source buckets plus existing memberships. Normal enemies take a capability fast path. When no beacons are active it unsubscribes from movement. No per-enemy node, all-enemy scan per frame, polling timer, physics Area2D or per-beacon process is introduced.
+
+Leaving one radius removes only that source. Overlapping sources keep enemies revealed until all leave. Construction/upgrading/disabled/destroyed/removed beacon releases coverage immediately; reactivation finds stationary enemies. Teleports and source range edits refresh coverage. Enemy death/arrival/reinitialization and world teardown release both sides. Pause has no reveal timer to expire; simulation motion pauses normally.
+
+Visibility lives in FEEDBACK/Stealth; target eligibility in TOWERS/Shared/Detection; source scene/config in TOWERS/Utility/StealthBeacon. See TESTS/Stealth/README.md for real placement, wave and weapon checks. No existing map or authored wave has been changed to introduce stealth automatically.

@@ -58,11 +58,11 @@ public partial class SpawnManager : Node
     }
     // =========================================================
     // Wave callers retain portal/shield policy; this adapter only resolves the registered type.
-    public Enemy SpawnWave(string enemyId, RandomNumberGenerator random, string requiredPortal = "", bool spawnWithShield = false)
+    public Enemy SpawnWave(string enemyId, RandomNumberGenerator random, string requiredPortal = "", bool spawnWithShield = false, bool spawnWithStealth = false)
     {
         PackedScene scene = Catalog.Find(enemyId);
         if (scene == null) { LastMessage = "Unknown EnemyId: " + enemyId; return null; }
-        return SpawnWave(scene, random, requiredPortal, spawnWithShield);
+        return SpawnWave(scene, random, requiredPortal, spawnWithShield, spawnWithStealth);
     }
     // =========================================================
     // Current single-cell routing guarantees clearance only below half a navigation cell.
@@ -159,7 +159,7 @@ public partial class SpawnManager : Node
     // =========================================================
     // Wave requests sample eligible portals uniformly, falling back to permitted edges in Both.
     // Reservoir sampling avoids a per-spawn candidate allocation or any additional A* calls.
-    public Enemy SpawnWave(PackedScene scene, RandomNumberGenerator random, string requiredPortal = "", bool spawnWithShield = false)
+    public Enemy SpawnWave(PackedScene scene, RandomNumberGenerator random, string requiredPortal = "", bool spawnWithShield = false, bool spawnWithStealth = false)
     {
         RefreshSources();
         if (scene == null || random == null) { LastMessage = "Wave enemy scene/RNG is missing."; return null; }
@@ -193,7 +193,7 @@ public partial class SpawnManager : Node
         _ships.AddChild(ship); ship.GlobalPosition = spawn;
         EnemyPortal chosenPortal = chosen < _portalCount ? _portalObjects[chosen] as EnemyPortal : null;
         WaveEnemyCreated?.Invoke(ship);
-        ship.Initialize(Registry, Paths, spawnWithShield, chosenPortal?.ResolveCheckpoint(), chosenPortal?.RequiresCheckpoint == true, assignedCitadel: chosen < _portalCount ? CitadelAssignments.For(_portalObjects[chosen]) : nav.SingleDestination); LastMessage = "Wave spawned " + ship.Definition.DisplayName;
+        ship.Initialize(Registry, Paths, spawnWithShield, chosenPortal?.ResolveCheckpoint(), chosenPortal?.RequiresCheckpoint == true, assignedCitadel: chosen < _portalCount ? CitadelAssignments.For(_portalObjects[chosen]) : nav.SingleDestination, spawnWithStealth: spawnWithStealth); LastMessage = "Wave spawned " + ship.Definition.DisplayName;
         return ship;
     }
 

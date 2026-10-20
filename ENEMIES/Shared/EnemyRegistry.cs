@@ -16,6 +16,8 @@ public partial class EnemyRegistry : Node
     public IReadOnlyList<Enemy> Living => _living;
     public int KilledCount { get; private set; }
     public int ArrivedCount { get; private set; }
+    public event Action<Enemy> EnemyRegistered;
+    public event Action<Enemy> EnemyPositionChanged;
     public event Action<Enemy> EnemyKilled;
     public event Action<Enemy, DamageSource> AttributedKill;
     public event Action<Enemy> EnemyUnregistered;
@@ -23,7 +25,7 @@ public partial class EnemyRegistry : Node
 
     // =========================================================
     // Register once; enemies unregister immediately on death or arrival.
-    public void Register(Enemy enemy) { if (_members.Add(enemy)) { _living.Add(enemy); Spatial.Add(enemy); } }
+    public void Register(Enemy enemy) { if (_members.Add(enemy)) { _living.Add(enemy); Spatial.Add(enemy); EnemyRegistered?.Invoke(enemy); } }
 
     // =========================================================
     // Exit-tree cleanup is idempotent and does not count an outcome twice.
@@ -45,7 +47,8 @@ public partial class EnemyRegistry : Node
     internal void GetNeighborsInRadius(Vector2 center, float radius, List<EnemySpatialIndex.Neighbor> results) => Spatial.Neighbors(center, radius, results);
     // =========================================================
     // Transform notifications also cover explicit teleports and editor/debug repositioning.
-    public void UpdatePosition(Enemy enemy) => _spatial?.Move(enemy, enemy.GlobalPosition);
+    public void UpdatePosition(Enemy enemy)
+    { _spatial?.Move(enemy, enemy.GlobalPosition); if (EnemyPositionChanged != null && _members.Contains(enemy)) EnemyPositionChanged.Invoke(enemy); }
     // =========================================================
     // Shared pooled buffers remain safe when a damage callback starts another query.
     internal List<EnemySpatialIndex.Neighbor> RentQueryBuffer() => _queryBuffers.Count > 0 ? _queryBuffers.Pop() : new();
@@ -65,7 +68,7 @@ public partial class EnemyRegistry : Node
 
     // =========================================================
     // World unload releases index history, membership and reusable query storage together.
-    public override void _ExitTree() { _living.Clear(); _members.Clear(); _queryBuffers.Clear(); _spatial = null; EnemyUnregistered = null; AttributedKill = null; }
+    public override void _ExitTree() { _living.Clear(); _members.Clear(); _queryBuffers.Clear(); _spatial = null; EnemyUnregistered = null; EnemyRegistered = null; EnemyPositionChanged = null; AttributedKill = null; }
 
     // =========================================================
     // Emit kill-only notifications after an enemy leaves the living registry.

@@ -1,3 +1,7 @@
+## Stealth Beacon — SE1 (2026-10-20 UTC)
+
+A new registered Utility tower reveals enemies inside its radius, while ordinary aimed towers reject effective stealth unless their private config enables CanDetectStealth. See `Utility/StealthBeacon/README.md` and `Shared/Detection/README.md`. Existing layouts, waves and offensive balance are unchanged.
+
 ## Credit economy towers — CP2/CP3 (2026-10-19)
 
 Resource Tower (2×2 periodic active-wave income) and Adaptable Resource Generator (1×1 nearby killing-tower income) are now available under Economy. Each has three paid tiers, independent capped storage and Inspector collection, using the existing wallet and shared production helpers. See `ECONOMY/Production/README.md` from the repository root for balance/settings and deferred research. Earlier planned status below is historical.

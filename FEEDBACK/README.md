@@ -1,3 +1,7 @@
+## Stealth opacity — SE1 (2026-10-20 UTC)
+
+`Stealth/` adds configurable event-driven hidden/revealed opacity, composing with existing status tint and dimming shield/defense feedback. It owns no targeting rules or reveal membership.
+
 # FEEDBACK — Combat and World Response
 
 Reusable visual feedback systems. **DefenseBars and DeathExplosion are now active on Enemy001**, while DamageNumbers and CameraEffects remain reserved.

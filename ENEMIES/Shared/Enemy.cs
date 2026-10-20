@@ -85,8 +85,9 @@ public partial class Enemy : Node2D
 
     // =========================================================
     // Called by SpawnManager after adding the scene, using world-scoped services.
-    public void Initialize(EnemyRegistry registry, PathRequestManager paths, bool spawnWithShield = false, RouteCheckpoint checkpoint = null, bool requiresCheckpoint = false, EnemyRouteHandoff routeHandoff = null, int generation = 0, CitadelDestination assignedCitadel = null)
+    public void Initialize(EnemyRegistry registry, PathRequestManager paths, bool spawnWithShield = false, RouteCheckpoint checkpoint = null, bool requiresCheckpoint = false, EnemyRouteHandoff routeHandoff = null, int generation = 0, CitadelDestination assignedCitadel = null, bool spawnWithStealth = false)
     {
+        if (GodotObject.IsInstanceValid(_registry) && _registry.Contains(this)) _registry.Unregister(this);
         AssignedCitadel = routeHandoff?.Destination ?? assignedCitadel ?? paths.Navigation.SingleDestination;
         ClearStatuses();
         SpawnGeneration = generation; _registry = registry; Health = Mathf.Max(1f, Definition.MaxHealth); IsAlive = true;
@@ -103,6 +104,7 @@ public partial class Enemy : Node2D
         _defenseBar?.SetHealth(Health, Definition.MaxHealth);
         SyncShieldVisual(0f, CurrentShield, false);
         _defenseBar?.AlignWithOwner(Rotation);
+        InitializeStealth(spawnWithStealth);
         Movement = GetNode<EnemyMovement>("Movement");
         SetNotifyLocalTransform(true); SetNotifyTransform(true);
         _registry.Register(this);
@@ -224,6 +226,7 @@ public partial class Enemy : Node2D
         }
         if (GodotObject.IsInstanceValid(_shieldVisual))
             _shieldVisual.SetShield(before, after, animate);
+        RefreshStealthVisual();
     }
 
     // =========================================================
@@ -256,7 +259,7 @@ public partial class Enemy : Node2D
     // Also clean up when the whole level is unloaded.
     public override void _ExitTree()
     {
-        ClearStatuses();
+        ClearStatuses(); ClearStealth();
         if (GodotObject.IsInstanceValid(_shieldVisual)) _shieldVisual.ResetVisual();
         _shieldVisual = null;
         bool unresolved = IsAlive; IsAlive = false; _registry?.Unregister(this);

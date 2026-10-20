@@ -1,3 +1,11 @@
+## SE1 — stealth enemies and reveal beacon — implemented 2026-10-20 UTC
+
+Waves may now author `Enemy("basic_mk1", stealth: true)` independently of `shield: true`. Default spawns remain ordinary; no existing wave/map was changed. Stealth ships render at30% alpha, revealed ships at100%, with configurable/dimmed defense feedback that composes with Cryo/Stasis. All aimed towers share detection filtering and cached-lock validation; private TowerConfig.CanDetectStealth opts a specialist in without globally revealing enemies. Existing attacks already emitted, splash and untargeted Shockwave remain able to damage hidden ships (stealth is targeting, not immunity).
+
+New Ctrl / Utility Stealth Beacon:250 Credits,1×1,2s build,180 HP,256px range, one paid tier. It reveals enemies inside range for all towers; overlap, exit/re-entry, disable/reactivation, construction, destruction, relocation, enemy removal/reuse and world teardown are source-owned. One lazy spatial reveal index listens to enemy motion only while beacons are active; no per-frame enemy scans or per-beacon processing. See ENEMIES/Shared/Stealth, FEEDBACK/Stealth, TOWERS/Shared/Detection, TOWERS/Utility/StealthBeacon and TESTS/Stealth READMEs. Existing Inspector layout/resize is retained. Earlier blanket “stealth/detection future” notes below are historical; stealth preference scoring, Radar, tower-grant detection beacons and further content remain separate future work.
+
+---
+
 ## Fleet families and six new types — 2026-10-18
 
 The catalog now holds 13 ships. All definitions expose **Identity / Family** through the stable `EnemyFamily` enum. This is role metadata, independent of Mk progression and future threat tiers. New types reuse GenericEnemy; Heavy Transporter reuses two DeathSpawn jobs for six Drones + four Interceptors. Full balance, family mappings, shield opt-in and future work are in `ENEMIES/Types/README.md` (repository root). Historical counts/plans below are retained.
