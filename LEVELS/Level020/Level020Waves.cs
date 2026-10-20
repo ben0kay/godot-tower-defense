@@ -1,9 +1,17 @@
 // Level020 / The Five Gates: seven escalating encounters across five eligible entrances.
 // Waves 1-3 are small swarms, 4-5 mix transporters with escorts, and 6-7 introduce heavy ships.
+using Godot;
 using static WaveBuilder;
 
-public static class Level020Waves
+[GlobalClass]
+public partial class Level020Waves : WaveSetSource
 {
+    #region Wave Source
+    // =========================================================
+    // Keep this recipe assignable to LevelConfig.WaveSource as well as existing Create() callers.
+    public override WaveDefinition[] Build() => Create();
+    #endregion
+
     #region Five Gates Encounters
     // =========================================================
     // Every entry uses the level's existing unpinned portal distribution; numbers are total ships per batch.

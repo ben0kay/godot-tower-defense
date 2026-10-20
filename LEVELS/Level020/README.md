@@ -1,3 +1,9 @@
+## Level020 setup-error repair — 2026-10-20 UTC
+
+The seven-wave content update had changed Level020Waves back to a static class, breaking the serialized LevelConfig.WaveSource contract from the shared-level pass. Restored [GlobalClass] Resource inheritance (WaveSetSource) and Build() → Create(); all seven wave definitions, map and settings are retained. Recipes assigned in LevelConfig must remain resource classes; preserve the wrapper when editing batches. Added TESTS/Integration/Level020WaveSetupChecks.tscn to load the actual saved resource and launcher, assert seven Ready waves and successfully start wave1. C# build (zero warnings/errors) and this headless regression passed.
+
+---
+
 # Level020 — The Five Gates
 
 A **100 × 80** painted-grid battlefield at **64 px/cell = 6,400 × 5,120 px**, deliberately larger than a 1920×1080 viewport. Normal camera pan/zoom applies. This is a genuine editable `TileMapLayer` map, not a runtime procedural generator.

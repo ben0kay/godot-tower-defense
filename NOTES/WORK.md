@@ -1,3 +1,9 @@
+## Level020 setup-error repair — 2026-10-20 UTC
+
+The seven-wave content update had changed Level020Waves back to a static class, breaking the serialized LevelConfig.WaveSource contract from the shared-level pass. Restored [GlobalClass] Resource inheritance (WaveSetSource) and Build() → Create(); all seven wave definitions, map and settings are retained. Recipes assigned in LevelConfig must remain resource classes; preserve the wrapper when editing batches. Added TESTS/Integration/Level020WaveSetupChecks.tscn to load the actual saved resource and launcher, assert seven Ready waves and successfully start wave1. C# build (zero warnings/errors) and this headless regression passed.
+
+---
+
 ## Level020 waves expanded to seven (2026-10-19)
 
 - [x] Level020: authored 7-wave Five Gates assault, **52/68/80/72/72/60/58** ships, beginning with small hordes; regular/heavy Transporters in waves4–5; big armoured enemies and a pair of shielded Cruisers in wave7.

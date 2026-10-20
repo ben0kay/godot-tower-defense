@@ -1,3 +1,9 @@
+## Level020 setup-error repair — 2026-10-20 UTC
+
+The seven-wave content update had changed Level020Waves back to a static class, breaking the serialized LevelConfig.WaveSource contract from the shared-level pass. Restored [GlobalClass] Resource inheritance (WaveSetSource) and Build() → Create(); all seven wave definitions, map and settings are retained. Recipes assigned in LevelConfig must remain resource classes; preserve the wrapper when editing batches. Added TESTS/Integration/Level020WaveSetupChecks.tscn to load the actual saved resource and launcher, assert seven Ready waves and successfully start wave1. C# build (zero warnings/errors) and this headless regression passed.
+
+---
+
 ## Level020 seven-wave Five Gates assault (2026-10-19)
 
 `LEVELS/Level020/Level020Waves.cs` now defines **seven** manual waves with scheduled counts **52 / 68 / 80 / 72 / 72 / 60 / 58** (462 total, not counting death-spawn children). Waves1–3 use many small Standard/Swift/Racer/Reinforced ships and a few Bulwarks/supports; waves4–5 introduce regular and Heavy Transporters with escort squads; waves6–7 feature Big, Elite and Heavy Bulwarks, ending with exactly two opt-in **shielded Cruisers**. All five portals remain eligible; `Level020Config.tres` and the map are unchanged. Existing per-entry `shield: true` and weighted quota mechanisms are reused. Verify with `TESTS/Integration/Level020Checks.cs` and `LevelReorganizationChecks.cs`. See [Level020 design](../Level020/README.md) for the encounter-by-encounter table and balancing notes.
