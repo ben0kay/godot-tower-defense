@@ -1,3 +1,9 @@
+## Enemy gunships / small red Minigun tracers — EG1–EG4 (PLANNED, 2026-10-20)
+
+A new **Gunner Drone** is planned as the first armed enemy: it follows its existing Citadel route while independently firing **small, thin, subtly red-tinted unguided tracer bullets** at nearby towers. `ENEMIES/Weapons/README.md` is the authoritative Codex implementation brief: opt-in weapon mounts, spatial tower targeting, centralized bullet simulation and rendering, Inspector presets, F2-only testing, performance constraints and phased tests. **No enemy gun code, visual resources, new catalog enemy or authored wave changes were implemented in the documentation pass.** Existing tower durability and shared Kinetic damage APIs provide the intended foundation.
+
+---
+
 ## SE1 — stealth enemies and reveal beacon — implemented 2026-10-20 UTC
 
 Waves may now author `Enemy("basic_mk1", stealth: true)` independently of `shield: true`. Default spawns remain ordinary; no existing wave/map was changed. Stealth ships render at30% alpha, revealed ships at100%, with configurable/dimmed defense feedback that composes with Cryo/Stasis. All aimed towers share detection filtering and cached-lock validation; private TowerConfig.CanDetectStealth opts a specialist in without globally revealing enemies. Existing attacks already emitted, splash and untargeted Shockwave remain able to damage hidden ships (stealth is targeting, not immunity).

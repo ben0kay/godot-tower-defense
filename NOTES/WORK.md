@@ -1,3 +1,15 @@
+## EG1–EG4 — Armed Gunner Drone with muted-red minigun bullets (PLANNED, 2026-10-20)
+
+**Codex handoff:** [`ENEMIES/Weapons/README.md`](../ENEMIES/Weapons/README.md). Design approved; code and tests **not yet implemented**. First hostile weapon: a new F2/catalog Gunner Drone, moving along its assigned route while an independent single minigun attacks nearby placed towers with small **7px-long, 1.3px-thick muted coral-red** unguided tracers and tiny orange-red muzzle flash; editable visual/pacing presets. Regular enemies and authored waves remain unchanged.
+
+- [ ] **EG1:** optional enemy weapon mount/config, staggered spatial tower targeting, independently rotating barrel.
+- [ ] **EG2:** central fast unguided hostile-bullet state/rendering and swept first-tower impact via existing `TowerBase.ApplyDamage(DamageInfo)`; no per-bullet scene nodes.
+- [ ] **EG3:** new Gunner Drone inherited enemy scene, standalone `.tres` and SVG art, red tracer/muzzle presets, F2 catalog registration, manually test tower firefights.
+- [ ] **EG4:** profile pooled/batched hostile bullets under realistic large waves; later reuse for multi-gun Cruisers. Preserve enemy routing, stealth, tower death/cleanup, pauses, targeting and performance.
+- [ ] Godot compile/headless tests and in-game visual approval of **small slightly red** tracers; document genuine pass results before checking phases complete.
+
+---
+
 ## Offensive projectile recoil rollout — source implemented (2026-10-20)
 
 User approved extending the successful Battle recoil preview. Machine Gun, Sniper, Blaster Cannon, Rocket, Cryo and Stasis now have split fixed bases, recoiling gun/muzzle assemblies and independent Inspector-editable presets using the shared controller. Existing composite icons are retained. Laser and nonrotating Shockwave retain their beam/radial presentations; no forced rotation or directional recoil was added to either. No balance, wave, UI/Inspector resize or progression changes.
