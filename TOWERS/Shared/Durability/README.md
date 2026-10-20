@@ -1,3 +1,7 @@
+## EG2 hostile bullets — 2026-10-20
+
+Optional enemy miniguns now deliver world-owned straight bullets whose first swept tower-footprint intersection calls the existing ApplyDamage(DamageInfo) once with Kinetic damage and null DamageSource. Existing HP, DefenseBar, Inspector, destruction and occupancy/work/logistics cleanup remain authoritative. No extra health model or direct fake hit is introduced; no current authored enemy/wave is armed. The F2 Gunner Drone comes in EG3. Build/runtime verification is pending. Earlier EG1-only/deferred-delivery wording below is historical.
+
 ## EG1 target lookup — 2026-10-20
 
 ../Registry now indexes placed/living tower roots and complete footprints for optional enemy weapon targeting. Destroyed immediately unregisters the hull; tree exit releases membership idempotently. Disabled and constructing towers remain valid living targets. This adds no new damage path: actual hostile bullets remain EG2 and must call the existing ApplyDamage(DamageInfo) resolver. Runtime/build verification is pending.

@@ -14,7 +14,7 @@ public partial class EnemyWeaponConfig : Resource
     [ExportGroup("Aiming")]
     [Export] public float RotationSpeedDegrees { get; set; } = 240;
     [Export] public float AimToleranceDegrees { get; set; } = 6;
-    [ExportGroup("Future Bullet Delivery")]
+    [ExportGroup("Bullet Delivery")]
     [Export] public float DamagePerBullet { get; set; } = 2;
     [Export] public float BulletSpeedPixels { get; set; } = 1200;
     [Export] public float ShotsPerSecond { get; set; } = 6;

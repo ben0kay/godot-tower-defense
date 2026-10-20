@@ -1,3 +1,7 @@
+### EG2 hostile bullet foundation — source implemented (2026-10-20)
+
+Enemy minigun mounts can now launch straight world-owned bullets that sweep against living tower footprints and apply existing Kinetic tower damage. One retained shot buffer and renderer replace per-bullet scene nodes; pause, lifetime, overflow and source-removal handling are included. Generic muted-red tracer appearance and budgets are Inspector editable. Existing enemies/waves remain unarmed; Gunner Drone/F2/art is EG3, benchmarking is EG4. Build/runtime/visual verification remains pending because execution was unavailable. See [enemy bullets](ENEMIES/Projectiles/README.md).
+
 ### EG1 enemy weapon foundation — source implemented (2026-10-20)
 
 Optional enemy weapon mounts now acquire nearby living towers through one event-driven spatial TowerRegistry and aim a separate gun pivot while normal routing continues. Minigun burst timing exposes an immutable shot-request seam. Existing enemies remain unarmed; hostile bullets/damage (EG2), Gunner Drone/F2/art (EG3) and profiling (EG4) remain future work. C# build/Godot/runtime tests are pending because execution was unavailable. See [enemy weapons](ENEMIES/Weapons/README.md).

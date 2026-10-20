@@ -1,3 +1,17 @@
+## EG2 — centralized hostile bullets — source implemented (2026-10-20)
+
+World/EnemyBullets now owns a fixed-capacity dense shot buffer and one active-only physics callback; World/EnemyBulletRenderer draws those same live shots at projectile depth. No per-bullet Node2D, physics body, Tween or Timer is created. EnemyMinigun submits real barrel-tip requests directly to this world service; ShotRequested now observes accepted launches. Sources and targets are never retained in bullet state, so emitted rounds survive shooter death/removal.
+
+Straight flight uses captured world direction/speed and a finite lifetime. Every step is clipped to remaining lifetime and swept across spatial tower candidates. Cached world AABBs provide broadphase; exact clipping in grid space resolves full footprints, including transformed grids. First contact wins, with registration-order ties. Each round is consumed before one Kinetic TowerBase.ApplyDamage(DamageInfo) call, with null DamageSource. No enemy/Citadel/wall collision or friendly XP attribution is introduced.
+
+Capacity defaults to4096 active bullets; lifetime defaults to2.5s. DefaultEnemyProjectileConfig.tres contains Inspector-editable budgets and a generic small7×1.3px muted-red tracer fallback. EnemyMinigunConfig optionally captures its own ProjectileVisual and BulletLifetimeSeconds; dedicated Gunner Drone tracer/flash presets and scene/F2 registration remain EG3. Current enemies and authored waves remain unarmed/unchanged. No spread is added; bullets follow actual barrel direction exactly.
+
+Pause freezes launch/travel/lifetime. Invalid launches are rejected; numerically unrepresentable endpoints are invalidated. Lifetime expiry removes missed rounds. Capacity overflow rejects new launches without deleting already-fired shots or queuing later catch-up fire. No offscreen gameplay culling exists. Counters expose ActiveCount, Spawned, Impacts, Expired, Invalidated, Cleared, Rejected, Overflow and CandidateChecks. Clear is for explicit world reset only; source death must not call it. Unload releases buffers and renderer binding.
+
+**Verification:** regression fixtures and static resource/scene/source checks are written/reviewed. No execution environment was available: C# build, Godot headless/runtime checks and desktop visual acceptance remain pending. No bullet-hell throughput/GPU batching claims are made; EG4 remains measured profiling. Earlier EG1-only/documentation-only statements below are retained as history and superseded by this entry. EG3 and EG4 remain planned.
+
+---
+
 ## EG1 — source implemented, runtime verification pending (2026-10-20)
 
 EG1 now supplies optional EnemyWeaponMount/EnemyWeaponConfig, an EnemyMinigun burst/request seam, shared closest-tower targeting and one world-scoped TowerRegistry. The registry observes actual World/Towers membership, root transforms and hull destruction; it caches full multi-cell footprint AABBs, deduplicates spatial candidates and uses a stable insertion serial for exact target ties. Startup discovery supports existing direct/preplaced tower instances. Construction sites and disabled living towers remain eligible; destroyed, queued, detached and foreign-world targets do not.

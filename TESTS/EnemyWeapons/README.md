@@ -1,3 +1,23 @@
+## EG2 verification record — 2026-10-20
+
+EnemyBulletChecks.cs/.tscn now covers pure swept rectangle geometry; fast first-tower hits; multi-cell edges; successive bullets after lethal destruction; actual shared Kinetic HP loss; misses after target relocation; inclusive lifetime endpoint; expiry beyond lifetime; pause/malformed launch and delta guards; exact transformed-grid clipping; real mounted launch; source death independence; null friendly XP; capacity overflow/slot reuse; immutable/sanitized visuals; counters and no per-bullet scene children.
+
+EnemyWeaponChecks retains the production TowerRegistry instead of replacing the service underneath the new bullet system. Its cadence check now verifies accepted central slots, with zero launch-time damage. Startup discovery remains an implementation path requiring runtime acceptance. Both fixtures use private worlds and leave source maps/catalog/waves unchanged.
+
+Run after importing/building with your Godot .NET executable:
+
+```sh
+dotnet build
+godot --headless --path . res://TESTS/EnemyWeapons/EnemyBulletChecks.tscn
+godot --headless --path . res://TESTS/EnemyWeapons/EnemyWeaponChecks.tscn
+godot --headless --path . res://TESTS/Towers/TowerHealthChecks.tscn
+godot --headless --path . res://TESTS/Integration/EnemyIntegrationChecks.tscn
+```
+
+**Not executed:** build, headless/runtime, desktop visuals and performance benchmarks. No usable execution environment was available. Static resource/scene references and source were reviewed; do not treat authored checks as passing test evidence. EG3 Gunner Drone/F2/flash presets and EG4 profiling remain planned. Earlier EG1-only status below is historical. Manual EG2 testing may use a temporary mounted enemy; no production enemy is automatically armed.
+
+---
+
 # EG1 verification record
 
 ## Status — 2026-10-20

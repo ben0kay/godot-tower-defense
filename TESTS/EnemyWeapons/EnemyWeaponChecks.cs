@@ -39,8 +39,7 @@ public partial class EnemyWeaponChecks : Node
         var grid = f.Main.GetNode<WorldGrid>("World/Grid");
         List<TowerBase> scratch = new();
         BattleTower first = f.Add<BattleTower>("battle", new(2000, 2000));
-        index.Free(); index = new TowerRegistry { Name = "TowerRegistry" }; f.Main.GetNode("World").AddChild(index);
-        Require(index.Count == 1 && index.Contains(first), "Startup discovery includes a pre-existing tower");
+        Require(index.Count == 1 && index.Contains(first), "Direct scene addition registers with the existing authoritative index");
         BattleTower second = f.Add<BattleTower>("battle", new(2200, 2000));
         Require(index.Count == 2 && !index.IsProcessing() && !index.IsPhysicsProcessing(), "Event-only index observes actual tower container");
         Require(EnemyTowerTargeting.Closest(index, new(2100, 2000), 100, scratch) == first, "Inclusive closest-center tie uses insertion serial");
@@ -74,7 +73,7 @@ public partial class EnemyWeaponChecks : Node
     #region Mount Lifecycle
     // =========================================================
     // Add an optional real component before initialization; ordinary enemy scenes are never edited or armed.
-    private static (Enemy Enemy, EnemyWeaponMount Mount, Node2D Pivot) Create(AmmoLoopFixture f, EnemyWeaponConfig config, bool minigun = false)
+    internal static (Enemy Enemy, EnemyWeaponMount Mount, Node2D Pivot) Create(AmmoLoopFixture f, EnemyWeaponConfig config, bool minigun = false)
     {
         Enemy enemy = GD.Load<PackedScene>("res://ENEMIES/Types/Enemy001/Enemy001.tscn").Instantiate<Enemy>();
         enemy.Definition = (EnemyDefinition)enemy.Definition.Duplicate(true); enemy.Definition.MaxHealth = 10000;
@@ -132,7 +131,7 @@ public partial class EnemyWeaponChecks : Node
 
     #region Minigun Seam and Opt In
     // =========================================================
-    // EG1 timing emits immutable requests only: no bullet, damage, flash or new catalog enemy is manufactured.
+    // EG2 now consumes the same burst requests; this fixture keeps world simulation paused for timing assertions.
     private static void Cadence(AmmoLoopFixture f)
     {
         using EnemyMinigunConfig config = new();
@@ -148,8 +147,9 @@ public partial class EnemyWeaponChecks : Node
         for (int i = 0; i < 20; i++) gun._PhysicsProcess(1.0 / 60);
         int resting = requests;
         for (int i = 0; i < 20; i++) gun._PhysicsProcess(1.0 / 60);
-        Require(requests == resting && tower.Health == hp && f.Main.GetNode("World/Projectiles").GetChildCount() == 0,
-            "Burst rest is quiet; EG1 requests cannot apply fake hits or spawn bullets");
+        Require(requests == resting && tower.Health == hp && f.Main.GetNode("World/Projectiles").GetChildCount() == 0
+            && f.Main.GetNode<EnemyBulletSystem>("World/EnemyBullets").ActiveCount == requests,
+            "Burst rest is quiet; accepted requests create only central slots, with no launch-time damage");
         enemy.GetTree().Paused = true; gun._PhysicsProcess(100); enemy.GetTree().Paused = false;
         Require(requests == resting, "Paused gun emits no requests");
         gun.Enabled = false; gun._PhysicsProcess(100); Require(requests == resting, "Disabled gun emits no requests");

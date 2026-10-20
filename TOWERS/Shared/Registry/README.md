@@ -1,3 +1,7 @@
+## EG2 swept footprint API — 2026-10-20
+
+GetSegmentCandidates deduplicates spatial candidates along a segment's world AABB, then rejects world-AABB misses. TryIntersectFootprint clips through the cached grid-space rectangle for exact first-contact fractions, including multi-cell and rotated/scaled grid geometry; TowerFootprintCollision supplies a reusable inclusive double-precision slab solver. Tower roots may relocate through existing transform notifications; the battlefield grid transform is assumed fixed during play. An EG2 shot rechecks membership before each collision and is consumed before ApplyDamage callbacks, so destruction cannot absorb repeated hits from one round. Registry queries and damage callbacks never share an active dictionary enumeration. Earlier “no bullet delivery” statements describe EG1. Build/runtime verification remains pending.
+
 # World tower registry — EG1
 
 World.tscn owns exactly one TowerRegistry sibling of Grid and Towers. It observes direct World/Towers children through ChildEnteredTree/ChildExitingTree, performs one startup discovery for existing roots, and unregisters immediately on hull Destroyed. Previews outside that container do not register. Placement/occupancy/navigation, transactions and selection retain their existing owners; registration changes none of them. A failed placement removed from the world loses membership through the same exit path.

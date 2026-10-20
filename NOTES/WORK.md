@@ -1,3 +1,13 @@
+## EG2 — world-owned hostile bullets / tower hits — source implemented (2026-10-20)
+
+Added EnemyBulletSystem, EnemyBulletData, EnemyBulletRenderer and EnemyProjectileMasterConfig/default preset. World owns one fixed-capacity retained buffer, active-only physics loop and drawing surface. Optional EnemyMinigun now submits actual muzzle-tip straight shots; accepted shots are observed by ShotRequested, with captured lifetime/visual data. Sources/targets are not retained by bullets; source death/removal cannot cancel emitted rounds.
+
+Spatial broadphase reuses EG1's TowerRegistry; shared swept slab clipping finds the first exact full footprint and calls existing Kinetic TowerBase.ApplyDamage once with null DamageSource. Pause, misses, moved/queued/dead towers, lifetime clipping, large deltas, invalid data, overflow, reset/unload and counters are handled. Generic small muted-red fallback presentation is Inspector editable. Offscreen visuals never cancel gameplay. Current enemies/catalog/F2/waves remain unarmed; EG3 adds Gunner Drone and specific tracer/flash art, EG4 measures performance.
+
+Focused EG2 checks are authored; EG1 cadence checks now expect actual central shot slots. Static source/resource/scene checks completed. **Godot/.NET build, headless/runtime tests, desktop visuals and profiling remain pending: execution was unavailable.** Historical unchecked phase plans below remain as acceptance history; source is delivered but not runtime verified. See [projectiles](../ENEMIES/Projectiles/README.md) and [checks](../TESTS/EnemyWeapons/README.md).
+
+---
+
 ## EG1 — optional enemy weapons / tower lookup — source implemented (2026-10-20)
 
 Added shared EnemyWeaponConfig/EnemyWeaponMount, EnemyTowerTargeting, EnemyMinigunConfig/EnemyMinigun timing seam, world-owned TowerRegistry and optional tower-root spatial notifications. Full footprints update on membership, relocation and destruction. Closest-center targeting uses staggered spatial queries, deterministic insertion-order ties and cached-lock validity; independent gun heading leaves navigation untouched. Source settings are captured per initialization/config assignment; pause/removal/reuse/invalid config stop or reset private timing safely. Unarmed enemies receive no weapon nodes or callbacks.

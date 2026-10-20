@@ -1,3 +1,7 @@
+## EG2 delivery update — 2026-10-20
+
+EnemyShotRequest now lives in this Shared folder and optionally carries a lifetime and immutable ProjectileVisualSnapshot. Actual accepted minigun requests go directly to the world-owned EnemyBulletSystem; ShotRequested observes accepted launches rather than acting as the delivery subscriber. Source/target references are absent from bullet state. Navigation and mount acquisition remain unchanged. See ../../Projectiles/README.md. Earlier EG1-only delivery-seam wording below is historical.
+
 # Optional enemy weapon mount and targeting — EG1
 
 EnemyWeaponMount is a Node2D capability added only to armed enemy scenes. Host can be an explicit ancestor reference or is found once from ancestry. PivotPath defaults to TurretPivot; MuzzlePath to TurretPivot/GunSprite/Muzzle. Both must resolve inside the mount, with the muzzle beneath the pivot. Use a Node2D grouping parent so transforms follow the hull. The gun holds world heading independently when the hull turns and reuses TurretAiming.Track; movement/checkpoints/Citadel assignment remain untouched.

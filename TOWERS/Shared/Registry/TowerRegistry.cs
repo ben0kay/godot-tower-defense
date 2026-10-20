@@ -18,7 +18,7 @@ public partial class TowerRegistry : Node
     private sealed class Entry
     {
         public TowerBase Tower;
-        public Rect2 Bounds;
+        public Rect2 Bounds, GridBounds;
         public long Order;
         public ulong Query;
         public Action OnDeath;
@@ -84,6 +84,7 @@ public partial class TowerRegistry : Node
         if (!tower.GlobalPosition.IsFinite() || !TowerDefinition.ValidFootprint(tower.Footprint)) return;
         Vector2 half = (Vector2)tower.Footprint * (_grid.Config.CellSize * .5f);
         Vector2 center = _grid.ToLocal(tower.GlobalPosition);
+        entry.GridBounds = new(center - half, half * 2);
         Vector2 a = _grid.ToGlobal(center - half), b = _grid.ToGlobal(center + half);
         Vector2 c = _grid.ToGlobal(center + new Vector2(half.X, -half.Y));
         Vector2 d = _grid.ToGlobal(center + new Vector2(-half.X, half.Y));
@@ -156,6 +157,42 @@ public partial class TowerRegistry : Node
     {
         if (Contains(tower) && _entries.TryGetValue(tower, out Entry entry)) { bounds = entry.Bounds; return true; }
         bounds = default; return false;
+    }
+    // =========================================================
+    // Swept broadphase uses only cells overlapping the travelled segment's AABB; no per-bullet tower-container scan.
+    public void GetSegmentCandidates(Vector2 from, Vector2 to, List<TowerBase> results)
+    {
+        results.Clear(); LastCandidates = 0;
+        if (!from.IsFinite() || !to.IsFinite()) return;
+        if (++_query == 0) { foreach (Entry entry in _entries.Values) entry.Query = 0; _query = 1; }
+        var low = Cell(from.Min(to)); var high = Cell(from.Max(to));
+        double width = high.X - low.X + 1, height = high.Y - low.Y + 1;
+        if (!double.IsFinite(width * height) || width * height > _cells.Count)
+        {
+            foreach (var pair in _cells)
+                if (pair.Key.X >= low.X && pair.Key.X <= high.X && pair.Key.Y >= low.Y && pair.Key.Y <= high.Y)
+                    foreach (Entry entry in pair.Value) VisitSegment(entry, from, to, results);
+        }
+        else for (int y = 0; y < height; y++) for (int x = 0; x < width; x++)
+            if (_cells.TryGetValue((low.X + x, low.Y + y), out var bucket))
+                foreach (Entry entry in bucket) VisitSegment(entry, from, to, results);
+        foreach (Entry entry in _wide) VisitSegment(entry, from, to, results);
+    }
+    // =========================================================
+    // Cached world bounds reject misses cheaply; multi-cell bucket duplication never repeats a candidate.
+    private void VisitSegment(Entry entry, Vector2 from, Vector2 to, List<TowerBase> results)
+    {
+        if (entry.Query == _query) return;
+        entry.Query = _query; LastCandidates++;
+        if (Contains(entry.Tower) && TowerFootprintCollision.SegmentRect(from, to, entry.Bounds, out _)) results.Add(entry.Tower);
+    }
+    // =========================================================
+    // Clip in grid space for the actual rectangle, avoiding false hits in rotated/scaled grid world-AABB corners.
+    public bool TryIntersectFootprint(TowerBase tower, Vector2 from, Vector2 to, out double fraction)
+    {
+        fraction = 0;
+        return from.IsFinite() && to.IsFinite() && Contains(tower) && _entries.TryGetValue(tower, out Entry entry)
+            && TowerFootprintCollision.SegmentRect(_grid.ToLocal(from), _grid.ToLocal(to), entry.GridBounds, out fraction);
     }
     // =========================================================
     // Floor supports negative coordinates; double keys avoid integer-cell overflow.

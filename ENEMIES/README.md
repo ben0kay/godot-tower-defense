@@ -1,3 +1,9 @@
+## EG2 hostile bullet delivery — source implemented (2026-10-20)
+
+Optional EnemyMinigun mounts now use one world-owned EnemyBulletSystem/Renderer with retained shot slots, straight travel, swept first-tower-footprint collision and shared Kinetic damage. Source death does not cancel emitted rounds; bullets cannot damage enemies, Citadels or terrain in this pass. Existing enemy scenes, catalog/F2 and waves remain unchanged/unarmed. Gunner Drone and its type-specific red/flash art remain EG3; profiling remains EG4. See Projectiles/README.md. Build/runtime/desktop verification remains pending; older EG1-only entries below are historical.
+
+---
+
 ## EG1 enemy weapon foundation — source implementation (2026-10-20)
 
 Optional mounted aiming, staggered nearby-tower targeting and minigun request timing are now present under Weapons/. One World/TowerRegistry tracks living placed footprints. No existing enemy scene, catalog entry, F2 spawn option or authored wave is armed/changed. Actual hostile bullets/damage remain EG2; Gunner Drone and red visual presets remain EG3; performance profiling remains EG4. Build/runtime/desktop acceptance remains pending; earlier documentation-only statements below describe the original plan. See [Weapons/README.md](Weapons/README.md).
