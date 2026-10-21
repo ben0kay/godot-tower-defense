@@ -1,3 +1,39 @@
+## CD1/CD2 implemented — 2026-10-21
+
+Paid positive-duration **initial** construction now waits for a Citadel builder. The site/payment/full-footprint claim and stage-0 art happen immediately. A cyan drone flies from the nearest available Citadel, deploys its holographic cone, releases that site's work hold exactly once, hovers while the original build clock runs, then returns. Upgrades, zero-second builds and direct scene instances retain their previous behavior.
+
+### Ownership and files
+
+- `ConstructionDroneMasterConfig.cs` / `DefaultConstructionDroneConfig.tres`: shared Inspector controls. Defaults: **Enabled=true, ShowVisuals=true, RequireDroneToBuild=false, cap8, dispatch budget4/tick, speed420px/s, arrival8px, deployment0.25s, hover12px, height48px, beam alpha0.26**. Numeric settings are sanitized. Cap clamps1–64; dispatch budget1–16.
+- `ConstructionDroneManager.cs`: one active-only service in shared `WORLD/World.tscn`, synchronously bound by placement Ready. Only successful `TowerPlaced` queues work; the optional hold is registered **inside the paid commit before AddChild**. One per-site owner/token rejects duplicates and stale arrival. FIFO pending assignments stay held; outbound/building/returning drones all consume capacity. Reducing cap never cancels existing assignments.
+- `ConstructionDrone.cs` / `.tscn`: imported shared36×28 cyan drone SVG plus one beam child. Neither drone nor beam has a per-frame callback. One manager advances active flights and beaming poses; lazy pooled visuals are created only when concurrency grows, up to64 roots. Parked visuals hide and do no processing. A normal drone uses **three nodes total** (root, sprite, beam); no fixed permanent flying fleet is pre-created.
+- `Visuals/ConstructionBeam.cs`: retained four-vertex/color buffers, soft cyan cone, thin bright edges, nozzle and three lattice lines. No particles, custom shader, light, physics body, navigation request or per-frame arrays. Footprint-derived width/height and bounded hover support 1×1/2×2/3×2 and larger future sites. Target remains at the site's existing full footprint center.
+- `TowerBase` exposes AwaitingConstructionDrone and a narrow owner/token release seam. `ConstructionWorkManager` tracks held jobs separately from its active timer batches: **held-only clocks sleep and visit zero sites**, while independent work/upgrades continue. Release adds only that job to the ordinary clock. It never advances time or completes a building.
+
+### Timing, homes and fallback
+
+Nearest available non-destroyed registered Citadel wins by world-space distance; stable objective number breaks ties. An optional `DroneLaunch` Node2D/Marker2D under the Citadel root supplies the exact launch point; otherwise its existing footprint center is transformed to world space. Builders fly directly through the sky, independent of terrain/enemies/ammunition logistics. No map scenes require modification.
+
+Transitions: **queued/held → flying/held → deploying/held → beaming/work released → returning → parked**. Manager physics priority runs after the work clock, so flight/deployment delta cannot be credited as earlier construction time. Excess flight-tick time is discarded at transitions. The beam is fully deployed before release; original work events/clock remain authoritative. Completion immediately hides the beam and activates the tower, without waiting for return. Source loss after work begins does not interrupt work; returning selects a surviving home or parks safely if none exists.
+
+Missing Citadel, invalid/missing drone scene, failed visual creation or source loss during outbound/deployment warns once per battlefield and normally releases construction without a drone. Strict RequireDroneToBuild keeps an unreleased job held and retries at most every0.25s using the bounded dispatcher. It is a testing/design switch, not the default. Tower removal/death cancels its assignment/beam and frees capacity; removal of the service itself safely releases orphan holds without completing work. Unload detaches event listeners and drops assignment/pool references.
+
+**ShowVisuals=false preserves all flight/deployment timing. Enabled=false releases current holds and preserves the ordinary timed-build behavior.** Pause freezes both flight and work; actual mission Results pause is covered. The existing Inspector now minimally distinguishes `AWAITING CONSTRUCTION DRONE` from `CONSTRUCTING`; its size/layout is unchanged. Remaining time stays fixed until arrival. No ETA, sounds, research/hangars, combat targeting/destructible drones, upgrade builders or save integration are added. Further CD3 UX/desktop polish remains pending.
+
+### Observed validation
+
+Godot .NET build/import succeeded with zero C# warnings/errors. `TESTS/Towers/ConstructionDroneChecks.tscn` passes paid success/failure/duplicate/token checks on both main maps, held-clock sleep/large-delta immunity, independent work, beam/return and pool reuse, pause, visuals-off timing, FIFO/cap reduction,2×2 Depot/3×2 Factory, tower death/removal, missing/wrong scene, strict retry, lost/missing/queued-removal homes, real multi-Citadel tie/marker/return reroute, zero-distance arrival, zero-duration/direct compatibility, manager removal, actual defeat/Results freeze and20-build stress. Runtime-only broad foundations make large-building tests independent of narrow authored maze walls; saved terrain is untouched.
+
+Observed CPU-only samples:20 active flights over120 central ticks **2.165ms total /40 managed bytes** (Stopwatch allocation);20 active beams over600 central ticks **8.576ms total /0 managed bytes**. Pool grew to20 drone roots (60 scene nodes), with no added A* calculations. This excludes draw callbacks, GPU cost and normal enemy simulation; not an FPS guarantee. F4 profiling includes dispatcher CPU in the existing **Friendly towers** row, without a new debugger/key.
+
+`FootprintChecks` passes real 6/4-cell placement, payment/rollback, selection, navigation and500-enemy placement stress. `PerformanceOverlayChecks` passes all three battlefields. Existing ConstructionChecks passes source/timer/pause/callback and Battle artwork groups, then stops at **Could not purchase ammo_factory** in the older map-dependent timed-upgrade fixture. The same failure was reproduced on pre-feature619573d production code with only the same test-layer search correction; it is not claimed fixed or passed. Ordinary AmmoLoopFixture checks explicitly disable builders, keeping their prior timer contracts, and now search all painted layers so valid solid foundations are not ignored.
+
+**Desktop review still required:** imported drone/bright cyan beam at normal zoom, stage art visibility, return animation/overlap,1920×1080 and960×540 presentation, and rendered20-build GPU cost. Headless correctness does not verify these visuals. CD1/CD2 source and runtime foundation are complete; CD3's remaining desktop/UX polish is not marked complete.
+
+---
+
+## Original CD1–CD3 handoff (retained as planning history)
+
 # Citadel Construction Drones — implementation plan for Codex
 
 > **STATUS: PLANNED, NOT IMPLEMENTED (2026-10-21).** This is documentation only. Do not report drone construction, arrival-gated work clocks, visuals, or tests as implemented until code exists and is verified.

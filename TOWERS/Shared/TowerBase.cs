@@ -159,13 +159,16 @@ public abstract partial class TowerBase : Node2D
     public event Action WorkProgressChanged;
     public event Action WorkCompleted;
     private ConstructionWorkManager _construction;
+    private ConstructionDroneManager _constructionDroneOwner;
+    internal ulong ConstructionDroneReservation { get; private set; }
+    public bool AwaitingConstructionDrone => _constructionDroneOwner != null && WorkPhase == TowerWorkPhase.Constructing;
     private bool _operationalPhysics;
     private double _lastWorkNotice;
     public TowerWorkState CaptureWorkState() => new(WorkPhase, ElapsedWorkSeconds, WorkSeconds, PendingUpgradeLevel);
 
     // =========================================================
     // Paid placement calls this before AddChild/Ready; direct scene instances remain operational by default.
-    internal void StartConstruction(ConstructionWorkManager manager)
+    internal void StartConstruction(ConstructionWorkManager manager, ConstructionDroneManager builders = null)
     {
         if (IsInsideTree() || IsBusy) throw new InvalidOperationException("Construction must start before placement.");
         double seconds = AuthoredConfig.BuildSeconds;
@@ -175,7 +178,22 @@ public abstract partial class TowerBase : Node2D
         WorkSeconds = seconds; ElapsedWorkSeconds = 0; _lastWorkNotice = 0;
         if (seconds == 0) return; // Zero-duration compatibility has no inactive tick or job.
         WorkPhase = TowerWorkPhase.Constructing; _construction = manager;
+        _constructionDroneOwner = builders;
+        ConstructionDroneReservation = builders?.Reserve() ?? 0;
         manager.Register(this); WorkStarted?.Invoke();
+    }
+
+    // =========================================================
+    // Arrival must match the exact initial paid-job reservation; upgrades and stale duplicate callbacks cannot release it.
+    internal bool IsHeldBy(ConstructionDroneManager owner) => AwaitingConstructionDrone && _constructionDroneOwner == owner;
+    // =========================================================
+    // Release only this builder reservation, then notify the existing work display without advancing time.
+    internal bool ReleaseConstructionDrone(ConstructionDroneManager owner, ulong reservation)
+    {
+        if (!IsHeldBy(owner) || reservation != ConstructionDroneReservation || IsDestroyed || IsQueuedForDeletion()) return false;
+        _constructionDroneOwner = null;
+        if (GodotObject.IsInstanceValid(_construction)) _construction.Resume(this);
+        WorkProgressChanged?.Invoke(); return true;
     }
 
     // =========================================================
@@ -187,7 +205,7 @@ public abstract partial class TowerBase : Node2D
     // Exact boundary tolerance prevents an extra physics frame after sums such as120 increments of1/60.
     internal void AdvanceWork(ConstructionWorkManager manager, double delta)
     {
-        if (_construction != manager || !IsBusy) return;
+        if (_construction != manager || !IsBusy || AwaitingConstructionDrone) return;
         double remaining = RemainingWorkSeconds;
         if (delta >= remaining || remaining - delta <= 1e-9)
         {
@@ -218,10 +236,10 @@ public abstract partial class TowerBase : Node2D
     // =========================================================
     // Manager shutdown/rollback stops the clock without turning an unfinished site into a working building.
     internal void DetachConstruction(ConstructionWorkManager manager)
-    { if (_construction == manager) _construction = null; }
+    { if (_construction == manager) { _construction = null; _constructionDroneOwner = null; } }
     internal void CancelConstruction()
     {
-        ConstructionWorkManager manager = _construction; _construction = null;
+        ConstructionWorkManager manager = _construction; _construction = null; _constructionDroneOwner = null;
         if (GodotObject.IsInstanceValid(manager)) manager.Unregister(this);
     }
     public override void _ExitTree() { Ready -= InitializeDurability; _conditions?.Clear(); _conditions = null; CancelConstruction(); }

@@ -29,6 +29,7 @@ public partial class TowerPlacementController : Node2D
     private SpawnManager _spawns;
     private Node2D _towers;
     private ConstructionWorkManager _construction;
+    private ConstructionDroneManager _builders;
     private Sprite2D _ghost;
     private readonly Dictionary<Vector2I, TowerBase> _placedTowers = new();
     private Vector2I _hoverCell = new(int.MinValue, int.MinValue);
@@ -61,6 +62,7 @@ public partial class TowerPlacementController : Node2D
         _spawns = GetNode<SpawnManager>("../World/EnemySystems/Spawning");
         _towers = GetNode<Node2D>("../World/Towers");
         _construction = GetNode<ConstructionWorkManager>("../World/ConstructionWork");
+        _builders = GetNodeOrNull<ConstructionDroneManager>("../World/ConstructionDrones"); _builders?.Bind(this);
         _hud = GetNode<GameplayHUD>("../UI/GameplayHUD");
         Catalog.Rebuild();
         _hud.BindCatalog(Catalog);
@@ -335,7 +337,7 @@ public partial class TowerPlacementController : Node2D
             if (tower.Levels.Count > 0) tower.ResolveLevel(1); // Fail invalid inputs before occupancy/Ready/payment.
             if (!_grid.TryOccupy(cell, _buildDefinition.Footprint)) { tower.Free(); tower = null; return false; }
             occupied = true;
-            tower.StartConstruction(_construction);
+            tower.StartConstruction(_construction, GodotObject.IsInstanceValid(_builders) && _builders.CanGate ? _builders : null);
             tower.Position = _towers.ToLocal(_grid.FootprintCenter(cell, _buildDefinition.Footprint));
             _towers.AddChild(tower);
             tower.SetPlacement(cell, _grid.FootprintCenter(cell, _buildDefinition.Footprint));

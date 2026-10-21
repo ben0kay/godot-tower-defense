@@ -467,7 +467,7 @@ public partial class GameplayHUD : Control
         _towerCategory.Text = "Footprint: " + (tower.Definition?.Footprint ?? Vector2I.One).X + "×" + (tower.Definition?.Footprint ?? Vector2I.One).Y;
         _workStatus.Text = tower.WorkPhase switch
         {
-            TowerWorkPhase.Constructing => "CONSTRUCTING",
+            TowerWorkPhase.Constructing => tower.AwaitingConstructionDrone ? "AWAITING CONSTRUCTION DRONE" : "CONSTRUCTING",
             TowerWorkPhase.Upgrading => $"UPGRADING → {tower.PendingUpgradeLevel}",
             _ => tower.IsDisabled ? "DISABLED" : "OPERATIONAL"
         };

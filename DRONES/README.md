@@ -1,3 +1,7 @@
+## Separate construction builder role — 2026-10-21
+
+Citadel builders live under TOWERS/ConstructionDrones because they coordinate paid tower construction. They own separate pooled artwork/beam and a central airborne dispatcher; Transport couriers and ammunition reservations/delivery remain unchanged. No shared drone health/combat/navigation framework is introduced. See ../TOWERS/ConstructionDrones/README.md.
+
 # DRONES — Reusable mobile units
 
 [Transport](Transport/README.md) is implemented: visible direct flights carry actual ammunition **Factory→Depot and Depot→Tower**, then return to their home building. Shared flight/lifecycle and small vector visuals remain independent of ammo inventories, transactions and reservations, which belong to [ammunition logistics](../TOWERS/Economy/Ammunition/Shared/Logistics/README.md).

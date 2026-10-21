@@ -1,3 +1,7 @@
+## CD1/CD2 builder foundation implemented — 2026-10-21
+
+`ConstructionDrones/` now gates positive-duration paid initial builds until a pooled Citadel drone arrives/deploys its cyan beam, then returns at normal work completion. Shared World wiring applies across towers/buildings; upgrades and ammo transport remain independent. Cap/fallback/timing and verified checks are documented there. Desktop visual/GPU review and further CD3 polish remain pending. Older planned-only entries below are retained history.
+
 ## Citadel construction drones — Codex handoff (2026-10-21; planned only)
 
 A reusable drone dispatched from an available Citadel should **gate paid tower construction until it arrives**, orbit/hover with a bright cyan holographic cone while existing timed work runs, then return when finished. Respect current placement, work manager, multi-Citadel objectives and construction art; do not reuse ammunition transport drones. No implementation in this planning commit. See [ConstructionDrones/README.md](ConstructionDrones/README.md) for CD1–CD3 contracts, fallbacks, performance and tests.

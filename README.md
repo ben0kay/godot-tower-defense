@@ -1,3 +1,7 @@
+## Citadel construction drones — CD1/CD2 (2026-10-21)
+
+Paid initial tower/building sites now wait for a cyan builder from the nearest available Citadel. Its beam deploys before ordinary construction time starts; the drone returns after completion. One capped manager/pool handles all towers, with no ground A*. Upgrades/direct/zero-second instances retain their behavior. Settings: TOWERS/ConstructionDrones/DefaultConstructionDroneConfig.tres. Build and dedicated builder/footprint/F4 checks pass; desktop visual/GPU review remains. See TOWERS/ConstructionDrones/README.md for observed tests and existing broad-suite fixture limits.
+
 ## Cosmetic shield ricochets — 2026-10-21
 
 Battle/Machine Gun/Sniper shield hits can now leave a short reflected cosmetic streak after real positive shield absorption. One capped world buffer handles all effects; combat remains one hit. Settings: FEEDBACK/DefaultFeedbackConfig.tres and FEEDBACK/Ricochet/DefaultRicochetStyle.tres. Build, focused ricochet and projectile handling checks pass; desktop appearance/GPU review remains. See FEEDBACK/Ricochet/README.md.

@@ -13,7 +13,11 @@ internal sealed class AmmoLoopFixture : IDisposable
     internal GameplayHUD Hud => Main.GetNode<GameplayHUD>("UI/GameplayHUD");
     internal EconomyManager Wallet => Main.GetNode<EconomyManager>("Economy");
     internal AmmoLoopFixture(Node parent, string scene = "res://Main.tscn")
-    { Main = GD.Load<PackedScene>(scene).Instantiate(); parent.AddChild(Main); Disable(Main); }
+    {
+        Main = GD.Load<PackedScene>(scene).Instantiate(); parent.AddChild(Main); Disable(Main);
+        var builders = Main.GetNodeOrNull<ConstructionDroneManager>("World/ConstructionDrones");
+        if (builders != null) builders.Config = new ConstructionDroneMasterConfig { Enabled = false };
+    }
 
     // =========================================================
     // Explicit ticks keep transfer observations independent of the headless renderer's frame rate.
@@ -40,7 +44,7 @@ internal sealed class AmmoLoopFixture : IDisposable
         Hud.GetBuildButton(id).EmitSignal(Button.SignalName.Pressed);
         WorldGrid grid = Main.GetNode<WorldGrid>("World/Grid");
         int before = Towers.GetChildCount();
-        foreach (Vector2I cell in grid.Level.Passable.GetUsedCells())
+        foreach (Vector2I cell in grid.Level.Passable.GetUsedCells().Concat(grid.Level.Impassable.GetUsedCells()).Concat(grid.Level.Interactive.GetUsedCells()).Distinct())
         {
             if (grid.PlacementFailure(cell, Placement.Catalog.Find(id).Footprint).Length != 0 || Spawns.PlacementFailure(cell, Placement.Catalog.Find(id).Footprint).Length != 0) continue;
             Placement.Call("TryPlace", cell);

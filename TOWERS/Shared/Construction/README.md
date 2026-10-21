@@ -1,3 +1,9 @@
+## CD1/CD2 arrival hold — implemented 2026-10-21
+
+TowerBase.StartConstruction optionally accepts the paid placement's builder owner; it creates the hold/token before Ready/first tick. AwaitingConstructionDrone keeps phase Constructing and the site inactive. Held jobs remain registered but stay outside ConstructionWorkManager's active batches; held-only clocks sleep. Matching builder arrival resumes only that token/job and publishes a work-only refresh, never elapsed time or completion. Active upgrades/unheld jobs retain their timer behavior. Cancellation/clock teardown removes holds safely.
+
+The shared builder manager listens only to successful placement, flies/deploys its beam and waits for existing WorkCompleted before returning. See ../../ConstructionDrones/README.md for architecture, configuration, passing checks and pending desktop review. Earlier planned descriptions below are historical. Saving remains unimplemented; the transient builder hold does not change TowerWorkState's future-save placeholder.
+
 ## Planned Citadel construction drone arrival-gated work (2026-10-21; NOT IMPLEMENTED)
 
 Codex implementation handoff: [TOWERS/ConstructionDrones/README.md](../../ConstructionDrones/README.md). **Current work still starts immediately after paid placement.** The proposed shared mechanic would hold only *initial* nonzero construction clocks until a Citadel builder drone arrives and activates its cyan beam, without touching placement/footprint occupancy, Credits, normal upgrades, stage visuals or the sparse timer. See CD1–CD3 in that README; source remains unchanged.

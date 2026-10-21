@@ -1,3 +1,9 @@
+## CD1/CD2 builder verification — 2026-10-21
+
+Run ConstructionDroneChecks.tscn for real paid gates/beam/return, independent clocks, FIFO/cap/token/duplicate safety, pause/visual-off, failures/strict fallback, multi-Citadel/marker/source loss,2×2/3×2, destruction/teardown, mission Results freeze and20-build CPU/allocation stress. It opts in explicitly; ordinary AmmoLoopFixture tests disable builders for their unrelated timer contracts. The fixture placement search now includes all painted layers, including solid foundations. Saved maps are never changed.
+
+Dedicated builder/FootprintChecks/PerformanceOverlayChecks pass. Existing combined ConstructionChecks passes timers/Battle art then hits the pre-existing ammo_factory map-space purchase failure, reproduced on baseline production code. Exact timings, known limits and pending desktop review: TOWERS/ConstructionDrones/README.md.
+
 ## Tower durability rebalance — 2026-10-20 (source updated; Godot runtime tests pending)
 
 **Current authoritative defaults supersede older HP references below:** Base/max hull health for every available player-built tower/structure is **10× the previous level-1 value**. All **nine offensive towers** (Battle, Laser, Blaster Cannon, Shockwave, Machine Gun, Sniper, Rocket, Cryo, Stasis) have explicit, independent paid level snapshots: **1,000 → 1,050 → 1,102.5 HP** (two-level towers stop at 1,050). **Every purchased upgrade adds 5% of the previous tier's Max HP**, compounded, not 5 percentage points of the original at every tier; the values are authored as complete absolute tier stats, not runtime additive bonuses.

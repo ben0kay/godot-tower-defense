@@ -1,3 +1,11 @@
+## Completed CD1/CD2 — Citadel construction drone foundation (2026-10-21)
+
+- [x] **CD1:** paid commit atomically holds initial nonzero work; successful-event FIFO dispatch, nearest available Citadel/stable tie, per-job token, specific arrival release, bounded capacity and fallback/strict mode implemented.
+- [x] **CD2:** separate pooled cyan builder SVG, direct airborne movement, footprint-aware holographic beam/hover, authoritative work-completion return, cancellation and source-loss handling implemented.
+- [ ] **CD3 remaining:** desktop visual/GPU review and further UX/polish. Minimal waiting Inspector label and core automated coverage were included so CD1/CD2 are understandable/testable; no ETA/sounds/hangars/upgrades/saving expansion.
+
+Build/import pass; dedicated ConstructionDroneChecks, FootprintChecks and F4 PerformanceOverlayChecks pass. Held-only clocks sleep; active work/upgrades remain independent. Twenty beams/600 explicit central ticks measured8.576ms total and0 managed bytes on one CPU-only run; drawing/GPU excluded. Existing combined ConstructionChecks still stops at its map-dependent ammo_factory purchase, reproduced on pre-feature619573d with the same test-layer search correction; timer/art groups passed. Full details/settings/limitations: TOWERS/ConstructionDrones/README.md. Earlier planning entries below are retained as history.
+
 ## CD1–CD3 — Citadel construction drones (PLANNED, 2026-10-21)
 
 Codex handoff: [TOWERS/ConstructionDrones/README.md](../TOWERS/ConstructionDrones/README.md). On successful paid placement, launch a builder from an available Citadel; construction **does not advance** until arrival and cyan projected-beam activation. During building, hover/orbit near the tower with a bright translucent cone; on completion fly back home. Support multi-Citadel, multiple simultaneous sites, existing stage art, pause, failure/cleanup and a no-deadlock fallback. Does not affect upgrades yet.

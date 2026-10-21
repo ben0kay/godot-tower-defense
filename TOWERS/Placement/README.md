@@ -1,3 +1,7 @@
+## CD1/CD2 successful paid construction drones — 2026-10-21
+
+Placement synchronously binds the optional World/ConstructionDrones service in Ready. Inside the existing paid commit, positive initial work is held before AddChild; only the later successful TowerPlaced event queues a drone. Failed/rolled-back transactions cannot dispatch. Zero-second sites, disabled/absent service, normal footprint/route validation, prices and placement/input behavior retain their prior semantics. See ../ConstructionDrones/README.md. Earlier planned-only notes below are historical.
+
 ## Citadel builder drone concept (2026-10-21; planned only)
 
 See [ConstructionDrones design](../ConstructionDrones/README.md). Placement already emits `TowerPlaced` only on a successful paid site. The future drone coordinator should attach to that success, and hold the initial work clock *before its first tick* until arrival. Existing validation, payment, footprint reservation, navigation revision and repeat-placement controls must remain unchanged. No placement code changed for this plan.
