@@ -2,14 +2,21 @@
 
 [ext_resource type="Script" path="res://FEEDBACK/Shields/ShieldVisual.cs" id="1_visual"]
 [ext_resource type="Resource" path="res://FEEDBACK/Shields/DefaultShieldVisualStyle.tres" id="2_style"]
-[ext_resource type="Texture2D" path="res://FEEDBACK/Shields/Artwork/ShieldAura.svg" id="3_aura"]
+[ext_resource type="Shader" path="res://FEEDBACK/Shields/Artwork/ShieldOrb.gdshader" id="3_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_orb"]
+shader = ExtResource("3_shader")
 
 [node name="ShieldVisual" type="Node2D"]
 z_index = -1
 script = ExtResource("1_visual")
 Style = ExtResource("2_style")
 
-[node name="Aura" type="Sprite2D" parent="."]
-texture_filter = 2
+[node name="Aura" type="ColorRect" parent="."]
 visible = false
-texture = ExtResource("3_aura")
+material = SubResource("ShaderMaterial_orb")
+offset_left = -64.0
+offset_top = -64.0
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2

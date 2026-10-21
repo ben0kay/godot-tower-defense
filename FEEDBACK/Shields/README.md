@@ -1,3 +1,16 @@
+## GPU-rendered shield orb — 2026-10-21
+
+The reusable shield visual is now a **static CanvasItem shader** (`Artwork/ShieldOrb.gdshader`) on one `ColorRect` quad in `ShieldVisual.tscn`, replacing the previous SVG sprite. It approximates a sleek spherical red force field: transparent center, glossy inner curvature, smooth bright rim/halo and subtle hexagonal cells. It is a 2D visual illusion rather than a real 3D sphere or generated mesh. **No TIME animation, _Draw(), _Process(), _PhysicsProcess(), or per-enemy image baking.** The same shader resource is shared by all shields; Godot evaluates the pixels when each visible quad is rendered. Do not confuse this with zero GPU cost: lots of large overlapping transparent quads still have overdraw.
+
+**Inspector tweak points:**
+- `DefaultShieldVisualStyle.tres`: `Tint` (red by default), `SizeMultiplier`, idle opacity, hit/break opacity and duration.
+- `ShieldVisual.tscn/Aura/ShaderMaterial`: `rim_brightness`, `rim_thickness`, `hex_visibility`, `field_opacity`, `halo_strength` uniforms, shared by the scene. Keep uniforms identical for batches; do not duplicate or animate a material per enemy.
+- To change the pattern instead of the balances, edit only `Artwork/ShieldOrb.gdshader`. The old `Artwork/ShieldAura.svg` is retained unused for easy comparison/rollback.
+
+`ShieldVisual.cs` retains its public interface (`SetVisualSize`, `SetShield`, `ResetVisual`, `HasShieldVisual`). It scales the original 128px art quad at spawn to match each enemy, receives events from combat, and uses existing short damage/break tweens. Enemy defenses, stealth dimming, shield regeneration policy, allocations only for shielded enemies, and gameplay remain unchanged. This requires desktop visual verification in Godot at normal zoom and high enemy counts; shader appearance/performance is not yet runtime-tested.
+
+---
+
 # Shared shield aura — visuals only (SV1)
 
 This folder owns the reusable **aura visual**, not the shield damage mechanic or the shield **meter**. The slim shield bar above hull health lives in [`FEEDBACK/DefenseBars`](../DefenseBars/README.md) and is drawn in the already-inherited `DefenseBar` node when shields are present. It can be attached to **any** shield-owning gameplay entity (enemies now, optional towers later).

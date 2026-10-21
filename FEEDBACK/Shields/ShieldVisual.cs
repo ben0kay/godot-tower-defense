@@ -1,5 +1,5 @@
-// One reusable, event-driven shield sprite for enemies now and optional damageable towers later.
-// This component receives shield changes; it owns no health, damage, healing or targeting rules.
+// One reusable GPU shader orb for enemies now and optional damageable towers later.
+// Event-driven damage/break alpha transitions; idle shields do no C# per-frame work.
 using Godot;
 
 public partial class ShieldVisual : Node2D
@@ -7,26 +7,26 @@ public partial class ShieldVisual : Node2D
     #region Presentation
     [Export] public ShieldVisualStyle Style { get; set; }
     public bool HasShieldVisual { get; private set; }
-    private Sprite2D _aura;
+    private ColorRect _aura;
     private Tween _feedbackTween;
     #endregion
 
     #region Lifecycle
     // =========================================================
-    // One baked sprite and no frame-based visual calculations for idle shields.
+    // Share one static shader material and a lightweight quad; no per-frame geometry or CPU processing.
     public override void _Ready()
     {
-        _aura = GetNode<Sprite2D>("Aura");
+        _aura = GetNode<ColorRect>("Aura");
         SetProcess(false); SetPhysicsProcess(false);
         ResetVisual();
     }
 
     // =========================================================
-    // Fit the same ellipse/halo artwork to any source visual size once at creation.
+    // Fit the circular shader orb to any source visual size once at creation.
     public void SetVisualSize(Vector2 sourceDimensions)
     {
-        if (_aura?.Texture == null) return;
-        Vector2 baseSize = _aura.Texture.GetSize();
+        if (_aura == null) return;
+        Vector2 baseSize = _aura.Size;
         float multiplier = Safe(Style?.SizeMultiplier ?? 1.65f, 1.65f, 1f, 2f);
         Vector2 size = new(
             Mathf.Max(8f, Safe(sourceDimensions.X, 32f, 0f, 2048f) * multiplier),
