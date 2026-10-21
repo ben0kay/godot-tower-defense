@@ -35,6 +35,8 @@ internal static class MissionOutcomeChecks
                 "Outcome clears active placement/ghost");
             Require(!f.Results.ActionsAvailable && f.Results.DetailsButton.Disabled && f.Results.PrimaryButton.Disabled,
                 "Actions locked during ordered reveal");
+            Require(!f.Results.XPRevealCompleted && f.Results.GetNode<ResultsVectorBackdrop>("Screen/VectorBackdrop").MouseFilter == Control.MouseFilterEnum.Ignore,
+                "R2 vector decorations ignore input while XP reveal is still pending");
             f.Results.PrimaryButton.EmitSignal(Button.SignalName.Pressed); Require(tree.Paused, "Hidden primary cannot navigate early");
             f.Pause.Open(); f.Pause.Resume(); Require(tree.Paused && !f.Pause.IsOpen, "Pause cannot resume or cover final results");
             parent.GetViewport().PushInput(new InputEventKey { Keycode = Key.Ctrl, Pressed = true });
@@ -43,6 +45,8 @@ internal static class MissionOutcomeChecks
             Require(f.Results.ActionsAvailable && tree.Paused && !f.Pause.IsOpen, "Escape skips reveal only, never resumes");
             parent.GetViewport().PushInput(new InputEventKey { Keycode = Key.F11, Pressed = true });
             Require(parent.GetViewport().IsInputHandled(), "Global F11 remains responsive in results");
+            Require(f.Results.XPRevealCompleted && !f.Results.GetNode<ResultsVectorBackdrop>("Screen/VectorBackdrop").IsDefeat,
+                "R2 victory theme and instant Skip reveal");
             Require(f.Results.PrimaryButton.Text == "NEXT LEVEL" && f.Results.PrimaryButton.Disabled == (path == MenuNavigation.Level020Scene),
                 "Victory primary reflects actual next playable launcher");
             Require(f.Results.DetailsButton.Disabled && f.Results.DetailsButton.TooltipText.Contains("coming soon"), "Details remains disabled after Skip");
@@ -63,6 +67,9 @@ internal static class MissionOutcomeChecks
                 && f.Session.Snapshot.WavesCompleted == 1 && f.Waves.State == WaveManager.WaveState.AllWavesComplete,
                 "Final lethal arrival includes breach/completion, and defeat beats victory");
             f.Results.SkipReveal(); Require(f.Results.PrimaryButton.Text == "RETRY MISSION" && !f.Results.PrimaryButton.Disabled, "Defeat offers Retry");
+            Require(f.Results.GetNode<ResultsVectorBackdrop>("Screen/VectorBackdrop").IsDefeat &&
+                ((Label)f.Results.FindChild("DebriefStatus", true, false)).Text.Contains("CRITICAL FAILURE"),
+                "R2 defeat uses a red warning vector presentation");
         }
         using (MissionFixture f = new(parent))
         {

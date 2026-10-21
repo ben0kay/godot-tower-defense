@@ -31,6 +31,9 @@ public partial class MissionXPChecks : Node
                 long before = ProgressionService.GetCurrent().LifetimePlayerXP;
                 using MissionFixture f = new(this, scene);
                 f.Start().TakeDamage(999999); await Frames(); f.Results.SkipReveal();
+                ProgressBar bar = (ProgressBar)f.Results.FindChild("PlayerXPBar", true, false);
+                Require(f.Results.XPRevealCompleted && bar.Value == f.Session.Reward.After.CurrentXP &&
+                    bar.MaxValue == f.Session.Reward.After.RequiredXP, "R2 Skip resolves to the persisted player XP value");
                 Require(f.Session.Reward != null && f.Session.Reward.Breakdown.TotalXP == 500, "Real victory grants authored baseline on both maps");
                 Require(ProgressionService.GetCurrent().LifetimePlayerXP == before + 500, "Outcome committed before Results actions");
                 string heading = ((Label)f.Results.FindChild("MissionXPHeading", true, false)).Text;
@@ -55,6 +58,8 @@ public partial class MissionXPChecks : Node
                     "Failed disk commit does not claim or grant reward");
                 Directory.Delete(blocked); ButtonFor(f.Results, "RETRY XP SAVE").EmitSignal(Button.SignalName.Pressed);
                 Require(f.Session.Reward != null && ProgressionService.GetCurrent().LifetimePlayerXP == 500, "Paused Results retry commits once");
+                Require(((ProgressBar)f.Results.FindChild("PlayerXPBar", true, false)).Value == f.Session.Reward.After.CurrentXP,
+                    "R2 late save retry displays the final bar when reveal was skipped");
                 ButtonFor(f.Results, "RETRY XP SAVE").EmitSignal(Button.SignalName.Pressed);
                 Require(ProgressionService.GetCurrent().LifetimePlayerXP == 500, "Repeated retry cannot award twice");
             }

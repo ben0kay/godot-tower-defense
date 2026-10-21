@@ -1,3 +1,17 @@
+## R2 neon vector Mission Debrief — 2026-10-21
+
+**Source implemented; Godot/.NET build and rendered QA not run in this environment.** R1 outcomes, immutable snapshots, locked actions, disabled Details, session navigation, and already-saved mission XP are unchanged.
+
+- Victory uses a teal/cyan vector frame, stat accents and XP track; defeat changes to dark crimson and bright red warning accents throughout. A compact outcome-specific telemetry strip appears beneath the heading. A thin neon border with soft StyleBox shadow replaces the original plain card frame.
+- `ResultsVectorBackdrop.cs` draws a **static**, mouse-transparent full-screen grid, four corner brackets and short side marks underneath the same responsive menu card; it redraws only on resize or outcome change. No shaders, per-tick updates, extra physics nodes or GPU-particle systems. `ShowVectorGrid` disables the decoration.
+- `LevelResults.cs` now has an Inspector-configurable entrance fade, staggered illuminated stat-row fade/scale reveals, delayed saved-XP track animation, and an optional crossed-level fill/reset. Timing is controlled by `IntroSeconds`, `StatRevealSeconds`, `StatGapSeconds` and `XPFillSeconds`.
+- XP animation is **presentation-only**, consuming `MissionRewardResult.Before/After` already persisted by `LevelSessionController`. Level-up fills the previous track then animates the final new-level track; multiple level-ups use the truthful existing summary rather than invent intermediate XP. Failed/profileless saves show no fake filled bar. A successful XP-save retry after Skip immediately displays the true final track.
+- Escape/Skip immediately kills both animations, reveals every statistic/XP final value and enables the usual buttons; hiding/unloading cancels running tweens. Responsiveness remains 1020×900 target with 24px margins and a scrollable stats section.
+
+**Run locally:** `res://TESTS/UI/ResultsChecks.tscn`, `res://TESTS/Progression/MissionXPChecks.tscn`, plus both `ResultsExitChecks` outcomes. Check 1920×1080, 1366×768 and 960×540 in the real editor; compare natural versus Skip, win versus defeat, saved XP / profileless / failed save, and responsiveness/pause. Assertions cover passive grid, theme switch, XP Skip and retry. This commit is not a measured FPS or desktop visual approval.
+
+---
+
 ## Mission XP foundation — 2026-10-17
 
 Mission XP pass: ResultsChecks passed with Campaign-return expectations and a temporary progression store. MissionXPChecks covers real saved XP, failed-save retry/profileless behavior and viewport geometry; see TESTS/Progression/MissionXP.md.

@@ -1,3 +1,9 @@
+## R2 vector debrief — source implemented 2026-10-21
+
+Reworked the existing UI/Menus/Results screen with passive neon vector grid/brackets, cyan victory vs crimson defeat, stat fade/scale entrance, and saved-XP track fill/level-up animation with immediate Skip. R1/R4 state, credits, stats, navigation and persistence are unchanged. Test assertions were added; Godot/.NET build and desktop QA are pending. Old R2 unchecked plan entries are historical; see UI/Menus/Results/README.md.
+
+---
+
 ## Completed CD1/CD2 — Citadel construction drone foundation (2026-10-21)
 
 - [x] **CD1:** paid commit atomically holds initial nonzero work; successful-event FIFO dispatch, nearest available Citadel/stable tie, per-job token, specific arrival release, bounded capacity and fallback/strict mode implemented.
