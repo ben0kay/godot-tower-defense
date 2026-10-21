@@ -1,3 +1,7 @@
+## F2 enemy artwork preview — 2026-10-21
+
+The wider F2 window now shows the selected enemy's actual-size1:1 sprite on the right, including separate gun artwork. Large artwork scrolls without shrinking. Preview code lives in DEBUG/Spawning and does not spawn gameplay enemies.
+
 ## F2 independent batches — 2026-10-21
 
 Start multiple enemy batches concurrently from F2, each with its own amount/gap and Shielded/Stealthed checkboxes. Active rows show progress and individual Cancel controls; Cancel All stops all pending deliveries. All batches share one bounded spawn budget. See DEBUG/Spawning/README.md.

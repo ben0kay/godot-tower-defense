@@ -1,3 +1,7 @@
+## F2 sprite preview — 2026-10-21
+
+EnemySpawnMenuChecks now exercises every catalog selection, native hull texture/scale, separate Gunner hull/gun layers, no attached preview scripts or live enemy registration, idle process flags, and oversized artwork preserving authored scale. Existing independent batches and shield/stealth controls remain covered.
+
 ## Concurrent batches and flags — 2026-10-21
 
 EnemySpawnMenuChecks now verifies two simultaneous enemy types with different gaps and captured shield/stealth flags, a combined-flags submission through the actual checkbox/button controls, round-robin fairness under a one-spawn global budget, and individual row cancellation without stopping the other batch. Existing single-batch exact-count/pause/close/random-portal/wave-isolation checks remain. This supersedes the old one-batch rejection expectation.

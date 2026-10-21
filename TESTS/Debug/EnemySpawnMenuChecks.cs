@@ -20,6 +20,7 @@ public partial class EnemySpawnMenuChecks : Node
                 LevelDebugController debug = f.Main.GetNode<LevelDebugController>("World/Level/Debug");
                 EnemySpawnMenu menu = debug.SpawnMenu;
                 Require(menu != null && !menu.IsOpen && !menu.IsSpawning, "Menu initializes closed and idle");
+                Preview(f, menu);
                 int before = f.Spawns.Registry.Living.Count;
                 debug._UnhandledKeyInput(new InputEventKey { Keycode = Key.F2, Pressed = true });
                 Require(menu.IsOpen && f.Spawns.Registry.Living.Count == before, "F2 opens without spawning");
@@ -54,6 +55,38 @@ public partial class EnemySpawnMenuChecks : Node
             GD.Print("PASS: F2 menu, bounded exact batches, gaps, pause, close, cancel, validation and wave isolation"); GetTree().Quit();
         }
         catch (Exception error) { GetTree().Paused = false; GD.PushError(error.ToString()); GetTree().Quit(1); }
+    }
+    // =========================================================
+    // Real selector changes render authored hull/gun geometry without ever registering a gameplay enemy.
+    private static void Preview(AmmoLoopFixture f, EnemySpawnMenu menu)
+    {
+        OptionButton choice = (OptionButton)menu.FindChild("Enemy", true, false);
+        int before = f.Spawns.Registry.Living.Count;
+        for (int index = 0; index < f.Spawns.Catalog.Scenes.Count; index++)
+        {
+            choice.Select(index); choice.EmitSignal(OptionButton.SignalName.ItemSelected, index);
+            Require(menu.SpritePreview.SpriteCount >= 1 && menu.SpritePreview.ArtworkBounds.Size.X > 0, "Catalog artwork preview populated");
+            Require(!menu.SpritePreview.IsProcessing() && !menu.SpritePreview.IsPhysicsProcessing(), "Static artwork preview does not tick");
+            Node source = f.Spawns.Catalog.Scenes[index].Instantiate();
+            try
+            {
+                Sprite2D hull = source.GetNode<Sprite2D>("Sprite");
+                Sprite2D copy = menu.SpritePreview.GetNode<Node2D>("Artwork").GetChildren().OfType<Sprite2D>().First();
+                Require(copy.Texture == hull.Texture && copy.Scale.IsEqualApprox(hull.Scale) && copy.GetScript().AsGodotObject() == null,
+                    "Native hull texture/scale copied without scripts");
+                if (source is Enemy enemy && enemy.Definition.EnemyId == "gunner_drone_mk1")
+                    Require(menu.SpritePreview.SpriteCount == 2, "Separate gun artwork included");
+            }
+            finally { source.Free(); }
+        }
+        Require(f.Spawns.Registry.Living.Count == before, "Preview never creates a live enemy");
+        Node2D large = new() { Scale = Vector2.One * 2 };
+        large.AddChild(new Sprite2D { Name = "Sprite", Texture = new PlaceholderTexture2D { Size = new(500, 300) } });
+        PackedScene packed = new(); large.GetNode("Sprite").Owner = large; packed.Pack(large);
+        menu.SpritePreview.ShowScene(packed); large.Free();
+        Require(menu.SpritePreview.ArtworkBounds.Size.IsEqualApprox(new Vector2(1000, 600))
+            && menu.SpritePreview.CustomMinimumSize.X >= 1000, "Oversized artwork keeps authored scale instead of shrinking");
+        choice.Select(0); choice.EmitSignal(OptionButton.SignalName.ItemSelected, 0);
     }
     // =========================================================
     // Concurrent batches retain different intervals/types/flags and share a fair global spawn budget.

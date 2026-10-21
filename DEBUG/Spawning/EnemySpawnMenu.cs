@@ -17,6 +17,8 @@ public partial class EnemySpawnMenu : CanvasLayer
     private readonly List<PackedScene> _scenes = new();
     private PanelContainer _panel;
     private OptionButton _enemy;
+    public EnemySpritePreview SpritePreview { get; private set; }
+    private Label _previewCaption;
     private SpinBox _amount, _gap;
     private Label _status;
     private CheckBox _shielded, _stealthed;
@@ -46,11 +48,12 @@ public partial class EnemySpawnMenu : CanvasLayer
         AddChild(root); root.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
         CenterContainer center = new() { MouseFilter = Control.MouseFilterEnum.Ignore };
         root.AddChild(center); center.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
-        _panel = new() { Name = "Panel", CustomMinimumSize = new(440, 0), MouseFilter = Control.MouseFilterEnum.Stop };
+        _panel = new() { Name = "Panel", CustomMinimumSize = new(860, 0), MouseFilter = Control.MouseFilterEnum.Stop };
         center.AddChild(_panel);
         UIMasterConfig theme = GD.Load<UIMasterConfig>("res://UI/DefaultUIConfig.tres");
         _panel.AddThemeStyleboxOverride("panel", UIButtonFactory.Box(theme.PanelColor, theme.AccentColor));
-        VBoxContainer box = new(); _panel.AddChild(box);
+        HBoxContainer columns = new(); columns.AddThemeConstantOverride("separation", 24); _panel.AddChild(columns);
+        VBoxContainer box = new() { CustomMinimumSize = new(420, 0), SizeFlagsHorizontal = Control.SizeFlags.ExpandFill }; columns.AddChild(box);
         box.AddChild(UIButtonFactory.Label("ENEMY SPAWNER · F2", 20));
         box.AddChild(UIButtonFactory.Label("Random valid portal per ship", 14));
         _enemy = new() { Name = "Enemy", SizeFlagsHorizontal = Control.SizeFlags.ExpandFill }; box.AddChild(_enemy);
@@ -67,7 +70,24 @@ public partial class EnemySpawnMenu : CanvasLayer
         box.AddChild(UIButtonFactory.Create("Cancel all remaining spawns", CancelBatch, UIButtonStyle.Compact, 32));
         box.AddChild(UIButtonFactory.Create("Close · F2 / Escape", Close, UIButtonStyle.Compact, 32));
         _status = UIButtonFactory.Label("Choose an enemy and batch settings.", 14); _status.AutowrapMode = TextServer.AutowrapMode.WordSmart; box.AddChild(_status);
+        VBoxContainer preview = new() { CustomMinimumSize = new(360, 0), SizeFlagsHorizontal = Control.SizeFlags.ExpandFill }; columns.AddChild(preview);
+        preview.AddChild(UIButtonFactory.Label("SPRITE PREVIEW · ACTUAL SIZE", 17));
+        _previewCaption = UIButtonFactory.Label("", 14); _previewCaption.AutowrapMode = TextServer.AutowrapMode.WordSmart; preview.AddChild(_previewCaption);
+        ScrollContainer artwork = new() { SizeFlagsVertical = Control.SizeFlags.ExpandFill, CustomMinimumSize = new(360, 320) }; preview.AddChild(artwork);
+        SpritePreview = new() { Name = "SpritePreview", SizeFlagsHorizontal = Control.SizeFlags.ExpandFill, SizeFlagsVertical = Control.SizeFlags.ExpandFill }; artwork.AddChild(SpritePreview);
+        _enemy.ItemSelected += _ => RefreshPreview(); RefreshPreview();
         Close(); SetPhysicsProcess(false);
+    }
+    // =========================================================
+    // Refresh only when the enemy choice changes; native size is independent of battlefield camera zoom.
+    private void RefreshPreview()
+    {
+        int index = _enemy.Selected;
+        SpritePreview.ShowScene(index >= 0 && index < _scenes.Count ? _scenes[index] : null);
+        Vector2 size = SpritePreview.ArtworkBounds.Size;
+        _previewCaption.Text = index >= 0 && index < _scenes.Count
+            ? $"{_enemy.GetItemText(index)} · {size.X:0.#} × {size.Y:0.#} px · 1:1"
+            : "No enemy artwork available.";
     }
     // =========================================================
     // Labeled inputs retain values when reopening and use seconds directly.
