@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="AudioCatalog" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="AudioCatalog" format=3 uid="uid://blig024sxe6jg"]
 
-[ext_resource type="Script" path="res://AUDIO/AudioCatalog.cs" id="1_catalog"]
+[ext_resource type="Script" uid="uid://14re82jeoiwi" path="res://AUDIO/AudioCatalog.cs" id="1_catalog"]
+[ext_resource type="Script" uid="uid://ba4ugryh3wdf6" path="res://AUDIO/AudioDefinition.cs" id="1_qhxs2"]
 [ext_resource type="Resource" path="res://AUDIO/VoiceAssistant/Cues/Profiles/WelcomeCommander.tres" id="2_welcome"]
 
 [resource]
 script = ExtResource("1_catalog")
-Sounds = Array[Resource]([ExtResource("2_welcome")])
+Sounds = Array[ExtResource("1_qhxs2")]([ExtResource("2_welcome")])

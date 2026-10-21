@@ -1,20 +1,15 @@
 [gd_resource type="Resource" script_class="BattleTowerConfig" format=3 uid="uid://dwkunf5wywb8t"]
 
-[ext_resource type="Script" path="res://TOWERS/Offensive/BattleTower/BattleTowerConfig.cs" id="1"]
-
-[ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/Artwork/Construction/BattleConstructionArt.tres" id="2_art"]
-
-[ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/Visuals/BattleTracerStyle.tres" id="pv_tracer"]
+[ext_resource type="Script" uid="uid://cin5m60oapsu1" path="res://TOWERS/Offensive/BattleTower/BattleTowerConfig.cs" id="1"]
+[ext_resource type="Resource" uid="uid://dlfujas2jtbyv" path="res://TOWERS/Offensive/BattleTower/Artwork/Construction/BattleConstructionArt.tres" id="2_art"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/Visuals/BattleMuzzleFlashStyle.tres" id="pv_flash"]
-[ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/Visuals/BattleRecoilStyle.tres" id="recoil"]
+[ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/Visuals/BattleTracerStyle.tres" id="pv_tracer"]
+[ext_resource type="Resource" uid="uid://bkiqcbyqtnexc" path="res://TOWERS/Offensive/BattleTower/Visuals/BattleRecoilStyle.tres" id="recoil"]
+
 [resource]
 script = ExtResource("1")
-ConstructionArt = ExtResource("2_art")
-
+HeatEnabled = true
+Recoil = ExtResource("recoil")
 ProjectileVisual = ExtResource("pv_tracer")
 MuzzleFlash = ExtResource("pv_flash")
-Recoil = ExtResource("recoil")
-
-HeatEnabled = true
-OverheatAfterMinutes = 3.0
-OverheatRecoverySeconds = 9.0
+ConstructionArt = ExtResource("2_art")

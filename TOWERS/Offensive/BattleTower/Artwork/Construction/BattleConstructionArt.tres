@@ -1,15 +1,14 @@
-[gd_resource type="Resource" script_class="TowerConstructionArt" load_steps=12 format=3]
+[gd_resource type="Resource" script_class="TowerConstructionArt" format=3 uid="uid://dlfujas2jtbyv"]
 
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="1_art"]
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="2_stage"]
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerLevelArtwork.cs" id="3_level"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BattleTower/Artwork/Construction/stage0_foundation.svg" id="4_foundation"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BattleTower/Artwork/Construction/stage1_frame.svg" id="5_frame"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BattleTower/Artwork/Construction/stage2_assembly.svg" id="6_assembly"]
+[ext_resource type="Script" uid="uid://bt7vaabnpo1us" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="1_art"]
+[ext_resource type="Script" uid="uid://phileg818m3o" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="2_stage"]
+[ext_resource type="Script" uid="uid://iww0iyddykhp" path="res://TOWERS/Shared/Construction/TowerLevelArtwork.cs" id="3_level"]
+[ext_resource type="Texture2D" uid="uid://cr2yc3t76ole6" path="res://TOWERS/Offensive/BattleTower/Artwork/Construction/stage0_foundation.svg" id="4_foundation"]
+[ext_resource type="Texture2D" uid="uid://conapg5cykva3" path="res://TOWERS/Offensive/BattleTower/Artwork/Construction/stage1_frame.svg" id="5_frame"]
+[ext_resource type="Texture2D" uid="uid://b5yttvsv0j4om" path="res://TOWERS/Offensive/BattleTower/Artwork/Construction/stage2_assembly.svg" id="6_assembly"]
 
 [sub_resource type="Resource" id="Stage0"]
 script = ExtResource("2_stage")
-Progress = 0.0
 Texture = ExtResource("4_foundation")
 
 [sub_resource type="Resource" id="Stage1"]
@@ -24,7 +23,6 @@ Texture = ExtResource("6_assembly")
 
 [sub_resource type="Resource" id="Level2"]
 script = ExtResource("3_level")
-Level = 2
 
 [sub_resource type="Resource" id="Level3"]
 script = ExtResource("3_level")
@@ -32,5 +30,5 @@ Level = 3
 
 [resource]
 script = ExtResource("1_art")
-BuildStages = [SubResource("Stage0"), SubResource("Stage1"), SubResource("Stage2")]
-LevelArtwork = [SubResource("Level2"), SubResource("Level3")]
+BuildStages = Array[ExtResource("2_stage")]([SubResource("Stage0"), SubResource("Stage1"), SubResource("Stage2")])
+LevelArtwork = Array[ExtResource("3_level")]([SubResource("Level2"), SubResource("Level3")])
