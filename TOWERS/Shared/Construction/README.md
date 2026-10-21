@@ -1,3 +1,9 @@
+## Planned Citadel construction drone arrival-gated work (2026-10-21; NOT IMPLEMENTED)
+
+Codex implementation handoff: [TOWERS/ConstructionDrones/README.md](../../ConstructionDrones/README.md). **Current work still starts immediately after paid placement.** The proposed shared mechanic would hold only *initial* nonzero construction clocks until a Citadel builder drone arrives and activates its cyan beam, without touching placement/footprint occupancy, Credits, normal upgrades, stage visuals or the sparse timer. See CD1–CD3 in that README; source remains unchanged.
+
+---
+
 ## Optional split finished visuals
 
 TowerConstructionVisuals.FinishedVisualPaths optionally lists cached CanvasItem layers alongside SpritePath's composite overlay. Existing presenters with an empty list retain their original visibility behavior. The original composite finished texture selects split layers; authored construction/custom monolithic tier or upgrade textures select the overlay. PresentationChanged fires only when this mode changes. Battle uses this to retain all existing construction art while showing its fixed base and recoiling gun after completion. Custom composite artwork suspends split recoil; it is not automatically partitioned.

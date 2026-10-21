@@ -1,3 +1,14 @@
+## CD1–CD3 — Citadel construction drones (PLANNED, 2026-10-21)
+
+Codex handoff: [TOWERS/ConstructionDrones/README.md](../TOWERS/ConstructionDrones/README.md). On successful paid placement, launch a builder from an available Citadel; construction **does not advance** until arrival and cyan projected-beam activation. During building, hover/orbit near the tower with a bright translucent cone; on completion fly back home. Support multi-Citadel, multiple simultaneous sites, existing stage art, pause, failure/cleanup and a no-deadlock fallback. Does not affect upgrades yet.
+
+- [ ] **CD1:** reusable assignment service + per-job work hold/release, deterministic Citadel selection, fallback and first arrival-gated build.
+- [ ] **CD2:** cached drone SVG and shared cyan hologram beam, hover, return flight and cleanup; shared for all paid towers/buildings.
+- [ ] **CD3:** Inspector waiting state, config/test performance and comprehensive Godot QA.
+- **This commit is documentation only.** Existing construction timing, logic and visuals remain unchanged.
+
+---
+
 ## Completed: shield ricochet SR1–SR4 foundation — 2026-10-21
 
 Implemented FEEDBACK/Ricochet handoff with combined world controller/renderer, capped value slots, affine visible-shield reflection, positive absorption bridge, and typed Battle/Machine Gun/Sniper opt-in. Improvement: curve turns toward outward normal so grazing reflections cannot curl inward. No additional damage/ammo/status/XP or per-round nodes. Build and focused RicochetChecks/ProjectileAccuracyChecks/PerformanceOverlayChecks pass. CPU-only stress:9,600 requests/600 ticks/300 enemies present,15.643ms total,40 fixed managed bytes; rendering excluded. Desktop look/GPU comparison still pending. Settings and exact observed boundaries in FEEDBACK/Ricochet/README.md. Historical passes below retained.

@@ -1,3 +1,9 @@
+## Citadel construction drones — Codex handoff (2026-10-21; planned only)
+
+A reusable drone dispatched from an available Citadel should **gate paid tower construction until it arrives**, orbit/hover with a bright cyan holographic cone while existing timed work runs, then return when finished. Respect current placement, work manager, multi-Citadel objectives and construction art; do not reuse ammunition transport drones. No implementation in this planning commit. See [ConstructionDrones/README.md](ConstructionDrones/README.md) for CD1–CD3 contracts, fallbacks, performance and tests.
+
+---
+
 ## PF2 debug update (2026-10-20)
 
 Optional subsystem timing hooks feed the existing F4 panel (Shift+F4 toggles profiling; F5 saves a report). Old GridDebugOverlay/Info labels are retired; F2/F3 remain. See `DEBUG/README.md` for inclusive timing semantics, fixed sample storage and validation details. Historical notes below remain as reference.

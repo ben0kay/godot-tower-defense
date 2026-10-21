@@ -1,3 +1,9 @@
+## Citadel builder drone concept (2026-10-21; planned only)
+
+See [ConstructionDrones design](../ConstructionDrones/README.md). Placement already emits `TowerPlaced` only on a successful paid site. The future drone coordinator should attach to that success, and hold the initial work clock *before its first tick* until arrival. Existing validation, payment, footprint reservation, navigation revision and repeat-placement controls must remain unchanged. No placement code changed for this plan.
+
+---
+
 ## Hold Right Shift to keep building — 2026-10-20
 
 Physical Right Shift is a **hold**, not a toggle: while the same tower is armed, Right Shift + LMB places one valid paid tower and keeps its ghost/placement mode active. Release Right Shift and the next successful LMB restores the tray and exits as before. Left Shift is ignored. Rejected cells remain armed; payments, affordability, occupancy/navigation and construction continue through existing transactional rules. Same-frame follow-up clicks cannot double-pay. RMB/Escape/Ctrl and category cancellation are unchanged; focus loss clears the held key. No new Node or global GameInput action.
