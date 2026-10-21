@@ -1,3 +1,9 @@
+## Live Citadel critical alerts — 2026-10-21 (source implemented; engine QA pending)
+
+Existing major `citadel_critical` warning now fires once on each living Citadel's crossing into the HUD's critical health band (default 25%). Single wording stays unchanged; multi-Citadel warnings identify their own objective and reuse the manager's priorities, per-ID cooldowns and F7 catalog, with no extra per-frame work. Lethal hits defer to mission defeat; reset/unload removes subscriptions. Authored MultiCitadelHudChecks cover threshold, dedupe, identity and queuing; Godot/.NET runs and desktop QA remain pending. See UI/Alerts/README.md and WORLD/OBJECTIVES/Citadel/README.md.
+
+---
+
 ## R2 vector debrief — source implemented 2026-10-21
 
 Reworked the existing UI/Menus/Results screen with passive neon vector grid/brackets, cyan victory vs crimson defeat, stat fade/scale entrance, and saved-XP track fill/level-up animation with immediate Skip. R1/R4 state, credits, stats, navigation and persistence are unchanged. Test assertions were added; Godot/.NET build and desktop QA are pending. Old R2 unchecked plan entries are historical; see UI/Menus/Results/README.md.

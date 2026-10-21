@@ -1,5 +1,5 @@
-// Battlefield connection: arriving enemies damage this level's Citadel and health events update the HUD.
-// Keeps objective health logic independent of enemies, waves, and future victory/defeat orchestration.
+// Battlefield connection: incoming enemies damage assigned Citadels; health events update HUD and critical alerts.
+// Reuses the existing alert catalog and outcome arbiter; no per-frame health polling or gameplay ownership changes.
 using Godot;
 using System.Collections.Generic;
 
@@ -12,6 +12,9 @@ public partial class CitadelSession : Node
     public bool AnyIsDestroyed { get { foreach (var objective in Objectives) if (!objective.Available || objective.Health.IsDestroyed) return true; return false; } }
     public CitadelHealth ResultHealth { get { foreach (var objective in Objectives) if (objective.Available && objective.Health.IsDestroyed) return objective.Health; return Health; } }
     private bool _destroyed;
+    private NotificationManager _alerts;
+    private readonly Dictionary<CitadelDestination, System.Action<int, int>> _criticalHandlers = new();
+    private readonly HashSet<CitadelDestination> _criticalLatched = new();
 
     [ExportGroup("Citadel Credit Production")]
     [Export(PropertyHint.Range, "1,100000,1,or_greater")] public int CreditBufferCapacity { get; set; } = 80;
@@ -62,6 +65,7 @@ public partial class CitadelSession : Node
         WorldLevel level = GetNode<WorldGrid>("../World/Grid").Level;
         _registry = GetNode<EnemyRegistry>("../World/EnemySystems/Registry");
         _hud = GetNode<GameplayHUD>("../UI/GameplayHUD");
+        _alerts = _hud.GetNodeOrNull<NotificationManager>("NotificationManager");
         _economy = GetNode<EconomyManager>("../Economy");
         _waves = GetNode<WaveManager>("../Waves");
         _levelSession = GetNodeOrNull<LevelSessionController>("../LevelSession");
@@ -77,6 +81,9 @@ public partial class CitadelSession : Node
         {
             objective.Health.Initialize(Research.CitadelMaximum(level.Settings.CitadelMaxHealth));
             objective.Health.Destroyed += OnDestroyed;
+            System.Action<int, int> handler = (current, maximum) => OnHealthForAlert(objective, current, maximum);
+            objective.Health.HealthChanged += handler;
+            _criticalHandlers.Add(objective, handler);
             _income.Add(objective, new Income(CreditBufferCapacity, CreditsPerCycle, CreditCycleSeconds));
         }
         _hud.BindCitadels(Objectives, this);
@@ -94,9 +101,15 @@ public partial class CitadelSession : Node
     {
         if (GodotObject.IsInstanceValid(_registry)) _registry.EnemyArrived -= OnEnemyArrived;
         if (GodotObject.IsInstanceValid(Health)) Health.HealthChanged -= UpdateHud;
-        if (Objectives != null) foreach (var objective in Objectives) if (GodotObject.IsInstanceValid(objective.Health)) objective.Health.Destroyed -= OnDestroyed;
+        if (Objectives != null) foreach (var objective in Objectives)
+        {
+            if (!GodotObject.IsInstanceValid(objective.Health)) continue;
+            objective.Health.Destroyed -= OnDestroyed;
+            if (_criticalHandlers.TryGetValue(objective, out var handler)) objective.Health.HealthChanged -= handler;
+        }
         if (GodotObject.IsInstanceValid(_waves)) _waves.Changed -= RefreshProductionClock;
-        _income.Clear();
+        _criticalHandlers.Clear(); _criticalLatched.Clear(); _income.Clear();
+        _alerts = null;
     }
     #endregion
 
@@ -130,6 +143,30 @@ public partial class CitadelSession : Node
     {
         var destination = enemy?.AssignedCitadel;
         if (destination?.Available == true) destination.Health.TakeDamage(enemy.Definition?.CitadelDamage ?? 0);
+    }
+
+    // =========================================================
+    // Health thresholds are event-driven per Citadel, not checked during combat/physics callbacks.
+    // Warn once on entering the living critical band; rearm only after recovery above the threshold.
+    private void OnHealthForAlert(CitadelDestination objective, int current, int maximum)
+    {
+        if (_destroyed || maximum <= 0 || objective?.Available != true) return;
+        float criticalAt = maximum * Mathf.Clamp(_hud?.Config?.HealthCriticalThreshold ?? .25f, 0f, 1f);
+        if (current > criticalAt) { _criticalLatched.Remove(objective); return; }
+        if (current <= 0 || !_criticalLatched.Add(objective) || _alerts == null) return;
+
+        MajorAlertDefinition template = _alerts.Catalog?.Find("citadel_critical");
+        if (template == null) return;
+        // A separate transient ID preserves the manager's cooldown/priority per objective, not per map.
+        // Duplicate the Resource so F7's shared catalog artwork and wording never change.
+        MajorAlertDefinition alert = (MajorAlertDefinition)template.Duplicate();
+        alert.Id = template.Id + ":" + objective.Number;
+        if (Objectives.Count > 1)
+        {
+            alert.Title = objective.DisplayName + " IN DANGER";
+            alert.Description = objective.DisplayName + " integrity has reached a critical level.";
+        }
+        _alerts.ShowMajor(alert);
     }
 
     // =========================================================

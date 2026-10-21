@@ -1,3 +1,16 @@
+## Live Citadel critical-integrity warnings — 2026-10-21
+
+**Source implemented; Godot/.NET and in-game visual verification pending.** The existing F7-only `citadel_critical` major alert now also triggers automatically from **authoritative, event-driven `CitadelHealth.HealthChanged`** when a *living* Citadel enters the HUD's critical band (`UI/DefaultUIConfig.tres → HealthCriticalThreshold`, default **25%**, including exactly 25%). There is no HP polling, extra physics callback or duplicate notification system. Damage that jumps directly to **0 HP** uses the existing defeat flow; no pointless critical banner is queued behind the Results screen.
+
+- `WORLD/OBJECTIVES/Citadel/CitadelSession.cs` registers one lightweight handler per authored Citadel after health initialization. **Single Citadel** retains the catalog's exact `CITADEL IN DANGER` wording; **multiple Citadels** render `CITADEL 2 IN DANGER`, etc., with objective-specific descriptions.
+- The alert is a **transient duplicate of the existing `MajorAlertDefinition` resource**, with stable per-objective IDs. Thus each objective keeps its own existing configured priority, 6s duration, 40s cooldown, and common queue/critical interruption policy; neither `MajorAlertCatalog.tres` nor its shared definitions are mutated. F7 debug previews remain valid.
+- Each objective latches after the first critical crossing. More attacks inside the critical band do nothing; a genuine recovery to above threshold rearms it. The manager's normal cooldown may still suppress a very rapid re-crossing after recovery. Failed/queued requests are never retried each hit. No gameplay balance/HP changes.
+- All health delegates are unsubscribed and transient latch state cleared during level/session teardown, supporting multi-Citadel lifecycles and no stale alerts after leaving a level.
+
+**Regression coverage authored:** `TESTS/UI/MultiCitadelHudChecks.tscn` checks single-Citadel 25% boundary, no repeat/loss-only warnings, multi-Citadel naming, independent queueing and unchanged shared catalog while retaining MC3 HUD/F3 coverage. `NotificationManager.PendingMajorCount` is a passive read-only test/debug property. Re-run `TESTS/Navigation/MultiCitadelChecks.tscn`, `TESTS/UI/MultiCitadelHudChecks.tscn` and `TESTS/UI/ResultsChecks.tscn` locally. Check single/multi Citadel visuals at 1920×1080 and 960×540, and Pause/Results interruption. Godot/.NET execution is not available here: **no test passes or FPS gains claimed.**
+
+---
+
 ## NP2 narrator alongside NP1 wave banners (2026-10-20)
 
 The existing `NotificationManager` still owns all major wave banners and their priority queue; no new alert engine was added. The shared `LEVELS/Waves/Presentation/WavePresentationController.cs` now also routes wave narration to the **separate** `UI/Narration/NarrationDisplay.tscn` when text is authored. It sits top-right beneath the wave HUD; on narrower screens it moves below the major alert area. No audio, countdowns or changes to ShowMajor APIs. See [Narration README](../Narration/README.md).

@@ -17,6 +17,17 @@ public partial class MultiCitadelHudChecks : Node
                 SubsystemBattlefield.DetachSession(single.Main);
                 Require(single.Hud.GetNodeOrNull("TopBar/Status/CitadelRow") == null && single.Hud.GetNode<Control>("TopBar/Status/Citadel").Visible,
                     "Single-Citadel layout retains its original nodes");
+                NotificationManager alerts = single.Hud.GetNode<NotificationManager>("NotificationManager");
+                CitadelHealth health = single.Main.GetNode<CitadelSession>("CitadelSession").Health;
+                int critical = Mathf.FloorToInt(health.MaxHealth * single.Hud.Config.HealthCriticalThreshold);
+                health.TakeDamage(health.MaxHealth - critical - 1);
+                Require(alerts.ActiveMajorTitle == "" && alerts.PendingMajorCount == 0, "Above critical HP stays quiet");
+                health.TakeDamage(1);
+                Require(alerts.ActiveMajorTitle == "CITADEL IN DANGER", "Single Citadel crossing shows existing catalog warning");
+                health.TakeDamage(1);
+                Require(alerts.PendingMajorCount == 0, "Further critical-range damage never queues another warning");
+                health.TakeDamage(int.MaxValue);
+                Require(alerts.PendingMajorCount == 0, "Lethal destruction does not enqueue a redundant warning");
             }
             foreach (int count in new[] { 2, 4 })
             {
@@ -46,12 +57,22 @@ public partial class MultiCitadelHudChecks : Node
                 f.Session.Objectives[1].Health.TakeDamage(100);
                 Require(row.GetChild<Control>(1).GetNode<Label>("Health").Text=="900 / 1,000" && row.GetChild<Control>(0).GetNode<Label>("Health").Text==first,
                     "Only damaged objective's authoritative number changes");
+                NotificationManager alertManager = hud.GetNode<NotificationManager>("NotificationManager");
+                f.Session.Objectives[1].Health.TakeDamage(649);
+                Require(alertManager.ActiveMajorTitle == "", "Secondary Citadel above 25% does not alert");
+                f.Session.Objectives[1].Health.TakeDamage(1);
+                Require(alertManager.ActiveMajorTitle == "CITADEL 2 IN DANGER", "Secondary Citadel warning has correct identity");
+                f.Session.Objectives[1].Health.TakeDamage(10);
+                Require(alertManager.PendingMajorCount == 0, "Repeated critical damage does not duplicate its warning");
                 f.Session.Objectives[1].Health.TakeDamage(900);
                 var changedBar=row.GetChild<Control>(1).GetNode<ProgressBar>("Bar");
                 Require(((StyleBoxFlat)changedBar.GetThemeStylebox("fill")).BgColor==hud.Config.HealthCriticalColor
                     && ((StyleBoxFlat)row.GetChild<Control>(0).GetNode<ProgressBar>("Bar").GetThemeStylebox("fill")).BgColor==hud.Config.HealthHealthyColor,"Threshold colors are independent");
                 await ToSignal(GetTree().CreateTimer(hud.Config.CitadelBarTweenSeconds+.08),SceneTreeTimer.SignalName.Timeout);
                 Require(Math.Abs(changedBar.Value)<.01 && row.GetChild<Control>(1).GetNode<Label>("Health").Text=="0 / 1,000","Damaged meter animation reaches authoritative zero");
+                f.Session.Objectives[0].Health.TakeDamage(750);
+                Require(alertManager.PendingMajorCount == 1 && alertManager.Catalog.Find("citadel_critical").Title == "CITADEL IN DANGER",
+                    "Independent Citadel critical warning queues without overwriting shared catalog or first warning");
                 f.Session.Objectives[count-1].Health.Initialize(2000);
                 Require(row.GetChild<Control>(count-1).GetNode<Label>("Health").Text=="2,000 / 2,000","Each objective retains independent maximum");
                 Preview(f);

@@ -28,6 +28,8 @@ public partial class NotificationManager : CanvasLayer
     private readonly Dictionary<string, double> _lastDisplayed = new();
     private MajorAlertDefinition _current;
     public string ActiveMajorTitle => _current?.Title ?? "";
+    // Passive debug/test counter; requests are bounded by NotificationSettings.
+    public int PendingMajorCount => _pending.Count;
     private double _clock;
     #endregion
 
