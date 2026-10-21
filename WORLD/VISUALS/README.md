@@ -1,3 +1,9 @@
+## VE1 organic background refinement — 2026-10-21
+
+The early VE1 screenshot showed rectangular cloud bands and a hard-edged rectangle from the original baked backdrop. `Shaders/NebulaDrift.gdshader` now uses four-octave domain-warped clouds shaped by an irregular elliptical fade rather than rectangular edge feathering. The original `WORLD/BACKGROUNDS/Stars/level001_space.svg` opaque solid background rectangle is removed, retaining the static dots and faint pre-baked elliptical nebula. The scene's underlying viewport clear color will show through transparent portions. **This makes the backdrop's base color depend on project/viewport clear settings**, so verify that the out-of-map space remains the intended dark-blue shade at normal zoom. No terrain or other gameplay layer is changed.
+
+If the background becomes unexpectedly black or colored on a particular renderer, configure a shared solid-color backdrop covering the visible camera area *behind the artwork*, rather than reintroducing the old finite opaque SVG rectangle. Smooth organic shapes and draw-coverage edges are separate concerns. Actual desktop verification is pending.
+
 # WORLD/VISUALS
 
 VE1 implemented as an optional level-local star twinkle and nebula drift overlay. VE2–VE7 remain planned in WORLD/BACKGROUNDS/README.md.
