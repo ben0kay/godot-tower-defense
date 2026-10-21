@@ -1,3 +1,7 @@
+## Shared-route optimization — 2026-10-20
+
+User approved sharing finished waypoint variants after four desktop PF2 captures and the corridor-off comparison. A bounded world-owned raw/refined route pool now avoids repeated compatible A*/corridor work. Demand-warmed within existing requests, not an exhaustive startup bake. Exact safety/appearance tradeoffs, controls and benchmark/regression evidence: `WORLD/NAVIGATION/README.md` and `TESTS/Performance/SharedRoutePool.md`. This addresses repeated route assignment; remaining movement/spawn/render costs and target-hardware FPS are not claimed fixed. Earlier pass statuses below are historical context.
+
 ## Level100 wave numbering update — 2026-10-20
 
 The user removed original waves1–3. Former wave4 (400 ships) is now wave1; former wave5 (500 ships) is now wave2, with identical batch recipes. References to waves4/5 and five-wave totals below describe the original measurement workload, not the current wave list.

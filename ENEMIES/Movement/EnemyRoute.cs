@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public sealed class EnemyRoute
 {
     public int CorridorSamples { get; private set; }
+    public bool ReusedTemplate { get; private set; }
     public bool CorridorVariationApplied { get; private set; }
     private Vector2I[][] _corridorCorners;
     public Vector2[] Points { get; private set; } = System.Array.Empty<Vector2>();
@@ -12,11 +13,34 @@ public sealed class EnemyRoute
     private Vector2I[] _logicalCells = System.Array.Empty<Vector2I>();
     public readonly Dictionary<Vector2I, List<int>> Dependencies = new();
 
+    #region Shared Template Adoption
+    // =========================================================
+    // Only the first origin differs; reject an unsafe/backwards connector before using a shared tail.
+    public bool TryUseShared(EnemyRoute template, Vector2[] logical, Vector2 start, NavigationGrid nav, float radius, Vector2 forward)
+    {
+        Vector2 next = template.Points[1];
+        if (forward != Vector2.Zero && (next - start).Dot(forward) < -0.01f) return false;
+        if (!CorridorClearance.ConnectionClear(nav, start, next, radius)) return false;
+        UseShared(template, logical, start, nav, radius, reused: true); return true;
+    }
+    // =========================================================
+    // Mutable per-ship geometry/dependencies remain private; expensive lateral probes are not repeated.
+    public void UseShared(EnemyRoute template, Vector2[] logical, Vector2 start, NavigationGrid nav, float radius, bool reused = false)
+    {
+        Points = (Vector2[])template.Points.Clone(); Points[0] = start;
+        Suffix = new float[Points.Length]; _logicalCells = new Vector2I[logical.Length];
+        for (int i = 0; i < logical.Length; i++) _logicalCells[i] = nav.Grid.WorldToCell(logical[i]);
+        ReusedTemplate = reused; CorridorSamples = reused ? 0 : template.CorridorSamples; CorridorVariationApplied = template.CorridorVariationApplied; _corridorCorners = null;
+        CacheGeometry(start, nav, radius);
+        if (template._corridorCorners != null) CacheCorners(start, nav, radius);
+    }
+    #endregion
+
     // =========================================================
     // Apply one stable lateral bias, tapering safely at corners/walls and preserving endpoints.
     public void Build(Vector2[] logical, Vector2 start, NavigationGrid nav, float radius, float offset, Vector2 forward = default)
     {
-        CorridorSamples = 0; CorridorVariationApplied = false; _corridorCorners = null;
+        ReusedTemplate = false; CorridorSamples = 0; CorridorVariationApplied = false; _corridorCorners = null;
         _logicalCells = new Vector2I[logical.Length];
         for (int i = 0; i < logical.Length; i++) _logicalCells[i] = nav.Grid.WorldToCell(logical[i]);
         Points = (Vector2[])logical.Clone(); Dependencies.Clear(); Suffix = new float[Points.Length];

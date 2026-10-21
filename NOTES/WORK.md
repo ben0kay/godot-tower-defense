@@ -1,3 +1,7 @@
+## Shared raw/finished-route cache — 2026-10-20
+
+Implemented level-owned bounded route reuse after PF2 captures identified costly refinement. Reuses8 stable variations by default; global master/variant/cache limits live in EnemyMasterConfig. Original routing remains available with master off. Selective block invalidation, safe actual-origin connectors, independent ship progress and checkpoint branches are retained. Demand-warmed through existing budgets rather than a synchronous startup bake. No map, waves or combat values changed. F5 reports include cumulative cache counters. Evidence and baseline suite limitations: `TESTS/Performance/SharedRoutePool.md`.
+
 ## Level100 stress-wave shortcut — 2026-10-20
 
 Removed original waves1–3. Former wave4 is now wave1 (400 ships); former wave5 is now wave2 (500 ships). Retained all batch recipes/timings/weights/shields, including20 gunners per wave;900 scheduled ships/40 gunners total. Existing map painting, portals and mission settings are preserved. Updated Level100 README and quota-test expectations. Historical profiler notes mentioning wave4/5 refer to the old numbering.

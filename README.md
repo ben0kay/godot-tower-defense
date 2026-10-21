@@ -1,3 +1,7 @@
+## Shared finished routes — 2026-10-20
+
+Compatible enemies now reuse bounded raw paths and finished corridor variations, with selective tower-block invalidation and private movement progress. Toggle **Shared Route Pool** in `ENEMIES/DefaultEnemyConfig.tres`. It warms through ordinary budgeted requests, with no exhaustive startup bake. Trajectories may repeat more often. See `WORLD/NAVIGATION/README.md` and `TESTS/Performance/SharedRoutePool.md` for behavior and measured results.
+
 ## PF2 profiling — 2026-10-20
 
 The F4 performance panel now supports optional subsystem CPU timings: Shift+F4 toggles profiling, F5 saves a report. The older top-left grid debug readout is removed; F2/F3 remain. Profiling defaults off. See `DEBUG/README.md` for controls, nested timing meanings and report location, and `TESTS/Debug/PF2.md` for actual verification.

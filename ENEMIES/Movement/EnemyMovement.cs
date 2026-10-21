@@ -130,10 +130,10 @@ public partial class EnemyMovement : Node
         _stopped = false; _replacementNeeded = false;
         float offset = _allowOffsets && _paths.Config.EnablePathOffsets ? Mathf.Clamp(LateralOffsetPixels,
             -Mathf.Max(0f, _paths.Config.PathOffsetMaxPixels), Mathf.Max(0f, _paths.Config.PathOffsetMaxPixels)) : 0f;
-        if (UsesCorridorVariation && _paths.Config.EnableCorridorVariation && _paths.Config.CorridorVariationStrength > 0)
-            _route.BuildCorridor(connected, Enemy.GlobalPosition, _paths.Navigation, Enemy.Definition.RadiusPixels,
-                offset, CorridorSeed, _paths.Config, _travelDirection);
-        else _route.Build(connected, Enemy.GlobalPosition, _paths.Navigation, Enemy.Definition.RadiusPixels, offset, _travelDirection);
+        _paths.Navigation.RoutePool.Build(_paths.Navigation, _route, connected, Enemy.GlobalPosition,
+            Enemy.Definition.RadiusPixels, offset,
+            UsesCorridorVariation && _paths.Config.EnableCorridorVariation && _paths.Config.CorridorVariationStrength > 0,
+            CorridorSeed, _travelDirection);
         _paths.RegisterRoute(this); UpdateDistance();
         _paths.Journeys.Detach(_journey);
         _journey = HeadingToCheckpoint ? _paths.Journeys.Attach(_checkpointNetwork, Checkpoint, CorridorSeed,

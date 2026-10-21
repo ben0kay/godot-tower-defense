@@ -1,3 +1,7 @@
+## Shared-route report counters
+
+F5 reports now include `sharedRawHits`, `sharedRefinedHits`, and `sharedTemplateBuilds` in workload metadata. These are cumulative for the current world, whereas CPU rows cover only the retained sample window. See `WORLD/NAVIGATION/README.md` for the global Shared Route Pool toggle and bounded variation settings.
+
 ## PF2 subsystem measurements — 2026-10-20
 
 F4 keeps the normal performance panel; **Shift+F4** starts/stops optional C# subsystem profiling. **F5** prints and saves the retained report to Godot `user://Debug/pf2-*.txt` (the absolute path is printed). Profiling defaults off. Hiding F4 stops profiling; reopening starts a fresh capture if it was enabled. Pause adds no physics samples; reports remain available. Leaving the battlefield clears the active capture. Only one battlefield captures at a time; owner filtering prevents another test world's calls from entering it.

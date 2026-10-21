@@ -1,3 +1,21 @@
+## Shared finished-route pool — 2026-10-20
+
+Enemies still use the existing weighted/neutral profiles, but compatible requests now also reuse raw A* paths and a finite set of finished corridor/offset variations. This is a performance change, not more profiles or new movement physics. No saved terrain, wave recipes, speeds, combat or corridor master settings were changed.
+
+Settings: select `ENEMIES/DefaultEnemyConfig.tres` → **Shared Route Pool**. `EnableSharedRoutePool` defaults true; `SharedRouteVariants` defaults8 (1–32); `SharedRouteCacheEntries` defaults256 per cache (16–2048). Master off restores the original per-ship seed/offset builders for subsequent assignments. Existing accepted routes continue safely until their ordinary next assignment. Corridor/offset/diversity per-type permissions and global masters remain independent.
+
+The pool belongs to each NavigationGrid/world, including a private pool for F3 preview grids. Raw keys use start cell, goal cell, profile and enabled congestion snapshot; returned arrays are copied and costs are rescored for the actual start position. Finished keys include exact logical tail, start cell, physical clearance radius, optional lateral offset and selected corridor variant/settings. Hash matches are verified against actual coordinates. Equivalent geometry can be reused across destinations, but no Citadel/checkpoint identity, branch decision or progress is stored in a template; each ship still owns those obligations.
+
+Each eligible ship chooses a stable seed slot. Optional offsets use that slot's bounded lateral position instead of a unique continuous offset; disabled offsets stay zero. Corridor selection still uses the original per-ship seed and probability, while its geometry uses a finite variant seed. Consequently trajectories can repeat more often; broad movement appearance and authored variation limits remain, but pixel-identical paths are not promised. The slot does not change wave RNG, spawn ordinals or checkpoint branch choices.
+
+The first request builds a template through the existing budgeted path queue; later compatible ships reuse it. **Warming is on demand, not an exhaustive startup bake.** This avoids startup hitches and speculative routes for unknown branch/spawn positions. Cold variants, new radii/destinations and unsafe join cases still require work. Hits retain the scheduler's existing conservative query-count budget and soft time budget. Reuse avoids repeated corridor probes, while private per-ship waypoint arrays, suffix distances, corner/dependency caches and progress remain for correctness.
+
+A reused route gets a checked connector from the actual (possibly jittered) spawn/repath position. A backwards or unsafe connector falls back to building for that ship. Immediate swept movement checks and the existing queued safe-prefix/repath behavior are retained. Placing a tower invalidates only cached routes whose conservative cell dependencies intersect its cells; live ships retain their own dependency subscriptions. Removing a blocker clears raw searches to permit discovering shorter alternatives, without forcing live valid routes to repath. Full terrain/profile resets clear the pool. Capacity evicts one template at a time; caches never grow without limit.
+
+F5 PF2 report metadata now includes cumulative `sharedRawHits`, `sharedRefinedHits` and `sharedTemplateBuilds`. These are world-lifetime counters, not just the retained five-second timing window. Runtime verification and actual headless benchmark results: `TESTS/Performance/SharedRoutePool.md`. They are not a promise of desktop FPS or a complete solution to unrelated spawn/render/movement costs.
+
+---
+
 ## PF2 debug update (2026-10-20)
 
 Optional subsystem timing hooks feed the existing F4 panel (Shift+F4 toggles profiling; F5 saves a report). Old GridDebugOverlay/Info labels are retired; F2/F3 remain. See `DEBUG/README.md` for inclusive timing semantics, fixed sample storage and validation details. Historical notes below remain as reference.

@@ -38,16 +38,25 @@ public static class MovementPermissionChecks
                         Vector2[] logical = nav.FindPath(start, goal, m.RouteProfile, out _);
                         m.AcceptPath(logical, nav.Revision);
                         if (!selected) Require(m.CorridorSamplingChecks == 0, "Disabled corridor bypasses N4 probes");
+                        float effectiveOffset = master && d.AllowPathOffsets ? m.LateralOffsetPixels : 0;
+                        uint effectiveSeed = m.CorridorSeed;
+                        if (c.EnableSharedRoutePool && logical.Length >= 3)
+                        {
+                            int variants = Math.Clamp(c.SharedRouteVariants, 1, 32), slot = (int)(m.CorridorSeed % (uint)variants);
+                            if (effectiveOffset != 0 && c.PathOffsetMaxPixels > 0)
+                                effectiveOffset = variants == 1 ? 0 : (slot * 2f / (variants - 1) - 1) * c.PathOffsetMaxPixels;
+                            effectiveSeed = CorridorPreference.Seed(m.CorridorSeed % (uint)variants, c.RoutePreferenceSeed);
+                        }
                         if (!selected)
                         {
                             EnemyRoute oracle = new(); oracle.Build(logical, start, nav, d.RadiusPixels,
-                                master && d.AllowPathOffsets ? m.LateralOffsetPixels : 0);
+                                effectiveOffset);
                             Require(m.Waypoints.SequenceEqual(oracle.Points), "Independent offset gate matches ordinary builder");
                         }
                         else
                         {
                             EnemyRoute oracle = new(); oracle.BuildCorridor(logical, start, nav, d.RadiusPixels,
-                                master && d.AllowPathOffsets ? m.LateralOffsetPixels : 0, m.CorridorSeed, c);
+                                effectiveOffset, effectiveSeed, c);
                             Require(m.Waypoints.SequenceEqual(oracle.Points), "Corridor and offsets are independent");
                         }
                         Vector2[] accepted = (Vector2[])m.Waypoints.Clone(); uint seed = m.CorridorSeed;

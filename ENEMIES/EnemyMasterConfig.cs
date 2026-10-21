@@ -11,6 +11,10 @@ public partial class EnemyMasterConfig : Resource
     [Export(PropertyHint.Range, "1,128,1")] public int MaxRouteValidationsPerFrame { get; set; } = 16;
     [Export(PropertyHint.Range, "0,5,0.1")] public float MaxRouteValidationMillisecondsPerFrame { get; set; } = 0.5f;
     [Export(PropertyHint.Range, "1,16,1")] public int FairRequestEveryCalculations { get; set; } = 4;
+    [ExportGroup("Shared Route Pool")]
+    [Export] public bool EnableSharedRoutePool { get; set; } = true;
+    [Export(PropertyHint.Range, "1,32,1")] public int SharedRouteVariants { get; set; } = 8;
+    [Export(PropertyHint.Range, "16,2048,16")] public int SharedRouteCacheEntries { get; set; } = 256;
     [ExportGroup("Movement Refinement")]
     [Export] public bool EnablePathOffsets { get; set; } = true;
     [Export(PropertyHint.Range, "0,24,1")] public float PathOffsetMaxPixels { get; set; } = 8f;

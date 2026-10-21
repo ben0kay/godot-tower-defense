@@ -82,11 +82,13 @@ public partial class CorridorNavigationChecks : Node
         Require(logical.Length > 20, "Straight fixture has enough corridor for sustained variation");
         Enemy ship = f.Spawns.Spawn("basic_mk1", true); ship.Movement.SetPhysicsProcess(false);
         uint seed = ship.Movement.CorridorSeed;
+        bool shared = f.Config.EnableSharedRoutePool; f.Config.EnableSharedRoutePool = false; // Exact legacy offset oracle, separate from pooled variations.
         f.Config.EnablePathOffsets = true; f.Config.EnableCorridorVariation = false;
         ship.Movement.AcceptPath(logical, f.Grid.NavigationRevision);
         EnemyRoute legacy = new(); legacy.Build(logical, f.Start, f.Paths.Navigation, 12, ship.Movement.LateralOffsetPixels);
         Require(ship.Movement.Waypoints.SequenceEqual(legacy.Points) && ship.Movement.CorridorSamplingChecks == 0,
             "Disabled master preserves exact existing offset builder with no N4 samples");
+        f.Config.EnableSharedRoutePool = shared;
         f.Config.EnablePathOffsets = false; f.Config.EnableCorridorVariation = true;
         ship.Movement.AcceptPath(logical, f.Grid.NavigationRevision);
         Vector2[] first = (Vector2[])ship.Movement.Waypoints.Clone();
