@@ -1,3 +1,9 @@
+## VE2 implementation — 2026-10-21
+
+Shared WORLD/VISUALS/Shaders/EnergyField.gdshader now animates portal inner swirl and Citadel teal reactor, independently per scene with low-cost shader time. Successful portal spawns briefly pulse the matching visual via a tween; no failed attempts or map edge spawns trigger it. The built-in bloom experiment was removed. The rest of VE3–VE7 remains planned; live Godot appearance testing is pending.
+
+---
+
 ## VE1 implementation — 2026-10-21
 
 VE1 now has a reusable opt-in LevelAtmosphereController, six Inspector preset resources, StarTwinkle and NebulaDrift shaders and the modular WORLD/VISUALS folders. Level001 uses CalmSpace behind terrain; LevelTemplate includes the disabled-by-visibility scaffold. Existing star SVG and painted maps are preserved. See WORLD/VISUALS/README.md. VE2–VE7 remain planned; desktop appearance/GPU checks remain.

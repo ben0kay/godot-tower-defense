@@ -4,6 +4,13 @@
 [ext_resource type="Script" path="res://WORLD/OBJECTIVES/Citadel/CitadelHealth.cs" id="2_health"]
 [ext_resource type="Texture2D" path="res://WORLD/OBJECTIVES/Citadel/Visuals/CitadelFortress.svg" id="3_art"]
 
+[ext_resource type="Script" path="res://WORLD/VISUALS/EnergyFieldVisual.cs" id="ve2_visual"]
+[ext_resource type="Resource" path="res://WORLD/VISUALS/Presets/CitadelReactor.tres" id="ve2_style"]
+[ext_resource type="Shader" path="res://WORLD/VISUALS/Shaders/EnergyField.gdshader" id="ve2_shader"]
+
+[sub_resource type="ShaderMaterial" id="ve2_material"]
+shader = ExtResource("ve2_shader")
+
 [node name="Citadel" type="Node2D"]
 z_index = 3
 script = ExtResource("1")
@@ -13,6 +20,16 @@ BlocksEnemies = true
 [node name="CitadelArt" type="Sprite2D" parent="."]
 position = Vector2(64, 64)
 texture = ExtResource("3_art")
+
+[node name="ReactorEnergy" type="ColorRect" parent="."]
+material = SubResource("ve2_material")
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 112.0
+offset_bottom = 112.0
+mouse_filter = 2
+script = ExtResource("ve2_visual")
+Style = ExtResource("ve2_style")
 
 [node name="Label" type="Label" parent="."]
 offset_left = 24.0

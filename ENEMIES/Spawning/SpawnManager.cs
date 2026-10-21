@@ -150,6 +150,7 @@ public partial class SpawnManager : Node
             _ships.AddChild(ship); ship.GlobalPosition = position;
             EnemyPortal chosenPortal = portalOnly || source < _portalCount ? portals[source] as EnemyPortal : null;
             ship.Initialize(Registry, Paths, checkpoint: chosenPortal?.ResolveCheckpoint(), requiresCheckpoint: chosenPortal?.RequiresCheckpoint == true, assignedCitadel: source < _portalCount ? CitadelAssignments.For(portals[source]) : nav.SingleDestination); LastMessage = "Spawned " + ship.Definition.DisplayName;
+            chosenPortal?.GetNodeOrNull<EnergyFieldVisual>("Visuals/EnergyField")?.PlaySpawnPulse();
             return ship;
         }
         ship.Free(); LastMessage = "No permitted reachable spawn exit; check tiles and Citadel approach points.";
@@ -206,6 +207,7 @@ public partial class SpawnManager : Node
         EnemyPortal chosenPortal = chosen < _portalCount ? _portalObjects[chosen] as EnemyPortal : null;
         if (waveOwned) WaveEnemyCreated?.Invoke(ship);
         ship.Initialize(Registry, Paths, spawnWithShield, chosenPortal?.ResolveCheckpoint(), chosenPortal?.RequiresCheckpoint == true, assignedCitadel: chosen < _portalCount ? CitadelAssignments.For(_portalObjects[chosen]) : nav.SingleDestination, spawnWithStealth: spawnWithStealth); LastMessage = "Wave spawned " + ship.Definition.DisplayName;
+        chosenPortal?.GetNodeOrNull<EnergyFieldVisual>("Visuals/EnergyField")?.PlaySpawnPulse();
         return ship;
     }
 

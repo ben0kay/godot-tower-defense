@@ -1,3 +1,7 @@
+## VE2 energy structures — 2026-10-21
+
+EnergyFieldVisual.cs, EnergyFieldStyle.cs, Shaders/EnergyField.gdshader, Presets/PortalEnergy.tres, Presets/CitadelReactor.tres. The reusable shader selects a portal-vortex or reactor-core mode, with per-instance material parameters and optional event-only portal spawn flash. Inspector tune each preset. No 2D HDR/bloom setup, gameplay mechanics or new per-frame CPU hooks. VE5C bloom test removed as requested.
+
 ## VE1 organic background refinement — 2026-10-21
 
 The early VE1 screenshot showed rectangular cloud bands and a hard-edged rectangle from the original baked backdrop. `Shaders/NebulaDrift.gdshader` now uses four-octave domain-warped clouds shaped by an irregular elliptical fade rather than rectangular edge feathering. The original `WORLD/BACKGROUNDS/Stars/level001_space.svg` opaque solid background rectangle is removed, retaining the static dots and faint pre-baked elliptical nebula. The scene's underlying viewport clear color will show through transparent portions. **This makes the backdrop's base color depend on project/viewport clear settings**, so verify that the out-of-map space remains the intended dark-blue shade at normal zoom. No terrain or other gameplay layer is changed.

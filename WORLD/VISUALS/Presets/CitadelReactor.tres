@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="EnergyFieldStyle" load_steps=2 format=3]
+[ext_resource type="Script" path="res://WORLD/VISUALS/EnergyFieldStyle.cs" id="1"]
+[resource]
+script = ExtResource("1")
+Kind = 1
+Tint = Color(0.18, 0.93, 0.94, 1)
+Opacity = 0.68
+AnimationSpeed = 0.27
+GlowWidth = 0.11

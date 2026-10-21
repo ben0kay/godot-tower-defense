@@ -1,3 +1,9 @@
+## VE2 visual energy — 2026-10-21
+
+The existing violet SVG stays as the base. An EnergyField ColorRect under Visuals shares WORLD/VISUALS/Shaders/EnergyField.gdshader and PortalEnergy.tres. Very slow purple swirl/rim are GPU shader motion. A successful wave/F2 portal spawn triggers the optional PlaySpawnPulse on that portal; only the overlay brightens briefly. Visuals child retains existing Scale multiplier and SpawnExit is unchanged. The overlay ignores mouse events and never changes collision/path/spawn logic. Desktop appearance is pending verification.
+
+---
+
 ## Violet portal artwork — 2026-10-20
 
 `EnemyPortal.tscn` now uses a cached `Sprite2D` referencing `Visuals/PortalViolet.svg` instead of its old cyan Polygon2D placeholder. The new texture contains a violet spiral, metallic outer ring and softly shaded central glow; it is **static**, with no procedural per-frame drawing or gameplay-affecting animation. `Visuals` remains the existing size-multiplied child, so the current portal-size Inspector slider continues to scale the entire texture. `SpawnExit`, editor snapping, collision footprint, routes, wave spawning and portal size-dependent spawn spread remain unchanged. To replace artwork, edit the SVG under this portal's `Visuals/` folder.

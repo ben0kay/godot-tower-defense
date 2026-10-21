@@ -1,3 +1,9 @@
+## VE2 reactor energy — 2026-10-21
+
+A transparent, non-interactive ReactorEnergy ColorRect now overlays the SVG's center at local (64,64), with shared EnergyField.gdshader and CitadelReactor.tres. The cyan/teal reactor gently breathes via GPU shader TIME without an idle C# process. No dependency on Credits or CitadelHealth and no changes to multi-Citadel logic or click areas. Future credit-ready/damage accents require event integration and are not implemented. Desktop visual verification pending.
+
+---
+
 ## Fortress artwork — 2026-10-20
 
 `Citadel.tscn` now uses a cached `Sprite2D` referencing `Visuals/CitadelFortress.svg` instead of the temporary Hull/Core polygons. The top-down armored 192px octagonal fortress is centered at local `(64,64)` to retain the existing 3×3 footprint alignment; its cyan reactor is decorative only. The `WorldObjectFootprint` root, 4 approach markers, health component, label, collision/navigation, clicking and multi-Citadel identity remain untouched. It has no runtime geometry generation or animation. Edit the SVG in this Citadel's `Visuals/` folder to swap it later.
