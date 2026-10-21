@@ -1,3 +1,7 @@
+## Segment safety counters — 2026-10-20
+
+F5 report metadata includes world-lifetime segmentSafetyHits, segmentSafetyBuilds and current segmentSafetyEntries. Hits include cached uncertain results, which still use original movement sweeps; a hit alone does not mean a sweep was skipped. Compare Clearance CPU timing separately. Counters persist when entries are invalidated and reset with the NavigationGrid lifetime.
+
 ## Shared-route report counters
 
 F5 reports now include `sharedRawHits`, `sharedRefinedHits`, and `sharedTemplateBuilds` in workload metadata. These are cumulative for the current world, whereas CPU rows cover only the retained sample window. See `WORLD/NAVIGATION/README.md` for the global Shared Route Pool toggle and bounded variation settings.

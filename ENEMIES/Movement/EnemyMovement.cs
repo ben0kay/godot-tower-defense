@@ -302,7 +302,7 @@ public partial class EnemyMovement : Node
             if (distance <= 0.01f) { _next++; continue; }
             if (travel <= 0f) break;
             Vector2 nextPosition = Enemy.GlobalPosition.MoveToward(target, travel);
-            if (!_paths.Navigation.SegmentClear(Enemy.GlobalPosition, nextPosition, Enemy.Definition.RadiusPixels))
+            if (!_route.MovementClear(_next, Enemy.GlobalPosition, nextPosition, _paths.Navigation, Enemy.Definition.RadiusPixels))
             { RequestRoute(0f, true); return; }
             float entry = 0;
             bool reachesCheckpoint = HeadingToCheckpoint && _checkpointError.Length == 0 && GodotObject.IsInstanceValid(Checkpoint)

@@ -1,3 +1,13 @@
+## Cached movement safety — 2026-10-20
+
+Implemented the shared-route follow-up: `WORLD/NAVIGATION/RouteSegmentSafety.cs` caches conservative continuous swept-circle safety certificates for exact segment endpoints and enemy radius. Compatible ships reuse certificates across waves. Warmed lazily on first traversal, not baked each round. Each physics tick still moves/aims accurately, but certified on-segment movement skips repeated wall sampling. Geometry near expanded wall rectangles, deviations/teleports and disabled caching use the original swept check. Strict logical/corridor corner results are cached per ship/segment and navigation revision.
+
+Only walkability changes invalidate safety. Existing WorldGrid occupancy already publishes no navigation event for towers entirely on solid terrain. A passable-tile blocker expires intersecting certificates immediately; unrelated certificates survive placement/removal. Full terrain rebuild/unload clears all. Existing queued route validations and replacement A* remain count/time budgeted; urgent unsafe movement cannot proceed while waiting. Corner memoization resets conservatively on any navigation revision. No combat stats, maps, wave recipes or UI layout changed.
+
+Toggle `EnemyMasterConfig.EnableRouteSafetyCache` under **Shared Route Pool**; defaults true independently of route-template pooling. Storage is bounded to clamped SharedRouteCacheEntries ×32 segment entries; uncertain results are cached too but never authorize movement. F5 metadata adds cumulative segmentSafetyHits/segmentSafetyBuilds/segmentSafetyEntries (not five-second CPU-window counts). See TESTS/Performance/SharedRoutePool.md for verification and limitations.
+
+---
+
 ## Shared-route optimization — 2026-10-20
 
 User approved sharing finished waypoint variants after four desktop PF2 captures and the corridor-off comparison. A bounded world-owned raw/refined route pool now avoids repeated compatible A*/corridor work. Demand-warmed within existing requests, not an exhaustive startup bake. Exact safety/appearance tradeoffs, controls and benchmark/regression evidence: `WORLD/NAVIGATION/README.md` and `TESTS/Performance/SharedRoutePool.md`. This addresses repeated route assignment; remaining movement/spawn/render costs and target-hardware FPS are not claimed fixed. Earlier pass statuses below are historical context.

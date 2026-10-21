@@ -1,3 +1,7 @@
+## Cached movement safety — 2026-10-20
+
+Enemies now share conservative route-segment safety results across waves, avoiding repeated swept wall checks on certified unchanged geometry. Only relevant walkability changes expire certificates; existing staggered repaths and uncertain-geometry fallback remain. Toggle **Enable Route Safety Cache** under the enemy config's Shared Route Pool. See WORLD/NAVIGATION/README.md and TESTS/Performance/SharedRoutePool.md.
+
 ## Shared finished routes — 2026-10-20
 
 Compatible enemies now reuse bounded raw paths and finished corridor variations, with selective tower-block invalidation and private movement progress. Toggle **Shared Route Pool** in `ENEMIES/DefaultEnemyConfig.tres`. It warms through ordinary budgeted requests, with no exhaustive startup bake. Trajectories may repeat more often. See `WORLD/NAVIGATION/README.md` and `TESTS/Performance/SharedRoutePool.md` for behavior and measured results.

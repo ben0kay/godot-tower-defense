@@ -19,6 +19,7 @@ public partial class NavigationGrid : Node
         : destination.Available ? destination.Goals : System.Array.Empty<Vector2I>();
     [Export] public EnemyMasterConfig Config { get; set; }
     public SharedRoutePool RoutePool { get; } = new();
+    public RouteSegmentSafety SegmentSafety { get; } = new();
     public int CostRevision { get; private set; }
     public int CongestionRevision => _crowdRevision;
     public const int NeutralProfile = -1;
@@ -83,7 +84,7 @@ public partial class NavigationGrid : Node
     {
         EnsureProfiles();
         if (_revision == Revision) return;
-        RoutePool.Clear();
+        RoutePool.Clear(); SegmentSafety.Clear();
         long started = Stopwatch.GetTimestamp(); FullRebuildCount++;
         _crowd.Clear(); _crowdRevision++; _crowdTimer = 0f;
         _solid ??= new bool[Grid.Config.WidthCells * Grid.Config.HeightCells];
@@ -103,8 +104,8 @@ public partial class NavigationGrid : Node
     // One tower modifies one cell in each shared profile; terrain reloads defer a full refresh.
     private void OnGridChanged(Vector2I? changed, bool blocked)
     {
-        if (changed == null || _revision < 0) { RoutePool.Clear(); _revision = -1; return; }
-        RoutePool.Invalidate(changed.Value, blocked);
+        if (changed == null || _revision < 0) { RoutePool.Clear(); SegmentSafety.Clear(); _revision = -1; return; }
+        RoutePool.Invalidate(changed.Value, blocked); SegmentSafety.Invalidate(changed.Value);
         long started = Stopwatch.GetTimestamp();
         foreach (Profile profile in _profiles) profile.AStar.SetPointSolid(changed.Value, blocked);
         _solid[changed.Value.Y * Grid.Config.WidthCells + changed.Value.X] = blocked;
@@ -122,7 +123,7 @@ public partial class NavigationGrid : Node
         for (int y = rectangle.Position.Y; y < rectangle.End.Y; y++) for (int x = rectangle.Position.X; x < rectangle.End.X; x++)
         {
             Vector2I cell = new(x, y); if (Grid.TerrainBlocksEnemies(cell)) continue;
-            RoutePool.Invalidate(cell, blocked);
+            RoutePool.Invalidate(cell, blocked); SegmentSafety.Invalidate(cell);
             foreach (Profile profile in _profiles) profile.AStar.SetPointSolid(cell, blocked);
             _solid[y * Grid.Config.WidthCells + x] = blocked; IncrementalCellUpdates++;
         }
@@ -481,6 +482,6 @@ public partial class NavigationGrid : Node
 
     // =========================================================
     // Release the native pathfinding resource with the world.
-    public override void _ExitTree() { RoutePool.Clear(); foreach (var destination in Destinations) destination.Dispose(); if (GodotObject.IsInstanceValid(Grid)) { Grid.NavigationChanged -= OnGridChanged; Grid.NavigationBatchChanged -= OnGridBatchChanged; } foreach (Profile profile in _profiles) profile.AStar.Dispose(); }
+    public override void _ExitTree() { RoutePool.Clear(); SegmentSafety.Clear(); foreach (var destination in Destinations) destination.Dispose(); if (GodotObject.IsInstanceValid(Grid)) { Grid.NavigationChanged -= OnGridChanged; Grid.NavigationBatchChanged -= OnGridBatchChanged; } foreach (Profile profile in _profiles) profile.AStar.Dispose(); }
     #endregion
 }

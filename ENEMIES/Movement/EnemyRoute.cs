@@ -8,6 +8,8 @@ public sealed class EnemyRoute
     public bool ReusedTemplate { get; private set; }
     public bool CorridorVariationApplied { get; private set; }
     private Vector2I[][] _corridorCorners;
+    private int _cornerRevision = -1;
+    private readonly Dictionary<int, bool> _cornerSafety = new();
     public Vector2[] Points { get; private set; } = System.Array.Empty<Vector2>();
     public float[] Suffix { get; private set; } = System.Array.Empty<float>();
     private Vector2I[] _logicalCells = System.Array.Empty<Vector2I>();
@@ -87,7 +89,7 @@ public sealed class EnemyRoute
     // Cache physical distance and swept dependencies from the actual traveled chain, not its old centerline.
     private void CacheGeometry(Vector2 start, NavigationGrid nav, float radius)
     {
-        Dependencies.Clear();
+        _cornerRevision = -1; _cornerSafety.Clear(); Dependencies.Clear();
         for (int i = Points.Length - 2; i >= 0; i--) Suffix[i] = Suffix[i + 1] + Points[i].DistanceTo(Points[i + 1]);
         for (int i = 0; i < Points.Length; i++)
         {
@@ -148,8 +150,31 @@ public sealed class EnemyRoute
     }
 
     // =========================================================
+    // Only motion on the certified segment skips sampling; teleports/deviations keep the original sweep.
+    public bool MovementClear(int index, Vector2 from, Vector2 to, NavigationGrid nav, float radius)
+    {
+        if (index > 0 && index < Points.Length)
+        {
+            Vector2 a = Points[index - 1], b = Points[index];
+            if (Geometry2D.GetClosestPointToSegment(from, a, b).DistanceSquaredTo(from) <= .000001f
+                && Geometry2D.GetClosestPointToSegment(to, a, b).DistanceSquaredTo(to) <= .000001f
+                && nav.SegmentSafety.Certified(nav, a, b, radius)) return true;
+        }
+        return nav.SegmentClear(from, to, radius);
+    }
+
+    // =========================================================
     // Cached logical corner links stay strict even for tiny-radius ships with lateral offsets.
     public bool CornerBlocked(int index, NavigationGrid nav)
+    {
+        if (!nav.Config.EnableRouteSafetyCache) return ComputeCornerBlocked(index, nav);
+        if (_cornerRevision != nav.Revision) { _cornerSafety.Clear(); _cornerRevision = nav.Revision; }
+        if (!_cornerSafety.TryGetValue(index, out bool blocked)) _cornerSafety[index] = blocked = ComputeCornerBlocked(index, nav);
+        return blocked;
+    }
+    // =========================================================
+    // Preserve existing strict logical/corridor corner rules on every navigation revision.
+    private bool ComputeCornerBlocked(int index, NavigationGrid nav)
     {
         if (_corridorCorners != null)
         {

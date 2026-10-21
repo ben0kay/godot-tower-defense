@@ -1,3 +1,13 @@
+## Cached movement safety — 2026-10-20
+
+Implemented the shared-route follow-up: `WORLD/NAVIGATION/RouteSegmentSafety.cs` caches conservative continuous swept-circle safety certificates for exact segment endpoints and enemy radius. Compatible ships reuse certificates across waves. Warmed lazily on first traversal, not baked each round. Each physics tick still moves/aims accurately, but certified on-segment movement skips repeated wall sampling. Geometry near expanded wall rectangles, deviations/teleports and disabled caching use the original swept check. Strict logical/corridor corner results are cached per ship/segment and navigation revision.
+
+Only walkability changes invalidate safety. Existing WorldGrid occupancy already publishes no navigation event for towers entirely on solid terrain. A passable-tile blocker expires intersecting certificates immediately; unrelated certificates survive placement/removal. Full terrain rebuild/unload clears all. Existing queued route validations and replacement A* remain count/time budgeted; urgent unsafe movement cannot proceed while waiting. Corner memoization resets conservatively on any navigation revision. No combat stats, maps, wave recipes or UI layout changed.
+
+Toggle `EnemyMasterConfig.EnableRouteSafetyCache` under **Shared Route Pool**; defaults true independently of route-template pooling. Storage is bounded to clamped SharedRouteCacheEntries ×32 segment entries; uncertain results are cached too but never authorize movement. F5 metadata adds cumulative segmentSafetyHits/segmentSafetyBuilds/segmentSafetyEntries (not five-second CPU-window counts). See TESTS/Performance/SharedRoutePool.md for verification and limitations.
+
+---
+
 ## Shared raw/finished-route cache — 2026-10-20
 
 Implemented level-owned bounded route reuse after PF2 captures identified costly refinement. Reuses8 stable variations by default; global master/variant/cache limits live in EnemyMasterConfig. Original routing remains available with master off. Selective block invalidation, safe actual-origin connectors, independent ship progress and checkpoint branches are retained. Demand-warmed through existing budgets rather than a synchronous startup bake. No map, waves or combat values changed. F5 reports include cumulative cache counters. Evidence and baseline suite limitations: `TESTS/Performance/SharedRoutePool.md`.

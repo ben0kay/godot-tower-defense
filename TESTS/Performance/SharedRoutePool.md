@@ -1,3 +1,13 @@
+## Movement safety extension — 2026-10-20
+
+Build passed with zero warnings/errors. SharedRoutePoolChecks passed with safety caching enabled: shared certificates, exact-radius separation, immediate affected-block invalidation, unrelated-block retention, off-route swept fallback, blocker removal, storage bound, full terrain reset, and actual placement/removal on a solid buildable tile producing no navigation revision. Existing twelve-ship/two-checkpoint test and 100/500 live-ship runs (600 ticks after obstruction) passed. MovementRegistryChecks, ProjectileAccuracyChecks and PerformanceOverlayChecks also passed. Fixture warnings about the missing secondary portal SpawnExit and catalog fallback remain; no new broader-suite pass claim supersedes the baseline failures documented below.
+
+Isolated warmed 100,000 movement checks: original sweeps 85.379ms versus cached checks 31.891ms on this host. Earlier run: 78.181ms versus30.399ms. These measure a straight open segment, include segment-membership checks/cache lookup, and exclude cold certificate construction. They are not an overall FPS comparison. Conservative certificates use expanded blocked-cell rectangles (including a small numeric margin); uncertain segments keep the original sampled sweep and may see less benefit. Original corner rules remain separate and are memoized per route/navigation revision. Actual route templates/progress and firing rates are unchanged.
+
+The new helper is world-owned, bounded, shared across waves, and warmed on demand on first traversal. No startup bake or extra per-frame enemy scan was added. Navigation events selectively invalidate certificates synchronously before further movement, while existing route validation/replacement work stays queued and budgeted. F5 adds cumulative certificate counters; a cache hit can include an uncertain result and does not by itself prove a sweep was skipped.
+
+---
+
 # Shared route pool — verification 2026-10-20
 
 Source base: `5990d6c`. Godot4.7.2 Mono/.NET8, headless execution container. `dotnet build --no-restore` passed with zero warnings/errors; headless import completed. These are controlled CPU/correctness fixtures, not the user's rendered Level100 FPS or exact desktop tower layout.
