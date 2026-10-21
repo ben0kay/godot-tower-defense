@@ -1,3 +1,7 @@
+## Level100 wave numbering update — 2026-10-20
+
+The user removed original waves1–3. Former wave4 (400 ships) is now wave1; former wave5 (500 ships) is now wave2, with identical batch recipes. References to waves4/5 and five-wave totals below describe the original measurement workload, not the current wave list.
+
 ## PF2 implementation — 2026-10-20
 
 User approved PF2 and removal of the old grid Info overlay. Optional timing scopes now feed F4; Shift+F4 starts/stops, F5 prints/saves reports. Default off, fixed rolling physics samples, inclusive overlap labels and world/lifecycle guards. Old Info nodes/script removed; F2/F3 retained. Actual build/headless results and remaining desktop overhead/workload measurements: `TESTS/Debug/PF2.md`. This implements the measurement tooling, not a measured diagnosis or FPS gain. Earlier PF1-only stopping instructions below describe the prior job.

@@ -26,9 +26,9 @@ public partial class Level100StressChecks : Node
             Require(config.WaveSource is Level100Waves && config.WaveSetId == "level100",
                 "WaveSource is an Inspector-assignable Level100Waves resource");
             WaveDefinition[] waves = config.WaveSource.Build();
-            Require(waves.Length == 5, "Exactly five stress waves");
+            Require(waves.Length == 2, "Exactly two stress waves");
             WaveCatalog.Validate(waves, EnemyCatalog.Default.ToSceneMap());
-            int[] totals = { 100, 200, 300, 400, 500 };
+            int[] totals = { 400, 500 };
             RandomNumberGenerator random = new(); random.Seed = 12345;
             int all = 0;
             for (int i = 0; i < waves.Length; i++)
@@ -51,7 +51,8 @@ public partial class Level100StressChecks : Node
                 Require(count == totals[i] && gunner == 20, "Wave " + wave.Number + " has exact enemy and gunner totals");
                 all += count;
             }
-            Require(all == 1500, "Five waves schedule 1,500 enemies in all");
+            Require(all == 900, "Two waves schedule 900 enemies in all");
+            GD.Print("PASS: two contiguous Level100 waves, 400/500 scheduled ships, 20 gunners each, valid catalog composition");
             WorldLevel map = GD.Load<PackedScene>(mission.MapScenePath).Instantiate<WorldLevel>();
             try
             {
@@ -65,7 +66,7 @@ public partial class Level100StressChecks : Node
                 Require(map.GetNodeOrNull<Node2D>("Objectives/Citadel") != null, "Citadel remains editable");
             }
             finally { map.Free(); }
-            GD.Print("PASS: Level100 blank terrain, campaign registry, five portals, 100k credits, 1500 scheduled enemies, 20 gunners/wave.");
+            GD.Print("PASS: Level100 blank terrain, campaign registry, five portals, 100k credits, 900 scheduled enemies, 20 gunners/wave.");
             GetTree().Quit();
         }
         catch (Exception error) { GD.PushError(error.ToString()); GetTree().Quit(1); }

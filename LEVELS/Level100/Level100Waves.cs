@@ -14,109 +14,12 @@ public partial class Level100Waves : WaveSetSource
 
     #region Authored Stress Waves
     // =========================================================
-    // Four minigun groups of five in every wave; light swarms grow from 80 to 480 additional ships.
+    // Four minigun groups of five in every wave; light swarms contain 380 then 480 additional ships.
     // All five enabled portals are equally eligible for unpinned spawns. Manually start each wave.
     public static WaveDefinition[] Create() =>
     [
-        // Wave 1: 100 scheduled ships = 80 mixed attackers + exactly 20 armed gunners.
+        // Wave 1 (formerly wave 4): 400 scheduled ships = 380 mixed attackers + exactly 20 armed gunners.
         Wave(1,
-            Batch(count: 20, interval: 0.120, after: 0.80,
-                Enemy("basic_mk1", 75),
-                Enemy("scout_mk1", 25)),
-            Batch(count: 5, interval: 0.150, after: 0.60,
-                Enemy("gunner_drone_mk1")),
-            Batch(count: 15, interval: 0.100, after: 0.80,
-                Enemy("basic_mk1", 80),
-                Enemy("scout_mk1", 13),
-                Enemy("medium_mk1", 7)),
-            Batch(count: 5, interval: 0.150, after: 0.60,
-                Enemy("gunner_drone_mk1")),
-            Batch(count: 25, interval: 0.110, after: 0.80,
-                Enemy("basic_mk1", 55),
-                Enemy("scout_mk1", 35),
-                Enemy("racer_mk1", 10)),
-            Batch(count: 5, interval: 0.150, after: 0.60,
-                Enemy("gunner_drone_mk1")),
-            Batch(count: 20, interval: 0.100, after: 0.00,
-                Enemy("basic_mk1", 60),
-                Enemy("scout_mk1", 35),
-                Enemy("medium_mk1", 5)),
-            Batch(count: 5, interval: 0.150, after: 0.00,
-                Enemy("gunner_drone_mk1"))
-        ),
-
-        // Wave 2: 200 scheduled ships = 180 mixed attackers + exactly 20 armed gunners.
-        Wave(2,
-            Batch(count: 45, interval: 0.085, after: 1.00,
-                Enemy("basic_mk1", 45),
-                Enemy("scout_mk1", 35),
-                Enemy("racer_mk1", 10),
-                Enemy("reinforced_drone_mk1", 10)),
-            Batch(count: 5, interval: 0.150, after: 0.60,
-                Enemy("gunner_drone_mk1")),
-            Batch(count: 40, interval: 0.090, after: 0.75,
-                Enemy("basic_mk1", 40),
-                Enemy("scout_mk1", 30),
-                Enemy("reinforced_drone_mk1", 25),
-                Enemy("medium_mk1", 5)),
-            Batch(count: 5, interval: 0.150, after: 0.60,
-                Enemy("gunner_drone_mk1")),
-            Batch(count: 50, interval: 0.085, after: 1.00,
-                Enemy("basic_mk1", 38),
-                Enemy("scout_mk1", 32),
-                Enemy("racer_mk1", 15),
-                Enemy("medium_mk1", 15)),
-            Batch(count: 5, interval: 0.150, after: 0.60,
-                Enemy("gunner_drone_mk1")),
-            Batch(count: 45, interval: 0.090, after: 0.00,
-                Enemy("basic_mk1", 35),
-                Enemy("scout_mk1", 30),
-                Enemy("reinforced_drone_mk1", 20),
-                Enemy("medium_mk1", 10),
-                Enemy("shield_emitter_mk1", 5)),
-            Batch(count: 5, interval: 0.150, after: 0.00,
-                Enemy("gunner_drone_mk1"))
-        ),
-
-        // Wave 3: 300 scheduled ships = 280 mixed attackers + exactly 20 armed gunners.
-        Wave(3,
-            Batch(count: 60, interval: 0.070, after: 0.85,
-                Enemy("basic_mk1", 38),
-                Enemy("scout_mk1", 32),
-                Enemy("racer_mk1", 15),
-                Enemy("reinforced_drone_mk1", 12),
-                Enemy("medium_mk1", 3)),
-            Batch(count: 5, interval: 0.150, after: 0.60,
-                Enemy("gunner_drone_mk1")),
-            Batch(count: 75, interval: 0.075, after: 0.90,
-                Enemy("basic_mk1", 35),
-                Enemy("scout_mk1", 27),
-                Enemy("reinforced_drone_mk1", 23),
-                Enemy("medium_mk1", 13),
-                Enemy("shield_emitter_mk1", 2)),
-            Batch(count: 5, interval: 0.150, after: 0.60,
-                Enemy("gunner_drone_mk1")),
-            Batch(count: 70, interval: 0.070, after: 0.80,
-                Enemy("basic_mk1", 33),
-                Enemy("scout_mk1", 30),
-                Enemy("racer_mk1", 12),
-                Enemy("reinforced_drone_mk1", 20),
-                Enemy("medium_mk1", 5)),
-            Batch(count: 5, interval: 0.150, after: 0.60,
-                Enemy("gunner_drone_mk1")),
-            Batch(count: 75, interval: 0.075, after: 0.00,
-                Enemy("basic_mk1", 30),
-                Enemy("scout_mk1", 25),
-                Enemy("reinforced_drone_mk1", 25),
-                Enemy("medium_mk1", 15),
-                Enemy("shield_frigate_mk1", 3, shield: true),
-                Enemy("heavy_bulwark_mk1", 2)),
-            Batch(count: 5, interval: 0.150, after: 0.00,
-                Enemy("gunner_drone_mk1"))
-        ),
-
-        // Wave 4: 400 scheduled ships = 380 mixed attackers + exactly 20 armed gunners.
-        Wave(4,
             Batch(count: 95, interval: 0.065, after: 0.90,
                 Enemy("basic_mk1", 34),
                 Enemy("scout_mk1", 28),
@@ -154,8 +57,8 @@ public partial class Level100Waves : WaveSetSource
                 Enemy("gunner_drone_mk1"))
         ),
 
-        // Wave 5: 500 scheduled ships = 480 mixed attackers + exactly 20 armed gunners.
-        Wave(5,
+        // Wave 2 (formerly wave 5): 500 scheduled ships = 480 mixed attackers + exactly 20 armed gunners.
+        Wave(2,
             Batch(count: 120, interval: 0.058, after: 0.85,
                 Enemy("basic_mk1", 30),
                 Enemy("scout_mk1", 30),

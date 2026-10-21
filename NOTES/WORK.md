@@ -1,3 +1,7 @@
+## Level100 stress-wave shortcut — 2026-10-20
+
+Removed original waves1–3. Former wave4 is now wave1 (400 ships); former wave5 is now wave2 (500 ships). Retained all batch recipes/timings/weights/shields, including20 gunners per wave;900 scheduled ships/40 gunners total. Existing map painting, portals and mission settings are preserved. Updated Level100 README and quota-test expectations. Historical profiler notes mentioning wave4/5 refer to the old numbering.
+
 ## PF2 subsystem profiling + legacy overlay removal — 2026-10-20
 
 Implemented optional world-scoped CPU timings in the existing F4 panel. Shift+F4 toggles capture (default off); F5 dumps mean/p95/peak/calls and metadata to user://Debug. Fixed rolling sample storage, nested-cost labels, sampled-tick stride, world/pause/unload isolation and partial observer cost are included. Removed old top-left grid Info nodes/script while preserving F2/F3/checkpoint controls. See DEBUG/README.md and TESTS/Debug/PF2.md for real validation and remaining target-hardware measurements. PF3/PF4 optimizations are not included.
