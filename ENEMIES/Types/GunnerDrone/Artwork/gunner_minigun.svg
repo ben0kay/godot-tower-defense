@@ -1,14 +1,25 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="40" viewBox="0 0 24 40">
-<!-- Up-facing gun: rotation origin at canvas centre (12,20); muzzle tip (12,2) => Marker2D(0,-18). -->
-<defs><linearGradient id="steel"><stop stop-color="#18242e"/><stop offset=".4" stop-color="#94a4ad"/><stop offset=".65" stop-color="#455763"/><stop offset="1" stop-color="#16232e"/></linearGradient></defs>
-<g stroke-linejoin="round">
- <path d="M7 21V5L9 2H15L17 5V21Z" fill="url(#steel)" stroke="#0b141d" stroke-width="1.2"/>
- <path d="M10 5V18M14 5V18" stroke="#15232d" stroke-width="1.2"/>
- <path d="M7 2H17V6H7Z" fill="#263743" stroke="#bd7365" stroke-width="1"/>
- <path d="M6 13H18V16H6Z" fill="#4d616d" stroke="#12212b"/>
- <path d="M4 20L7 16H17L20 20V28L16 32H8L4 28Z" fill="#354855" stroke="#8598a4" stroke-width="1"/>
- <circle cx="12" cy="23" r="5" fill="#162631" stroke="#718795"/>
- <circle cx="12" cy="23" r="2" fill="#c96552"/>
- <path d="M8 31H16V35H8Z" fill="#182731" stroke="#4c606e"/>
+<!-- Up-facing independent minigun. Keep canvas centre (12,20), and real muzzle tip (12,2) = Marker2D(0,-18). -->
+<defs>
+ <linearGradient id="armour" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d1e1e7"/><stop offset=".32" stop-color="#819ba8"/><stop offset=".67" stop-color="#486575"/><stop offset="1" stop-color="#223742"/></linearGradient>
+ <linearGradient id="barrels" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#101d29"/><stop offset=".45" stop-color="#a0c3ce"/><stop offset=".75" stop-color="#334956"/><stop offset="1" stop-color="#142632"/></linearGradient>
+</defs>
+<g stroke-linejoin="round" stroke-linecap="round">
+ <!-- Thin contrasting silhouette leaves the whole rotating mount readable against dark hull. -->
+ <path d="M4 17L5 7L8 3H16L19 7L20 17L22 21L21 30L17 34H7L3 30L2 21Z" fill="#101923" stroke="#bed8e2" stroke-width="1.1"/>
+ <!-- Three long barrel rails; single physical muzzle remains at the central front tip. -->
+ <path d="M6 18V5L8 2H10V18Z M10.5 19V3H13.5V19Z M14 18V2H16L18 5V18Z" fill="url(#barrels)" stroke="#0a1822" stroke-width=".75"/>
+ <path d="M8 6V16 M12 5V17 M16 6V16" stroke="#d3edf1" stroke-width=".85" opacity=".85"/>
+ <path d="M5 6H19V10H5Z" fill="#344855" stroke="#d9a196" stroke-width="1"/>
+ <path d="M5 15H19V19H5Z" fill="#91b4c0" stroke="#1b2e3a" stroke-width=".8"/>
+ <!-- Strong angular rotating gun shield. -->
+ <path d="M4 20L8 17H16L20 20L21 27L16 32H8L3 27Z" fill="url(#armour)" stroke="#deedf0" stroke-width="1.15"/>
+ <path d="M5 21L10 19H14L19 21L17 26H7Z" fill="#283e4b" stroke="#90a8b3" stroke-width=".75"/>
+ <path d="M4 23L7 26L7 29L4 27Z M20 23L17 26L17 29L20 27Z" fill="#bd7770"/>
+ <circle cx="12" cy="24" r="5.1" fill="#122734" stroke="#b8d0da" stroke-width="1.2"/>
+ <circle cx="12" cy="24" r="2.6" fill="#ea866c" stroke="#702c2b" stroke-width=".7"/>
+ <circle cx="12" cy="24" r="1" fill="#ffe2bd"/>
+ <path d="M8 31H16L17 35H7Z" fill="#526e7b" stroke="#b7d0dc" stroke-width=".9"/>
+ <path d="M9 35H15" stroke="#f39b75" stroke-width="1.5"/>
 </g>
 </svg>
