@@ -1,3 +1,13 @@
+## Cache-pressure regression — 2026-10-20
+
+Reproduced on unchanged 6aab989 production code using the new pressure harness: 600 different active segments, shared capacity512, fixed open terrain, no placements,120 ticks (72,000 movement checks). After warming:10,680 extra builds and61,320 hits,36.137ms. The new assertion fails on that baseline as expected. With the correction:0 additional builds,0 shared dictionary consultations,512 shared entries,12.931ms. The active result adds constant per-route storage and survives global entry eviction. These synthetic times are not overall FPS measurements.
+
+Build passed with zero warnings/errors. SharedRoutePoolChecks passed, including least-recently-used eviction ordering, active-result invalidation by new blockers, uncertain-result retention with original safe-prefix sweeps, removal, off switch, existing selective invalidation/size/bounds/terrain checks, two required checkpoints for12 ships, and100/500-ship dynamic-blocker runs for600 ticks. Existing prior baseline-suite caveats below remain applicable; this is not a complete-suite pass claim.
+
+The 100,000-check warmed straight-segment benchmark measured90.267ms swept versus13.451ms cached on this run. It now includes the local memo path. F5 eviction counters help distinguish normal initial warming from repeat rebuilding. No combat or effects optimization was bundled into this fix.
+
+---
+
 ## Movement safety extension — 2026-10-20
 
 Build passed with zero warnings/errors. SharedRoutePoolChecks passed with safety caching enabled: shared certificates, exact-radius separation, immediate affected-block invalidation, unrelated-block retention, off-route swept fallback, blocker removal, storage bound, full terrain reset, and actual placement/removal on a solid buildable tile producing no navigation revision. Existing twelve-ship/two-checkpoint test and 100/500 live-ship runs (600 ticks after obstruction) passed. MovementRegistryChecks, ProjectileAccuracyChecks and PerformanceOverlayChecks also passed. Fixture warnings about the missing secondary portal SpawnExit and catalog fallback remain; no new broader-suite pass claim supersedes the baseline failures documented below.

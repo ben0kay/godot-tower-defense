@@ -1,3 +1,7 @@
+## Safety-cache churn correction — 2026-10-20
+
+Active enemies now retain their current segment's safety result, and the shared cache evicts least-recently-used entries. This prevents repeated rebuilding when active segments exceed shared capacity, while immediate navigation invalidation and swept fallbacks remain. See TESTS/Performance/SharedRoutePool.md for the reproduced pressure case and verification.
+
 ## Cached movement safety — 2026-10-20
 
 Enemies now share conservative route-segment safety results across waves, avoiding repeated swept wall checks on certified unchanged geometry. Only relevant walkability changes expire certificates; existing staggered repaths and uncertain-geometry fallback remain. Toggle **Enable Route Safety Cache** under the enemy config's Shared Route Pool. See WORLD/NAVIGATION/README.md and TESTS/Performance/SharedRoutePool.md.

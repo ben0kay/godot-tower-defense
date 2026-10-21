@@ -1,3 +1,7 @@
+## Safety cache pressure counters — 2026-10-20
+
+F5 adds world-lifetime segmentSafetyEvictions. Ships retain their current segment result until geometry/radius/navigation changes, so shared-hit growth no longer counts every warm movement tick. Consults can reuse uncertain results, which retain swept fallback. A full shared cache alone does not prove churn; compare build/eviction deltas while the same segments remain active.
+
 ## Segment safety counters — 2026-10-20
 
 F5 report metadata includes world-lifetime segmentSafetyHits, segmentSafetyBuilds and current segmentSafetyEntries. Hits include cached uncertain results, which still use original movement sweeps; a hit alone does not mean a sweep was skipped. Compare Clearance CPU timing separately. Counters persist when entries are invalidated and reset with the NavigationGrid lifetime.

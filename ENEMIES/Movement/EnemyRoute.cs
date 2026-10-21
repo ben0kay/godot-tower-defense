@@ -10,6 +10,11 @@ public sealed class EnemyRoute
     private Vector2I[][] _corridorCorners;
     private int _cornerRevision = -1;
     private readonly Dictionary<int, bool> _cornerSafety = new();
+    private RouteSegmentSafety _safetyPool;
+    private long _safetyVersion = -1;
+    private int _safetyIndex = -1;
+    private float _safetyRadius;
+    private bool _segmentCertified;
     public Vector2[] Points { get; private set; } = System.Array.Empty<Vector2>();
     public float[] Suffix { get; private set; } = System.Array.Empty<float>();
     private Vector2I[] _logicalCells = System.Array.Empty<Vector2I>();
@@ -89,7 +94,7 @@ public sealed class EnemyRoute
     // Cache physical distance and swept dependencies from the actual traveled chain, not its old centerline.
     private void CacheGeometry(Vector2 start, NavigationGrid nav, float radius)
     {
-        _cornerRevision = -1; _cornerSafety.Clear(); Dependencies.Clear();
+        _safetyIndex = -1; _safetyPool = null; _cornerRevision = -1; _cornerSafety.Clear(); Dependencies.Clear();
         for (int i = Points.Length - 2; i >= 0; i--) Suffix[i] = Suffix[i + 1] + Points[i].DistanceTo(Points[i + 1]);
         for (int i = 0; i < Points.Length; i++)
         {
@@ -153,12 +158,20 @@ public sealed class EnemyRoute
     // Only motion on the certified segment skips sampling; teleports/deviations keep the original sweep.
     public bool MovementClear(int index, Vector2 from, Vector2 to, NavigationGrid nav, float radius)
     {
-        if (index > 0 && index < Points.Length)
+        if (nav.Config.EnableRouteSafetyCache && index > 0 && index < Points.Length)
         {
             Vector2 a = Points[index - 1], b = Points[index];
             if (Geometry2D.GetClosestPointToSegment(from, a, b).DistanceSquaredTo(from) <= .000001f
-                && Geometry2D.GetClosestPointToSegment(to, a, b).DistanceSquaredTo(to) <= .000001f
-                && nav.SegmentSafety.Certified(nav, a, b, radius)) return true;
+                && Geometry2D.GetClosestPointToSegment(to, a, b).DistanceSquaredTo(to) <= .000001f)
+            {
+                RouteSegmentSafety pool = nav.SegmentSafety;
+                if (_safetyIndex != index || _safetyRadius != radius || _safetyPool != pool || _safetyVersion != pool.Version)
+                {
+                    _segmentCertified = pool.Certified(nav, a, b, radius);
+                    _safetyIndex = index; _safetyRadius = radius; _safetyPool = pool; _safetyVersion = pool.Version;
+                }
+                if (_segmentCertified) return true;
+            }
         }
         return nav.SegmentClear(from, to, radius);
     }

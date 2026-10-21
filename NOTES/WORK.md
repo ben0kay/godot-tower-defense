@@ -1,3 +1,13 @@
+## Safety-cache churn fix — 2026-10-20
+
+Fixed repeated certification under cache pressure. Previously every active ship queried the bounded shared dictionary every tick, and arbitrary first-entry eviction could repeatedly discard a just-built result. EnemyRoute now retains one current-segment result (safe or uncertain), keyed by segment index, radius, pool identity and invalidation version. Geometry rebuild resets it. This is constant extra storage per route, not an unbounded per-ship route cache. Membership checks still reject off-segment motion; uncertain results still run original swept checks.
+
+Shared entries now use bounded least-recently-used eviction with dictionary/list cleanup on selective invalidation and full clear. Eviction does not invalidate a ship's retained current result: unchanged terrain keeps that result valid. Navigation changes/explicit clear advance the pool version immediately, so local results reconsult shared safety before further movement. Unrelated shared certificates survive, although local memos conservatively reconsult once after any navigation change. Solid-terrain tower occupancy still produces no navigation event. Existing staggered validation/repath budgets and all gameplay settings remain unchanged.
+
+F5 adds cumulative `segmentSafetyEvictions`. Shared hits now count consultations between ships/segments, not every warm movement tick; lower hit growth can be expected. Read counters together with Clearance and Movement CPU timing. Verification: TESTS/Performance/SharedRoutePool.md. This fixes demonstrated cache churn; it does not claim to explain or eliminate the desktop 17-FPS combat hitch.
+
+---
+
 ## Cached movement safety — 2026-10-20
 
 Implemented the shared-route follow-up: `WORLD/NAVIGATION/RouteSegmentSafety.cs` caches conservative continuous swept-circle safety certificates for exact segment endpoints and enemy radius. Compatible ships reuse certificates across waves. Warmed lazily on first traversal, not baked each round. Each physics tick still moves/aims accurately, but certified on-segment movement skips repeated wall sampling. Geometry near expanded wall rectangles, deviations/teleports and disabled caching use the original swept check. Strict logical/corridor corner results are cached per ship/segment and navigation revision.

@@ -63,6 +63,53 @@ public partial class SharedRoutePoolChecks : Node
     }
     #endregion
 
+    #region Cache Pressure Regression
+    // =========================================================
+    // More simultaneously active segments than shared capacity must not rebuild safety every physics tick.
+    private static void SafetyPressure(NavigationGrid nav)
+    {
+        int capacity = nav.Config.SharedRouteCacheEntries; nav.Config.SharedRouteCacheEntries = 16;
+        var cache = nav.SegmentSafety; cache.Clear();
+        const int ships = 600, ticks = 120;
+        EnemyRoute[] routes = new EnemyRoute[ships];
+        Vector2 a = nav.Grid.CellToWorldCenter(new(5, 10)), b = nav.Grid.CellToWorldCenter(new(25, 10));
+        for (int i = 0; i < ships; i++)
+        {
+            Vector2 shift = Vector2.Down * (i * .001f);
+            routes[i] = new(); routes[i].Build(new[] { a + shift, b + shift }, a + shift, nav, 1, 0);
+            Require(routes[i].MovementClear(1, a + shift, a + shift + Vector2.Right, nav, 1), "Pressure warmup safe");
+        }
+        Require(cache.Count == 512 && cache.Evictions > 0, "Pressure exceeds bounded capacity");
+        long builds = cache.Builds, hits = cache.Hits;
+        var watch = Stopwatch.StartNew();
+        for (int tick = 0; tick < ticks; tick++) for (int i = 0; i < ships; i++)
+        {
+            Vector2 shift = Vector2.Down * (i * .001f);
+            Require(routes[i].MovementClear(1, a + shift, a + shift + Vector2.Right, nav, 1), "Retained active result safe");
+        }
+        Require(cache.Builds == builds && cache.Hits == hits, "Stable active segments bypass shared eviction churn and lookup");
+        GD.Print($"SAFETY PRESSURE ships={ships}; ticks={ticks}; ms={watch.Elapsed.TotalMilliseconds:0.###}; additionalBuilds={cache.Builds - builds}; sharedLookups={cache.Hits - hits}; entries={cache.Count}");
+        Require(nav.Grid.TryOccupy(new(15, 10)), "Pressure blocker accepted");
+        Require(!routes[0].MovementClear(1, a, b, nav, 1), "Active local certificate invalidated immediately");
+        builds = cache.Builds;
+        for (int i = 0; i < ticks; i++) Require(routes[0].MovementClear(1, a, a + Vector2.Right, nav, 1), "Uncertain segment retains safe-prefix sweep");
+        Require(cache.Builds == builds, "Uncertain result also retained locally");
+        nav.Grid.ReleaseOccupancy(new(15, 10));
+        Require(routes[0].MovementClear(1, a, b, nav, 1), "Removal rechecks local result");
+        nav.Config.EnableRouteSafetyCache = false; builds = cache.Builds;
+        Require(routes[0].MovementClear(1, a, b, nav, 1) && cache.Builds == builds, "Off switch bypasses local certificate");
+        nav.Config.EnableRouteSafetyCache = true;
+        cache.Clear();
+        for (int i = 0; i < 512; i++) cache.Certified(nav, a + Vector2.Down * (i * .001f), b, 1);
+        cache.Certified(nav, a, b, 1); // Touch the oldest entry before introducing a new one.
+        cache.Certified(nav, a + Vector2.Down, b, 1); builds = cache.Builds;
+        Require(cache.Certified(nav, a, b, 1) && cache.Builds == builds, "LRU retains recently touched entry");
+        cache.Certified(nav, a + Vector2.Down * .001f, b, 1);
+        Require(cache.Builds == builds + 1, "LRU expires the least recently used entry");
+        nav.Config.SharedRouteCacheEntries = capacity; cache.Clear();
+    }
+    #endregion
+
     #region Runner
     // =========================================================
     // Private terrain and resources isolate swarm measurements from authored maps, profiles and waves.
@@ -78,7 +125,7 @@ public partial class SharedRoutePoolChecks : Node
                 for (int y = 0; y < grid.Config.HeightCells; y++) for (int x = 0; x < grid.Config.WidthCells; x++)
                     grid.Level.Passable.SetCell(new(x, y), 0, new(2, 0));
                 grid.RebuildTerrain(); nav.Refresh();
-                Safety(nav); RawPaths(nav); Refinements(nav); CheckpointChain(f); Swarm(f, 100); Swarm(f, 500); Benchmark(nav);
+                Safety(nav); SafetyPressure(nav); RawPaths(nav); Refinements(nav); CheckpointChain(f); Swarm(f, 100); Swarm(f, 500); Benchmark(nav);
             }
             await SubsystemBattlefield.DrainFreedFixtures(this);
             GD.Print("PASS: shared raw/refined routes, private arrays, safe jitter connectors, radius/endpoint separation, selective invalidation, settings and bounded storage");

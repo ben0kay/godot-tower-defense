@@ -6,8 +6,11 @@ public sealed class RouteSegmentSafety
 {
     #region Certificates
     private readonly record struct Key(Vector2 From, Vector2 To, float Radius);
-    private readonly record struct Entry(Rect2I Cells, bool Safe);
+    private readonly record struct Entry(Rect2I Cells, bool Safe, LinkedListNode<Key> Age);
     private readonly Dictionary<Key, Entry> _entries = new();
+    private readonly LinkedList<Key> _recent = new();
+    public long Version { get; private set; }
+    public long Evictions { get; private set; }
     public long Hits { get; private set; }
     public long Builds { get; private set; }
     public int Count => _entries.Count;
@@ -17,7 +20,8 @@ public sealed class RouteSegmentSafety
     {
         if (!nav.Config.EnableRouteSafetyCache || !from.IsFinite() || !to.IsFinite() || !float.IsFinite(radius) || radius < 0) return false;
         Key key = new(from, to, radius);
-        if (_entries.TryGetValue(key, out Entry entry)) { Hits++; return entry.Safe; }
+        if (_entries.TryGetValue(key, out Entry entry))
+        { Hits++; _recent.Remove(entry.Age); _recent.AddLast(entry.Age); return entry.Safe; }
         float padding = radius + .02f;
         Vector2I low = nav.Grid.WorldToCell(from.Min(to) - Vector2.One * padding);
         Vector2I high = nav.Grid.WorldToCell(from.Max(to) + Vector2.One * padding);
@@ -32,9 +36,9 @@ public sealed class RouteSegmentSafety
             if (Intersects(a, b, wall)) { safe = false; break; }
         }
         int capacity = Mathf.Clamp(nav.Config.SharedRouteCacheEntries, 16, 2048) * 32;
-        if (_entries.Count >= capacity)
-        { using var cursor = _entries.Keys.GetEnumerator(); if (cursor.MoveNext()) _entries.Remove(cursor.Current); }
-        Builds++; _entries[key] = new(cells, safe); return safe;
+        while (_entries.Count >= capacity)
+        { _entries.Remove(_recent.First.Value); _recent.RemoveFirst(); Evictions++; }
+        Builds++; _entries[key] = new(cells, safe, _recent.AddLast(key)); return safe;
     }
     // =========================================================
     // Inclusive slab intersection rejects touching walls; no sampling gaps can create a certificate.
@@ -58,12 +62,13 @@ public sealed class RouteSegmentSafety
     // Navigation events already exclude towers placed entirely on solid terrain.
     public void Invalidate(Vector2I cell)
     {
-        List<Key> removed = null;
+        Version++; List<Key> removed = null;
         foreach (var pair in _entries) if (pair.Value.Cells.HasPoint(cell)) (removed ??= new()).Add(pair.Key);
-        if (removed != null) foreach (Key key in removed) _entries.Remove(key);
+        if (removed != null) foreach (Key key in removed)
+        { _recent.Remove(_entries[key].Age); _entries.Remove(key); }
     }
     // =========================================================
     // Full terrain rebuild and world teardown release certificates together.
-    public void Clear() => _entries.Clear();
+    public void Clear() { Version++; _entries.Clear(); _recent.Clear(); }
     #endregion
 }
