@@ -1,3 +1,7 @@
+## Shared organic terrain edges — E1/E2 (2026-10-21)
+
+Mars atlas clipping/banding is corrected. A reusable profile-driven visual mask now rounds selected terrain boundaries and holes at level load/terrain rebuild, without altering painted tiles, navigation or build rules. The master remains opt-in: WORLD/TERRAIN/Edges/DefaultTerrainEdgeConfig.tres → Enabled=true, then restart the level. Add other tile materials through profiles; no Mars-specific renderer code. See WORLD/TERRAIN/Edges/README.md for settings, tested behavior and remaining desktop visual review.
+
 ## F2 enemy artwork preview — 2026-10-21
 
 The wider F2 window now shows the selected enemy's actual-size1:1 sprite on the right, including separate gun artwork. Large artwork scrolls without shrinking. Preview code lives in DEBUG/Spawning and does not spawn gameplay enemies.

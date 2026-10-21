@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3]
+[gd_scene load_steps=23 format=3]
 
 [ext_resource type="Script" path="res://WORLD/GRID/WorldGrid.cs" id="1_script"]
 [ext_resource type="Resource" path="res://WORLD/DefaultWorldConfig.tres" id="2_config"]
@@ -27,6 +27,10 @@
 [ext_resource type="Script" path="res://ENEMIES/Projectiles/EnemyBulletSystem.cs" id="hostile_system"]
 [ext_resource type="Script" path="res://ENEMIES/Projectiles/EnemyBulletRenderer.cs" id="hostile_renderer"]
 [ext_resource type="Resource" path="res://ENEMIES/Projectiles/DefaultEnemyProjectileConfig.tres" id="hostile_config"]
+
+[ext_resource type="Script" path="res://WORLD/TERRAIN/Edges/TerrainEdgeController.cs" id="edge_controller"]
+[ext_resource type="Script" path="res://WORLD/TERRAIN/Edges/TerrainEdgeRenderer.cs" id="edge_renderer"]
+[ext_resource type="Resource" path="res://WORLD/TERRAIN/Edges/DefaultTerrainEdgeConfig.tres" id="edge_config"]
 
 [node name="World" type="Node2D"]
 script = ExtResource("loader")
@@ -89,3 +93,10 @@ script = ExtResource("hostile_renderer")
 [node name="EnemyBullets" type="Node" parent="."]
 script = ExtResource("hostile_system")
 Config = ExtResource("hostile_config")
+
+[node name="TerrainEdges" type="Node2D" parent="."]
+script = ExtResource("edge_controller")
+Config = ExtResource("edge_config")
+
+[node name="Renderer" type="Node2D" parent="TerrainEdges"]
+script = ExtResource("edge_renderer")

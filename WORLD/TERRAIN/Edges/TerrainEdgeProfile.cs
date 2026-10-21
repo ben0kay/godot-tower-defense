@@ -13,7 +13,8 @@ public partial class TerrainEdgeProfile : Resource
     [Export(PropertyHint.Range, "0,32,1")] public int SourceId { get; set; } = 2;
     [Export] public Godot.Collections.Array<Vector2I> AtlasCells { get; set; } = new();
 
-    [ExportGroup("Future Visual Style")]
+    [ExportGroup("Visual Style")]
+    [Export] public bool RenderEdges { get; set; } = true;
     [Export] public TerrainEdgeShape Shape { get; set; } = TerrainEdgeShape.Soft;
     [Export(PropertyHint.Range, "0,1,0.01")] public float CornerSoftness { get; set; } = 0.65f;
     [Export(PropertyHint.Range, "0,1,0.01")] public float Irregularity { get; set; } = 0.35f;

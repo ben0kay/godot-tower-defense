@@ -1,19 +1,26 @@
-// Dormant terrain-edge foundation: rebuild a material ID cache only after explicitly attaching to WorldGrid.
+// World-scoped visual material cache; rebuild only on attachment and explicit terrain events.
 using Godot;
 using System;
 using System.Collections.Generic;
 
 public partial class TerrainEdgeController : Node2D
 {
+    #region Material Cache
     [Export] public TerrainEdgeMasterConfig Config { get; set; }
     private WorldGrid _grid;
+    public WorldGrid Grid => _grid;
+    public readonly record struct Tile(TerrainEdgeProfile Profile, TileMapLayer Layer, Vector2I Authored);
+    public readonly Dictionary<Vector2I, Tile> Tiles = new();
+    public readonly HashSet<Vector2I> Painted = new();
     private readonly Dictionary<Vector2I, string> _materials = new();
     public IReadOnlyDictionary<Vector2I, string> Materials => _materials;
     public event Action MaterialsRebuilt;
+    #endregion
+
+    #region Lifecycle and Rebuild
 
     // =========================================================
-    // Codex will attach one world-scoped instance after placing the visual renderer in the scene.
-    // No instances are added to current gameplay scenes by this foundation pass.
+    // One world-scoped renderer attaches here after Grid startup.
     public void Attach(WorldGrid grid)
     {
         if (_grid == grid) return;
@@ -28,7 +35,7 @@ public partial class TerrainEdgeController : Node2D
     // Unrecognized tiles on a higher layer clear the lower layer's visual identity.
     public void Rebuild()
     {
-        _materials.Clear();
+        _materials.Clear(); Tiles.Clear(); Painted.Clear();
         if (Config != null && Config.Enabled && GodotObject.IsInstanceValid(_grid) && _grid.Level != null)
         {
             ReadLayer(_grid.Level.Passable, TerrainEdgeLayer.Passable);
@@ -47,15 +54,15 @@ public partial class TerrainEdgeController : Node2D
         {
             Vector2I cell = _grid.WorldToCell(layer.ToGlobal(layer.MapToLocal(authored)));
             if (!_grid.IsInsideMap(cell)) continue;
-            _materials.Remove(cell);
+            _materials.Remove(cell); Tiles.Remove(cell); Painted.Add(cell);
             TerrainEdgeProfile profile = Config.Find(category, layer.GetCellSourceId(authored),
                 layer.GetCellAtlasCoords(authored));
-            if (profile != null) _materials[cell] = profile.MaterialId;
+            if (profile != null) { _materials[cell] = profile.MaterialId; Tiles[cell] = new(profile, layer, authored); }
         }
     }
 
     // =========================================================
-    // Future visual renderer uses these masks; no pathfinding, occupancy or construction flags are changed.
+    // Shared visual consumers use these masks; no pathfinding, occupancy or construction flags are changed.
     public TerrainEdgeNeighbours GetNeighbours(Vector2I cell) =>
         _materials.TryGetValue(cell, out string material)
             ? TerrainEdgeNeighbourhood.Matching(cell, material, _materials) : TerrainEdgeNeighbours.None;
@@ -65,8 +72,11 @@ public partial class TerrainEdgeController : Node2D
     public void Detach()
     {
         if (GodotObject.IsInstanceValid(_grid)) _grid.TerrainRebuilt -= Rebuild;
-        _grid = null; _materials.Clear();
+        _grid = null; _materials.Clear(); Tiles.Clear(); Painted.Clear(); MaterialsRebuilt?.Invoke();
     }
 
+    // =========================================================
+    // Release world references on exit.
     public override void _ExitTree() => Detach();
+    #endregion
 }

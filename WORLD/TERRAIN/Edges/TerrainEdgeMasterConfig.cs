@@ -1,4 +1,4 @@
-// Central Inspector settings for future edge generation. Disabled by default; no game systems consume this yet.
+// Central opt-in mask-generation settings; disabled by default for explicit visual/performance rollout.
 using Godot;
 
 [GlobalClass]
@@ -6,6 +6,8 @@ public partial class TerrainEdgeMasterConfig : Resource
 {
     [ExportGroup("Feature")]
     [Export] public bool Enabled { get; set; } = false;
+    [Export(PropertyHint.Range, "8,32,8")] public int MaskPixelsPerCell { get; set; } = 16;
+    [Export(PropertyHint.Range, "1,64,1")] public int MaximumMaskMegapixels { get; set; } = 16;
     [Export] public int VariationSeed { get; set; } = 1337;
 
     [ExportGroup("Material Profiles")]
