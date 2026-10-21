@@ -21,6 +21,7 @@ public partial class EnemySpawnMenuChecks : Node
                 EnemySpawnMenu menu = debug.SpawnMenu;
                 Require(menu != null && !menu.IsOpen && !menu.IsSpawning, "Menu initializes closed and idle");
                 Preview(f, menu);
+                HoverPreview(f, menu);
                 int before = f.Spawns.Registry.Living.Count;
                 debug._UnhandledKeyInput(new InputEventKey { Keycode = Key.F2, Pressed = true });
                 Require(menu.IsOpen && f.Spawns.Registry.Living.Count == before, "F2 opens without spawning");
@@ -87,6 +88,29 @@ public partial class EnemySpawnMenuChecks : Node
         Require(menu.SpritePreview.ArtworkBounds.Size.IsEqualApprox(new Vector2(1000, 600))
             && menu.SpritePreview.CustomMinimumSize.X >= 1000, "Oversized artwork keeps authored scale instead of shrinking");
         choice.Select(0); choice.EmitSignal(OptionButton.SignalName.ItemSelected, 0);
+    }
+    // =========================================================
+    // The popup highlight previews other enemy art without committing a new spawn type or creating gameplay ships.
+    private static void HoverPreview(AmmoLoopFixture f, EnemySpawnMenu menu)
+    {
+        OptionButton choice = (OptionButton)menu.FindChild("Enemy", true, false);
+        PopupMenu popup = choice.GetPopup();
+        int selected = choice.Selected, next = (selected + 1) % choice.ItemCount;
+        int live = f.Spawns.Registry.Living.Count;
+        menu.Toggle();
+        menu.Call("OnEnemyPopupOpened"); // Emulate the popup's about-to-open signal independently of window-system rendering.
+        Require(menu.IsProcessing(), "Open enemy popup enables lightweight hover polling");
+        popup.SetFocusedItem(next); menu._Process(0);
+        Require(menu.PreviewEnemyIndex == next && choice.Selected == selected && f.Spawns.Registry.Living.Count == live,
+            "Hover highlights a different sprite without changing selected enemy or spawning a ship");
+        popup.SetFocusedItem(selected); menu._Process(0);
+        Require(menu.PreviewEnemyIndex == selected, "Returning hover to the selected item updates the preview");
+        popup.SetFocusedItem(next); menu._Process(0);
+        menu.Call("OnEnemyPopupClosed");
+        Require(menu.PreviewEnemyIndex == selected && !menu.IsProcessing() && choice.Selected == selected,
+            "Dismissing the list restores the committed selection and stops polling");
+        menu.Close();
+        Require(!menu.IsProcessing() && !menu.IsOpen, "Closed F2 menu never polls the popup");
     }
     // =========================================================
     // Concurrent batches retain different intervals/types/flags and share a fair global spawn budget.

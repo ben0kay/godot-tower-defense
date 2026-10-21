@@ -17,6 +17,9 @@ public partial class EnemySpawnMenu : CanvasLayer
     private readonly List<PackedScene> _scenes = new();
     private PanelContainer _panel;
     private OptionButton _enemy;
+    private PopupMenu _enemyPopup;
+    private int _previewEnemyIndex = -1;
+    public int PreviewEnemyIndex => _previewEnemyIndex;
     public EnemySpritePreview SpritePreview { get; private set; }
     private Label _previewCaption;
     private SpinBox _amount, _gap;
@@ -75,14 +78,31 @@ public partial class EnemySpawnMenu : CanvasLayer
         _previewCaption = UIButtonFactory.Label("", 14); _previewCaption.AutowrapMode = TextServer.AutowrapMode.WordSmart; preview.AddChild(_previewCaption);
         ScrollContainer artwork = new() { SizeFlagsVertical = Control.SizeFlags.ExpandFill, CustomMinimumSize = new(360, 320) }; preview.AddChild(artwork);
         SpritePreview = new() { Name = "SpritePreview", SizeFlagsHorizontal = Control.SizeFlags.ExpandFill, SizeFlagsVertical = Control.SizeFlags.ExpandFill }; artwork.AddChild(SpritePreview);
-        _enemy.ItemSelected += _ => RefreshPreview(); RefreshPreview();
-        Close(); SetPhysicsProcess(false);
+        _enemyPopup = _enemy.GetPopup();
+        _enemyPopup.AboutToPopup += OnEnemyPopupOpened; _enemyPopup.PopupHide += OnEnemyPopupClosed;
+        _enemy.ItemSelected += index => RefreshPreview((int)index); RefreshPreview(_enemy.Selected);
+        Close(); SetProcess(false); SetPhysicsProcess(false);
     }
     // =========================================================
-    // Refresh only when the enemy choice changes; native size is independent of battlefield camera zoom.
-    private void RefreshPreview()
+    // Read the highlighted popup item only while open; hover never changes the spawn selection.
+    public override void _Process(double delta)
     {
-        int index = _enemy.Selected;
+        if (!IsOpen) return;
+        int hovered = _enemyPopup.GetFocusedItem();
+        if (hovered >= 0 && hovered < _scenes.Count) RefreshPreview(hovered);
+    }
+    // =========================================================
+    // Keep mouse hover and arrow-key highlight updates contained to the visible dropdown.
+    private void OnEnemyPopupOpened() => SetProcess(true);
+    // =========================================================
+    // Escape/outside dismissal restores the committed spawn selection's artwork.
+    private void OnEnemyPopupClosed() { SetProcess(false); RefreshPreview(_enemy.Selected); }
+    // =========================================================
+    // Only changing the displayed type rebuilds static artwork; battlefield zoom never affects 1:1 size.
+    private void RefreshPreview(int index)
+    {
+        if (index == _previewEnemyIndex) return;
+        _previewEnemyIndex = index;
         SpritePreview.ShowScene(index >= 0 && index < _scenes.Count ? _scenes[index] : null);
         Vector2 size = SpritePreview.ArtworkBounds.Size;
         _previewCaption.Text = index >= 0 && index < _scenes.Count
@@ -102,7 +122,7 @@ public partial class EnemySpawnMenu : CanvasLayer
     public void Toggle() { if (IsOpen) Close(); else { _panel.Show(); _enemy.GrabFocus(); } }
     // =========================================================
     // Closing leaves an accepted batch running; cancellation is explicit.
-    public void Close() => _panel?.Hide();
+    public void Close() { _panel?.Hide(); SetProcess(false); if (_enemy != null) RefreshPreview(_enemy.Selected); }
     // =========================================================
     // Capture controls once so editing inputs cannot mutate an in-flight batch.
     private void StartSelected() => StartBatch(_enemy.Selected, (int)_amount.Value, _gap.Value, _shielded.ButtonPressed, _stealthed.ButtonPressed);

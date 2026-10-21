@@ -1,3 +1,13 @@
+## F2 hover-to-preview enemy artwork — 2026-10-21
+
+Opening the F2 enemy OptionButton dropdown now previews the enemy under the mouse **immediately without selecting it**. Arrow-key-highlighted rows use the same behaviour. Clicking a row still commits the enemy used by "Spawn batch"; hovering alone never changes the chosen type or submits/spawns a batch. Dismissing the list with Escape, an outside click, or reopening F2 without choosing returns to the committed selection's artwork and native-size caption.
+
+Godot PopupMenu does not fire `IdFocused` for mouse hovering, so `EnemySpawnMenu` reads `PopupMenu.GetFocusedItem()` from a lightweight `_Process` callback **only while its dropdown is open**. A cached preview index prevents recreating sprites when the highlighted item is unchanged, and polling stops on popup hide/F2 close. The 1:1 artwork copier, scroll behaviour, shielding/stealth checkboxes, batch timers and spawn selection are unchanged.
+
+`TESTS/Debug/EnemySpawnMenuChecks.cs` now exercises highlighted-row transitions, unchanged spawn selection/registry count, dismiss-to-restore and idle processing. Godot/.NET runtime tests have **not been executed in this environment**; verify with `res://TESTS/Debug/EnemySpawnMenuChecks.tscn` and desktop mouse hover, keyboard highlight and Escape.
+
+---
+
 ## F2 actual-size sprite preview — 2026-10-21
 
 The F2 panel is widened into left-side batch controls and a right-side sprite preview. Changing the enemy selector updates authored artwork at1:1 scale, independent of battlefield camera zoom, with displayed pixel bounds. Authored root/sprite transforms, offsets, frames, tint and separate gun layers are retained. Oversized artwork scrolls rather than being scaled to fit.
