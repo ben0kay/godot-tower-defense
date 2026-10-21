@@ -23,7 +23,8 @@ public partial class PerformanceOverlayChecks : Node
                 LevelDebugController debug = f.Main.GetNode<LevelDebugController>("World/Level/Debug");
                 Require(debug.RoutePreview != null, "F3 service initializes alongside F2");
                 debug._UnhandledKeyInput(new InputEventKey { Keycode = Key.F2, Pressed = true });
-                Require(f.Spawns.Registry.Living.Count == 1, "F2 creates a ship on this real battlefield");
+                debug.SpawnMenu.StartBatch(0, 1, 0); debug.SpawnMenu._PhysicsProcess(1.0 / 60);
+                Require(f.Spawns.Registry.Living.Count == 1, "F2 menu batch creates a ship on this real battlefield");
                 debug._UnhandledKeyInput(new InputEventKey { Keycode = Key.F2, Pressed = true, Echo = true });
                 Require(f.Spawns.Registry.Living.Count == 1, "F2 ignores key repeat");
                 Enemy enemy = f.Spawns.Registry.Living.Single();

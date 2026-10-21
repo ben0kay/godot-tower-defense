@@ -1,3 +1,13 @@
+## F2 batch spawner and centralized debug tools — 2026-10-21
+
+F2 now toggles an enemy batch menu, not immediate catalog cycling. Pick a catalog enemy, amount1–10,000 and spawn gap0–60 seconds. Each accepted ship independently samples a valid registered portal uniformly through production source/clearance/checkpoint/Citadel rules. Debug batches use their own RNG and do not emit WaveEnemyCreated; authored wave accounting/randomness are unchanged. Zero gap is bounded to16 spawns per physics tick (Inspector MaxSpawnsPerTick, clamped1–64); positive gaps emit at most one ship per physics tick, rounded up to the physics interval. No catch-up bursts after hitches. Pause freezes pending work. Close/F2/Escape hides without cancelling; Cancel stops only remaining work. Any delivery failure stops the batch and shows the reason instead of retrying forever. Existing enemies continue normally. Disabling the level debug controller cancels pending work. No physics callback remains active when idle.
+
+Tool source now lives under DEBUG: LevelTools (controller/reusable map scene), Spawning (new menu and unbound LegacyCatalogSpawner), Navigation (F3 preview planner/overlay and editor checkpoint design overlay), Alerts (F7 preview), Audio (F9 tester), Progression (optional menu XP grant partial), plus existing performance overlay/profiler. Scene/script UIDs are retained and map/HUD/autoload references updated. Scene instances stay with their level/HUD/audio owners; production navigation/combat services and small profiler/attachment hooks retain their normal ownership. Automated tests remain under TESTS. Existing F3/F4/F5/F7/F9 behavior is retained; historical F2-cycling descriptions below are superseded.
+
+Verification: TESTS/Debug/EnemySpawnMenuChecks.tscn and existing PerformanceOverlayChecks pass. Random portal test uses40 seeded deliveries across two registered portals and rejects edge fallback. Build/import passed. Desktop appearance review remains with the user; broader previously documented baseline-suite failures are not claimed fixed.
+
+---
+
 ## Safety-cache churn fix — 2026-10-20
 
 Fixed repeated certification under cache pressure. Previously every active ship queried the bounded shared dictionary every tick, and arbitrary first-entry eviction could repeatedly discard a just-built result. EnemyRoute now retains one current-segment result (safe or uncertain), keyed by segment index, radius, pool identity and invalidation version. Geometry rebuild resets it. This is constant extra storage per route, not an unbounded per-ship route cache. Membership checks still reject off-segment motion; uncertain results still run original swept checks.
@@ -261,7 +271,7 @@ Prices for tiers2/3 are upgrade purchases, not cumulative costs. All work takes2
 
 `DEBUG/PerformanceOverlay.cs` is one isolated self-building CanvasLayer script, mounted on all three playable launchers. F4 toggles a debug-build-only panel below top HUD/existing map diagnostics, with throttled frame/engine timing, enemy/projectile-node counts, bounded navigation peak windows/queues and render counters. Click-through, pause-responsive, cached read-only service access; hidden sampling stops. Inspector settings live on the overlay node. See `DEBUG/README.md` for metric meanings and thresholds.
 
-Level002's Debug node and LevelTemplate lacked LevelDebugController/HUD wiring, so F2/F3 were absent there. Both now instance reusable `LEVELS/Debug/LevelDebugTools.tscn`; checkpoint-overlay children and map artwork/coordinates remain intact. Missing optional HUD no longer aborts controller setup. Failed catalog F2 attempts warn with SpawnManager.LastMessage while retaining the next enemy index. Raw map-only F6 still intentionally has no world services: use MainLevel002.tscn F6 or Campaign for gameplay spawning.
+Level002's Debug node and LevelTemplate lacked LevelDebugController/HUD wiring, so F2/F3 were absent there. Both now instance reusable `DEBUG/LevelTools/LevelDebugTools.tscn`; checkpoint-overlay children and map artwork/coordinates remain intact. Missing optional HUD no longer aborts controller setup. Failed catalog F2 attempts warn with SpawnManager.LastMessage while retaining the next enemy index. Raw map-only F6 still intentionally has no world services: use MainLevel002.tscn F6 or Campaign for gameplay spawning.
 
 Verification: C# build and `TESTS/Debug/PerformanceOverlayChecks.tscn`; detailed scope is in `TESTS/Debug/README.md`. Existing user changes to economy, terrain and tower stats are preserved. Earlier plans/history below remain intact.
 

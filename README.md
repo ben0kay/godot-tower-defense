@@ -1,3 +1,7 @@
+## F2 batch spawner — 2026-10-21
+
+F2 opens a menu to choose enemy, amount and spawn gap in seconds; each ship uses a random valid portal. Close with F2/Escape, or cancel remaining deliveries explicitly. Debug tool implementations now live together under DEBUG (including F3 navigation, audio/alert previews and optional XP grant). Old direct F2 cycling is parked and unbound. See DEBUG/README.md for structure and controls.
+
 ## Safety-cache churn correction — 2026-10-20
 
 Active enemies now retain their current segment's safety result, and the shared cache evicts least-recently-used entries. This prevents repeated rebuilding when active segments exceed shared capacity, while immediate navigation invalidation and swept fallbacks remain. See TESTS/Performance/SharedRoutePool.md for the reproduced pressure case and verification.
@@ -75,7 +79,7 @@ The Ctrl **Economy** tray now includes two muted-green Credit producers, each wi
 
 ## Performance overlay and F2 tools — 2026-10-18
 
-**F4** toggles the new click-through performance panel in debug builds on all playable battlefields. The contained script and settings guide live in `DEBUG/`. Level002/template now include the shared F2 spawn/F3 route-preview tools; use Campaign or a Main launcher for gameplay rather than running the raw map alone. See `LEVELS/Debug/README.md`.
+**F4** toggles the new click-through performance panel in debug builds on all playable battlefields. The contained script and settings guide live in `DEBUG/`. Level002/template now include the shared F2 spawn/F3 route-preview tools; use Campaign or a Main launcher for gameplay rather than running the raw map alone. See `DEBUG/LevelTools/README.md`.
 
 ---
 

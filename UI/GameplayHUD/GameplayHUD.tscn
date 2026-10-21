@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" path="res://UI/GameplayHUD/Inspector/InspectorPanel.tscn" id="5_inspector"]
 
 [ext_resource type="PackedScene" path="res://UI/Alerts/NotificationManager.tscn" id="6_alerts"]
-[ext_resource type="Script" path="res://UI/Alerts/Debug/AlertPreview.cs" id="7_preview"]
+[ext_resource type="Script" path="res://DEBUG/Alerts/AlertPreview.cs" id="7_preview"]
 [ext_resource type="PackedScene" path="res://UI/Narration/NarrationDisplay.tscn" id="8_narration"]
 
 [node name="GameplayHUD" type="Control"]

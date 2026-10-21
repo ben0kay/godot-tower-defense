@@ -13,20 +13,19 @@ public partial class LevelDebugController : Node
         {
             _enabled = value;
             if (!value && RoutePreview?.IsOpen == true) RoutePreview.Toggle();
+            if (!value) { SpawnMenu?.Close(); SpawnMenu?.CancelBatch(); }
             if (!IsInsideTree()) return;
             SetProcessUnhandledKeyInput(value && _spawns != null);
         }
     }
     [Export] public Key SpawnKey { get; set; } = Key.F2;
-    [Export] public PackedScene EnemyScene { get; set; }
-    [Export] public bool PortalOnly { get; set; } = true;
     [ExportGroup("Route Preview")]
     [Export] public Key PreviewKey { get; set; } = Key.F3;
     [Export(PropertyHint.Range, "1,8,1")] public int PreviewCalculationsPerFrame { get; set; } = 1;
     [Export(PropertyHint.Range, "0,5,0.1")] public float PreviewMillisecondsPerFrame { get; set; } = 1;
     public RoutePreviewOverlay RoutePreview { get; private set; }
     private SpawnManager _spawns;
-    private int _nextEnemyIndex;
+    public EnemySpawnMenu SpawnMenu { get; private set; }
     #endregion
 
     #region Lifecycle and Shortcuts
@@ -43,6 +42,7 @@ public partial class LevelDebugController : Node
         SetProcessUnhandledKeyInput(Enabled && _spawns != null);
         if (Enabled && _spawns != null)
         {
+            SpawnMenu = new EnemySpawnMenu { Name = "EnemySpawnMenu" }; AddChild(SpawnMenu); SpawnMenu.Initialize(_spawns);
             RoutePreview = new RoutePreviewOverlay { Name = "RoutePreview",
                 MaxCalculationsPerFrame = PreviewCalculationsPerFrame, MaxMillisecondsPerFrame = PreviewMillisecondsPerFrame };
             AddChild(RoutePreview); RoutePreview.Initialize(_spawns);
@@ -50,25 +50,22 @@ public partial class LevelDebugController : Node
     }
 
     // =========================================================
-    // F2 cycles catalog entries in Inspector order; only a successful spawn advances the index.
+    // F2 opens the batch menu; F3 retains its independent preview shortcut. No key press directly spawns.
     public override void _UnhandledKeyInput(InputEvent input)
     {
         if (!Enabled || _spawns == null || input is not InputEventKey key || !key.Pressed || key.Echo) return;
         if (key.Keycode == PreviewKey)
-        { RoutePreview?.Toggle(); GetViewport().SetInputAsHandled(); return; }
+        { SpawnMenu?.Close(); RoutePreview?.Toggle(); GetViewport().SetInputAsHandled(); return; }
         if (key.Keycode != SpawnKey) return;
-
-        var scenes = _spawns.Catalog?.Scenes;
-        if (scenes != null && scenes.Count > 0)
-        {
-            int index = _nextEnemyIndex % scenes.Count;
-            if (_spawns.Spawn(scenes[index], PortalOnly) != null)
-                _nextEnemyIndex = (index + 1) % scenes.Count;
-            else GD.PushWarning("F2 spawn rejected: " + _spawns.LastMessage);
-        }
-        else if (EnemyScene != null) _spawns.Spawn(EnemyScene, PortalOnly);
-
-        GetViewport().SetInputAsHandled();
+        if (RoutePreview?.IsOpen == true) RoutePreview.Toggle();
+        SpawnMenu?.Toggle(); GetViewport().SetInputAsHandled();
+    }
+    // =========================================================
+    // Escape dismisses this panel before gameplay interprets it as a pause/placement action.
+    public override void _Input(InputEvent input)
+    {
+        if (SpawnMenu?.IsOpen == true && input is InputEventKey { Pressed: true, Echo: false, Keycode: Key.Escape })
+        { SpawnMenu.Close(); GetViewport().SetInputAsHandled(); }
     }
     #endregion
 }

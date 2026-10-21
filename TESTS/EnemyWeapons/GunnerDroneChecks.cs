@@ -19,10 +19,10 @@ public partial class GunnerDroneChecks : Node
             {
                 SubsystemBattlefield.DetachSession(f.Main);
                 await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-                Definitions(f); F2(f); Firefight(f); StealthAndFreeze(f); Overflow(f);
+                Definitions(f); CatalogCycle(f); Firefight(f); StealthAndFreeze(f); Overflow(f);
             }
             await SubsystemBattlefield.DrainFreedFixtures(this);
-            GD.Print("PASS: EG3 Gunner Drone split artwork/medium size, actual F2 cycle, muzzle snapshots, accepted-shot flashes and tower HP loss");
+            GD.Print("PASS: EG3 Gunner Drone split artwork/medium size, parked catalog cycle, muzzle snapshots, accepted-shot flashes and tower HP loss");
             GetTree().Quit();
         }
         catch (Exception error) { GetTree().Paused = false; GD.PushError(error.ToString()); GetTree().Quit(1); }
@@ -58,16 +58,16 @@ public partial class GunnerDroneChecks : Node
         preview.Free();
     }
     // =========================================================
-    // Invoke the actual existing debug handler through one complete catalog cycle, keeping source order unchanged.
-    private static void F2(AmmoLoopFixture f)
+    // Invoke the parked legacy helper through one complete catalog cycle, keeping source order unchanged.
+    private static void CatalogCycle(AmmoLoopFixture f)
     {
         var debug = f.Main.GetNode<LevelDebugController>("World/Level/Debug");
         Require(debug.RoutePreview != null, "Deferred F2/F3 service connected");
-        int gunners = 0;
+        int gunners = 0; LegacyCatalogSpawner legacy = new();
         foreach (PackedScene scene in f.Spawns.Catalog.Scenes)
         {
             Require(f.Spawns.Registry.Living.Count == 0, "Debug cycle fixture starts empty");
-            debug._UnhandledKeyInput(new InputEventKey { Keycode = Key.F2, Pressed = true });
+            legacy.SpawnNext(f.Spawns);
             Enemy ship = f.Spawns.Registry.Living.Single(); Disable(ship);
             if (ship.Definition.EnemyId == "gunner_drone_mk1") gunners++;
             debug._UnhandledKeyInput(new InputEventKey { Keycode = Key.F2, Pressed = true, Echo = true });

@@ -160,6 +160,17 @@ public partial class SpawnManager : Node
     // Wave requests sample eligible portals uniformly, falling back to permitted edges in Both.
     // Reservoir sampling avoids a per-spawn candidate allocation or any additional A* calls.
     public Enemy SpawnWave(PackedScene scene, RandomNumberGenerator random, string requiredPortal = "", bool spawnWithShield = false, bool spawnWithStealth = false)
+        => SpawnRandom(scene, random, requiredPortal, spawnWithShield, spawnWithStealth, false, true);
+
+    // =========================================================
+    // Random portal delivery shares source validation without emitting wave ownership notifications.
+    public Enemy SpawnRandomPortal(PackedScene scene, RandomNumberGenerator random)
+        => SpawnRandom(scene, random, "", false, false, true, false);
+
+    // =========================================================
+    // One reservoir sampler owns random delivery; portal-only callers never fall back to map edges.
+    private Enemy SpawnRandom(PackedScene scene, RandomNumberGenerator random, string requiredPortal,
+        bool spawnWithShield, bool spawnWithStealth, bool portalOnly, bool waveOwned)
     {
         RefreshSources();
         if (scene == null || random == null) { LastMessage = "Wave enemy scene/RNG is missing."; return null; }
@@ -172,6 +183,7 @@ public partial class SpawnManager : Node
         for (int i = 0; i < _entries.Count; i++)
         {
             bool portal = i < _portalCount;
+            if (portalOnly && !portal) continue;
             if (requiredPortal.Length > 0 && (!portal || _portalPaths[i] != requiredPortal)) continue;
             // If any eligible portal was found, Both mode ignores all map-edge candidates.
             if (!portal && chosen >= 0 && chosen < _portalCount) break;
@@ -192,7 +204,7 @@ public partial class SpawnManager : Node
         if (chosen < _portalCount) spawn = OffsetPortal(spawn, ship.Definition.RadiusPixels, random, _portalObjects[chosen]);
         _ships.AddChild(ship); ship.GlobalPosition = spawn;
         EnemyPortal chosenPortal = chosen < _portalCount ? _portalObjects[chosen] as EnemyPortal : null;
-        WaveEnemyCreated?.Invoke(ship);
+        if (waveOwned) WaveEnemyCreated?.Invoke(ship);
         ship.Initialize(Registry, Paths, spawnWithShield, chosenPortal?.ResolveCheckpoint(), chosenPortal?.RequiresCheckpoint == true, assignedCitadel: chosen < _portalCount ? CitadelAssignments.For(_portalObjects[chosen]) : nav.SingleDestination, spawnWithStealth: spawnWithStealth); LastMessage = "Wave spawned " + ship.Definition.DisplayName;
         return ship;
     }

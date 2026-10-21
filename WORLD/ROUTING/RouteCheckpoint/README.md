@@ -55,4 +55,4 @@ Level001, Level020 and LevelTemplate now include `Debug/CheckpointOverlay`, a sh
 - A single editor scan throttled to0.15s detects moved/resized/renamed markers and link/topology edits, rebuilding cached drawing only on changes. No checkpoint-specific processing loops or physics areas are added.
 - Hide the diagram with the owner's **Show In Editor** option. In normal gameplay it is hidden and has no processing; F3 optionally shows it alongside actual sampled paths and closes it with the panel.
 
-For another level, instance/copy a Node2D under its Debug group, attach `WORLD/ROUTING/CheckpointDesignOverlay.cs`, and leave LevelPath `../..` (relative to that owner). The template's Debug group is design-only; it does not add gameplay input services.
+For another level, instance/copy a Node2D under its Debug group, attach `DEBUG/Navigation/CheckpointDesignOverlay.cs`, and leave LevelPath `../..` (relative to that owner). The template's Debug group is design-only; it does not add gameplay input services.

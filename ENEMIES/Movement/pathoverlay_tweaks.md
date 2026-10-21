@@ -66,7 +66,7 @@ In a running debug game (and ideally usable with existing level editing workflow
 5. Do not compute 50 routes × all portals × every Citadel/checkpoint target **each frame**. Bound preview calculations per frame using separate debug work budgets and cache results until the portal, settings, selected enemy, checkpoint geometry or navigation revision changes. It must remain usable with 500+ enemies. Debug drawing should be batched efficiently in one owner/overlay, not a node per path segment.
 6. Show clearly when a preview is a **route plan** rather than a prediction of exact enemy timing/traffic. With the optional congestion influence, indicate the snapshot nature of previewed weights.
 
-**Implementation suggestion:** a level/debug-owned `RoutePreviewOverlay.cs` under `ENEMIES/Movement/` (or a small `LEVELS/Debug/` counterpart if cleaner), drawing via `_Draw` in world coordinates; optional debug UI controls in the existing level Debug node, not a new permanent gameplay HUD panel. Do not modify `WorldGrid` into a giant debugger.
+**Implementation suggestion:** a level/debug-owned `RoutePreviewOverlay.cs` under `ENEMIES/Movement/` (or a small `DEBUG/LevelTools/` counterpart if cleaner), drawing via `_Draw` in world coordinates; optional debug UI controls in the existing level Debug node, not a new permanent gameplay HUD panel. Do not modify `WorldGrid` into a giant debugger.
 
 ---
 

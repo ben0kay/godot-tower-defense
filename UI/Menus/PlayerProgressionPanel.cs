@@ -7,7 +7,6 @@ public partial class PlayerProgressionPanel : VBoxContainer
     public bool AllowDebugGrant { get; set; }
     private Label _summary, _points, _status;
     private ProgressBar _bar;
-    private Button _grant;
 
     // =========================================================
     // Build a compact shared view; optional development grant is absent in release exports.
@@ -19,14 +18,7 @@ public partial class PlayerProgressionPanel : VBoxContainer
         _status.AutowrapMode = TextServer.AutowrapMode.WordSmart;
         _bar = new ProgressBar { CustomMinimumSize = new Vector2(0, 14), ShowPercentage = false };
         AddChild(_summary); AddChild(_bar); AddChild(_points); AddChild(_status);
-#if DEBUG
-        if (AllowDebugGrant)
-        {
-            _grant = UIButtonFactory.Create("DEBUG: GRANT 600 PLAYER XP", GrantDebugXP, UIButtonStyle.Compact);
-            _grant.TooltipText = "Development only. Grants and saves real XP to the selected profile.";
-            AddChild(_grant);
-        }
-#endif
+        AttachDebugGrant();
         ProgressionService.Changed += OnChanged;
         Refresh();
     }
@@ -66,11 +58,4 @@ public partial class PlayerProgressionPanel : VBoxContainer
         }
     }
 
-    // =========================================================
-    // Development verification only; live mission results never call this button.
-    private void GrantDebugXP()
-    {
-        try { ProgressionService.GrantXP(600); }
-        catch (Exception error) { _status.Text = error.Message; _status.Visible = true; }
-    }
 }

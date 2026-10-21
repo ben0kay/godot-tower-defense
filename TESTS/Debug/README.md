@@ -1,3 +1,9 @@
+Final checks: C# build/import, EnemySpawnMenuChecks, PerformanceOverlayChecks and PlayerProgressionChecks pass. GunnerDroneChecks stops at its pre-existing tracer/flash-style assertion; the identical failure reproduces on unchanged6aab989 before this debug reorganization. Its legacy catalog-cycle section is adapted, but no complete GunnerDrone suite pass is claimed.
+
+## F2 batch menu — 2026-10-21
+
+EnemySpawnMenuChecks.tscn verifies F2 opens without spawning, echo suppression, Escape, exact bounded zero-gap batches, positive gaps, pause, close/continue, cancellation, rejected inputs, disabled-controller cleanup, independent wave ownership, random distribution across two seeded portal sources, and no map-edge fallback. PerformanceOverlayChecks now explicitly submits a menu batch instead of expecting keypress spawning. GunnerDroneChecks uses the parked legacy catalog helper for its catalog cycle. Existing broader integration fixtures retain previously documented failures unrelated to this change.
+
 ## PF2 debug update (2026-10-20)
 
 Optional subsystem timing hooks feed the existing F4 panel (Shift+F4 toggles profiling; F5 saves a report). Old GridDebugOverlay/Info labels are retired; F2/F3 remain. See `DEBUG/README.md` for inclusive timing semantics, fixed sample storage and validation details. Historical notes below remain as reference.

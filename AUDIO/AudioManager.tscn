@@ -4,7 +4,7 @@
 [ext_resource type="Resource" path="res://AUDIO/DefaultAudioConfig.tres" id="2_config"]
 [ext_resource type="Resource" path="res://AUDIO/DefaultAudioCatalog.tres" id="3_catalog"]
 [ext_resource type="Script" path="res://AUDIO/VoiceAssistant/VoiceAssistant.cs" id="4_voice"]
-[ext_resource type="Script" path="res://AUDIO/Debug/AudioTester.cs" id="5_debug"]
+[ext_resource type="Script" path="res://DEBUG/Audio/AudioTester.cs" id="5_debug"]
 
 [node name="AudioManager" type="Node2D"]
 process_mode = 3

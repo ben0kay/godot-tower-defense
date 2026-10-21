@@ -9,9 +9,9 @@
 [ext_resource type="Resource" path="res://LEVELS/Level020/Level020Config.tres" id="7_config"]
 [ext_resource type="PackedScene" path="res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn" id="8_portal"]
 [ext_resource type="PackedScene" path="res://WORLD/OBJECTIVES/Citadel/Citadel.tscn" id="9_citadel"]
-[ext_resource type="Script" uid="uid://x78ylg3dne5d" path="res://LEVELS/Debug/LevelDebugController.cs" id="10_debug"]
+[ext_resource type="Script" uid="uid://x78ylg3dne5d" path="res://DEBUG/LevelTools/LevelDebugController.cs" id="10_debug"]
 [ext_resource type="PackedScene" path="res://ENEMIES/Types/Enemy001/Enemy001.tscn" id="11_enemy"]
-[ext_resource type="Script" uid="uid://ceof7q2uqyh1q" path="res://WORLD/ROUTING/CheckpointDesignOverlay.cs" id="checkpoint_overlay"]
+[ext_resource type="Script" uid="uid://ceof7q2uqyh1q" path="res://DEBUG/Navigation/CheckpointDesignOverlay.cs" id="checkpoint_overlay"]
 
 [node name="Level020" type="Node2D" unique_id=1426546349]
 script = ExtResource("6_root")
@@ -75,7 +75,6 @@ position = Vector2(3104, 2531)
 
 [node name="Debug" type="Node" parent="." unique_id=1262761477]
 script = ExtResource("10_debug")
-EnemyScene = ExtResource("11_enemy")
 
 [node name="CheckpointOverlay" type="Node2D" parent="Debug" unique_id=593809922]
 z_index = 4090

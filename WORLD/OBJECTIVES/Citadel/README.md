@@ -110,7 +110,7 @@ A level can contain **two or more independently damageable Citadels**. Each regi
 | \`WORLD/OBJECTIVES/Citadel/CitadelSession.cs\` | Single \`Health\`, single HUD \`SetCitadelHealth\`; \`EnemyArrived\` damages it | Own/manage multiple independent \`CitadelHealth\` subscriptions, route arrival to the assigned one, cleanly unsubscribe; retain single-level HUD/Research compatibility |
 | \`TOWERS/Shared/Targeting/TowerTargeting.cs\` | \`First\`/\`Last\` compare \`Enemy.RemainingJourneyDistance\` | Keep the scoring rule; ensure it remains correct for the enemy's chosen goal and full checkpoint/journey obligations |
 | Tower placement / world navigation checks | Protect route to the one authored Citadel | Reject any construction that blocks an assigned portal → mandatory checkpoint chain → Citadel route |
-| \`LEVELS/Debug/\` / F3 Route Preview | Samples routes for the current goal, plus checkpoints | Display cached portal → Citadel assignment, distinguish each Citadel's route; allow checking each portal's actual destination |
+| \`DEBUG/LevelTools/\` / F3 Route Preview | Samples routes for the current goal, plus checkpoints | Display cached portal → Citadel assignment, distinguish each Citadel's route; allow checking each portal's actual destination |
 
 **Important:** Current shared \`NavigationGrid.Goals\` and \`EnemyMovement.RemainingJourneyDistance\` already exist; reuse these concepts instead of introducing a parallel enemy distance-tracking component. There is **no need for per-enemy objective-discovery A*** and no per-enemy per-frame scanning.
 

@@ -81,6 +81,7 @@ public partial class EnemyIntegrationChecks : Node
             int arrivedBefore = _spawns.Registry.ArrivedCount;
             LevelDebugController debug = _grid.Level.GetNode<LevelDebugController>("Debug");
             debug._UnhandledKeyInput(new InputEventKey { Keycode = Key.F2, Pressed = true });
+                debug.SpawnMenu.StartBatch(0, 1, 0); debug.SpawnMenu._PhysicsProcess(1.0 / 60);
             Check(_spawns.Registry.Living.Count == 1, "F2 creates one Enemy001");
             debug._UnhandledKeyInput(new InputEventKey { Keycode = Key.F2, Pressed = true, Echo = true });
             Check(_spawns.Registry.Living.Count == 1, "F2 ignores OS key repeat");
