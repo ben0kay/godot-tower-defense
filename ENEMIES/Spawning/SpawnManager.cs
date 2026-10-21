@@ -164,8 +164,8 @@ public partial class SpawnManager : Node
 
     // =========================================================
     // Random portal delivery shares source validation without emitting wave ownership notifications.
-    public Enemy SpawnRandomPortal(PackedScene scene, RandomNumberGenerator random)
-        => SpawnRandom(scene, random, "", false, false, true, false);
+    public Enemy SpawnRandomPortal(PackedScene scene, RandomNumberGenerator random, bool spawnWithShield = false, bool spawnWithStealth = false)
+        => SpawnRandom(scene, random, "", spawnWithShield, spawnWithStealth, true, false);
 
     // =========================================================
     // One reservoir sampler owns random delivery; portal-only callers never fall back to map edges.

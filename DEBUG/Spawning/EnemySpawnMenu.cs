@@ -7,8 +7,9 @@ public partial class EnemySpawnMenu : CanvasLayer
     #region State
     [Export(PropertyHint.Range, "1,64,1")] public int MaxSpawnsPerTick { get; set; } = 16;
     public bool IsOpen => _panel?.Visible == true;
-    public bool IsSpawning => Remaining > 0;
-    public int Remaining { get; private set; }
+    public bool IsSpawning => _batches.Count > 0;
+    public int ActiveBatchCount => _batches.Count;
+    public int Remaining { get { int total = 0; foreach (Batch batch in _batches) total += batch.Remaining; return total; } }
     public int Spawned { get; private set; }
     public string Status => _status?.Text ?? "";
     private SpawnManager _spawns;
@@ -18,9 +19,21 @@ public partial class EnemySpawnMenu : CanvasLayer
     private OptionButton _enemy;
     private SpinBox _amount, _gap;
     private Label _status;
-    private Button _start;
-    private PackedScene _batch;
-    private double _wait, _interval;
+    private CheckBox _shielded, _stealthed;
+    private VBoxContainer _batchRows;
+    private readonly List<Batch> _batches = new();
+    private int _cursor, _nextId;
+    private string _lastFailure = "";
+    private sealed class Batch
+    {
+        public int Id, Remaining, Spawned;
+        public PackedScene Scene;
+        public double Wait, Interval;
+        public bool Shielded, Stealthed;
+        public string Name;
+        public HBoxContainer Row;
+        public Label Progress;
+    }
     #endregion
 
     #region Menu
@@ -45,8 +58,13 @@ public partial class EnemySpawnMenu : CanvasLayer
         { _scenes.Add(pair.Value); _enemy.AddItem(spawns.Catalog.DefinitionFor(pair.Key).DisplayName); }
         _amount = Number(box, "Amount", "Amount", 1, 10000, 1, 10);
         _gap = Number(box, "Spawn gap (seconds)", "Gap", 0, 60, .01, .1);
-        _start = UIButtonFactory.Create("Spawn batch", StartSelected, UIButtonStyle.Compact, 36); box.AddChild(_start);
-        box.AddChild(UIButtonFactory.Create("Cancel remaining spawns", CancelBatch, UIButtonStyle.Compact, 32));
+        HBoxContainer flags = new(); box.AddChild(flags);
+        _shielded = new() { Name = "Shielded", Text = "Shielded", TooltipText = "Uses this enemy type’s configured shield capacity." }; flags.AddChild(_shielded);
+        _stealthed = new() { Name = "Stealthed", Text = "Stealthed" }; flags.AddChild(_stealthed);
+        box.AddChild(UIButtonFactory.Create("Spawn batch", StartSelected, UIButtonStyle.Compact, 36));
+        ScrollContainer active = new() { CustomMinimumSize = new(0, 110), HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
+        box.AddChild(active); _batchRows = new() { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill }; active.AddChild(_batchRows);
+        box.AddChild(UIButtonFactory.Create("Cancel all remaining spawns", CancelBatch, UIButtonStyle.Compact, 32));
         box.AddChild(UIButtonFactory.Create("Close · F2 / Escape", Close, UIButtonStyle.Compact, 32));
         _status = UIButtonFactory.Label("Choose an enemy and batch settings.", 14); _status.AutowrapMode = TextServer.AutowrapMode.WordSmart; box.AddChild(_status);
         Close(); SetPhysicsProcess(false);
@@ -67,45 +85,82 @@ public partial class EnemySpawnMenu : CanvasLayer
     public void Close() => _panel?.Hide();
     // =========================================================
     // Capture controls once so editing inputs cannot mutate an in-flight batch.
-    private void StartSelected() => StartBatch(_enemy.Selected, (int)_amount.Value, _gap.Value);
+    private void StartSelected() => StartBatch(_enemy.Selected, (int)_amount.Value, _gap.Value, _shielded.ButtonPressed, _stealthed.ButtonPressed);
     #endregion
 
     #region Delivery
     // =========================================================
-    // One batch at a time; reject invalid inputs instead of replacing or silently truncating existing work.
-    public bool StartBatch(int enemyIndex, int amount, double gap)
+    // Each click captures an independent batch; editing controls cannot alter previously accepted deliveries.
+    public bool StartBatch(int enemyIndex, int amount, double gap, bool shielded = false, bool stealthed = false)
     {
-        if (IsSpawning || enemyIndex < 0 || enemyIndex >= _scenes.Count || amount < 1 || amount > 10000
+        if (enemyIndex < 0 || enemyIndex >= _scenes.Count || amount < 1 || amount > 10000
             || !double.IsFinite(gap) || gap < 0 || gap > 60) return false;
-        _batch = _scenes[enemyIndex]; Remaining = amount; Spawned = 0; _interval = gap; _wait = 0;
-        _start.Disabled = true; SetPhysicsProcess(true); UpdateStatus(); return true;
+        if (!IsSpawning) Spawned = 0;
+        Batch batch = new() { Id = ++_nextId, Scene = _scenes[enemyIndex], Remaining = amount, Interval = gap,
+            Shielded = shielded, Stealthed = stealthed, Name = _enemy.GetItemText(enemyIndex) };
+        batch.Row = new(); _batchRows.AddChild(batch.Row);
+        batch.Progress = UIButtonFactory.Label("", 13); batch.Progress.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+        batch.Progress.AutowrapMode = TextServer.AutowrapMode.WordSmart; batch.Row.AddChild(batch.Progress);
+        batch.Row.AddChild(UIButtonFactory.Create("Cancel", () => CancelBatch(batch.Id), UIButtonStyle.Compact, 28));
+        _batches.Add(batch); _lastFailure = ""; UpdateBatch(batch); SetPhysicsProcess(true); UpdateStatus(); return true;
     }
     // =========================================================
-    // Zero-gap batches are spread over bounded ticks; positive gaps never burst to catch up after a hitch.
+    // Independent timers share one global delivery budget and rotate fairly; positive gaps never catch up in bursts.
     public override void _PhysicsProcess(double delta)
     {
         if (!IsSpawning || GetTree().Paused || !double.IsFinite(delta) || delta <= 0) return;
-        _wait -= delta; if (_wait > 0) return;
-        int budget = _interval == 0 ? Mathf.Clamp(MaxSpawnsPerTick, 1, 64) : 1;
-        for (int i = 0; i < budget && Remaining > 0; i++)
+        if (!GodotObject.IsInstanceValid(_spawns) || _spawns.IsQueuedForDeletion()) { CancelBatch(); return; }
+        foreach (Batch batch in _batches) batch.Wait = System.Math.Max(0, batch.Wait - delta);
+        int budget = Mathf.Clamp(MaxSpawnsPerTick, 1, 64), skipped = 0; bool changed = false;
+        while (_batches.Count > 0 && budget > 0 && skipped < _batches.Count)
         {
-            if (!GodotObject.IsInstanceValid(_spawns) || _spawns.IsQueuedForDeletion()) { CancelBatch(); return; }
-            if (_spawns.SpawnRandomPortal(_batch, _random) == null)
+            _cursor %= _batches.Count; Batch batch = _batches[_cursor];
+            if (batch.Wait > 0) { _cursor = (_cursor + 1) % _batches.Count; skipped++; continue; }
+            skipped = 0; budget--; changed = true;
+            if (_spawns.SpawnRandomPortal(batch.Scene, _random, batch.Shielded, batch.Stealthed) == null)
             {
-                string reason = _spawns.LastMessage; CancelBatch();
-                _status.Text = $"Stopped after {Spawned}: {reason}"; return;
+                _lastFailure = $"Batch #{batch.Id} stopped: {_spawns.LastMessage}";
+                RemoveBatch(_cursor); continue;
             }
-            Remaining--; Spawned++;
+            batch.Remaining--; batch.Spawned++; Spawned++; batch.Wait = batch.Interval;
+            if (batch.Remaining == 0) RemoveBatch(_cursor);
+            else { UpdateBatch(batch); _cursor = (_cursor + 1) % _batches.Count; }
         }
-        _wait = _interval; UpdateStatus();
-        if (Remaining == 0) { _batch = null; _start.Disabled = false; SetPhysicsProcess(false); }
+        if (changed) UpdateStatus();
+        if (!IsSpawning) SetPhysicsProcess(false);
     }
     // =========================================================
-    // Cancellation removes only pending requests; existing enemies retain ordinary gameplay lifecycle.
-    public void CancelBatch()
-    { Remaining = 0; _batch = null; SetPhysicsProcess(false); if (_start != null) _start.Disabled = false; UpdateStatus(); }
+    // A row cancels only its own pending deliveries; other batches and existing ships remain independent.
+    public void CancelBatch(int id)
+    {
+        int index = _batches.FindIndex(batch => batch.Id == id); if (index < 0) return;
+        RemoveBatch(index); if (!IsSpawning) SetPhysicsProcess(false); UpdateStatus();
+    }
     // =========================================================
-    // Status changes only on delivery/cancellation, never in a separate UI frame loop.
-    private void UpdateStatus() { if (_status != null) _status.Text = $"Spawned {Spawned} · remaining {Remaining}"; }
+    // Disable/unload callers and the explicit Cancel All action stop all pending work.
+    public void CancelBatch()
+    {
+        foreach (Batch batch in _batches) batch.Row.QueueFree();
+        _batches.Clear(); _cursor = 0; SetPhysicsProcess(false); UpdateStatus();
+    }
+    // =========================================================
+    // Adjust the rotating cursor when any row retires; no completed row/scene reference is retained.
+    private void RemoveBatch(int index)
+    {
+        _batches[index].Row.QueueFree(); _batches.RemoveAt(index);
+        if (index < _cursor) _cursor--; if (_batches.Count == 0) _cursor = 0; else _cursor %= _batches.Count;
+    }
+    // =========================================================
+    // Per-batch status shows captured options and progresses only on accepted deliveries.
+    private static void UpdateBatch(Batch batch) => batch.Progress.Text =
+        $"#{batch.Id} {batch.Name} · {batch.Spawned} spawned / {batch.Remaining} left · {batch.Interval:0.##}s" +
+        (batch.Shielded ? " · shielded" : "") + (batch.Stealthed ? " · stealthed" : "");
+    // =========================================================
+    // Aggregate status changes only with batch state, not in an extra per-frame UI loop.
+    private void UpdateStatus()
+    {
+        if (_status != null) _status.Text = $"Active batches {ActiveBatchCount} · spawned {Spawned} · remaining {Remaining}" +
+            (_lastFailure.Length > 0 ? "\n" + _lastFailure : "");
+    }
     #endregion
 }

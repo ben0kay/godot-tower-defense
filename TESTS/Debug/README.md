@@ -1,3 +1,7 @@
+## Concurrent batches and flags — 2026-10-21
+
+EnemySpawnMenuChecks now verifies two simultaneous enemy types with different gaps and captured shield/stealth flags, a combined-flags submission through the actual checkbox/button controls, round-robin fairness under a one-spawn global budget, and individual row cancellation without stopping the other batch. Existing single-batch exact-count/pause/close/random-portal/wave-isolation checks remain. This supersedes the old one-batch rejection expectation.
+
 Final checks: C# build/import, EnemySpawnMenuChecks, PerformanceOverlayChecks and PlayerProgressionChecks pass. GunnerDroneChecks stops at its pre-existing tracer/flash-style assertion; the identical failure reproduces on unchanged6aab989 before this debug reorganization. Its legacy catalog-cycle section is adapted, but no complete GunnerDrone suite pass is claimed.
 
 ## F2 batch menu — 2026-10-21

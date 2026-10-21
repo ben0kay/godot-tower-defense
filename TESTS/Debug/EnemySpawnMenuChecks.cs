@@ -30,7 +30,7 @@ public partial class EnemySpawnMenuChecks : Node
                 int waveCreated = 0; f.Spawns.WaveEnemyCreated += _ => waveCreated++;
                 Require(!menu.StartBatch(-1, 2, 0) && !menu.StartBatch(0, 0, 0) && !menu.StartBatch(0, 1, double.NaN), "Reject invalid inputs");
                 menu.MaxSpawnsPerTick = 2;
-                Require(menu.StartBatch(0, 5, 0) && !menu.StartBatch(1, 5, 0), "One captured batch");
+                Require(menu.StartBatch(0, 5, 0), "First captured batch");
                 menu._PhysicsProcess(.016);
                 Require(menu.Spawned == 2 && menu.Remaining == 3, "Zero gap bounded per tick");
                 menu.Close(); menu._PhysicsProcess(.016); menu._PhysicsProcess(.016);
@@ -45,6 +45,7 @@ public partial class EnemySpawnMenuChecks : Node
                 menu._PhysicsProcess(.11); Require(menu.Spawned == 2, "Gap expires");
                 menu.CancelBatch(); menu._PhysicsProcess(10);
                 Require(menu.Spawned == 2 && !menu.IsSpawning, "Cancel keeps existing ships, stops pending");
+                IndependentBatches(f, menu);
                 RandomPortals(f);
                 menu.StartBatch(0, 10, 0); debug.Enabled = false;
                 Require(!menu.IsSpawning && !menu.IsOpen, "Disabled level tool cancels batch");
@@ -53,6 +54,43 @@ public partial class EnemySpawnMenuChecks : Node
             GD.Print("PASS: F2 menu, bounded exact batches, gaps, pause, close, cancel, validation and wave isolation"); GetTree().Quit();
         }
         catch (Exception error) { GetTree().Paused = false; GD.PushError(error.ToString()); GetTree().Quit(1); }
+    }
+    // =========================================================
+    // Concurrent batches retain different intervals/types/flags and share a fair global spawn budget.
+    private static void IndependentBatches(AmmoLoopFixture f, EnemySpawnMenu menu)
+    {
+        foreach (Enemy e in f.Spawns.Registry.Living.ToArray()) e.Free();
+        menu.MaxSpawnsPerTick = 2;
+        Require(menu.StartBatch(0, 3, .5, true, false) && menu.StartBatch(1, 3, .1, false, true), "Concurrent batches accepted");
+        menu._PhysicsProcess(.016);
+        Require(menu.ActiveBatchCount == 2 && menu.Spawned == 2 && menu.Remaining == 4, "Global budget shared by both ready batches");
+        Enemy shield = f.Spawns.Registry.Living.Single(e => e.Definition.EnemyId == "basic_mk1");
+        Enemy stealth = f.Spawns.Registry.Living.Single(e => e.Definition.EnemyId == "scout_mk1");
+        Require(shield.CurrentShield > 0 && !shield.HasStealth, "First batch captures shield only");
+        Require(stealth.HasStealth && stealth.CurrentShield == 0, "Second batch captures stealth only");
+        menu._PhysicsProcess(.11);
+        Require(menu.Spawned == 3 && f.Spawns.Registry.Living.Count(e => e.Definition.EnemyId == "basic_mk1") == 1, "Faster batch proceeds while slower waits");
+        menu._PhysicsProcess(.11);
+        Require(menu.ActiveBatchCount == 1 && menu.Spawned == 4, "Fast batch completes independently");
+        menu._PhysicsProcess(.3);
+        Require(menu.Spawned == 5 && menu.ActiveBatchCount == 1, "Slow batch preserves its timer");
+        menu.CancelBatch();
+        foreach (Enemy e in f.Spawns.Registry.Living.ToArray()) e.Free();
+        ((SpinBox)menu.FindChild("Amount", true, false)).Value = 1;
+        ((SpinBox)menu.FindChild("Gap", true, false)).Value = 0;
+        ((CheckBox)menu.FindChild("Shielded", true, false)).ButtonPressed = true;
+        ((CheckBox)menu.FindChild("Stealthed", true, false)).ButtonPressed = true;
+        menu.FindChildren("*", "Button", true, false).OfType<Button>().Single(b => b.Text == "Spawn batch").EmitSignal(Button.SignalName.Pressed);
+        menu._PhysicsProcess(.016);
+        Enemy both = f.Spawns.Registry.Living.Single(); Require(both.HasStealth && both.CurrentShield > 0, "Shield and stealth combine"); both.Free();
+        menu.MaxSpawnsPerTick = 1;
+        menu.StartBatch(0, 4, 0); menu.StartBatch(1, 4, 0);
+        menu._PhysicsProcess(.016); menu._PhysicsProcess(.016);
+        Require(menu.Spawned == 2 && f.Spawns.Registry.Living.Select(e => e.Definition.EnemyId).Distinct().Count() == 2, "One-per-tick budget rotates fairly");
+        menu.FindChildren("*", "Button", true, false).OfType<Button>()
+            .First(b => b.Text == "Cancel" && !b.GetParent().IsQueuedForDeletion()).EmitSignal(Button.SignalName.Pressed);
+        Require(menu.ActiveBatchCount == 1 && menu.Remaining == 3, "Per-row cancel leaves other batch intact");
+        menu.CancelBatch();
     }
     // =========================================================
     // Registered portals are sampled independently per ship; absent portals never fall back to map edges.

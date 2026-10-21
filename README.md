@@ -1,3 +1,7 @@
+## F2 independent batches — 2026-10-21
+
+Start multiple enemy batches concurrently from F2, each with its own amount/gap and Shielded/Stealthed checkboxes. Active rows show progress and individual Cancel controls; Cancel All stops all pending deliveries. All batches share one bounded spawn budget. See DEBUG/Spawning/README.md.
+
 ## F2 batch spawner — 2026-10-21
 
 F2 opens a menu to choose enemy, amount and spawn gap in seconds; each ship uses a random valid portal. Close with F2/Escape, or cancel remaining deliveries explicitly. Debug tool implementations now live together under DEBUG (including F3 navigation, audio/alert previews and optional XP grant). Old direct F2 cycling is parked and unbound. See DEBUG/README.md for structure and controls.
