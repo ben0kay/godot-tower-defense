@@ -1,3 +1,7 @@
+## Shield ricochet — SR1–SR4 (2026-10-21)
+
+`Ricochet/` owns a bounded world-space cosmetic streak buffer with angle-aware shield reflections. Only opted Kinetic projectiles with confirmed shield absorption request it. Master toggle ShieldRicochetsEnabled; shared DefaultRicochetStyle controls chance/motion/cap. No per-round nodes, collisions or gameplay effects. See Ricochet/README.md for tuning, checks and pending desktop review.
+
 ## Stealth opacity — SE1 (2026-10-20 UTC)
 
 `Stealth/` adds configurable event-driven hidden/revealed opacity, composing with existing status tint and dimming shield/defense feedback. It owns no targeting rules or reveal membership.

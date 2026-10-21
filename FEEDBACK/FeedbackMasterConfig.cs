@@ -5,6 +5,7 @@ using Godot;
 public partial class FeedbackMasterConfig : Resource
 {
     [ExportGroup("Feedback Visibility")]
+    [Export] public bool ShieldRicochetsEnabled { get; set; } = true;
     [Export] public bool DefenseBarsEnabled { get; set; } = true;
     [Export] public bool DeathExplosionsEnabled { get; set; } = true;
     [Export] public bool DamageNumbersEnabled { get; set; } = true;

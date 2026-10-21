@@ -1,3 +1,28 @@
+## SR1–SR4 implementation — 2026-10-21
+
+Implemented the shared cosmetic shield ricochet foundation. The original handoff below is retained as historical planning; desktop appearance/GPU review is still pending.
+
+- Battle, Machine Gun and Sniper opt in through typed config booleans, captured at launch. Kinetic BasicProjectile contacts require **actual positive committed shield absorption**. Full bypass, zero shield response, ordinary hull hits and non-opted weapons produce no ricochet. Combat damage, disposal, status, ammo and XP remain single-hit operations.
+- `Enemy.ApplyDamageWithShieldAbsorption` resolves and commits once, returning the absorbed amount. Existing void `ApplyDamage` delegates to it. Combat/Damage owns its unchanged arithmetic and has no feedback dependency. Shield geometry/position/direction are captured before damage, so lethal callbacks cannot leave the visual reading a removed enemy.
+- `ShieldVisual.TryGetRim` exposes the actual Aura transform, pivot and size at the shader's bright rim (UV radius **.875**). `RicochetGeometry` intersects that affine ellipse and inverse-transforms its normal correctly, including rotation/nonuniform scale/shear. The bridge extends the incoming line backwards from contact because gameplay's smaller collision circle may be reached after a previous tick already crossed the visible rim. This only reconciles presentation; collision/damage timing is unchanged. Invalid, tangent, inside-origin helper calls and missed geometry suppress feedback.
+- `RicochetController` combines controller and renderer in one `World/Effects/Ricochets` CanvasItem. Fixed 512-slot storage, configurable active cap **128**, no effect nodes/timers/tweens/physics queries, no enemy references. Empty buffers sleep; overload increments `SkippedCapacity` and drops immediately. Values are sanitized/captured at spawn. No asset loads or Resource snapshots on impact.
+- Reflections start outside the rim, use at most ±2° default jitter, slow and shorten while fading, and gently turn **toward the outward normal** after spawning. This improves the handoff's random curve proposal by preventing near-tangent streaks bending back into the shield. Rendering simplifies the source snapshot to two thin core/body colored lines, deliberately omitting optional texture/glow layers. No shader, particle system or light is added.
+- Pause freezes existing rounds; expiry resumes afterward. Disabling globally hides drawing immediately and clears active slots on the next unpaused effect tick. World unload/retry clears all slots; no static service retains a battlefield.
+
+### Tuning
+
+`FEEDBACK/DefaultFeedbackConfig.tres` → **ShieldRicochetsEnabled** (default true) is the global switch. `DefaultRicochetStyle.tres` controls chance35%, speed retention45%, deceleration85%, lifetime0.55s, curve12°, jitter2°, length80%, opacity65%, cap128. Disabling the style also suppresses the effect. Machine Gun/Sniper configs export ShieldRicochet (default resource true); Battle's typed config defaults true. Other projectile config defaults remain false.
+
+### Verification
+
+Godot .NET build: zero warnings/errors. Headless `TESTS/Combat/RicochetChecks.tscn` passes affine/head-on/glancing/tangent/degenerate geometry, actual shader-transform alignment, once-only shield damage, bypass/zero response, policy, lethal callbacks, pause/expiry/unload, global-off and overload behavior. PerformanceOverlayChecks passes on all three battlefields. Existing ProjectileAccuracyChecks passes straight/homing/status/splash and spatial checks. Production maps/terrain are untouched.
+
+CPU-only stress with300 enemies present:9,600 spawn requests over600 explicit ticks, cap128, **15.643ms total** on one observed run,40 managed bytes (the Stopwatch allocation), no per-round managed allocations/nodes. Off:9,600 rejected requests **0.224ms total**. These timings exclude `_Draw`, GPU cost and normal enemy simulation; they are not FPS guarantees. F4/Shift+F4/F5's existing **Projectiles / waves** category includes cosmetic motion when profiling is enabled. No additional debug overlay or key is introduced. Desktop first-shot/rim appearance, high-rate rendered volleys, and enabled/off GPU comparison remain to review.
+
+---
+
+## Original implementation handoff (retained)
+
 # Shield Ricochet — Codex implementation handoff
 
 **Status: PLANNED / NOT IMPLEMENTED.** This folder is a documentation-only scaffold. No gameplay or effect code has been added.

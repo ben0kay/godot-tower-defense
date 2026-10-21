@@ -1,3 +1,7 @@
+## Cosmetic shield ricochets — 2026-10-21
+
+Battle/Machine Gun/Sniper shield hits can now leave a short reflected cosmetic streak after real positive shield absorption. One capped world buffer handles all effects; combat remains one hit. Settings: FEEDBACK/DefaultFeedbackConfig.tres and FEEDBACK/Ricochet/DefaultRicochetStyle.tres. Build, focused ricochet and projectile handling checks pass; desktop appearance/GPU review remains. See FEEDBACK/Ricochet/README.md.
+
 ## Shared organic terrain edges — E1/E2 (2026-10-21)
 
 Mars atlas clipping/banding is corrected. A reusable profile-driven visual mask now rounds selected terrain boundaries and holes at level load/terrain rebuild, without altering painted tiles, navigation or build rules. The master remains opt-in: WORLD/TERRAIN/Edges/DefaultTerrainEdgeConfig.tres → Enabled=true, then restart the level. Add other tile materials through profiles; no Mars-specific renderer code. See WORLD/TERRAIN/Edges/README.md for settings, tested behavior and remaining desktop visual review.

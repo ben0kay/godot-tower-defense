@@ -100,7 +100,7 @@ public partial class BattleTower : TowerBase
         if (Ammunition?.TryFire() == false) return;
         BasicProjectile bullet = new();
         bullet.Initialize(_target, FinalStats.ProjectileSpeed,
-            new DamageInfo(FinalStats.DamagePerShot, DamageType.Kinetic, shieldPenetration: FinalStats.ShieldPenetration, source: DamageSource), visual: Config.ProjectileVisual, handling: FinalStats.Handling);
+            new DamageInfo(FinalStats.DamagePerShot, DamageType.Kinetic, shieldPenetration: FinalStats.ShieldPenetration, source: DamageSource), visual: Config.ProjectileVisual, handling: FinalStats.Handling, shieldRicochet: Config.ShieldRicochet);
         _projectiles.AddChild(bullet); WeaponVisuals.Present(bullet, _muzzle, Config, _visuals);
         _recoil.Kick(); // Snapshot the real barrel-tip launch and flash before starting visual motion.
         _shotTimer = Mathf.Max(0, 1f / FinalStats.ShotsPerSecond + _shotTimer);

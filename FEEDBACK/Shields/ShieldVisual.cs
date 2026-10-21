@@ -35,6 +35,17 @@ public partial class ShieldVisual : Node2D
     }
     #endregion
 
+    // =========================================================
+    // Unit circle maps to the shader's bright rim at UV radius .875, including pivot/rotation/nonuniform scale.
+    public bool TryGetRim(out Transform2D ellipse)
+    {
+        ellipse = default;
+        if (_aura == null || !HasShieldVisual || !IsVisibleInTree()) return false;
+        ellipse = _aura.GetGlobalTransform() * new Transform2D(0, _aura.Size * .5f);
+        ellipse = new Transform2D(ellipse.X * _aura.Size.X * .4375f, ellipse.Y * _aura.Size.Y * .4375f, ellipse.Origin);
+        return true;
+    }
+
     #region Event-driven shield display
     // =========================================================
     // Caller passes only old/new points: damage and restoration are determined outside this component.

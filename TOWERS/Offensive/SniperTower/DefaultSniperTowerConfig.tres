@@ -9,3 +9,5 @@ script = ExtResource("1")
 ProjectileVisual = ExtResource("pv_tracer")
 MuzzleFlash = ExtResource("pv_flash")
 AimLaser = ExtResource("pv_aim")
+
+ShieldRicochet = true

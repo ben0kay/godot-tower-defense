@@ -1,3 +1,7 @@
+## Completed: shield ricochet SR1–SR4 foundation — 2026-10-21
+
+Implemented FEEDBACK/Ricochet handoff with combined world controller/renderer, capped value slots, affine visible-shield reflection, positive absorption bridge, and typed Battle/Machine Gun/Sniper opt-in. Improvement: curve turns toward outward normal so grazing reflections cannot curl inward. No additional damage/ammo/status/XP or per-round nodes. Build and focused RicochetChecks/ProjectileAccuracyChecks/PerformanceOverlayChecks pass. CPU-only stress:9,600 requests/600 ticks/300 enemies present,15.643ms total,40 fixed managed bytes; rendering excluded. Desktop look/GPU comparison still pending. Settings and exact observed boundaries in FEEDBACK/Ricochet/README.md. Historical passes below retained.
+
 ## E1/E2 implementation — 2026-10-21
 
 E1 clips both64×64 SVG atlas cells independently, removes the dust's repeated gradient/sediment bands in favour of low-contrast seamless grain, and softens the rock's repeating black strokes. Source IDs, atlas coordinates, TileData flags and saved maps are unchanged.

@@ -151,11 +151,25 @@ public partial class Enemy : Node2D
 
     // =========================================================
     // Typed attacks supply base units; the global resolver owns all defense-layer math.
-    public void ApplyDamage(DamageInfo hit)
+    public void ApplyDamage(DamageInfo hit) => ApplyDamageWithShieldAbsorption(hit);
+
+    // =========================================================
+    // Return actual committed absorption without resolving twice; capture before lethal callbacks can remove this enemy.
+    public float ApplyDamageWithShieldAbsorption(DamageInfo hit)
     {
         if (!IsAlive || !IsInsideTree() || IsQueuedForDeletion() || hit.Amount == 0
-            || !GodotObject.IsInstanceValid(_registry) || !_registry.IsInsideTree() || !_registry.Contains(this)) return;
-        CommitDamage(DamageResolver.Resolve(hit, CurrentShield, Health), hit.Source);
+            || !GodotObject.IsInstanceValid(_registry) || !_registry.IsInsideTree() || !_registry.Contains(this)) return 0;
+        var result = DamageResolver.Resolve(hit, CurrentShield, Health);
+        float absorbed = Mathf.Max(0, CurrentShield - result.Shield);
+        CommitDamage(result, hit.Source); return absorbed;
+    }
+
+    // =========================================================
+    // Presentation geometry is optional and captured before damage/death callbacks.
+    public bool TryGetShieldRim(out Transform2D ellipse)
+    {
+        ellipse = default;
+        return GodotObject.IsInstanceValid(_shieldVisual) && _shieldVisual.TryGetRim(out ellipse);
     }
 
     // =========================================================

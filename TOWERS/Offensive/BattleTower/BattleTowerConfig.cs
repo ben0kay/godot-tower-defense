@@ -14,6 +14,7 @@ public partial class BattleTowerConfig : TowerConfig, ITowerTargetingPolicy, IPr
         Levels = BattleTowerLevels.Create();
     }
 
+    [Export] public bool ShieldRicochet { get; set; } = true;
     private bool _heatEnabled;
     private double _overheatMinutes = 3, _recoverySeconds = 9;
     [ExportGroup("Heat")]

@@ -1,3 +1,7 @@
+## Cosmetic shield-hit bridge — 2026-10-21
+
+BasicProjectile appends an optional immutable shieldRicochet launch flag (default false). Battle/Machine Gun/Sniper opt in via typed configs. On Kinetic contact it captures optional shield geometry, commits damage once via Enemy.ApplyDamageWithShieldAbsorption, then requests a purely cosmetic reflected tracer only for positive absorption. Original disposal/status/XP remain unchanged. Fixed world effects have no contact/targeting logic. Geometry may reconcile an earlier visible rim along the incoming line without changing gameplay contact. See FEEDBACK/Ricochet/README.md.
+
 ## Projectile handling update (PA1–PA3)
 
 Optional immutable handling now carries launch spread and explicit Straight/Homing guidance through level → selected rank → captured research → safety → final snapshots. Projectile towers default to straight physical shots; splash uses a fixed launch destination. See `TOWERS/Shared/Projectiles/PROJECTILE_GUIDANCE_ACCURACY_PLAN.md` for implementation decisions and retained pass history.

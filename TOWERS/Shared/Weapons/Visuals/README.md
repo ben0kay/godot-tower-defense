@@ -1,3 +1,7 @@
+## Cosmetic reflected tracers — 2026-10-21
+
+FEEDBACK/Ricochet reuses the bullet's existing immutable visual snapshot (core/body colors, length, thickness); no impact-time resource capture/load. Its bounded renderer simplifies artwork to two streak lines. Original projectile and muzzle presentation remain unchanged. See FEEDBACK/Ricochet/README.md.
+
 ## Hostile energy-streak snapshot options — 2026-10-20
 
 ProjectileVisualStyle/Snapshot append optional Tapered, TailWidthFraction, TailOpacity and HeadWidthMultiplier fields for the centralized hostile renderer. Defaults preserve original straight tracers and existing snapshot constructor call sites. Capture clamps new numeric values; EnemyBulletSystem sanitizes direct requests too. Friendly projectile rendering/configs remain unchanged. Shape affects presentation only. Build and focused enemy checks passed; broader ProjectileVisualChecks retains an unrelated Cryo placement-fixture failure tracked in TESTS/EnemyWeapons/README.md.

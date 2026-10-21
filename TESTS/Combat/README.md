@@ -1,3 +1,7 @@
+## Shield ricochet checks — 2026-10-21
+
+Run RicochetChecks.tscn for pure affine ellipse/reflection, actual shader-transform sizing, real shield contact/damage-once, bypass/zero response, weapon opt-in, lethal callbacks, pause, expiry, disabled/overload and300-enemy cosmetic-buffer allocation stress. Passed headlessly alongside ProjectileAccuracyChecks; CPU fixture timings and pending rendered review are documented in FEEDBACK/Ricochet/README.md.
+
 # Combat tests
 
 Damage, shields, instant area damage, travelling shockwaves, death feedback and spatial-query correctness.

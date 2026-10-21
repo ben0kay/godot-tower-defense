@@ -1,3 +1,7 @@
+## Shield absorption result adapter — 2026-10-21
+
+Enemy.ApplyDamageWithShieldAbsorption resolves and commits typed damage exactly once and returns the positive difference between pre-hit shield and resolved shield. Existing void ApplyDamage delegates to it. This exposes an authoritative outcome to cosmetic projectile feedback without rerunning the resolver or adding a FEEDBACK dependency here. DamageResult/formulas are unchanged.
+
 # Typed damage — Phases 4C-1 and 4C-3 implemented
 
 `DamageInfo` is an immutable validated base hit with a damage type, independently optional absolute shield/hull coefficient overrides, and a shield penetration fraction (default 0). Existing two-argument callers remain valid. Null overrides inherit the type default; explicit zero overrides remain meaningful. Negative/nonfinite amounts or overrides, unknown types, and nonfinite/out-of-range penetration are rejected before target state changes.

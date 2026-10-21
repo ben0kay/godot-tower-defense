@@ -133,7 +133,7 @@ public abstract partial class ProjectileTurretBase : TowerBase
             if (Ammunition?.TryFire() == false) return;
             Marker2D muzzle = _muzzles[_barrels.MuzzleIndex(mode, i)];
             BasicProjectile bullet = new();
-            bullet.Initialize(_target, FinalStats.ProjectileSpeed, hit, CreateEffect(FinalStats), Config.ProjectileVisual, FinalStats.Handling);
+            bullet.Initialize(_target, FinalStats.ProjectileSpeed, hit, CreateEffect(FinalStats), Config.ProjectileVisual, FinalStats.Handling, Config.ShieldRicochet);
             _projectiles.AddChild(bullet);
             WeaponVisuals.Present(bullet, muzzle, Config, _visuals);
         }

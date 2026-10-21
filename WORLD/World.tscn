@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3]
+[gd_scene load_steps=26 format=3]
 
 [ext_resource type="Script" path="res://WORLD/GRID/WorldGrid.cs" id="1_script"]
 [ext_resource type="Resource" path="res://WORLD/DefaultWorldConfig.tres" id="2_config"]
@@ -31,6 +31,10 @@
 [ext_resource type="Script" path="res://WORLD/TERRAIN/Edges/TerrainEdgeController.cs" id="edge_controller"]
 [ext_resource type="Script" path="res://WORLD/TERRAIN/Edges/TerrainEdgeRenderer.cs" id="edge_renderer"]
 [ext_resource type="Resource" path="res://WORLD/TERRAIN/Edges/DefaultTerrainEdgeConfig.tres" id="edge_config"]
+
+[ext_resource type="Script" path="res://FEEDBACK/Ricochet/RicochetController.cs" id="ricochet"]
+[ext_resource type="Resource" path="res://FEEDBACK/Ricochet/DefaultRicochetStyle.tres" id="ricochet_style"]
+[ext_resource type="Resource" path="res://FEEDBACK/DefaultFeedbackConfig.tres" id="feedback_master"]
 
 [node name="World" type="Node2D"]
 script = ExtResource("loader")
@@ -100,3 +104,8 @@ Config = ExtResource("edge_config")
 
 [node name="Renderer" type="Node2D" parent="TerrainEdges"]
 script = ExtResource("edge_renderer")
+
+[node name="Ricochets" type="Node2D" parent="Effects"]
+script = ExtResource("ricochet")
+Style = ExtResource("ricochet_style")
+Master = ExtResource("feedback_master")

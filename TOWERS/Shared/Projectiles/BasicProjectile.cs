@@ -4,6 +4,9 @@ using Godot;
 public partial class BasicProjectile : Node2D
 {
     #region Launch State
+    private static readonly NodePath RicochetPath = new("../../Effects/Ricochets");
+    private bool _shieldRicochet;
+    private RicochetController _ricochets;
     private Enemy _target;
     private EnemyRegistry _registry;
     private Vector2 _initialTarget;
@@ -24,7 +27,7 @@ public partial class BasicProjectile : Node2D
     // =========================================================
     // Capture value payloads once; straight shots keep no original-target reference after initialization.
     public void Initialize(Enemy target, float speed, DamageInfo damage, StatusEffectPayload? effect = null,
-        ProjectileVisualStyle visual = null, ProjectileHandlingStats? handling = null)
+        ProjectileVisualStyle visual = null, ProjectileHandlingStats? handling = null, bool shieldRicochet = false)
     {
         if (!float.IsFinite(speed) || speed <= 0) throw new System.ArgumentOutOfRangeException(nameof(speed));
         _handling = ProjectileHandlingStats.Sanitize(handling ?? new());
@@ -32,6 +35,7 @@ public partial class BasicProjectile : Node2D
         _initialTarget = GodotObject.IsInstanceValid(target) ? target.GlobalPosition : Vector2.Zero;
         _target = _handling.Guidance == ProjectileGuidance.Homing ? target : null;
         _speed = speed; _damage = damage; _effect = effect; _visual = visual?.Capture();
+        _shieldRicochet = shieldRicochet;
         _life = 5; _impacted = false; _launched = false;
     }
     // =========================================================
@@ -40,6 +44,7 @@ public partial class BasicProjectile : Node2D
     {
         if (_launched) return;
         if (!worldPosition.IsFinite()) { _impacted = true; QueueFree(); return; }
+        _ricochets = _shieldRicochet ? GetNodeOrNull<RicochetController>(RicochetPath) : null;
         GlobalPosition = worldPosition;
         _travelDirection = ProjectileLaunch.Direction(forward ?? (_initialTarget - worldPosition), _handling.SpreadDegrees, spreadSample);
         GlobalRotation = _travelDirection.Angle(); _launched = true;
@@ -72,7 +77,15 @@ public partial class BasicProjectile : Node2D
         if (hit != null)
         {
             _impacted = true; GlobalPosition = from.Lerp(end, (float)entry); QueueFree();
-            hit.ApplyDamage(_damage);
+            Vector2 point = default, normal = default, reflected = default;
+            // Extend the incoming line backwards: a prior physics tick may already be inside the larger visual rim.
+            bool bounce = _shieldRicochet && _damage.Type == DamageType.Kinetic && _visual.HasValue &&
+                GodotObject.IsInstanceValid(_ricochets) && _ricochets.Available && hit.TryGetShieldRim(out var ellipse) &&
+                RicochetGeometry.Reflect(ellipse, GlobalPosition - _travelDirection * (2 * (ellipse.X.Length() + ellipse.Y.Length()) + 1),
+                    GlobalPosition, _travelDirection, out point, out normal, out reflected);
+            float absorbed = hit.ApplyDamageWithShieldAbsorption(_damage);
+            if (bounce && absorbed > 0 && GodotObject.IsInstanceValid(_ricochets))
+                _ricochets.Spawn(point, normal, reflected, _speed, _visual.Value);
             if (_effect.HasValue && GodotObject.IsInstanceValid(hit) && hit.IsAlive && !hit.IsQueuedForDeletion()) hit.ApplyStatus(_effect.Value);
             return;
         }
@@ -81,7 +94,7 @@ public partial class BasicProjectile : Node2D
     }
     // =========================================================
     // World unload is terminal even if a caller manually ticks a retained managed wrapper.
-    public override void _ExitTree() { _impacted = true; _target = null; _registry = null; }
+    public override void _ExitTree() { _impacted = true; _target = null; _registry = null; _ricochets = null; }
     #endregion
 
     // =========================================================

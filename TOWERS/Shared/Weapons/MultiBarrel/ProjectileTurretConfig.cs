@@ -7,6 +7,7 @@ public partial class ProjectileTurretConfig : TowerConfig, ITowerTargetingPolicy
     [ExportGroup("Firing")]
     [Export] public BarrelFireMode FiringMode { get; set; } = BarrelFireMode.Single;
     [ExportGroup("Weapon Visuals")]
+    [Export] public bool ShieldRicochet { get; set; }
     [Export] public ProjectileVisualStyle ProjectileVisual { get; set; }
     [Export] public MuzzleFlashStyle MuzzleFlash { get; set; }
     [Export] public AimLaserStyle AimLaser { get; set; }

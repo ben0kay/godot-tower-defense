@@ -1,3 +1,7 @@
+## Read-only ricochet geometry — 2026-10-21
+
+ShieldVisual.TryGetRim returns an affine unit-circle transform at the current shader bright rim (UV radius.875), using the actual ColorRect global transform, pivot and dimensions. It contains no hit decision/damage logic. Ricochet captures this before damage and uses the confirmed absorption result. If shader rim geometry changes later, update this shared presentation constant too. See ../Ricochet/README.md.
+
 ## GPU-rendered shield orb — 2026-10-21
 
 The reusable shield visual is now a **static CanvasItem shader** (`Artwork/ShieldOrb.gdshader`) on one `ColorRect` quad in `ShieldVisual.tscn`, replacing the previous SVG sprite. It approximates a sleek spherical red force field: transparent center, glossy inner curvature, smooth bright rim/halo and subtle hexagonal cells. It is a 2D visual illusion rather than a real 3D sphere or generated mesh. **No TIME animation, _Draw(), _Process(), _PhysicsProcess(), or per-enemy image baking.** The same shader resource is shared by all shields; Godot evaluates the pixels when each visible quad is rendered. Do not confuse this with zero GPU cost: lots of large overlapping transparent quads still have overdraw.
