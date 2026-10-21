@@ -17,6 +17,9 @@
 script = ExtResource("3_root")
 Settings = ExtResource("4_config")
 
+[ext_resource type="Script" path="res://WORLD/VISUALS/LevelAtmosphereController.cs" id="ve1_controller"]
+[ext_resource type="Resource" path="res://WORLD/VISUALS/Presets/CalmSpace.tres" id="ve1_preset"]
+
 [node name="SpaceBackground" type="Node2D" parent="." unique_id=1825087959]
 z_index = -20
 
@@ -31,6 +34,10 @@ texture = ExtResource("1_p5ed7")
 centered = false
 
 [node name="Planets" type="Node2D" parent="SpaceBackground" unique_id=1684856347]
+
+[node name="VisualAtmosphere" type="Node2D" parent="SpaceBackground"]
+script = ExtResource("ve1_controller")
+Config = ExtResource("ve1_preset")
 
 [node name="Terrain" type="Node2D" parent="." unique_id=833107286]
 

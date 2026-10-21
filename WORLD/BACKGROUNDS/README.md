@@ -1,3 +1,9 @@
+## VE1 implementation — 2026-10-21
+
+VE1 now has a reusable opt-in LevelAtmosphereController, six Inspector preset resources, StarTwinkle and NebulaDrift shaders and the modular WORLD/VISUALS folders. Level001 uses CalmSpace behind terrain; LevelTemplate includes the disabled-by-visibility scaffold. Existing star SVG and painted maps are preserved. See WORLD/VISUALS/README.md. VE2–VE7 remain planned; desktop appearance/GPU checks remain.
+
+---
+
 # BACKGROUNDS — Cosmetic Space Scenery
 
 Purely visual **non-tilemap** art intended to appear behind a level's physical terrain. Keep the reusable assets/scene components here; place instances in each level's `SpaceBackground` section.
