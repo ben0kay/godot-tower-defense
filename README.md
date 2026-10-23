@@ -1,3 +1,9 @@
+## Development backlog and documentation audit (2026-10-23)
+
+For current unfinished work **ranked by complexity**, suggested **Codex vs regular ChatGPT** task sizes, additional unimplemented concepts, and a **checklist of outdated Markdown to clean**, see **[NOTES/IMPLEMENTATION_BACKLOG.md](NOTES/IMPLEMENTATION_BACKLOG.md)**. This index distinguishes implemented source, pending QA and historically superseded plan text. Recheck current GitHub HEAD before starting a phase.
+
+---
+
 ## Citadel construction drones — CD1/CD2 (2026-10-21)
 
 Paid initial tower/building sites now wait for a cyan builder from the nearest available Citadel. Its beam deploys before ordinary construction time starts; the drone returns after completion. One capped manager/pool handles all towers, with no ground A*. Upgrades/direct/zero-second instances retain their behavior. Settings: TOWERS/ConstructionDrones/DefaultConstructionDroneConfig.tres. Build and dedicated builder/footprint/F4 checks pass; desktop visual/GPU review remains. See TOWERS/ConstructionDrones/README.md for observed tests and existing broad-suite fixture limits.
