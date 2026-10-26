@@ -32,6 +32,7 @@ public partial class ConstructionDroneManager : Node2D
     private WorldGrid _grid;
     private ulong _reservation;
     private bool _shutdown, _ticking, _warned;
+    private ConstructionCompletionFlash _completionFlashes;
     private double _retry;
     public bool CanGate => !_shutdown && Config?.Enabled == true && IsInsideTree() && !IsQueuedForDeletion();
     public int ActiveCount => _active.Count;
@@ -51,7 +52,12 @@ public partial class ConstructionDroneManager : Node2D
     #region Binding and Success-only Reservations
     // =========================================================
     // The shared World owns one dispatcher; run after the work clock so arrival never grants earlier frame time.
-    public override void _Ready() { ProcessPhysicsPriority = 100; SetProcess(false); SetPhysicsProcess(false); }
+    public override void _Ready()
+    {
+        ProcessPhysicsPriority = 100; SetProcess(false); SetPhysicsProcess(false);
+        _completionFlashes = new ConstructionCompletionFlash { Name = "CompletionFlashes" };
+        AddChild(_completionFlashes);
+    }
     // =========================================================
     // Placement connects synchronously in Ready, before any funded site can be created (no deferred binding race).
     public void Bind(TowerPlacementController placement)
@@ -190,6 +196,7 @@ public partial class ConstructionDroneManager : Node2D
         {
             if (Config?.Enabled != true) { DisableFeature(); return; }
             float dt = (float)Math.Min(delta, 3600);
+            if (Config.ShowVisuals == false) _completionFlashes?.Clear();
             for (int i = _active.Count - 1; i >= 0; i--)
             {
                 var job = _active[i];
@@ -273,12 +280,13 @@ public partial class ConstructionDroneManager : Node2D
     private void Completed(Assignment job)
     {
         if (job.Cancelled || job.Tower?.WorkPhase != TowerWorkPhase.Operational) return;
+        _completionFlashes?.Spawn(job.Target, job.HalfWidth, Config);
         Forget(job); job.Phase = ConstructionDronePhase.Returning;
         if (GodotObject.IsInstanceValid(job.Drone)) Present(job, 0); else job.Cancelled = true;
     }
     // =========================================================
     // A fixed site center and bounded footprint-derived hover/beam make large factories use the same implementation.
-    private void Present(Assignment job, float strength) => job.Drone.Present(job.Position, job.Target, job.HalfWidth, strength, Config);
+    private void Present(Assignment job, float strength) => job.Drone.Present(job.Position, job.Target, job.HalfWidth, strength, Config, job.Age);
     #endregion
 
     #region Disable and Teardown
@@ -286,6 +294,7 @@ public partial class ConstructionDroneManager : Node2D
     // Feature OFF releases holds without creating/completing work; visual OFF alone never enters this path.
     private void DisableFeature()
     {
+        _completionFlashes?.Clear();
         while (_pending.TryDequeue(out var job)) { Release(job); Cancel(job); Park(job); }
         for (int i = _active.Count - 1; i >= 0; i--) { var job = _active[i]; Release(job); Cancel(job); Park(job); }
         _active.Clear();

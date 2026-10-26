@@ -18,6 +18,19 @@ public partial class ConstructionDroneMasterConfig : Resource
     [Export(PropertyHint.Range, "16,96,1")] public float HoverHeight { get; set; } = 48;
     [Export(PropertyHint.Range, ".05,.5,.01")] public float BeamOpacity { get; set; } = .26f;
     [Export] public Color BeamColor { get; set; } = new(.2f, .9f, 1);
+    #endregion
+    #region CD3 Hologram Animation
+    [Export(PropertyHint.Range, "0,8,1")] public int BeamScanBands { get; set; } = 4;
+    [Export(PropertyHint.Range, "0,6,.1")] public float BeamScanCyclesPerSecond { get; set; } = 1.5f;
+    [Export(PropertyHint.Range, "0,6,.1")] public float BeamPulseHz { get; set; } = 2f;
+    [Export(PropertyHint.Range, "0,.35,.01")] public float BeamPulseDepth { get; set; } = .13f;
+    #endregion
+    #region CD3 Completion Flash
+    [Export] public bool CompletionFlashEnabled { get; set; } = true;
+    [Export(PropertyHint.Range, ".1,1,.01")] public float CompletionFlashSeconds { get; set; } = .28f;
+    [Export(PropertyHint.Range, "0,1,.01")] public float CompletionFlashOpacity { get; set; } = .65f;
+    #endregion
+    #region Validation
     // =========================================================
     // Clamp programmatic and Remote Inspector inputs too, not just the editor's sliders.
     public static float Safe(float value, float fallback, float min, float max) => float.IsFinite(value) ? Mathf.Clamp(value, min, max) : fallback;

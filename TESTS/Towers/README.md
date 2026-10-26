@@ -1,3 +1,9 @@
+## CD3 construction hologram presentation — 2026-10-25
+
+`ConstructionDroneChecks.tscn` now also asserts beam animation time, exactly one site-anchored completion flash after paid initial construction, independence from the returning/pooled drone, short-lived idle renderer cleanup, and suppression when visuals are off or a paid upgrade completes. CD1/CD2 hold/payment/return tests remain intact. Actual editor/GPU appearance testing is separate and not claimed here.
+
+---
+
 ## CD1/CD2 builder verification — 2026-10-21
 
 Run ConstructionDroneChecks.tscn for real paid gates/beam/return, independent clocks, FIFO/cap/token/duplicate safety, pause/visual-off, failures/strict fallback, multi-Citadel/marker/source loss,2×2/3×2, destruction/teardown, mission Results freeze and20-build CPU/allocation stress. It opts in explicitly; ordinary AmmoLoopFixture tests disable builders for their unrelated timer contracts. The fixture placement search now includes all painted layers, including solid foundations. Saved maps are never changed.

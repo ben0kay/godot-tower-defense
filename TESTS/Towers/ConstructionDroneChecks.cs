@@ -1,4 +1,4 @@
-// CD1/CD2 production checks: successful paid holds, deterministic multi-Citadel flight, beam, return, safety and bounded updates.
+// CD1/CD2/CD3 production checks: successful paid holds, deterministic multi-Citadel flight, beam, return, safety and bounded updates.
 using Godot;
 using System;
 using System.Diagnostics;
@@ -15,7 +15,7 @@ public partial class ConstructionDroneChecks : Node
             foreach (string scene in new[] { "res://Main.tscn", "res://MainLevel020.tscn" }) PaidFlow(scene);
             QueuesAndRemoval(); Fallbacks(); MultiCitadel(); Compatibility(); ResultsFreeze(); Stress();
             await SubsystemBattlefield.DrainFreedFixtures(this);
-            GD.Print("PASS: CD1/CD2 paid arrival hold, beam/return, FIFO/cap, pause/visual-off, fallback/strict, multi-Citadel, cleanup and stress");
+            GD.Print("PASS: CD1/CD2/CD3 paid arrival hold, animated beam/completion flash, return, FIFO/cap, pause/visual-off, fallback/strict, multi-Citadel, cleanup and stress");
             GetTree().Quit();
         }
         catch (Exception error) { GetTree().Paused = false; GD.PushError(error.ToString()); GetTree().Quit(1); }
@@ -80,20 +80,29 @@ public partial class ConstructionDroneChecks : Node
         GetTree().Paused = true; builders._PhysicsProcess(10); clock.Advance(999); GetTree().Paused = false;
         Require(drone.GlobalPosition == position && tower.ElapsedWorkSeconds == 0, "Pause freezes flight and work");
         Arrive(builders, tower);
-        Require(drone.BeamVisible && status.Text == "CONSTRUCTING" && builders.Releases == 1 && clock.HeldCount == 0, "Beam deployed before one release");
+        var beam = drone.GetNode<ConstructionBeam>("Beam");
+        var flashes = builders.GetNode<ConstructionCompletionFlash>("CompletionFlashes");
+        Require(drone.BeamVisible && beam.AnimationSeconds > 0 && status.Text == "CONSTRUCTING" &&
+            builders.Releases == 1 && clock.HeldCount == 0, "Animated beam deployed before one release");
         Require(!tower.ReleaseConstructionDrone(builders, token), "Repeated arrival cannot release twice");
         clock.Advance(1); Require(tower.ElapsedWorkSeconds == 1 && !tower.IsOperational, "Ordinary clock starts after arrival");
-        clock.Advance(2); Require(tower.IsOperational && !drone.BeamVisible && builders.ActiveCount == 1, "Completion activates independently of return");
+        clock.Advance(2); Require(tower.IsOperational && !drone.BeamVisible && builders.ActiveCount == 1 &&
+            flashes.ActiveCount == 1 && flashes.IsProcessing(), "Site completion flashes once independently of return");
         Return(builders);
+        Require(flashes.ActiveCount == 1, "Returning or pooling the drone does not remove the site flash");
+        flashes._Process(.5);
+        Require(flashes.ActiveCount == 0 && !flashes.IsProcessing(), "Completion flash expires and renderer sleeps");
         Require(f.Spawns.Paths.TotalCalculations == paths && f.Spawns.Paths.Navigation.Grid.NavigationRevision == revision &&
             f.Wallet.GetBalance(f.Wallet.CreditsResource) == balance - cost, "Flight never changes paths, occupancy or wallet");
         builders.Config.ShowVisuals = false;
         var second = f.Purchase<BattleTower>("battle", false); Arrive(builders, second);
         Require(!builders.DroneFor(second).Visible && builders.Releases == 2 && builders.CreatedVisuals == 1, "Visual OFF retains timing and reuses parked drone");
         clock.Advance(3); Return(builders);
+        Require(flashes.ActiveCount == 0, "Visuals-off construction produces no completion flash");
         Require(TowerUpgradeController.TryUpgrade(tower, f.Wallet, f.Placement.Settings, 1, out _), "Existing paid upgrade accepted");
         Require(!tower.AwaitingConstructionDrone && tower.IsOperational && builders.ActiveCount == 0 && builders.PendingCount == 0, "Upgrade works at old tier with no builder");
-        clock.Advance(tower.RemainingWorkSeconds); Require(tower.UpgradeLevel == 2, "Paid upgrade completes normally");
+        clock.Advance(tower.RemainingWorkSeconds); Require(tower.UpgradeLevel == 2 && flashes.ActiveCount == 0,
+            "Paid upgrades complete normally without a builder completion flash");
     }
     // =========================================================
     // FIFO holds remain reserved while outbound/building/returning slots are busy; cancellation promptly frees capacity.

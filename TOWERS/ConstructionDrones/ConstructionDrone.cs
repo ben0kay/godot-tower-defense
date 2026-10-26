@@ -10,11 +10,10 @@ public partial class ConstructionDrone : Node2D
     { _beam = GetNode<ConstructionBeam>("Beam"); SetProcess(false); SetPhysicsProcess(false); }
     // =========================================================
     // All endpoints are world-space; no enemy, tower, work clock or Citadel references live in this visual.
-    public void Present(Vector2 position, Vector2 target, float halfWidth, float strength, ConstructionDroneMasterConfig config)
+    public void Present(Vector2 position, Vector2 target, float halfWidth, float strength, ConstructionDroneMasterConfig config, float beamAge = 0)
     {
         GlobalPosition = position; Visible = config.ShowVisuals;
-        _beam.Present(target, halfWidth, config.ShowVisuals ? strength : 0, config.BeamColor,
-            ConstructionDroneMasterConfig.Safe(config.BeamOpacity, .26f, .05f, .5f));
+        _beam.Present(target, halfWidth, config.ShowVisuals ? strength : 0, config, beamAge);
     }
     // =========================================================
     // Idle pool entries do no update/drawing and retain no assignment references.

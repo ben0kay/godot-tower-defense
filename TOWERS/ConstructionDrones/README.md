@@ -1,3 +1,13 @@
+## CD3 visual-only hologram polish — 2026-10-25
+
+Implemented scrolling scan bands, soft pulsing cyan beam, enlarged nozzle and footprint-centered glow in the existing pooled drone renderer. Added one central, capped 64-entry completion-flash renderer which emits a .28-second cyan ring only after a paid initial build completes successfully. There are no extra per-drone processing callbacks, new GPU emitters, scene nodes per flash, modifications to the work clock, flight speed, damage, placement, Inspector or research.
+
+`ConstructionDroneMasterConfig.cs` / `DefaultConstructionDroneConfig.tres` expose the beam scan-band count (0–8, default 4), scan cycles/s (1.5), pulse Hz (2), pulse depth (.13), completion-flash enabled, duration (.28s) and opacity (.65). All are visual-only; `ShowVisuals=false` skips beam and flashes while maintaining unchanged arrival/work timing. This is deliberately limited to CD3 visual work, not the broader outstanding CD3 desktop/GPU acceptance or optional HUD ETA/sounds/research.
+
+Focused production tests now check animated time, one completion flash (independent of returning drone), idle cleanup and visuals-off suppression. **Godot/.NET build and headless execution still require verification if unavailable in the authoring environment; live-screen look and 20-beam GPU profiling remain local tasks.** See `Visuals/README.md`.
+
+---
+
 ## CD1/CD2 implemented — 2026-10-21
 
 Paid positive-duration **initial** construction now waits for a Citadel builder. The site/payment/full-footprint claim and stage-0 art happen immediately. A cyan drone flies from the nearest available Citadel, deploys its holographic cone, releases that site's work hold exactly once, hovers while the original build clock runs, then returns. Upgrades, zero-second builds and direct scene instances retain their previous behavior.
