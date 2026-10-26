@@ -1,11 +1,13 @@
-[gd_resource type="Resource" script_class="MachineGunTowerConfig" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="MachineGunTowerConfig" load_steps=5 format=3]
 [ext_resource type="Script" path="res://TOWERS/Offensive/MachineGunTower/MachineGunTowerConfig.cs" id="1"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/MachineGunTower/Visuals/MachineGunTracerStyle.tres" id="pv_tracer"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/MachineGunTower/Visuals/MachineGunMuzzleFlashStyle.tres" id="pv_flash"]
+[ext_resource type="Resource" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Construction/MachineGunConstructionArt.tres" id="construction"]
 [resource]
 script = ExtResource("1")
 
 ProjectileVisual = ExtResource("pv_tracer")
 MuzzleFlash = ExtResource("pv_flash")
+ConstructionArt = ExtResource("construction")
 
 ShieldRicochet = true

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="machineHull" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8a9ca9"/><stop offset=".5" stop-color="#384b5b"/><stop offset="1" stop-color="#152533"/>
+    </linearGradient>
+    <linearGradient id="gunMetal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#243947"/><stop offset=".5" stop-color="#89a5ac"/><stop offset="1" stop-color="#2b4050"/>
+    </linearGradient>
+  </defs>
+  <!-- Nearly complete base and twin barrels, but with unfinished short muzzles and dim central core. -->
+  <path d="M14 8H23L28 13H36L41 8H50L56 14V23L51 28V36L56 41V50L50 56H41L36 51H28L23 56H14L8 50V41L13 36V28L8 23V14Z" fill="#162c38" stroke="#54798b" stroke-width="1.4"/>
+  <circle cx="32" cy="34" r="19.5" fill="url(#machineHull)" stroke="#81b7c6" stroke-width="1.7"/>
+  <path d="M17 30L22 23H42L47 30V41L42 46H22L17 41Z" fill="#1b3342" stroke="#0f2029" stroke-width="1.5"/>
+  <path d="M17 29L20 15L22 12H27L29 15L30 31Z" fill="url(#gunMetal)" stroke="#14232c" stroke-width="1.7"/>
+  <path d="M34 31L35 15L38 12H43L45 15L47 29Z" fill="url(#gunMetal)" stroke="#14232c" stroke-width="1.7"/>
+  <path d="M21 15H28M36 15H44" stroke="#819da7" stroke-width="2"/>
+  <path d="M23 18V26M41 18V26" stroke="#739ba8" stroke-width="1.2"/>
+  <circle cx="32" cy="35" r="12" fill="#355263" stroke="#a4d1d5" stroke-width="1.8"/>
+  <circle cx="32" cy="35" r="7" fill="#192d3a" stroke="#5cbecf" stroke-width="1.7"/>
+  <circle cx="32" cy="35" r="3" fill="#745a49" stroke="#8d9095" stroke-width=".8"/>
+  <path d="M13 32H19M45 32H51" stroke="#64cddd" stroke-width="2"/>
+</svg>

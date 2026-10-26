@@ -1,3 +1,11 @@
+## Machine Gun C4 rollout — 2026-10-26
+
+Machine Gun now uses the same `TowerConstructionVisuals` + `TowerConstructionArt` implementation as Battle. A dedicated stage profile references three authored, aligned 64×64 SVGs at 0/35/70% and switches back to the original finished split base/twin-barrel assembly at 100%. With the 4-second authored initial work, stage thresholds correspond to 0/1.4/2.8/4 seconds of **unheld** work. It does not change the Citadel drone or upgrade timings. Shared `ProjectileTurretBase.SetSelected` tints an optional construction overlay as well as the finished sprites, with no per-frame polling.
+
+The focused `ConstructionArtChecks` includes a paid Machine Gun phase/selection/finished-split check and direct-instance fallback; this is an authored regression, not a claim of a completed Godot editor/desktop run. Inspect normal-zoom transitions and return to twin-barrel recoil in Godot.
+
+---
+
 # C4 Battle-only construction artwork pilot
 
 **Implemented scope:** shared event-driven artwork presenter, Battle Tower stage SVGs, optional future per-level intermediate/finished images. **No sparks or construction VFX.** Real Factory/Depot/other tower stage assets are not enabled.

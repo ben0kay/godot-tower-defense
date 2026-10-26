@@ -1,3 +1,11 @@
+## Shared C4 staged construction artwork — 2026-10-26
+
+The Machine Gun Tower now builds in **foundation (0%) → circular frame (35%) → twin-barrel assembly (70%) → completed tower (100%)**, using its own 64×64 SVGs in `Artwork/Construction/` and the same shared `TowerConstructionVisuals` presenter as Battle. Paid initial work remains **4 seconds**, beginning only after an available construction drone arrives and activates its beam. A composite construction overlay temporarily replaces the split finished base/gun; at completion the original fixed base, dual-muzzle gun and recoil resume unchanged. Selection tint applies to the construction overlay through the shared optional sprite path. Upgrades retain the existing finished look; optional Level2/3 artwork slots are empty. No new timers, per-frame callbacks, tower mechanics or tower-specific construction scripts were added.
+
+Configurable thresholds and art: `Artwork/Construction/MachineGunConstructionArt.tres` via `DefaultMachineGunTowerConfig.tres`. See `Artwork/Construction/README.md` for the authored stages, compatibility and desktop visual checklist. Brief source/resource checks only; Godot editor visual acceptance remains pending.
+
+---
+
 ## PA3 projectile handling
 
 Existing level rows author ±5/4.5/4° launch spread. Selected rank totals reduce spread by 0/5/10/15/20%; reductions are not accumulated across ranks. Each emitted shot snapshots effective handling and samples once at its real muzzle. Straight is the default; see the shared projectile accuracy plan. Existing damage, cadence, ammunition and recoil values are retained.
@@ -26,7 +34,7 @@ The config exposes optional `Single`, `Sequential`, and `Simultaneous` modes for
 
 ## Initial construction (C1/C2)
 
-Paid placement occupies its footprint immediately and takes **4 seconds**, authored in the Level1 WorkSeconds column of this tower's `*Levels.cs`. It cannot acquire targets/fire/consume ammunition or request deliveries until complete. Completion preserves stats, level, rank and stock. Direct scene fixtures remain operational by default. Current final artwork stays visible; stage SVGs/VFX (C4) remain deferred. C3 Inspector progress is implemented; purchased upgrades use their own WorkSeconds and retain old-tier operation until completion. Duplicate purchases are disabled while work is active. See `TOWERS/Shared/Construction/README.md`.
+Paid placement occupies its footprint immediately and takes **4 seconds**, authored in the Level1 WorkSeconds column of this tower's `*Levels.cs`. It cannot acquire targets/fire/consume ammunition or request deliveries until complete. Completion preserves stats, level, rank and stock. Direct scene fixtures remain operational by default. The shared C4 presenter now displays Machine Gun-specific construction stages while work is pending; completed artwork and all firing/recoil behavior are unchanged. C3 Inspector progress is implemented; purchased upgrades use their own WorkSeconds and retain old-tier operation until completion. Duplicate purchases are disabled while work is active. See `TOWERS/Shared/Construction/README.md`.
 
 ## Projectile presentation — PV1/PV2
 

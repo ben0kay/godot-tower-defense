@@ -19,7 +19,7 @@ public abstract partial class ProjectileTurretBase : TowerBase
     private ProjectileTurretConfig _config;
     private bool _initialized;
     private Node2D _pivot, _projectiles;
-    private Sprite2D _sprite, _baseSprite;
+    private Sprite2D _sprite, _baseSprite, _constructionSprite;
     private TowerRecoilController _recoil;
     private EnemyRegistry _registry;
     private Enemy _target;
@@ -74,6 +74,7 @@ public abstract partial class ProjectileTurretBase : TowerBase
     {
         _pivot = GetNode<Node2D>("TurretPivot");
         _baseSprite = GetNodeOrNull<Sprite2D>("BaseSprite");
+        _constructionSprite = GetNodeOrNull<Sprite2D>("TurretPivot/ConstructionSprite");
         _recoil = GetNodeOrNull<TowerRecoilController>("Recoil");
         _sprite = GetNode<Sprite2D>("TurretPivot/RecoilRoot/Sprite");
         Node2D holder = GetNode<Node2D>("TurretPivot/RecoilRoot/Muzzles");
@@ -159,12 +160,13 @@ public abstract partial class ProjectileTurretBase : TowerBase
     }
 
     // =========================================================
-    // Keep selection visual on the rotating sprite while leaving placement coordinates fixed.
+    // Keep selection tint on the optional construction overlay as well as the finished gun/base.
     public override void SetSelected(bool selected)
     {
         Color tint = selected ? new Color(1f, .9f, .68f) : Colors.White;
         if (GodotObject.IsInstanceValid(_sprite)) _sprite.Modulate = tint;
         if (GodotObject.IsInstanceValid(_baseSprite)) _baseSprite.Modulate = tint;
+        if (GodotObject.IsInstanceValid(_constructionSprite)) _constructionSprite.Modulate = tint;
     }
 
     // =========================================================

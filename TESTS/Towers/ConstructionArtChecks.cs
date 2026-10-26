@@ -12,8 +12,8 @@ internal static class ConstructionArtChecks
     // Exercise real paid placement and optional per-level slots without modifying authored balance/art resources.
     internal static void Run(Node runner)
     {
-        Build(runner); DataAndFallback(runner); Upgrade(runner); GeometryAndCleanup(runner);
-        GD.Print("PASS: Battle build SVG0/35/70/final, no repeat writes/polling, optional upgrade/final art, fallback/isolation, pause/selection/ghost and rectangular geometry");
+        Build(runner); MachineGunBuild(runner); DataAndFallback(runner); Upgrade(runner); GeometryAndCleanup(runner);
+        GD.Print("PASS: Battle/Machine Gun build SVG0/35/70/final, split gun return, selection, no repeat writes/polling, optional upgrade/final art, fallback/isolation, pause/ghost and rectangular geometry");
     }
 
     // =========================================================
@@ -44,6 +44,39 @@ internal static class ConstructionArtChecks
             && direct.Config.ConstructionArt == tower.Config.ConstructionArt && direct.Config.Levels[0] != tower.Config.Levels[0], "Loaded art resources shared, mutable numeric rows private, direct instances remain finished");
         f.Hud.GetBuildButton("battle").EmitSignal(Button.SignalName.Pressed);
         Require(f.Placement.GetNode<Sprite2D>("PlacementGhost").Texture == Original, "Ghost keeps finished icon, not construction art");
+    }
+
+    // =========================================================
+    // Machine Gun reuses the same presenter; initial staging must hide both split finished layers.
+    private static void MachineGunBuild(Node runner)
+    {
+        const string folder = "res://TOWERS/Offensive/MachineGunTower/Artwork/Construction/";
+        using AmmoLoopFixture f = new(runner);
+        MachineGunTower tower = f.Purchase<MachineGunTower>("machine_gun", false);
+        var sprite = tower.GetNode<Sprite2D>("TurretPivot/ConstructionSprite");
+        var baseSprite = tower.GetNode<Sprite2D>("BaseSprite");
+        var gun = tower.GetNode<Node2D>("TurretPivot/RecoilRoot");
+        var presenter = tower.GetNode<TowerConstructionVisuals>("ConstructionVisuals");
+        var clock = f.Main.GetNode<ConstructionWorkManager>("World/ConstructionWork");
+        Require(sprite.Visible && !baseSprite.Visible && !gun.Visible &&
+            sprite.Texture == GD.Load<Texture2D>(folder + "stage0_foundation.svg") && !tower.IsOperational,
+            "Machine Gun paid site begins at foundation and hides both finished layers");
+        tower.SetSelected(true);
+        Require(sprite.Modulate == new Color(1f, .9f, .68f), "Selecting unfinished Machine Gun also tints construction art");
+        tower.SetSelected(false);
+        clock.Advance(1.5);
+        Require(sprite.Texture == GD.Load<Texture2D>(folder + "stage1_frame.svg"), "Machine Gun 35% frame art");
+        clock.Advance(1.4);
+        Require(sprite.Texture == GD.Load<Texture2D>(folder + "stage2_assembly.svg"), "Machine Gun 70% twin-barrel assembly art");
+        clock.Advance(1.1);
+        Require(tower.IsOperational && !sprite.Visible && baseSprite.Visible && gun.Visible &&
+            sprite.Texture == GD.Load<Texture2D>("res://TOWERS/Offensive/MachineGunTower/Artwork/machine_gun_tower.svg") &&
+            presenter.TextureChanges == 4 && !presenter.IsProcessing(),
+            "Four seconds returns Machine Gun to original independent split gun/base without idle presenter");
+        var direct = f.Add<MachineGunTower>("machine_gun", new(2200, 2064));
+        Require(direct.IsOperational && !direct.GetNode<Sprite2D>("TurretPivot/ConstructionSprite").Visible &&
+            direct.GetNode<Sprite2D>("BaseSprite").Visible,
+            "Direct Machine Gun instances remain finished without a construction transition");
     }
 
     // =========================================================

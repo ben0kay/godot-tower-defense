@@ -1,3 +1,11 @@
+## C4 staged-art rollout to Machine Gun — 2026-10-26
+
+The same event-driven `TowerConstructionVisuals` presenter used by Battle now drives Machine Gun's distinct 64×64 foundation (0%), frame (35%) and twin-barrel assembly (70%) artwork during its existing 4-second paid initial build. The Machine Gun's split fixed base and recoiling turret are hidden only while the composite build stages show, then restored at completion; normal upgrades and direct operational scene instances retain the original finished artwork. Its `DefaultMachineGunTowerConfig.tres` references a dedicated, Inspector-editable `Artwork/Construction/MachineGunConstructionArt.tres`; Level2/Level3 upgrade-art slots remain empty. The shared projectile turret base optionally tints a construction sprite on selection without new polling. Authoring details: `../../Offensive/MachineGunTower/Artwork/Construction/README.md`.
+
+No modification to the shared work clock, drone flight, stage resolver or firing logic. Desktop visual acceptance remains pending.
+
+---
+
 ## CD1/CD2 arrival hold — implemented 2026-10-21
 
 TowerBase.StartConstruction optionally accepts the paid placement's builder owner; it creates the hold/token before Ready/first tick. AwaitingConstructionDrone keeps phase Constructing and the site inactive. Held jobs remain registered but stay outside ConstructionWorkManager's active batches; held-only clocks sleep. Matching builder arrival resumes only that token/job and publishes a work-only refresh, never elapsed time or completion. Active upgrades/unheld jobs retain their timer behavior. Cancellation/clock teardown removes holds safely.
