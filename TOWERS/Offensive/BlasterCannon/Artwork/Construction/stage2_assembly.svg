@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Partially installed main barrel stops short of finished muzzle; power core is dim. -->
+  <path d="M12 22 22 12H42L52 22V48L42 58H22L12 48Z" fill="#263b47" stroke="#e6a74b" stroke-width="2"/>
+  <circle cx="32" cy="36" r="16" fill="#385563" stroke="#9ab5be" stroke-width="2"/>
+  <path d="M24 34V14L22 11H42L40 14V34Z" fill="#756b51" stroke="#d9a35d" stroke-width="2"/>
+  <path d="M27 14H37V25H27Z" fill="#17232d" stroke="#758488" stroke-width="1"/>
+  <path d="M24 15H40" stroke="#c6ac7b" stroke-dasharray="3 2" stroke-width="1.2"/>
+  <path d="M23 26L19 30M41 26L45 30" stroke="#93a8ab" stroke-width="2"/>
+  <circle cx="32" cy="36" r="7" fill="#74644f" stroke="#b88b4f" stroke-width="1.1"/>
+  <circle cx="32" cy="36" r="3" fill="#c78943" opacity=".5"/>
+</svg>

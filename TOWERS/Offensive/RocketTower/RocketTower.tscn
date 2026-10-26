@@ -4,6 +4,8 @@
 [ext_resource type="Texture2D" path="res://TOWERS/Offensive/RocketTower/Artwork/rocket_tower_gun.svg" id="3"]
 [ext_resource type="Texture2D" path="res://TOWERS/Offensive/RocketTower/Artwork/rocket_tower_base.svg" id="base"]
 [ext_resource type="Script" path="res://TOWERS/Shared/Weapons/Recoil/TowerRecoilController.cs" id="recoil"]
+[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionVisuals.cs" id="construction_visuals"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/RocketTower/Artwork/rocket_tower.svg" id="finished_composite"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/RocketTower/Visuals/RocketTowerRecoil.tres" id="recoil_style"]
 [node name="RocketTower" type="Node2D"]
 script = ExtResource("1")
@@ -21,6 +23,15 @@ texture = ExtResource("3")
 position = Vector2(-10, -25)
 [node name="MuzzleB" type="Marker2D" parent="TurretPivot/RecoilRoot/Muzzles"]
 position = Vector2(10, -25)
+
+[node name="ConstructionSprite" type="Sprite2D" parent="TurretPivot"]
+visible = false
+texture = ExtResource("finished_composite")
+
+[node name="ConstructionVisuals" type="Node" parent="."]
+script = ExtResource("construction_visuals")
+SpritePath = NodePath("../TurretPivot/ConstructionSprite")
+FinishedVisualPaths = Array[NodePath]([NodePath("../BaseSprite"), NodePath("../TurretPivot/RecoilRoot")])
 
 [node name="Recoil" type="Node" parent="."]
 script = ExtResource("recoil")

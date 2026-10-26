@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Twin launcher guide rails, empty cradles and unpowered guidance hub. -->
+  <path d="M13 22L23 13H41L51 22V46L42 55H22L13 46Z" fill="#293945" stroke="#8fb4bf" stroke-width="2"/>
+  <path d="M18 27L24 20H40L46 27V43L39 49H25L18 43Z" fill="#405968" stroke="#162935" stroke-width="1.5"/>
+  <path d="M16 34V15L21 11H28L29 34M48 34V15L43 11H36L35 34" fill="none" stroke="#9ab1b9" stroke-width="2.5"/>
+  <rect x="19" y="16" width="8" height="18" rx="1" fill="#183440" stroke="#69848d" stroke-width="1.2"/>
+  <rect x="37" y="16" width="8" height="18" rx="1" fill="#183440" stroke="#69848d" stroke-width="1.2"/>
+  <path d="M19 22H27M37 22H45M19 30H27M37 30H45" stroke="#9cb2ba" stroke-width="1.5"/>
+  <circle cx="32" cy="38" r="10" fill="#203a46" stroke="#80b6c6" stroke-width="1.7"/>
+  <circle cx="32" cy="38" r="5" fill="#274b5d" stroke="#6596a7" stroke-width="1.4"/>
+  <path d="M15 44L24 51M49 44L40 51" stroke="#62c5df" stroke-width="2" stroke-linecap="round"/>
+</svg>

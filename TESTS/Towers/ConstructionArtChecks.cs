@@ -1,4 +1,4 @@
-// Battle-only authored C4 artwork and reusable presenter regressions; no sparks or real unique upgrade sprites added.
+// C4 shared stage-art regressions for Battle, Machine Gun, Blaster Cannon and Rocket Tower.
 using Godot;
 using static AmmoLoopFixture;
 
@@ -12,8 +12,8 @@ internal static class ConstructionArtChecks
     // Exercise real paid placement and optional per-level slots without modifying authored balance/art resources.
     internal static void Run(Node runner)
     {
-        Build(runner); MachineGunBuild(runner); DataAndFallback(runner); Upgrade(runner); GeometryAndCleanup(runner);
-        GD.Print("PASS: Battle/Machine Gun build SVG0/35/70/final, split gun return, selection, no repeat writes/polling, optional upgrade/final art, fallback/isolation, pause/ghost and rectangular geometry");
+        Build(runner); MachineGunBuild(runner); BlasterAndRocketBuild(runner); DataAndFallback(runner); Upgrade(runner); GeometryAndCleanup(runner);
+        GD.Print("PASS: Battle/Machine Gun/Blaster/Rocket build SVG0/35/70/final, split gun return, selection, no repeat writes/polling, optional upgrade/final art, fallback/isolation, pause/ghost and rectangular geometry");
     }
 
     // =========================================================
@@ -83,6 +83,46 @@ internal static class ConstructionArtChecks
         Require(direct.IsOperational && !direct.GetNode<Sprite2D>("TurretPivot/ConstructionSprite").Visible &&
             direct.GetNode<Sprite2D>("BaseSprite").Visible,
             "Direct Machine Gun instances remain finished without a construction transition");
+    }
+
+    // =========================================================
+    // Paid splash-tower initial builds use the common 5-second staged presenter and original split sprites.
+    private static void BlasterAndRocketBuild(Node runner)
+    {
+        foreach (var (id, dir, filename) in new[] {
+            ("blaster_cannon", "BlasterCannon", "blaster_cannon"),
+            ("rocket", "RocketTower", "rocket_tower") })
+        using (AmmoLoopFixture f = new(runner))
+        {
+            TowerBase tower = f.Purchase<TowerBase>(id, false);
+            string prefix = "res://TOWERS/Offensive/" + dir + "/Artwork/";
+            var sprite = tower.GetNode<Sprite2D>("TurretPivot/ConstructionSprite");
+            var basis = tower.GetNode<Sprite2D>("BaseSprite");
+            var gun = tower.GetNode<Node2D>("TurretPivot/RecoilRoot");
+            var presenter = tower.GetNode<TowerConstructionVisuals>("ConstructionVisuals");
+            var clock = f.Main.GetNode<ConstructionWorkManager>("World/ConstructionWork");
+            Require(sprite.Visible && !basis.Visible && !gun.Visible && !tower.IsOperational &&
+                sprite.Texture == GD.Load<Texture2D>(prefix + "Construction/stage0_foundation.svg"),
+                id + " starts on foundation with finished base/gun hidden");
+            tower.SetSelected(true);
+            Require(sprite.Modulate == new Color(1f, .9f, .68f), id + " construction selection tint");
+            tower.SetSelected(false);
+            clock.Advance(1.8);
+            Require(sprite.Texture == GD.Load<Texture2D>(prefix + "Construction/stage1_frame.svg"),
+                id + " switches to 35% frame");
+            clock.Advance(1.8);
+            Require(sprite.Texture == GD.Load<Texture2D>(prefix + "Construction/stage2_assembly.svg"),
+                id + " switches to 70% weapon assembly");
+            clock.Advance(1.4);
+            Require(tower.IsOperational && !sprite.Visible && basis.Visible && gun.Visible &&
+                sprite.Texture == GD.Load<Texture2D>(prefix + filename + ".svg") &&
+                presenter.TextureChanges == 4 && !presenter.IsProcessing(),
+                id + " restores original split recoil visuals at 100%");
+            TowerBase direct = f.Add<TowerBase>(id, new Vector2(2200, 2064));
+            Require(direct.IsOperational && !direct.GetNode<Sprite2D>("TurretPivot/ConstructionSprite").Visible &&
+                direct.GetNode<Sprite2D>("BaseSprite").Visible,
+                id + " direct operational instance keeps original sprite");
+        }
     }
 
     // =========================================================

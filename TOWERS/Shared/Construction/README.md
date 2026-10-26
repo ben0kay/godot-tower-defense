@@ -1,3 +1,9 @@
+## C4 construction-art rollout to Blaster Cannon and Rocket Tower — 2026-10-26
+
+Both splash towers now reuse the Battle/Machine Gun event-driven staged artwork at 0%, 35% and 70%, finishing with their existing original base and recoiling gun at 100%. Each has its own 64×64 SVGs and Inspector construction art resource with empty future-level art slots. Five-second build duration, Citadel drone holding, CV1 site hologram, selection, weapons, prices and upgrades are unchanged. Local Godot visual check pending. See each `TOWERS/Offensive/{BlasterCannon,RocketTower}/Artwork/Construction/README.md`.
+
+---
+
 ## CV1 shared construction-site hologram — 2026-10-26
 
 The world-scoped `Effects/ConstructionSiteHolograms` renderer observes the existing paid initial-job registration lifecycle, including held/queued builder jobs and S2/S3 restores. Every unfinished site gets a blue footprint outline, moving perimeter light, translucent blueprint lines and rotating engineering rings; the effect intensifies once its drone releases the held work clock and vanishes immediately on unregistration. All tower types and 1×1/2×2/3×2 footprints share the same renderer and Inspector preset, regardless of whether the tower has authored C4 stage textures. There are no per-site nodes/updates or gameplay changes. Details/settings: [Visuals/README.md](Visuals/README.md).

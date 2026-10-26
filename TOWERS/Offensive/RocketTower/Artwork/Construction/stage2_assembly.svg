@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Shortened twin tubes mounted; incomplete muzzle housings and dim cyan lights. -->
+  <path d="M13 22L23 13H41L51 22V46L42 55H22L13 46Z" fill="#293945" stroke="#8fb4bf" stroke-width="2"/>
+  <path d="M18 27L24 20H40L46 27V43L39 49H25L18 43Z" fill="#405968" stroke="#162935" stroke-width="1.5"/>
+  <path d="M16 31V13L21 9H28L29 31L25 38H20Z M48 31V13L43 9H36L35 31L39 38H44Z" fill="#98b0bc" stroke="#234353" stroke-width="2"/>
+  <path d="M19 14H26V28H19Z M38 14H45V28H38Z" fill="#263946"/>
+  <path d="M20 16H25V23H20Z M39 16H44V23H39Z" fill="#6095a3" opacity=".7"/>
+  <path d="M19 10H27M37 10H45" stroke="#d9e9ec" stroke-width="1.5" stroke-dasharray="4 2"/>
+  <circle cx="32" cy="38" r="10" fill="#203a46" stroke="#80b6c6" stroke-width="2"/>
+  <circle cx="32" cy="38" r="5" fill="#347588" stroke="#5cb2c5" stroke-width="1.1"/>
+  <path d="M15 44L24 51M49 44L40 51" stroke="#62c5df" stroke-width="2" stroke-linecap="round"/>
+</svg>

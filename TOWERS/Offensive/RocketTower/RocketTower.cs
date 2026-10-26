@@ -41,7 +41,7 @@ public partial class RocketTower : TowerBase
     // =========================================================
     // Per-instance initialization preserves the exported Blaster Config and its change subscriptions.
     protected override void ApplyConfig(TowerConfig config) => Config = (RocketTowerConfig)config;
-    private Sprite2D _sprite, _baseSprite;
+    private Sprite2D _sprite, _baseSprite, _constructionSprite;
     private TowerRecoilController _recoil;
     private Marker2D _muzzleA, _muzzleB;
     private BarrelFireController _barrels;
@@ -62,6 +62,7 @@ public partial class RocketTower : TowerBase
         _baseSprite = GetNode<Sprite2D>("BaseSprite");
         _recoil = GetNode<TowerRecoilController>("Recoil");
         _sprite = _turret.GetNode<Sprite2D>("RecoilRoot/Sprite");
+        _constructionSprite = _turret.GetNode<Sprite2D>("ConstructionSprite");
         _muzzleA = GetNode<Marker2D>("TurretPivot/RecoilRoot/Muzzles/MuzzleA");
         _muzzleB = GetNode<Marker2D>("TurretPivot/RecoilRoot/Muzzles/MuzzleB");
         _barrels = new BarrelFireController(2);
@@ -137,7 +138,7 @@ public partial class RocketTower : TowerBase
     public override void SetSelected(bool selected)
     {
         Color tint = selected ? new Color(1f, .9f, .68f) : Colors.White;
-        _sprite.Modulate = tint; _baseSprite.Modulate = tint;
+        _sprite.Modulate = tint; _baseSprite.Modulate = tint; _constructionSprite.Modulate = tint;
     }
     #endregion
 

@@ -1,3 +1,9 @@
+## C4 staged construction artwork — 2026-10-26
+
+Blaster Cannon now has 0% foundation, 35% structural frame and 70% incomplete weapon SVGs. The shared `TowerConstructionVisuals` replaces the finished split artwork only during paid initial building, restoring the original rotating/recoiling turret at 100%. Stage textures and thresholds live in `Artwork/Construction/BlasterConstructionArt.tres` via the default config. Existing five-second construction (after Citadel drone arrival), CV1 site hologram, credits, firing, splash, damage and upgrade logic are unchanged. See [construction artwork notes](Artwork/Construction/README.md). Local Godot import and visual review pending.
+
+---
+
 ## PA3 projectile handling
 
 Existing level rows author ±1/.75° launch spread. Selected rank totals reduce spread by 0/5/10/15/20%; reductions are not accumulated across ranks. Each emitted shot snapshots effective handling and samples once at its real muzzle. Straight is the default; see the shared projectile accuracy plan. Existing damage, cadence, ammunition and recoil values are retained.

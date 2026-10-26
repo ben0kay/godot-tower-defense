@@ -1,8 +1,11 @@
-[gd_resource type="Resource" script_class="RocketTowerConfig" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="RocketTowerConfig" load_steps=5 format=3]
 [ext_resource type="Script" path="res://TOWERS/Offensive/RocketTower/RocketTowerConfig.cs" id="1"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/RocketTower/Effects/RocketShockwaveStyle.tres" id="2"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/RocketTower/Visuals/RocketMuzzleFlashStyle.tres" id="3"]
+[ext_resource type="Resource" path="res://TOWERS/Offensive/RocketTower/Artwork/Construction/RocketConstructionArt.tres" id="construction"]
+
 [resource]
 script = ExtResource("1")
+ConstructionArt = ExtResource("construction")
 ImpactStyle = ExtResource("2")
 MuzzleFlash = ExtResource("3")

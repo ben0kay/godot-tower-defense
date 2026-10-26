@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Empty missile-launcher pad showing unfinished bay outlines. -->
+  <path d="M13 22L23 13H41L51 22V46L42 55H22L13 46Z" fill="#273944" stroke="#7396a4" stroke-width="1.8"/>
+  <path d="M18 27L24 20H40L46 27V43L39 49H25L18 43Z" fill="#203745" stroke="#4b6c79" stroke-width="1.5"/>
+  <rect x="18" y="17" width="12" height="19" rx="2" fill="none" stroke="#506e79" stroke-width="1.2" stroke-dasharray="3 2"/>
+  <rect x="34" y="17" width="12" height="19" rx="2" fill="none" stroke="#506e79" stroke-width="1.2" stroke-dasharray="3 2"/>
+  <circle cx="32" cy="38" r="9" fill="#172f3a" stroke="#617e8c" stroke-width="1.4"/>
+  <path d="M25 38H39M32 31V45" stroke="#557784" stroke-width="1.2"/>
+  <path d="M15 44L24 51M49 44L40 51" stroke="#468a9a" stroke-width="1.8" stroke-linecap="round"/>
+</svg>

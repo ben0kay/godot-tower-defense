@@ -6,7 +6,10 @@
 
 [ext_resource type="Resource" path="res://TOWERS/Offensive/BlasterCannon/Visuals/BlasterMuzzleFlashStyle.tres" id="flash"]
 
+[ext_resource type="Resource" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Construction/BlasterConstructionArt.tres" id="construction"]
+
 [resource]
 script = ExtResource("1")
+ConstructionArt = ExtResource("construction")
 ImpactStyle = ExtResource("2")
 MuzzleFlash = ExtResource("flash")

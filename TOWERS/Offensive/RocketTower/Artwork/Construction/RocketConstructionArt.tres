@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="TowerConstructionArt" format=3]
+
+[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="1_art"]
+[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="2_stage"]
+[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerLevelArtwork.cs" id="3_level"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/RocketTower/Artwork/Construction/stage0_foundation.svg" id="4_foundation"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/RocketTower/Artwork/Construction/stage1_frame.svg" id="5_frame"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/RocketTower/Artwork/Construction/stage2_assembly.svg" id="6_assembly"]
+
+[sub_resource type="Resource" id="Stage0"]
+script = ExtResource("2_stage")
+Texture = ExtResource("4_foundation")
+
+[sub_resource type="Resource" id="Stage1"]
+script = ExtResource("2_stage")
+Progress = 0.35
+Texture = ExtResource("5_frame")
+
+[sub_resource type="Resource" id="Stage2"]
+script = ExtResource("2_stage")
+Progress = 0.7
+Texture = ExtResource("6_assembly")
+
+[sub_resource type="Resource" id="Level2"]
+script = ExtResource("3_level")
+Level = 2
+
+[sub_resource type="Resource" id="Level3"]
+script = ExtResource("3_level")
+Level = 3
+
+[resource]
+script = ExtResource("1_art")
+BuildStages = Array[ExtResource("2_stage")]([SubResource("Stage0"), SubResource("Stage1"), SubResource("Stage2")])
+LevelArtwork = Array[ExtResource("3_level")]([SubResource("Level2"), SubResource("Level3")])

@@ -12,6 +12,12 @@ The focused `ConstructionArtChecks` now verifies that a paid Battle initial work
 
 ---
 
+## C4 splash-tower art rollout — 2026-10-26
+
+`ConstructionArtChecks` also verifies paid Blaster/Rocket foundation/frame/assembly at 0/35/70%, split gun/base return at the existing five-second completion, selection tint, and direct operational fallback. Source/resource checks only; local Godot render/import and performance remain unverified.
+
+---
+
 # C4 Battle-only construction artwork pilot
 
 **Implemented scope:** shared event-driven artwork presenter, Battle Tower stage SVGs, optional future per-level intermediate/finished images. **No sparks or construction VFX.** Real Factory/Depot/other tower stage assets are not enabled.
