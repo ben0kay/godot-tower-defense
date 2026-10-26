@@ -14,8 +14,8 @@ public static class EnemyCatalogChecks
             && GD.Load<EnemyDefinition>("res://ENEMIES/Types/Enemy001/Enemy001.tres").DisplayName == "Standard Drone"
             && GD.Load<EnemyDefinition>("res://ENEMIES/Types/Enemy002/Enemy002.tres").EnemyId == "scout_mk1"
             && GD.Load<EnemyDefinition>("res://ENEMIES/Types/Enemy002/Enemy002.tres").DisplayName == "Swift Interceptor"
-            && GD.Load<EnemyDefinition>("res://ENEMIES/Types/ShieldGenerator/ShieldGenerator.tres").EnemyId == "shield_emitter_mk1"
-            && GD.Load<EnemyDefinition>("res://ENEMIES/Types/ShieldGenerator/ShieldGenerator.tres").DisplayName == "Shield Generator",
+            && GD.Load<EnemyDefinition>("res://ENEMIES/Types/Enemy003/Enemy003.tres").EnemyId == "shield_emitter_mk1"
+            && GD.Load<EnemyDefinition>("res://ENEMIES/Types/Enemy003/Enemy003.tres").DisplayName == "Shield Emitter",
             "Numbered scene assets have independent stable gameplay IDs and display names");
         EnemyDefinition mediumDefinition = GD.Load<EnemyDefinition>("res://ENEMIES/Types/Enemy004/Enemy004.tres");
         Require(mediumDefinition.EnemyId == "medium_mk1" && mediumDefinition.DisplayName == "Bulwark Drone"

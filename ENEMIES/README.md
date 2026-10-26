@@ -1,3 +1,9 @@
+## Numbered support enemy rename — 2026-10-26
+
+The Shield Emitter now lives at `Types/Enemy003/Enemy003.tscn` with `Enemy003.tres` and `Artwork/enemy003.svg`; its stable `shield_emitter_mk1` ID, abilities, balance, and save/wave references remain unchanged. This is a source-asset rename and **does not introduce it to early campaign waves**.
+
+---
+
 ## EG3 Gunner Drone — source implemented (2026-10-20)
 
 The14th catalog entry, gunner_drone_mk1, is F2/F3 available with separate64×48 hull and24×40 up-facing gun art, an independent gun pivot/real muzzle and dedicated small red tracer/warm flash presets. Enemy004 is the medium-size reference. It reuses GenericEnemy movement/status/stealth and EG1/EG2 aiming/bullets/tower damage. Existing13 types remain unarmed; no authored wave changes. Provisional180HP,75px/s,8 Credits,22px radius, family Drone. See Types/GunnerDrone/README.md. Build/runtime/visual acceptance remains pending; earlier no-Gunner statements below are historical.
@@ -54,11 +60,11 @@ This top-level folder owns **enemy gameplay mechanics** in the Godot 4 C#/.NET s
 
 **Earlier medium plain type:** `Types/Enemy004/` adds the medium-sized **Bulwark Drone**: development asset `Enemy004.tscn`, stable ID `medium_mk1`, display name `Bulwark Drone`, 64×48 art, 160 HP, 75 px/s, 22px navigation radius, 7 Credits. Registered in the catalog for F2 and wave authoring; not added to Level001's actual waves. No special ability or new behavior is attached. See `Types/Enemy004/README.md`.
 
-**Enemy identity (current):** Numbered `ENEMIES/Types/Enemy001/`, `Enemy002/` and `ShieldGenerator/` asset names document development history **only**. Their saved definitions now use unique wave/catalog IDs `basic_mk1`, `scout_mk1`, `shield_emitter_mk1`, and player-facing names `Standard Drone`, `Swift Interceptor`, `Shield Generator`. `EnemyDefinition.EnemyId` and `.DisplayName` are separate; wave order is authored in `LEVELS/Level001/Level001Waves.cs`, not inferred from filenames or catalog order. New enemy definitions require an explicit unique ID. The previous IDs `enemy001`, `enemy002`, `shieldgenerator` are retired; update authored waves/tests using them. The F2 debug cycler still follows catalog **scene order**.
+**Enemy identity (current):** Numbered `ENEMIES/Types/Enemy001/`, `Enemy002/` and `Enemy003/` asset names document development history **only**. Their saved definitions now use unique wave/catalog IDs `basic_mk1`, `scout_mk1`, `shield_emitter_mk1`, and player-facing names `Standard Drone`, `Swift Interceptor`, `Shield Emitter`. `EnemyDefinition.EnemyId` and `.DisplayName` are separate; wave order is authored in `LEVELS/Level001/Level001Waves.cs`, not inferred from filenames or catalog order. New enemy definitions require an explicit unique ID. The previous IDs `enemy001`, `enemy002`, `shieldgenerator` are retired; update authored waves/tests using them. The F2 debug cycler still follows catalog **scene order**.
 
 **Implemented baseline (October 2026):** Enemy001, shared hull HP and opt-in shield capacity, `EnemyRegistry` with killed/arrived events, kill rewards, death-puff feedback, Citadel arrival damage, budgeted AStarGrid2D navigation/repathing, portal/edge spawning, F2 debug spawns, immutable authored waves, and tower targeting/projectiles. `ENEMIES/Types/Enemy001/Enemy001.tres` has **60 MaxHealth, 0 saved MaxShield capacity, 100 px/s MoveSpeed and 3 Credits on kill**; its currently authored waves and F2 still spawn unshielded by default. See `Shared/README.md`, `Types/Enemy001/README.md` and `LEVELS/Waves/README.md`.
 
-**E2A/E2B implemented:** DefaultEnemyCatalog registers Enemy001, weaker/faster Enemy002 and ShieldGenerator by canonical EnemyDefinition.EnemyId. WaveCatalog supplies level wave sets; scene lookup comes from the validated enemy catalog. Enemy002 uses 30 hull/160px/s/8px radius/2-Credit reward and 40 optional shield capacity. ShieldGenerator uses a real optional ShieldEmitter scene child; ordinary types have no ability nodes. E2A was compiled/headless-verified independently before E2B.
+**E2A/E2B implemented:** DefaultEnemyCatalog registers Enemy001, weaker/faster Enemy002 and Enemy003 by canonical EnemyDefinition.EnemyId. WaveCatalog supplies level wave sets; scene lookup comes from the validated enemy catalog. Enemy002 uses 30 hull/160px/s/8px radius/2-Credit reward and 40 optional shield capacity. Enemy003 uses a real optional ShieldEmitter scene child; ordinary types have no ability nodes. E2A was compiled/headless-verified independently before E2B.
 
 **E3A implemented:** `Types/Transporter/` registers `transporter_mk1`, a large slow vessel with optional DeathSpawn: six `basic_mk1` children near its death point, staggered at 0.12s, with wave reservations and remaining checkpoint inheritance. See `Abilities/DeathSpawn/README.md` and `TESTS/Enemies/DeathSpawn.md`.
 
@@ -123,7 +129,7 @@ ENEMIES/
 └── Types/
     ├── Enemy001/                           # EXISTS: ordinary reference type, unchanged
     ├── Enemy002/                           # Example future fast/slow type
-    ├── ShieldGeneratorShip/                # Example, can use normal Enemy + ability child
+    ├── Enemy003Ship/                # Example, can use normal Enemy + ability child
     ├── CarrierShip/                        # Example, can use normal Enemy + ability child
     └── ElectricalShip/                     # Example, can use normal Enemy + ability child
 
@@ -170,7 +176,7 @@ An ordinary scout should not get empty ability controllers or per-frame AI nodes
 5. Preserve shield-first damage, kill/arrival results, actual DefenseBar hull-only rendering and 4C-1 typed damage response once it lands. The shield emitter should restore shields through an explicit safe `Enemy` API (for example, `RestoreShield(amount)`), not by mutating `EnemyDefinition.MaxShield` or bypassing health invariants.
 6. Don't build a universal aura/status/effect stack to implement just one shield pulse. Define clean optional host-lifecycle callbacks only when necessary; guard against use after the enemy is removed/queued for deletion and against duplicate pulses after a scene restart.
 
-**E2B acceptance:** ordinary Enemy001 still runs unchanged with no ability node. A ShieldGenerator enemy with the component periodically replenishes only eligible allies within radius, obeys caps and intervals, can be combined with other optional children later, and stops affecting the world when removed. Add two-emitter/recipient-isolation, range, cap, no-ability-zero-cost and cleanup tests.
+**E2B acceptance:** ordinary Enemy001 still runs unchanged with no ability node. A Enemy003 enemy with the component periodically replenishes only eligible allies within radius, obeys caps and intervals, can be combined with other optional children later, and stops affecting the world when removed. Add two-emitter/recipient-isolation, range, cap, no-ability-zero-cost and cleanup tests.
 
 ### Phase E3A — DeathSpawn: reusable on-death release ability (IMPLEMENTED / VERIFIED)
 

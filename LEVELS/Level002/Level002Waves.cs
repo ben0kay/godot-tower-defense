@@ -1,5 +1,5 @@
 // Level002 tutorial: four small, unshielded waves introduce baseline, speed, then durability.
-// The third plain enemy is Bulwark (medium_mk1 / Enemy004), not a nonexistent Enemy003 asset.
+// The third plain wave role is Bulwark (medium_mk1 / Enemy004); Enemy003 is the Shield Emitter support asset.
 using Godot;
 using static WaveBuilder;
 

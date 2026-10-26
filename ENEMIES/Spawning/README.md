@@ -18,7 +18,7 @@ Portal spawning now uses the centered SpawnExit plus a random offset up to Porta
 E2A: optional exported Catalog defaults to DefaultEnemyCatalog; string-ID Spawn/SpawnWave adapters resolve types while legacy scene APIs/F2 remain intact. WaveManager uses this actual world catalog. Current guaranteed single-cell route support requires radius smaller than half CellSize; oversized types are held/retried with a diagnostic, not squeezed through obstacles. No new A* work or radius grid is created.
 
 
-Default catalog also registers `shield_emitter_mk1` (the `ShieldGenerator.tscn` asset). Abilities initialize only after a safe physical source, registry and movement are ready. SpawnManager does not own pulse timers or shield-restoration logic; wave starting-shield policy remains unchanged.
+Default catalog also registers `shield_emitter_mk1` (the `Enemy003.tscn` asset). Abilities initialize only after a safe physical source, registry and movement are ready. SpawnManager does not own pulse timers or shield-restoration logic; wave starting-shield policy remains unchanged.
 
 
 Portal offsets now scale by each EnemyPortal.SizeMultiplier and its authored transform. Portal references are cached alongside source metadata; current size is read on each spawn, so changing it needs no A* or navigation rebuild. The base config offset remains the shared tuning control, and all8 bounded safety attempts/center fallback still apply. Map-edge sources are unaffected.

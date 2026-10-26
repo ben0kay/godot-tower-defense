@@ -39,7 +39,7 @@ C# build and `Level002TutorialChecks.tscn` passed: actual map/scheduler spawned 
 
 # C# wave authoring
 
-`LEVELS/Level001/Level001Waves.cs` contains **three escalating mixed test waves (38 / 40 / 55 enemies)**. The first introduces small shielded Standard Drones; the second adds Swift Interceptors, and the third adds a few Bulwarks. This is a content choice, not a restriction of the wave system: the validated catalog already includes **Enemy001, Enemy002 and ShieldGenerator**. Edit counts, internal enemy IDs, intervals and delays there. The new medium ship `medium_mk1` (`Enemy004.tscn`, Bulwark Drone) can be authored as `Enemy("medium_mk1")`, independently of its numbered filename; current Level001 encounters have not been changed. Filenames remain `Enemy001.tscn`/`Enemy002.tscn` for development history; stable IDs are `basic_mk1`, `scout_mk1`, `shield_emitter_mk1`. `WaveCatalog` maps `LevelConfig.WaveSetId = "level001"` to this file; empty IDs disable waves and unknown IDs raise setup errors.
+`LEVELS/Level001/Level001Waves.cs` contains **three escalating mixed test waves (38 / 40 / 55 enemies)**. The first introduces small shielded Standard Drones; the second adds Swift Interceptors, and the third adds a few Bulwarks. This is a content choice, not a restriction of the wave system: the validated catalog already includes **Enemy001, Enemy002 and Enemy003**. Edit counts, internal enemy IDs, intervals and delays there. The new medium ship `medium_mk1` (`Enemy004.tscn`, Bulwark Drone) can be authored as `Enemy("medium_mk1")`, independently of its numbered filename; current Level001 encounters have not been changed. Filenames remain `Enemy001.tscn`/`Enemy002.tscn` for development history; stable IDs are `basic_mk1`, `scout_mk1`, `shield_emitter_mk1`. `WaveCatalog` maps `LevelConfig.WaveSetId = "level001"` to this file; empty IDs disable waves and unknown IDs raise setup errors.
 
 Use static WaveBuilder helpers:
 
@@ -50,7 +50,7 @@ Use static WaveBuilder helpers:
 
 Count is the total ships in a batch. The first spawn is immediate. Interval follows a successful spawn, and After begins after the batch's final successful spawn. Final-batch After is ignored. Earlier batches keep moving while later ones spawn. Completing a wave requires both zero planned spawns and zero owned live ships; Next Wave remains manual.
 
-Entries accept relative double weights (80/20, 8/2 or .8/.2). Composition uses exact largest-remainder quotas with stable entry-order ties, then seeded shuffle. Types are selected once per batch; failed attempts retain the selected entry. **Register future enemy scenes in `ENEMIES/DefaultEnemyCatalog.tres`, not in `WaveCatalog.cs`**; registered Enemy002 and ShieldGenerator can already appear in weighted batches.
+Entries accept relative double weights (80/20, 8/2 or .8/.2). Composition uses exact largest-remainder quotas with stable entry-order ties, then seeded shuffle. Types are selected once per batch; failed attempts retain the selected entry. **Register future enemy scenes in `ENEMIES/DefaultEnemyCatalog.tres`, not in `WaveCatalog.cs`**; registered Enemy002 and Enemy003 can already appear in weighted batches.
 
 Optional Enemy(..., portal: "Portals/EnemyPortal2") requires that exact registered permitted portal. Missing/blocked entrances pause and retry without fallback. Opt-in full spawn shields are supported through `shield: true`; boss, stealth and other modifiers remain future work.
 
@@ -70,7 +70,7 @@ Batch(count: 5, interval: 0.2, after: 0,
 `Enemy001.tres` now saves **20 shield points of capacity**; the integration suite temporarily uses 100 for its exact damage fixtures. A real shielded wave entry can use `basic_mk1` (20 SP) or `scout_mk1` (40 SP). Shielded spawns begin full and automatically show the shared reddish `FEEDBACK/Shields` aura; unshielded entries and F2 still start at zero. Exact weighted quotas/shuffle are unchanged, and entries with the same EnemyId can have different shield flags. **Level001 now opts in 7, 12 and 18 shielded enemies across waves 1–3.** ShieldEmitter support restoration still exists but is not authored in Level001 waves; natural/passive shield regeneration, stealth and boss wave modifiers remain future work.
 
 
-## Mixed types and ShieldGenerator (implemented)
+## Mixed types and Enemy003 (implemented)
 
 ```csharp
 // Example only: change Level001Waves.cs if you want this batch in the game.

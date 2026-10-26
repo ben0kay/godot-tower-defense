@@ -36,7 +36,7 @@ Each actual F2 press spawns the next scene registered in `ENEMIES/DefaultEnemyCa
 
 1. Enemy001 asset — `basic_mk1` / Standard Drone
 2. Enemy002 asset — `scout_mk1` / Swift Interceptor
-3. ShieldGenerator asset — `shield_emitter_mk1` / Shield Generator
+3. Enemy003 asset — `shield_emitter_mk1` / Shield Emitter
 4. Enemy004 asset — `medium_mk1` / Bulwark Drone
 5. Transporter asset — `transporter_mk1` / Transporter
 6. Enemy005 asset — `big_mk1` / Big mk.1

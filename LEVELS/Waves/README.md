@@ -28,13 +28,13 @@ Authoring steps: `LEVELS/AUTHORING.md`; ownership: `LEVELS/Catalog/README.md`, `
 
 # WAVES — Hand-Authored Enemy Waves
 
-> **Identity convention:** The actual wave/catalog IDs are `basic_mk1` (asset Enemy001), `scout_mk1` (asset Enemy002) and `shield_emitter_mk1` (asset ShieldGenerator). Display names are independent. Numbered filenames do not determine spawn/wave order. Any old identifiers mentioned in historical prose below refer to those development asset names.
+> **Identity convention:** The actual wave/catalog IDs are `basic_mk1` (asset Enemy001), `scout_mk1` (asset Enemy002) and `shield_emitter_mk1` (asset Enemy003). Display names are independent. Numbered filenames do not determine spawn/wave order. Any old identifiers mentioned in historical prose below refer to those development asset names.
 
-> **Current status (October 2026):** Finite manual waves are implemented. Level001's **three authored waves now mix unshielded/shielded Enemy001, Scouts and a few Bulwarks**, but the validated enemy catalog already registers **Enemy001, Enemy002 and ShieldGenerator** for mixed waves. Exact weighted quotas, random eligible portals, per-entry required portals, opt-in full starting shields, enemy kill rewards, Citadel arrival damage, wave-owned completion and the HUD Start/Next controls are active. **Enemy003, general elite/stealth wave modifiers, wave-completion bonuses and wave persistence are future work.** Sections below distinguish existing APIs from future ideas.
+> **Current status (October 2026):** Finite manual waves are implemented. Level001's **three authored waves now mix unshielded/shielded Enemy001, Scouts and a few Bulwarks**, but the validated enemy catalog already registers **Enemy001, Enemy002 and Enemy003** for mixed waves. Exact weighted quotas, random eligible portals, per-entry required portals, opt-in full starting shields, enemy kill rewards, Citadel arrival damage, wave-owned completion and the HUD Start/Next controls are active. **General elite/stealth wave modifiers, wave-completion bonuses and wave persistence are future work.** Sections below distinguish existing APIs from future ideas.
 
 ## Implemented Phase 1 playtest
 
-F5 loads **WAVE 00 / 03** without spawning. Press **START WAVE** below the top-right status. Level001's current Wave 1 runs 10 unshielded Standard Drones at 0.1s, waits 2s, then 8 Standard Drones (25% shielded) at 0.3s, waits 4s, then 20 Standard Drones (25% shielded) at 0.2s. Level001's authored wave totals are 38, 40 and 55 ships. Waves 2–3 introduce Scouts, and Wave 3 has a few Bulwarks; no Shield Generators are authored here. The button shows remaining scheduled + alive ships while disabled. After every owned ship is killed or arrives, **NEXT WAVE** becomes available. F2 debug ships are unowned and cannot hold waves open. The final wave displays COMPLETE without auto-restarting.
+F5 loads **WAVE 00 / 03** without spawning. Press **START WAVE** below the top-right status. Level001's current Wave 1 runs 10 unshielded Standard Drones at 0.1s, waits 2s, then 8 Standard Drones (25% shielded) at 0.3s, waits 4s, then 20 Standard Drones (25% shielded) at 0.2s. Level001's authored wave totals are 38, 40 and 55 ships. Waves 2–3 introduce Scouts, and Wave 3 has a few Bulwarks; no Shield Emitters are authored here. The button shows remaining scheduled + alive ships while disabled. After every owned ship is killed or arrives, **NEXT WAVE** becomes available. F2 debug ships are unowned and cannot hold waves open. The final wave displays COMPLETE without auto-restarting.
 
 Edit `LEVELS/Level001/Level001Waves.cs` for encounter counts, type IDs and timing; `WaveCatalog.cs` maps `LevelConfig.WaveSetId` to authored level wave sets. **Register additional enemy scenes in `ENEMIES/DefaultEnemyCatalog.tres`**, not WaveCatalog. Empty `WaveSetId` disables waves; unknown IDs report `SETUP ERROR`. `ENEMIES/DefaultEnemyConfig.tres` exposes wave scheduling limits (default two spawn attempts/frame, 0.5s retry and seed 12345). A blocked spawn preserves its planned entry.
 
@@ -74,7 +74,7 @@ Wave scheduling is independent of movement, portal visual nodes, navigation and 
 - A 10-enemy batch at 0.1s interval means first spawn at t=0, last around t=0.9s, THEN the 2s post-batch delay (assuming no failed spawn attempts).
 - A batch's post-delay is **not** a minimum lifetime, does not require killing enemies, and is skipped/irrelevant after the final batch unless a later design explicitly adds a final cooldown.
 - Enemy type percentages should **default to exact counts** (deterministic largest-remainder rounding for non-divisible ratios and seeded shuffle). This avoids a 20% entry sometimes spawning 0 or 9 ships by chance. A future `WeightedRandom` mode may allow statistically random counts, but distinguish it explicitly.
-- **Enemy002 already exists** (30 HP, 160 px/s speed, 40 optional shield capacity); ShieldGenerator and Bulwark are also registered. **Enemy003 has not been added.** The mixed example is a valid illustration of syntax, not the exact active Level001 wave list (which now includes a few Scouts and Bulwarks).
+- **Enemy002 already exists** (30 HP, 160 px/s speed, 40 optional shield capacity); Enemy003 and Bulwark are also registered. **Enemy003 is the registered Shield Emitter; no new wave content was added by the source rename.** The mixed example is a valid illustration of syntax, not the exact active Level001 wave list (which now includes a few Scouts and Bulwarks).
 
 ### Existing readable `WaveBuilder` C# authoring format
 
@@ -200,7 +200,7 @@ Deterministic per-run seed (optional per-wave override) is recommended so tester
 
 ## 7. Current entry options and future modifiers
 
-**Implemented:** `Enemy(id, weight:, portal:, shield:)`; per-type stats from `EnemyDefinition`; ShieldGenerator's optional `ShieldEmitter` component. The table below distinguishes this working shield flag from **future** general modifiers. Do not treat its other rows as an existing `EnemySpawnFlags` API:
+**Implemented:** `Enemy(id, weight:, portal:, shield:)`; per-type stats from `EnemyDefinition`; Enemy003's optional `ShieldEmitter` component. The table below distinguishes this working shield flag from **future** general modifiers. Do not treat its other rows as an existing `EnemySpawnFlags` API:
 
 | Modifier / behavior | Status or proposed effect |
 | --- | --- |
@@ -213,7 +213,7 @@ Deterministic per-run seed (optional per-wave override) is recommended so tester
 | `Splitting` | Spawns other enemies on death |
 | `Elite` / `Boss` | Stat multipliers, UI highlight, optional boss portal |
 | `Jammer` | Interferes with turret accuracy/target acquisition |
-| `ShieldEmitter` support | **Implemented** on ShieldGenerator for replenishing eligible nearby shields; other buffs/heals remain future |
+| `ShieldEmitter` support | **Implemented** on Enemy003 for replenishing eligible nearby shields; other buffs/heals remain future |
 
 **Possible future APIs only:** general `[Flags] EnemySpawnFlags` and numeric `EnemySpawnModifiers`. Neither exists today, and there is no reason to build either until a concrete modifier needs it.
 
@@ -225,7 +225,7 @@ Starting shields and ability-driven shield restoration already function. Stealth
 - **Implemented:** the top-right **Start Wave / Next Wave** button appears when an authored wave is available, disables during active waves and shows blocked/error states. The existing Credits, Citadel health, build tray and Inspector are preserved.
 - **Implemented:** scheduled plus wave-owned living ship counts appear in the wave control/status tooltip. The wave label remains top-right.
 - **Implemented:** `WaveManager.Publish()` pushes state/count changes to the HUD and emits `Changed`.
-- **Implemented:** `EconomyManager` handles session Credits and tower construction; each enemy pays its `KillRewardCredits` exactly once on death through `EnemyRegistry.EnemyKilled` (Enemy001: 3; Enemy002: 2; ShieldGenerator: 5). Arrivals do not pay kill rewards. **Future:** optional wave-completion bonuses would pay once through the existing wallet.
+- **Implemented:** `EconomyManager` handles session Credits and tower construction; each enemy pays its `KillRewardCredits` exactly once on death through `EnemyRegistry.EnemyKilled` (Enemy001: 3; Enemy002: 2; Enemy003: 5). Arrivals do not pay kill rewards. **Future:** optional wave-completion bonuses would pay once through the existing wallet.
 - Allow optional later `PreWaveDelaySeconds`, `AutoStartWaves`, wave bonus and encounter announcements without complicating Phase 1.
 
 ## 9. Performance, error handling and safety
@@ -246,9 +246,9 @@ Existing: immutable `WaveDefinition`/`WaveBatch`/`WaveEnemyEntry`, `WaveBuilder`
 
 ### Phase 2 — Registered mixed enemy types and spawn options (PARTIALLY COMPLETED)
 
-**Implemented:** enemy catalog with Enemy001, Enemy002 and ShieldGenerator; validated mixed-type spawning (see `TESTS/Integration/EnemyCatalogChecks.cs`); explicit per-entry portal selection; optional full starting shield; ShieldGenerator's independent aura ability.
+**Implemented:** enemy catalog with Enemy001, Enemy002 and Enemy003; validated mixed-type spawning (see `TESTS/Integration/EnemyCatalogChecks.cs`); explicit per-entry portal selection; optional full starting shield; Enemy003's independent aura ability.
 
-**Future:** Enemy003 or other types as authored, enabling mixed types in Level001's *default* wave content, extra portal strategies, Elite/stealth/speed modifiers and advanced boss mechanics. These are **content/features**, not reasons to rebuild the scheduler.
+**Future:** Additional enemy types as authored, enabling mixed types in Level001's *default* wave content, extra portal strategies, Elite/stealth/speed modifiers and advanced boss mechanics. These are **content/features**, not reasons to rebuild the scheduler.
 
 ### Phase 3 — More wave progression (FUTURE)
 
@@ -268,7 +268,7 @@ Optional completed-wave Credits bonuses, automatic next waves/pre-wave countdown
 - Changing/restarting levels uses that level's wave set and releases old event subscriptions.
 - Existing navigation, tower placement, Battle Tower combat, Credits/HUD and headless tests still work.
 
-**Current authored encounters:** Level001 remains Enemy001-only. Enemy002 and ShieldGenerator are **registered and available** for future Level001 edits or other authored wave sets; shield-on-spawn and ShieldEmitter restoration are implemented. Additional modifiers, wave-completion bonuses, advanced progression and saving remain later passes.
+**Current authored encounters:** Level001 remains Enemy001-only. Enemy002 and Enemy003 are **registered and available** for future Level001 edits or other authored wave sets; shield-on-spawn and ShieldEmitter restoration are implemented. Additional modifiers, wave-completion bonuses, advanced progression and saving remain later passes.
 
 ## Optional full spawn shields (implemented)
 
