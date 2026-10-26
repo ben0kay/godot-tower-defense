@@ -1,3 +1,9 @@
+## HD4 cannon heat (2026-10-26)
+
+The shipped Blaster Cannon preset now enables approximately **4-minute** continuous funded fire and **12-second** recovery to 35%. Per-shot heat uses each purchased level's authored rate; Heat Enabled/Minutes/Recovery are Inspector editable. Rocket Tower inherits the same policy in an independent resource. No new launch logic or damage/price/ammo changes; Godot/runtime acceptance pending.
+
+---
+
 ## C4 staged construction artwork — 2026-10-26
 
 Blaster Cannon now has 0% foundation, 35% structural frame and 70% incomplete weapon SVGs. The shared `TowerConstructionVisuals` replaces the finished split artwork only during paid initial building, restoring the original rotating/recoiling turret at 100%. Stage textures and thresholds live in `Artwork/Construction/BlasterConstructionArt.tres` via the default config. Existing five-second construction (after Citadel drone arrival), CV1 site hologram, credits, firing, splash, damage and upgrade logic are unchanged. See [construction artwork notes](Artwork/Construction/README.md). Local Godot import and visual review pending.
