@@ -23,12 +23,69 @@ public partial class TowerConditionsChecks : Node
     // The full integration runner can execute this same focused production-world group.
     internal static async System.Threading.Tasks.Task Run(Node owner)
     {
+        VerifyAuthoredHeatProfiles();
         using (AmmoLoopFixture f = new(owner))
         {
             SubsystemBattlefield.DetachSession(f.Main);
             Sources(f); Weapons(f); BeamRates(f); CoolingRates(f); Progression(f); await Automatic(owner, f); Bench(f);
         }
     }
+    // =========================================================
+    // Current preset resources enable only the agreed weapons; selected paid rows resolve their own real cadence.
+    private static void VerifyAuthoredHeatProfiles()
+    {
+        var presets = new (string Id, string Path, double Minutes, double Recovery)[]
+        {
+            ("machine_gun", "MachineGunTower/DefaultMachineGunTowerConfig.tres", 2, 10),
+            ("laser", "LaserTower/DefaultLaserTowerConfig.tres", 3.5, 10),
+            ("blaster_cannon", "BlasterCannon/DefaultBlasterCannonConfig.tres", 4, 12),
+            ("rocket", "RocketTower/DefaultRocketTowerConfig.tres", 4, 12),
+            ("shockwave", "ShockwaveTower/DefaultShockwaveTowerConfig.tres", 3, 12)
+        };
+        foreach (var item in presets)
+        {
+            TowerConfig config = GD.Load<TowerConfig>("res://TOWERS/Offensive/" + item.Path);
+            Require(config != null && config.SustainedHeatTiming.HasValue, item.Id + " preset opts in");
+            HeatTiming timing = config.SustainedHeatTiming.Value;
+            Require(System.Math.Abs(timing.OverheatSeconds - item.Minutes * 60) < .001 &&
+                System.Math.Abs(timing.RecoverySeconds - item.Recovery) < .001, item.Id + " authored minutes/recovery");
+            for (int level = 1; level <= config.Levels.Count; level++)
+            {
+                TowerFinalStats final = config.ResolveStats(level);
+                HeatStats? expected = final.Beam.HasValue ? timing.ResolveBeam() :
+                    final.Shockwave.HasValue ? timing.Resolve(1f / final.Shockwave.Value.IntervalSeconds) :
+                    timing.Resolve(final.ShotsPerSecond);
+                Require(final.Heat.HasValue && expected.HasValue, item.Id + " level " + level + " has resolved heat");
+                HeatStats actual = final.Heat.Value, e = expected.Value;
+                Require(System.Math.Abs(actual.PerShot - e.PerShot) < .0001f &&
+                    System.Math.Abs(actual.PerBeamSecond - e.PerBeamSecond) < .0001f &&
+                    System.Math.Abs(actual.CoolingPerSecond - e.CoolingPerSecond) < .0001f &&
+                    actual.RestartBelowFraction == e.RestartBelowFraction,
+                    item.Id + " level " + level + " uses its real launch/beam cadence");
+            }
+            // Changing one placed config cannot mutate the source preset or accidentally remove explicit level heat.
+            TowerConfig copy = config.CreateInstanceCopy();
+            switch (copy)
+            {
+                case MachineGunTowerConfig gun: gun.HeatEnabled = false; break;
+                case LaserTowerConfig laser: laser.HeatEnabled = false; break;
+                case BlasterCannonConfig cannon: cannon.HeatEnabled = false; break;
+                case ShockwaveTowerConfig shockwave: shockwave.HeatEnabled = false; break;
+            }
+            Require(copy.ResolveStats(1).Heat == null && config.ResolveStats(1).Heat.HasValue,
+                item.Id + " can opt out without editing the shared preset");
+            HeatStats explicitRow = new(100, 7, 0, 3, .3f);
+            copy.SetLevelStats(1, copy.Levels[0].Stats with { Heat = explicitRow });
+            Require(copy.ResolveStats(1).Heat == explicitRow, item.Id + " explicit paid row stays authoritative");
+        }
+        foreach (string path in new[] { "SniperTower/DefaultSniperTowerConfig.tres",
+            "CryoTower/DefaultCryoTowerConfig.tres", "StasisTower/DefaultStasisTowerConfig.tres" })
+        {
+            TowerConfig config = GD.Load<TowerConfig>("res://TOWERS/Offensive/" + path);
+            Require(config != null && config.ResolveStats(1).Heat == null, path + " remains heatless");
+        }
+    }
+
     // =========================================================
     // Handles isolate applications/towers; same nonzero source refreshes, separate sources overlap safely.
     private static void Sources(AmmoLoopFixture f)
