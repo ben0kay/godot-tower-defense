@@ -1,8 +1,18 @@
+## Correction — 2026-10-25: apply the actual Godot clear-color setting
+
+The previous space-background fix incorrectly wrote `rendering/environment/defaults/default_clear_color` **inside the `[rendering]` section** of `project.godot`. Godot project-file sections already supply the `rendering/` prefix, so that entry was stored under a wrong duplicated path and did not configure the viewport's default clear color.
+
+**Correct:** `[rendering]` → `environment/defaults/default_clear_color=Color(0.03137255, 0.05490196, 0.10588235, 1)` (the original SVG's #080E1B base). This affects every level and preserves the transparent starfield and organic nebula. No level scene, gameplay or shader logic changed.
+
+**Editor verification pending:** after pulling, restart Godot and inspect Project Settings → Rendering → Environment → Defaults → Default Clear Color to confirm the dark-navy value. Run Level001 and Level020, pan/zoom across map edges; verify the original starfield remains visible on top. This repairs the invalid setting, not the starfield's intrinsic brightness or any separate future renderer issue.
+
+---
+
 ## Shared space clear color — 2026-10-25
 
 The VE1 organic nebula pass deliberately removed the opaque rectangle from `WORLD/BACKGROUNDS/Stars/level001_space.svg`. All level scenes still reference this translucent SVG, but Godot's unspecified default viewport clear color made the uncovered space appear wrong or effectively blank.
 
-`project.godot` now sets `rendering/environment/defaults/default_clear_color` to **#080E1B** (the SVG's original deep-navy base). This is a single project-wide 2D viewport background; no per-level solid rectangles, scene nodes, runtime polling, or GPU overdraw are required. The existing static SVG, organic nebula fade, opt-in VE1 shader overlays, map terrain and z-order remain unchanged. To retint base space, change the one setting in **Project Settings → Rendering → Environment → Defaults → Default Clear Color**. A future explicitly configured Viewport/Environment background can override it.
+`project.godot` now sets the actual `rendering/environment/defaults/default_clear_color` project setting (written as `environment/defaults/default_clear_color` under `[rendering]`) to **#080E1B** (the SVG's original deep-navy base). This is a single project-wide 2D viewport background; no per-level solid rectangles, scene nodes, runtime polling, or GPU overdraw are required. The existing static SVG, organic nebula fade, opt-in VE1 shader overlays, map terrain and z-order remain unchanged. To retint base space, change the one setting in **Project Settings → Rendering → Environment → Defaults → Default Clear Color**. A future explicitly configured Viewport/Environment background can override it.
 
 **Desktop check still required:** run Level001, Level002, Level020 and Level100, including camera pan/zoom and map edges; verify consistent dark navy behind stars with no rectangular seams. Toggle Level001's `VisualAtmosphere` off and reload to confirm the static starfield still has the correct base color.
 
