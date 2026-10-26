@@ -1,3 +1,9 @@
+## HD4 additional heat preset coverage — 2026-10-26
+
+`TowerConditionsChecks` now validates shipped MG/Laser/Blaster/Rocket/Shockwave opt-in resource timing on all paid levels, shot versus damaging-beam-second versus wave-interval resolution, opt-out/private-copy isolation, explicit Heat row precedence and Sniper/Cryo/Stasis remaining heatless. This was added as focused source regression coverage; **execution still pending** (no local Godot/.NET runtime for this authoring session). See `TOWERS/Shared/Conditions/README.md` for balance defaults.
+
+---
+
 ## CD3 construction hologram presentation — 2026-10-25
 
 `ConstructionDroneChecks.tscn` now also asserts beam animation time, exactly one site-anchored completion flash after paid initial construction, independence from the returning/pooled drone, short-lived idle renderer cleanup, and suppression when visuals are off or a paid upgrade completes. CD1/CD2 hold/payment/return tests remain intact. Actual editor/GPU appearance testing is separate and not claimed here.
