@@ -1,3 +1,12 @@
+## 2026-10-26 — Saving S2/S3
+
+- Added typed v2 between-wave checkpoints and real shared-battlefield capture/restore through dormant CampaignSession.
+- Preserves wallet, every Citadel, placed type/cell/tier/XP/HP/priority/work/heat/disables/cooldowns, producer clocks, ammo stock/counters, real cargo/reservations/slots, builder holds/queue/phases/return flights/retry, wave RNG and mission telemetry.
+- Restores frozen research and the original mission reward ticket; rejects retired tickets without replaying XP. Profile progression is never restored from a battlefield file.
+- Wired Esc Save/Load and profile Campaign Continue. Disabled Save displays **Unavailable during combat**. Live F2 enemies, pending death releases and real projectile leftovers count as combat; remaining debug batches cancel on Save. Profileless play remains available.
+- Prepared paused replacement scene keeps the old scene available on failure. Stable catalog IDs, dependency fingerprint and owner/schema validation guard content. Version-one metadata cannot Continue; explicit saving migrates its envelope to v2.
+- Updated the focused disposable-directory storage fixture and local smoke steps. Diff/basic source checks only: .NET/Godot unavailable, so build/runtime/visual/export acceptance is pending. No extensive tests/profiling performed.
+
 ## 2026-10-26 — Saving S0/S1
 
 - Completed source audit and staged plan in SYSTEMS/Saving/IMPLEMENTATION_PLAN.md.

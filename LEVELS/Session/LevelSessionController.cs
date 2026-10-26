@@ -48,7 +48,12 @@ public partial class LevelSessionController : Node
         _levelName = PlayableLevelCatalog.Identify(GetParent(), _spawns.Paths.Navigation.Grid.Level);
         _levelConfig = _spawns.Paths.Navigation.Grid.Level.Settings;
         _rewardProfileId = GetNode<CitadelSession>("../CitadelSession").Research.ProfileId;
-        if (!string.IsNullOrEmpty(_rewardProfileId)) PrepareReward();
+        if (GetParent() is BattlefieldLauncher savedLauncher && savedLauncher.RestoringCampaign?.Checkpoint != null)
+        {
+            _rewardTicket = savedLauncher.RestoringCampaign.Checkpoint.RewardTicket;
+            _rewardPolicy = _rewardTicket.Policy; _rewardPolicyCaptured = true;
+        }
+        else if (!string.IsNullOrEmpty(_rewardProfileId)) PrepareReward();
         _spawns.WaveEnemyCreated += TrackWaveEnemy;
         _registry.EnemyKilled += CountKill; _registry.EnemyArrived += CountBreach;
         _citadels.AnyDestroyed += Defeat; _waves.WaveCompleted += OnWaveCompleted;
@@ -200,4 +205,12 @@ public partial class LevelSessionController : Node
         if (State != LevelSessionState.Playing) GetTree().Paused = false;
     }
     #endregion
+
+    // =========================================================
+    // Explicit checkpoint input/output, with no purchase or reward replay.
+    internal MissionRewardTicket SavedRewardTicket => _rewardTicket;
+    internal string SavedLevelId => _levelName;
+    internal RunSaveData CaptureCheckpoint() => RunStats.CaptureCheckpoint(_killed, _breached);
+    internal void RestoreCheckpoint(LevelSaveData data, IEnumerable<TowerBase> towers)
+    { _killed = data.Run.Killed; _breached = data.Run.Breached; RunStats.RestoreCheckpoint(data.Run, towers); }
 }

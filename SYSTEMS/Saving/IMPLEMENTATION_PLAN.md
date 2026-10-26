@@ -1,6 +1,7 @@
 # Between-wave saving — S0 audit and staged implementation
 
-S0 completed 2026-10-26 against source `120f9e8`. S1 is storage only. S2/S3 remain pending.
+S0 completed 2026-10-26 against source `120f9e8`. S1–S3 are now source implemented; .NET/Godot runtime acceptance remains pending.
+The findings below describe the original S0 audit; current behavior is in README.md.
 User preference: brief initial checks; extended runtime/visual/performance testing stays local.
 
 ## Player contract
@@ -59,20 +60,18 @@ silently authorize a partial combat snapshot. Refresh the UI from lifecycle even
 Restore into a prepared fresh battlefield: validate all data/catalog references first; suppress
 initial grants, payment, initial ammo refill, stats and reward issuance; instantiate all durable
 objects; resolve cross-references/reservations; restore clocks/counters; rebuild occupancy/navigation;
-then bind UI and unpause. On failure keep the original save and report the problem. Add typed
-LevelSaveData/TowerSaveData only with their actual capture/restore seams, rather than guess an
-incomplete battlefield format in S1.
+then bind UI and unpause. On failure keep the original save and report the problem. Typed LevelSaveData/TowerSaveData now ship with the capture/restore seams in S2.
 
 ## Passes
 
 | Pass | Scope | Status |
 | --- | --- | --- |
 | S0 | Audit ownership, safe boundary and integration requirements | Complete; this document |
-| S1 | Typed versioned campaign metadata and safe per-profile storage | Implemented; no callers/gameplay writes |
-| S2 | Complete typed battlefield schema, main-thread capture/restore and original mission ticket integration | Pending |
-| S3 | Esc Save/Load, Continue, combat explanation and profile-owned navigation | Pending |
+| S1 | Typed versioned campaign metadata and safe per-profile storage | Implemented; used by the live save coordinator |
+| S2 | Complete typed battlefield schema, main-thread capture/restore and original mission ticket integration | Source implemented; local build/runtime acceptance pending |
+| S3 | Esc Save/Load, Continue, combat explanation and profile-owned navigation | Source implemented; local build/runtime acceptance pending |
 
-## S1 storage contract
+## Original S1 storage contract (v1 history; v2 now includes the checkpoint)
 
 `CampaignData` v1 deliberately contains only profile/campaign GUIDs and UTC creation/save times.
 This is metadata, **not a resumable checkpoint**. S2 must bump the version and explicitly migrate

@@ -1,3 +1,14 @@
+## Between-wave checkpoint integration — 2026-10-26
+
+S2/S3 now provide source-owned capture/restore seams for this feature through
+`SYSTEMS/Saving/CampaignSession.cs` and feature-local saving helpers. Esc Save/Load and Campaign
+Continue use the selected profile's checkpoint; combat Save explains **Unavailable during combat**.
+Historical saving-unimplemented statements below are superseded. See `SYSTEMS/Saving/README.md`
+for field ownership, restored cargo/builders, original reward tickets and compatibility limits.
+Source/basic diff review completed; .NET/Godot build/runtime acceptance remains pending locally.
+
+---
+
 ## P3 Campaign hub / Levels split — implemented 2026-10-17
 
 - Campaign now shows the selected profile's saved player level, XP and Research Points, followed by distinct **LEVELS** and **RESEARCH** destinations.

@@ -33,7 +33,17 @@ public partial class CampaignMenu : Control
         _errorDialog = new AcceptDialog { Title = "Could not launch" };
         AddChild(_errorDialog);
         UIButtonFactory.Apply(_errorDialog.GetOkButton(), UIButtonStyle.Action);
-        levels.GrabFocus();
+        Button resume = UIButtonFactory.Create("CONTINUE", ContinueCheckpoint, UIButtonStyle.Menu, 64f);
+        content.AddChild(resume); content.MoveChild(resume, 1);
+        try
+        {
+            var saved = CampaignSession.ReadCurrent();
+            string unavailable = CampaignSession.LoadUnavailableReason(saved);
+            resume.Disabled = unavailable.Length > 0;
+            resume.TooltipText = resume.Disabled ? unavailable : "Resume " + saved.Checkpoint.LevelId + ". " + CampaignSession.RecoveryMessage;
+        }
+        catch (Exception error) { resume.Disabled = true; resume.TooltipText = error.Message; }
+        if (resume.Disabled) levels.GrabFocus(); else resume.GrabFocus();
     }
     #endregion
 
@@ -58,4 +68,13 @@ public partial class CampaignMenu : Control
         }
     }
     #endregion
+
+    // =========================================================
+    // Use the same profile-owned loader as Pause; the menu retains all navigation if preparation fails.
+    private void ContinueCheckpoint() => Callable.From(() =>
+    {
+        try { CampaignSession.LoadCurrent(this); }
+        catch (Exception error)
+        { _errorDialog.DialogText = error.Message; _errorDialog.PopupCentered(new Vector2I(460, 180)); }
+    }).CallDeferred();
 }

@@ -41,7 +41,8 @@ public partial class EconomyManager : Node
         string[] previous = new string[_balances.Count]; _balances.Keys.CopyTo(previous, 0);
         _balances.Clear();
         if (GodotObject.IsInstanceValid(_hud)) _hud.ResetCreditReward();
-        _balances[CreditsResource.ResourceId] = Mathf.Clamp(level.StartingCredits, 0, MaximumBalance);
+        _balances[CreditsResource.ResourceId] = GetParent() is BattlefieldLauncher launcher && launcher.RestoringCampaign != null
+            ? 0 : Mathf.Clamp(level.StartingCredits, 0, MaximumBalance);
         foreach (string id in previous)
             if (id != CreditsResource.ResourceId) EmitSignal(SignalName.BalanceChanged, id, 0);
         EmitSignal(SignalName.BalanceChanged, CreditsResource.ResourceId, GetBalance(CreditsResource));
@@ -170,4 +171,17 @@ public partial class EconomyManager : Node
         return true;
     }
     #endregion
+
+    // =========================================================
+    // Explicit checkpoint input/output, with no purchase or reward replay.
+    internal Dictionary<string, int> CaptureCheckpoint() => new(_balances);
+    internal void RestoreCheckpoint(Dictionary<string, int> balances)
+    {
+        if (_transactionActive) throw new InvalidOperationException("Wallet transaction is active.");
+        foreach (var pair in balances)
+            if (pair.Value < (Config?.AllowNegativeBalances == true ? -MaximumBalance : 0) || pair.Value > MaximumBalance)
+                throw new System.IO.InvalidDataException("Saved balance exceeds wallet bounds.");
+        _balances.Clear(); foreach (var pair in balances) _balances.Add(pair.Key, pair.Value);
+        EmitSignal(SignalName.BalanceChanged, CreditsResource.ResourceId, GetBalance(CreditsResource));
+    }
 }

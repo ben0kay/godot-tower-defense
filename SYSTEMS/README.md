@@ -9,7 +9,7 @@ Progression now includes a v2 purchased-research-ID record and the first Campaig
 This folder holds systems shared between Boot, Main Menu, campaigns and gameplay, not individual tower/enemy/world mechanics.
 
 - `Profiles/`: **implemented** persistent local player identity, selection and backup recovery.
-- `Saving/`: **S0/S1 foundation implemented**: audited checkpoint plan, typed campaign metadata and safe profile-owned storage. No gameplay callers, battlefield snapshots or Save/Load/Continue yet; S2/S3 remain pending.
+- `Saving/`: **S0–S3 source implemented**: typed between-wave checkpoints, safe profile-owned storage, prepared-world restoration, Pause Save/Load and Campaign Continue. Local build/runtime acceptance remains pending; see Saving/README.md.
 
 The Boot screen selects the identity. Game scenes remain independent of menu lifetime. Future campaigns belong to stable profile IDs, never profile display names. Keep save I/O and persistence away from `UI/`, and do not move `ECONOMY/`, `LEVELS/`, `TOWERS/` or `WORLD/` gameplay rules into this folder.
 

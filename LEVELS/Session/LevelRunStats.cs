@@ -64,4 +64,13 @@ public partial class LevelRunStats : Node
         if (GodotObject.IsInstanceValid(_placement)) _placement.TowerPlaced -= OnTowerPlaced;
         foreach (TowerBase tower in new List<TowerBase>(_subscriptions.Keys)) Forget(tower);
     }
+
+    // =========================================================
+    // Explicit checkpoint input/output, with no purchase or reward replay.
+    internal RunSaveData CaptureCheckpoint(int killed, int breached) => new(killed, breached, TowersPlaced, TowersConstructed, UpgradesPurchased, MissionSeconds);
+    internal void RestoreCheckpoint(RunSaveData saved, System.Collections.Generic.IEnumerable<TowerBase> towers)
+    {
+        foreach (var tower in towers) OnTowerPlaced(tower);
+        TowersPlaced = saved.Placed; TowersConstructed = saved.Constructed; UpgradesPurchased = saved.Upgrades; MissionSeconds = saved.Seconds;
+    }
 }

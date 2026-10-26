@@ -1,3 +1,14 @@
+## Between-wave checkpoint integration — 2026-10-26
+
+S2/S3 now provide source-owned capture/restore seams for this feature through
+`SYSTEMS/Saving/CampaignSession.cs` and feature-local saving helpers. Esc Save/Load and Campaign
+Continue use the selected profile's checkpoint; combat Save explains **Unavailable during combat**.
+Historical saving-unimplemented statements below are superseded. See `SYSTEMS/Saving/README.md`
+for field ownership, restored cargo/builders, original reward tickets and compatibility limits.
+Source/basic diff review completed; .NET/Godot build/runtime acceptance remains pending locally.
+
+---
+
 # Shared tower disabling and optional weapon heat — HD1/HD2
 
 `TowerBase` owns the public API. `TowerConditions` is one lazily created child clock per affected tower, not a node per debuff, a global tower scan, or a parallel damage system. Ordinary heatless/unaffected towers have no clock node. Cold clocks and exclusively condition-based effects stop processing. Paused scene time freezes all durations/cooling. No enemy or source Node references are retained.

@@ -45,4 +45,10 @@ public sealed class ResearchDeployment
         if (authored <= 0) throw new ArgumentOutOfRangeException(nameof(authored));
         return checked((int)Math.Round(authored * (1 + CitadelHealthPercent / 100), MidpointRounding.AwayFromZero));
     }
+
+    // =========================================================
+    // Explicit checkpoint input/output, with no purchase or reward replay.
+    internal ResearchSaveData CaptureCheckpoint() => new(ProfileId, CitadelHealthPercent, new Dictionary<string, TowerResearchBonuses>(_towers));
+    internal static ResearchDeployment RestoreCheckpoint(ResearchSaveData saved) =>
+        new(saved.ProfileId, saved.CitadelHealthPercent, saved.Towers.ToImmutableDictionary(StringComparer.Ordinal));
 }

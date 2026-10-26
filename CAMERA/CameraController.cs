@@ -115,4 +115,13 @@ public partial class CameraController : Node2D
             top > bottom ? center.Y : Mathf.Clamp(proposed.Y, top, bottom));
     }
     #endregion
+
+    // =========================================================
+    // Checkpoint restore sets source state directly; callers validate before publishing the battlefield.
+    internal void RestoreCamera(SavePoint position, float zoom)
+    {
+        if (zoom < Config.MinimumZoom || zoom > Config.MaximumZoom) throw new System.IO.InvalidDataException("Saved camera zoom is incompatible.");
+        _camera.Zoom = Vector2.One * zoom; GlobalPosition = ClampToMap(position.Vector());
+        _targetPosition = GlobalPosition; _dragging = false; _camera.ResetSmoothing();
+    }
 }

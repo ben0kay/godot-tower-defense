@@ -1,3 +1,14 @@
+## Between-wave checkpoint integration — 2026-10-26
+
+S2/S3 now provide source-owned capture/restore seams for this feature through
+`SYSTEMS/Saving/CampaignSession.cs` and feature-local saving helpers. Esc Save/Load and Campaign
+Continue use the selected profile's checkpoint; combat Save explains **Unavailable during combat**.
+Historical saving-unimplemented statements below are superseded. See `SYSTEMS/Saving/README.md`
+for field ownership, restored cargo/builders, original reward tickets and compatibility limits.
+Source/basic diff review completed; .NET/Godot build/runtime acceptance remains pending locally.
+
+---
+
 ## CD1/CD2 builder foundation implemented — 2026-10-21
 
 `ConstructionDrones/` now gates positive-duration paid initial builds until a pooled Citadel drone arrives/deploys its cyan beam, then returns at normal work completion. Shared World wiring applies across towers/buildings; upgrades and ammo transport remain independent. Cap/fallback/timing and verified checks are documented there. Desktop visual/GPU review and further CD3 polish remain pending. Older planned-only entries below are retained history.

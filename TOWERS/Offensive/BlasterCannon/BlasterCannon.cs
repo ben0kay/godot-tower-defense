@@ -134,4 +134,9 @@ public partial class BlasterCannon : TowerBase
         _sprite.Modulate = tint; _baseSprite.Modulate = tint;
     }
     #endregion
+
+    // =========================================================
+    // Checkpoint restore sets source state directly; callers validate before publishing the battlefield.
+    internal override double CaptureWeaponCooldown() => _shotTimer;
+    internal override void RestoreWeaponCooldown(double seconds) => _shotTimer = (float)seconds;
 }
