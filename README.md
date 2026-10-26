@@ -1,3 +1,14 @@
+## Campaign saving foundation — S0/S1 (2026-10-26)
+
+Saving ownership and checkpoint requirements are audited. Typed campaign metadata and a safe,
+profile-owned store now exist with version/size validation, atomic writes and backup recovery.
+There are no gameplay callers yet: **battlefield saving, Continue and Pause Save/Load remain
+unavailable** until S2/S3. Combat explanation is specified as **Unavailable during combat**.
+See [saving plan](SYSTEMS/Saving/IMPLEMENTATION_PLAN.md) for cargo, construction, frozen research
+and original mission-ticket requirements. Build/runtime checks remain local; no extensive suite run.
+
+---
+
 ## Development backlog and documentation audit (2026-10-23)
 
 For current unfinished work **ranked by complexity**, suggested **Codex vs regular ChatGPT** task sizes, additional unimplemented concepts, and a **checklist of outdated Markdown to clean**, see **[NOTES/IMPLEMENTATION_BACKLOG.md](NOTES/IMPLEMENTATION_BACKLOG.md)**. This index distinguishes implemented source, pending QA and historically superseded plan text. Recheck current GitHub HEAD before starting a phase.

@@ -1,3 +1,11 @@
+## 2026-10-26 — Saving S0/S1
+
+- Completed source audit and staged plan in SYSTEMS/Saving/IMPLEMENTATION_PLAN.md.
+- Significant S2 requirements: real in-flight cargo/reservations, builder holds/work, frozen deployment research, original reward ticket/stale-checkpoint handling, F2/unowned combat and wave RNG state.
+- Added strict typed v1 campaign metadata and explicit one-current-slot-per-profile store; no polling or game callers. Atomic replace/flush/readback, bounded reads, ownership/format validation and read-only backup recovery. Corrupt originals are preserved; replacement/repair requires a future explicit flow.
+- Added focused isolated storage fixture. Static/diff review only; dotnet/Godot unavailable here. No broad tests/profiling.
+- S2 battlefield schema/capture/restore and S3 interface remain pending. Exact combat explanation: **Unavailable during combat**.
+
 ## Live Citadel critical alerts — 2026-10-21 (source implemented; engine QA pending)
 
 Existing major `citadel_critical` warning now fires once on each living Citadel's crossing into the HUD's critical health band (default 25%). Single wording stays unchanged; multi-Citadel warnings identify their own objective and reuse the manager's priorities, per-ID cooldowns and F7 catalog, with no extra per-frame work. Lethal hits defer to mission defeat; reset/unload removes subscriptions. Authored MultiCitadelHudChecks cover threshold, dedupe, identity and queuing; Godot/.NET runs and desktop QA remain pending. See UI/Alerts/README.md and WORLD/OBJECTIVES/Citadel/README.md.
