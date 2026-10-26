@@ -1,12 +1,26 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=6 format=3]
 [ext_resource type="Script" path="res://TOWERS/ConstructionDrones/ConstructionDrone.cs" id="1"]
 [ext_resource type="Texture2D" path="res://TOWERS/ConstructionDrones/Visuals/ConstructionDrone.svg" id="2"]
 [ext_resource type="Script" path="res://TOWERS/ConstructionDrones/Visuals/ConstructionBeam.cs" id="3"]
+[ext_resource type="Script" path="res://TOWERS/ConstructionDrones/Visuals/ConstructionBeamCone.cs" id="4"]
+[ext_resource type="Script" path="res://TOWERS/ConstructionDrones/Visuals/ConstructionBeamGlow.cs" id="5"]
 [node name="ConstructionDrone" type="Node2D"]
 script = ExtResource("1")
 [node name="Beam" type="Node2D" parent="."]
 position = Vector2(0, 7)
 show_behind_parent = true
 script = ExtResource("3")
+[node name="Cone" type="Node2D" parent="Beam"]
+show_behind_parent = true
+script = ExtResource("4")
+
+[node name="GroundContact" type="Node2D" parent="Beam"]
+show_behind_parent = true
+script = ExtResource("5")
+GroundContact = true
+
+[node name="NozzleGlow" type="Node2D" parent="Beam"]
+script = ExtResource("5")
+
 [node name="Sprite" type="Sprite2D" parent="."]
 texture = ExtResource("2")

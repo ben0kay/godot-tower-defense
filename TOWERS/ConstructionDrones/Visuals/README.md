@@ -1,3 +1,11 @@
+## Cached cone and scan-only redraw — 2026-10-26
+
+The construction beam now uses a static cached `ConstructionBeamCone` canvas (four-vertex fill and edge lines) and two cached `ConstructionBeamGlow` canvases (site contact and nozzle). These are drawn once per footprint/style assignment. The regular builder physics tick can move/hover the drone, changing only the cached cone's affine transform and the contact's position; **the static cone is not `QueueRedraw()`-ed every frame**. During the short 0.25s deployment, CanvasItem alpha updates without rebuilding geometry. `ConstructionBeam._Draw()` now handles **only the moving scan bands**, refreshing at up to 24 Hz from the same manager-supplied time; 0 configured bands do not animate. No additional per-node processing or physics, new shaders, particle systems, timers or gameplay changes.
+
+The visual change deliberately leaves the static cone/contact/nozzle brightness constant while beaming; the existing pulse remains on scanning lines. Pause, visuals-off, pool reuse, completion and destruction hide the entire beam as before. Focused test checks assert cone geometry remains cached over repeated hover ticks. **FPS savings are unmeasured** and must be assessed in the desktop Godot renderer, comparing three active beams with the prior behavior.
+
+---
+
 ## CD3 visual polish — 2026-10-25
 
 The existing footprint-sized four-vertex cyan cone now gains manager-driven scrolling scan bands (four by default), a subtle adjustable brightness pulse, brighter nozzle glow, and a faint site-centered contact halo. All are drawn with lightweight canvas primitives using retained arrays. The **same single manager** passes hover age during deployment/beaming; there is no additional per-drone processing, GPU particle system, shader, physics, or combat logic.

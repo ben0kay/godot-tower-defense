@@ -86,6 +86,11 @@ public partial class ConstructionDroneChecks : Node
         var flashes = builders.GetNode<ConstructionCompletionFlash>("CompletionFlashes");
         Require(drone.BeamVisible && beam.AnimationSeconds > 0 && status.Text == "CONSTRUCTING" &&
             builders.Releases == 1 && clock.HeldCount == 0, "Animated beam deployed before one release");
+        int coneBuilds = beam.ConeGeometryRefreshes, scans = beam.ScanRedrawRequests;
+        Require(coneBuilds == 1 && scans > 0, "Initial beam builds one reusable cone, independent of scan refreshes");
+        for (int i = 0; i < 40; i++) builders._PhysicsProcess(.001);
+        Require(beam.ConeGeometryRefreshes == coneBuilds && beam.ScanRedrawRequests - scans <= 2,
+            "Hovering builders transform one cached cone while scan redraws remain capped at 24Hz");
         Require(!tower.ReleaseConstructionDrone(builders, token), "Repeated arrival cannot release twice");
         clock.Advance(1); Require(tower.ElapsedWorkSeconds == 1 && !tower.IsOperational, "Ordinary clock starts after arrival");
         clock.Advance(2); Require(tower.IsOperational && !sites.HasSite(tower) && !drone.BeamVisible && builders.ActiveCount == 1 &&
