@@ -15,3 +15,9 @@ I like grouping similar variables in structs / export groups for inspector so it
 Check out my isometric 3d and isometric 2d github repositories for code/folder structure references.
 If an .md file is available in the project for a section/feature/mechanic we are editing, refer to the .md as sometimes it will have extra context. Some might be outdated. Update md files appropriately when completing work.
 Only do one commit for github per job instead of multiple commits.
+
+By default, keep validation brief and proportional: review the changes and run initial build/basic checks where practical, then leave extended runtime testing, visual verification and performance profiling to me. Do not spend excessive time on repeated checks or large test suites unless I explicitly request them; this overrides broader validation requirements below. Clearly state any checks left for me.
+
+**Design for low idle cost from the beginning, not just functional correctness.** Before writing a feature, identify what activates it, what work happens while active, and exactly what stops that work afterward. Avoid introducing an always-running `_Process` or `_PhysicsProcess` by default.
+
+- **Inactive means dormant:** If an effect is off, intensity is zero, or its animation has finished, it should not keep simulating, checking objects, redrawing, or rewriting GPU properties. Use `SetProcess(false)`, `SetPhysicsProcess(false)`, emitter shutdown, and explicit activation where suitable. Keep a way for UI/config changes to wake it without idle polling.
