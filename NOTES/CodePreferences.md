@@ -1,3 +1,12 @@
+## Branch workflow (2026-10-26)
+
+- **Default development target: `dev`** for all future code, asset, test, and documentation commits/pushes in `ben0kay/godot-tower-defense`, unless I explicitly request another branch.
+- Keep `main` as the stable branch. Do **not** commit, push, merge, or change GitHub's default branch to `main` as part of regular development jobs unless I explicitly ask.
+- Read and write files using the explicit GitHub ref `dev` (connector calls without a ref may silently read `main`). Fetch `dev`'s current HEAD before composing commits and advance `dev` with a non-force update.
+- Only merge `dev` into `main` when I request a merge/release. Changes should generally be one commit per job, as specified below.
+
+---
+
 Read the main README.md in the project root for an overall flavour of the game/coding structure
 I prefer comments above functions/methods. along with a commented line of ========================================================= so i can easily see when editing code in godot
 I prefer some comment at top of each script to explain what the script is doing.
