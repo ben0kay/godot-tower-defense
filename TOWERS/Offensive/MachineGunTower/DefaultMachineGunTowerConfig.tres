@@ -5,6 +5,7 @@
 [ext_resource type="Resource" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Construction/MachineGunConstructionArt.tres" id="construction"]
 [resource]
 script = ExtResource("1")
+HeatEnabled = true
 
 ProjectileVisual = ExtResource("pv_tracer")
 MuzzleFlash = ExtResource("pv_flash")

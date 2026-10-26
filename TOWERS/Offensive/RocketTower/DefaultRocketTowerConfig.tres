@@ -6,6 +6,7 @@
 
 [resource]
 script = ExtResource("1")
+HeatEnabled = true
 ConstructionArt = ExtResource("construction")
 ImpactStyle = ExtResource("2")
 MuzzleFlash = ExtResource("3")

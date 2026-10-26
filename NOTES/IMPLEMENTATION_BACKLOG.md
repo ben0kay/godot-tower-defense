@@ -38,8 +38,7 @@ The ranking estimates *total project scope and integration risk*, not lines of c
 | 23 | [Floating damage numbers](../FEEDBACK/DamageNumbers/README.md) | Small–medium | **Regular** | **Planned only.** Reusable capped visual-only numbers based on authoritative damage results; merge high-frequency hits to avoid label spam. |
 | 24 | [Camera shake and impact reactions](../FEEDBACK/CameraEffects/README.md) | Small–medium | **Regular** | **Planned only.** Optional, bounded impact feedback; keep normal camera controls and zoom intact. |
 | 25 | More research nodes using **existing** effect kinds | Small–medium | **Regular** | Expand incrementally after selecting actual bonuses/costs. New homing/precision behaviors require an explicit mechanic and unlock, not just a graph node. [Research](../SYSTEMS/Progression/Research/README.md). |
-| 26 | Additional tower heat profiles | Small | **Regular** | [HD1–HD3](../TOWERS/Shared/Conditions/README.md) already exists; Battle has a **3-minute** overheat profile and **9-second** recovery. Other towers are currently heatless by default. Balance only selected opt-ins. |
-| 27 | Authored mixed-wave content and balance | Small | **Regular** | Use existing [wave authoring](../LEVELS/Waves/Authoring.md), catalog and mission resources. Add only the intended combinations; no scheduler rewrite. |
+| 26 | Authored mixed-wave content and balance | Small | **Regular** | Use existing [wave authoring](../LEVELS/Waves/Authoring.md), catalog and mission resources. Add only the intended combinations; no scheduler rewrite. |
 
 ### Useful scoping notes
 
@@ -74,6 +73,7 @@ The separate uploaded childhood GameMaker game notes are historical design inspi
 
 ## C. Already implemented — don't assign the same work again
 
+- **HD4 authored heat presets (2026-10-26):** Machine Gun (2min), Laser (3.5min), Blaster Cannon/Rocket (4min), Shockwave (3min), each with a modest independent recovery setting; shared beam/pulse timing, Inspector opt-in and source-level focused checks are implemented. Battle remains unchanged; desktop Godot acceptance pending. [Conditions](../TOWERS/Shared/Conditions/README.md).
 This list describes **source delivery**, not universal desktop approval.
 
 - **Tower/combat:** IT1–IT4 Inspector/6 target modes; CT1–CT3 Cryo; ST1 Stasis; HD1–HD3 generic disable/heat/Inspector; existing tower HP/damage/destruction; PA1–PA3 straight/projectile spread/homing contract; PV tracer/muzzle effects; Battle plus six offensive recoil rollouts; SR1–SR4 cosmetic shield ricochets.

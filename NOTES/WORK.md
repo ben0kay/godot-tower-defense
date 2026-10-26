@@ -1,3 +1,7 @@
+## 2026-10-26 — HD4 expanded weapon heat presets
+
+Five shipped presets now opt into the existing HD1–HD3 heat capability: Machine Gun 2min/10s, Laser 3.5min/10s, Blaster Cannon 4min/12s, Rocket 4min/12s and Shockwave 3min/12s. Shared timing resolution now handles funded damaging beam seconds and actual wave intervals in addition to bullet cadence. Battle stays 3min/9s; Sniper/Cryo/Stasis stay heatless. Type-local Inspector controls and opt-out, private config snapshots, explicit per-level Heat precedence, lazy condition-clock rules and campaign saving are retained. Focused resource/pipeline test assertions added to TowerConditionsChecks; .NET/Godot not executed here, brief static review only.
+
 ## 2026-10-26 — Organic builders and stronger credit gains
 
 - Shared builder manager now uses eased cubic outbound/return flight, travel-facing sprites, gentle hover and randomized eased orbit arcs with beam fixed on the site. Existing build/deployment clocks stay authoritative.

@@ -10,7 +10,7 @@ public static class SafetyClampsStage
         Handling = stats.Handling.HasValue ? ProjectileHandlingStats.Sanitize(stats.Handling.Value) : null,
         Freeze = stats.Freeze.HasValue ? new FreezeStats(FiniteMinimum(stats.Freeze.Value.DurationSeconds, 0)) : null,
         MaxHealth = FiniteMinimum(stats.MaxHealth, 1),
-        Heat = HeatStats.Sanitize(stats.Heat ?? context.HeatTiming?.Resolve(stats.ShotsPerSecond)),
+        Heat = HeatStats.Sanitize(stats.Heat ?? ResolveAuthoredHeat(stats, context.HeatTiming)),
         ShieldPenetration = Mathf.Min(1, FiniteMinimum(stats.ShieldPenetration, 0)),
         RangePixels = FiniteMinimum(stats.RangePixels, 0),
         ShotsPerSecond = FiniteMinimum(stats.ShotsPerSecond, 0),
@@ -31,6 +31,22 @@ public static class SafetyClampsStage
         Slow = stats.Slow.HasValue ? new SlowStats(Mathf.Min(.99f, FiniteMinimum(stats.Slow.Value.Fraction, 0))) : null,
         Beam = stats.Beam.HasValue ? new BeamStats(FiniteMinimum(stats.Beam.Value.DamagePerSecond, 0)) : null
     };
+
+    // =========================================================
+    // Beam damage is funded per second; wavefronts are emitted by interval; ordinary weapons fire by shot rate.
+    // Explicit selected-level HeatStats always wins, and heatless towers never resolve a fallback capability.
+    private static HeatStats? ResolveAuthoredHeat(TowerStatBlock stats, HeatTiming? timing)
+    {
+        if (!timing.HasValue) return null;
+        if (stats.Beam.HasValue) return timing.Value.ResolveBeam();
+        if (stats.Shockwave.HasValue)
+        {
+            float interval = stats.Shockwave.Value.IntervalSeconds;
+            if (!float.IsFinite(interval)) return null;
+            return timing.Value.Resolve(1f / Mathf.Max(.05f, interval));
+        }
+        return timing.Value.Resolve(stats.ShotsPerSecond);
+    }
 
     // =========================================================
     // Reject NaN/infinity before applying a stat's supported lower bound.

@@ -1,3 +1,23 @@
+## HD4 — additional forgiving heat profiles (2026-10-26)
+
+The shared HD1–HD3 condition/overheat clock now serves five more default-enabled offensive presets. **Timing is a target under sustained funded attacks with continuous passive cooling**, not a guaranteed wall-clock shutdown if the target dies, ammo runs out or a tower stops firing.
+
+| Tower | Heat target | Recovery to 35% | Source |
+| --- | ---: | ---: | --- |
+| Battle | 3 min | 9s | Existing, unchanged |
+| Machine Gun | 2 min | 10s | Combined actual bullet rate across both muzzles |
+| Laser | 3.5 min | 10s | Actual damaging/funded beam seconds; no arbitrary virtual bullets |
+| Blaster Cannon | 4 min | 12s | Actual paid-level projectile cadence |
+| Rocket | 4 min | 12s | Inherits Blaster Heat policy, independent Rocket config |
+| Shockwave | 3 min | 12s | Actual purchased wave interval; one heat charge per emitted pulse |
+| Sniper, Cryo, Stasis | Disabled | — | Existing heatless default |
+
+Edit `HeatEnabled`, `OverheatAfterMinutes`, `OverheatRecoverySeconds` in each `Offensive/<Type>/Default<Type>Config.tres` Inspector resource; the shipped presets enable the five profiles (the Battle resource was already enabled). Private runtime copies propagate changes through the existing cached stat resolver, rank/upgrade and Inspector display. An explicitly authored `HeatStats` level row still wins over timing defaults, and disabling the timing opt-in does not erase an explicit row. The shared `SafetyClamps` stage selects shot cadence, Shockwave's actual interval or continuous beam time; no new attack manager, per-frame config recomputation, per-projectile node, always-running clock or heat mutation during save/load.
+
+`TESTS/Towers/TowerConditionsChecks.cs` now includes focused checks for the shipped resources, selected paid levels, beam/pulse calibration, opt-out/config isolation, explicit row precedence and heatless towers. No comprehensive suite or desktop performance review was done; Godot/.NET execution remains pending in this environment.
+
+---
+
 ## Between-wave checkpoint integration — 2026-10-26
 
 S2/S3 now provide source-owned capture/restore seams for this feature through
