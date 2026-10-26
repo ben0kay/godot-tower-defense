@@ -1,3 +1,9 @@
+## More opt-in tower heat profiles — 2026-10-26
+
+Machine Gun (2 min / 10s recovery), Laser (3.5 min / 10s), Blaster Cannon (4 min / 12s), Rocket (4 min / 12s) and Shockwave (3 min / 12s) now enable the existing shared heat capability in their shipped config resources. Laser calibrates heat per damaging beam-second, Shockwave per real pulse interval; shot weapons use their selected paid-level cadence. Battle remains 3 min / 9s; Sniper, Cryo and Stasis stay heatless. Each type exposes Inspector Heat Enabled / Overheat After Minutes / Recovery Seconds. Firing, ammo, price, tower stats and pause/save ownership are unchanged. This is source-implemented; desktop/.NET/Godot verification remains pending. See [heat conditions](TOWERS/Shared/Conditions/README.md).
+
+---
+
 ## Organic builders and credit-gain feedback — 2026-10-26
 
 Construction drones now accelerate/brake along curved flights, face travel, hover and reposition
