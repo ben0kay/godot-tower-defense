@@ -1,19 +1,42 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="28" height="18" viewBox="0 0 28 18">
-<!-- Right-facing alien robotic hull; baked vector lighting only. Keep native canvas and forward axis. -->
-<defs>
-  <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#53626e"/><stop offset=".25" stop-color="#263440"/><stop offset=".56" stop-color="#111a23"/><stop offset="1" stop-color="#070c12"/></linearGradient>
-  <linearGradient id="plate" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#78858d"/><stop offset=".17" stop-color="#3b4b57"/><stop offset=".6" stop-color="#19242e"/><stop offset="1" stop-color="#0d151d"/></linearGradient>
-  <linearGradient id="core" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#18d9ff"/><stop offset=".5" stop-color="#d1fdff"/><stop offset="1" stop-color="#18d9ff"/></linearGradient>
-</defs>
-<g transform="translate(0 0) scale(0.28 0.18)" stroke-linejoin="round" stroke-linecap="round">
-<!-- Small, open-tailed hooked interceptor: three separated rear prongs -->
-<path d="M5 4 65 22 42 31 23 26 34 43 34 57 23 74 42 69 65 78 5 96 16 66 9 50 16 34Z" fill="url(#hull)" stroke="#718893" stroke-width="1.8"/>
-<path d="M10 9 51 23 26 21Z M10 91 51 77 26 79Z" fill="#596d78"/>
-<path d="M20 45 63 34 97 50 63 66 20 55 8 50Z" fill="url(#plate)" stroke="#8699a3" stroke-width="1.8"/>
-<path d="M34 45 64 41 83 50 64 59 34 55 25 50Z" fill="#08141d"/>
-<path d="M43 47 66 45 77 50 66 55 43 53Z" fill="#11bfe1" opacity=".65"/>
-<path d="M45 49 67 48 73 50 67 52 45 51Z" fill="#b4f8ff"/>
-<path d="M24 30 34 37 M24 70 34 63" stroke="#f44627" stroke-width="3"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="28" height="18" viewBox="0 0 140 90">
+  <!-- Swift Interceptor: compact +X three-prong dart in Enemy001's flat dark/red fleet style.
+       Crisp solid plates only; no gradients, baked highlights, glows, filters or embedded images. -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <!-- Widely separated swept rear fins with open gaps toward the body. -->
+    <path d="M5 8 44 20 65 29 79 34 60 37 40 31 21 25 13 18Z" fill="#111920" stroke="#05080c" stroke-width="3"/>
+    <path d="M5 82 44 70 65 61 79 56 60 53 40 59 21 65 13 72Z" fill="#111920" stroke="#05080c" stroke-width="3"/>
+    <path d="M15 16 43 24 58 31 41 28 24 24Z M15 74 43 66 58 59 41 62 24 66Z" fill="#96262a"/>
+    <path d="M20 21 38 27 33 27 21 24Z M20 69 38 63 33 63 21 66Z" fill="#ec4b34"/>
 
-</g>
+    <!-- Open forked tail roots: deliberately retain dark negative space between all three prongs. -->
+    <path d="M6 36 30 34 45 39 38 45 22 44 3 40Z" fill="#171e25" stroke="#05080c" stroke-width="2.8"/>
+    <path d="M6 54 30 56 45 51 38 45 22 46 3 50Z" fill="#171e25" stroke="#05080c" stroke-width="2.8"/>
+    <path d="M10 39 29 37 37 41 22 42Z M10 51 29 53 37 49 22 48Z" fill="#30363d"/>
+
+    <!-- Narrow central spear hull with a slim, unmistakably forward-pointed prow. -->
+    <path d="M22 39 47 32 76 34 103 39 136 45 103 51 76 56 47 58 22 51 29 45Z" fill="#1e252c" stroke="#060a0f" stroke-width="3"/>
+    <path d="M67 35 96 33 128 43 103 42 86 41Z" fill="#10171d" stroke="#05080c" stroke-width="2.2"/>
+    <path d="M67 55 96 57 128 47 103 48 86 49Z" fill="#10171d" stroke="#05080c" stroke-width="2.2"/>
+    <path d="M81 37 102 39 122 44 100 43Z M81 53 102 51 122 46 100 47Z" fill="#30363c"/>
+    <path d="M109 40 133 45 109 50 116 45Z" fill="#070b10"/>
+
+    <!-- Non-reflective inlaid armour, mirrored on both hull flanks. -->
+    <path d="M39 38 61 36 78 41 60 44 38 43Z" fill="#31373e" stroke="#0c1218" stroke-width="1.4"/>
+    <path d="M39 52 61 54 78 49 60 46 38 47Z" fill="#31373e" stroke="#0c1218" stroke-width="1.4"/>
+    <path d="M67 40 84 42 94 45 84 48 67 50 76 45Z" fill="#0f171e" stroke="#060b10" stroke-width="1.6"/>
+    <path d="M70 42 83 43 88 45 83 47 70 48 78 45Z" fill="#272e35"/>
+
+    <!-- Compact third rear prong and dark thruster housing. -->
+    <path d="M4 42 26 41 36 45 26 49 4 48 1 45Z" fill="#0b1117" stroke="#030609" stroke-width="2.6"/>
+    <path d="M12 42 24 42 29 45 24 48 12 48Z" fill="#323a41"/>
+    <path d="M4 43 13 43 15 45 13 47 4 47Z" fill="#ad2929"/>
+    <path d="M5 44 11 44 12 45 11 46 5 46Z" fill="#ff5e39"/>
+
+    <!-- Enemy001-family identification slashes and red recessed spear-point core. -->
+    <path d="M47 39 57 40 59 42 50 42Z M47 51 57 50 59 48 50 48Z" fill="#a7272a"/>
+    <path d="M61 38 67 40 72 43 67 43Z M61 52 67 50 72 47 67 47Z" fill="#eb4531"/>
+    <path d="M94 42 109 43 122 45 109 47 94 48 102 45Z" fill="#a82529" stroke="#070a0f" stroke-width="1.3"/>
+    <path d="M100 44 111 45 100 46 96 45Z" fill="#ff5c36"/>
+    <path d="M116 40 127 43 122 43Z M116 50 127 47 122 47Z" fill="#b82b2b"/>
+  </g>
 </svg>

@@ -1,3 +1,9 @@
+## Artwork update — flat red-accented interceptor (2026-10-26)
+
+The 28×18 right-facing three-prong `Artwork/enemy002.svg` now matches Enemy001's flat dark charcoal/black hull palette and small red/orange identification marks rather than the older gradient steel and cold-blue core. Geometry stays lean and swept, preserving its separate Swift Interceptor silhouette; no scene/definition/movement changes. See `Artwork/README.md` for details. Older blue-core descriptions below are historical.
+
+---
+
 ## Current artwork — alien robotic pass (2026-10-18)
 
 **Hooked needle interceptor**, right-facing, native **28×18px**. Very small three-prong silhouette with swept open wing slots and a cold blue recessed core. Artwork only: stable identity, scenes, gameplay/ability settings and navigation clearance are unchanged. Earlier art/color descriptions below are historical. See `../ART_DIRECTION.md` for fleet-wide conventions and the review sheet.
