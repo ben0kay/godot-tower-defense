@@ -37,4 +37,9 @@ public partial class AmmunitionFactory : AmmoBuilding
     }
     public override string DescribeRuntime() => $"Buffered ammo: {Inventory.Amount:N0} / {Inventory.Capacity:N0}\n" +
         (!IsOperational ? "Production waiting for construction" : Production.IsPaused ? "Production paused — buffer full" : "Producing automatically") + "\n" + DroneStatus;
+
+    // =========================================================
+    // Checkpoint restore sets source state directly; callers validate before publishing the battlefield.
+    internal void RestoreProduction(double seconds, long produced)
+    { Production.RestoreSeconds(seconds); ProducedRounds = produced; }
 }

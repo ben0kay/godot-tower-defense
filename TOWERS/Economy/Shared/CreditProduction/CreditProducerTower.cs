@@ -76,4 +76,10 @@ public abstract partial class CreditProducerTower : TowerBase
         base._ExitTree();
     }
     #endregion
+
+    // =========================================================
+    // Checkpoint restore sets source state directly; callers validate before publishing the battlefield.
+    internal double SavedCreditSeconds => _timer?.ElapsedSeconds ?? 0;
+    internal void RestoreProduction(int credits, double seconds)
+    { Buffer.RestoreAmount(credits); if (_timer != null) _timer.RestoreSeconds(seconds); else if (seconds != 0) throw new System.IO.InvalidDataException("Unexpected production clock."); }
 }

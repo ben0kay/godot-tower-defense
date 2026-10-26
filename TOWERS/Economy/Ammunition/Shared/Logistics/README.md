@@ -1,3 +1,14 @@
+## Between-wave checkpoint integration — 2026-10-26
+
+S2/S3 now provide source-owned capture/restore seams for this feature through
+`SYSTEMS/Saving/CampaignSession.cs` and feature-local saving helpers. Esc Save/Load and Campaign
+Continue use the selected profile's checkpoint; combat Save explains **Unavailable during combat**.
+Historical saving-unimplemented statements below are superseded. See `SYSTEMS/Saving/README.md`
+for field ownership, restored cargo/builders, original reward tickets and compatibility limits.
+Source/basic diff review completed; .NET/Godot build/runtime acceptance remains pending locally.
+
+---
+
 # Ammunition logistics — implemented
 
 `AmmunitionLogistics` is one world-owned Node2D in each World scene. Endpoints register/unregister directly; no scene-tree discovery or enemy scans occur. `AmmoDeliveryJob` holds source/destination, a separate finite cargo inventory, reserved incoming space and the visible drone.

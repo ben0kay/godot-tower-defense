@@ -1,3 +1,14 @@
+## Between-wave checkpoint integration — 2026-10-26
+
+S2/S3 now provide source-owned capture/restore seams for this feature through
+`SYSTEMS/Saving/CampaignSession.cs` and feature-local saving helpers. Esc Save/Load and Campaign
+Continue use the selected profile's checkpoint; combat Save explains **Unavailable during combat**.
+Historical saving-unimplemented statements below are superseded. See `SYSTEMS/Saving/README.md`
+for field ownership, restored cargo/builders, original reward tickets and compatibility limits.
+Source/basic diff review completed; .NET/Godot build/runtime acceptance remains pending locally.
+
+---
+
 ## Lightweight data-driven levels — implemented 2026-10-19
 
 Shared `LEVELS/Runtime/Battlefield.tscn` + `WORLD/World.tscn` replace per-level service copies. Existing Main launchers and World variants are thin compatibility shortcuts; F6 paths stay valid. Each level now has a MissionDefinition resource and the Campaign roster is `LEVELS/Catalog/DefaultMissionCatalog.tres`. Menu number/title/description/map are data, with a bounded scrollable mission list. New missions deploy/retry directly from their resource; no per-level launcher/world or menu/catalog code is required. Next advances only to the immediate enabled number.

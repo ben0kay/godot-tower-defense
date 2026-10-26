@@ -35,4 +35,12 @@ public sealed class CreditProductionTimer
     // =========================================================
     // New level/restart explicitly discards fractional progress from the previous session.
     public void Reset() => ElapsedSeconds = 0;
+
+    // =========================================================
+    // Checkpoint restore sets source state directly; callers validate before publishing the battlefield.
+    internal void RestoreSeconds(double seconds)
+    {
+        if (!double.IsFinite(seconds) || seconds < 0 || seconds >= CycleSeconds) throw new ArgumentOutOfRangeException(nameof(seconds));
+        ElapsedSeconds = seconds;
+    }
 }

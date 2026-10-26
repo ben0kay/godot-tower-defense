@@ -199,7 +199,7 @@ public partial class AmmunitionLogistics : Node2D
         { _delivering.Remove(job.Destination); if (Live(job.Destination)) UpdateRequest(job.Destination); }
         if (Live(job.Source)) job.Source.NotifyRuntimeChanged();
     }
-    private bool DestinationIsConsumer(AmmoDeliveryJob job) => _delivering.TryGetValue(job.Destination, out AmmoDeliveryJob active) && active == job;
+    private bool DestinationIsConsumer(AmmoDeliveryJob job) => job.Destination != null && _delivering.TryGetValue(job.Destination, out AmmoDeliveryJob active) && active == job;
 
     // =========================================================
     // Endpoint removal releases reservations and source slots; active callbacks cannot keep unloaded scenes alive.

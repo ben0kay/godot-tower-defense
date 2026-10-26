@@ -1,3 +1,14 @@
+## Between-wave checkpoint integration — 2026-10-26
+
+S2/S3 now provide source-owned capture/restore seams for this feature through
+`SYSTEMS/Saving/CampaignSession.cs` and feature-local saving helpers. Esc Save/Load and Campaign
+Continue use the selected profile's checkpoint; combat Save explains **Unavailable during combat**.
+Historical saving-unimplemented statements below are superseded. See `SYSTEMS/Saving/README.md`
+for field ownership, restored cargo/builders, original reward tickets and compatibility limits.
+Source/basic diff review completed; .NET/Godot build/runtime acceptance remains pending locally.
+
+---
+
 ## CD3 visual-only hologram polish — 2026-10-25
 
 Implemented scrolling scan bands, soft pulsing cyan beam, enlarged nozzle and footprint-centered glow in the existing pooled drone renderer. Added one central, capped 64-entry completion-flash renderer which emits a .28-second cyan ring only after a paid initial build completes successfully. There are no extra per-drone processing callbacks, new GPU emitters, scene nodes per flash, modifications to the work clock, flight speed, damage, placement, Inspector or research.

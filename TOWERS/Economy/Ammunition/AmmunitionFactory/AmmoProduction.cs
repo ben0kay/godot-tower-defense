@@ -41,4 +41,12 @@ public sealed class AmmoProduction
         ProgressSeconds = IsPaused ? 0 : Math.Max(0, total - batches * SecondsPerBatch);
         return produced;
     }
+
+    // =========================================================
+    // Checkpoint restore sets source state directly; callers validate before publishing the battlefield.
+    internal void RestoreSeconds(double seconds)
+    {
+        if (!double.IsFinite(seconds) || seconds < 0 || seconds >= SecondsPerBatch) throw new ArgumentOutOfRangeException(nameof(seconds));
+        ProgressSeconds = seconds;
+    }
 }

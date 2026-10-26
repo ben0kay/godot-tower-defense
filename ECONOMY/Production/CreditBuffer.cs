@@ -64,4 +64,12 @@ public sealed class CreditBuffer
         if (Current == 0) return;
         Current = 0; Changed?.Invoke(Current, Capacity);
     }
+
+    // =========================================================
+    // Checkpoint restore sets source state directly; callers validate before publishing the battlefield.
+    internal void RestoreAmount(int amount)
+    {
+        if (_collecting || amount < 0 || amount > Capacity) throw new ArgumentOutOfRangeException(nameof(amount));
+        Current = amount; Changed?.Invoke(Current, Capacity);
+    }
 }

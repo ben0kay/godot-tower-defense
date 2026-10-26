@@ -1,9 +1,10 @@
 // Explicit, dormant campaign storage: one current slot per profile, strict ownership and recoverable atomic writes.
-// This foundation does not serialize a battlefield or enable Continue/Save/Load. No Godot dependency or polling.
+// Only explicit caller requests perform I/O; there is no polling.
 using System;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 public sealed class CampaignStore
 {
@@ -12,7 +13,21 @@ public sealed class CampaignStore
     private readonly string _profilesRoot;
     private readonly object _gate = new();
     private static readonly JsonSerializerOptions Json = new()
-    { WriteIndented = true, UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow };
+    { WriteIndented = true, UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow, TypeInfoResolver = RequiredFields() };
+
+    // =========================================================
+    // Every typed checkpoint input is required, including meaningful zero/null fields; v1 envelope remains readable.
+    private static IJsonTypeInfoResolver RequiredFields()
+    {
+        var resolver = new DefaultJsonTypeInfoResolver();
+        resolver.Modifiers.Add(info =>
+        {
+            if (info.Type == typeof(CampaignData) || info.Kind != JsonTypeInfoKind.Object) return;
+            if (info.Type.Assembly != typeof(CampaignData).Assembly) return;
+            foreach (var property in info.Properties) if (property.Set != null) property.IsRequired = true;
+        });
+        return resolver;
+    }
     public string RecoveryMessage { get; private set; } = "";
 
     // =========================================================
@@ -75,9 +90,11 @@ public sealed class CampaignStore
     {
         if (value == null) throw new InvalidDataException("Missing campaign record.");
         ValidateId(value.ProfileId); ValidateId(value.CampaignId);
-        if (value.Version != 1 || value.ProfileId != profileId || value.CreatedUtc.Kind != DateTimeKind.Utc ||
+        if ((value.Version != 1 && value.Version != 2) || value.ProfileId != profileId || value.CreatedUtc.Kind != DateTimeKind.Utc ||
             value.SavedUtc.Kind != DateTimeKind.Utc || value.CreatedUtc == default || value.SavedUtc < value.CreatedUtc)
             throw new InvalidDataException("Unsupported, incomplete or incorrectly owned campaign record.");
+        if (value.Version == 1 && value.Checkpoint != null) throw new InvalidDataException("Unexpected checkpoint in metadata-only version.");
+        if (value.Checkpoint != null) SaveValidation.Validate(value.Checkpoint, profileId);
     }
 
     // =========================================================
@@ -92,9 +109,23 @@ public sealed class CampaignStore
         using JsonDocument document = JsonDocument.Parse(bytes);
         // Duplicate properties are ambiguous even when the JSON serializer otherwise accepts them.
         if (document.RootElement.ValueKind != JsonValueKind.Object) throw new InvalidDataException("Expected campaign object.");
-        var names = new System.Collections.Generic.HashSet<string>(StringComparer.Ordinal);
-        foreach (JsonProperty property in document.RootElement.EnumerateObject())
-            if (!names.Add(property.Name)) throw new InvalidDataException("Duplicate campaign property.");
+        void CheckDuplicates(JsonElement element)
+        {
+            if (element.ValueKind == JsonValueKind.Object)
+            {
+                var names = new System.Collections.Generic.HashSet<string>(StringComparer.Ordinal);
+                foreach (var property in element.EnumerateObject())
+                {
+                    if (!names.Add(property.Name)) throw new InvalidDataException("Duplicate checkpoint property.");
+                    CheckDuplicates(property.Value);
+                }
+            }
+            else if (element.ValueKind == JsonValueKind.Array) foreach (var item in element.EnumerateArray()) CheckDuplicates(item);
+        }
+        CheckDuplicates(document.RootElement);
+        if (document.RootElement.TryGetProperty("Version", out var version) && version.ValueKind == JsonValueKind.Number &&
+            version.TryGetInt32(out int format) && format == 2 && !document.RootElement.TryGetProperty("Checkpoint", out _))
+            throw new InvalidDataException("Missing checkpoint field.");
         CampaignData value = JsonSerializer.Deserialize<CampaignData>(bytes, Json);
         Validate(value, profileId);
         return value;

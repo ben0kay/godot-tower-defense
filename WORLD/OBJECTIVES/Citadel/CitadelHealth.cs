@@ -36,4 +36,12 @@ public partial class CitadelHealth : Node
         if (CurrentHealth == 0) Destroyed?.Invoke();
     }
     #endregion
+
+    // =========================================================
+    // Checkpoint restore sets source state directly; callers validate before publishing the battlefield.
+    internal void RestoreCurrent(int current)
+    {
+        if (current < 1 || current > MaxHealth) throw new ArgumentOutOfRangeException(nameof(current));
+        CurrentHealth = current; HealthChanged?.Invoke(CurrentHealth, MaxHealth);
+    }
 }

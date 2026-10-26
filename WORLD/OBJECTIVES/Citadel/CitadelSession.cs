@@ -76,7 +76,8 @@ public partial class CitadelSession : Node
         Health = Objectives[0].Health;
         if (Objectives.Count == 1) Health.HealthChanged += UpdateHud;
         _registry.EnemyArrived += OnEnemyArrived;
-        Research = ResearchService.CaptureDeployment();
+        Research = GetParent() is BattlefieldLauncher savedLauncher && savedLauncher.RestoringCampaign?.Checkpoint != null
+            ? ResearchDeployment.RestoreCheckpoint(savedLauncher.RestoringCampaign.Checkpoint.Research) : ResearchService.CaptureDeployment();
         foreach (var objective in Objectives)
         {
             objective.Health.Initialize(Research.CitadelMaximum(level.Settings.CitadelMaxHealth));
@@ -180,4 +181,30 @@ public partial class CitadelSession : Node
         if (GodotObject.IsInstanceValid(_hud)) _hud.SetCitadelHealth(current, maximum);
     }
     #endregion
+
+    // =========================================================
+    // Explicit checkpoint input/output, with no purchase or reward replay.
+    internal List<CitadelSaveData> CaptureCheckpoint()
+    {
+        var result = new List<CitadelSaveData>();
+        foreach (var o in Objectives) result.Add(new(o.Id, o.Health.CurrentHealth, _income[o].Buffer.Current, _income[o].Clock.ElapsedSeconds, _criticalLatched.Contains(o)));
+        return result;
+    }
+    internal void RestoreCheckpoint(List<CitadelSaveData> saved)
+    {
+        if (saved.Count != Objectives.Count) throw new System.IO.InvalidDataException("Citadel layout changed.");
+        foreach (var data in saved)
+        {
+            CitadelDestination objective = null;
+            foreach (var item in Objectives) if (item.Id == data.Id) objective = item;
+            if (objective == null) throw new System.IO.InvalidDataException("Saved Citadel is missing.");
+            // HUD updates remain live, but loading must not replay a previously fired critical-health alert.
+            var alertHandler = _criticalHandlers[objective]; objective.Health.HealthChanged -= alertHandler;
+            try { objective.Health.RestoreCurrent(data.Health); }
+            finally { objective.Health.HealthChanged += alertHandler; }
+            _income[objective].Buffer.RestoreAmount(data.Credits);
+            _income[objective].Clock.RestoreSeconds(data.ProductionSeconds);
+            if (data.CriticalLatched) _criticalLatched.Add(objective); else _criticalLatched.Remove(objective);
+        }
+    }
 }

@@ -87,4 +87,9 @@ public partial class ShockwaveTower : TowerBase
     // =========================================================
     // Preserve purple art while the generic selection state adds the established warm tint.
     public override void SetSelected(bool selected) => _sprite.Modulate = selected ? new Color(1f, .9f, .68f) : Colors.White;
+
+    // =========================================================
+    // Checkpoint restore sets source state directly; callers validate before publishing the battlefield.
+    internal override double CaptureWeaponCooldown() => _cooldown;
+    internal override void RestoreWeaponCooldown(double seconds) => _cooldown = (double)seconds;
 }

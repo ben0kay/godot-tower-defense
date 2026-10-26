@@ -58,4 +58,12 @@ public sealed class AmmoInventory
         Changed?.Invoke(); destination.Changed?.Invoke();
         return true;
     }
+
+    // =========================================================
+    // Checkpoint restore sets source state directly; callers validate before publishing the battlefield.
+    internal void RestoreAmount(int amount)
+    {
+        if (amount < 0 || amount > Capacity) throw new ArgumentOutOfRangeException(nameof(amount));
+        Amount = amount; Changed?.Invoke();
+    }
 }

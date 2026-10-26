@@ -1,14 +1,16 @@
-// Version-one campaign identity/metadata only. Battlefield snapshots arrive with S2's complete typed schema.
+// Versioned campaign identity and optional typed between-wave checkpoint.
 using System;
 using System.Text.Json.Serialization;
 
 public sealed record CampaignData
 {
-    [JsonRequired] public int Version { get; init; } = 1;
+    [JsonRequired] public int Version { get; init; } = 2;
     [JsonRequired] public string ProfileId { get; init; } = "";
     [JsonRequired] public string CampaignId { get; init; } = "";
     [JsonRequired] public DateTime CreatedUtc { get; init; }
     [JsonRequired] public DateTime SavedUtc { get; init; }
+
+    public LevelSaveData Checkpoint { get; init; }
 
     // =========================================================
     // Prepare metadata without writing files, selecting a campaign or reserving mission rewards.

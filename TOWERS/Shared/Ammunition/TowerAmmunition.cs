@@ -67,4 +67,10 @@ public sealed class TowerAmmunition
 
     public string Describe() => $"Ammo: {Inventory.Amount:N0} / {Inventory.Capacity:N0}\n" +
         (Inventory.Amount == 0 ? "Out of ammo — " : "") + (DeliveryInFlight ? "Resupply drone in flight" : ResupplyRequested ? "Resupply requested — waiting for stock/drone" : Inventory.Amount == 0 ? "Awaiting supply" : "Ammo ready");
+
+    // =========================================================
+    // Checkpoint restore sets source state directly; callers validate before publishing the battlefield.
+    internal double SavedBeamCredit => _beamCredit;
+    internal void RestoreCounters(long consumed, long discarded, double beamCredit)
+    { ConsumedRounds = consumed; DiscardedRounds = discarded; _beamCredit = beamCredit; }
 }

@@ -1,11 +1,11 @@
-## Campaign saving foundation — S0/S1 (2026-10-26)
+## Between-wave battlefield saves — S2/S3 (2026-10-26)
 
-Saving ownership and checkpoint requirements are audited. Typed campaign metadata and a safe,
-profile-owned store now exist with version/size validation, atomic writes and backup recovery.
-There are no gameplay callers yet: **battlefield saving, Continue and Pause Save/Load remain
-unavailable** until S2/S3. Combat explanation is specified as **Unavailable during combat**.
-See [saving plan](SYSTEMS/Saving/IMPLEMENTATION_PLAN.md) for cargo, construction, frozen research
-and original mission-ticket requirements. Build/runtime checks remain local; no extensive suite run.
+Esc Save/Load and profile Campaign Continue now connect to typed battlefield checkpoints. Save
+is disabled during combat with **Unavailable during combat**. Towers, work/builders, stock/cargo,
+production, wave/RNG progress, frozen research and original reward identity restore into a prepared
+paused battlefield. Profileless F6 remains supported. Content changes and retired reward tickets
+reject restoration explicitly. Source/diff review completed; **.NET/Godot build/runtime acceptance
+remains pending** in the local editor. See [saving](SYSTEMS/Saving/README.md).
 
 ---
 

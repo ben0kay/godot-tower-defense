@@ -228,4 +228,16 @@ public partial class WaveManager : Node
         Changed?.Invoke();
     }
     #endregion
+
+    // =========================================================
+    // Explicit checkpoint input/output, with no purchase or reward replay.
+    internal ulong SavedRandomState => _random.State;
+    internal void RestoreCheckpoint(int completed, ulong randomState)
+    {
+        if (completed < 0 || completed >= _waves.Length || _owned.Count != 0) throw new System.IO.InvalidDataException("Invalid wave checkpoint.");
+        CompletedWaves = completed; _waveIndex = completed - 1; _random.State = randomState;
+        State = completed == 0 ? WaveState.Ready : WaveState.Completed;
+        PlannedRemaining = PendingDeathSpawns = 0; _sequence = null; _countdown = 0;
+        SetPhysicsProcess(false); Publish();
+    }
 }
