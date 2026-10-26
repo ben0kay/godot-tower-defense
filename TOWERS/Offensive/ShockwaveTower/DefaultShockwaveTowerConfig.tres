@@ -3,4 +3,5 @@
 [ext_resource type="Resource" path="res://TOWERS/Offensive/ShockwaveTower/Effects/ShockwaveTowerStyle.tres" id="2"]
 [resource]
 script = ExtResource("1")
+HeatEnabled = true
 WaveStyle = ExtResource("2")
