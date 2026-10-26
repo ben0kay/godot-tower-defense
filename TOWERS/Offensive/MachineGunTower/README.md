@@ -1,3 +1,9 @@
+## HD4 heat (2026-10-26)
+
+The shipped Machine Gun config now enables shared heat: **2 minutes** of sustained shooting with continuous cooling, **10-second** recovery to 35% after overheating. It counts total successful bullets across both muzzles and uses the selected paid-level fire rate. Its 1,200-round reserve may require physical resupply to reach a full two-minute sustained run. Inspector Heat fields can disable or tune this without touching per-level damage/rate/price. Source-implemented; live runtime acceptance pending.
+
+---
+
 ## Shared C4 staged construction artwork — 2026-10-26
 
 The Machine Gun Tower now builds in **foundation (0%) → circular frame (35%) → twin-barrel assembly (70%) → completed tower (100%)**, using its own 64×64 SVGs in `Artwork/Construction/` and the same shared `TowerConstructionVisuals` presenter as Battle. Paid initial work remains **4 seconds**, beginning only after an available construction drone arrives and activates its beam. A composite construction overlay temporarily replaces the split finished base/gun; at completion the original fixed base, dual-muzzle gun and recoil resume unchanged. Selection tint applies to the construction overlay through the shared optional sprite path. Upgrades retain the existing finished look; optional Level2/3 artwork slots are empty. No new timers, per-frame callbacks, tower mechanics or tower-specific construction scripts were added.
