@@ -25,6 +25,9 @@ internal static class ConstructionArtChecks
         Sprite2D sprite = tower.GetNode<Sprite2D>(BattleTower.ConstructionSpritePath); var transform = sprite.Transform; Color tint = sprite.Modulate;
         var visual = tower.GetNode<TowerConstructionVisuals>("ConstructionVisuals");
         var clock = f.Main.GetNode<ConstructionWorkManager>("World/ConstructionWork");
+        var sites = f.Main.GetNode<ConstructionSiteHologram>("World/Effects/ConstructionSiteHolograms");
+        Require(sites.HasSite(tower) && sites.ActiveSites == 1 && sites.IsProcessing(),
+            "CV1 appears on paid foundation immediately before work, not on the placement ghost");
         var stats = tower.FinalStats; int revision = f.Spawns.Paths.Navigation.Grid.NavigationRevision;
         Require(sprite.Texture == Texture("stage0_foundation") && visual.TextureChanges == 1 && !tower.IsOperational, "Actual paid Battle shows foundation at Ready");
         for (int i = 0; i < 30; i++) clock.Advance(.03);
@@ -37,9 +40,12 @@ internal static class ConstructionArtChecks
         Require(sprite.Texture == Texture("stage2_assembly") && visual.TextureChanges == 3, "70% assembly stage");
         clock.Advance(.9); clock.Advance(100);
         Require(sprite.Texture == Original && visual.TextureChanges == 4 && tower.IsOperational && !visual.IsProcessing() && !visual.IsPhysicsProcessing(), "Completion restores unchanged final art once, with no presenter processing");
+        Require(!sites.HasSite(tower) && sites.ActiveSites == 0 && !sites.IsProcessing(),
+            "CV1 releases the completed site and sleeps without independent visuals");
         Require(sprite.Transform == transform && sprite.Modulate == tint && tower.FinalStats == stats && tower.RankProgress.TotalXp == 0
             && f.Wallet.GetBalance(f.Wallet.CreditsResource) == 800 && f.Spawns.Paths.Navigation.Grid.NavigationRevision == revision, "Art never changes placement, selection, stats, XP or payment");
         BattleTower direct = f.Add<BattleTower>("battle", new(2200, 2000));
+        Require(!sites.HasSite(direct) && !sites.IsProcessing(), "Direct operational instances have no CV1 site");
         Require(direct.GetNode<Sprite2D>(BattleTower.ConstructionSpritePath).Texture == Original && direct.GetNode<TowerConstructionVisuals>("ConstructionVisuals").TextureChanges == 0
             && direct.Config.ConstructionArt == tower.Config.ConstructionArt && direct.Config.Levels[0] != tower.Config.Levels[0], "Loaded art resources shared, mutable numeric rows private, direct instances remain finished");
         f.Hud.GetBuildButton("battle").EmitSignal(Button.SignalName.Pressed);

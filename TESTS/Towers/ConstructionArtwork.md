@@ -6,6 +6,12 @@ The focused `ConstructionArtChecks` includes a paid Machine Gun phase/selection/
 
 ---
 
+## CV1 construction-site visual registration — 2026-10-26
+
+The focused `ConstructionArtChecks` now verifies that a paid Battle initial work job registers a site in `World/Effects/ConstructionSiteHolograms` immediately, that the shared renderer sleeps after completion, and that direct operational instances do not spawn a site. Builder-held/queued work is covered by the same work manager's registration; visual acceptance and Godot execution are pending. The CV1 effect itself is documented at `TOWERS/Shared/Construction/Visuals/README.md`.
+
+---
+
 # C4 Battle-only construction artwork pilot
 
 **Implemented scope:** shared event-driven artwork presenter, Battle Tower stage SVGs, optional future per-level intermediate/finished images. **No sparks or construction VFX.** Real Factory/Depot/other tower stage assets are not enabled.

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ConstructionSiteVisualConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://TOWERS/Shared/Construction/Visuals/ConstructionSiteVisualConfig.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+Enabled = true
+RefreshHz = 24.0
+MaxVisibleSites = 128
+Tint = Color(0.25, 0.82, 1, 1)
+WaitingOpacity = 0.43
+BuildingOpacity = 0.68
+BlueprintOpacity = 0.13
+InsetPixels = 4.0
+CornerLength = 11.0
+RotationDegreesPerSecond = 18.0
+PerimeterCyclesPerSecond = 0.23
+PulseHz = 1.2
+PulseDepth = 0.14

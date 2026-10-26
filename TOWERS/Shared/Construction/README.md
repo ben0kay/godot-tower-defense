@@ -1,3 +1,9 @@
+## CV1 shared construction-site hologram — 2026-10-26
+
+The world-scoped `Effects/ConstructionSiteHolograms` renderer observes the existing paid initial-job registration lifecycle, including held/queued builder jobs and S2/S3 restores. Every unfinished site gets a blue footprint outline, moving perimeter light, translucent blueprint lines and rotating engineering rings; the effect intensifies once its drone releases the held work clock and vanishes immediately on unregistration. All tower types and 1×1/2×2/3×2 footprints share the same renderer and Inspector preset, regardless of whether the tower has authored C4 stage textures. There are no per-site nodes/updates or gameplay changes. Details/settings: [Visuals/README.md](Visuals/README.md).
+
+---
+
 ## C4 staged-art rollout to Machine Gun — 2026-10-26
 
 The same event-driven `TowerConstructionVisuals` presenter used by Battle now drives Machine Gun's distinct 64×64 foundation (0%), frame (35%) and twin-barrel assembly (70%) artwork during its existing 4-second paid initial build. The Machine Gun's split fixed base and recoiling turret are hidden only while the composite build stages show, then restored at completion; normal upgrades and direct operational scene instances retain the original finished artwork. Its `DefaultMachineGunTowerConfig.tres` references a dedicated, Inspector-editable `Artwork/Construction/MachineGunConstructionArt.tres`; Level2/Level3 upgrade-art slots remain empty. The shared projectile turret base optionally tints a construction sprite on selection without new polling. Authoring details: `../../Offensive/MachineGunTower/Artwork/Construction/README.md`.

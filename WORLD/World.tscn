@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3]
+[gd_scene load_steps=31 format=3]
 
 [ext_resource type="Script" path="res://WORLD/GRID/WorldGrid.cs" id="1_script"]
 [ext_resource type="Resource" path="res://WORLD/DefaultWorldConfig.tres" id="2_config"]
@@ -19,6 +19,8 @@
 [ext_resource type="PackedScene" path="res://DRONES/Transport/TransportDrone.tscn" id="13_drone"]
 
 [ext_resource type="Script" path="res://TOWERS/Shared/Construction/ConstructionWorkManager.cs" id="14_work"]
+[ext_resource type="Script" path="res://TOWERS/Shared/Construction/Visuals/ConstructionSiteHologram.cs" id="site_hologram"]
+[ext_resource type="Resource" path="res://TOWERS/Shared/Construction/Visuals/DefaultConstructionSiteVisualConfig.tres" id="site_hologram_config"]
 
 [ext_resource type="Script" path="res://LEVELS/Runtime/WorldMapLoader.cs" id="loader"]
 
@@ -61,6 +63,10 @@ z_index = 6
 
 [node name="Effects" type="Node2D" parent="."]
 z_index = 7
+
+[node name="ConstructionSiteHolograms" type="Node2D" parent="Effects"]
+script = ExtResource("site_hologram")
+Config = ExtResource("site_hologram_config")
 
 [node name="EnemySystems" type="Node" parent="."]
 

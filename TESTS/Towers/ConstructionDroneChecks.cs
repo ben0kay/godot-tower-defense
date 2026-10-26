@@ -65,6 +65,8 @@ public partial class ConstructionDroneChecks : Node
         Require(f.Wallet.GetBalance(f.Wallet.CreditsResource) == balance - cost && builders.PendingCount == 1 && builders.ActiveCount == 0,
             "Only funded commit queues drone; payment once");
         Require(tower.AwaitingConstructionDrone && !tower.IsOperational && clock.HeldCount == 1 && !clock.IsPhysicsProcessing(), "Held site sleeps in clock");
+        var sites = f.Main.GetNode<ConstructionSiteHologram>("World/Effects/ConstructionSiteHolograms");
+        Require(sites.HasSite(tower) && sites.ActiveSites == 1, "CV1 hologram exists while paid site is awaiting drone");
         var status = f.Hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Heading/WorkSection/Status");
         Require(status.Text == "AWAITING CONSTRUCTION DRONE", "Inspector distinguishes hold");
         var target = f.Target(tower.GlobalPosition + Vector2.Right * 80); int rounds = tower.Ammunition.Inventory.Amount;
@@ -86,7 +88,7 @@ public partial class ConstructionDroneChecks : Node
             builders.Releases == 1 && clock.HeldCount == 0, "Animated beam deployed before one release");
         Require(!tower.ReleaseConstructionDrone(builders, token), "Repeated arrival cannot release twice");
         clock.Advance(1); Require(tower.ElapsedWorkSeconds == 1 && !tower.IsOperational, "Ordinary clock starts after arrival");
-        clock.Advance(2); Require(tower.IsOperational && !drone.BeamVisible && builders.ActiveCount == 1 &&
+        clock.Advance(2); Require(tower.IsOperational && !sites.HasSite(tower) && !drone.BeamVisible && builders.ActiveCount == 1 &&
             flashes.ActiveCount == 1 && flashes.IsProcessing(), "Site completion flashes once independently of return");
         Return(builders);
         Require(flashes.ActiveCount == 1, "Returning or pooling the drone does not remove the site flash");

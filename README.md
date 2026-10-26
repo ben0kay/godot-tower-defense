@@ -1,3 +1,9 @@
+## CV1 shared construction-site holograms — 2026-10-26
+
+Every paid unfinished building now projects a cyan footprint bracket, travelling perimeter indicator and slowly rotating blueprint scanner, including sites **awaiting a queued Citadel builder**. One shared `World/Effects` renderer reads the existing work registration lifecycle, adjusts intensity when the drone releases its hold and sleeps when all construction finishes. Inspector tuning and footprint sizing: [CV1 visuals](TOWERS/Shared/Construction/Visuals/README.md). Desktop visual/performance review remains pending.
+
+---
+
 ## Between-wave battlefield saves — S2/S3 (2026-10-26)
 
 Esc Save/Load and profile Campaign Continue now connect to typed battlefield checkpoints. Save

@@ -17,6 +17,9 @@ public partial class ConstructionWorkManager : Node
     public int HeldCount => _held.Count;
     private int WorkingCount => _jobs.Count - _held.Count;
     public int LastJobsVisited { get; private set; }
+    // Cosmetic listeners observe paid initial jobs without affecting the authoritative clock.
+    public event Action<TowerBase> JobRegistered;
+    public event Action<TowerBase> JobUnregistered;
 
     #endregion
 
@@ -35,6 +38,7 @@ public partial class ConstructionWorkManager : Node
         _jobs.Add(tower, version);
         if (tower.AwaitingConstructionDrone) _held.Add(tower); else _waiting.Add(new(tower, version));
         SetPhysicsProcess(WorkingCount > 0);
+        PublishVisualEvent(JobRegistered, tower);
     }
 
     // =========================================================
@@ -49,10 +53,21 @@ public partial class ConstructionWorkManager : Node
     // In-flight entries become harmless tombstones; no mutation of an enumerated collection or per-frame copies.
     internal void Unregister(TowerBase tower)
     {
-        _jobs.Remove(tower); _held.Remove(tower);
+        bool removed = _jobs.Remove(tower); _held.Remove(tower);
+        if (removed) PublishVisualEvent(JobUnregistered, tower);
         SetPhysicsProcess(WorkingCount > 0);
         if (_jobs.Count != 0) return;
         SetPhysicsProcess(false); _waiting.Clear(); if (!_advancing) _batch.Clear();
+    }
+
+    // =========================================================
+    // Optional presentation callbacks must never fail a funded transaction or delay work completion.
+    private static void PublishVisualEvent(Action<TowerBase> listeners, TowerBase tower)
+    {
+        if (listeners == null) return;
+        foreach (Delegate listener in listeners.GetInvocationList())
+            try { ((Action<TowerBase>)listener)(tower); }
+            catch (Exception ex) { GD.PushWarning("Construction visual listener failed: " + ex.Message); }
     }
 
     #endregion
