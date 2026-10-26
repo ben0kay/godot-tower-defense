@@ -1,3 +1,9 @@
+## HD4 continuous beam heat (2026-10-26)
+
+The shipped Laser config now enables **3.5-minute** sustained damaging beam heat and **10-second** overheat recovery (35% restart). Calibrated to funded beam seconds, not the zero `ShotsPerSecond` placeholder; idle/lost-target intervals cool normally. Inspector Heat fields can change minutes/recovery or opt out. Existing DPS/energy response, ammo and attack rules are unchanged. Source-implemented; live runtime acceptance pending.
+
+---
+
 ## Laser shield preference — implemented 2026-10-18
 
 Laser configs now expose **Targeting → TargetPreference**, default **Shielded** (None opts out). This preference is separate from First/Last/Closest/Farthest/Strongest/Weakest: choose eligible in-range enemies with **CurrentShield > 0** first, apply the chosen mode within that group, and fall back to ordinary eligible targets when no preferred candidate qualifies. First/Last retain full remaining-journey distance across portals; Strongest/Weakest retain current hull + shield scoring and stable registration-order ties.
