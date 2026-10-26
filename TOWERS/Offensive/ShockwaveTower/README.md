@@ -1,3 +1,9 @@
+## HD4 pulse heat (2026-10-26)
+
+The shipped Shockwave config now enables approximately **3-minute** sustained emission heat and **12-second** recovery to 35%. The shared stat resolver uses each purchased wave's actual interval rather than zero `ShotsPerSecond`; each funded pulse charges once, including a pulse emitted without a current target. Inspector Heat fields can turn it off or retune it. Damage/wave mechanics, prices and ammo are unchanged. Source-implemented; runtime acceptance pending.
+
+---
+
 # Shockwave Tower — purple travelling energy pulse
 
 A real1×1 offensive tower registered as `shockwave` in DefaultTowerCatalog. Ctrl → Shockwave Tower → place on route-safe terrain. Generic placement, economy, build tray, selection/range ring, Inspector and paid upgrades service it without type switches.
