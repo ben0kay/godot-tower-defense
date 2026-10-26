@@ -1,3 +1,13 @@
+## Organic builders and credit-gain feedback — 2026-10-26
+
+Construction drones now accelerate/brake along curved flights, face travel, hover and reposition
+around buildings while beaming, then turn into a smooth return. Motion is checkpointed and stays
+inside the active-only shared manager. Credit-gain pulses peak 50% larger and last slightly longer.
+See TOWERS/ConstructionDrones/README.md and UI/GameplayHUD/TopBar/README.md. Source/diff review
+completed; local .NET/Godot/visual acceptance remains pending.
+
+---
+
 ## CV1 shared construction-site holograms — 2026-10-26
 
 Every paid unfinished building now projects a cyan footprint bracket, travelling perimeter indicator and slowly rotating blueprint scanner, including sites **awaiting a queued Citadel builder**. One shared `World/Effects` renderer reads the existing work registration lifecycle, adjusts intensity when the drone releases its hold and sleeps when all construction finishes. Inspector tuning and footprint sizing: [CV1 visuals](TOWERS/Shared/Construction/Visuals/README.md). Desktop visual/performance review remains pending.

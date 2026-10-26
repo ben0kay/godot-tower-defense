@@ -88,6 +88,7 @@ public static class SaveValidation
                 (builder.Tower.Length > 0 && !towerIds.Contains(builder.Tower)) ||
                 (builder.Phase == ConstructionDronePhase.Returning && builder.Tower.Length > 0) || (!builder.Queued && !data.Citadels.Any(c => c.Id == builder.HomeId)))
                 throw new InvalidDataException("Invalid saved builder.");
+            builder.Motion?.Validate();
             Point(builder.Home); Point(builder.Target); Point(builder.Position);
             Number(builder.HalfWidth); Number(builder.Hover); Number(builder.Height); Number(builder.Age); Number(builder.Deploy);
         }

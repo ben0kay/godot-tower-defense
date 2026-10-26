@@ -19,6 +19,15 @@ public partial class ConstructionDroneMasterConfig : Resource
     [Export(PropertyHint.Range, ".05,.5,.01")] public float BeamOpacity { get; set; } = .26f;
     [Export] public Color BeamColor { get; set; } = new(.2f, .9f, 1);
     #endregion
+    #region Organic Movement
+    [ExportGroup("Organic Movement")]
+    [Export(PropertyHint.Range, "0,400,1")] public float FlightCurvePixels { get; set; } = 100;
+    [Export(PropertyHint.Range, "30,720,5")] public float TurnDegreesPerSecond { get; set; } = 240;
+    [Export(PropertyHint.Range, "8,160,1")] public float OrbitRadius { get; set; } = 28;
+    [Export(PropertyHint.Range, "5,180,1")] public float OrbitDegreesPerSecond { get; set; } = 55;
+    [Export(PropertyHint.Range, ".05,10,.05")] public float HoverPauseMinimum { get; set; } = .6f;
+    [Export(PropertyHint.Range, ".05,15,.05")] public float HoverPauseMaximum { get; set; } = 1.4f;
+    #endregion
     #region CD3 Hologram Animation
     [Export(PropertyHint.Range, "0,8,1")] public int BeamScanBands { get; set; } = 4;
     [Export(PropertyHint.Range, "0,6,.1")] public float BeamScanCyclesPerSecond { get; set; } = 1.5f;

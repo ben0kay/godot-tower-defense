@@ -13,6 +13,7 @@ public partial class CreditGainIndicator : Label
     private double _elapsed, _pulseElapsed;
     private float _stackSeconds, _fadeSeconds, _risePixels, _pulseSeconds, _pulseScale;
     private bool _active;
+    private float _spendPulseScale, _spendPulseSeconds;
     #endregion
 
     #region Setup
@@ -33,6 +34,8 @@ public partial class CreditGainIndicator : Label
         _risePixels = Mathf.Max(0f, config.CreditRewardRisePixels);
         _pulseSeconds = Mathf.Max(0.01f, config.CreditRewardPulseSeconds);
         _pulseScale = Mathf.Max(1f, config.CreditRewardPulseScale);
+        _spendPulseScale = Mathf.Max(1f, config.CreditSpendPulseScale);
+        _spendPulseSeconds = Mathf.Max(.01f, config.CreditSpendPulseSeconds);
         _gainColor = config.CreditRewardColor;
         _spendColor = config.CreditSpendColor;
         AddThemeConstantOverride("outline_size", 2);
@@ -43,6 +46,7 @@ public partial class CreditGainIndicator : Label
     public void SetOrigin(Vector2 origin)
     {
         _origin = origin;
+        PivotOffset = new Vector2(0, GetCombinedMinimumSize().Y * .5f);
         RefreshVisuals();
     }
     #endregion
@@ -65,6 +69,7 @@ public partial class CreditGainIndicator : Label
             ? AccumulatedReward + amount : amount;
         IsExpense = expense;
         Text = expense ? $"(-{AccumulatedReward:N0})" : $"(+{AccumulatedReward:N0})";
+        PivotOffset = new Vector2(0, GetCombinedMinimumSize().Y * .5f);
         Color color = expense ? _spendColor : _gainColor;
         AddThemeColorOverride("font_color", color);
         AddThemeColorOverride("font_outline_color", new Color(color.R, color.G, color.B, 0.30f));
@@ -103,10 +108,12 @@ public partial class CreditGainIndicator : Label
     private void RefreshVisuals()
     {
         float fade = Mathf.Clamp((float)((_elapsed - _stackSeconds) / _fadeSeconds), 0f, 1f);
-        float pulse = Mathf.Clamp(1f - (float)(_pulseElapsed / _pulseSeconds), 0f, 1f);
+        float seconds = IsExpense ? _spendPulseSeconds : _pulseSeconds;
+        float scale = IsExpense ? _spendPulseScale : _pulseScale;
+        float pulse = Mathf.Clamp(1f - (float)(_pulseElapsed / seconds), 0f, 1f);
         pulse *= pulse;
         Position = _origin + Vector2.Up * (_risePixels * fade);
-        Scale = Vector2.One * (1f + (_pulseScale - 1f) * pulse);
+        Scale = Vector2.One * (1f + (scale - 1f) * pulse);
         SelfModulate = new Color(1f + pulse * 0.25f, 1f + pulse * 0.25f,
             1f + pulse * 0.25f, 1f - fade);
     }

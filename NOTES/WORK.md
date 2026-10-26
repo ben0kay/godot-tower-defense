@@ -1,3 +1,10 @@
+## 2026-10-26 — Organic builders and stronger credit gains
+
+- Shared builder manager now uses eased cubic outbound/return flight, travel-facing sprites, gentle hover and randomized eased orbit arcs with beam fixed on the site. Existing build/deployment clocks stay authoritative.
+- Added bounded Inspector movement controls and per-assignment plain state/PRNG; no navigation or additional per-drone processing. Saves retain live movement; older builder snapshots without Motion remain readable.
+- Increased positive top-left credit pulse 1.25× → 1.875× (50%) and .22s → .35s; separate spending settings retain prior pulse behavior. Hidden indicators still sleep.
+- Source/diff review only; no .NET/Godot executable here. Local visual/runtime verification pending; no extensive tests/profiling.
+
 ## 2026-10-26 — Saving S2/S3
 
 - Added typed v2 between-wave checkpoints and real shared-battlefield capture/restore through dormant CampaignSession.

@@ -40,10 +40,12 @@ public partial class UIMasterConfig : Resource
     [Export(PropertyHint.Range, "0.1,3,0.05")] public float CreditRewardStackSeconds { get; set; } = 0.8f;
     [Export(PropertyHint.Range, "0.1,2,0.05")] public float CreditRewardFadeSeconds { get; set; } = 0.5f;
     [Export(PropertyHint.Range, "0,12,1")] public float CreditRewardRisePixels { get; set; } = 4f;
-    [Export(PropertyHint.Range, "1,1.5,0.05")] public float CreditRewardPulseScale { get; set; } = 1.25f;
-    [Export(PropertyHint.Range, "0.05,0.5,0.05")] public float CreditRewardPulseSeconds { get; set; } = 0.22f;
+    [Export(PropertyHint.Range, "1,2.5,0.025")] public float CreditRewardPulseScale { get; set; } = 1.875f;
+    [Export(PropertyHint.Range, "0.05,0.5,0.05")] public float CreditRewardPulseSeconds { get; set; } = 0.35f;
     [Export] public Color CreditRewardColor { get; set; } = new Color("#69e4a3");
     [Export] public bool ShowCreditExpenses { get; set; } = true;
+    [Export(PropertyHint.Range, "1,2.5,0.025")] public float CreditSpendPulseScale { get; set; } = 1.25f;
+    [Export(PropertyHint.Range, "0.05,0.5,0.05")] public float CreditSpendPulseSeconds { get; set; } = .22f;
     [Export] public Color CreditSpendColor { get; set; } = new Color("#efbc62");
 
     [ExportGroup("Top Bar Reactions")]

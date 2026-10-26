@@ -77,6 +77,7 @@ public sealed record LogisticsSaveData
 }
 public sealed record BuilderSaveData
 {
+    public ConstructionDroneMotion Motion { get; init; }
     public string Tower { get; init; } = "";
     public string HomeId { get; init; } = "";
     public bool Queued { get; init; }

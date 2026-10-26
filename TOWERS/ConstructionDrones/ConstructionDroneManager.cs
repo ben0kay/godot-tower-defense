@@ -21,6 +21,7 @@ public partial class ConstructionDroneManager : Node2D
         public ConstructionDronePhase Phase;
         public Action Completed, Removed;
         public bool Cancelled;
+        public ConstructionDroneMotion Motion = new();
     }
     private readonly Dictionary<TowerBase, Assignment> _jobs = new();
     private readonly Queue<Assignment> _pending = new();
@@ -223,20 +224,33 @@ public partial class ConstructionDroneManager : Node2D
             if (job.Source == null || job.Drone == null)
             { Fallback(job); _retry = .25; break; }
             job.Home = LaunchPoint(job.Source); job.Position = job.Home;
+            InitializeMotion(job);
+            Vector2 center = job.Target + Vector2.Up * job.Height;
+            job.Motion.Heading = (job.Motion.OrbitPoint(center) - job.Home).Angle();
+            job.Motion.BeginFlight(job.Home, job.Motion.OrbitPoint(center), Vector2.Zero, job.Motion.Tangent(), Config);
             job.Phase = ConstructionDronePhase.Flying; job.Age = job.Deploy = 0;
             _active.Add(job); Present(job, 0);
         }
     }
     // =========================================================
-    // Clamped direct flight, with a short ease-out near the endpoint; excess tick time is never credited as construction.
-    private bool Fly(Assignment job, Vector2 target, float dt)
+    // Set up one bounded movement state per assignment; random choices do not touch global combat/wave RNG.
+    private void InitializeMotion(Assignment job)
     {
-        float distance = job.Position.DistanceTo(target), radius = ConstructionDroneMasterConfig.Safe(Config.ArrivalRadius, 8, 1, 24);
-        float speed = ConstructionDroneMasterConfig.Safe(Config.TravelSpeed, 420, 32, 2000);
-        float step = speed * Mathf.Clamp(distance / 64, .25f, 1) * dt;
-        job.Position = job.Position.MoveToward(target, step);
-        if (distance > step + radius) return false;
-        job.Position = target; return true;
+        job.Motion.RandomState = unchecked((uint)(job.Token * 747796405UL + 2891336453UL));
+        float radius = ConstructionDroneMasterConfig.Safe(Config.OrbitRadius, 28, 8, 160);
+        job.Motion.Radii = new(Mathf.Max(radius, job.HalfWidth * 1.15f), Mathf.Max(radius * .55f, job.Height * .3f));
+        job.Motion.Angle = -Mathf.Pi / 2 + Mathf.Lerp(-.8f, .8f, job.Motion.Random());
+        job.Motion.HoldSeconds = job.Motion.NextHold(Config);
+        job.Motion.BobPhase = job.Motion.Random() * Mathf.Tau;
+        job.Motion.HoverStart = SavePoint.From(job.Position); job.Motion.HoverBlend = 0;
+    }
+    // =========================================================
+    // Begin a curved return along the current motion before bending toward the Citadel; work is already finished.
+    private void BeginReturn(Assignment job)
+    {
+        Vector2 direction = job.Motion.Velocity.Vector();
+        if (direction.LengthSquared() < 1) direction = Vector2.FromAngle(job.Motion.Heading);
+        job.Motion.BeginFlight(job.Position, job.Home, direction, job.Home - job.Position, Config);
     }
     // =========================================================
     // Movement changes visuals/state only. The normal work clock is the only owner of elapsed build time.
@@ -250,9 +264,9 @@ public partial class ConstructionDroneManager : Node2D
             {
                 job.Source = NearestHome(job.Position);
                 if (job.Source == null) { job.Cancelled = true; return; }
-                job.Home = LaunchPoint(job.Source);
+                job.Home = LaunchPoint(job.Source); BeginReturn(job);
             }
-            if (Fly(job, job.Home, dt)) job.Cancelled = true;
+            if (job.Motion.Fly(dt, ref job.Position, Config)) job.Cancelled = true;
             Present(job, 0); return;
         }
         if (!GodotObject.IsInstanceValid(job.Tower) || job.Tower.IsDestroyed || job.Tower.IsQueuedForDeletion()) { Cancel(job); return; }
@@ -261,11 +275,15 @@ public partial class ConstructionDroneManager : Node2D
         Vector2 hover = job.Target + Vector2.Up * job.Height;
         if (job.Phase == ConstructionDronePhase.Flying)
         {
-            if (Fly(job, hover, dt)) job.Phase = ConstructionDronePhase.Deploying;
+            if (job.Motion.Fly(dt, ref job.Position, Config))
+            {
+                job.Phase = ConstructionDronePhase.Deploying;
+                job.Motion.HoverStart = SavePoint.From(job.Position); job.Motion.HoverBlend = 0;
+            }
             Present(job, 0); return;
         }
         job.Age += dt;
-        job.Position = hover + new Vector2(Mathf.Sin(job.Age * 1.6f) * job.Hover, Mathf.Cos(job.Age * 2) * job.Hover * .2f);
+        job.Motion.Hover(hover, job.Age, job.Hover, dt, ref job.Position, Config);
         float deployment = ConstructionDroneMasterConfig.Safe(Config.BeamDeploymentSeconds, .25f, 0, 1);
         if (job.Phase == ConstructionDronePhase.Deploying)
         {
@@ -281,12 +299,12 @@ public partial class ConstructionDroneManager : Node2D
     {
         if (job.Cancelled || job.Tower?.WorkPhase != TowerWorkPhase.Operational) return;
         _completionFlashes?.Spawn(job.Target, job.HalfWidth, Config);
-        Forget(job); job.Phase = ConstructionDronePhase.Returning;
+        Forget(job); job.Phase = ConstructionDronePhase.Returning; BeginReturn(job);
         if (GodotObject.IsInstanceValid(job.Drone)) Present(job, 0); else job.Cancelled = true;
     }
     // =========================================================
     // A fixed site center and bounded footprint-derived hover/beam make large factories use the same implementation.
-    private void Present(Assignment job, float strength) => job.Drone.Present(job.Position, job.Target, job.HalfWidth, strength, Config, job.Age);
+    private void Present(Assignment job, float strength) => job.Drone.Present(job.Position, job.Target, job.HalfWidth, strength, Config, job.Age, job.Motion.Heading);
     #endregion
 
     #region Disable and Teardown

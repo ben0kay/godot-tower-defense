@@ -1,3 +1,13 @@
+## More visible credit gains — 2026-10-26
+
+Positive credit-gain pulses now peak at 1.875× instead of 1.25× (50% larger) and decay over 0.35s
+instead of 0.22s. The popup scales about its left/vertical-center anchor. Stacking, fade and balance
+accounting are retained. Expense pulses have separate settings retaining 1.25× / 0.22s.
+Tune Credit Reward Feedback in UI/DefaultUIConfig.tres / UIMasterConfig.cs. Hidden feedback still stops
+processing. Source/diff review only; live small-window/large-balance appearance remains local.
+
+---
+
 ## CP1B: Citadel collection widgets (code implemented 2026-10-18; runtime validation pending)
 
 The original top-centre Citadel health area now includes a green stored Credits label/bar. Clicking that cell collects only the matching Citadel's saved income via `CitadelSession.TryCollectCredits`. The multi-Citadel row keeps individual health/credit meters side-by-side; each cell is clickable/focusable, and individual per-buffer events update amounts (no HUD polling). The clickable world Citadel routes through the existing tower placement input and displays the same buffer in its own green bar. A failed wallet grant does not empty the display. The single-Citadel legacy `Health` and `Bar` nodes remain for current integrations.

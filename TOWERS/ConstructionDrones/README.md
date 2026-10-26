@@ -1,3 +1,26 @@
+## Organic builder flight and orbit — 2026-10-26
+
+Builders now follow cubic flight paths with eased acceleration/braking, sprite-only travel heading,
+then hover and periodically glide to a randomized angle around an elevated footprint-sized ellipse.
+The beam remains fixed on the site while the sprite turns. Return flights bend along the departure
+heading toward the Citadel and brake on arrival. Work/deployment clocks retain their existing ownership;
+hover/orbit never interrupts construction. Actual travel time naturally follows the new flight path.
+
+`ConstructionDroneMotion.cs` is one small plain state per assignment, advanced by the same active-only
+manager. No navigation queries, per-drone ticks, tweens or extra visual nodes. Parked drones remain dormant.
+Settings are in DefaultConstructionDroneConfig.tres: curve 100px, turning 240°/s, minimum orbit radius
+28px (grows with footprint), orbit speed 55°/s, hover rests 0.6–1.4s. Bobbing uses independent stable phase;
+orbit choices use a per-assignment PRNG, never wave/combat randomness.
+
+Checkpoint capture retains curve controls/progress, heading, orbit/rest state and PRNG state. Older
+v2 builder records without Motion remain readable and blend from their saved pose into the new model;
+metadata checks still validate all supplied movement values. Existing content fingerprint rules apply.
+
+Validation: source review and diff checks only; .NET/Godot are unavailable here. Live flight/beam appearance,
+arrival, interruption/return and save-during-orbit verification remain local. No extensive suite/profiling run.
+
+---
+
 ## Between-wave checkpoint integration — 2026-10-26
 
 S2/S3 now provide source-owned capture/restore seams for this feature through

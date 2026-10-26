@@ -17,6 +17,7 @@ public partial class ConstructionDroneManager
         {
             if (j.Cancelled) return;
             result.Add(new() { Tower = j.Tower?.SaveId ?? "", HomeId = j.Source?.Id ?? "", Queued = queued, Phase = queued ? ConstructionDronePhase.Flying : j.Phase,
+                Motion = queued ? null : j.Motion.Copy(),
                 Home = SavePoint.From(j.Home), Target = SavePoint.From(j.Target), Position = SavePoint.From(j.Position),
                 HalfWidth = j.HalfWidth, Hover = j.Hover, Height = j.Height, Age = j.Age, Deploy = j.Deploy });
         }
@@ -51,7 +52,19 @@ public partial class ConstructionDroneManager
             else
             {
                 job.Drone = Rent() ?? throw new InvalidDataException("Saved builder visual could not be created.");
-                _active.Add(job); Present(job, saved.Phase == ConstructionDronePhase.Beaming ? 1 : 0);
+                if (saved.Motion != null) job.Motion = saved.Motion.Copy();
+                else
+                {
+                    // Older checkpoints keep their current pose and blend into the new movement model.
+                    InitializeMotion(job);
+                    job.Motion.Heading = (job.Home - job.Position).Angle();
+                    if (job.Phase == ConstructionDronePhase.Returning) BeginReturn(job);
+                    else job.Motion.BeginFlight(job.Position, job.Motion.OrbitPoint(job.Target + Vector2.Up * job.Height), Vector2.Zero, job.Motion.Tangent(), Config);
+                }
+                _active.Add(job);
+                float duration = ConstructionDroneMasterConfig.Safe(Config.BeamDeploymentSeconds, .25f, 0, 1);
+                float strength = saved.Phase == ConstructionDronePhase.Beaming ? 1 : saved.Phase == ConstructionDronePhase.Deploying ? (duration <= 0 ? 1 : Mathf.Min(1, job.Deploy / duration)) : 0;
+                Present(job, strength);
             }
         }
         foreach (var tower in towers.Values)
