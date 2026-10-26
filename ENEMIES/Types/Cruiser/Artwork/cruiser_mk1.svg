@@ -1,3 +1,89 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="168" height="96" viewBox="0 0 160 100">
-<defs><linearGradient id="plate" x1="0" y1="0" x2="0.2" y2="1"><stop stop-color="#566476"/><stop offset=".45" stop-color="#293240"/><stop offset="1" stop-color="#10151f"/></linearGradient></defs>
-<path d="M9 35L30 24 106 21 151 40 160 50 151 60 106 79 30 76 9 65Z" fill="url(#plate)" stroke="#8b98aa" stroke-width="1.5" stroke-linejoin="round"/><path d="M18 6L89 10 124 25 146 28 130 35 51 29 13 21Z" fill="url(#plate)" stroke="#8b98aa" stroke-width="1.5" stroke-linejoin="round"/><path d="M18 94L89 90 124 75 146 72 130 65 51 71 13 79Z" fill="url(#plate)" stroke="#8b98aa" stroke-width="1.5" stroke-linejoin="round"/><path d="M35 37L120 34 151 50 120 66 35 63Z" fill="url(#plate)" stroke="#8b98aa" stroke-width="1.5" stroke-linejoin="round"/><path d="M42 14l8 2v7l-8 -2ZM42 86l8 -2v-7l-8 2Z" fill="#9b303c" stroke="#29141e"/><path d="M42 40v20" stroke="#151a25" stroke-width="3"/><path d="M61 14l8 2v7l-8 -2ZM61 86l8 -2v-7l-8 2Z" fill="#9b303c" stroke="#29141e"/><path d="M61 40v20" stroke="#151a25" stroke-width="3"/><path d="M80 14l8 2v7l-8 -2ZM80 86l8 -2v-7l-8 2Z" fill="#9b303c" stroke="#29141e"/><path d="M80 40v20" stroke="#151a25" stroke-width="3"/><path d="M99 14l8 2v7l-8 -2ZM99 86l8 -2v-7l-8 2Z" fill="#9b303c" stroke="#29141e"/><path d="M99 40v20" stroke="#151a25" stroke-width="3"/><path d="M20 42v16M27 43v14" stroke="#e4494a" stroke-width="3"/><path d="M74 47L116 47 128 50 116 53 74 53Z" fill="#f34b56" stroke="#191c2b" stroke-width="2"/><path d="M48 36L70 34M48 64L70 66M112 33l12 4M112 67l12 -4" fill="none" stroke="#abb4c1" stroke-width="1.5"/></svg>
+  <!-- Cruiser (cruiser_mk1): +X capital ship. Flat layered charcoal plating and red/orange fleet markings. -->
+  <!-- Its long twin nacelles, reinforced central spine and broad prow preserve a capital-ship silhouette. -->
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <!-- Heavy detached upper/lower flanking nacelles and forward cutwater arms. -->
+    <path d="M7 13 20 4 43 7 71 9 101 13 126 22 149 23 140 32 115 38 81 32 46 30 17 26 9 28Z"
+          fill="#111920" stroke="#05080c" stroke-width="2.5"/>
+    <path d="M7 87 20 96 43 93 71 91 101 87 126 78 149 77 140 68 115 62 81 68 46 70 17 74 9 72Z"
+          fill="#111920" stroke="#05080c" stroke-width="2.5"/>
+    <!-- Upper and lower hard-angle armoured decks leave dark trenches around the midship. -->
+    <path d="M15 14 29 10 62 15 94 17 119 26 136 27 128 32 99 30 65 27 29 24Z"
+          fill="#2d343b" stroke="#080d12" stroke-width="1.4"/>
+    <path d="M15 86 29 90 62 85 94 83 119 74 136 73 128 68 99 70 65 73 29 76Z"
+          fill="#2d343b" stroke="#080d12" stroke-width="1.4"/>
+    <path d="M109 31 132 25 152 19 147 34 126 41 104 40Z"
+          fill="#131b22" stroke="#05090e" stroke-width="2"/>
+    <path d="M109 69 132 75 152 81 147 66 126 59 104 60Z"
+          fill="#131b22" stroke="#05090e" stroke-width="2"/>
+    <path d="M125 28 143 23 146 22 141 32 131 36 120 36Z"
+          fill="#33393f"/>
+    <path d="M125 72 143 77 146 78 141 68 131 64 120 64Z"
+          fill="#33393f"/>
+
+    <!-- Three large structural bays on each lateral engine spine. -->
+    <path d="M25 12 42 13 46 24 29 21Z M53 15 73 18 76 28 56 25Z M83 19 104 25 105 31 84 28Z"
+          fill="#171f27" stroke="#070b10" stroke-width="1.1"/>
+    <path d="M25 88 42 87 46 76 29 79Z M53 85 73 82 76 72 56 75Z M83 81 104 75 105 69 84 72Z"
+          fill="#171f27" stroke="#070b10" stroke-width="1.1"/>
+    <path d="M29 14 40 15 42 18 30 17Z M57 18 70 20 72 23 58 22Z M87 22 100 26 101 28 88 25Z"
+          fill="#ad2729"/>
+    <path d="M29 86 40 85 42 82 30 83Z M57 82 70 80 72 77 58 78Z M87 78 100 74 101 72 88 75Z"
+          fill="#ad2729"/>
+    <path d="M31 15 38 16 38 17 32 16Z M60 19 69 21 68 22 61 21Z M31 85 38 84 38 83 32 84Z M60 81 69 79 68 78 61 79Z"
+          fill="#f04a32"/>
+    <!-- Long under-nacelle graphite reinforcement rails. -->
+    <path d="M12 29 42 29 71 34 108 36 126 42 120 46 84 41 41 36 17 38Z"
+          fill="#0e151c" stroke="#060a0f" stroke-width="1.8"/>
+    <path d="M12 71 42 71 71 66 108 64 126 58 120 54 84 59 41 64 17 62Z"
+          fill="#0e151c" stroke="#060a0f" stroke-width="1.8"/>
+
+    <!-- Primary elongated, armoured fuselage; wider amidships than forward spear tip. -->
+    <path d="M13 39 32 33 66 32 97 35 124 39 157 50 124 61 97 65 66 68 32 67 13 61 21 50Z"
+          fill="#1e252c" stroke="#05090e" stroke-width="2.8"/>
+    <path d="M23 39 48 35 73 36 82 44 64 47 35 46Z"
+          fill="#31383f" stroke="#0b1117" stroke-width="1.5"/>
+    <path d="M23 61 48 65 73 64 82 56 64 53 35 54Z"
+          fill="#31383f" stroke="#0b1117" stroke-width="1.5"/>
+    <path d="M62 39 94 39 116 44 132 50 116 56 94 61 62 61 73 50Z"
+          fill="#101820" stroke="#060a0f" stroke-width="1.8"/>
+    <path d="M74 43 99 42 113 47 125 50 113 53 99 58 74 57 85 50Z"
+          fill="#293139" stroke="#0a1016" stroke-width="1.1"/>
+    <path d="M102 42 121 40 151 49 128 47 116 47Z"
+          fill="#0d151c" stroke="#05090e" stroke-width="1.6"/>
+    <path d="M102 58 121 60 151 51 128 53 116 53Z"
+          fill="#0d151c" stroke="#05090e" stroke-width="1.6"/>
+    <path d="M122 45 154 50 122 55 134 50Z" fill="#070d13"/>
+
+    <!-- Large inset command/reaction slit rather than a luminous gradient globe. -->
+    <path d="M89 46 109 45 131 50 109 55 89 54 100 50Z"
+          fill="#060a0e" stroke="#04070a" stroke-width="1.4"/>
+    <path d="M95 48 110 47 124 50 110 53 95 52 104 50Z"
+          fill="#a7242a"/>
+    <path d="M103 49 115 50 103 51 99 50Z" fill="#ff6039"/>
+    <path d="M139 47 155 50 139 53 145 50Z" fill="#aa262a"/>
+
+    <!-- Massive rear drive stacks with restrained orange-red exhaust bands. -->
+    <path d="M9 32 24 34 31 41 26 47 10 46 3 40Z"
+          fill="#0a1016" stroke="#030609" stroke-width="2"/>
+    <path d="M9 68 24 66 31 59 26 53 10 54 3 60Z"
+          fill="#0a1016" stroke="#030609" stroke-width="2"/>
+    <path d="M5 36 16 36 20 40 16 44 5 44Z M5 56 16 56 20 60 16 64 5 64Z"
+          fill="#a5272a"/>
+    <path d="M4 39 13 39 15 40 13 41 4 41Z M4 59 13 59 15 60 13 61 4 61Z"
+          fill="#ff5b37"/>
+    <path d="M15 39 23 39 24 42 17 43Z M15 61 23 61 24 58 17 57Z" fill="#323a42"/>
+
+    <!-- Block-like plating ribs and faction markers unique to a long capital hull. -->
+    <path d="M39 37 45 38 46 44 40 44Z M53 36 59 37 60 44 54 44Z M67 37 72 39 73 44 68 43Z"
+          fill="#101820"/>
+    <path d="M39 63 45 62 46 56 40 56Z M53 64 59 63 60 56 54 56Z M67 63 72 61 73 56 68 57Z"
+          fill="#101820"/>
+    <path d="M42 39 44 39 44 42 42 42Z M56 38 58 39 58 42 56 42Z M42 61 44 61 44 58 42 58Z M56 62 58 61 58 58 56 58Z"
+          fill="#b52a2b"/>
+    <path d="M77 38 88 40 93 43 80 42Z M77 62 88 60 93 57 80 58Z"
+          fill="#ad252a"/>
+    <path d="M82 40 88 41 89 42 83 41Z M82 60 88 59 89 58 83 59Z"
+          fill="#e54932"/>
+  </g>
+</svg>

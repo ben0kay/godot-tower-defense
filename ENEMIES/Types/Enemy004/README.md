@@ -1,3 +1,9 @@
+## Flat dark/red Bulwark artwork refresh — 2026-10-26
+
+The existing `Artwork/enemy004.svg` is now a **flat charcoal/black, red-accented** counterpart to Enemy001 and Enemy002. Its unique **64×48px broad tusked assault** silhouette remains medium/heavy rather than copying the small dart shapes: two reinforced outboard nacelles, sharp cleaving forward tusks, a bulky central hull, dark inset plates, twin rear drive ports and a narrow red core slit. No gradients, filters, runtime lights or glowing shader layers; the original SVG viewBox and right (+X) nose are preserved. The existing scene, `medium_mk1` ID, movement, hit radius, shields, combat and rewards are untouched. Earlier amber reactor/metallic-gradient artwork descriptions below are historical. Verify the sprite's appearance at normal gameplay zoom in Godot.
+
+---
+
 ## Current artwork — alien robotic pass (2026-10-18)
 
 **Tusked assault cruiser**, right-facing, native **64×48px**. Broad armored side nacelles, forward cleaving tusks, ribbed plates and an amber round reactor. Artwork only: stable identity, scenes, gameplay/ability settings and navigation clearance are unchanged. Earlier art/color descriptions below are historical. See `../ART_DIRECTION.md` for fleet-wide conventions and the review sheet.

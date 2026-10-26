@@ -1,3 +1,11 @@
+## Flat dark fleet substyle — 2026-10-26
+
+The current `Enemy001` and `Enemy002` redesigns are joined by `Enemy004` and `Cruiser/cruiser_mk1`. These four have a *deliberate consistent look*: solid charcoal armour (#111920, #1e252c, #30363c), thick almost-black recess/outline (#05080c), muted scarlet (#ad2729) and small orange-red drive/core details (#ff6039). **No baked gradients, reflection highlights, SVG filters, glow or particles** in these assets; each keeps its unique silhouette and its original native canvas/facing. This flat style supersedes earlier gradient-oriented descriptions **for these four ships only**; other fleet assets are unchanged pending a separate art pass.
+
+Enemy004 remains a **broad twin-nacelle tusked Bulwark**, 64×48, while Cruiser remains an **elongated capital ship with flanking nacelles and distinct propulsion bays**, 168×96. Collision/navigation footprint, scene path and authored definitions are independent of their new artwork.
+
+---
+
 # Alien machine fleet — hull art guide
 
 ![Enlarged inspection sheet](ARTWORK_PREVIEW.png)
