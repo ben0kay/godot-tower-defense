@@ -1,3 +1,13 @@
+## Shared space clear color — 2026-10-25
+
+The VE1 organic nebula pass deliberately removed the opaque rectangle from `WORLD/BACKGROUNDS/Stars/level001_space.svg`. All level scenes still reference this translucent SVG, but Godot's unspecified default viewport clear color made the uncovered space appear wrong or effectively blank.
+
+`project.godot` now sets `rendering/environment/defaults/default_clear_color` to **#080E1B** (the SVG's original deep-navy base). This is a single project-wide 2D viewport background; no per-level solid rectangles, scene nodes, runtime polling, or GPU overdraw are required. The existing static SVG, organic nebula fade, opt-in VE1 shader overlays, map terrain and z-order remain unchanged. To retint base space, change the one setting in **Project Settings → Rendering → Environment → Defaults → Default Clear Color**. A future explicitly configured Viewport/Environment background can override it.
+
+**Desktop check still required:** run Level001, Level002, Level020 and Level100, including camera pan/zoom and map edges; verify consistent dark navy behind stars with no rectangular seams. Toggle Level001's `VisualAtmosphere` off and reload to confirm the static starfield still has the correct base color.
+
+---
+
 ## VE2 energy structures — 2026-10-21
 
 EnergyFieldVisual.cs, EnergyFieldStyle.cs, Shaders/EnergyField.gdshader, Presets/PortalEnergy.tres, Presets/CitadelReactor.tres. The reusable shader selects a portal-vortex or reactor-core mode, with per-instance material parameters and optional event-only portal spawn flash. Inspector tune each preset. No 2D HDR/bloom setup, gameplay mechanics or new per-frame CPU hooks. VE5C bloom test removed as requested.
