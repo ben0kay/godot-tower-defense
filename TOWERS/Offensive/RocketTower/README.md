@@ -1,3 +1,9 @@
+## HD4 rocket heat (2026-10-26)
+
+The shipped Rocket config now enables approximately **4-minute** continuous firing heat and **12-second** recovery to 35%. It reuses its Blaster-derived Inspector heat policy but resolves heat against Rocket's own level-dependent rocket rate; Rocket settings stay independent of Blaster. Projectiles, splash, ammo and purchases are unchanged. Source-implemented; live runtime acceptance pending.
+
+---
+
 ## C4 staged construction artwork — 2026-10-26
 
 Rocket Tower now has 0% foundation, 35% structural frame and 70% incomplete weapon SVGs. The shared `TowerConstructionVisuals` replaces the finished split artwork only during paid initial building, restoring the original rotating/recoiling turret at 100%. Stage textures and thresholds live in `Artwork/Construction/RocketConstructionArt.tres` via the default config. Existing five-second construction (after Citadel drone arrival), CV1 site hologram, credits, firing, splash, damage and upgrade logic are unchanged. See [construction artwork notes](Artwork/Construction/README.md). Local Godot import and visual review pending.
