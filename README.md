@@ -1,3 +1,9 @@
+## Paid upgrades now disable towers; Battle Tower Level2/3 artwork — 2026-10-27
+
+Paid tower upgrades now suspend attacking/aiming/owner physics until the shared work clock finishes. The selected Inspector reports **DISABLED: UPGRADING** and retains progress/current stats; zero-duration upgrades remain instant. The Battle Tower alone pilots separate Level2/Level3 fixed-base and rotating-gun SVG pairs, plus a 35%-progress temporary upgrade scaffold. No new process loops, purchase/stat changes or loss of muzzle/recoil. Existing save work phases reconstruct the upgrade disable. Source implemented on `dev`; Godot/.NET, zoom and save-resume smoke checks pending. See [DU plan](TOWERS/Shared/Upgrades/UPGRADE_DISABLE_TIER_ART_PLAN.md).
+
+---
+
 ## Level003 blank map + four-wave Bulwark debut — 2026-10-27
 
 `LEVELS/Level003/` now contains a blank copy of LevelTemplate for user-painted terrain, a separate config and a four-wave `basic_mk1`/Enemy001, `scout_mk1`/Enemy002 and `medium_mk1`/Enemy004 recipe. Enemy004 starts in wave 3; authored totals are 18/22/26/32. Enabled in Campaign as the immediate Next after Level002. The template portal/Citadel may be moved; **paint a walkable path before trying combat**. See [Level003](LEVELS/Level003/README.md). Source-only validation; Godot/.NET run pending.

@@ -6,10 +6,13 @@ using System.Collections.Generic;
 public partial class TowerConstructionVisuals : Node
 {
     [Export] public NodePath SpritePath { get; set; } = new();
+    [Export] public NodePath FinishedBaseSpritePath { get; set; } = new();
+    [Export] public NodePath FinishedGunSpritePath { get; set; } = new();
     [Export] public Godot.Collections.Array<NodePath> FinishedVisualPaths { get; set; } = new();
     private readonly List<CanvasItem> _finished = new();
     private TowerBase _tower;
-    private Sprite2D _sprite;
+    private Sprite2D _sprite, _baseSprite, _gunSprite;
+    private Texture2D _originalBase, _originalGun;
     private TowerConstructionArt _art;
     private Texture2D _original;
     private bool _watchingProgress;
@@ -26,6 +29,9 @@ public partial class TowerConstructionVisuals : Node
         _tower = GetParent() as TowerBase;
         _sprite = SpritePath.IsEmpty ? null : GetNodeOrNull<Sprite2D>(SpritePath);
         if (_tower == null || _sprite == null) return;
+        _baseSprite = FinishedBaseSpritePath.IsEmpty ? null : GetNodeOrNull<Sprite2D>(FinishedBaseSpritePath);
+        _gunSprite = FinishedGunSpritePath.IsEmpty ? null : GetNodeOrNull<Sprite2D>(FinishedGunSpritePath);
+        _originalBase = _baseSprite?.Texture; _originalGun = _gunSprite?.Texture;
         if (FinishedVisualPaths != null) foreach (NodePath path in FinishedVisualPaths)
         {
             CanvasItem layer = path.IsEmpty ? null : GetNodeOrNull<CanvasItem>(path);
@@ -36,7 +42,7 @@ public partial class TowerConstructionVisuals : Node
     }
 
     // =========================================================
-    // Existing art resolver remains the sole threshold/tier authority; normal upgrades keep old-tier visuals/firing.
+    // Existing art resolver remains the sole threshold/tier authority; paid work keeps the old tier until completion.
     private void Refresh()
     {
         if (!GodotObject.IsInstanceValid(_tower) || !GodotObject.IsInstanceValid(_sprite)) return;
@@ -46,6 +52,9 @@ public partial class TowerConstructionVisuals : Node
             if (busy) _tower.WorkProgressChanged += Refresh; else _tower.WorkProgressChanged -= Refresh;
             _watchingProgress = busy;
         }
+        // Apply tier-specific split art before resolving the optional monolithic construction overlay.
+        if (_baseSprite != null) _baseSprite.Texture = _art?.FinishedBaseTexture(_tower.UpgradeLevel, _originalBase) ?? _originalBase;
+        if (_gunSprite != null) _gunSprite.Texture = _art?.FinishedGunTexture(_tower.UpgradeLevel, _originalGun) ?? _originalGun;
         Texture2D finished = _art?.FinishedTexture(_tower.UpgradeLevel, _original) ?? _original;
         Texture2D texture = _tower.WorkPhase switch
         {
@@ -81,6 +90,8 @@ public partial class TowerConstructionVisuals : Node
             {
                 _sprite.Texture = _art?.FinishedTexture(_tower.UpgradeLevel, _original) ?? _original;
                 ShowLayers(_sprite.Texture, false);
+                if (GodotObject.IsInstanceValid(_baseSprite)) _baseSprite.Texture = _art?.FinishedBaseTexture(_tower.UpgradeLevel, _originalBase) ?? _originalBase;
+                if (GodotObject.IsInstanceValid(_gunSprite)) _gunSprite.Texture = _art?.FinishedGunTexture(_tower.UpgradeLevel, _originalGun) ?? _originalGun;
             }
         }
         _watchingProgress = false; PresentationChanged = null; _finished.Clear();

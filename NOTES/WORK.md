@@ -1,3 +1,9 @@
+## 2026-10-27 — DU1/DU2 paid-upgrade disabling and Battle tier art pilot
+
+`TowerWorkPhase.Upgrading` now acts as an event-published derived disable reason and owner-physics suspension across tower types, preserving the independently paused work manager, existing HP/occupancy/logistics, latest rank when committing, other disable causes, and save/restore. Selected HUD shows `DISABLED: UPGRADING` even on heatless towers. Existing Battle C4 construction presenter now supports optional finished split base/gun tier textures; shipped 64px Level2 and Level3 upgraded SVG pairs and tier-specific 35%-progress scaffolds in `BattleTower/Artwork/Upgrades/`. Old Level1 art and muzzle/recoil hierarchy unchanged. Focused regression expectations updated; .NET/Godot and desktop visuals **not run** in this environment. [Plan](../TOWERS/Shared/Upgrades/UPGRADE_DISABLE_TIER_ART_PLAN.md). Target `dev`, not `main`.
+
+---
+
 ## 2026-10-27 — Level003 template copy and four-wave encounter
 
 Added `LEVELS/Level003/`: an independent **blank** template map (all four TileMapLayers unpainted), local config, four-wave Enemy001/Enemy002/Enemy004-only recipe, and enabled MissionDefinition. 18/22/26/32 totals, Enemy004 arrives wave 3, 1,200 Credits, 1,000 Citadel HP; one template portal and one Citadel remain movable. Registered Level003 after Level002; Next from 002 now points to003, with no next 004. Updated the mission/catalog/result-navigation regression expectations. **The user must paint a connected passable route before enemy spawning is possible.** No engine/build/headless run; static resource/source review only. Developed for `dev`, not `main`.

@@ -1,3 +1,9 @@
+## DU1 upgrading is a built-in disable reason (2026-10-27)
+
+A timed paid `TowerWorkPhase.Upgrading` now appears as the derived `TowerDisableReason.Upgrading` in `IsDisabled`, the selected HUD reason list and shared `CanOperate` / `CanAttack` gating. The independent work clock continues while weapon/owner physics sleeps; completion resumes unless another disable remains. No `TowerConditions` node/handle is created for this work-owned reason, no extra serialized DisableSaveData entry exists, and explicitly calling `ApplyDisable(Upgrading)` is rejected. Restored upgrades remain disabled from their saved phase. Pre-existing instructions that upgrades keep firing are superseded. [Plan](../Upgrades/UPGRADE_DISABLE_TIER_ART_PLAN.md).
+
+---
+
 ## HD4 — additional forgiving heat profiles (2026-10-26)
 
 The shared HD1–HD3 condition/overheat clock now serves five more default-enabled offensive presets. **Timing is a target under sustained funded attacks with continuous passive cooling**, not a guaranteed wall-clock shutdown if the target dies, ammo runs out or a tower stops firing.

@@ -1,3 +1,9 @@
+## DU2 purchased-level split artwork (2026-10-27)
+
+A tower can now opt into separate finished base and rotating/recoiling gun sprites via `TowerLevelArtwork.FinishedBaseTexture` / `FinishedGunTexture` and the construction presenter's optional split NodePaths. Battle uses this for paid levels 2 and 3, and an intermediate composite upgrade overlay at 35% progress. The presenter remains entirely event-driven, old monolithic `FinishedTexture` and `UpgradeTexture` fallbacks still work, initial C4 construction artwork is unaffected, and non-participating towers need no extra nodes. [Plan](../Upgrades/UPGRADE_DISABLE_TIER_ART_PLAN.md).
+
+---
+
 ## C4 construction-art rollout to Blaster Cannon and Rocket Tower — 2026-10-26
 
 Both splash towers now reuse the Battle/Machine Gun event-driven staged artwork at 0%, 35% and 70%, finishing with their existing original base and recoiling gun at 100%. Each has its own 64×64 SVGs and Inspector construction art resource with empty future-level art slots. Five-second build duration, Citadel drone holding, CV1 site hologram, selection, weapons, prices and upgrades are unchanged. Local Godot visual check pending. See each `TOWERS/Offensive/{BlasterCannon,RocketTower}/Artwork/Construction/README.md`.

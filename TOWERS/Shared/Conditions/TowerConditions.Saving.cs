@@ -27,6 +27,7 @@ public partial class TowerConditions
         _entries.Clear(); _overheat = default; Heat = heat;
         foreach (var entry in entries)
         {
+            if (entry.Reason == TowerDisableReason.Upgrading) throw new InvalidDataException("Upgrade disabling is derived from saved work, not a stored condition.");
             long token = ++_next;
             _entries.Add(new() { Token = token, Reason = entry.Reason, Remaining = entry.Remaining, Source = sourceId(entry.Source) });
             if (entry.Reason == TowerDisableReason.Overheated && overheated) _overheat = new(_owner.GetInstanceId(), token);

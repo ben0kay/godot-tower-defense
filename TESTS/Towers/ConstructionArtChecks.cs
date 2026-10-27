@@ -12,7 +12,7 @@ internal static class ConstructionArtChecks
     // Exercise real paid placement and optional per-level slots without modifying authored balance/art resources.
     internal static void Run(Node runner)
     {
-        Build(runner); MachineGunBuild(runner); BlasterAndRocketBuild(runner); DataAndFallback(runner); Upgrade(runner); GeometryAndCleanup(runner);
+        Build(runner); MachineGunBuild(runner); BlasterAndRocketBuild(runner); DataAndFallback(runner); Upgrade(runner); BattleTierSprites(runner); GeometryAndCleanup(runner);
         GD.Print("PASS: Battle/Machine Gun/Blaster/Rocket build SVG0/35/70/final, split gun return, selection, no repeat writes/polling, optional upgrade/final art, fallback/isolation, pause/ghost and rectangular geometry");
     }
 
@@ -157,9 +157,10 @@ internal static class ConstructionArtChecks
         var clock = f.Main.GetNode<ConstructionWorkManager>("World/ConstructionWork");
         Require(TowerUpgradeController.TryUpgrade(tower, f.Wallet, f.Placement.Settings, 1, out _) && sprite.Texture == Original, "Upgrade begins with old completed artwork");
         clock.Advance(1.9); Require(sprite.Texture == Original, "No intermediate image before its configured threshold");
-        clock.Advance(.1); Require(sprite.Texture == Texture("stage1_frame") && tower.UpgradeLevel == 1 && tower.IsOperational, "One optional intermediate image does not change old-tier operation");
+        clock.Advance(.1); Require(sprite.Texture == Texture("stage1_frame") && tower.UpgradeLevel == 1 && tower.IsDisabled, "Intermediate art does not resume a disabled upgrade");
         f.Target(tower.GlobalPosition + new Vector2(0, -64)); tower._PhysicsProcess(1);
-        Require(tower.Ammunition.Inventory.Amount == 999 && sprite.GetParent<Node2D>().Rotation == 0, "Working turret still aims/fires during optional transition art");
+        Require(tower.Ammunition.Inventory.Amount == 1000 && sprite.GetParent<Node2D>().Rotation == 0 && !tower.CanAttack,
+            "Upgrade art displays while weapon aiming/firing remains suspended");
         clock.Advance(2); Require(sprite.Texture == Texture("stage2_assembly") && tower.UpgradeLevel == 2, "Final level2 image applies at actual completion");
         Require(sprite.Visible && !tower.GetNode<Sprite2D>("BaseSprite").Visible && !tower.GetNode<Node2D>("TurretPivot/RecoilRoot").Visible
             && !tower.GetNode<TowerRecoilController>("Recoil").Active, "Custom composite art shows alone and suspends split recoil");
@@ -170,6 +171,43 @@ internal static class ConstructionArtChecks
         f.Wallet.Initialize(new LevelConfig { StartingCredits = 1000 });
         Require(TowerUpgradeController.TryUpgrade(instant, f.Wallet, f.Placement.Settings, 1, out _)
             && instant.GetNode<Sprite2D>(BattleTower.ConstructionSpritePath).Texture == Texture("stage2_assembly"), "Zero-duration upgrade art synchronizes immediately");
+    }
+
+    // =========================================================
+    // Shipped Battle artwork switches temporary upgrade scaffold to independently rotating base/gun sprites.
+    private static void BattleTierSprites(Node runner)
+    {
+        using AmmoLoopFixture f = new(runner);
+        BattleTower tower = f.Add<BattleTower>("battle", new Vector2(2300, 2200));
+        Sprite2D basis = tower.GetNode<Sprite2D>("BaseSprite");
+        Sprite2D gun = tower.GetNode<Sprite2D>(BattleTower.GunSpritePath);
+        Sprite2D overlay = tower.GetNode<Sprite2D>(BattleTower.ConstructionSpritePath);
+        Node2D recoilRoot = tower.GetNode<Node2D>("TurretPivot/RecoilRoot");
+        Marker2D muzzle = tower.GetNode<Marker2D>(BattleTower.MuzzlePath);
+        var clock = f.Main.GetNode<ConstructionWorkManager>("World/ConstructionWork");
+        string prefix = "res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/";
+        Require(tower.UpgradeLevel == 1 && basis.Visible && recoilRoot.Visible && !overlay.Visible,
+            "Unupgraded Battle tower retains its split original artwork");
+        for (int level = 2; level <= 3; level++)
+        {
+            Require(TowerUpgradeController.TryUpgrade(tower, f.Wallet, f.Placement.Settings, level - 1, out _)
+                && tower.IsDisabled && !tower.CanAttack && !tower.IsPhysicsProcessing(),
+                "Upgrade suspends the real weapon at level " + level);
+            int rounds = tower.Ammunition.Inventory.Amount;
+            tower._PhysicsProcess(1);
+            Require(rounds == tower.Ammunition.Inventory.Amount, "Disabled upgrade never spends ammo");
+            clock.Advance(level == 2 ? 1.5 : 1.9);
+            Require(overlay.Visible && !basis.Visible && !recoilRoot.Visible
+                && overlay.Texture == GD.Load<Texture2D>(prefix + "battle_upgrade_l" + level + ".svg"),
+                "Level " + level + " displays upgrade-in-progress scaffold after 35%");
+            clock.Advance(level == 2 ? 2.5 : 3.1);
+            Require(tower.UpgradeLevel == level && !tower.IsDisabled && tower.CanAttack && tower.IsPhysicsProcessing()
+                && basis.Visible && recoilRoot.Visible && !overlay.Visible
+                && basis.Texture == GD.Load<Texture2D>(prefix + "battle_base_l" + level + ".svg")
+                && gun.Texture == GD.Load<Texture2D>(prefix + "battle_gun_l" + level + ".svg"),
+                "Level " + level + " resumes with distinct fixed base and rotating/recoiling gun sprites");
+            Require(muzzle.Position == new Vector2(0, -28.5f), "Tier art never shifts the actual barrel-tip muzzle");
+        }
     }
 
     // =========================================================

@@ -417,7 +417,7 @@ public partial class GameplayHUD : Control
         bool valid = GodotObject.IsInstanceValid(tower) && !_buildPreview;
         HeatStats? heat = valid ? tower.FinalStats?.Heat : null;
         bool disabled = valid && tower.IsDisabled;
-        _conditionSection.Visible = heat.HasValue;
+        _conditionSection.Visible = heat.HasValue || disabled;
         _heatText.Visible = _heatBar.Visible = heat.HasValue;
         _disableReasons.Visible = disabled;
         if (!valid) return;

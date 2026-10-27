@@ -127,6 +127,8 @@ public abstract partial class TowerBase : Node2D
         try { manager.Register(this); } catch (InvalidOperationException) { return false; }
         _construction = manager; WorkPhase = TowerWorkPhase.Upgrading; PendingUpgradeLevel = next.Level;
         WorkSeconds = next.WorkSeconds; ElapsedWorkSeconds = _lastWorkNotice = 0;
+        // Suspend weapon/production callbacks while the independent shared work clock runs.
+        SetPhysicsProcess(false);
         return true;
     }
 
@@ -137,7 +139,7 @@ public abstract partial class TowerBase : Node2D
         if (!IsInsideTree() || IsQueuedForDeletion()) return;
         UpgradePurchased?.Invoke();
         if (!GodotObject.IsInstanceValid(this) || !IsInsideTree() || IsQueuedForDeletion()) return;
-        if (WorkPhase == TowerWorkPhase.Upgrading) WorkStarted?.Invoke();
+        if (WorkPhase == TowerWorkPhase.Upgrading) { PublishDisableChanged(); WorkStarted?.Invoke(); }
         else if (instant)
         {
             NotifyStatsChanged();
@@ -199,7 +201,7 @@ public abstract partial class TowerBase : Node2D
     // =========================================================
     // Ready records normal capability processing once; unfinished structures have no weapon/production ticks.
     protected void SetOperationalPhysicsProcess(bool enabled)
-    { _operationalPhysics = enabled; SetPhysicsProcess(enabled && IsOperational); }
+    { _operationalPhysics = enabled; SetPhysicsProcess(enabled && WorkPhase == TowerWorkPhase.Operational && !IsDestroyed); }
 
     // =========================================================
     // Exact boundary tolerance prevents an extra physics frame after sums such as120 increments of1/60.
@@ -215,7 +217,12 @@ public abstract partial class TowerBase : Node2D
             if (upgrading) { UpgradeLevel = PendingUpgradeLevel; FinalStats = upgraded; }
             ElapsedWorkSeconds = WorkSeconds; WorkPhase = TowerWorkPhase.Operational; PendingUpgradeLevel = 0;
             _construction = null; manager.Unregister(this);
-            if (upgrading) NotifyStatsChanged();
+            if (upgrading)
+            {
+                NotifyStatsChanged();
+                if (GodotObject.IsInstanceValid(this) && IsInsideTree() && !IsQueuedForDeletion())
+                { SetPhysicsProcess(_operationalPhysics); PublishDisableChanged(); }
+            }
             else { SetPhysicsProcess(_operationalPhysics); OnBecameOperational(); }
             // A stat/inventory observer may have removed this building during activation.
             if (GodotObject.IsInstanceValid(this) && IsInsideTree() && !IsQueuedForDeletion()) WorkCompleted?.Invoke();

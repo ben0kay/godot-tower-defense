@@ -63,7 +63,7 @@ public static class SaveValidation
             if (tower.Disables.Count(d => d.Reason == TowerDisableReason.Overheated) != (tower.Overheated ? 1 : 0)) throw new InvalidDataException("Invalid overheat latch.");
             foreach (var disable in tower.Disables)
             {
-                if (!Enum.IsDefined(disable.Reason) || disable.Source == null || disable.Source.Length > 256) throw new InvalidDataException("Invalid disable source.");
+                if (!Enum.IsDefined(disable.Reason) || disable.Reason == TowerDisableReason.Upgrading || disable.Source == null || disable.Source.Length > 256) throw new InvalidDataException("Invalid disable source.");
                 if (disable.Remaining.HasValue) { Number(disable.Remaining.Value); if (disable.Remaining == 0) throw new InvalidDataException("Expired disable in checkpoint."); }
             }
         }
