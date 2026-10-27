@@ -95,6 +95,9 @@ public partial class ConstructionDroneChecks : Node
         var scanLayer = beam.GetNode<ConstructionBeamScan>("ScanLines");
         Require(coneLayer.Transform == scanLayer.Transform && scanLayer.RedrawRequests == beam.ScanRedrawRequests,
             "Cached cone and animated scans share the identical moving source/target transform");
+        Require(coneLayer.Material is ShaderMaterial coneMaterial && coneMaterial.Shader != null &&
+            coneMaterial.Shader.ResourcePath.EndsWith("ConstructionBeamGradient.gdshader"),
+            "Cached projection uses shared CanvasItem gradient material rather than stacked polygon passes");
         Require(!tower.ReleaseConstructionDrone(builders, token), "Repeated arrival cannot release twice");
         clock.Advance(1); Require(tower.ElapsedWorkSeconds == 1 && !tower.IsOperational, "Ordinary clock starts after arrival");
         clock.Advance(2); Require(tower.IsOperational && !sites.HasSite(tower) && !drone.BeamVisible && builders.ActiveCount == 1 &&

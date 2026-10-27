@@ -1,3 +1,13 @@
+## Smooth shader projection — 2026-10-27
+
+The construction-drone cone now uses **one cached four-vertex polygon**, rather than drawing three superimposed translucent polygons with distinct sharp boundaries. `ConstructionBeamGradient.gdshader` provides a continuous cyan falloff across its width with fragment-level `smoothstep` and pixel-derivative edge feathering. The nozzle remains brighter, while ground contact keeps a visible (but slightly softer) center. There is no texture render-to-cache, low-resolution viewport, noise, `TIME`, shader animation, or texture lookup.
+
+The shared `ShaderMaterial` is attached to the `Cone` scene node; **no per-drone material copies or per-frame shader parameter writes** are needed. The beam's existing cached per-vertex tint/opacity and CanvasItem deployment alpha still work. Its four-point geometry redraws only on footprint/style changes; hovering moves the same affine transform. Animated scan bands remain a separate aligned child, capped at 24 Hz; ground/nozzle glows remain cached. Construction, drone movement, opt-in ShowVisuals, pooling, pause/save, and the 280 px/s flight default are unchanged.
+
+Performance expectations: this replaces three polygon fills plus edge strokes with one fill and one small shader, but GPU pixels still render each frame; FPS improvement is not guaranteed until measured. The viewport's pixel scaling/zoom can still expose individual pixels at low resolution. Desktop acceptance: compare beams at normal gameplay zoom, 1×1 and 3×2 construction, and three overlapping beam sites; check Godot shader import and F4 timings. Source/test references updated; no extensive runtime suite executed.
+
+---
+
 ## Seamless projection polish — 2026-10-27
 
 A user screenshot showed a washed-out/broken middle to the construction projection. The earlier cone ended at just **15% of its source opacity**, while the 24-Hz scan bands were rebuilt in the beam parent and the cone followed the drone through a different CanvasItem transform.

@@ -1,62 +1,41 @@
-// One seamless, softly feathered projection cone. Canvas commands are cached between style/footprint changes.
-// The parent changes its transform while a drone hovers; the cone never rebuilds because an endpoint moves.
+// One cached four-vertex construction-beam cone with a shared lightweight CanvasItem gradient.
+// The shader feathers edges per pixel; only the parent transform moves during hovering, not its geometry.
 using Godot;
 
 public partial class ConstructionBeamCone : Node2D
 {
-    #region Cached Beam Shape
-    private readonly Vector2[] _fringe = new Vector2[4], _body = new Vector2[4], _core = new Vector2[4];
-    private readonly Color[] _fringeColors = new Color[4], _bodyColors = new Color[4], _coreColors = new Color[4];
+    #region Cached Beam Geometry
+    private readonly Vector2[] _vertices = new Vector2[4];
+    private readonly Color[] _colors = new Color[4];
+    private readonly Vector2[] _uvs = { new(0, 0), new(1, 0), new(1, 1), new(0, 1) };
     private float _width = -1, _opacity = -1;
     private Color _tint;
     public int GeometryRefreshes { get; private set; }
 
     // =========================================================
-    // Unit-height geometry uses exactly the same endpoint basis as animated scan lines.
-    // The body stays legible at the ground instead of fading to almost zero halfway through.
+    // The continuous full-length shape remains cached while the drone moves.
+    // Vertex alpha keeps the beam gently tapered in brightness from nozzle to target.
     public void Configure(float halfWidth, Color tint, float opacity)
     {
         if (Mathf.IsEqualApprox(_width, halfWidth) && Mathf.IsEqualApprox(_opacity, opacity) && _tint == tint) return;
         _width = halfWidth; _tint = tint; _opacity = opacity;
-        SetQuad(_fringe, 5f, _width + 6f);
-        SetQuad(_body, 3f, _width);
-        SetQuad(_core, 1.5f, Mathf.Max(3f, _width * .30f));
-        SetColors(_fringeColors, .20f * opacity, .13f * opacity);
-        SetColors(_bodyColors, .75f * opacity, .58f * opacity);
-        SetColors(_coreColors, .65f * opacity, .43f * opacity);
+        _vertices[0] = new(-5f, 0); _vertices[1] = new(5f, 0);
+        _vertices[2] = new(_width + 6f, 1); _vertices[3] = new(-_width - 6f, 1);
+        _colors[0] = _colors[1] = new(_tint.R, _tint.G, _tint.B, _opacity * 1.45f);
+        _colors[2] = _colors[3] = new(_tint.R, _tint.G, _tint.B, _opacity * 1.12f);
         GeometryRefreshes++;
         QueueRedraw();
     }
-
-    // =========================================================
-    // A single continuous tapered quadrilateral at each opacity, with no stacked lengthwise segments.
-    private static void SetQuad(Vector2[] points, float top, float bottom)
-    {
-        points[0] = new(-top, 0); points[1] = new(top, 0);
-        points[2] = new(bottom, 1); points[3] = new(-bottom, 1);
-    }
-
-    // =========================================================
-    // Independent vertex alpha creates a shallow vertical fade without a ground-level transparency gap.
-    private void SetColors(Color[] colors, float top, float bottom)
-    {
-        colors[0] = colors[1] = new(_tint.R, _tint.G, _tint.B, top);
-        colors[2] = colors[3] = new(_tint.R, _tint.G, _tint.B, bottom);
-    }
     #endregion
 
-    #region Cached Rendering
+    #region One Cached Draw Command
     // =========================================================
-    // Wide feather, uninterrupted main fill and restrained inner energy channel; no hard neon wedge borders.
+    // UVs feed the shared shader's smooth horizontal falloff. No overlapped hard-edged polygons,
+    // animated shader uniforms, CPU recomposition, or per-tick draw commands.
     public override void _Draw()
     {
         if (_width <= 0) return;
-        DrawPolygon(_fringe, _fringeColors);
-        DrawPolygon(_body, _bodyColors);
-        DrawPolygon(_core, _coreColors);
-        Color rim = new(_tint.R, _tint.G, _tint.B, .17f);
-        DrawLine(_body[0], _body[3], rim, .9f, true);
-        DrawLine(_body[1], _body[2], rim, .9f, true);
+        DrawPolygon(_vertices, _colors, _uvs);
     }
     #endregion
 }
