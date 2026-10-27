@@ -1,3 +1,9 @@
+## 2026-10-27 — CD4 drone-assisted upgrades and two-stage tier artwork
+
+Source change on `dev`: paid nonzero-duration upgrades use the existing capped, pooled Citadel construction drone and pre-registered work hold; the payment callback queues flight, beam deploy releases the reservation, and the ordinary work clock begins. Towers stay `DISABLED: UPGRADING` and the selected HUD now says `AWAITING UPGRADE DRONE → tier` until release. Battle now authors separate 35%/70% in-progress SVGs for Level2 and Level3 through reusable `TowerLevelArtwork.UpgradeStages`, followed by the existing split base/recoil artwork. Per-master `ServiceUpgrades` can opt out; save/restore of held and beaming upgrades uses the existing format. Focused source regression expectations updated. No .NET/Godot builds or desktop visual acceptance performed. [Plan](../TOWERS/Shared/Upgrades/UPGRADE_DISABLE_TIER_ART_PLAN.md).
+
+---
+
 ## 2026-10-27 — DU1/DU2 paid-upgrade disabling and Battle tier art pilot
 
 `TowerWorkPhase.Upgrading` now acts as an event-published derived disable reason and owner-physics suspension across tower types, preserving the independently paused work manager, existing HP/occupancy/logistics, latest rank when committing, other disable causes, and save/restore. Selected HUD shows `DISABLED: UPGRADING` even on heatless towers. Existing Battle C4 construction presenter now supports optional finished split base/gun tier textures; shipped 64px Level2 and Level3 upgraded SVG pairs and tier-specific 35%-progress scaffolds in `BattleTower/Artwork/Upgrades/`. Old Level1 art and muzzle/recoil hierarchy unchanged. Focused regression expectations updated; .NET/Godot and desktop visuals **not run** in this environment. [Plan](../TOWERS/Shared/Upgrades/UPGRADE_DISABLE_TIER_ART_PLAN.md). Target `dev`, not `main`.
