@@ -42,7 +42,7 @@ public partial class ConstructionDroneManager
             if (saved.HomeId.Length > 0 && job.Source == null) throw new InvalidDataException("Saved builder home is missing.");
             if (tower != null)
             {
-                if (tower.WorkPhase != TowerWorkPhase.Constructing || tower.AwaitingConstructionDrone != (saved.Queued || saved.Phase != ConstructionDronePhase.Beaming))
+                if (!tower.IsBusy || tower.AwaitingConstructionDrone != (saved.Queued || saved.Phase != ConstructionDronePhase.Beaming))
                     throw new InvalidDataException("Saved builder/work phase mismatch.");
                 job.Completed = () => Completed(job); job.Removed = () => Cancel(job);
                 _jobs.Add(tower, job); tower.WorkCompleted += job.Completed; tower.TreeExiting += job.Removed; tower.Destroyed += job.Removed;
@@ -68,7 +68,7 @@ public partial class ConstructionDroneManager
             }
         }
         foreach (var tower in towers.Values)
-            if (tower.AwaitingConstructionDrone && !_jobs.ContainsKey(tower)) throw new InvalidDataException("Saved construction hold has no builder.");
+            if (tower.AwaitingConstructionDrone && !_jobs.ContainsKey(tower)) throw new InvalidDataException("Saved paid work hold has no builder.");
         _retry = retry; SetPhysicsProcess(_active.Count > 0 || _pending.Count > 0);
     }
 }
