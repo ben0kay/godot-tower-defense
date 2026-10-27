@@ -14,4 +14,4 @@ Both custom pairs are assigned as `FinishedBaseTexture` and `FinishedGunTexture`
 
 Edit Level2/Level3 textures through `DefaultBattleTowerConfig.tres → Construction Artwork → Level Artwork`. Keep different purchased levels independent from combat *Levels.cs and rank art (ranks are a different system). If a tier texture is missing, the presenter preserves the nearest earlier finished split texture. Other towers currently need no changes.
 
-Related: [shared upgrade pass](../../../Shared/Upgrades/UPGRADE_DISABLE_TIER_ART_PLAN.md) · [C4 initial construction](../Construction/README.md). Smoke-check scale, pivot rotation, muzzle, recoil and save/resume locally in Godot.
+Related: [shared upgrade pass](../../../../Shared/Upgrades/UPGRADE_DISABLE_TIER_ART_PLAN.md) · [C4 initial construction](../Construction/README.md). Smoke-check scale, pivot rotation, muzzle, recoil and save/resume locally in Godot.
