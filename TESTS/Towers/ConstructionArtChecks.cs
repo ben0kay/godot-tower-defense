@@ -157,9 +157,10 @@ internal static class ConstructionArtChecks
         var clock = f.Main.GetNode<ConstructionWorkManager>("World/ConstructionWork");
         Require(TowerUpgradeController.TryUpgrade(tower, f.Wallet, f.Placement.Settings, 1, out _) && sprite.Texture == Original, "Upgrade begins with old completed artwork");
         clock.Advance(1.9); Require(sprite.Texture == Original, "No intermediate image before its configured threshold");
-        clock.Advance(.1); Require(sprite.Texture == Texture("stage1_frame") && tower.UpgradeLevel == 1 && tower.IsOperational, "One optional intermediate image does not change old-tier operation");
+        clock.Advance(.1); Require(sprite.Texture == Texture("stage1_frame") && tower.UpgradeLevel == 1 && tower.IsDisabled, "Intermediate art does not resume a disabled upgrade");
         f.Target(tower.GlobalPosition + new Vector2(0, -64)); tower._PhysicsProcess(1);
-        Require(tower.Ammunition.Inventory.Amount == 999 && sprite.GetParent<Node2D>().Rotation == 0, "Working turret still aims/fires during optional transition art");
+        Require(tower.Ammunition.Inventory.Amount == 1000 && sprite.GetParent<Node2D>().Rotation == 0 && !tower.CanAttack,
+            "Upgrade art displays while weapon aiming/firing remains suspended");
         clock.Advance(2); Require(sprite.Texture == Texture("stage2_assembly") && tower.UpgradeLevel == 2, "Final level2 image applies at actual completion");
         Require(sprite.Visible && !tower.GetNode<Sprite2D>("BaseSprite").Visible && !tower.GetNode<Node2D>("TurretPivot/RecoilRoot").Visible
             && !tower.GetNode<TowerRecoilController>("Recoil").Active, "Custom composite art shows alone and suspends split recoil");
