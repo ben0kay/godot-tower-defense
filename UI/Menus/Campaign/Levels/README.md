@@ -1,6 +1,6 @@
 ## Level003 registered for map design (2026-10-27)
 
-The Campaign roster now includes enabled `Level003Mission.tres`, built from unpainted `LevelTemplate.tscn`. Level002's Next advances to this mission; Level003 has no immediate enabled Level004, so it does not skip to Level020. Four waves use Enemy001/Enemy002, then Enemy004 beginning in wave 3. **The map is deliberately unpainted and cannot run a real combat route until connected passable tiles are authored**; see [Level003](../../../Level003/README.md) for map editing and wave counts. No menu or runtime copies were added.
+The Campaign roster now includes enabled `Level003Mission.tres`, built from unpainted `LevelTemplate.tscn`. Level002's Next advances to this mission; Level003 has no immediate enabled Level004, so it does not skip to Level020. Four waves use Enemy001/Enemy002, then Enemy004 beginning in wave 3. **The map is deliberately unpainted and cannot run a real combat route until connected passable tiles are authored**; see [Level003](../../../../LEVELS/Level003/README.md) for map editing and wave counts. No menu or runtime copies were added.
 
 ---
 
