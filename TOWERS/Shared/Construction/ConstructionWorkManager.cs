@@ -17,7 +17,7 @@ public partial class ConstructionWorkManager : Node
     public int HeldCount => _held.Count;
     private int WorkingCount => _jobs.Count - _held.Count;
     public int LastJobsVisited { get; private set; }
-    // Cosmetic listeners observe paid initial jobs without affecting the authoritative clock.
+    // Cosmetic listeners observe paid construction and upgrade jobs without affecting the authoritative clock.
     public event Action<TowerBase> JobRegistered;
     public event Action<TowerBase> JobUnregistered;
 
