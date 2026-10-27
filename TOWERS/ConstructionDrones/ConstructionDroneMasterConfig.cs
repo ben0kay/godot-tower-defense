@@ -6,6 +6,8 @@ public partial class ConstructionDroneMasterConfig : Resource
     #region Feature and Dispatch
     [Export] public bool Enabled { get; set; } = true;
     [Export] public bool ShowVisuals { get; set; } = true;
+    // Apply the same Citadel drone arrival gate to paid nonzero-duration upgrades.
+    [Export] public bool ServiceUpgrades { get; set; } = true;
     [Export] public bool RequireDroneToBuild { get; set; }
     [Export(PropertyHint.Range, "1,64,1")] public int MaxActiveDrones { get; set; } = 8;
     [Export(PropertyHint.Range, "1,16,1")] public int DispatchesPerTick { get; set; } = 4;
