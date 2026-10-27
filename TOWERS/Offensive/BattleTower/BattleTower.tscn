@@ -33,6 +33,8 @@ texture = ExtResource("3_art")
 [node name="ConstructionVisuals" type="Node" parent="."]
 script = ExtResource("4_construction")
 SpritePath = NodePath("../TurretPivot/ConstructionSprite")
+FinishedBaseSpritePath = NodePath("../BaseSprite")
+FinishedGunSpritePath = NodePath("../TurretPivot/RecoilRoot/Sprite")
 FinishedVisualPaths = Array[NodePath]([NodePath("../BaseSprite"), NodePath("../TurretPivot/RecoilRoot")])
 
 [node name="Recoil" type="Node" parent="."]
