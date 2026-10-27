@@ -1,3 +1,18 @@
+## CD4 extension — builder-assisted upgrades (implemented source 2026-10-27)
+
+The next approved pass extends **DU1/DU2** using the existing `ConstructionDroneManager` and `TowerWorkPhase.Upgrading`, rather than a second upgrade clock or standalone builder. It is source-implemented on `dev`; Godot/.NET build and visual acceptance pending.
+
+- A successful paid **nonzero-duration** upgrade creates a builder hold before registering work; only the **post-payment** notification enqueues the flight. No transaction or reservation occurs for rejected/instant upgrades.
+- Tower remains disabled from payment until the existing timed upgrade finishes. Work progress starts at zero and stays frozen while the drone flies/deploys; on cyan beam activation, its reservation is released once. Completion commits the purchased tier, resumes the tower and sends the same drone home; the return never delays shooting.
+- The existing builder dispatch cap/FIFO/nearest-Citadel/pool/fallback/hover/beam applies equally to initial builds and upgrades. `DefaultConstructionDroneConfig.tres → ServiceUpgrades` is the enabled-by-default opt-out. No per-tower physics polling or new currency. No new initial construction stage is shown during an upgrade.
+- Shared `TowerLevelArtwork.UpgradeStages` optionally contains several thresholds; Battle Level2 and Level3 each show intermediate composite SVGs at **35%** and **70%**, retaining the prior finished tier until the first step and switching to the new split fixed base/gun at 100%. Existing single `UpgradeTexture` remains compatible with other towers.
+- The established `Held` bit and `BuilderSaveData` are reused for mid-upgrade checkpoints. Loader validation now accepts held `Upgrading` jobs, verifies that corresponding drone assignments exist, and preserves the exact resumed progress. Beaming upgrades save as active work with a builder that is already deployed.
+- HUD exposes `AWAITING UPGRADE DRONE → N`, `UPGRADING → N` and existing `DISABLED: UPGRADING`. The ordinary work bar remains the only upgrade bar; all other disable/heat policies persist independently.
+
+Scope deliberately leaves upgrades as the **same paid work durations** (e.g. Battle 4s/5s after beam) and still subject to work pause. Existing regression tests use a builder-disabled fixture when testing independent upgrade timing. Manual acceptance: buy Battle L1→L2 and L2→L3, verify launch/deploy, frozen timer, 35/70/final SVG stages, return, and save/load in flight and beaming; turn `ServiceUpgrades` off and confirm original behavior.
+
+---
+
 # Upgrade disabling and purchased-level artwork — DU1/DU2
 
 **Status (2026-10-27): DU1 and DU2 implemented in source on `dev`; local .NET/Godot and visual acceptance pending.** This plan belongs in `TOWERS/Shared/Upgrades/` because paid work, the disable policy and tier visuals apply to all tower types. Battle is the art pilot; the authored art lives under its own `Artwork/Upgrades/` folder.
