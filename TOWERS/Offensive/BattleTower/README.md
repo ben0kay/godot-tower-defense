@@ -1,3 +1,9 @@
+## CD4 — upgrade drone arrives before the Battle upgrade clock (2026-10-27)
+
+The same Citadel drone that builds a new Battle Tower now flies out again for its 1→2 and 2→3 paid upgrades. After the paid click the existing disabled tower waits, without accruing upgrade seconds; at beam deployment it progresses through two distinct in-progress artwork steps at 35% and 70%, then switches to the completed split tier sprites at 100%. The beam shuts off and the drone returns while the upgraded turret resumes its old recoil/aiming behavior. Starting build artwork, levels, prices and damage are unchanged. Local in-editor testing pending. [Artwork](Artwork/Upgrades/README.md).
+
+---
+
 ## Battle paid-upgrade disable and visual tiers — 2026-10-27
 
 During Level1→2 and Level2→3 paid work, the Battle Tower immediately enters the shared **Upgrading** disabled reason, stops firing/aiming/recoil and suspends its owner physics callback. At 35% progress an upgrade-in-progress blueprint/scaffold sprite replaces the finished split artwork. When the 4s/5s work respectively finishes, a visually upgraded **fixed base + rotating/recoiling gun** Level2/3 SVG pair takes over, with unchanged actual single-barrel muzzle, range, stats, ammo and prices. The existing level1 SVGs and C4 initial-build stages remain intact; save/load derives the disabled state from the persisted work phase. Source implemented, visual/runtime test pending. Settings/assets: [Artwork/Upgrades](Artwork/Upgrades/README.md). Architecture: [shared plan](../../Shared/Upgrades/UPGRADE_DISABLE_TIER_ART_PLAN.md).
