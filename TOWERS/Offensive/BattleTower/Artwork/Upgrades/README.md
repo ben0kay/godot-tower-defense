@@ -1,3 +1,9 @@
+## CD4 — two upgrade assembly images while the drone beams (2026-10-27)
+
+Each paid Battle upgrade now waits for a construction drone. The prior tier stays drawn while the drone travels. As soon as its beam is fully deployed, the ordinary **4s Level2 / 5s Level3** work bar starts; the composite upgrades at **35%** (`battle_upgrade_l2.svg` or `battle_upgrade_l3.svg`) and again at **70%** (`battle_upgrade_l2_70.svg` or `battle_upgrade_l3_70.svg`). The 70% artwork has partially assembled upgraded bracing/core details, visually distinct from the earlier scaffold. At 100%, the correct separate fixed base and rotating/recoiling gun textures are restored. The existing Level1 initial-build foundation/frame/gun steps are **not** used for an already-built tower. Configure or replace milestone textures in `../Construction/BattleConstructionArt.tres`; the shared `UpgradeStages` array accepts more thresholds. [Shared CD4 plan](../../../../Shared/Upgrades/UPGRADE_DISABLE_TIER_ART_PLAN.md).
+
+---
+
 # Battle Tower — purchased-level upgrade art (DU2)
 
 **Source-implemented 2026-10-27; Godot appearance review pending.** All assets are 64×64 upward-facing SVGs matching the original centered `battle_base.svg` and `battle_gun.svg`, with the same single muzzle at local (0, -28.5) under `TurretPivot/RecoilRoot/Muzzles/MuzzleA`.
