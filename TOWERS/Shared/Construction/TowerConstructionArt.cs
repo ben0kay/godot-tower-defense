@@ -30,6 +30,28 @@ public partial class TowerConstructionArt : Resource
     }
 
     // =========================================================
+    // Independent tier layers retain the nearest completed sprite for levels with no authored replacement.
+    public Texture2D FinishedBaseTexture(int level, Texture2D original)
+    {
+        int best = 0;
+        if (LevelArtwork != null) foreach (TowerLevelArtwork art in LevelArtwork)
+            if (art?.FinishedBaseTexture != null && art.Level > best && art.Level <= level)
+            { best = art.Level; original = art.FinishedBaseTexture; }
+        return original;
+    }
+
+    // =========================================================
+    // Rotating/recoiling gun art follows the same fallback policy without changing muzzle node placement.
+    public Texture2D FinishedGunTexture(int level, Texture2D original)
+    {
+        int best = 0;
+        if (LevelArtwork != null) foreach (TowerLevelArtwork art in LevelArtwork)
+            if (art?.FinishedGunTexture != null && art.Level > best && art.Level <= level)
+            { best = art.Level; original = art.FinishedGunTexture; }
+        return original;
+    }
+
+    // =========================================================
     // Only the exact purchased target may show its optional intermediate image; old-tier mechanics stay independent.
     public Texture2D UpgradeTexture(int level, double progress, Texture2D fallback)
     {
