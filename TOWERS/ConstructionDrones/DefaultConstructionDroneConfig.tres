@@ -4,6 +4,7 @@
 script = ExtResource("1")
 Enabled = true
 ShowVisuals = true
+ServiceUpgrades = true
 RequireDroneToBuild = false
 TravelSpeed = 280.0
 BeamScanBands = 4
