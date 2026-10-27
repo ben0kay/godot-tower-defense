@@ -1,3 +1,9 @@
+## 2026-10-27 — Level003 template copy and four-wave encounter
+
+Added `LEVELS/Level003/`: an independent **blank** template map (all four TileMapLayers unpainted), local config, four-wave Enemy001/Enemy002/Enemy004-only recipe, and enabled MissionDefinition. 18/22/26/32 totals, Enemy004 arrives wave 3, 1,200 Credits, 1,000 Citadel HP; one template portal and one Citadel remain movable. Registered Level003 after Level002; Next from 002 now points to003, with no next 004. Updated the mission/catalog/result-navigation regression expectations. **The user must paint a connected passable route before enemy spawning is possible.** No engine/build/headless run; static resource/source review only. Developed for `dev`, not `main`.
+
+---
+
 ## 2026-10-26 — HD4 expanded weapon heat presets
 
 Five shipped presets now opt into the existing HD1–HD3 heat capability: Machine Gun 2min/10s, Laser 3.5min/10s, Blaster Cannon 4min/12s, Rocket 4min/12s and Shockwave 3min/12s. Shared timing resolution now handles funded damaging beam seconds and actual wave intervals in addition to bullet cadence. Battle stays 3min/9s; Sniper/Cryo/Stasis stay heatless. Type-local Inspector controls and opt-out, private config snapshots, explicit per-level Heat precedence, lazy condition-clock rules and campaign saving are retained. Focused resource/pipeline test assertions added to TowerConditionsChecks; .NET/Godot not executed here, brief static review only.

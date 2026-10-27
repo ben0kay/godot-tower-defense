@@ -18,7 +18,7 @@ public partial class MissionCatalogChecks : Node
         try
         {
             GetTree().CurrentScene = null;
-            Require(catalog.Entries().Select(m => m.Number).SequenceEqual(new[] { 1, 2, 20, 100 }), "Existing campaign order retained");
+            Require(catalog.Entries().Select(m => m.Number).SequenceEqual(new[] { 1, 2, 3, 20, 100 }), "Campaign order includes newly registered Level003");
             foreach (var mission in catalog.Entries())
             {
                 BattlefieldLauncher root = GD.Load<PackedScene>(mission.LaunchPath).Instantiate<BattlefieldLauncher>();
@@ -36,26 +36,26 @@ public partial class MissionCatalogChecks : Node
                 Require(left.AssignedCitadel.Root == multi.First && right.AssignedCitadel.Root == multi.Second,
                     "Shared launcher preserves independently assigned Citadel routes");
             }
-            temporary = new MissionDefinition { Number = 3, Title = "Data-only fixture", MapScenePath = catalog.Entries()[1].MapScenePath };
+            temporary = new MissionDefinition { Number = 4, Title = "Data-only fixture", MapScenePath = catalog.Entries()[1].MapScenePath };
             Require(ResourceSaver.Save(temporary, "user://MissionCatalogFixture.tres") == Error.Ok, "Write isolated fixture resource");
             temporary = GD.Load<MissionDefinition>("user://MissionCatalogFixture.tres");
             catalog.Missions.Add(temporary);
-            Require(PlayableLevelCatalog.NextScene("Level002") == temporary.ResourcePath && PlayableLevelCatalog.IsPlayable(temporary.ResourcePath),
-                "New data entry enables immediate next mission with no launcher or code registration");
-            temporary.Enabled = false; Require(PlayableLevelCatalog.NextScene("Level002") == null, "Disabled mission is omitted without skipping to020");
+            Require(PlayableLevelCatalog.NextScene("Level003") == temporary.ResourcePath && PlayableLevelCatalog.IsPlayable(temporary.ResourcePath),
+                "Temporary Level004 follows Level003 without new launcher or code registration");
+            temporary.Enabled = false; Require(PlayableLevelCatalog.NextScene("Level003") == null, "Disabled Level004 cannot skip ahead to Level020");
             temporary.Enabled = true;
             catalog.Missions.Add(temporary);
             bool duplicate = false; try { catalog.Entries(); } catch (InvalidOperationException) { duplicate = true; }
             catalog.Missions.RemoveAt(catalog.Missions.Count - 1); Require(duplicate, "Duplicate identities reject explicitly");
             MenuNavigation.Open(this, temporary.ResourcePath);
             BattlefieldLauncher first = await Deployment(null);
-            Require(first.Mission.Number == 3 && first.GetNode<WorldGrid>("World/Grid").Level.Settings.WaveSetId == "level002", "Resource-only deployment keeps own identity and selected map");
+            Require(first.Mission.Number == 4 && first.GetNode<WorldGrid>("World/Grid").Level.Settings.WaveSetId == "level002", "Temporary Level004 deployment keeps own identity and selected map");
             first.GetNode<CitadelSession>("CitadelSession").Health.TakeDamage(int.MaxValue);
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
             first.GetNode<LevelResults>("LevelResults").SkipReveal();
             first.GetNode<LevelSessionController>("LevelSession").Retry();
             BattlefieldLauncher retry = await Deployment(first);
-            Require(retry.Mission.Number == 3 && !GetTree().Paused && retry.GetNode<LevelSessionController>("LevelSession").State == LevelSessionState.Playing,
+            Require(retry.Mission.Number == 4 && !GetTree().Paused && retry.GetNode<LevelSessionController>("LevelSession").State == LevelSessionState.Playing,
                 "Resource-only retry retains mission and resets session");
             GetTree().Root.RemoveChild(retry); retry.Free(); GetTree().CurrentScene = null;
             await SubsystemBattlefield.DrainFreedFixtures(this);

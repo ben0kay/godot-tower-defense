@@ -1,3 +1,9 @@
+## Level003 registered for map design (2026-10-27)
+
+The Campaign roster now includes enabled `Level003Mission.tres`, built from unpainted `LevelTemplate.tscn`. Level002's Next advances to this mission; Level003 has no immediate enabled Level004, so it does not skip to Level020. Four waves use Enemy001/Enemy002, then Enemy004 beginning in wave 3. **The map is deliberately unpainted and cannot run a real combat route until connected passable tiles are authored**; see [Level003](../../../../LEVELS/Level003/README.md) for map editing and wave counts. No menu or runtime copies were added.
+
+---
+
 ## Lightweight data-driven levels — implemented 2026-10-19
 
 Shared `LEVELS/Runtime/Battlefield.tscn` + `WORLD/World.tscn` replace per-level service copies. Existing Main launchers and World variants are thin compatibility shortcuts; F6 paths stay valid. Each level now has a MissionDefinition resource and the Campaign roster is `LEVELS/Catalog/DefaultMissionCatalog.tres`. Menu number/title/description/map are data, with a bounded scrollable mission list. New missions deploy/retry directly from their resource; no per-level launcher/world or menu/catalog code is required. Next advances only to the immediate enabled number.
@@ -10,7 +16,7 @@ Authoring steps: `LEVELS/AUTHORING.md`; ownership: `LEVELS/Catalog/README.md`, `
 
 ## Level002 tutorial waves — 2026-10-18 (implemented)
 
-The newly painted Level002 is now playable through **Campaign → Levels → PLAY LEVEL 002**, `MainLevel002.tscn` (F6), and Level001's Next Level result action. Its dedicated `WORLD/WorldLevel002.tscn` mounts the existing user-authored map unchanged. Level020 remains separately playable and unchanged. Level002 Next stays disabled because there is no playable Level003; it never skips to Level020.
+The newly painted Level002 is now playable through **Campaign → Levels → PLAY LEVEL 002**, `MainLevel002.tscn` (F6), and Level001's Next Level result action. Its dedicated `WORLD/WorldLevel002.tscn` mounts the existing user-authored map unchanged. Level020 remains separately playable and unchanged. Level002 Next now advances to the enabled Level003 designer map; it still does not skip to Level020.
 
 `LEVELS/Level002/Level002Waves.cs` defines four modest, manually started waves. Enemy “1–2–3” means the three introductory plain roles: Standard Drone (`basic_mk1`), Swift Interceptor (`scout_mk1`) and Bulwark Drone (`medium_mk1`, asset Enemy004). There is no Enemy003 scene. No shields, support ships, carriers, bosses or extra mechanics are introduced.
 
