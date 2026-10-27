@@ -1,3 +1,9 @@
+## Level003 blank map + four-wave Bulwark debut — 2026-10-27
+
+`LEVELS/Level003/` now contains a blank copy of LevelTemplate for user-painted terrain, a separate config and a four-wave `basic_mk1`/Enemy001, `scout_mk1`/Enemy002 and `medium_mk1`/Enemy004 recipe. Enemy004 starts in wave 3; authored totals are 18/22/26/32. Enabled in Campaign as the immediate Next after Level002. The template portal/Citadel may be moved; **paint a walkable path before trying combat**. See [Level003](LEVELS/Level003/README.md). Source-only validation; Godot/.NET run pending.
+
+---
+
 ## More opt-in tower heat profiles — 2026-10-26
 
 Machine Gun (2 min / 10s recovery), Laser (3.5 min / 10s), Blaster Cannon (4 min / 12s), Rocket (4 min / 12s) and Shockwave (3 min / 12s) now enable the existing shared heat capability in their shipped config resources. Laser calibrates heat per damaging beam-second, Shockwave per real pulse interval; shot weapons use their selected paid-level cadence. Battle remains 3 min / 9s; Sniper, Cryo and Stasis stay heatless. Each type exposes Inspector Heat Enabled / Overheat After Minutes / Recovery Seconds. Firing, ammo, price, tower stats and pause/save ownership are unchanged. This is source-implemented; desktop/.NET/Godot verification remains pending. See [heat conditions](TOWERS/Shared/Conditions/README.md).
