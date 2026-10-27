@@ -13,9 +13,9 @@ public partial class ConstructionDroneChecks : Node
         try
         {
             foreach (string scene in new[] { "res://Main.tscn", "res://MainLevel020.tscn" }) PaidFlow(scene);
-            QueuesAndRemoval(); Fallbacks(); MultiCitadel(); Compatibility(); ResultsFreeze(); Stress();
+            QueuesAndRemoval(); UpgradeFlow(); Fallbacks(); MultiCitadel(); Compatibility(); ResultsFreeze(); Stress();
             await SubsystemBattlefield.DrainFreedFixtures(this);
-            GD.Print("PASS: CD1/CD2/CD3 paid arrival hold, animated beam/completion flash, return, FIFO/cap, pause/visual-off, fallback/strict, multi-Citadel, cleanup and stress");
+            GD.Print("PASS: CD1–CD4 paid initial builds and upgrade drone arrival gates, staged art, return, FIFO/cap, pause/fallback, multi-Citadel and cleanup");
             GetTree().Quit();
         }
         catch (Exception error) { GetTree().Paused = false; GD.PushError(error.ToString()); GetTree().Quit(1); }
@@ -110,11 +110,68 @@ public partial class ConstructionDroneChecks : Node
         Require(!builders.DroneFor(second).Visible && builders.Releases == 2 && builders.CreatedVisuals == 1, "Visual OFF retains timing and reuses parked drone");
         clock.Advance(3); Return(builders);
         Require(flashes.ActiveCount == 0, "Visuals-off construction produces no completion flash");
-        Require(TowerUpgradeController.TryUpgrade(tower, f.Wallet, f.Placement.Settings, 1, out _), "Existing paid upgrade accepted");
-        Require(!tower.AwaitingConstructionDrone && tower.IsOperational && builders.ActiveCount == 0 && builders.PendingCount == 0, "Upgrade works at old tier with no builder");
+        Require(TowerUpgradeController.TryUpgrade(tower, f.Wallet, f.Placement.Settings, 1, out _) &&
+            tower.AwaitingConstructionDrone && clock.HeldCount == 1 && !tower.CanAttack, "Paid upgrade queues a builder even when visuals are off");
+        clock.Advance(100); Require(tower.ElapsedWorkSeconds == 0, "Upgrade clock stays held until builder arrival");
+        Arrive(builders, tower);
         clock.Advance(tower.RemainingWorkSeconds); Require(tower.UpgradeLevel == 2 && flashes.ActiveCount == 0,
-            "Paid upgrades complete normally without a builder completion flash");
+            "Visuals-off upgrade completes from the shared clock without spawning flashes");
+        Return(builders);
     }
+    // =========================================================
+    // Upgrade jobs reuse the flight/beam/return lifecycle and show two staged Battle images without rebuilding a tower.
+    private void UpgradeFlow()
+    {
+        using AmmoLoopFixture f = new(this); var builders = Enable(f);
+        var clock = f.Main.GetNode<ConstructionWorkManager>("World/ConstructionWork");
+        BattleTower tower = f.Add<BattleTower>("battle", new Vector2(2200, 2000));
+        Sprite2D overlay = tower.GetNode<Sprite2D>(BattleTower.ConstructionSpritePath);
+        Sprite2D gun = tower.GetNode<Sprite2D>(BattleTower.GunSpritePath);
+        string art = "res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/";
+        var status = f.Hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Heading/WorkSection/Status");
+        f.Placement.Call("SelectTower", tower);
+        int credits = f.Wallet.GetBalance(f.Wallet.CreditsResource);
+        for (int level = 2; level <= 3; level++)
+        {
+            Require(TowerUpgradeController.TryUpgrade(tower, f.Wallet, f.Placement.Settings, level - 1, out _)
+                && tower.AwaitingConstructionDrone && tower.IsDisabled && tower.PendingUpgradeLevel == level
+                && !tower.IsPhysicsProcessing() && builders.PendingCount == 1 && clock.HeldCount == 1,
+                "Level " + level + " funded upgrade reserves one sleeping builder hold");
+            Require(status.Text.Contains("AWAITING UPGRADE DRONE") && status.Text.Contains(level.ToString()),
+                "Inspector distinguishes paused upgrade progress before drone arrival");
+            clock.Advance(1000); Require(tower.WorkProgress == 0 && tower.UpgradeLevel == level - 1,
+                "Upgrade cannot gain work time before builder beam");
+            builders._PhysicsProcess(.01);
+            Require(builders.DroneFor(tower) != null && builders.PhaseFor(tower) == ConstructionDronePhase.Flying,
+                "Same Citadel flight starts for paid upgrade");
+            Arrive(builders, tower);
+            Require(builders.DroneFor(tower).BeamVisible && status.Text == "UPGRADING → " + level
+                && !tower.CanAttack && clock.HeldCount == 0,
+                "Beam release starts upgrade clock but does not enable attacks");
+            clock.Advance(level == 2 ? 1.6 : 2.0);
+            Require(overlay.Visible && overlay.Texture == GD.Load<Texture2D>(art + "battle_upgrade_l" + level + ".svg"),
+                "First upgrade image appears at 35% of work");
+            clock.Advance(level == 2 ? 1.4 : 1.5);
+            Require(overlay.Texture == GD.Load<Texture2D>(art + "battle_upgrade_l" + level + "_70.svg"),
+                "Second upgrade image appears at 70% of work");
+            clock.Advance(tower.RemainingWorkSeconds);
+            Require(tower.UpgradeLevel == level && tower.CanAttack && !tower.IsDisabled &&
+                !overlay.Visible && gun.Texture == GD.Load<Texture2D>(art + "battle_gun_l" + level + ".svg")
+                && builders.PhaseFor(tower) == null, "Completed tier activates finished gun; drone returns independently");
+            Return(builders);
+        }
+        Require(credits - f.Wallet.GetBalance(f.Wallet.CreditsResource) == 400,
+            "Two upgrade purchases pay 150 and 250 Credits only once");
+        builders.Config.ServiceUpgrades = false;
+        // The optional toggle preserves the old immediate upgrade clock with no drone allocation.
+        var noDrone = f.Add<BattleTower>("battle", new Vector2(2400, 2200));
+        Require(TowerUpgradeController.TryUpgrade(noDrone, f.Wallet, f.Placement.Settings, 1, out _) &&
+            !noDrone.AwaitingConstructionDrone && builders.PendingCount == 0 && clock.HeldCount == 0,
+            "Opting out restores ordinary timed upgrades");
+        clock.Advance(noDrone.RemainingWorkSeconds);
+        Require(noDrone.UpgradeLevel == 2, "Disabled upgrade drone option cannot strand work");
+    }
+
     // =========================================================
     // FIFO holds remain reserved while outbound/building/returning slots are busy; cancellation promptly frees capacity.
     private void QueuesAndRemoval()
