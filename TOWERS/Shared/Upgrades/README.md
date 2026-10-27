@@ -1,3 +1,9 @@
+## CD4 drone-assisted paid upgrades (2026-10-27)
+
+All paid nonzero-duration upgrades can now request the same nearest-Citadel construction drone used for initial builds. Work stays held at zero until beam deployment; then the existing upgrade timer advances and the combat-disabled tower receives its new stats only at completion. Drone departs independently. Inspector distinguishes waiting/drone-active upgrade and only Battle pilots 35% + 70% artwork steps. Shared config option `ServiceUpgrades=true` can disable this without affecting initial construction; strict/fallback, pause and saved work/drone state remain shared. [Implementation plan](UPGRADE_DISABLE_TIER_ART_PLAN.md).
+
+---
+
 ## DU1/DU2 — disabled paid upgrades and split purchased-level artwork (2026-10-27)
 
 **Source implemented; editor/runtime acceptance pending.** All tower types now derive an **Upgrading** disable reason from their existing paid `TowerWorkPhase`: attacks/owner physics stop while the old tier and ammo/rank remain cached, then the new paid tier applies and operation resumes. The normal Inspector displays `UPGRADING → N` and the condition reason `DISABLED: UPGRADING`, alongside any independent heat/EMP disables. Work is still timed by the shared event-driven manager; there is no extra disable condition node, interval clock or saved disable entry. Existing logistics/occupancy are preserved and zero-duration purchases remain instantaneous.
