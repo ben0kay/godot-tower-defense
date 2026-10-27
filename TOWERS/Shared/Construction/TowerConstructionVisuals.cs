@@ -42,7 +42,7 @@ public partial class TowerConstructionVisuals : Node
     }
 
     // =========================================================
-    // Existing art resolver remains the sole threshold/tier authority; normal upgrades keep old-tier visuals/firing.
+    // Existing art resolver remains the sole threshold/tier authority; paid work keeps the old tier until completion.
     private void Refresh()
     {
         if (!GodotObject.IsInstanceValid(_tower) || !GodotObject.IsInstanceValid(_sprite)) return;
