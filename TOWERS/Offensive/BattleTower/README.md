@@ -1,3 +1,9 @@
+## Battle paid-upgrade disable and visual tiers — 2026-10-27
+
+During Level1→2 and Level2→3 paid work, the Battle Tower immediately enters the shared **Upgrading** disabled reason, stops firing/aiming/recoil and suspends its owner physics callback. At 35% progress an upgrade-in-progress blueprint/scaffold sprite replaces the finished split artwork. When the 4s/5s work respectively finishes, a visually upgraded **fixed base + rotating/recoiling gun** Level2/3 SVG pair takes over, with unchanged actual single-barrel muzzle, range, stats, ammo and prices. The existing level1 SVGs and C4 initial-build stages remain intact; save/load derives the disabled state from the persisted work phase. Source implemented, visual/runtime test pending. Settings/assets: [Artwork/Upgrades](Artwork/Upgrades/README.md). Architecture: [shared plan](../../Shared/Upgrades/UPGRADE_DISABLE_TIER_ART_PLAN.md).
+
+---
+
 ## PA3 projectile handling
 
 Existing level rows author ±2.5/2/1.5° launch spread. Selected rank totals reduce spread by 0/5/10/15/20%; reductions are not accumulated across ranks. Each emitted shot snapshots effective handling and samples once at its real muzzle. Straight is the default; see the shared projectile accuracy plan. Existing damage, cadence, ammunition and recoil values are retained.
