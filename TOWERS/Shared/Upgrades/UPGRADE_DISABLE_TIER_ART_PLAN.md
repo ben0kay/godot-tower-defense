@@ -1,3 +1,9 @@
+## CV1 extension — overlay during upgrades (implemented source 2026-10-27)
+
+Per request, the existing **construction-site square overlay** accompanies paid upgrades as well as initial builds. The previous CV1 `Constructing`-only filter was broadened to `TowerBase.IsBusy` for both registration and rendering. Existing purchased-tier artwork remains visible under the overlay; drone arrival holds/progress/beam remain exactly as CD4 implemented, and `JobUnregistered` immediately removes the overlay when the tier finishes. No extra node/effect layer/asset, timer, payment, work state, save field or tile occupancy changes. Existing shared config owns opacity/tint/footprint settings; no Battle-only overlay code. Code and focused assertions landed, runtime visual review pending.
+
+---
+
 ## CD4 extension — builder-assisted upgrades (implemented source 2026-10-27)
 
 The next approved pass extends **DU1/DU2** using the existing `ConstructionDroneManager` and `TowerWorkPhase.Upgrading`, rather than a second upgrade clock or standalone builder. It is source-implemented on `dev`; Godot/.NET build and visual acceptance pending.
