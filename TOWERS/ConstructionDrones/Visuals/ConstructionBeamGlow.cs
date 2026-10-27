@@ -24,11 +24,11 @@ public partial class ConstructionBeamGlow : Node2D
         if (_width <= 0) return;
         if (GroundContact)
         {
-            DrawCircle(Vector2.Zero, _width * .6f, new Color(_tint.R, _tint.G, _tint.B, .075f));
+            DrawCircle(Vector2.Zero, _width * .53f, new Color(_tint.R, _tint.G, _tint.B, .065f));
             DrawArc(Vector2.Zero, _width * .72f, 0, Mathf.Tau, 32,
-                new Color(_tint.R, _tint.G, _tint.B, .28f), 1.3f, true);
+                new Color(_tint.R, _tint.G, _tint.B, .16f), 1.0f, true);
             DrawLine(Vector2.Left * _width, Vector2.Right * _width,
-                new Color(_tint.R, _tint.G, _tint.B, .54f), 1, true);
+                new Color(_tint.R, _tint.G, _tint.B, .25f), 1, true);
             return;
         }
         DrawCircle(Vector2.Zero, 7, new Color(_tint.R, _tint.G, _tint.B, .12f));

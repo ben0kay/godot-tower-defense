@@ -91,6 +91,10 @@ public partial class ConstructionDroneChecks : Node
         for (int i = 0; i < 40; i++) builders._PhysicsProcess(.001);
         Require(beam.ConeGeometryRefreshes == coneBuilds && beam.ScanRedrawRequests - scans <= 2,
             "Hovering builders transform one cached cone while scan redraws remain capped at 24Hz");
+        var coneLayer = beam.GetNode<ConstructionBeamCone>("Cone");
+        var scanLayer = beam.GetNode<ConstructionBeamScan>("ScanLines");
+        Require(coneLayer.Transform == scanLayer.Transform && scanLayer.RedrawRequests == beam.ScanRedrawRequests,
+            "Cached cone and animated scans share the identical moving source/target transform");
         Require(!tower.ReleaseConstructionDrone(builders, token), "Repeated arrival cannot release twice");
         clock.Advance(1); Require(tower.ElapsedWorkSeconds == 1 && !tower.IsOperational, "Ordinary clock starts after arrival");
         clock.Advance(2); Require(tower.IsOperational && !sites.HasSite(tower) && !drone.BeamVisible && builders.ActiveCount == 1 &&

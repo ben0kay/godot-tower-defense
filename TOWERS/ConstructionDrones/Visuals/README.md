@@ -1,3 +1,15 @@
+## Seamless projection polish — 2026-10-27
+
+A user screenshot showed a washed-out/broken middle to the construction projection. The earlier cone ended at just **15% of its source opacity**, while the 24-Hz scan bands were rebuilt in the beam parent and the cone followed the drone through a different CanvasItem transform.
+
+The cone now consists of **three cached, full-length, translucent layers**: wide low-alpha edge feather, broad continuous body, and restrained brighter inner channel. It no longer fades almost to zero at ground contact. Sharp bright edges and the ground ring are softened. The unchanged four-point nozzle-to-site basis uses one affine transform, with no redrawing of the cone for hover, orbit or beam animation.
+
+A small `ConstructionBeamScan` child follows **the exact same transform** as the cone every manager tick, so moving scan bands cannot visually lag behind the beam. Only its scan strokes redraw at a capped **24 Hz**, and no additional _Process/_PhysicsProcess callbacks, shader, particles or new textures are introduced. All layers remain hidden/dormant when not in use. The existing beam settings, 280px/s travel speed, construction clocks, save compatibility and gameplay are unchanged.
+
+Static review and a focused transform/cache regression check added; live Godot visual acceptance and FPS measurement remain for desktop testing (especially three simultaneous beams and large footprints).
+
+---
+
 ## Cached cone and scan-only redraw — 2026-10-26
 
 The construction beam now uses a static cached `ConstructionBeamCone` canvas (four-vertex fill and edge lines) and two cached `ConstructionBeamGlow` canvases (site contact and nozzle). These are drawn once per footprint/style assignment. The regular builder physics tick can move/hover the drone, changing only the cached cone's affine transform and the contact's position; **the static cone is not `QueueRedraw()`-ed every frame**. During the short 0.25s deployment, CanvasItem alpha updates without rebuilding geometry. `ConstructionBeam._Draw()` now handles **only the moving scan bands**, refreshing at up to 24 Hz from the same manager-supplied time; 0 configured bands do not animate. No additional per-node processing or physics, new shaders, particle systems, timers or gameplay changes.
