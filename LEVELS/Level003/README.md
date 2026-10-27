@@ -19,7 +19,7 @@ Only existing catalog enemies are used: **Enemy001** = `basic_mk1`, **Enemy002**
 | 2 | 14 | 8 | 0 | 22 | Higher light-ship pressure |
 | 3 | 14 | 8 | 4 | 26 | Introduce Bulwarks |
 | 4 | 12 | 12 | 8 | 32 | Mixed finale |
-| **Total** | **52** | **44** | **12** | **98** | |
+| **Total** | **52** | **34** | **12** | **98** | |
 
 Waves live exclusively in `Level003Waves.cs` (four `Wave(...)` definitions) and are registered by the `WaveSetSource` sub-resource in `Level003Config.tres`; no per-level scheduler or launcher duplication. Spawn gaps are 0.6–1.3 seconds, with pauses between batches. Wave 4's first 16 enemies use exact 75/25 weighted composition.
 
