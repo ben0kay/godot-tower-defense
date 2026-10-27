@@ -468,7 +468,9 @@ public partial class GameplayHUD : Control
         _workStatus.Text = tower.WorkPhase switch
         {
             TowerWorkPhase.Constructing => tower.AwaitingConstructionDrone ? "AWAITING CONSTRUCTION DRONE" : "CONSTRUCTING",
-            TowerWorkPhase.Upgrading => $"UPGRADING → {tower.PendingUpgradeLevel}",
+            TowerWorkPhase.Upgrading => tower.AwaitingConstructionDrone
+                ? $"AWAITING UPGRADE DRONE → {tower.PendingUpgradeLevel}"
+                : $"UPGRADING → {tower.PendingUpgradeLevel}",
             _ => tower.IsDisabled ? "DISABLED" : "OPERATIONAL"
         };
         _workBar.Visible = _workTime.Visible = tower.IsBusy;

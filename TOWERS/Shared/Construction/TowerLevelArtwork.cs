@@ -11,5 +11,7 @@ public partial class TowerLevelArtwork : Resource
     [Export] public Texture2D FinishedBaseTexture { get; set; }
     [Export] public Texture2D FinishedGunTexture { get; set; }
     [Export] public Texture2D UpgradeTexture { get; set; }
+    // Multiple optional visual milestones; legacy single UpgradeTexture still works when this list is empty.
+    [Export] public Godot.Collections.Array<TowerConstructionStage> UpgradeStages { get; set; } = new();
     [Export(PropertyHint.Range, "0,1,0.01")] public float UpgradeProgress { get; set; } = .75f;
 }

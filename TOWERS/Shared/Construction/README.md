@@ -1,3 +1,9 @@
+## CD4 — existing construction clock now supports upgrade drone holds (2026-10-27)
+
+The shared `ConstructionWorkManager` needed no new timer: `TowerBase.BeginUpgrade` now reserves the same optional owner/token hold **before** registering paid work. The successful purchase notification queues a Citadel drone; its deployment releases that one hold, and timed upgrade seconds begin at zero. Upgrades stay disabled and keep old cached stats until the existing completion commit. No foundation reconstruction, extra occupancy or altered paid durations. In addition, `TowerLevelArtwork.UpgradeStages` supports event-driven multiple thresholds while preserving the older one-image upgrade fallback. Battle alone authors 35/70% intermediate artwork. [CD4 details](../../ConstructionDrones/README.md).
+
+---
+
 ## DU2 purchased-level split artwork (2026-10-27)
 
 A tower can now opt into separate finished base and rotating/recoiling gun sprites via `TowerLevelArtwork.FinishedBaseTexture` / `FinishedGunTexture` and the construction presenter's optional split NodePaths. Battle uses this for paid levels 2 and 3, and an intermediate composite upgrade overlay at 35% progress. The presenter remains entirely event-driven, old monolithic `FinishedTexture` and `UpgradeTexture` fallbacks still work, initial C4 construction artwork is unaffected, and non-participating towers need no extra nodes. [Plan](../Upgrades/UPGRADE_DISABLE_TIER_ART_PLAN.md).

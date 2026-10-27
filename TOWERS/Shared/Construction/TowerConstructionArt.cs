@@ -52,12 +52,22 @@ public partial class TowerConstructionArt : Resource
     }
 
     // =========================================================
-    // Only the exact purchased target may show its optional intermediate image; old-tier mechanics stay independent.
+    // Only the purchased target draws staged upgrade imagery. Reuse build-stage thresholds without altering its work timer.
     public Texture2D UpgradeTexture(int level, double progress, Texture2D fallback)
     {
-        if (LevelArtwork != null) foreach (TowerLevelArtwork art in LevelArtwork)
-            if (art?.Level == level && art.UpgradeTexture != null && ValidThreshold(art.UpgradeProgress) && progress >= art.UpgradeProgress)
-                return art.UpgradeTexture;
+        if (LevelArtwork == null) return fallback;
+        foreach (TowerLevelArtwork art in LevelArtwork)
+        {
+            if (art?.Level != level) continue;
+            float best = -1;
+            Texture2D chosen = fallback;
+            if (art.UpgradeStages != null) foreach (TowerConstructionStage stage in art.UpgradeStages)
+                if (stage?.Texture != null && ValidThreshold(stage.Progress) && stage.Progress <= progress && stage.Progress > best)
+                { best = stage.Progress; chosen = stage.Texture; }
+            if (best >= 0) return chosen;
+            return art.UpgradeTexture != null && ValidThreshold(art.UpgradeProgress) && progress >= art.UpgradeProgress
+                ? art.UpgradeTexture : fallback;
+        }
         return fallback;
     }
 

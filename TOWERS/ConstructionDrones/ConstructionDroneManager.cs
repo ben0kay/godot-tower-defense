@@ -1,4 +1,4 @@
-// One active-only dispatcher for paid initial builds: FIFO holds, deterministic Citadel flight, pooled visuals and return.
+// One active-only dispatcher for paid builds and upgrades: FIFO holds, Citadel flight, pooled visuals and return.
 // Work time remains exclusively in ConstructionWorkManager; no ground routes/collisions or ammunition dependencies.
 using Godot;
 using System;
@@ -36,6 +36,7 @@ public partial class ConstructionDroneManager : Node2D
     private ConstructionCompletionFlash _completionFlashes;
     private double _retry;
     public bool CanGate => !_shutdown && Config?.Enabled == true && IsInsideTree() && !IsQueuedForDeletion();
+    public bool CanServiceUpgrades => CanGate && Config.ServiceUpgrades;
     public int ActiveCount => _active.Count;
     public int PendingCount => _pending.Count;
     public int CreatedVisuals { get; private set; }
@@ -70,10 +71,19 @@ public partial class ConstructionDroneManager : Node2D
         _session = GetNodeOrNull<LevelSessionController>("../../LevelSession");
     }
     // =========================================================
-    // Only committed paid placements reach this event; duplicates cannot reserve another drone or release token.
-    private void OnPlaced(TowerBase tower)
+    // Only committed paid placements or upgrades enqueue work with an already-reserved hold.
+    private void OnPlaced(TowerBase tower) => QueueHeldWork(tower);
+
+    // =========================================================
+    // The paid upgrade callback uses the same bounded dispatcher after wallet commit.
+    internal bool QueueUpgrade(TowerBase tower) => CanServiceUpgrades && QueueHeldWork(tower);
+
+    // =========================================================
+    // A single assignment path for both paid initial builds and upgrades.
+    private bool QueueHeldWork(TowerBase tower)
     {
-        if (_shutdown || !GodotObject.IsInstanceValid(tower) || !tower.IsHeldBy(this) || _jobs.ContainsKey(tower)) return;
+        if (_shutdown || !GodotObject.IsInstanceValid(tower) || !tower.IsHeldBy(this) || _jobs.ContainsKey(tower)
+            || !GodotObject.IsInstanceValid(_grid) || !IsInsideTree() || IsQueuedForDeletion()) return false;
         var job = new Assignment { Tower = tower, Token = tower.ConstructionDroneReservation, Target = tower.GlobalPosition };
         job.HalfWidth = Mathf.Clamp(tower.Footprint.X * _grid.Config.CellSize * .36f, 16, 160);
         job.Hover = Mathf.Min(ConstructionDroneMasterConfig.Safe(Config?.HoverRadius ?? 12, 12, 0, 20),
@@ -84,6 +94,7 @@ public partial class ConstructionDroneManager : Node2D
         _jobs.Add(tower, job); _pending.Enqueue(job);
         tower.WorkCompleted += job.Completed; tower.TreeExiting += job.Removed; tower.Destroyed += job.Removed;
         SetPhysicsProcess(true);
+        return true;
     }
     // =========================================================
     // Detach before callbacks; returning visuals retain neither a tower nor any work subscription.
