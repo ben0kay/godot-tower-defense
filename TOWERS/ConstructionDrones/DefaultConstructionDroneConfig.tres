@@ -5,6 +5,7 @@ script = ExtResource("1")
 Enabled = true
 ShowVisuals = true
 RequireDroneToBuild = false
+TravelSpeed = 280.0
 BeamScanBands = 4
 BeamScanCyclesPerSecond = 1.5
 BeamPulseHz = 2.0

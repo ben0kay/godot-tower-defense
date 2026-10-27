@@ -51,7 +51,7 @@ public sealed class ConstructionDroneMotion
         Control1 = SavePoint.From(start + departure.Normalized() * bend);
         Control2 = SavePoint.From(end - arrival.Normalized() * bend);
         float estimate = (distance + start.DistanceTo(Control1.Vector()) + Control1.Vector().DistanceTo(Control2.Vector()) + Control2.Vector().DistanceTo(end)) * .5f;
-        float speed = ConstructionDroneMasterConfig.Safe(config.TravelSpeed, 420, 32, 2000);
+        float speed = ConstructionDroneMasterConfig.Safe(config.TravelSpeed, 280, 32, 2000);
         // Smoothstep's peak derivative is 1.5; keep the configured speed approximately the peak cruise speed.
         FlightSeconds = Mathf.Max(.12f, estimate * 1.5f / speed); FlightElapsed = 0;
         Velocity = default;

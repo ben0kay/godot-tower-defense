@@ -1,3 +1,9 @@
+## Slower construction drone flight — 2026-10-27
+
+Builder outbound and return maximum flight speed is now **280 px/s**, down from **420 px/s** (one-third slower). The shared `TravelSpeed` Inspector setting is explicitly serialized in `DefaultConstructionDroneConfig.tres`, and `ConstructionDroneMasterConfig.cs` plus the motion fallback use the same 280 px/s baseline. Cubic paths, acceleration/braking, turning, orbit movement, deployment and construction durations are unchanged; the existing movement model naturally extends flight times. Already-in-progress saved flight durations retain their checkpoint state until their next flight leg. Gameplay/desktop review pending.
+
+---
+
 ## Organic builder flight and orbit — 2026-10-26
 
 Builders now follow cubic flight paths with eased acceleration/braking, sprite-only travel heading,
@@ -48,7 +54,7 @@ Paid positive-duration **initial** construction now waits for a Citadel builder.
 
 ### Ownership and files
 
-- `ConstructionDroneMasterConfig.cs` / `DefaultConstructionDroneConfig.tres`: shared Inspector controls. Defaults: **Enabled=true, ShowVisuals=true, RequireDroneToBuild=false, cap8, dispatch budget4/tick, speed420px/s, arrival8px, deployment0.25s, hover12px, height48px, beam alpha0.26**. Numeric settings are sanitized. Cap clamps1–64; dispatch budget1–16.
+- `ConstructionDroneMasterConfig.cs` / `DefaultConstructionDroneConfig.tres`: shared Inspector controls. Defaults: **Enabled=true, ShowVisuals=true, RequireDroneToBuild=false, cap8, dispatch budget4/tick, speed280px/s, arrival8px, deployment0.25s, hover12px, height48px, beam alpha0.26**. Numeric settings are sanitized. Cap clamps1–64; dispatch budget1–16.
 - `ConstructionDroneManager.cs`: one active-only service in shared `WORLD/World.tscn`, synchronously bound by placement Ready. Only successful `TowerPlaced` queues work; the optional hold is registered **inside the paid commit before AddChild**. One per-site owner/token rejects duplicates and stale arrival. FIFO pending assignments stay held; outbound/building/returning drones all consume capacity. Reducing cap never cancels existing assignments.
 - `ConstructionDrone.cs` / `.tscn`: imported shared36×28 cyan drone SVG plus one beam child. Neither drone nor beam has a per-frame callback. One manager advances active flights and beaming poses; lazy pooled visuals are created only when concurrency grows, up to64 roots. Parked visuals hide and do no processing. A normal drone uses **three nodes total** (root, sprite, beam); no fixed permanent flying fleet is pre-created.
 - `Visuals/ConstructionBeam.cs`: retained four-vertex/color buffers, soft cyan cone, thin bright edges, nozzle and three lattice lines. No particles, custom shader, light, physics body, navigation request or per-frame arrays. Footprint-derived width/height and bounded hover support 1×1/2×2/3×2 and larger future sites. Target remains at the site's existing full footprint center.

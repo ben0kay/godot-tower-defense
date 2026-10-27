@@ -11,7 +11,7 @@ public partial class ConstructionDroneMasterConfig : Resource
     [Export(PropertyHint.Range, "1,16,1")] public int DispatchesPerTick { get; set; } = 4;
     #endregion
     #region Flight and Hologram
-    [Export(PropertyHint.Range, "32,2000,1")] public float TravelSpeed { get; set; } = 420;
+    [Export(PropertyHint.Range, "32,2000,1")] public float TravelSpeed { get; set; } = 280;
     [Export(PropertyHint.Range, "1,24,1")] public float ArrivalRadius { get; set; } = 8;
     [Export(PropertyHint.Range, "0,1,.05")] public float BeamDeploymentSeconds { get; set; } = .25f;
     [Export(PropertyHint.Range, "0,20,1")] public float HoverRadius { get; set; } = 12;
