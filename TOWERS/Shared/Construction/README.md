@@ -1,3 +1,9 @@
+## CV1 — construction-site holograms now cover upgrades (2026-10-27)
+
+The existing `World/Effects/ConstructionSiteHolograms` renderer now accepts both initial paid construction **and timed upgrading** jobs from the same work manager. It draws the same square footprint blueprint/brackets/scanner **over the existing tower** as soon as paid upgrade work registers, stays through drone wait/beam and 35%/70% Battle visual steps, and retires on work completion/unregistration. No new renderer, clocks, assets, tower art overrides, production changes or save fields. Even with upgrade drones disabled the paid timed job shows the overlay. [CV1 visuals](Visuals/README.md).
+
+---
+
 ## CD4 — existing construction clock now supports upgrade drone holds (2026-10-27)
 
 The shared `ConstructionWorkManager` needed no new timer: `TowerBase.BeginUpgrade` now reserves the same optional owner/token hold **before** registering paid work. The successful purchase notification queues a Citadel drone; its deployment releases that one hold, and timed upgrade seconds begin at zero. Upgrades stay disabled and keep old cached stats until the existing completion commit. No foundation reconstruction, extra occupancy or altered paid durations. In addition, `TowerLevelArtwork.UpgradeStages` supports event-driven multiple thresholds while preserving the older one-image upgrade fallback. Battle alone authors 35/70% intermediate artwork. [CD4 details](../../ConstructionDrones/README.md).

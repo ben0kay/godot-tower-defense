@@ -1,3 +1,9 @@
+## CV1 construction square during Battle upgrades (2026-10-27)
+
+When Battle upgrades 1→2 or 2→3, the original transparent cyan **square construction overlay** now frames the existing tower immediately after purchase, stays while the drone travels/beams and the 35%/70% staged SVGs show, and vanishes at 100% on the same work-completion event. The new tier's base and recoiling gun appear unchanged. This is shared for other timed upgrading towers too; no new Battle-only renderer. [Shared visuals](../../Shared/Construction/Visuals/README.md).
+
+---
+
 ## CD4 — upgrade drone arrives before the Battle upgrade clock (2026-10-27)
 
 The same Citadel drone that builds a new Battle Tower now flies out again for its 1→2 and 2→3 paid upgrades. After the paid click the existing disabled tower waits, without accruing upgrade seconds; at beam deployment it progresses through two distinct in-progress artwork steps at 35% and 70%, then switches to the completed split tier sprites at 100%. The beam shuts off and the drone returns while the upgraded turret resumes its old recoil/aiming behavior. Starting build artwork, levels, prices and damage are unchanged. Local in-editor testing pending. [Artwork](Artwork/Upgrades/README.md).

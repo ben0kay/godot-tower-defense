@@ -1,5 +1,5 @@
-// CV1: one pooled-in-place, active-only holographic canvas for every unfinished paid tower footprint.
-// Registration comes from the shared work manager, including queued drones and saved construction restore.
+// Shared active-only holographic canvas for paid construction and upgrade work on any tower footprint.
+// Registration comes from the shared work manager, including queued drones and restored work.
 using Godot;
 using System.Collections.Generic;
 
@@ -34,11 +34,11 @@ public partial class ConstructionSiteHologram : Node2D
     }
 
     // =========================================================
-    // Only initial paid construction has a site; upgrades retain their original active artwork.
-    // Called before AddChild for new placements, after AddChild for resumed saved jobs.
+    // Both paid builds and upgrades show the same footprint hologram; upgrades retain their existing tower art.
+    // Called before AddChild for initial placements, and during registered upgrades/restored jobs.
     private void OnRegistered(TowerBase tower)
     {
-        if (tower == null || tower.WorkPhase != TowerWorkPhase.Constructing || _sites.Contains(tower)) return;
+        if (tower == null || !tower.IsBusy || _sites.Contains(tower)) return;
         if (_sites.Count >= Mathf.Clamp(Config?.MaxVisibleSites ?? 128, 1, 256)) return;
         _sites.Add(tower);
         RefreshProcessing();
@@ -97,7 +97,7 @@ public partial class ConstructionSiteHologram : Node2D
         {
             if (!GodotObject.IsInstanceValid(tower) || !tower.IsInsideTree() ||
                 tower.IsQueuedForDeletion() || tower.IsDestroyed ||
-                tower.WorkPhase != TowerWorkPhase.Constructing) continue;
+                !tower.IsBusy) continue;
             Vector2 cells = (Vector2)tower.Footprint;
             if (cells.X <= 0 || cells.Y <= 0) continue;
             Vector2 size = cells * _cellSize;
