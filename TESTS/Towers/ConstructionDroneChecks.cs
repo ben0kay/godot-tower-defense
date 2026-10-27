@@ -127,6 +127,7 @@ public partial class ConstructionDroneChecks : Node
     {
         using AmmoLoopFixture f = new(this); var builders = Enable(f);
         var clock = f.Main.GetNode<ConstructionWorkManager>("World/ConstructionWork");
+        var sites = f.Main.GetNode<ConstructionSiteHologram>("World/Effects/ConstructionSiteHolograms");
         BattleTower tower = f.Add<BattleTower>("battle", new Vector2(2200, 2000));
         Sprite2D overlay = tower.GetNode<Sprite2D>(BattleTower.ConstructionSpritePath);
         Sprite2D gun = tower.GetNode<Sprite2D>(BattleTower.GunSpritePath);
@@ -140,6 +141,8 @@ public partial class ConstructionDroneChecks : Node
                 && tower.AwaitingConstructionDrone && tower.IsDisabled && tower.PendingUpgradeLevel == level
                 && !tower.IsPhysicsProcessing() && builders.PendingCount == 1 && clock.HeldCount == 1,
                 "Level " + level + " funded upgrade reserves one sleeping builder hold");
+            Require(sites.HasSite(tower) && sites.ActiveSites == 1 && sites.IsProcessing(),
+                "Same construction hologram surrounds the existing tower immediately during held upgrade");
             Require(status.Text.Contains("AWAITING UPGRADE DRONE") && status.Text.Contains(level.ToString()),
                 "Inspector distinguishes paused upgrade progress before drone arrival");
             clock.Advance(1000); Require(tower.WorkProgress == 0 && tower.UpgradeLevel == level - 1,
@@ -151,16 +154,21 @@ public partial class ConstructionDroneChecks : Node
             Require(builders.DroneFor(tower).BeamVisible && status.Text == "UPGRADING → " + level
                 && !tower.CanAttack && clock.HeldCount == 0,
                 "Beam release starts upgrade clock but does not enable attacks");
+            Require(sites.HasSite(tower) && sites.ActiveSites == 1,
+                "Hologram remains during beam construction after drone hold releases");
             clock.Advance(level == 2 ? 1.6 : 2.0);
             Require(overlay.Visible && overlay.Texture == GD.Load<Texture2D>(art + "battle_upgrade_l" + level + ".svg"),
                 "First upgrade image appears at 35% of work");
             clock.Advance(level == 2 ? 1.4 : 1.5);
             Require(overlay.Texture == GD.Load<Texture2D>(art + "battle_upgrade_l" + level + "_70.svg"),
                 "Second upgrade image appears at 70% of work");
+            Require(sites.HasSite(tower), "Hologram overlays both authored upgrade-art milestones");
             clock.Advance(tower.RemainingWorkSeconds);
             Require(tower.UpgradeLevel == level && tower.CanAttack && !tower.IsDisabled &&
                 !overlay.Visible && gun.Texture == GD.Load<Texture2D>(art + "battle_gun_l" + level + ".svg")
                 && builders.PhaseFor(tower) == null, "Completed tier activates finished gun; drone returns independently");
+            Require(!sites.HasSite(tower) && sites.ActiveSites == 0 && !sites.IsProcessing(),
+                "Finished upgrade immediately removes the shared hologram and sleeps when empty");
             Return(builders);
         }
         Require(credits - f.Wallet.GetBalance(f.Wallet.CreditsResource) == 400,
@@ -169,10 +177,11 @@ public partial class ConstructionDroneChecks : Node
         // The optional toggle preserves the old immediate upgrade clock with no drone allocation.
         var noDrone = f.Add<BattleTower>("battle", new Vector2(2400, 2200));
         Require(TowerUpgradeController.TryUpgrade(noDrone, f.Wallet, f.Placement.Settings, 1, out _) &&
-            !noDrone.AwaitingConstructionDrone && builders.PendingCount == 0 && clock.HeldCount == 0,
-            "Opting out restores ordinary timed upgrades");
+            !noDrone.AwaitingConstructionDrone && builders.PendingCount == 0 && clock.HeldCount == 0
+            && sites.HasSite(noDrone), "Opting out of upgrade drones still shows the shared site hologram");
         clock.Advance(noDrone.RemainingWorkSeconds);
-        Require(noDrone.UpgradeLevel == 2, "Disabled upgrade drone option cannot strand work");
+        Require(noDrone.UpgradeLevel == 2 && !sites.HasSite(noDrone) && !sites.IsProcessing(),
+            "Disabled upgrade drone option cannot strand work or leave a ghost hologram");
     }
 
     // =========================================================
