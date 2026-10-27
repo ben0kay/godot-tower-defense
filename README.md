@@ -1,3 +1,9 @@
+## CD4 builder drones for upgrades — 2026-10-27
+
+Successful nonzero-duration paid tower upgrades now queue the same nearest-Citadel pooled construction drone as initial builds. The tower is disabled and its upgrade work clock remains at zero until the beam deploys, then existing timed upgrade progress starts. Battle Level2/Level3 now show **35% and 70%** distinct assembly SVGs before the completed split-base/gun art appears at 100%; the drone returns independently. Opt out with `TOWERS/ConstructionDrones/DefaultConstructionDroneConfig.tres → ServiceUpgrades` (enabled by default). No new timers or changes to upgrade prices/stats; existing mid-work checkpoint ownership remains. Source-only validation; Godot runtime/visual checks pending. See [CD4](TOWERS/ConstructionDrones/README.md).
+
+---
+
 ## Paid upgrades now disable towers; Battle Tower Level2/3 artwork — 2026-10-27
 
 Paid tower upgrades now suspend attacking/aiming/owner physics until the shared work clock finishes. The selected Inspector reports **DISABLED: UPGRADING** and retains progress/current stats; zero-duration upgrades remain instant. The Battle Tower alone pilots separate Level2/Level3 fixed-base and rotating-gun SVG pairs, plus a 35%-progress temporary upgrade scaffold. No new process loops, purchase/stat changes or loss of muzzle/recoil. Existing save work phases reconstruct the upgrade disable. Source implemented on `dev`; Godot/.NET, zoom and save-resume smoke checks pending. See [DU plan](TOWERS/Shared/Upgrades/UPGRADE_DISABLE_TIER_ART_PLAN.md).
