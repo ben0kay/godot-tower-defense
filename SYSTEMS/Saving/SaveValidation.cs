@@ -51,7 +51,7 @@ public static class SaveValidation
             Number(tower.XP); Number(tower.Heat); Number(tower.Work.ElapsedSeconds); Number(tower.Work.TotalSeconds);
             if (tower.Work.ElapsedSeconds > tower.Work.TotalSeconds ||
                 (tower.Work.Phase != TowerWorkPhase.Operational && tower.Work.ElapsedSeconds >= tower.Work.TotalSeconds) ||
-                (tower.Held && tower.Work.Phase != TowerWorkPhase.Constructing) ||
+                (tower.Held && tower.Work.Phase != TowerWorkPhase.Constructing && tower.Work.Phase != TowerWorkPhase.Upgrading) ||
                 (tower.Work.Phase != TowerWorkPhase.Upgrading && tower.Work.PendingUpgradeLevel != 0))
                 throw new InvalidDataException("Invalid saved work state.");
             if (tower.Ammo < 0 || tower.StoredCredits < 0) throw new InvalidDataException("Invalid saved stock.");
