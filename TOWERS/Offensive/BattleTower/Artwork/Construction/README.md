@@ -1,3 +1,9 @@
+## Level2/3 visual upgrades (2026-10-27)
+
+The previously empty Level2 and Level3 subresources now assign temporary `UpgradeTexture` at progress **0.35**, plus distinct `FinishedBaseTexture` and `FinishedGunTexture` sprites. Full purchased tiers use the original split pivot/recoil scene hierarchy, not a static composite. Upgrade-period aiming and shooting are now disabled across towers; previous notes saying they continue are historical. The level-one 0/35/70% initial-construction stages remain identical. See [Upgrade artwork](../Upgrades/README.md) and [shared DU plan](../../../../Shared/Upgrades/UPGRADE_DISABLE_TIER_ART_PLAN.md).
+
+---
+
 # Battle Tower construction art
 
 All three stages use the existing64×64 canvas, center and upward-facing design. Final artwork remains `../battle_tower.svg` unchanged. `construction_preview.svg` is a contact sheet of the actual assets for browser review, not a runtime dependency or Godot screenshot.
