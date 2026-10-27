@@ -7,6 +7,13 @@
 [ext_resource type="Texture2D" uid="uid://conapg5cykva3" path="res://TOWERS/Offensive/BattleTower/Artwork/Construction/stage1_frame.svg" id="5_frame"]
 [ext_resource type="Texture2D" uid="uid://b5yttvsv0j4om" path="res://TOWERS/Offensive/BattleTower/Artwork/Construction/stage2_assembly.svg" id="6_assembly"]
 
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/battle_base_l2.svg" id="lvl2_base"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/battle_gun_l2.svg" id="lvl2_gun"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/battle_base_l3.svg" id="lvl3_base"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/battle_gun_l3.svg" id="lvl3_gun"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/battle_upgrade_l2.svg" id="lvl2_build"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/battle_upgrade_l3.svg" id="lvl3_build"]
+
 [sub_resource type="Resource" id="Stage0"]
 script = ExtResource("2_stage")
 Texture = ExtResource("4_foundation")
@@ -23,10 +30,18 @@ Texture = ExtResource("6_assembly")
 
 [sub_resource type="Resource" id="Level2"]
 script = ExtResource("3_level")
+FinishedBaseTexture = ExtResource("lvl2_base")
+FinishedGunTexture = ExtResource("lvl2_gun")
+UpgradeTexture = ExtResource("lvl2_build")
+UpgradeProgress = 0.35
 
 [sub_resource type="Resource" id="Level3"]
 script = ExtResource("3_level")
 Level = 3
+FinishedBaseTexture = ExtResource("lvl3_base")
+FinishedGunTexture = ExtResource("lvl3_gun")
+UpgradeTexture = ExtResource("lvl3_build")
+UpgradeProgress = 0.35
 
 [resource]
 script = ExtResource("1_art")
