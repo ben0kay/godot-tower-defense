@@ -1,3 +1,9 @@
+## 2026-10-27 — CV1 shared square hologram during paid upgrades
+
+Enabled the existing `ConstructionSiteHologram` renderer for timed `TowerWorkPhase.Upgrading` in addition to `Constructing`, reusing the work manager's registration/teardown events and the same soft-wait/bright-working footprint overlay over the existing tower/tier art. Applies to all timed tower upgrades, drone or no-drone. No new scenes, assets, clocks, save schema or combat/price changes; dormant when all jobs finish. Focused `ConstructionDroneChecks` assertions now cover 1→2 and 2→3 waiting, beaming, 35/70% stages, completion cleanup and drone opt-out. Godot/.NET runtime and rendered visuals pending.
+
+---
+
 ## 2026-10-27 — CD4 drone-assisted upgrades and two-stage tier artwork
 
 Source change on `dev`: paid nonzero-duration upgrades use the existing capped, pooled Citadel construction drone and pre-registered work hold; the payment callback queues flight, beam deploy releases the reservation, and the ordinary work clock begins. Towers stay `DISABLED: UPGRADING` and the selected HUD now says `AWAITING UPGRADE DRONE → tier` until release. Battle now authors separate 35%/70% in-progress SVGs for Level2 and Level3 through reusable `TowerLevelArtwork.UpgradeStages`, followed by the existing split base/recoil artwork. Per-master `ServiceUpgrades` can opt out; save/restore of held and beaming upgrades uses the existing format. Focused source regression expectations updated. No .NET/Godot builds or desktop visual acceptance performed. [Plan](../TOWERS/Shared/Upgrades/UPGRADE_DISABLE_TIER_ART_PLAN.md).
