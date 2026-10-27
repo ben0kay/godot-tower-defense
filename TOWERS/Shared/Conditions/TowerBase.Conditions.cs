@@ -5,12 +5,12 @@ using System;
 public abstract partial class TowerBase
 {
     private TowerConditions _conditions;
-    public bool IsDisabled => _conditions?.Count > 0;
+    public bool IsDisabled => WorkPhase == TowerWorkPhase.Upgrading || _conditions?.Count > 0;
     public bool CanOperate => IsOperational && !IsDisabled;
     public bool CanAttack => CanOperate && IsInsideTree() && !IsQueuedForDeletion() && !GetTree().Paused;
     public float CurrentHeat => _conditions?.Heat ?? 0;
     public bool IsOverheated => _conditions?.IsOverheated ?? false;
-    public int DisableCount => _conditions?.Count ?? 0;
+    public int DisableCount => (_conditions?.Count ?? 0) + (WorkPhase == TowerWorkPhase.Upgrading ? 1 : 0);
     public event Action DisableStateChanged;
     public event Action HeatChanged;
     // =========================================================
@@ -25,6 +25,7 @@ public abstract partial class TowerBase
     // Null duration is condition-based; source zero is independent, nonzero refreshes that source/reason.
     public TowerDisableHandle ApplyDisable(TowerDisableReason reason, double? durationSeconds = null, ulong sourceId = 0)
     {
+        if (reason == TowerDisableReason.Upgrading) throw new ArgumentOutOfRangeException(nameof(reason), "Upgrade disabling is owned by TowerWorkPhase.");
         if (!IsInsideTree() || IsQueuedForDeletion()) throw new InvalidOperationException("Disable requires a live placed tower.");
         return Conditions().Apply(reason, durationSeconds, sourceId);
     }
@@ -36,7 +37,8 @@ public abstract partial class TowerBase
     public void RemoveDisablesFromSource(ulong sourceId) => _conditions?.RemoveSource(sourceId);
     // =========================================================
     // HUD3 can read reasons on events without allocating a fresh collection each physics tick.
-    public TowerDisableReason GetDisableReason(int index) => _conditions.ReasonAt(index);
+    public TowerDisableReason GetDisableReason(int index) => WorkPhase == TowerWorkPhase.Upgrading && index == 0
+        ? TowerDisableReason.Upgrading : _conditions.ReasonAt(index - (WorkPhase == TowerWorkPhase.Upgrading ? 1 : 0));
     // =========================================================
     // Shared notification is immediate for beam/aim shutdown; ongoing timers/cooling stay enabled.
     internal void PublishDisableChanged() { OnDisableChanged(); DisableStateChanged?.Invoke(); NotifyRuntimeChanged(); }
