@@ -1,3 +1,9 @@
+## Level003 — blank designer map and four waves (2026-10-27)
+
+New `LEVELS/Level003/Level003.tscn` is a separate **unpainted LevelTemplate copy**: all four tile layers remain empty, with one movable enemy portal and the Citadel in their original template positions. `Level003Config.tres` contains its own 1,200 starting Credits / 1,000 Citadel HP and four manual waves (18/22/26/32 enemies). Enemy001/Enemy002 form waves 1–2; Enemy004 (Bulwark, `medium_mk1`) enters in wave 3 and joins the finale. No shields or extra types. Mission 003 is now in Campaign and is Level002's direct Next; **painting walkable tiles connecting the portal to the Citadel is required before combat works**. No extra launcher or duplicated services. [Level003 notes](Level003/README.md). Local Godot/.NET verification pending.
+
+---
+
 ## Level100 — Five-Gate Swarm stress mission (2026-10-20; source complete, not runtime-tested)
 
 Selectable from Campaign as a data-driven new Level100 mission: **100/200/300/400/500** scheduled enemies across five manually started waves, including exactly **20 armed Gunner Drones** distributed through each wave (100 gunners, 1,500 ships in total). Player starts with **100,000 Credits** and the Citadel has **10,000 HP**. **All four tile layers are intentionally completely unpainted**; five repositionable portals are on the left and the Citadel on the right. **Paint connected navigable ground before attempting to start a wave**, otherwise enemy spawning is blocked. There is no extra Main/World launcher or shared enemy balance change. See [Level100 README](Level100/README.md). A dedicated authoring/regression scene exists but was not run here.
