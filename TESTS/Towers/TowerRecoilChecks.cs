@@ -142,8 +142,9 @@ public partial class TowerRecoilChecks : Node
         f.ClearProjectiles();
         Require(TowerUpgradeController.TryUpgrade(tower, f.Wallet, f.Placement.Settings, 1, out _), "Paid level2 upgrade starts");
         var old = tower.FinalStats; long before = recoil.Impulses;
-        tower._PhysicsProcess(1); Require(tower.IsBusy && tower.UpgradeLevel == 1 && tower.FinalStats == old && recoil.Impulses == before + 1,
-            "Old-tier firing/recoil continue during ordinary paid upgrade work");
+        tower._PhysicsProcess(1); Require(tower.IsBusy && tower.IsDisabled && tower.UpgradeLevel == 1
+            && tower.FinalStats == old && recoil.Impulses == before && !recoil.Active,
+            "Paid upgrade suspends firing/recoil while the original stats remain cached");
         f.ClearProjectiles(); ConstructionTestClock.FinishWork(f.Main);
         Require(tower.UpgradeLevel == 2 && moving.Visible && basis.Visible && !overlay.Visible, "Level2 retains split finished layers");
         Require(ConstructionTestClock.PurchaseAndFinish(tower, f.Wallet, f.Placement.Settings, 2, out _), "Paid level3 completes");
