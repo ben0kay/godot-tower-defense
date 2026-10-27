@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="MissionDefinition" load_steps=2 format=3]
+[ext_resource type="Script" path="res://LEVELS/Catalog/MissionDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+Number = 3
+Title = "THE BULWARK ADVANCE"
+Description = "Blank terrain to design. Four waves of Standard Drones and Swift Interceptors; Bulwarks join in wave 3. Paint a route before playing."
+MapScenePath = "res://LEVELS/Level003/Level003.tscn"
+Enabled = true
