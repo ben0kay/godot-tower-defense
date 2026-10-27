@@ -12,11 +12,11 @@ internal static class TimedUpgradeChecks
     {
         using (AmmoLoopFixture f = new(runner)) await Progression(runner, f);
         Safety(runner); Deliveries(runner); ResultsPause(runner); await Automatic(runner);
-        GD.Print("PASS: C3 paid1→2→3 timing, old-tier operation, latest rank/ammo, selected progress/close/reselect, paused/overlapping work and zero/invalid/stale/free guards");
+        GD.Print("PASS: C3 paid1→2→3 timing, upgrade disable/resume, latest rank/ammo, selected progress/close/reselect, paused/overlapping work and zero/invalid/stale/free guards");
     }
 
     // =========================================================
-    // A paid target remains fixed while the old tier fires; latest rank is resolved only at completion.
+    // Paid work disables attacks but retains the prior cached tier; latest earned rank resolves at completion.
     private static async Task Progression(Node runner, AmmoLoopFixture f)
     {
         var manager = f.Main.GetNode<ConstructionWorkManager>("World/ConstructionWork");
@@ -35,7 +35,8 @@ internal static class TimedUpgradeChecks
         TowerFinalStats old = tower.FinalStats; double xp = tower.RankProgress.TotalXp;
         button.EmitSignal(Button.SignalName.Pressed);
         Require(tower.UpgradeLevel == 1 && tower.FinalStats == old && tower.RankProgress.TotalXp == xp && tower.WorkPhase == TowerWorkPhase.Upgrading
-            && tower.IsOperational && tower.IsBusy && tower.CaptureWorkState().PendingUpgradeLevel == 2 && tower.PendingUpgradeLevel == 2 && tower.WorkSeconds == 4 && started == 1 && changed == 0
+            && tower.IsOperational && tower.IsBusy && tower.IsDisabled && !tower.CanAttack && !tower.IsPhysicsProcessing()
+            && tower.GetDisableReason(0) == TowerDisableReason.Upgrading && tower.CaptureWorkState().PendingUpgradeLevel == 2 && tower.PendingUpgradeLevel == 2 && tower.WorkSeconds == 4 && started == 1 && changed == 0
             && tower.Ammunition.Inventory.Amount == 900 && tower.Ammunition.Inventory.Capacity == 1000, "Purchase charges once but preserves old tier/cached stats/XP/ammo");
         Require(f.Wallet.GetBalance(f.Wallet.CreditsResource) == 850 && button.Disabled && status.Text.Contains("UPGRADING") && status.Text.Contains("→ 2")
             && preview.Text.Contains("Cost already paid") && tower.UpgradeLevel == 1, "Inspector distinguishes paid work from another purchase");
@@ -45,7 +46,8 @@ internal static class TimedUpgradeChecks
         runner.GetTree().Paused = true; manager.Advance(100); runner.GetTree().Paused = false;
         Require(tower.ElapsedWorkSeconds == 1 && tower.UpgradeLevel == 1, "Upgrade clock freezes during pause");
         for (int i = 0; i < 60; i++) tower._PhysicsProcess(1.0 / 60);
-        Require(tower.Ammunition.Inventory.Amount < 900 && tower.UpgradeLevel == 1, "Old tier continues firing and consuming stock during upgrade");
+        Require(tower.Ammunition.Inventory.Amount == 900 && tower.UpgradeLevel == 1 && tower.IsDisabled,
+            "Upgrading disables firing and spends no ammo even under an explicit weapon tick");
         TowerRankController.AwardExperience(tower, 1000);
         Require(tower.CurrentRank.Rank == TowerRank.Veteran && tower.UpgradeLevel == 1 && tower.FinalStats.DamagePerShot == 31, "Promotion applies to old tier without ending work");
         BattleTower other = f.Add<BattleTower>("battle", new(2500, 2000)); f.Placement.Call("SelectTower", other);
@@ -60,7 +62,8 @@ internal static class TimedUpgradeChecks
         manager.Advance(.1);
         Require(tower.UpgradeLevel == 2 && tower.FinalStats == tower.ResolveLevel(2) && tower.FinalStats.DamagePerShot == 34
             && tower.RankProgress.TotalXp == 1000 && tower.Ammunition.Inventory.Amount == stock && tower.Ammunition.Inventory.Capacity == 1200
-            && completed == 1 && changed == 2 && inventoryChanges == 1 && tower.PendingUpgradeLevel == 0, "Completion resolves current rank, updates capacity once and never refills ammunition");
+            && completed == 1 && changed == 2 && inventoryChanges == 1 && tower.PendingUpgradeLevel == 0
+            && !tower.IsDisabled && tower.CanAttack && tower.IsPhysicsProcessing(), "Completion resolves current rank, updates capacity once and never refills ammunition");
         Require(status.Text == "OPERATIONAL" && !bar.Visible && !button.Disabled && preview.Text.Contains("LEVEL 3") && f.Wallet.GetBalance(f.Wallet.CreditsResource) == 850,
             "Completion updates actual Inspector stats/next preview with no additional payment");
         manager.Advance(99); Require(completed == 1 && changed == 2, "Repeated clock ticks cannot reapply a completed tier");
@@ -108,7 +111,7 @@ internal static class TimedUpgradeChecks
     }
 
     // =========================================================
-    // Existing logistics must keep serving an upgrading operational consumer, without duplicate registration.
+    // Passive logistics may still serve an upgrading tower; the weapon itself remains disabled.
     private static void Deliveries(Node runner)
     {
         using AmmoLoopFixture f = new(runner);
@@ -117,7 +120,7 @@ internal static class TimedUpgradeChecks
         Require(TowerUpgradeController.TryUpgrade(tower, f.Wallet, f.Placement.Settings, 1, out _), "Supply fixture begins upgrading");
         f.Dispatch(); Require(f.Logistics.Jobs.Count == 1 && tower.IsBusy, "Upgrading consumer still receives normal drone supply");
         var job = f.Logistics.Jobs[0]; f.Arrive(job); f.Return(job);
-        Require(tower.Ammunition.Inventory.Amount == 250 && tower.UpgradeLevel == 1, "Shipment unloads normally while old tier operates");
+        Require(tower.Ammunition.Inventory.Amount == 250 && tower.UpgradeLevel == 1, "Shipment unloads during disabled work without spending ammo");
     }
 
     // =========================================================
@@ -136,7 +139,7 @@ internal static class TimedUpgradeChecks
     }
 
     // =========================================================
-    // Real defeat/result pause must also freeze an upgrade without shutting off its old-tier state prematurely.
+    // Real defeat/result pause must also freeze an upgrade while keeping its attack-disabled state.
     private static void ResultsPause(Node runner)
     {
         using AmmoLoopFixture f = new(runner);
