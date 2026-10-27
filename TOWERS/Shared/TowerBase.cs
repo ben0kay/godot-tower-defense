@@ -124,9 +124,19 @@ public abstract partial class TowerBase : Node2D
         }
         ConstructionWorkManager manager = GetNodeOrNull<ConstructionWorkManager>("../../ConstructionWork");
         if (!GodotObject.IsInstanceValid(manager) || !manager.IsInsideTree() || manager.IsQueuedForDeletion()) return false;
-        try { manager.Register(this); } catch (InvalidOperationException) { return false; }
+        // Reserve a builder before registration so the work clock cannot advance during flight.
+        ConstructionDroneManager builders = GetNodeOrNull<ConstructionDroneManager>("../../ConstructionDrones");
+        if (builders?.CanServiceUpgrades != true) builders = null;
         _construction = manager; WorkPhase = TowerWorkPhase.Upgrading; PendingUpgradeLevel = next.Level;
         WorkSeconds = next.WorkSeconds; ElapsedWorkSeconds = _lastWorkNotice = 0;
+        _constructionDroneOwner = builders; ConstructionDroneReservation = builders?.Reserve() ?? 0;
+        try { manager.Register(this); }
+        catch (InvalidOperationException)
+        {
+            _construction = null; _constructionDroneOwner = null; ConstructionDroneReservation = 0;
+            WorkPhase = TowerWorkPhase.Operational; PendingUpgradeLevel = 0;
+            WorkSeconds = ElapsedWorkSeconds = _lastWorkNotice = 0; return false;
+        }
         // Suspend weapon/production callbacks while the independent shared work clock runs.
         SetPhysicsProcess(false);
         return true;
@@ -139,7 +149,17 @@ public abstract partial class TowerBase : Node2D
         if (!IsInsideTree() || IsQueuedForDeletion()) return;
         UpgradePurchased?.Invoke();
         if (!GodotObject.IsInstanceValid(this) || !IsInsideTree() || IsQueuedForDeletion()) return;
-        if (WorkPhase == TowerWorkPhase.Upgrading) { PublishDisableChanged(); WorkStarted?.Invoke(); }
+        if (WorkPhase == TowerWorkPhase.Upgrading)
+        {
+            PublishDisableChanged(); WorkStarted?.Invoke();
+            // Only queue once the wallet committed. Service loss falls back to ordinary timed work.
+            if (GodotObject.IsInstanceValid(this) && WorkPhase == TowerWorkPhase.Upgrading && AwaitingConstructionDrone)
+            {
+                ConstructionDroneManager builders = _constructionDroneOwner;
+                if (!GodotObject.IsInstanceValid(builders) || !builders.QueueUpgrade(this))
+                    ReleaseConstructionDrone(builders, ConstructionDroneReservation);
+            }
+        }
         else if (instant)
         {
             NotifyStatsChanged();
@@ -163,7 +183,7 @@ public abstract partial class TowerBase : Node2D
     private ConstructionWorkManager _construction;
     private ConstructionDroneManager _constructionDroneOwner;
     internal ulong ConstructionDroneReservation { get; private set; }
-    public bool AwaitingConstructionDrone => _constructionDroneOwner != null && WorkPhase == TowerWorkPhase.Constructing;
+    public bool AwaitingConstructionDrone => _constructionDroneOwner != null && IsBusy;
     private bool _operationalPhysics;
     private double _lastWorkNotice;
     public TowerWorkState CaptureWorkState() => new(WorkPhase, ElapsedWorkSeconds, WorkSeconds, PendingUpgradeLevel);
@@ -186,10 +206,10 @@ public abstract partial class TowerBase : Node2D
     }
 
     // =========================================================
-    // Arrival must match the exact initial paid-job reservation; upgrades and stale duplicate callbacks cannot release it.
+    // Both paid builds and upgrades validate the exact drone reservation; stale callbacks cannot release it.
     internal bool IsHeldBy(ConstructionDroneManager owner) => AwaitingConstructionDrone && _constructionDroneOwner == owner;
     // =========================================================
-    // Release only this builder reservation, then notify the existing work display without advancing time.
+    // Release only this builder reservation; update work visuals/HUD without advancing time.
     internal bool ReleaseConstructionDrone(ConstructionDroneManager owner, ulong reservation)
     {
         if (!IsHeldBy(owner) || reservation != ConstructionDroneReservation || IsDestroyed || IsQueuedForDeletion()) return false;
