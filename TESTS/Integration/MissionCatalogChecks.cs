@@ -26,7 +26,7 @@ public partial class MissionCatalogChecks : Node
                 Require(root.GetNode<WorldGrid>("World/Grid").Level.SceneFilePath == mission.MapScene.ResourcePath,
                     "Shared world installs correct authored map before Grid Ready");
                 Require(root.GetNode<WaveManager>("Waves").TotalWaves == WaveCatalog.GetWaves(root.GetNode<WorldGrid>("World/Grid").Level.Settings).Length,
-                    "Assigned C# recipe initializes existing scheduler");
+                    "Assigned wave resource initializes existing scheduler");
                 RemoveChild(root); root.Free();
             }
             using (var multi = new MultiCitadelChecks.Fixture(this))
