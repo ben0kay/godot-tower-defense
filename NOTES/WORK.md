@@ -1,3 +1,9 @@
+## 2026-10-29 — Wave Editor workspace and editable Level003
+
+Source-implemented `addons/wave_editor/` C# `[Tool]` main-screen Godot plugin with Open/New/Save/Reload and resizable wave/batch/enemy UI, duplication/reordering and production validation. Added native typed `WaveSetResource/WaveResource/WaveBatchResource/WaveEnemyResource` with conversion to existing immutable `WaveDefinition`; no new runtime scheduler or per-frame editor polling. Migrated Level003's existing four waves unchanged to `Level003Waves.tres`, pointed Level003Config.WaveSource to the external resource, kept its C# class only as a reference. Added focused parity/flags/metadata assertions in `WaveChecks`. Other levels remain C# sourced. Needs editor activation, .NET build and F6 smoke check locally. [Guide](../addons/wave_editor/README.md).
+
+---
+
 ## 2026-10-27 — CV1 shared square hologram during paid upgrades
 
 Enabled the existing `ConstructionSiteHologram` renderer for timed `TowerWorkPhase.Upgrading` in addition to `Constructing`, reusing the work manager's registration/teardown events and the same soft-wait/bright-working footprint overlay over the existing tower/tier art. Applies to all timed tower upgrades, drone or no-drone. No new scenes, assets, clocks, save schema or combat/price changes; dormant when all jobs finish. Focused `ConstructionDroneChecks` assertions now cover 1→2 and 2→3 waiting, beaming, 35/70% stages, completion cleanup and drone opt-out. Godot/.NET runtime and rendered visuals pending.

@@ -1,3 +1,9 @@
+## Full-size Godot Wave Editor tab + Level003 .tres waves — 2026-10-29
+
+Added a `[Tool]` C# main-screen **Wave Editor** plugin (`addons/wave_editor/`), opened from the same workspace selector as Godot's 2D/3D/Script tabs. A resizable editor now opens/creates/saves native `WaveSetResource` `.tres` files with waves, ordered batches, counts, intervals, delays, weighted enemy entries, portal/shield/stealth and optional presentation fields, while preserving the existing immutable `WaveDefinition` runtime data and all weighted spawn mechanics. **Level003** now references `LEVELS/Level003/Level003Waves.tres` with identical 18/22/26/32 enemy counts; original `Level003Waves.cs` remains only as a comparison fixture. Other levels stay C# authored. Build the C# project, enable **Project Settings → Plugins → Wave Editor**, click the new tab. See [plugin guide](addons/wave_editor/README.md). Source checks added; Godot editor/runtime playtest remains pending.
+
+---
+
 ## Square construction-site overlay on paid upgrades — 2026-10-27
 
 Timed tower upgrades now also display the existing **cyan square construction hologram** (footprint brackets, blueprint and scanner) over the still-visible tower, from accepted upgrade purchase through queued drone/beam and staged artwork to work completion. Existing `World/Effects/ConstructionSiteHolograms` handles initial builds **and** upgrades with no new nodes, per-tower animation or payment/timing changes; zero-duration upgrades remain instant. [CV1 visual documentation](TOWERS/Shared/Construction/Visuals/README.md). Source checks updated; editor/visual confirmation pending.

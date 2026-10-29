@@ -1,0 +1,361 @@
+// Editor-only, event-driven authoring panel for editable WaveSetResource .tres files.
+// No game-state changes or per-frame polling: all edits are explicit, saved by the user.
+#if TOOLS
+using Godot;
+using System;
+using System.Linq;
+
+[Tool]
+public partial class WaveEditorPanel : PanelContainer
+{
+    #region Document and Selection
+    private const string ExamplePath = "res://LEVELS/Level003/Level003Waves.tres";
+    private WaveSetResource _source;
+    private string _path = "";
+    private int _waveIndex, _batchIndex, _enemyIndex;
+    private bool _refreshing, _dirty;
+    private Label _fileLabel, _status, _totals;
+    private Button _saveButton;
+    private ItemList _waves, _batches, _enemies;
+    private VBoxContainer _waveFields, _batchFields, _enemyFields;
+    private SpinBox _waveNumber, _count, _interval, _after, _weight;
+    private OptionButton _alert;
+    private LineEdit _bannerTitle, _bannerDescription, _speaker, _narration, _voiceCue, _enemyId, _portal;
+    private CheckBox _shield, _stealth;
+    private EditorFileDialog _openFile, _newFile;
+    private ConfirmationDialog _discard;
+    private WaveResource Wave => _source != null && _waveIndex >= 0 && _waveIndex < _source.Waves.Count ? _source.Waves[_waveIndex] : null;
+    private WaveBatchResource Batch => Wave != null && _batchIndex >= 0 && _batchIndex < Wave.Batches.Count ? Wave.Batches[_batchIndex] : null;
+    private WaveEnemyResource Entry => Batch != null && _enemyIndex >= 0 && _enemyIndex < Batch.Enemies.Count ? Batch.Enemies[_enemyIndex] : null;
+    #endregion
+
+    #region Interface Construction
+    // =========================================================
+    // Build the interface once, with resizable wave/batch columns and a scrollable details pane.
+    public override void _Ready()
+    {
+        SetProcess(false); SetPhysicsProcess(false);
+        var margin = new MarginContainer();
+        foreach (string edge in new[] { "left", "right", "top", "bottom" })
+            margin.AddThemeConstantOverride("margin_" + edge, 12);
+        AddChild(margin);
+        var root = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
+        root.AddThemeConstantOverride("separation", 10); margin.AddChild(root);
+
+        var title = new HBoxContainer();
+        root.AddChild(title);
+        title.AddChild(new Label { Text = "WAVE EDITOR", ThemeTypeVariation = "HeaderSmall", CustomMinimumSize = new Vector2(120, 0) });
+        _fileLabel = new Label { SizeFlagsHorizontal = SizeFlags.ExpandFill, ClipText = true };
+        title.AddChild(_fileLabel);
+        title.AddChild(Button("Open .tres", Open));
+        title.AddChild(Button("New .tres", New));
+        _saveButton = Button("Save", Save); title.AddChild(_saveButton);
+        title.AddChild(Button("Reload", Reload));
+
+        var split = new HSplitContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
+        root.AddChild(split);
+        var wavePane = Pane("Waves", 205); split.AddChild(wavePane);
+        _waves = ItemList(wavePane, index => { _waveIndex = index; _batchIndex = _enemyIndex = 0; Refresh(); });
+        Buttons(wavePane, ("+ Wave", AddWave), ("Duplicate", DuplicateWave), ("Delete", DeleteWave));
+        Buttons(wavePane, ("Move ↑", () => MoveWave(-1)), ("Move ↓", () => MoveWave(1)));
+        var second = new HSplitContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
+        split.AddChild(second);
+        var batchPane = Pane("Batches", 245); second.AddChild(batchPane);
+        _batches = ItemList(batchPane, index => { _batchIndex = index; _enemyIndex = 0; Refresh(); });
+        Buttons(batchPane, ("+ Batch", AddBatch), ("Duplicate", DuplicateBatch), ("Delete", DeleteBatch));
+        Buttons(batchPane, ("Move ↑", () => MoveBatch(-1)), ("Move ↓", () => MoveBatch(1)));
+
+        var detailsScroll = new ScrollContainer { CustomMinimumSize = new Vector2(345, 0),
+            SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
+        second.AddChild(detailsScroll);
+        var details = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        details.AddThemeConstantOverride("separation", 10);
+        detailsScroll.AddChild(details);
+
+        _waveFields = Pane("Selected wave / presentation", 0); details.AddChild(_waveFields);
+        _waveNumber = Number(_waveFields, "Wave number", 1, 10000, 1, v => Wave.Number = (int)v);
+        _alert = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        foreach (WaveAlertKind alert in Enum.GetValues<WaveAlertKind>()) _alert.AddItem(alert.ToString());
+        Field(_waveFields, "Alert", _alert);
+        _alert.ItemSelected += i => { if (!_refreshing && Wave != null) { Wave.Alert = (WaveAlertKind)i; Dirty(); } };
+        _bannerTitle = Text(_waveFields, "Banner title", v => Wave.BannerTitle = v);
+        _bannerDescription = Text(_waveFields, "Banner description", v => Wave.BannerDescription = v);
+        _speaker = Text(_waveFields, "Speaker", v => Wave.Speaker = v);
+        _narration = Text(_waveFields, "Narration", v => Wave.NarrationText = v);
+        _voiceCue = Text(_waveFields, "Voice cue ID", v => Wave.VoiceCueId = v);
+
+        _batchFields = Pane("Selected batch", 0); details.AddChild(_batchFields);
+        _count = Number(_batchFields, "Total enemies", 1, 100000, 1, v => Batch.Count = (int)v);
+        _interval = Number(_batchFields, "Seconds between spawns", 0, 3600, .01, v => Batch.Interval = v);
+        _after = Number(_batchFields, "Delay after batch (seconds)", 0, 3600, .01, v => Batch.After = v);
+        _batchFields.AddChild(new Label { Text = "Enemy mix — weights are relative (e.g. 75 / 25).",
+            AutowrapMode = TextServer.AutowrapMode.WordSmart });
+        _enemies = ItemList(_batchFields, index => { _enemyIndex = index; Refresh(); });
+        _enemies.CustomMinimumSize = new Vector2(0, 135);
+        Buttons(_batchFields, ("+ Enemy", AddEnemy), ("Duplicate", DuplicateEnemy), ("Delete", DeleteEnemy));
+
+        _enemyFields = Pane("Selected enemy entry", 0); details.AddChild(_enemyFields);
+        _enemyId = Text(_enemyFields, "Enemy catalog ID", v => Entry.EnemyId = v);
+        _weight = Number(_enemyFields, "Weight", 0, 10000, .01, v => Entry.Weight = v);
+        _portal = Text(_enemyFields, "Required portal (blank = any)", v => Entry.Portal = v);
+        _shield = Check(_enemyFields, "Spawn with shield", v => Entry.Shield = v);
+        _stealth = Check(_enemyFields, "Spawn with stealth", v => Entry.Stealth = v);
+        details.AddChild(new Label { Text = "Enemy IDs are validated against DefaultEnemyCatalog.tres when saving.\n" +
+            "Wave order = list order; counts are per batch, not per enemy entry.", AutowrapMode = TextServer.AutowrapMode.WordSmart });
+
+        var footer = new HBoxContainer(); root.AddChild(footer);
+        _status = new Label { Text = "Choose a .tres wave set.", SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        _totals = new Label(); footer.AddChild(_status); footer.AddChild(_totals);
+        SetupDialogs(); LoadPath(ExamplePath);
+    }
+
+    // =========================================================
+    // Small composable widgets keep the editor structure readable without a bulky .tscn tree.
+    private static Button Button(string label, Action clicked)
+    { var button = new Button { Text = label }; button.Pressed += clicked; return button; }
+    private static VBoxContainer Pane(string heading, float minWidth)
+    {
+        var pane = new VBoxContainer { CustomMinimumSize = new Vector2(minWidth, 0), SizeFlagsVertical = SizeFlags.ExpandFill };
+        pane.AddThemeConstantOverride("separation", 7);
+        pane.AddChild(new Label { Text = heading.ToUpperInvariant() }); return pane;
+    }
+    private static void Buttons(VBoxContainer parent, params (string label, Action clicked)[] items)
+    { var row = new HBoxContainer(); parent.AddChild(row);
+        foreach (var item in items) { Button b = Button(item.label, item.clicked); b.SizeFlagsHorizontal = SizeFlags.ExpandFill; row.AddChild(b); }
+    }
+    private static ItemList ItemList(VBoxContainer parent, Action<int> selected)
+    {
+        var list = new ItemList { SelectMode = ItemList.SelectModeEnum.Single, SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            SizeFlagsVertical = SizeFlags.ExpandFill };
+        parent.AddChild(list); list.ItemSelected += index => selected((int)index); return list;
+    }
+    private static void Field(VBoxContainer parent, string label, Control control)
+    {
+        var row = new HBoxContainer(); parent.AddChild(row);
+        row.AddChild(new Label { Text = label, CustomMinimumSize = new Vector2(175, 0) });
+        control.SizeFlagsHorizontal = SizeFlags.ExpandFill; row.AddChild(control);
+    }
+    private SpinBox Number(VBoxContainer parent, string label, double min, double max, double step, Action<double> changed)
+    {
+        var box = new SpinBox { MinValue = min, MaxValue = max, Step = step, Rounded = step >= 1 };
+        Field(parent, label, box);
+        box.ValueChanged += v => { if (!_refreshing && _source != null) { changed(v); Dirty(); } };
+        return box;
+    }
+    private LineEdit Text(VBoxContainer parent, string label, Action<string> changed)
+    {
+        var edit = new LineEdit { PlaceholderText = "Optional" };
+        Field(parent, label, edit);
+        edit.TextChanged += v => { if (!_refreshing && _source != null) { changed(v); Dirty(); } };
+        edit.TextSubmitted += _ => Refresh();
+        return edit;
+    }
+    private CheckBox Check(VBoxContainer parent, string label, Action<bool> changed)
+    {
+        var check = new CheckBox { Text = label }; parent.AddChild(check);
+        check.Toggled += v => { if (!_refreshing && _source != null) { changed(v); Dirty(); } };
+        return check;
+    }
+    #endregion
+
+    #region Document Loading and Saving
+    // =========================================================
+    // Use resource-aware file pickers so this editor never touches the user's profile saves.
+    private void SetupDialogs()
+    {
+        _openFile = new EditorFileDialog { Access = EditorFileDialog.AccessEnum.Resources,
+            FileMode = EditorFileDialog.FileModeEnum.OpenFile, Title = "Open wave set" };
+        _openFile.AddFilter("*.tres", "Godot Resources");
+        AddChild(_openFile); _openFile.FileSelected += LoadPath;
+        _newFile = new EditorFileDialog { Access = EditorFileDialog.AccessEnum.Resources,
+            FileMode = EditorFileDialog.FileModeEnum.SaveFile, Title = "Create wave set" };
+        _newFile.AddFilter("*.tres", "Godot Resources");
+        AddChild(_newFile); _newFile.FileSelected += CreatePath;
+        _discard = new ConfirmationDialog { Title = "Discard wave edits", DialogText = "Discard unsaved changes and reload this wave set?" };
+        AddChild(_discard); _discard.Confirmed += () => { _dirty = false; LoadPath(_path); };
+    }
+    private void Open()
+    {
+        if (_dirty) { Message("Save or Reload unsaved changes before opening another file."); return; }
+        _openFile.PopupCenteredRatio(.75f);
+    }
+    private void New()
+    {
+        if (_dirty) { Message("Save or Reload unsaved changes before creating another file."); return; }
+        _newFile.CurrentFile = "NewLevelWaves.tres";
+        _newFile.PopupCenteredRatio(.75f);
+    }
+    private void Reload()
+    { if (string.IsNullOrEmpty(_path)) return;
+        if (_dirty) _discard.PopupCentered(); else LoadPath(_path); }
+
+    // =========================================================
+    // A new set has one immediately editable wave/batch/entry and stays separate from existing C# sets.
+    private void CreatePath(string path)
+    {
+        if (!path.StartsWith("res://", StringComparison.Ordinal) || !path.EndsWith(".tres", StringComparison.OrdinalIgnoreCase))
+        { Message("Choose a project .tres path."); return; }
+        _source = new WaveSetResource();
+        var wave = new WaveResource();
+        var batch = new WaveBatchResource();
+        batch.Enemies.Add(new WaveEnemyResource()); wave.Batches.Add(batch); _source.Waves.Add(wave);
+        _path = path; _waveIndex = _batchIndex = _enemyIndex = 0; _dirty = true;
+        Refresh(); Save();
+    }
+
+    // =========================================================
+    // Load fresh resource data; never alter an existing C# WaveSetSource through this editor.
+    private void LoadPath(string path)
+    {
+        if (_dirty) { Message("Save changes before switching files, or Reload to discard."); return; }
+        try
+        {
+            Resource resource = ResourceLoader.Load(path, cacheMode: ResourceLoader.CacheMode.Replace);
+            if (resource is not WaveSetResource set) { Message("Not a WaveSetResource .tres: " + path); return; }
+            _source = set; _path = path; _waveIndex = _batchIndex = _enemyIndex = 0; _dirty = false;
+            Refresh(); Message("Loaded " + path);
+        }
+        catch (Exception ex) { Message("Cannot open: " + ex.Message); }
+    }
+
+    // =========================================================
+    // Validate using the production wave catalog before writing; invalid edits stay in the editor for repair.
+    private void Save()
+    {
+        if (_source == null || string.IsNullOrEmpty(_path)) { Message("Open or create a wave set first."); return; }
+        try
+        {
+            WaveDefinition[] waves = _source.Build();
+            WaveCatalog.Validate(waves, EnemyCatalog.Default.ToSceneMap());
+            Error error = ResourceSaver.Save(_source, _path);
+            if (error != Error.Ok) { Message("Save failed: " + error); return; }
+            _dirty = false; _fileLabel.Text = _path; _saveButton.Disabled = true;
+            EditorInterface.Singleton.GetResourceFilesystem().Scan();
+            Message("Saved " + waves.Length + " waves to " + _path);
+        }
+        catch (Exception ex) { Message("Cannot save: " + ex.Message); }
+    }
+
+    private void Dirty()
+    {
+        _dirty = true;
+        _fileLabel.Text = _path + "  * UNSAVED";
+        _saveButton.Disabled = false;
+        if (_source != null) _totals.Text = _source.Waves.Count + " waves";
+    }
+    private void Message(string text) { if (_status != null) _status.Text = text; }
+    #endregion
+
+    #region Editable Wave / Batch / Enemy Operations
+    // =========================================================
+    // Content edits change only the selected .tres source, never runtime WaveManager.
+    private void AddWave()
+    {
+        if (_source == null) return;
+        var wave = new WaveResource { Number = _source.Waves.Count == 0 ? 1 : _source.Waves.Max(w => w.Number) + 1 };
+        var batch = new WaveBatchResource(); batch.Enemies.Add(new WaveEnemyResource());
+        wave.Batches.Add(batch); _source.Waves.Add(wave); _waveIndex = _source.Waves.Count - 1; _batchIndex = _enemyIndex = 0;
+        Dirty(); Refresh();
+    }
+    private void DuplicateWave()
+    {
+        if (Wave == null) return;
+        var copy = Wave.Copy(); copy.Number = _source.Waves.Max(w => w.Number) + 1;
+        _source.Waves.Insert(_waveIndex + 1, copy); _waveIndex++; _batchIndex = _enemyIndex = 0; Dirty(); Refresh();
+    }
+    private void DeleteWave()
+    {
+        if (Wave == null) return; _source.Waves.RemoveAt(_waveIndex);
+        _waveIndex = Math.Clamp(_waveIndex, 0, _source.Waves.Count - 1); _batchIndex = _enemyIndex = 0; Dirty(); Refresh();
+    }
+    private void MoveWave(int direction)
+    {
+        int next = _waveIndex + direction;
+        if (Wave == null || next < 0 || next >= _source.Waves.Count) return;
+        (_source.Waves[_waveIndex], _source.Waves[next]) = (_source.Waves[next], _source.Waves[_waveIndex]);
+        _waveIndex = next; Dirty(); Refresh();
+    }
+    private void AddBatch()
+    {
+        if (Wave == null) return;
+        var batch = new WaveBatchResource(); batch.Enemies.Add(new WaveEnemyResource());
+        Wave.Batches.Add(batch); _batchIndex = Wave.Batches.Count - 1; _enemyIndex = 0; Dirty(); Refresh();
+    }
+    private void DuplicateBatch()
+    {
+        if (Batch == null) return;
+        Wave.Batches.Insert(_batchIndex + 1, Batch.Copy()); _batchIndex++; _enemyIndex = 0; Dirty(); Refresh();
+    }
+    private void DeleteBatch()
+    {
+        if (Batch == null) return; Wave.Batches.RemoveAt(_batchIndex);
+        _batchIndex = Math.Clamp(_batchIndex, 0, Wave.Batches.Count - 1); _enemyIndex = 0; Dirty(); Refresh();
+    }
+    private void MoveBatch(int direction)
+    {
+        int next = _batchIndex + direction;
+        if (Batch == null || next < 0 || next >= Wave.Batches.Count) return;
+        (Wave.Batches[_batchIndex], Wave.Batches[next]) = (Wave.Batches[next], Wave.Batches[_batchIndex]);
+        _batchIndex = next; Dirty(); Refresh();
+    }
+    private void AddEnemy()
+    {
+        if (Batch == null) return; Batch.Enemies.Add(new WaveEnemyResource());
+        _enemyIndex = Batch.Enemies.Count - 1; Dirty(); Refresh();
+    }
+    private void DuplicateEnemy()
+    {
+        if (Entry == null) return; Batch.Enemies.Insert(_enemyIndex + 1, Entry.Copy()); _enemyIndex++; Dirty(); Refresh();
+    }
+    private void DeleteEnemy()
+    {
+        if (Entry == null) return; Batch.Enemies.RemoveAt(_enemyIndex);
+        _enemyIndex = Math.Clamp(_enemyIndex, 0, Batch.Enemies.Count - 1); Dirty(); Refresh();
+    }
+    #endregion
+
+    #region View Updates
+    // =========================================================
+    // Editor controls refresh only on document/selection edits, never in _Process.
+    private void Refresh()
+    {
+        _refreshing = true;
+        try
+        {
+            _waves.Clear(); _batches.Clear(); _enemies.Clear();
+            if (_source != null) foreach (var w in _source.Waves)
+                _waves.AddItem(w == null ? "Missing wave" : $"Wave {w.Number}    ({w.Batches.Sum(b => b?.Count ?? 0)} ships)");
+            if (_waveIndex >= 0 && _waveIndex < _waves.ItemCount) _waves.Select(_waveIndex);
+            var wave = Wave;
+            if (wave != null) foreach (var batch in wave.Batches)
+                _batches.AddItem(batch == null ? "Missing batch" : $"Batch {_batches.ItemCount + 1}    {batch.Count} ships   {batch.Interval:0.##}s");
+            if (_batchIndex >= 0 && _batchIndex < _batches.ItemCount) _batches.Select(_batchIndex);
+            var batchSelected = Batch;
+            if (batchSelected != null) foreach (var enemy in batchSelected.Enemies)
+                _enemies.AddItem(enemy == null ? "Missing enemy" : $"{enemy.EnemyId}   weight {enemy.Weight:0.##}" +
+                    (enemy.Shield ? "  [shield]" : "") + (enemy.Stealth ? "  [stealth]" : ""));
+            if (_enemyIndex >= 0 && _enemyIndex < _enemies.ItemCount) _enemies.Select(_enemyIndex);
+            _waveFields.Visible = wave != null; _batchFields.Visible = batchSelected != null; _enemyFields.Visible = Entry != null;
+            if (wave != null)
+            {
+                _waveNumber.Value = wave.Number; _alert.Select((int)wave.Alert);
+                _bannerTitle.Text = wave.BannerTitle ?? ""; _bannerDescription.Text = wave.BannerDescription ?? "";
+                _speaker.Text = wave.Speaker ?? ""; _narration.Text = wave.NarrationText ?? "";
+                _voiceCue.Text = wave.VoiceCueId ?? "";
+            }
+            if (batchSelected != null) { _count.Value = batchSelected.Count; _interval.Value = batchSelected.Interval; _after.Value = batchSelected.After; }
+            if (Entry != null)
+            {
+                _enemyId.Text = Entry.EnemyId ?? ""; _weight.Value = Entry.Weight; _portal.Text = Entry.Portal ?? "";
+                _shield.ButtonPressed = Entry.Shield; _stealth.ButtonPressed = Entry.Stealth;
+            }
+            _fileLabel.Text = _path + (_dirty ? "  * UNSAVED" : "");
+            _saveButton.Disabled = !_dirty || _source == null;
+            _totals.Text = _source == null ? "" : $"{_source.Waves.Count} waves  ·  " +
+                $"{_source.Waves.Sum(w => w?.Batches.Sum(b => b?.Count ?? 0) ?? 0)} enemies";
+        }
+        finally { _refreshing = false; }
+    }
+    #endregion
+}
+#endif

@@ -1,4 +1,4 @@
-// Level003: four modest unshielded encounters; Enemy004 (Bulwark) joins for waves 3–4.
+// Level003 original C# recipe retained for resource-parity checks; gameplay now reads Level003Waves.tres.
 // Enemy001=basic_mk1, Enemy002=scout_mk1, Enemy004=medium_mk1; no special variants.
 using Godot;
 using static WaveBuilder;

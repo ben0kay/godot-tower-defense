@@ -1,3 +1,11 @@
+## Editable .tres wave sets and main-screen Godot Wave Editor (pilot, 2026-10-29)
+
+`WaveSetSource` now has a data-only, `[Tool]` `WaveSetResource` alternative to the existing C# recipes. The **Wave Editor** main-screen plugin in `addons/wave_editor` opens, edits, validates and saves wave/batch/enemy `.tres` resources, including weights, count, interval, delay, portals, shield/stealth and optional narrated presentation. Existing `WaveCatalog` / `WaveManager` / weighted composition remain unchanged. **Level003** is the opt-in sample: `Level003Config.tres → Level003Waves.tres`; the previous C# file remains only as a test/reference. Levels001, 002, 020 and100 are still C# authored. See [Wave Editor guide](../../addons/wave_editor/README.md) and [resource model](Resources/README.md).
+
+This section supersedes the historical statements below claiming only C# wave editing is supported. Enable after C# build via **Project → Project Settings → Plugins → Wave Editor**. Source-level checks added; editor launch and in-game parity test must be run locally.
+
+---
+
 ## NP1 confirmed; NP2 top-right tactical narrator in source (2026-10-20)
 
 The NP1 accepted-wave `WaveStarted` + existing major `WAVE NN INCOMING` banners are implemented and visually approved. NP2 extends the same shared presentation controller to show an **optional top-right typewritten tactical transmission**, authored directly beside a wave's batches. Level020 waves 1,4,6,7 are examples; all others remain banner-only. There is no gameplay, wave timing or voice change. See [Presentation/README.md](Presentation/README.md) and [Narration README](../../UI/Narration/README.md). Build/headless/desktop NP2 verification pending.
