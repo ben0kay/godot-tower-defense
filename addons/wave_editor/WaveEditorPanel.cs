@@ -55,13 +55,13 @@ public partial class WaveEditorPanel : PanelContainer
         var split = new HSplitContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
         root.AddChild(split);
         var wavePane = Pane("Waves", 205); split.AddChild(wavePane);
-        _waves = ItemList(wavePane, index => { _waveIndex = index; _batchIndex = _enemyIndex = 0; Refresh(); });
+        _waves = CreateItemList(wavePane, index => { _waveIndex = index; _batchIndex = _enemyIndex = 0; Refresh(); });
         Buttons(wavePane, ("+ Wave", AddWave), ("Duplicate", DuplicateWave), ("Delete", DeleteWave));
         Buttons(wavePane, ("Move ↑", () => MoveWave(-1)), ("Move ↓", () => MoveWave(1)));
         var second = new HSplitContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
         split.AddChild(second);
         var batchPane = Pane("Batches", 245); second.AddChild(batchPane);
-        _batches = ItemList(batchPane, index => { _batchIndex = index; _enemyIndex = 0; Refresh(); });
+        _batches = CreateItemList(batchPane, index => { _batchIndex = index; _enemyIndex = 0; Refresh(); });
         Buttons(batchPane, ("+ Batch", AddBatch), ("Duplicate", DuplicateBatch), ("Delete", DeleteBatch));
         Buttons(batchPane, ("Move ↑", () => MoveBatch(-1)), ("Move ↓", () => MoveBatch(1)));
 
@@ -90,7 +90,7 @@ public partial class WaveEditorPanel : PanelContainer
         _after = Number(_batchFields, "Delay after batch (seconds)", 0, 3600, .01, v => Batch.After = v);
         _batchFields.AddChild(new Label { Text = "Enemy mix — weights are relative (e.g. 75 / 25).",
             AutowrapMode = TextServer.AutowrapMode.WordSmart });
-        _enemies = ItemList(_batchFields, index => { _enemyIndex = index; Refresh(); });
+        _enemies = CreateItemList(_batchFields, index => { _enemyIndex = index; Refresh(); });
         _enemies.CustomMinimumSize = new Vector2(0, 135);
         Buttons(_batchFields, ("+ Enemy", AddEnemy), ("Duplicate", DuplicateEnemy), ("Delete", DeleteEnemy));
 
@@ -123,7 +123,7 @@ public partial class WaveEditorPanel : PanelContainer
     { var row = new HBoxContainer(); parent.AddChild(row);
         foreach (var item in items) { Button b = Button(item.label, item.clicked); b.SizeFlagsHorizontal = SizeFlags.ExpandFill; row.AddChild(b); }
     }
-    private static ItemList ItemList(VBoxContainer parent, Action<int> selected)
+    private static ItemList CreateItemList(VBoxContainer parent, Action<int> selected)
     {
         var list = new ItemList { SelectMode = ItemList.SelectModeEnum.Single, SizeFlagsHorizontal = SizeFlags.ExpandFill,
             SizeFlagsVertical = SizeFlags.ExpandFill };
