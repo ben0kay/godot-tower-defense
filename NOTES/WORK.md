@@ -1,3 +1,9 @@
+## 2026-10-29 — Wave Editor CS0119 build fix
+
+Fixed user-reported `WaveEditorPanel.cs(128,48)`: the local `ItemList` helper shadowed Godot's `ItemList` enum accessor. Renamed helper and its three calls to `CreateItemList`. Other wave editor logic unchanged; local Godot/.NET rebuild pending.
+
+---
+
 ## 2026-10-29 — Wave Editor workspace and editable Level003
 
 Source-implemented `addons/wave_editor/` C# `[Tool]` main-screen Godot plugin with Open/New/Save/Reload and resizable wave/batch/enemy UI, duplication/reordering and production validation. Added native typed `WaveSetResource/WaveResource/WaveBatchResource/WaveEnemyResource` with conversion to existing immutable `WaveDefinition`; no new runtime scheduler or per-frame editor polling. Migrated Level003's existing four waves unchanged to `Level003Waves.tres`, pointed Level003Config.WaveSource to the external resource, kept its C# class only as a reference. Added focused parity/flags/metadata assertions in `WaveChecks`. Other levels remain C# sourced. Needs editor activation, .NET build and F6 smoke check locally. [Guide](../addons/wave_editor/README.md).

@@ -1,3 +1,9 @@
+## 2026-10-29 — first C# compile fix
+
+Renamed the Wave Editor panel's `ItemList(...)` factory to `CreateItemList(...)`, avoiding a C# member-name collision with `Godot.ItemList.SelectModeEnum.Single` (CS0119 at line 128). The three wave, batch and enemy list factory calls were updated. No editing or wave-data behavior changed. Source-checked only; rebuild in Godot .NET to verify and report any subsequent errors.
+
+---
+
 # Wave Editor — Godot main-screen plugin (pilot)
 
 **Source implemented 2026-10-29 on `dev`; Godot/.NET build and editor UI acceptance pending.** This is a Godot **EditorPlugin**, not an in-game menu. It adds a `Wave Editor` workspace button beside Godot's 2D / 3D / Script views. Its UI is a single editor-only, event-driven `WaveEditorPanel` instance, not gameplay scene nodes.
