@@ -1,0 +1,155 @@
+[gd_resource type="Resource" script_class="WaveSetResource" format=3]
+
+[ext_resource type="Script" path="res://LEVELS/Waves/Resources/WaveSetResource.cs" id="set"]
+[ext_resource type="Script" path="res://LEVELS/Waves/Resources/WaveResource.cs" id="wave"]
+[ext_resource type="Script" path="res://LEVELS/Waves/Resources/WaveBatchResource.cs" id="batch"]
+[ext_resource type="Script" path="res://LEVELS/Waves/Resources/WaveEnemyResource.cs" id="enemy"]
+
+[sub_resource type="Resource" id="E1_1_1"]
+script = ExtResource("enemy")
+EnemyId = "basic_mk1"
+Weight = 100.0
+
+[sub_resource type="Resource" id="B1_1"]
+script = ExtResource("batch")
+Count = 12
+Interval = 0.85
+After = 3.0
+Enemies = Array[ExtResource("enemy")]([SubResource("E1_1_1")])
+
+[sub_resource type="Resource" id="E1_2_1"]
+script = ExtResource("enemy")
+EnemyId = "scout_mk1"
+Weight = 100.0
+
+[sub_resource type="Resource" id="B1_2"]
+script = ExtResource("batch")
+Count = 6
+Interval = 0.95
+After = 0.0
+Enemies = Array[ExtResource("enemy")]([SubResource("E1_2_1")])
+
+[sub_resource type="Resource" id="W1"]
+script = ExtResource("wave")
+Number = 1
+Batches = Array[ExtResource("batch")]([SubResource("B1_1"), SubResource("B1_2")])
+
+[sub_resource type="Resource" id="E2_1_1"]
+script = ExtResource("enemy")
+EnemyId = "basic_mk1"
+Weight = 100.0
+
+[sub_resource type="Resource" id="B2_1"]
+script = ExtResource("batch")
+Count = 14
+Interval = 0.68
+After = 3.0
+Enemies = Array[ExtResource("enemy")]([SubResource("E2_1_1")])
+
+[sub_resource type="Resource" id="E2_2_1"]
+script = ExtResource("enemy")
+EnemyId = "scout_mk1"
+Weight = 100.0
+
+[sub_resource type="Resource" id="B2_2"]
+script = ExtResource("batch")
+Count = 8
+Interval = 0.85
+After = 0.0
+Enemies = Array[ExtResource("enemy")]([SubResource("E2_2_1")])
+
+[sub_resource type="Resource" id="W2"]
+script = ExtResource("wave")
+Number = 2
+Batches = Array[ExtResource("batch")]([SubResource("B2_1"), SubResource("B2_2")])
+
+[sub_resource type="Resource" id="E3_1_1"]
+script = ExtResource("enemy")
+EnemyId = "basic_mk1"
+Weight = 100.0
+
+[sub_resource type="Resource" id="B3_1"]
+script = ExtResource("batch")
+Count = 14
+Interval = 0.68
+After = 3.0
+Enemies = Array[ExtResource("enemy")]([SubResource("E3_1_1")])
+
+[sub_resource type="Resource" id="E3_2_1"]
+script = ExtResource("enemy")
+EnemyId = "scout_mk1"
+Weight = 100.0
+
+[sub_resource type="Resource" id="B3_2"]
+script = ExtResource("batch")
+Count = 8
+Interval = 0.85
+After = 3.0
+Enemies = Array[ExtResource("enemy")]([SubResource("E3_2_1")])
+
+[sub_resource type="Resource" id="E3_3_1"]
+script = ExtResource("enemy")
+EnemyId = "medium_mk1"
+Weight = 100.0
+
+[sub_resource type="Resource" id="B3_3"]
+script = ExtResource("batch")
+Count = 4
+Interval = 1.3
+After = 0.0
+Enemies = Array[ExtResource("enemy")]([SubResource("E3_3_1")])
+
+[sub_resource type="Resource" id="W3"]
+script = ExtResource("wave")
+Number = 3
+Batches = Array[ExtResource("batch")]([SubResource("B3_1"), SubResource("B3_2"), SubResource("B3_3")])
+
+[sub_resource type="Resource" id="E4_1_1"]
+script = ExtResource("enemy")
+EnemyId = "basic_mk1"
+Weight = 75.0
+
+[sub_resource type="Resource" id="E4_1_2"]
+script = ExtResource("enemy")
+EnemyId = "scout_mk1"
+Weight = 25.0
+
+[sub_resource type="Resource" id="B4_1"]
+script = ExtResource("batch")
+Count = 16
+Interval = 0.6
+After = 3.0
+Enemies = Array[ExtResource("enemy")]([SubResource("E4_1_1"), SubResource("E4_1_2")])
+
+[sub_resource type="Resource" id="E4_2_1"]
+script = ExtResource("enemy")
+EnemyId = "scout_mk1"
+Weight = 100.0
+
+[sub_resource type="Resource" id="B4_2"]
+script = ExtResource("batch")
+Count = 8
+Interval = 0.8
+After = 3.0
+Enemies = Array[ExtResource("enemy")]([SubResource("E4_2_1")])
+
+[sub_resource type="Resource" id="E4_3_1"]
+script = ExtResource("enemy")
+EnemyId = "medium_mk1"
+Weight = 100.0
+
+[sub_resource type="Resource" id="B4_3"]
+script = ExtResource("batch")
+Count = 8
+Interval = 1.1
+After = 0.0
+Enemies = Array[ExtResource("enemy")]([SubResource("E4_3_1")])
+
+[sub_resource type="Resource" id="W4"]
+script = ExtResource("wave")
+Number = 4
+Batches = Array[ExtResource("batch")]([SubResource("B4_1"), SubResource("B4_2"), SubResource("B4_3")])
+
+[resource]
+script = ExtResource("set")
+Waves = Array[ExtResource("wave")]([SubResource("W1"), SubResource("W2"), SubResource("W3"), SubResource("W4")])
