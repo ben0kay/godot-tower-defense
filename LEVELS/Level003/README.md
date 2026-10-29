@@ -29,4 +29,4 @@ Settings: **1,200 starting Credits**, **1,000 Citadel HP**, normal provisional p
 
 `Level003Mission.tres` is **enabled** and registered after Level002 in `LEVELS/Catalog/DefaultMissionCatalog.tres`. Deploy from **Campaign → Levels → Level003** once you've painted a navigable map; Level002's Next now points here. Retry/relaunch use the existing shared `LEVELS/Runtime/Battlefield.tscn`; there is no `MainLevel003` or `WorldLevel003`.
 
-**Validation:** includes a new focused wave-resource comparison with the original C# recipe (run locally); No Godot/.NET headless or desktop checks were run; paint first and do a brief local map-routing/combat smoke test.
+**Validation:** a focused regression comparison against the original C# wave recipe has been added but not run here. Godot/.NET editor, headless and desktop checks remain local; paint passable ground before testing combat.
