@@ -66,7 +66,7 @@ public static class WaveChecks
         one.Batches.Add(batchData); authored.Waves.Add(one);
         WaveDefinition roundtrip = authored.Build()[0];
         Require(roundtrip.Presentation.Alert == WaveAlertKind.Heavy &&
-            roundtrip.Presentation.NarrationText == "Watch your flank" &&
+            roundtrip.Presentation.Text == "Watch your flank" &&
             roundtrip.Batches[0].Entries[0].SpawnWithShield && roundtrip.Batches[0].Entries[0].SpawnWithStealth &&
             roundtrip.Batches[0].Entries[0].Portal == "Portals/EnemyPortal1" &&
             roundtrip.Batches[0].Entries[1].Weight == 60,
