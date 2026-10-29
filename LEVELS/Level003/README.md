@@ -21,12 +21,12 @@ Only existing catalog enemies are used: **Enemy001** = `basic_mk1`, **Enemy002**
 | 4 | 12 | 12 | 8 | 32 | Mixed finale |
 | **Total** | **52** | **34** | **12** | **98** | |
 
-Waves live exclusively in `Level003Waves.cs` (four `Wave(...)` definitions) and are registered by the `WaveSetSource` sub-resource in `Level003Config.tres`; no per-level scheduler or launcher duplication. Spawn gaps are 0.6–1.3 seconds, with pauses between batches. Wave 4's first 16 enemies use exact 75/25 weighted composition.
+Waves now live in the editable **`Level003Waves.tres`** (four waves, 10 batches), referenced directly by `Level003Config.tres → WaveSource`. Open the **Wave Editor** workspace tab after enabling the `addons/wave_editor` plugin; edit and Save this resource to tune the waves without changing C# code. The original `Level003Waves.cs` is retained only as a source reference and parity-check fixture, **not** the gameplay wave source. No per-level scheduler or launcher duplication. Spawn gaps are 0.6–1.3 seconds, with pauses between batches. Wave 4's first 16 enemies use exact 75/25 weighted composition.
 
-Settings: **1,200 starting Credits**, **1,000 Citadel HP**, normal provisional profile XP (500 on victory, 0 on defeat). Edit the level-local configuration/resource or waves without affecting Level002. No custom narrator/audio or additional research.
+Settings: **1,200 starting Credits**, **1,000 Citadel HP**, normal provisional profile XP (500 on victory, 0 on defeat). Edit the level-local configuration or Wave Editor resource without affecting Level002. No custom narrator/audio or additional research.
 
 ## Play / campaign
 
 `Level003Mission.tres` is **enabled** and registered after Level002 in `LEVELS/Catalog/DefaultMissionCatalog.tres`. Deploy from **Campaign → Levels → Level003** once you've painted a navigable map; Level002's Next now points here. Retry/relaunch use the existing shared `LEVELS/Runtime/Battlefield.tscn`; there is no `MainLevel003` or `WorldLevel003`.
 
-**Validation:** authoring/source inspection only. No Godot/.NET headless or desktop checks were run; paint first and do a brief local map-routing/combat smoke test.
+**Validation:** includes a new focused wave-resource comparison with the original C# recipe (run locally); No Godot/.NET headless or desktop checks were run; paint first and do a brief local map-routing/combat smoke test.
