@@ -172,7 +172,7 @@ public partial class WaveEditorPanel : PanelContainer
         _newFile.AddFilter("*.tres", "Godot Resources");
         AddChild(_newFile); _newFile.FileSelected += CreatePath;
         _discard = new ConfirmationDialog { Title = "Discard wave edits", DialogText = "Discard unsaved changes and reload this wave set?" };
-        AddChild(_discard); _discard.Confirmed += () => LoadPath(_path);
+        AddChild(_discard); _discard.Confirmed += () => { _dirty = false; LoadPath(_path); };
     }
     private void Open()
     {
