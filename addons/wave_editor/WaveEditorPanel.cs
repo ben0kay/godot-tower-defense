@@ -86,8 +86,8 @@ public partial class WaveEditorPanel : PanelContainer
 
         _batchFields = Pane("Selected batch", 0); details.AddChild(_batchFields);
         _count = Number(_batchFields, "Total enemies", 1, 100000, 1, v => Batch.Count = (int)v);
-        _interval = Number(_batchFields, "Seconds between spawns", 0, 3600, .05, v => Batch.Interval = v);
-        _after = Number(_batchFields, "Delay after batch (seconds)", 0, 3600, .05, v => Batch.After = v);
+        _interval = Number(_batchFields, "Seconds between spawns", 0, 3600, .01, v => Batch.Interval = v);
+        _after = Number(_batchFields, "Delay after batch (seconds)", 0, 3600, .01, v => Batch.After = v);
         _batchFields.AddChild(new Label { Text = "Enemy mix — weights are relative (e.g. 75 / 25).",
             AutowrapMode = TextServer.AutowrapMode.WordSmart });
         _enemies = ItemList(_batchFields, index => { _enemyIndex = index; Refresh(); });
@@ -96,7 +96,7 @@ public partial class WaveEditorPanel : PanelContainer
 
         _enemyFields = Pane("Selected enemy entry", 0); details.AddChild(_enemyFields);
         _enemyId = Text(_enemyFields, "Enemy catalog ID", v => Entry.EnemyId = v);
-        _weight = Number(_enemyFields, "Weight", 0, 10000, 1, v => Entry.Weight = v);
+        _weight = Number(_enemyFields, "Weight", 0, 10000, .01, v => Entry.Weight = v);
         _portal = Text(_enemyFields, "Required portal (blank = any)", v => Entry.Portal = v);
         _shield = Check(_enemyFields, "Spawn with shield", v => Entry.Shield = v);
         _stealth = Check(_enemyFields, "Spawn with stealth", v => Entry.Stealth = v);
@@ -208,10 +208,14 @@ public partial class WaveEditorPanel : PanelContainer
     private void LoadPath(string path)
     {
         if (_dirty) { Message("Save changes before switching files, or Reload to discard."); return; }
-        var resource = ResourceLoader.Load<WaveSetResource>(path, cacheMode: ResourceLoader.CacheMode.Replace);
-        if (resource == null) { Message("Not a WaveSetResource .tres: " + path); return; }
-        _source = resource; _path = path; _waveIndex = _batchIndex = _enemyIndex = 0; _dirty = false;
-        Refresh(); Message("Loaded " + path);
+        try
+        {
+            Resource resource = ResourceLoader.Load(path, cacheMode: ResourceLoader.CacheMode.Replace);
+            if (resource is not WaveSetResource set) { Message("Not a WaveSetResource .tres: " + path); return; }
+            _source = set; _path = path; _waveIndex = _batchIndex = _enemyIndex = 0; _dirty = false;
+            Refresh(); Message("Loaded " + path);
+        }
+        catch (Exception ex) { Message("Cannot open: " + ex.Message); }
     }
 
     // =========================================================
