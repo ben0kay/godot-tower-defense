@@ -17,7 +17,7 @@ public partial class WaveEditorPanel : PanelContainer
     private Label _fileLabel, _status, _totals;
     private Button _saveButton;
     private ItemList _waves, _batches, _enemies;
-    private VBoxContainer _waveFields, _batchFields, _enemyFields;
+    private VBoxContainer _waveFields, _batchFields, _enemyFields, _presentationFields;
     private SpinBox _waveNumber, _count, _interval, _after, _weight;
     private OptionButton _alert;
     private LineEdit _bannerTitle, _bannerDescription, _speaker, _narration, _voiceCue, _enemyId, _portal;
@@ -72,17 +72,8 @@ public partial class WaveEditorPanel : PanelContainer
         details.AddThemeConstantOverride("separation", 10);
         detailsScroll.AddChild(details);
 
-        _waveFields = Pane("Selected wave / presentation", 0); details.AddChild(_waveFields);
+        _waveFields = Pane("Selected wave", 0); details.AddChild(_waveFields);
         _waveNumber = Number(_waveFields, "Wave number", 1, 10000, 1, v => Wave.Number = (int)v);
-        _alert = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill };
-        foreach (WaveAlertKind alert in Enum.GetValues<WaveAlertKind>()) _alert.AddItem(alert.ToString());
-        Field(_waveFields, "Alert", _alert);
-        _alert.ItemSelected += i => { if (!_refreshing && Wave != null) { Wave.Alert = (WaveAlertKind)i; Dirty(); } };
-        _bannerTitle = Text(_waveFields, "Banner title", v => Wave.BannerTitle = v);
-        _bannerDescription = Text(_waveFields, "Banner description", v => Wave.BannerDescription = v);
-        _speaker = Text(_waveFields, "Speaker", v => Wave.Speaker = v);
-        _narration = Text(_waveFields, "Narration", v => Wave.NarrationText = v);
-        _voiceCue = Text(_waveFields, "Voice cue ID", v => Wave.VoiceCueId = v);
 
         _batchFields = Pane("Selected batch", 0); details.AddChild(_batchFields);
         _count = Number(_batchFields, "Total enemies", 1, 100000, 1, v => Batch.Count = (int)v);
@@ -100,6 +91,16 @@ public partial class WaveEditorPanel : PanelContainer
         _portal = Text(_enemyFields, "Required portal (blank = any)", v => Entry.Portal = v);
         _shield = Check(_enemyFields, "Spawn with shield", v => Entry.Shield = v);
         _stealth = Check(_enemyFields, "Spawn with stealth", v => Entry.Stealth = v);
+        _presentationFields = Pane("Wave presentation (optional)", 0); details.AddChild(_presentationFields);
+        _alert = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        foreach (WaveAlertKind alert in Enum.GetValues<WaveAlertKind>()) _alert.AddItem(alert.ToString());
+        Field(_presentationFields, "Alert", _alert);
+        _alert.ItemSelected += i => { if (!_refreshing && Wave != null) { Wave.Alert = (WaveAlertKind)i; Dirty(); } };
+        _bannerTitle = Text(_presentationFields, "Banner title", v => Wave.BannerTitle = v);
+        _bannerDescription = Text(_presentationFields, "Banner description", v => Wave.BannerDescription = v);
+        _speaker = Text(_presentationFields, "Speaker", v => Wave.Speaker = v);
+        _narration = Text(_presentationFields, "Narration", v => Wave.NarrationText = v);
+        _voiceCue = Text(_presentationFields, "Voice cue ID", v => Wave.VoiceCueId = v);
         details.AddChild(new Label { Text = "Enemy IDs are validated against DefaultEnemyCatalog.tres when saving.\n" +
             "Wave order = list order; counts are per batch, not per enemy entry.", AutowrapMode = TextServer.AutowrapMode.WordSmart });
 
@@ -335,7 +336,8 @@ public partial class WaveEditorPanel : PanelContainer
                 _enemies.AddItem(enemy == null ? "Missing enemy" : $"{enemy.EnemyId}   weight {enemy.Weight:0.##}" +
                     (enemy.Shield ? "  [shield]" : "") + (enemy.Stealth ? "  [stealth]" : ""));
             if (_enemyIndex >= 0 && _enemyIndex < _enemies.ItemCount) _enemies.Select(_enemyIndex);
-            _waveFields.Visible = wave != null; _batchFields.Visible = batchSelected != null; _enemyFields.Visible = Entry != null;
+            _waveFields.Visible = wave != null; _batchFields.Visible = batchSelected != null;
+            _enemyFields.Visible = Entry != null; _presentationFields.Visible = wave != null;
             if (wave != null)
             {
                 _waveNumber.Value = wave.Number; _alert.Select((int)wave.Alert);

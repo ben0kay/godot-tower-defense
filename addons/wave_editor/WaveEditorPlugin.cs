@@ -8,10 +8,15 @@ public partial class WaveEditorPlugin : EditorPlugin
     private WaveEditorPanel _panel;
 
     // =========================================================
-    // Main-screen plugins must attach their panel to the editor workspace, not the running game.
+    // Main-screen parent is a VBoxContainer: ExpandFill is required or our tab collapses into a short strip.
     public override void _EnterTree()
     {
-        _panel = new WaveEditorPanel { Name = "Wave Editor", Visible = false };
+        _panel = new WaveEditorPanel
+        {
+            Name = "Wave Editor", Visible = false,
+            SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+            SizeFlagsVertical = Control.SizeFlags.ExpandFill
+        };
         EditorInterface.Singleton.GetEditorMainScreen().AddChild(_panel);
         _panel.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
     }
