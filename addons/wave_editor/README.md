@@ -1,3 +1,15 @@
+## 2026-10-30 — full-height Wave Editor and basic authoring walkthrough
+
+**Layout repair:** Godot's `EditorInterface.GetEditorMainScreen()` is a `VBoxContainer`, which sizes child controls using their size flags. The plugin previously set `FullRect` anchors but **not** the required `SizeFlagsVertical = ExpandFill`, so the editor collapsed into a strip about 200 px tall and hid its wave/batch lists. The panel now explicitly sets both horizontal and vertical `ExpandFill` and keeps `FullRect` anchors. The details pane now places primary wave/batch/enemy controls **above** the optional narrator/banner fields, so most authoring requires less scrolling. The right scrollbar belongs only to those details, not to the whole workspace. No waves, resources, serializers, save paths or gameplay behavior changed.
+
+**Quick usage:** The top bar identifies the active `.tres` file (initially `Level003Waves.tres`). Click a **Wave** on the left, then a **Batch** in the center. On the right, edit Wave number and Batch Count, Interval (seconds between successful spawns), and After (seconds after its final spawn). Choose an **enemy entry** within the batch and edit EnemyId (e.g. `basic_mk1`, `scout_mk1`, `medium_mk1`), Weight (relative proportion within the batch, not number of ships), optional Portal, Shield, and Stealth. Add/Duplicate/Delete/Move buttons affect the currently selected row. Additional presentation fields are near the bottom of the right scroll area. **Save** persists the validated resource; **Reload** discards unsaved changes after confirmation. Next level load reads updated waves; the editor does not reconfigure a level already running.
+
+Example: **Wave 1 → Batch 1 → Count 12 to 20 → Save** gives Level003 eight more Standard Drones in that batch. If you change a batch to Count 20 and have two enemy entries with weights 75 and 25, that batch spawns exactly 15 of the first and 5 of the second, shuffled by the existing wave scheduler.
+
+This was corrected in source; the resized Godot editor workspace and the changed field order still need a local editor UI check. No automated .NET/Godot build was available during this pass.
+
+---
+
 ## 2026-10-29 — first C# compile fix
 
 Renamed the Wave Editor panel's `ItemList(...)` factory to `CreateItemList(...)`, avoiding a C# member-name collision with `Godot.ItemList.SelectModeEnum.Single` (CS0119 at line 128). The three wave, batch and enemy list factory calls were updated. No editing or wave-data behavior changed. Source-checked only; rebuild in Godot .NET to verify and report any subsequent errors.
