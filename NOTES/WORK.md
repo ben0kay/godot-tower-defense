@@ -1,3 +1,9 @@
+## 2026-10-30 — Wave Editor fills main Godot viewport
+
+Fixed user-observed shallow, clipped editor UI on a successfully loaded Level003 wave resource: `GetEditorMainScreen()` returns a `VBoxContainer` and the plugin root lacked `SizeFlagsVertical=ExpandFill`. Explicitly assigned horizontal/vertical ExpandFill alongside the existing FullRect preset. Moved optional presentation fields below primary batch/enemy settings so editing counts, timing, weights and shield/stealth needs less right-pane scrolling. No wave data or gameplay files touched. Source reviewed; Godot .NET/editor rebuild and visual acceptance pending. [Usage](../addons/wave_editor/README.md).
+
+---
+
 ## 2026-10-29 — Wave Editor CS0119 build fix
 
 Fixed user-reported `WaveEditorPanel.cs(128,48)`: the local `ItemList` helper shadowed Godot's `ItemList` enum accessor. Renamed helper and its three calls to `CreateItemList`. Other wave editor logic unchanged; local Godot/.NET rebuild pending.
