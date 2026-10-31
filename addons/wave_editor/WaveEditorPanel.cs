@@ -338,6 +338,15 @@ public partial class WaveEditorPanel : PanelContainer
         if (_source != null) _totals.Text = _source.Waves.Count + " waves";
     }
     private void Message(string text) { if (_status != null) _status.Text = text; }
+
+    // =========================================================
+    // Use one modal for all destructive editor actions; capture exact resource identities to avoid stale deletions.
+    private void ConfirmDelete(string message, Action delete)
+    {
+        _pendingDelete = delete;
+        _confirmDelete.DialogText = message;
+        _confirmDelete.PopupCentered(new Vector2I(480, 160));
+    }
     #endregion
 
     #region Editable Wave / Batch / Enemy Operations
@@ -444,6 +453,57 @@ public partial class WaveEditorPanel : PanelContainer
     #endregion
 
     #region View Updates
+    // =========================================================
+    // Preview the exact deterministic counts for this batch using the SAME quota calculation as WaveManager.
+    // It rebuilds only when fields/selection change; no physics, random shuffles or background updates.
+    private void RefreshComposition()
+    {
+        if (_compositionPreview == null) return;
+        foreach (Node child in _compositionPreview.GetChildren())
+        { _compositionPreview.RemoveChild(child); child.QueueFree(); }
+        WaveBatchResource batch = Batch;
+        _compositionPreview.Visible = batch != null;
+        if (batch == null) return;
+        if (batch.Enemies == null || batch.Enemies.Count == 0)
+        { _compositionPreview.AddChild(new Label { Text = "Add an enemy entry to preview this batch." }); return; }
+        try
+        {
+            WaveEnemyEntry[] entries = batch.Enemies.Select(e => WaveBuilder.Enemy(
+                e?.EnemyId ?? "", e?.Weight ?? 0, e?.Portal ?? "", e?.Shield ?? false, e?.Stealth ?? false)).ToArray();
+            int[] counts = WaveCatalog.CompositionCounts(WaveBuilder.Batch(batch.Count, batch.Interval, batch.After, entries));
+            _compositionPreview.AddChild(new Label { Text = $"{batch.Count} total enemies · exact quotas · shuffled spawn order",
+                TooltipText = "The game determines exact numbers using largest remainders (earlier entries win ties), then shuffles their order." });
+            for (int i = 0; i < counts.Length; i++)
+            {
+                WaveEnemyResource enemy = batch.Enemies[i];
+                string label = EnemyLabel(enemy?.EnemyId ?? "");
+                if (enemy?.Shield == true) label += " [shield]";
+                if (enemy?.Stealth == true) label += " [stealth]";
+                if (!string.IsNullOrEmpty(enemy?.Portal)) label += " [" + enemy.Portal + "]";
+                var row = new HBoxContainer();
+                _compositionPreview.AddChild(row);
+                row.AddChild(new Label { Text = label, SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                    ClipText = true, TooltipText = label });
+                row.AddChild(new Label { Text = $"{counts[i]} / {batch.Count}  ({100.0 * counts[i] / batch.Count:0.#}%)" });
+                _compositionPreview.AddChild(new ProgressBar { MinValue = 0, MaxValue = batch.Count, Value = counts[i],
+                    ShowPercentage = false, CustomMinimumSize = new Vector2(0, 9), SizeFlagsHorizontal = SizeFlags.ExpandFill });
+            }
+        }
+        catch (ArgumentException error)
+        { _compositionPreview.AddChild(new Label { Text = "Preview unavailable: " + error.Message,
+            AutowrapMode = TextServer.AutowrapMode.WordSmart }); }
+        // Keep list counts and flags current while editing numeric fields without rebuilding the whole selection UI.
+        if (Wave != null && _waveIndex >= 0 && _waveIndex < _waves.ItemCount)
+            _waves.SetItemText(_waveIndex, $"Wave {Wave.Number}    ({Wave.Batches.Sum(b => b?.Count ?? 0)} ships)");
+        if (_batchIndex >= 0 && _batchIndex < _batches.ItemCount)
+            _batches.SetItemText(_batchIndex, $"Batch {_batchIndex + 1}    {batch.Count} ships   {batch.Interval:0.##}s");
+        if (Entry != null && _enemyIndex >= 0 && _enemyIndex < _enemies.ItemCount)
+            _enemies.SetItemText(_enemyIndex, $"{EnemyLabel(Entry.EnemyId)}   weight {Entry.Weight:0.##}" +
+                (Entry.Shield ? "  [shield]" : "") + (Entry.Stealth ? "  [stealth]" : ""));
+        if (_source != null) _totals.Text = $"{_source.Waves.Count} waves  ·  " +
+            $"{_source.Waves.Sum(w => w?.Batches.Sum(b => b?.Count ?? 0) ?? 0)} enemies";
+    }
+
     // =========================================================
     // Editor controls refresh only on document/selection edits, never in _Process.
     private void Refresh()
