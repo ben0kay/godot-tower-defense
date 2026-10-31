@@ -18,7 +18,7 @@ public partial class WaveEditorPanel : PanelContainer
     private Label _fileLabel, _status, _totals;
     private Button _saveButton;
     private ItemList _waves, _batches, _enemies;
-    private VBoxContainer _waveFields, _batchFields, _enemyFields, _presentationFields;
+    private VBoxContainer _waveFields, _batchFields, _enemyFields, _presentationFields, _compositionPreview;
     private SpinBox _waveNumber, _count, _interval, _after, _weight;
     private OptionButton _alert, _enemyId;
     private LineEdit _bannerTitle, _bannerDescription, _speaker, _narration, _voiceCue, _portal;
@@ -26,7 +26,8 @@ public partial class WaveEditorPanel : PanelContainer
     private List<(string Id, string Name)> _enemyChoices = new();
     private CheckBox _shield, _stealth;
     private EditorFileDialog _openFile, _newFile;
-    private ConfirmationDialog _discard;
+    private ConfirmationDialog _discard, _confirmDelete;
+    private Action _pendingDelete;
     private WaveResource Wave => _source != null && _waveIndex >= 0 && _waveIndex < _source.Waves.Count ? _source.Waves[_waveIndex] : null;
     private WaveBatchResource Batch => Wave != null && _batchIndex >= 0 && _batchIndex < Wave.Batches.Count ? Wave.Batches[_batchIndex] : null;
     private WaveEnemyResource Entry => Batch != null && _enemyIndex >= 0 && _enemyIndex < Batch.Enemies.Count ? Batch.Enemies[_enemyIndex] : null;
@@ -77,16 +78,26 @@ public partial class WaveEditorPanel : PanelContainer
 
         _waveFields = Pane("Selected wave", 0); details.AddChild(_waveFields);
         _waveNumber = Number(_waveFields, "Wave number", 1, 10000, 1, v => Wave.Number = (int)v);
+        _waveNumber.TooltipText = "Unique positive wave number. Waves play in the list order shown on the left; moving them does not renumber them.";
 
         _batchFields = Pane("Selected batch", 0); details.AddChild(_batchFields);
-        _count = Number(_batchFields, "Total enemies", 1, 100000, 1, v => Batch.Count = (int)v);
+        _count = Number(_batchFields, "Total enemies", 1, 100000, 1, v => { Batch.Count = (int)v; RefreshComposition(); });
+        _count.TooltipText = "Total ships across all enemy entries in this batch; weights divide this count. Does not add ships per entry.";
         _interval = Number(_batchFields, "Seconds between spawns", 0, 3600, .01, v => Batch.Interval = v);
+        _interval.TooltipText = "Seconds between SUCCESSFUL spawns. The first ship starts immediately. Failed/blocked spawns retry and may extend this duration.";
         _after = Number(_batchFields, "Delay after batch (seconds)", 0, 3600, .01, v => Batch.After = v);
+        _after.TooltipText = "Seconds after the last successful spawn before the next batch. Does not wait for enemies to die. Ignored for the final batch.";
         _batchFields.AddChild(new Label { Text = "Enemy mix — weights are relative (e.g. 75 / 25).",
             AutowrapMode = TextServer.AutowrapMode.WordSmart });
         _enemies = CreateItemList(_batchFields, index => { _enemyIndex = index; Refresh(); });
         _enemies.CustomMinimumSize = new Vector2(0, 135);
         Buttons(_batchFields, ("+ Enemy", AddEnemy), ("Duplicate", DuplicateEnemy), ("Delete", DeleteEnemy));
+        var preview = Pane("Exact composition preview", 0);
+        _batchFields.AddChild(preview);
+        _compositionPreview = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        _compositionPreview.AddThemeConstantOverride("separation", 3);
+        preview.AddChild(_compositionPreview);
+        preview.TooltipText = "Guaranteed number of each entry in this batch. Counts use the real largest-remainder rule, then the game shuffles spawn order.";
 
         _enemyFields = Pane("Selected enemy entry", 0); details.AddChild(_enemyFields);
         var enemyPicker = new HBoxContainer();
@@ -102,20 +113,30 @@ public partial class WaveEditorPanel : PanelContainer
             if (Entry.EnemyId == id) return;
             Entry.EnemyId = id; Dirty(); Refresh();
         };
-        _weight = Number(_enemyFields, "Weight", 0, 10000, .01, v => Entry.Weight = v);
+        _weight = Number(_enemyFields, "Weight", 0, 10000, .01, v => { Entry.Weight = v; RefreshComposition(); });
+        _weight.TooltipText = "Relative share of this batch, not a ship count or an independent spawn chance. Example 75 and 25 with Count 20 means exactly 15 and 5, shuffled.";
         _portal = Text(_enemyFields, "Required portal (blank = any)", v => Entry.Portal = v);
-        _shield = Check(_enemyFields, "Spawn with shield", v => Entry.Shield = v);
-        _stealth = Check(_enemyFields, "Spawn with stealth", v => Entry.Stealth = v);
+        _portal.TooltipText = "Optional level-root-relative portal path (e.g. Portals/EnemyPortal1). Blank lets the spawn system pick a valid source.";
+        _shield = Check(_enemyFields, "Spawn with shield", v => { Entry.Shield = v; RefreshComposition(); });
+        _shield.TooltipText = "Start these ships with their configured shield full; this does not add shields to an enemy whose MaxShield is zero.";
+        _stealth = Check(_enemyFields, "Spawn with stealth", v => { Entry.Stealth = v; RefreshComposition(); });
+        _stealth.TooltipText = "Request starting stealth for this enemy entry. This flag is independent of the Shield flag.";
         _presentationFields = Pane("Wave presentation (optional)", 0); details.AddChild(_presentationFields);
         _alert = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         foreach (WaveAlertKind alert in Enum.GetValues<WaveAlertKind>()) _alert.AddItem(alert.ToString());
         Field(_presentationFields, "Alert", _alert);
+        _alert.TooltipText = "Wave announcement style only: Standard, Heavy, Final, Boss or None. It does not modify enemy strength or contents.";
         _alert.ItemSelected += i => { if (!_refreshing && Wave != null) { Wave.Alert = (WaveAlertKind)i; Dirty(); } };
         _bannerTitle = Text(_presentationFields, "Banner title", v => Wave.BannerTitle = v);
         _bannerDescription = Text(_presentationFields, "Banner description", v => Wave.BannerDescription = v);
         _speaker = Text(_presentationFields, "Speaker", v => Wave.Speaker = v);
         _narration = Text(_presentationFields, "Narration", v => Wave.NarrationText = v);
         _voiceCue = Text(_presentationFields, "Voice cue ID", v => Wave.VoiceCueId = v);
+        _bannerTitle.TooltipText = "Optional custom wave-start banner heading. Blank uses WAVE NN INCOMING.";
+        _bannerDescription.TooltipText = "Optional secondary text below the wave-start banner.";
+        _speaker.TooltipText = "Optional speaker name shown with the tactical narration.";
+        _narration.TooltipText = "Optional text displayed by the tactical narration panel when the wave starts.";
+        _voiceCue.TooltipText = "Optional registered voice cue ID for the wave-start alert. Does not create or record audio.";
         details.AddChild(new Label { Text = "Enemy names and IDs are read from DefaultEnemyCatalog.tres.\n" +
             "Wave order = list order; counts are per batch, not per enemy entry.", AutowrapMode = TextServer.AutowrapMode.WordSmart });
 
@@ -241,6 +262,10 @@ public partial class WaveEditorPanel : PanelContainer
         AddChild(_newFile); _newFile.FileSelected += CreatePath;
         _discard = new ConfirmationDialog { Title = "Discard wave edits", DialogText = "Discard unsaved changes and reload this wave set?" };
         AddChild(_discard); _discard.Confirmed += () => { _dirty = false; LoadPath(_path); };
+        _confirmDelete = new ConfirmationDialog { Title = "Confirm deletion" };
+        _confirmDelete.GetOkButton().Text = "Delete";
+        AddChild(_confirmDelete);
+        _confirmDelete.Confirmed += () => { Action action = _pendingDelete; _pendingDelete = null; action?.Invoke(); };
     }
     private void Open()
     {
@@ -334,8 +359,18 @@ public partial class WaveEditorPanel : PanelContainer
     }
     private void DeleteWave()
     {
-        if (Wave == null) return; _source.Waves.RemoveAt(_waveIndex);
-        _waveIndex = Math.Clamp(_waveIndex, 0, _source.Waves.Count - 1); _batchIndex = _enemyIndex = 0; Dirty(); Refresh();
+        WaveSetResource source = _source;
+        WaveResource selected = Wave;
+        if (selected == null) return;
+        ConfirmDelete($"Delete Wave {selected.Number} and all {selected.Batches.Count} batches? This cannot be undone.", () =>
+        {
+            if (_source != source) return;
+            int index = source.Waves.IndexOf(selected);
+            if (index < 0) return;
+            source.Waves.RemoveAt(index);
+            _waveIndex = Math.Clamp(index, 0, source.Waves.Count - 1);
+            _batchIndex = _enemyIndex = 0; Dirty(); Refresh();
+        });
     }
     private void MoveWave(int direction)
     {
@@ -357,8 +392,20 @@ public partial class WaveEditorPanel : PanelContainer
     }
     private void DeleteBatch()
     {
-        if (Batch == null) return; Wave.Batches.RemoveAt(_batchIndex);
-        _batchIndex = Math.Clamp(_batchIndex, 0, Wave.Batches.Count - 1); _enemyIndex = 0; Dirty(); Refresh();
+        WaveSetResource source = _source;
+        WaveResource wave = Wave;
+        WaveBatchResource selected = Batch;
+        if (selected == null) return;
+        ConfirmDelete($"Delete this batch ({selected.Count} enemies) from Wave {wave.Number}?", () =>
+        {
+            if (_source != source || !source.Waves.Contains(wave)) return;
+            int index = wave.Batches.IndexOf(selected);
+            if (index < 0) return;
+            wave.Batches.RemoveAt(index);
+            _waveIndex = source.Waves.IndexOf(wave);
+            _batchIndex = Math.Clamp(index, 0, wave.Batches.Count - 1);
+            _enemyIndex = 0; Dirty(); Refresh();
+        });
     }
     private void MoveBatch(int direction)
     {
@@ -378,8 +425,21 @@ public partial class WaveEditorPanel : PanelContainer
     }
     private void DeleteEnemy()
     {
-        if (Entry == null) return; Batch.Enemies.RemoveAt(_enemyIndex);
-        _enemyIndex = Math.Clamp(_enemyIndex, 0, Batch.Enemies.Count - 1); Dirty(); Refresh();
+        WaveSetResource source = _source;
+        WaveResource wave = Wave;
+        WaveBatchResource batch = Batch;
+        WaveEnemyResource selected = Entry;
+        if (selected == null) return;
+        ConfirmDelete($"Delete {EnemyLabel(selected.EnemyId)} from this batch?", () =>
+        {
+            if (_source != source || !source.Waves.Contains(wave) || !wave.Batches.Contains(batch)) return;
+            int index = batch.Enemies.IndexOf(selected);
+            if (index < 0) return;
+            batch.Enemies.RemoveAt(index);
+            _waveIndex = source.Waves.IndexOf(wave);
+            _batchIndex = wave.Batches.IndexOf(batch);
+            _enemyIndex = Math.Clamp(index, 0, batch.Enemies.Count - 1); Dirty(); Refresh();
+        });
     }
     #endregion
 
@@ -419,6 +479,7 @@ public partial class WaveEditorPanel : PanelContainer
                 SelectEnemyId(Entry.EnemyId); _weight.Value = Entry.Weight; _portal.Text = Entry.Portal ?? "";
                 _shield.ButtonPressed = Entry.Shield; _stealth.ButtonPressed = Entry.Stealth;
             }
+            RefreshComposition();
             _fileLabel.Text = _path + (_dirty ? "  * UNSAVED" : "");
             _saveButton.Disabled = !_dirty || _source == null;
             _totals.Text = _source == null ? "" : $"{_source.Waves.Count} waves  ·  " +
