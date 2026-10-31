@@ -1,3 +1,9 @@
+## 2026-10-31 — Wave Editor enemy catalogue dropdown
+
+Replaced the manually typed enemy ID field with a readable registered-enemy dropdown from `EnemyCatalog`, showing `DisplayName (EnemyId)`. Added a **Refresh list** button, readable labels in the batch-entry list and an explicit [Unregistered] fallback for old/removed IDs. Only the existing stable EnemyId is written to wave resources; the runtime wave scheduler and `.tres` schema are unchanged. The catalogue refresh is on demand, with no editor idle polling. [Editor guide](../addons/wave_editor/README.md). Godot.NET build/visual smoke check pending.
+
+---
+
 ## 2026-10-30 — Wave Editor fills main Godot viewport
 
 Fixed user-observed shallow, clipped editor UI on a successfully loaded Level003 wave resource: `GetEditorMainScreen()` returns a `VBoxContainer` and the plugin root lacked `SizeFlagsVertical=ExpandFill`. Explicitly assigned horizontal/vertical ExpandFill alongside the existing FullRect preset. Moved optional presentation fields below primary batch/enemy settings so editing counts, timing, weights and shield/stealth needs less right-pane scrolling. No wave data or gameplay files touched. Source reviewed; Godot .NET/editor rebuild and visual acceptance pending. [Usage](../addons/wave_editor/README.md).
