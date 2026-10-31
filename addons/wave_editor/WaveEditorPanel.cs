@@ -198,6 +198,14 @@ public partial class WaveEditorPanel : PanelContainer
     }
 
     // =========================================================
+    // Keep enemy list entries readable while preserving stable IDs in the underlying resource.
+    private string EnemyLabel(string id)
+    {
+        int index = _enemyChoices.FindIndex(e => e.Id == id);
+        return index < 0 ? "[Unregistered] " + id : _enemyChoices[index].Name + " (" + id + ")";
+    }
+
+    // =========================================================
     // Preserve and visibly flag stale IDs without silently replacing data or marking the .tres dirty.
     private void SelectEnemyId(string id)
     {
@@ -393,7 +401,7 @@ public partial class WaveEditorPanel : PanelContainer
             if (_batchIndex >= 0 && _batchIndex < _batches.ItemCount) _batches.Select(_batchIndex);
             var batchSelected = Batch;
             if (batchSelected != null) foreach (var enemy in batchSelected.Enemies)
-                _enemies.AddItem(enemy == null ? "Missing enemy" : $"{enemy.EnemyId}   weight {enemy.Weight:0.##}" +
+                _enemies.AddItem(enemy == null ? "Missing enemy" : $"{EnemyLabel(enemy.EnemyId)}   weight {enemy.Weight:0.##}" +
                     (enemy.Shield ? "  [shield]" : "") + (enemy.Stealth ? "  [stealth]" : ""));
             if (_enemyIndex >= 0 && _enemyIndex < _enemies.ItemCount) _enemies.Select(_enemyIndex);
             _waveFields.Visible = wave != null; _batchFields.Visible = batchSelected != null;
