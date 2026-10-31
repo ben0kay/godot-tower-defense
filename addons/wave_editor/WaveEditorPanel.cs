@@ -3,6 +3,7 @@
 #if TOOLS
 using Godot;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 [Tool]
@@ -19,8 +20,10 @@ public partial class WaveEditorPanel : PanelContainer
     private ItemList _waves, _batches, _enemies;
     private VBoxContainer _waveFields, _batchFields, _enemyFields, _presentationFields;
     private SpinBox _waveNumber, _count, _interval, _after, _weight;
-    private OptionButton _alert;
-    private LineEdit _bannerTitle, _bannerDescription, _speaker, _narration, _voiceCue, _enemyId, _portal;
+    private OptionButton _alert, _enemyId;
+    private LineEdit _bannerTitle, _bannerDescription, _speaker, _narration, _voiceCue, _portal;
+    private EnemyCatalog _enemyCatalog;
+    private List<(string Id, string Name)> _enemyChoices = new();
     private CheckBox _shield, _stealth;
     private EditorFileDialog _openFile, _newFile;
     private ConfirmationDialog _discard;
@@ -86,7 +89,19 @@ public partial class WaveEditorPanel : PanelContainer
         Buttons(_batchFields, ("+ Enemy", AddEnemy), ("Duplicate", DuplicateEnemy), ("Delete", DeleteEnemy));
 
         _enemyFields = Pane("Selected enemy entry", 0); details.AddChild(_enemyFields);
-        _enemyId = Text(_enemyFields, "Enemy catalog ID", v => Entry.EnemyId = v);
+        var enemyPicker = new HBoxContainer();
+        Field(_enemyFields, "Enemy type", enemyPicker);
+        _enemyId = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            TooltipText = "Choose a registered enemy. Names come from DefaultEnemyCatalog.tres; stable IDs are saved." };
+        enemyPicker.AddChild(_enemyId);
+        enemyPicker.AddChild(Button("Refresh list", ReloadEnemyCatalog));
+        _enemyId.ItemSelected += index =>
+        {
+            if (_refreshing || Entry == null || index < 0 || index >= _enemyChoices.Count) return;
+            string id = _enemyChoices[(int)index].Id;
+            if (Entry.EnemyId == id) return;
+            Entry.EnemyId = id; Dirty(); Refresh();
+        };
         _weight = Number(_enemyFields, "Weight", 0, 10000, .01, v => Entry.Weight = v);
         _portal = Text(_enemyFields, "Required portal (blank = any)", v => Entry.Portal = v);
         _shield = Check(_enemyFields, "Spawn with shield", v => Entry.Shield = v);
@@ -101,13 +116,13 @@ public partial class WaveEditorPanel : PanelContainer
         _speaker = Text(_presentationFields, "Speaker", v => Wave.Speaker = v);
         _narration = Text(_presentationFields, "Narration", v => Wave.NarrationText = v);
         _voiceCue = Text(_presentationFields, "Voice cue ID", v => Wave.VoiceCueId = v);
-        details.AddChild(new Label { Text = "Enemy IDs are validated against DefaultEnemyCatalog.tres when saving.\n" +
+        details.AddChild(new Label { Text = "Enemy names and IDs are read from DefaultEnemyCatalog.tres.\n" +
             "Wave order = list order; counts are per batch, not per enemy entry.", AutowrapMode = TextServer.AutowrapMode.WordSmart });
 
         var footer = new HBoxContainer(); root.AddChild(footer);
         _status = new Label { Text = "Choose a .tres wave set.", SizeFlagsHorizontal = SizeFlags.ExpandFill };
         _totals = new Label(); footer.AddChild(_status); footer.AddChild(_totals);
-        SetupDialogs(); LoadPath(ExamplePath);
+        SetupDialogs(); ReloadEnemyCatalog(); LoadPath(ExamplePath);
     }
 
     // =========================================================
@@ -156,6 +171,58 @@ public partial class WaveEditorPanel : PanelContainer
         var check = new CheckBox { Text = label }; parent.AddChild(check);
         check.Toggled += v => { if (!_refreshing && _source != null) { changed(v); Dirty(); } };
         return check;
+    }
+
+    // =========================================================
+    // Load enemy identity and readable display names from the authoritative scene catalogue on demand.
+    // Scene definitions are cached for UI changes; never instantiate enemies on every selection or frame.
+    private void ReloadEnemyCatalog()
+    {
+        try
+        {
+            var catalog = ResourceLoader.Load<EnemyCatalog>("res://ENEMIES/DefaultEnemyCatalog.tres",
+                cacheMode: ResourceLoader.CacheMode.Replace);
+            if (catalog == null) throw new InvalidOperationException("DefaultEnemyCatalog.tres could not be loaded.");
+            catalog.Rebuild();
+            var choices = catalog.ToSceneMap().Keys.Select(id =>
+                (Id: id, Name: catalog.DefinitionFor(id)?.DisplayName ?? id))
+                .OrderBy(e => e.Name, StringComparer.OrdinalIgnoreCase).ThenBy(e => e.Id, StringComparer.Ordinal).ToList();
+            _enemyCatalog = catalog; _enemyChoices = choices;
+            Refresh(); Message("Enemy list refreshed: " + choices.Count + " registered types.");
+        }
+        catch (Exception ex)
+        {
+            _enemyCatalog = null; _enemyChoices.Clear();
+            Refresh(); Message("Enemy list unavailable: " + ex.Message);
+        }
+    }
+
+    // =========================================================
+    // Keep enemy list entries readable while preserving stable IDs in the underlying resource.
+    private string EnemyLabel(string id)
+    {
+        int index = _enemyChoices.FindIndex(e => e.Id == id);
+        return index < 0 ? "[Unregistered] " + id : _enemyChoices[index].Name + " (" + id + ")";
+    }
+
+    // =========================================================
+    // Preserve and visibly flag stale IDs without silently replacing data or marking the .tres dirty.
+    private void SelectEnemyId(string id)
+    {
+        _enemyId.Clear();
+        for (int i = 0; i < _enemyChoices.Count; i++)
+        {
+            var item = _enemyChoices[i];
+            _enemyId.AddItem(item.Name + " (" + item.Id + ")");
+        }
+        int selected = _enemyChoices.FindIndex(e => e.Id == id);
+        if (selected < 0)
+        {
+            _enemyId.AddItem(string.IsNullOrEmpty(id) ? "[Missing enemy ID]" : "[Unregistered] " + id);
+            selected = _enemyId.ItemCount - 1;
+        }
+        _enemyId.Select(selected);
+        _enemyId.Disabled = _enemyChoices.Count == 0;
     }
     #endregion
 
@@ -227,7 +294,8 @@ public partial class WaveEditorPanel : PanelContainer
         try
         {
             WaveDefinition[] waves = _source.Build();
-            WaveCatalog.Validate(waves, EnemyCatalog.Default.ToSceneMap());
+            if (_enemyCatalog == null) throw new InvalidOperationException("Enemy catalogue unavailable. Click Refresh list.");
+            WaveCatalog.Validate(waves, _enemyCatalog.ToSceneMap());
             Error error = ResourceSaver.Save(_source, _path);
             if (error != Error.Ok) { Message("Save failed: " + error); return; }
             _dirty = false; _fileLabel.Text = _path; _saveButton.Disabled = true;
@@ -333,7 +401,7 @@ public partial class WaveEditorPanel : PanelContainer
             if (_batchIndex >= 0 && _batchIndex < _batches.ItemCount) _batches.Select(_batchIndex);
             var batchSelected = Batch;
             if (batchSelected != null) foreach (var enemy in batchSelected.Enemies)
-                _enemies.AddItem(enemy == null ? "Missing enemy" : $"{enemy.EnemyId}   weight {enemy.Weight:0.##}" +
+                _enemies.AddItem(enemy == null ? "Missing enemy" : $"{EnemyLabel(enemy.EnemyId)}   weight {enemy.Weight:0.##}" +
                     (enemy.Shield ? "  [shield]" : "") + (enemy.Stealth ? "  [stealth]" : ""));
             if (_enemyIndex >= 0 && _enemyIndex < _enemies.ItemCount) _enemies.Select(_enemyIndex);
             _waveFields.Visible = wave != null; _batchFields.Visible = batchSelected != null;
@@ -348,7 +416,7 @@ public partial class WaveEditorPanel : PanelContainer
             if (batchSelected != null) { _count.Value = batchSelected.Count; _interval.Value = batchSelected.Interval; _after.Value = batchSelected.After; }
             if (Entry != null)
             {
-                _enemyId.Text = Entry.EnemyId ?? ""; _weight.Value = Entry.Weight; _portal.Text = Entry.Portal ?? "";
+                SelectEnemyId(Entry.EnemyId); _weight.Value = Entry.Weight; _portal.Text = Entry.Portal ?? "";
                 _shield.ButtonPressed = Entry.Shield; _stealth.ButtonPressed = Entry.Stealth;
             }
             _fileLabel.Text = _path + (_dirty ? "  * UNSAVED" : "");
