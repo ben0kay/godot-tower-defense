@@ -1,3 +1,13 @@
+## Enemy selection dropdown — 2026-10-31
+
+The Wave Editor now uses an **Enemy type** dropdown instead of manually typing the internal enemy ID. Its options are populated from `ENEMIES/DefaultEnemyCatalog.tres`, showing each registered enemy's `EnemyDefinition.DisplayName` together with its stable `EnemyId` (for example, **Standard Drone (basic_mk1)**). The selected `.tres` entry still saves **only** the stable ID. The batch's entry list also shows readable names.
+
+**Refresh list** next to the dropdown explicitly reloads the registered enemy catalogue after adding or renaming enemy types. Catalogue lookups are performed on opening the editor and on button press, not every frame or every selection. Previously saved IDs are resolved on load; an ID that no longer exists is displayed as **[Unregistered] ID** rather than silently replaced. The normal wave validation still rejects unknown IDs on Save.
+
+No wave files, existing counts, weight/shield/stealth options, or gameplay spawning logic changed. Source checks performed; rebuild the Godot .NET project and re-enable the plugin if the editor doesn't hot-reload. Manual visual check pending.
+
+---
+
 ## 2026-10-30 — full-height Wave Editor and basic authoring walkthrough
 
 **Layout repair:** Godot's `EditorInterface.GetEditorMainScreen()` is a `VBoxContainer`, which sizes child controls using their size flags. The plugin previously set `FullRect` anchors but **not** the required `SizeFlagsVertical = ExpandFill`, so the editor collapsed into a strip about 200 px tall and hid its wave/batch lists. The panel now explicitly sets both horizontal and vertical `ExpandFill` and keeps `FullRect` anchors. The details pane now places primary wave/batch/enemy controls **above** the optional narrator/banner fields, so most authoring requires less scrolling. The right scrollbar belongs only to those details, not to the whole workspace. No waves, resources, serializers, save paths or gameplay behavior changed.
