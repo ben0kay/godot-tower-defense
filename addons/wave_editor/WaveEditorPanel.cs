@@ -77,13 +77,13 @@ public partial class WaveEditorPanel : PanelContainer
         detailsScroll.AddChild(details);
 
         _waveFields = Pane("Selected wave", 0); details.AddChild(_waveFields);
-        _waveNumber = Number(_waveFields, "Wave number", 1, 10000, 1, v => Wave.Number = (int)v);
+        _waveNumber = Number(_waveFields, "Wave number", 1, 10000, 1, v => { Wave.Number = (int)v; RefreshComposition(); });
         _waveNumber.TooltipText = "Unique positive wave number. Waves play in the list order shown on the left; moving them does not renumber them.";
 
         _batchFields = Pane("Selected batch", 0); details.AddChild(_batchFields);
         _count = Number(_batchFields, "Total enemies", 1, 100000, 1, v => { Batch.Count = (int)v; RefreshComposition(); });
         _count.TooltipText = "Total ships across all enemy entries in this batch; weights divide this count. Does not add ships per entry.";
-        _interval = Number(_batchFields, "Seconds between spawns", 0, 3600, .01, v => Batch.Interval = v);
+        _interval = Number(_batchFields, "Seconds between spawns", 0, 3600, .01, v => { Batch.Interval = v; RefreshComposition(); });
         _interval.TooltipText = "Seconds between SUCCESSFUL spawns. The first ship starts immediately. Failed/blocked spawns retry and may extend this duration.";
         _after = Number(_batchFields, "Delay after batch (seconds)", 0, 3600, .01, v => Batch.After = v);
         _after.TooltipText = "Seconds after the last successful spawn before the next batch. Does not wait for enemies to die. Ignored for the final batch.";
@@ -372,7 +372,7 @@ public partial class WaveEditorPanel : PanelContainer
         WaveSetResource source = _source;
         WaveResource selected = Wave;
         if (selected == null) return;
-        ConfirmDelete($"Delete Wave {selected.Number} and all {selected.Batches.Count} batches? This cannot be undone.", () =>
+        ConfirmDelete($"Delete Wave {selected.Number} and all {selected.Batches.Count} batches? Reload before saving to discard the change.", () =>
         {
             if (_source != source) return;
             int index = source.Waves.IndexOf(selected);
