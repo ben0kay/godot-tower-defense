@@ -75,10 +75,16 @@ public static class WaveCatalog
     }
 
     // =========================================================
-    // Largest-remainder quotas, stable tie breaks, then a seeded Fisher-Yates shuffle.
-    public static WaveEnemyEntry[] Compose(WaveBatch batch, RandomNumberGenerator random)
+    // Exact deterministic quota calculation shared by spawning and editor previews.
+    // Stable largest-remainder ties favour earlier enemy entries; no random sampling occurs here.
+    public static int[] CompositionCounts(WaveBatch batch)
     {
+        if (batch == null || batch.Count <= 0 || batch.Entries.IsDefaultOrEmpty ||
+            batch.Entries.Any(e => e == null || !double.IsFinite(e.Weight) || e.Weight < 0))
+            throw new ArgumentException("Composition needs a positive count and valid enemy weights.");
         double total = batch.Entries.Sum(e => e.Weight);
+        if (!double.IsFinite(total) || total <= 0)
+            throw new ArgumentException("Composition weights must total more than zero.");
         int[] counts = new int[batch.Entries.Length];
         double[] remainders = new double[counts.Length];
         int assigned = 0;
@@ -89,6 +95,14 @@ public static class WaveCatalog
         }
         int[] order = Enumerable.Range(0, counts.Length).OrderByDescending(i => remainders[i]).ThenBy(i => i).ToArray();
         for (int i = 0; i < batch.Count - assigned; i++) counts[order[i % order.Length]]++;
+        return counts;
+    }
+
+    // =========================================================
+    // The actual spawn order remains the same seeded Fisher-Yates shuffle of those exact quotas.
+    public static WaveEnemyEntry[] Compose(WaveBatch batch, RandomNumberGenerator random)
+    {
+        int[] counts = CompositionCounts(batch);
         WaveEnemyEntry[] result = new WaveEnemyEntry[batch.Count];
         int at = 0;
         for (int i = 0; i < counts.Length; i++)

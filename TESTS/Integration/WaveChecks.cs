@@ -80,10 +80,15 @@ public static class WaveChecks
             "Optional immutable presentation metadata coexists with the old wave recipe");
         WaveBatch mixed = Batch(20, 0.2, 0, Enemy("a", 80), Enemy("b", 20));
         RandomNumberGenerator rng = new() { Seed = 42 };
+        Require(WaveCatalog.CompositionCounts(mixed).SequenceEqual(new[] { 16, 4 }),
+            "Editor composition preview guarantees the same 16/4 count as runtime");
         var order = WaveCatalog.Compose(mixed, rng); rng.Seed = 42;
         Require(order.Count(e => e.EnemyId == "a") == 16 && order.Count(e => e.EnemyId == "b") == 4 &&
             order.SequenceEqual(WaveCatalog.Compose(mixed, rng)), "Exact quotas are 16/4 and shuffle is reproducible");
-        var tied = WaveCatalog.Compose(Batch(5, 0, 0, Enemy("a", 1), Enemy("b", 1)), rng);
+        var tiedBatch = Batch(5, 0, 0, Enemy("a", 1), Enemy("b", 1));
+        Require(WaveCatalog.CompositionCounts(tiedBatch).SequenceEqual(new[] { 3, 2 }),
+            "Editor and scheduler agree on stable largest-remainder ties");
+        var tied = WaveCatalog.Compose(tiedBatch, rng);
         Require(tied.Count(e => e.EnemyId == "a") == 3, "Largest remainder uses stable entry-order ties");
 
         manager.Configure(new[] { Wave(1, Batch(1, 0, 0, Enemy("missing"))) }, scenes);

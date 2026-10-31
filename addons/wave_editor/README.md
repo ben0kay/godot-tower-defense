@@ -1,3 +1,15 @@
+## 2026-10-31 — live exact composition, tooltips and safe deletion (WP1)
+
+**Implemented in source, awaiting a local Godot.NET editor smoke test.** Selecting a batch shows an **Exact composition preview** below the enemy-entry controls. It shows one labelled line and progress bar per configured enemy entry: guaranteed count, percentage of this batch, and flags/portal where applicable. For example, **Count 20** with weights **75/25** displays **15 Standard / 5 Scout**. It uses the same `WaveCatalog.CompositionCounts` rounding and stable tie rules as actual spawning, *not* independent per-spawn random chances. The scheduler still shuffles that fixed composition. The preview updates when count, weights, entry, shield/stealth, or selection changes and gracefully explains invalid/empty weight states. There is **no idle-frame processing**.
+
+Hover over the relevant fields for explanatory **tooltips**: Wave Number; Count, Interval, After; Weight, Portal, Shield, Stealth; Alert and banner/narration fields. In particular, *After* waits only for the next **batch**, not for the wave's enemies to die, and is ignored on the final batch.
+
+Every **Delete** action (wave, batch, enemy entry) now asks for confirmation. **Cancel** leaves the current `.tres` unchanged; **Delete** alters only the editor's unsaved resource and does not write to disk until **Save**. The confirmation captures the selected resource so a changed selection cannot remove a different item.
+
+The existing Level003 wave file, the saved resource structure and the wave schedule have not changed. Remaining ideas are recorded in [PLAN.md](PLAN.md), including enemy art previews, controls-at-top, wave difficulty summaries, renumbering, Save As, search, and future Exact Counts mode.
+
+---
+
 ## Enemy selection dropdown — 2026-10-31
 
 The Wave Editor now uses an **Enemy type** dropdown instead of manually typing the internal enemy ID. Its options are populated from `ENEMIES/DefaultEnemyCatalog.tres`, showing each registered enemy's `EnemyDefinition.DisplayName` together with its stable `EnemyId` (for example, **Standard Drone (basic_mk1)**). The selected `.tres` entry still saves **only** the stable ID. The batch's entry list also shows readable names.

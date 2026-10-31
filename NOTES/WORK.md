@@ -1,3 +1,9 @@
+## 2026-10-31 — WP1 Wave Editor preview + tooltips + delete confirmation
+
+Implemented three requested editor UX changes: exact per-entry composition counts/progress bars for selected batches, using shared `WaveCatalog.CompositionCounts` with largest remainders/stable ties and no random shuffle in the preview; explanatory field hover tooltips; and safe confirmation dialogs for deleting waves, batches or enemy entries. The preview refreshes only on relevant edit/selection events and distinguishes shield/stealth/portal variants. A small `WaveChecks` regression asserts preview quota parity with runtime for 80/20 and tied 50/50 mixes. Authored Level003 `.tres` waves untouched. Future improvements logged in [addons/wave_editor/PLAN.md](../addons/wave_editor/PLAN.md). Godot.NET build and visual smoke test not run here.
+
+---
+
 ## 2026-10-31 — Wave Editor enemy catalogue dropdown
 
 Replaced the manually typed enemy ID field with a readable registered-enemy dropdown from `EnemyCatalog`, showing `DisplayName (EnemyId)`. Added a **Refresh list** button, readable labels in the batch-entry list and an explicit [Unregistered] fallback for old/removed IDs. Only the existing stable EnemyId is written to wave resources; the runtime wave scheduler and `.tres` schema are unchanged. The catalogue refresh is on demand, with no editor idle polling. [Editor guide](../addons/wave_editor/README.md). Godot.NET build/visual smoke check pending.
