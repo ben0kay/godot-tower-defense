@@ -263,8 +263,8 @@ public partial class WaveEditorPanel : PanelContainer
         _discard = new ConfirmationDialog { Title = "Discard wave edits", DialogText = "Discard unsaved changes and reload this wave set?" };
         AddChild(_discard); _discard.Confirmed += () => { _dirty = false; LoadPath(_path); };
         _confirmDelete = new ConfirmationDialog { Title = "Confirm deletion" };
-        _confirmDelete.GetOkButton().Text = "Delete";
         AddChild(_confirmDelete);
+        _confirmDelete.GetOkButton().Text = "Delete";
         _confirmDelete.Confirmed += () => { Action action = _pendingDelete; _pendingDelete = null; action?.Invoke(); };
     }
     private void Open()
@@ -335,7 +335,8 @@ public partial class WaveEditorPanel : PanelContainer
         _dirty = true;
         _fileLabel.Text = _path + "  * UNSAVED";
         _saveButton.Disabled = false;
-        if (_source != null) _totals.Text = _source.Waves.Count + " waves";
+        if (_source != null) _totals.Text = $"{_source.Waves.Count} waves  ·  " +
+            $"{_source.Waves.Sum(w => w?.Batches.Sum(b => b?.Count ?? 0) ?? 0)} enemies";
     }
     private void Message(string text) { if (_status != null) _status.Text = text; }
 
