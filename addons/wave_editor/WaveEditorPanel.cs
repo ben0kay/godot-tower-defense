@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 [Tool]
-public partial class WaveEditorPanel : PanelContainer
+public partial class WaveEditorPanel : Control
 {
     #region Document and Selection
     private const string ExamplePath = "res://LEVELS/Level003/Level003Waves.tres";
@@ -18,6 +18,7 @@ public partial class WaveEditorPanel : PanelContainer
     private Label _fileLabel, _status, _totals;
     private Button _saveButton;
     private ItemList _waves, _batches, _enemies;
+    private ScrollContainer _detailsScroll;
     private VBoxContainer _waveFields, _batchFields, _enemyFields, _presentationFields, _compositionPreview;
     private SpinBox _waveNumber, _count, _interval, _after, _weight;
     private OptionButton _alert, _enemyId;
@@ -39,10 +40,17 @@ public partial class WaveEditorPanel : PanelContainer
     public override void _Ready()
     {
         SetProcess(false); SetPhysicsProcess(false);
-        var margin = new MarginContainer();
+        // The former PanelContainer child stayed at its minimum height despite a full-size plugin tab.
+        // Anchor the content margin to the FULL Control workspace so both lists and the editor can expand.
+        var margin = new MarginContainer
+        {
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            SizeFlagsVertical = SizeFlags.ExpandFill
+        };
         foreach (string edge in new[] { "left", "right", "top", "bottom" })
             margin.AddThemeConstantOverride("margin_" + edge, 12);
         AddChild(margin);
+        margin.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
         var root = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
         root.AddThemeConstantOverride("separation", 10); margin.AddChild(root);
 
@@ -59,22 +67,22 @@ public partial class WaveEditorPanel : PanelContainer
         var split = new HSplitContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
         root.AddChild(split);
         var wavePane = Pane("Waves", 205); split.AddChild(wavePane);
-        _waves = CreateItemList(wavePane, index => { _waveIndex = index; _batchIndex = _enemyIndex = 0; Refresh(); });
+        _waves = CreateItemList(wavePane, index => { _waveIndex = index; _batchIndex = _enemyIndex = 0; Refresh(); ResetDetailsScroll(); });
         Buttons(wavePane, ("+ Wave", AddWave), ("Duplicate", DuplicateWave), ("Delete", DeleteWave));
         Buttons(wavePane, ("Move ↑", () => MoveWave(-1)), ("Move ↓", () => MoveWave(1)));
         var second = new HSplitContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
         split.AddChild(second);
         var batchPane = Pane("Batches", 245); second.AddChild(batchPane);
-        _batches = CreateItemList(batchPane, index => { _batchIndex = index; _enemyIndex = 0; Refresh(); });
+        _batches = CreateItemList(batchPane, index => { _batchIndex = index; _enemyIndex = 0; Refresh(); ResetDetailsScroll(); });
         Buttons(batchPane, ("+ Batch", AddBatch), ("Duplicate", DuplicateBatch), ("Delete", DeleteBatch));
         Buttons(batchPane, ("Move ↑", () => MoveBatch(-1)), ("Move ↓", () => MoveBatch(1)));
 
-        var detailsScroll = new ScrollContainer { CustomMinimumSize = new Vector2(345, 0),
+        _detailsScroll = new ScrollContainer { CustomMinimumSize = new Vector2(345, 0),
             SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
-        second.AddChild(detailsScroll);
+        second.AddChild(_detailsScroll);
         var details = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         details.AddThemeConstantOverride("separation", 10);
-        detailsScroll.AddChild(details);
+        _detailsScroll.AddChild(details);
 
         _waveFields = Pane("Selected wave", 0); details.AddChild(_waveFields);
         _waveNumber = Number(_waveFields, "Wave number", 1, 10000, 1, v => { Wave.Number = (int)v; RefreshComposition(); });
