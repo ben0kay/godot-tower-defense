@@ -50,7 +50,7 @@ public partial class WaveEditorPanel : Control
         foreach (string edge in new[] { "left", "right", "top", "bottom" })
             margin.AddThemeConstantOverride("margin_" + edge, 12);
         AddChild(margin);
-        margin.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+        margin.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
         var root = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
         root.AddThemeConstantOverride("separation", 10); margin.AddChild(root);
 
