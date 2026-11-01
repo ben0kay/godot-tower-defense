@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 [Tool]
-public partial class WaveEditorPanel : PanelContainer
+public partial class WaveEditorPanel : Control
 {
     #region Document and Selection
     private const string ExamplePath = "res://LEVELS/Level003/Level003Waves.tres";
@@ -18,6 +18,7 @@ public partial class WaveEditorPanel : PanelContainer
     private Label _fileLabel, _status, _totals;
     private Button _saveButton;
     private ItemList _waves, _batches, _enemies;
+    private ScrollContainer _detailsScroll;
     private VBoxContainer _waveFields, _batchFields, _enemyFields, _presentationFields, _compositionPreview;
     private SpinBox _waveNumber, _count, _interval, _after, _weight;
     private OptionButton _alert, _enemyId;
@@ -39,10 +40,17 @@ public partial class WaveEditorPanel : PanelContainer
     public override void _Ready()
     {
         SetProcess(false); SetPhysicsProcess(false);
-        var margin = new MarginContainer();
+        // The former PanelContainer child stayed at its minimum height despite a full-size plugin tab.
+        // Anchor the content margin to the FULL Control workspace so both lists and the editor can expand.
+        var margin = new MarginContainer
+        {
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            SizeFlagsVertical = SizeFlags.ExpandFill
+        };
         foreach (string edge in new[] { "left", "right", "top", "bottom" })
             margin.AddThemeConstantOverride("margin_" + edge, 12);
         AddChild(margin);
+        margin.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
         var root = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
         root.AddThemeConstantOverride("separation", 10); margin.AddChild(root);
 
@@ -58,23 +66,23 @@ public partial class WaveEditorPanel : PanelContainer
 
         var split = new HSplitContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
         root.AddChild(split);
-        var wavePane = Pane("Waves", 205); split.AddChild(wavePane);
-        _waves = CreateItemList(wavePane, index => { _waveIndex = index; _batchIndex = _enemyIndex = 0; Refresh(); });
+        var wavePane = Pane("Waves", 205, expandHeight: true); split.AddChild(wavePane);
+        _waves = CreateItemList(wavePane, index => { _waveIndex = index; _batchIndex = _enemyIndex = 0; Refresh(); ResetDetailsScroll(); });
         Buttons(wavePane, ("+ Wave", AddWave), ("Duplicate", DuplicateWave), ("Delete", DeleteWave));
         Buttons(wavePane, ("Move ↑", () => MoveWave(-1)), ("Move ↓", () => MoveWave(1)));
         var second = new HSplitContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
         split.AddChild(second);
-        var batchPane = Pane("Batches", 245); second.AddChild(batchPane);
-        _batches = CreateItemList(batchPane, index => { _batchIndex = index; _enemyIndex = 0; Refresh(); });
+        var batchPane = Pane("Batches", 245, expandHeight: true); second.AddChild(batchPane);
+        _batches = CreateItemList(batchPane, index => { _batchIndex = index; _enemyIndex = 0; Refresh(); ResetDetailsScroll(); });
         Buttons(batchPane, ("+ Batch", AddBatch), ("Duplicate", DuplicateBatch), ("Delete", DeleteBatch));
         Buttons(batchPane, ("Move ↑", () => MoveBatch(-1)), ("Move ↓", () => MoveBatch(1)));
 
-        var detailsScroll = new ScrollContainer { CustomMinimumSize = new Vector2(345, 0),
+        _detailsScroll = new ScrollContainer { CustomMinimumSize = new Vector2(345, 0),
             SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
-        second.AddChild(detailsScroll);
+        second.AddChild(_detailsScroll);
         var details = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         details.AddThemeConstantOverride("separation", 10);
-        detailsScroll.AddChild(details);
+        _detailsScroll.AddChild(details);
 
         _waveFields = Pane("Selected wave", 0); details.AddChild(_waveFields);
         _waveNumber = Number(_waveFields, "Wave number", 1, 10000, 1, v => { Wave.Number = (int)v; RefreshComposition(); });
@@ -87,17 +95,19 @@ public partial class WaveEditorPanel : PanelContainer
         _interval.TooltipText = "Seconds between SUCCESSFUL spawns. The first ship starts immediately. Failed/blocked spawns retry and may extend this duration.";
         _after = Number(_batchFields, "Delay after batch (seconds)", 0, 3600, .01, v => Batch.After = v);
         _after.TooltipText = "Seconds after the last successful spawn before the next batch. Does not wait for enemies to die. Ignored for the final batch.";
+        // Keep the composition summary immediately beneath count/timing so it is visible without scrolling.
+        var preview = Pane("Live composition · exact counts", 0);
+        _batchFields.AddChild(preview);
+        _compositionPreview = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        _compositionPreview.AddThemeConstantOverride("separation", 3);
+        preview.AddChild(_compositionPreview);
+        preview.TooltipText = "Guaranteed counts for this batch, based on the game's actual weighted composition algorithm.";
+
         _batchFields.AddChild(new Label { Text = "Enemy mix — weights are relative (e.g. 75 / 25).",
             AutowrapMode = TextServer.AutowrapMode.WordSmart });
         _enemies = CreateItemList(_batchFields, index => { _enemyIndex = index; Refresh(); });
         _enemies.CustomMinimumSize = new Vector2(0, 135);
         Buttons(_batchFields, ("+ Enemy", AddEnemy), ("Duplicate", DuplicateEnemy), ("Delete", DeleteEnemy));
-        var preview = Pane("Exact composition preview", 0);
-        _batchFields.AddChild(preview);
-        _compositionPreview = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
-        _compositionPreview.AddThemeConstantOverride("separation", 3);
-        preview.AddChild(_compositionPreview);
-        preview.TooltipText = "Guaranteed number of each entry in this batch. Counts use the real largest-remainder rule, then the game shuffles spawn order.";
 
         _enemyFields = Pane("Selected enemy entry", 0); details.AddChild(_enemyFields);
         var enemyPicker = new HBoxContainer();
@@ -147,12 +157,21 @@ public partial class WaveEditorPanel : PanelContainer
     }
 
     // =========================================================
+    // A new wave/batch selection should show its primary settings, not retain an old narration scroll offset.
+    private void ResetDetailsScroll()
+    {
+        if (GodotObject.IsInstanceValid(_detailsScroll)) _detailsScroll.ScrollVertical = 0;
+    }
+
+    // =========================================================
     // Small composable widgets keep the editor structure readable without a bulky .tscn tree.
     private static Button Button(string label, Action clicked)
     { var button = new Button { Text = label }; button.Pressed += clicked; return button; }
-    private static VBoxContainer Pane(string heading, float minWidth)
+    private static VBoxContainer Pane(string heading, float minWidth, bool expandHeight = false)
     {
-        var pane = new VBoxContainer { CustomMinimumSize = new Vector2(minWidth, 0), SizeFlagsVertical = SizeFlags.ExpandFill };
+        // Only the wave/batch list columns stretch vertically; field sections stay compact inside their scroll.
+        var pane = new VBoxContainer { CustomMinimumSize = new Vector2(minWidth, 0),
+            SizeFlagsVertical = expandHeight ? SizeFlags.ExpandFill : SizeFlags.Fill };
         pane.AddThemeConstantOverride("separation", 7);
         pane.AddChild(new Label { Text = heading.ToUpperInvariant() }); return pane;
     }
@@ -306,7 +325,7 @@ public partial class WaveEditorPanel : PanelContainer
             Resource resource = ResourceLoader.Load(path, cacheMode: ResourceLoader.CacheMode.Replace);
             if (resource is not WaveSetResource set) { Message("Not a WaveSetResource .tres: " + path); return; }
             _source = set; _path = path; _waveIndex = _batchIndex = _enemyIndex = 0; _dirty = false;
-            Refresh(); Message("Loaded " + path);
+            Refresh(); ResetDetailsScroll(); Message("Loaded " + path);
         }
         catch (Exception ex) { Message("Cannot open: " + ex.Message); }
     }

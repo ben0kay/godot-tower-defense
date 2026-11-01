@@ -1,3 +1,11 @@
+## Editor-layout acceptance fix (2026-11-01)
+
+- Fixed collapse of the plugin's **inner** layout with a full-rect anchored content margin, after the outer tab `ExpandFill` fix proved insufficient in a user screenshot.
+- Moved the completed WP1 live composition preview to the **top of the selected batch details**, and reset the details scrollbar when switching waves/batches. These changes are UI-only; WP2–WP7 backlog below remains deferred.
+- Needs local Godot editor verification: whole-height wave/batch lists, preview immediately after timings, footer at bottom, and no visible layout overlap/clipping at normal IDE dock sizes.
+
+---
+
 # Wave Editor — quality-of-life improvements
 
 **Branch:** `dev` · **Updated:** 2026-10-31
