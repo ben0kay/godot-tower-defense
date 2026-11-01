@@ -1,3 +1,13 @@
+## 2026-11-01 — fix collapsed workspace and surface composition preview
+
+**Source fix; Godot editor visual acceptance pending.** A screenshot confirmed the first full-height attempt was insufficient: although the main-screen plugin tab expanded, `WaveEditorPanel`'s inner content was still constrained to its minimum height, leaving the wave/batch lists collapsed and a large empty region beneath the short top strip. The root now derives from `Control` and places a full-rect **anchored `MarginContainer`** around the vertical layout, so the wave/batch list columns get the central workspace height. Only these list columns use vertical ExpandFill; the wave/batch/entry/presentation sections in the scroll view stay compact rather than spreading their contents.
+
+The **LIVE COMPOSITION · EXACT COUNTS** panel now appears directly beneath the selected batch's Total Enemies / Interval / After controls, *above* the editable enemy-entry list. This should keep the preview visible without needing to scroll past the narration fields or all the enemy settings. Picking a different wave/batch or reloading a file resets the details pane to its top settings.
+
+**User check:** Pull the latest `dev`, rebuild Godot .NET, then disable/re-enable the Wave Editor plugin (or restart Godot) so the existing editor instance is recreated. Choose Level003 Wave 4 → Batch 1: you should see **16 total**, **12 Standard / 4 Scout** in the preview (75/25) beneath the timing fields. The wave and batch lists should fill the central editor height, with the file-status footer near the bottom of the tab. This patch only changes `addons/wave_editor/WaveEditorPanel.cs` and documentation: no `.tres`, gameplay, spawning, or save-schema changes.
+
+---
+
 ## 2026-10-31 — live exact composition, tooltips and safe deletion (WP1)
 
 **Implemented in source, awaiting a local Godot.NET editor smoke test.** Selecting a batch shows an **Exact composition preview** below the enemy-entry controls. It shows one labelled line and progress bar per configured enemy entry: guaranteed count, percentage of this batch, and flags/portal where applicable. For example, **Count 20** with weights **75/25** displays **15 Standard / 5 Scout**. It uses the same `WaveCatalog.CompositionCounts` rounding and stable tie rules as actual spawning, *not* independent per-spawn random chances. The scheduler still shuffles that fixed composition. The preview updates when count, weights, entry, shield/stealth, or selection changes and gracefully explains invalid/empty weight states. There is **no idle-frame processing**.
