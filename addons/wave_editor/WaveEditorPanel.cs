@@ -95,17 +95,19 @@ public partial class WaveEditorPanel : Control
         _interval.TooltipText = "Seconds between SUCCESSFUL spawns. The first ship starts immediately. Failed/blocked spawns retry and may extend this duration.";
         _after = Number(_batchFields, "Delay after batch (seconds)", 0, 3600, .01, v => Batch.After = v);
         _after.TooltipText = "Seconds after the last successful spawn before the next batch. Does not wait for enemies to die. Ignored for the final batch.";
+        // Keep the composition summary immediately beneath count/timing so it is visible without scrolling.
+        var preview = Pane("Live composition · exact counts", 0);
+        _batchFields.AddChild(preview);
+        _compositionPreview = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        _compositionPreview.AddThemeConstantOverride("separation", 3);
+        preview.AddChild(_compositionPreview);
+        preview.TooltipText = "Guaranteed counts for this batch, based on the game's actual weighted composition algorithm.";
+
         _batchFields.AddChild(new Label { Text = "Enemy mix — weights are relative (e.g. 75 / 25).",
             AutowrapMode = TextServer.AutowrapMode.WordSmart });
         _enemies = CreateItemList(_batchFields, index => { _enemyIndex = index; Refresh(); });
         _enemies.CustomMinimumSize = new Vector2(0, 135);
         Buttons(_batchFields, ("+ Enemy", AddEnemy), ("Duplicate", DuplicateEnemy), ("Delete", DeleteEnemy));
-        var preview = Pane("Exact composition preview", 0);
-        _batchFields.AddChild(preview);
-        _compositionPreview = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
-        _compositionPreview.AddThemeConstantOverride("separation", 3);
-        preview.AddChild(_compositionPreview);
-        preview.TooltipText = "Guaranteed number of each entry in this batch. Counts use the real largest-remainder rule, then the game shuffles spawn order.";
 
         _enemyFields = Pane("Selected enemy entry", 0); details.AddChild(_enemyFields);
         var enemyPicker = new HBoxContainer();
@@ -152,6 +154,13 @@ public partial class WaveEditorPanel : Control
         _status = new Label { Text = "Choose a .tres wave set.", SizeFlagsHorizontal = SizeFlags.ExpandFill };
         _totals = new Label(); footer.AddChild(_status); footer.AddChild(_totals);
         SetupDialogs(); ReloadEnemyCatalog(); LoadPath(ExamplePath);
+    }
+
+    // =========================================================
+    // A new wave/batch selection should show its primary settings, not retain an old narration scroll offset.
+    private void ResetDetailsScroll()
+    {
+        if (GodotObject.IsInstanceValid(_detailsScroll)) _detailsScroll.ScrollVertical = 0;
     }
 
     // =========================================================
