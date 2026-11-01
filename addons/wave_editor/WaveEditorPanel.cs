@@ -66,13 +66,13 @@ public partial class WaveEditorPanel : Control
 
         var split = new HSplitContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
         root.AddChild(split);
-        var wavePane = Pane("Waves", 205); split.AddChild(wavePane);
+        var wavePane = Pane("Waves", 205, expandHeight: true); split.AddChild(wavePane);
         _waves = CreateItemList(wavePane, index => { _waveIndex = index; _batchIndex = _enemyIndex = 0; Refresh(); ResetDetailsScroll(); });
         Buttons(wavePane, ("+ Wave", AddWave), ("Duplicate", DuplicateWave), ("Delete", DeleteWave));
         Buttons(wavePane, ("Move ↑", () => MoveWave(-1)), ("Move ↓", () => MoveWave(1)));
         var second = new HSplitContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
         split.AddChild(second);
-        var batchPane = Pane("Batches", 245); second.AddChild(batchPane);
+        var batchPane = Pane("Batches", 245, expandHeight: true); second.AddChild(batchPane);
         _batches = CreateItemList(batchPane, index => { _batchIndex = index; _enemyIndex = 0; Refresh(); ResetDetailsScroll(); });
         Buttons(batchPane, ("+ Batch", AddBatch), ("Duplicate", DuplicateBatch), ("Delete", DeleteBatch));
         Buttons(batchPane, ("Move ↑", () => MoveBatch(-1)), ("Move ↓", () => MoveBatch(1)));
@@ -167,9 +167,11 @@ public partial class WaveEditorPanel : Control
     // Small composable widgets keep the editor structure readable without a bulky .tscn tree.
     private static Button Button(string label, Action clicked)
     { var button = new Button { Text = label }; button.Pressed += clicked; return button; }
-    private static VBoxContainer Pane(string heading, float minWidth)
+    private static VBoxContainer Pane(string heading, float minWidth, bool expandHeight = false)
     {
-        var pane = new VBoxContainer { CustomMinimumSize = new Vector2(minWidth, 0), SizeFlagsVertical = SizeFlags.ExpandFill };
+        // Only the wave/batch list columns stretch vertically; field sections stay compact inside their scroll.
+        var pane = new VBoxContainer { CustomMinimumSize = new Vector2(minWidth, 0),
+            SizeFlagsVertical = expandHeight ? SizeFlags.ExpandFill : SizeFlags.Fill };
         pane.AddThemeConstantOverride("separation", 7);
         pane.AddChild(new Label { Text = heading.ToUpperInvariant() }); return pane;
     }
@@ -323,7 +325,7 @@ public partial class WaveEditorPanel : Control
             Resource resource = ResourceLoader.Load(path, cacheMode: ResourceLoader.CacheMode.Replace);
             if (resource is not WaveSetResource set) { Message("Not a WaveSetResource .tres: " + path); return; }
             _source = set; _path = path; _waveIndex = _batchIndex = _enemyIndex = 0; _dirty = false;
-            Refresh(); Message("Loaded " + path);
+            Refresh(); ResetDetailsScroll(); Message("Loaded " + path);
         }
         catch (Exception ex) { Message("Cannot open: " + ex.Message); }
     }
