@@ -1,3 +1,9 @@
+## 2026-11-01 — Wave Editor real full-height layout + visible composition
+
+User screenshot confirmed prior plugin `ExpandFill` change fixed only the outer main-screen tab; the wave/batch lists and right details were still collapsed into a ~100px strip, with the footer immediately underneath despite ample viewport space. Replaced `WaveEditorPanel : PanelContainer` with `Control`, anchored a `MarginContainer` to `FullRect`, retained a flex-height split area, allowed only list columns to vertically expand, and made details sections compact. Moved live exact-count composition preview immediately below batch count/timings, and reset right scroll to top on wave/batch selection and file load. No waves or runtime resources touched; static checks done; in-editor visual confirmation pending. [Editor instructions](../addons/wave_editor/README.md).
+
+---
+
 ## 2026-10-31 — WP1 Wave Editor preview + tooltips + delete confirmation
 
 Implemented three requested editor UX changes: exact per-entry composition counts/progress bars for selected batches, using shared `WaveCatalog.CompositionCounts` with largest remainders/stable ties and no random shuffle in the preview; explanatory field hover tooltips; and safe confirmation dialogs for deleting waves, batches or enemy entries. The preview refreshes only on relevant edit/selection events and distinguishes shield/stealth/portal variants. A small `WaveChecks` regression asserts preview quota parity with runtime for 80/20 and tied 50/50 mixes. Authored Level003 `.tres` waves untouched. Future improvements logged in [addons/wave_editor/PLAN.md](../addons/wave_editor/PLAN.md). Godot.NET build and visual smoke test not run here.
