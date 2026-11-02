@@ -23,6 +23,8 @@ public partial class EnemyDefinition : Resource
     [Export(PropertyHint.Range, "0,1000000,1")] public int KillRewardCredits { get; set; } = 0;
     [ExportGroup("Death Feedback")]
     [Export(PropertyHint.Range, "0,5,0.1")] public float DeathExplosionMultiplier { get; set; } = 1f;
+    [ExportGroup("Damage Appearance")]
+    [Export] public EnemyDamageAppearanceProfile DamageAppearance { get; set; }
     #endregion
 
     #region Status and Movement

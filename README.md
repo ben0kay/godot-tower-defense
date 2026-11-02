@@ -1,3 +1,9 @@
+## Enemy001 hull damage artwork experiment — 2026-11-02
+
+Only the Standard Drone (`basic_mk1`, Enemy001) now opts into three static Sprite2D artwork stages: original healthy hull, scraped/broken armour and heavily damaged exposed machinery. The reusable `EnemyDefinition.DamageAppearance` profile automatically divides **hull HP** into equal bands from its texture count (3 states = thirds, 4 = quarters, etc.), without hardcoded thresholds or per-enemy processing loops. Other enemy types retain original art, shield-only damage never changes hull art, and gameplay rules are untouched. Toggle it off by clearing `Enemy001.tres → Damage Appearance`. See [shared enemy visual documentation](ENEMIES/Shared/Visuals/README.md) and [Enemy001 details](ENEMIES/Types/Enemy001/README.md). Source implemented; owner visual acceptance in Godot pending.
+
+---
+
 ## Sniper Tower upgrade art and extended barrel — 2026-11-02
 
 Sniper now has distinct Level 2/3 fixed-base + rotating-gun artwork and separate **35% / 70%** upgrade assembly composites, reusing the Battle/Machine Gun shared construction presenter. The original Sniper gun and catalog artwork also have a longer barrel, with the real muzzle marker aligned to the new tip. The visual-only changes preserve instant-target combat, recoil, placement footprint, paid upgrade timing and economy. See [Sniper artwork guide](TOWERS/Offensive/SniperTower/Artwork/Upgrades/README.md). Owner Godot/editor acceptance pending.

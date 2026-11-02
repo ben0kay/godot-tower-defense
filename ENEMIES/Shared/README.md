@@ -1,3 +1,11 @@
+## Opt-in hull damage appearances — 2026-11-02
+
+`EnemyDefinition.DamageAppearance` optionally references `Visuals/EnemyDamageAppearanceProfile.cs`, which holds an ordered array of `Texture2D` static art. The lightweight `EnemyDamageAppearance.StageForHealth` maps each ship's **hull HP fraction** to a stage by dividing health into equal bands based on array length; no fixed 66%/33% numbers. `Enemy` caches the assigned sprite/profile once at initialization and replaces the texture **only** on an actual stage change after a hull HP mutation. No process loop, extra scene node or updates for unrelated ships. Damage stages intentionally do not react to shield-only hits or interfere with Slow/Freeze/Stealth tint, and this does not alter defensive calculations. See [shared visual notes](Visuals/README.md).
+
+**Only Enemy001 (`basic_mk1`) opts in for the initial art trial** through its own definition resource; every other type retains the null default. Source implemented; gameplay/art acceptance pending.
+
+---
+
 ## PF1 — notification-owned movement updates (source implemented; unverified)
 
 EnemyMovement no longer explicitly updates the registry after SetMovementPosition; Enemy's existing local/global transform notifications retain spatial indexing and reveal callbacks. Clearance, terrain traversal and swept history remain unchanged. See `TESTS/Performance/MovementRegistryChecks.tscn` and `NOTES/AGENT_FINDINGS/Performance.md`. Build, runtime regressions and timing measurements could not run because the execution environment was unavailable. No measured speedup is claimed.

@@ -1,3 +1,15 @@
+## Optional static damage-artwork states — 2026-11-02
+
+Enemy001 (`basic_mk1`) now opts into a **three-state Sprite2D appearance profile**, purely cosmetic and tied to **hull health** rather than shield charge. The original 32×24 `Artwork/enemy001.svg` stays the healthy state; two matching forked-drone SVGs show exposed plating/scratches at moderate hull damage and substantially broken armour/exposed internals at critical hull damage. All three retain the original viewBox, right-facing silhouette, and flat dark/red fleet palette.
+
+The shared `EnemyDefinition.DamageAppearance` resource is **null by default** for every other enemy. Only `Enemy001.tres` references `Visuals/Enemy001DamageAppearance.tres`, which contains a freely sized ordered texture array (healthy first). Its `N` entries automatically divide hull health into `N` equally sized bands: three stages switch at 2/3 and 1/3 HP, four stages switch at 3/4, 1/2 and 1/4 HP. No thresholds are hardcoded, and additional art requires no change to the shared C# logic.
+
+Artwork changes occur only on `Enemy.Initialize` and actual hull-health changes in the existing central `CommitDamage` path; shield-only hits do not change body art. No animation, additional per-enemy node, `_Process` polling, or scene inheritance change. Slow/Freeze/Stealth tint remains independent; all damage math, HP, rewards, hit detection, physics and movement are unchanged. To disable the test, clear `Enemy001.tres → Damage Appearance`. See [shared system notes](../../Shared/Visuals/README.md).
+
+**Awaiting owner validation:** spawn Enemy001, chip its hull with several small hits (strong Sniper hits may kill in one blow), inspect both sprite switches, shields and status tints, then verify the other enemy types retain their sprites.
+
+---
+
 ## Current artwork — alien robotic pass (2026-10-18)
 
 **Forked strike drone**, right-facing, native **32×24px**. Narrow plated body, split rear stabilizers and a recessed orange-red attack slit. Artwork only: stable identity, scenes, gameplay/ability settings and navigation clearance are unchanged. Earlier art/color descriptions below are historical. See `../ART_DIRECTION.md` for fleet-wide conventions and the review sheet.

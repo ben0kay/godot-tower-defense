@@ -77,6 +77,9 @@ public partial class Enemy : Node2D
     private Vector2 _terrainPosition;
     private bool _terrainMovement;
     private DefenseBar _defenseBar;
+    private EnemyDamageAppearanceProfile _damageAppearance;
+    private Sprite2D _damageAppearanceSprite;
+    private int _damageAppearanceStage = -1;
     private ShieldVisual _shieldVisual;
     private static PackedScene _shieldVisualScene;
     private double _initialDurability, _damageConsumed, _damageXpPool, _killXp;
@@ -99,6 +102,11 @@ public partial class Enemy : Node2D
         _defenseBar = GetNodeOrNull<DefenseBar>("DefenseBar");
         // Large hulls get extra bar clearance once, without per-type scene overrides.
         Sprite2D sprite = GetNodeOrNull<Sprite2D>("Sprite");
+        _damageAppearance = Definition.DamageAppearance;
+        _damageAppearanceSprite = _damageAppearance != null && _damageAppearance.Stages != null
+            && _damageAppearance.Stages.Count > 0 ? sprite : null;
+        _damageAppearanceStage = -1;
+        RefreshDamageAppearance();
         if (_defenseBar != null && sprite?.Texture != null)
             _defenseBar.SetOwnerVisualHeight(sprite.GetRect().Size.Y * Mathf.Abs(sprite.Scale.Y));
         _defenseBar?.SetHealth(Health, Definition.MaxHealth);
@@ -112,6 +120,19 @@ public partial class Enemy : Node2D
         Terrain = paths.Navigation.Grid.InteractiveTiles; _terrainPosition = GlobalPosition;
         Terrain?.Reposition(this);
         Initialized?.Invoke(this);
+    }
+
+    // =========================================================
+    // Optional per-type damage art is refreshed only on spawn and hull HP changes, not while moving.
+    private void RefreshDamageAppearance()
+    {
+        if (!GodotObject.IsInstanceValid(_damageAppearanceSprite) || _damageAppearance?.Stages == null) return;
+        int stage = EnemyDamageAppearance.StageForHealth(Health, Definition.MaxHealth, _damageAppearance.Stages.Count);
+        if (stage < 0 || stage == _damageAppearanceStage) return;
+        Texture2D next = _damageAppearance.Stages[stage];
+        if (!GodotObject.IsInstanceValid(next)) return;
+        _damageAppearanceStage = stage;
+        if (_damageAppearanceSprite.Texture != next) _damageAppearanceSprite.Texture = next;
     }
 
     // =========================================================
@@ -198,6 +219,7 @@ public partial class Enemy : Node2D
         if (CurrentShield != oldShield) SyncShieldVisual(oldShield, CurrentShield);
         if (Health != oldHealth)
         {
+            RefreshDamageAppearance();
             _defenseBar?.SetHealth(Health, Definition.MaxHealth);
             if (Health <= 0f) Finish(false);
         }
@@ -274,6 +296,7 @@ public partial class Enemy : Node2D
     public override void _ExitTree()
     {
         ClearStatuses(); ClearStealth();
+        _damageAppearance = null; _damageAppearanceSprite = null; _damageAppearanceStage = -1;
         if (GodotObject.IsInstanceValid(_shieldVisual)) _shieldVisual.ResetVisual();
         _shieldVisual = null;
         bool unresolved = IsAlive; IsAlive = false; _registry?.Unregister(this);

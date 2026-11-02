@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="EnemyDefinition" format=3 uid="uid://cx54px4ngllx4"]
 
 [ext_resource type="Script" uid="uid://d4cax7p5ep4fd" path="res://ENEMIES/Shared/EnemyDefinition.cs" id="1"]
+[ext_resource type="Resource" path="res://ENEMIES/Types/Enemy001/Visuals/Enemy001DamageAppearance.tres" id="2_damage"]
 
 [resource]
 script = ExtResource("1")
@@ -8,3 +9,4 @@ EnemyId = "basic_mk1"
 DisplayName = "Standard Drone"
 MaxShield = 20.0
 KillRewardCredits = 3
+DamageAppearance = ExtResource("2_damage")

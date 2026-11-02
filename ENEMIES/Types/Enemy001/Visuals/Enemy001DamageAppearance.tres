@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="EnemyDamageAppearanceProfile" format=3]
+
+[ext_resource type="Script" path="res://ENEMIES/Shared/Visuals/EnemyDamageAppearanceProfile.cs" id="1"]
+[ext_resource type="Texture2D" path="res://ENEMIES/Types/Enemy001/Artwork/enemy001.svg" id="healthy"]
+[ext_resource type="Texture2D" path="res://ENEMIES/Types/Enemy001/Artwork/enemy001_damaged.svg" id="damaged"]
+[ext_resource type="Texture2D" path="res://ENEMIES/Types/Enemy001/Artwork/enemy001_critical.svg" id="critical"]
+
+[resource]
+script = ExtResource("1")
+Stages = Array[Texture2D]([ExtResource("healthy"), ExtResource("damaged"), ExtResource("critical")])
