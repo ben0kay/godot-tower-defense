@@ -1,3 +1,15 @@
+## 2026-11-01 — Wave Editor full-height layout correction, direct container (Layout V2)
+
+**Source fix; in-editor validation pending.** Two earlier attempts changed size flags / anchored an inner margin, but the user's screenshot still showed all controls compressed into a short strip and the right details scrolled down to narration, even though the available Godot main-screen viewport was tall. This correction removes the nested `PanelContainer/Control -> MarginContainer -> VBoxContainer` chain entirely. The `WaveEditorPanel` is now **itself a `VBoxContainer`**, attached directly to Godot's main-screen `VBoxContainer`, with `SizeFlagsVertical=ExpandFill`. Its first-level children are strictly: compact header, an expanding three-column split editor, and a compact status/footer. No `FullRect` anchors are set on a Container-managed child. The root has a modest minimum height safeguard.
+
+The header now displays **WAVE EDITOR · LAYOUT V2** so you can *verify that the newly compiled tool assembly is running*. If you still see only `WAVE EDITOR` after a Git pull, **close Godot completely**, pull `dev`, reopen Godot .NET, **Build C#**, disable/re-enable the plugin (or restart again). Merely pulling code while the editor is running may leave an older plugin instance/assembly active.
+
+When loaded, the wave/batch lists should occupy the full central workspace and the status/footer should sit near the **bottom**, not immediately below the toolbar. The **LIVE COMPOSITION · EXACT COUNTS** section is just below Total Enemies / Interval / After in the right-hand pane. Selecting a wave/batch or loading a file resets right-side scrolling, including after the initial layout pass. For a clear example, select Level003 **Wave 4 → Batch 1**: it should show **16 enemies, 12 Standard Drone and 4 Swift Interceptor** (75/25).
+
+No authored `.tres`, wave-count, enemy-spawning, mission, or save changes. Previous plan remains in `PLAN.md`. Static source checks passed, but this environment lacks a Godot .NET binary; the user's next in-editor check will confirm actual geometry.
+
+---
+
 ## 2026-11-01 — fix collapsed workspace and surface composition preview
 
 **Source fix; Godot editor visual acceptance pending.** A screenshot confirmed the first full-height attempt was insufficient: although the main-screen plugin tab expanded, `WaveEditorPanel`'s inner content was still constrained to its minimum height, leaving the wave/batch lists collapsed and a large empty region beneath the short top strip. The root now derives from `Control` and places a full-rect **anchored `MarginContainer`** around the vertical layout, so the wave/batch list columns get the central workspace height. Only these list columns use vertical ExpandFill; the wave/batch/entry/presentation sections in the scroll view stay compact rather than spreading their contents.
