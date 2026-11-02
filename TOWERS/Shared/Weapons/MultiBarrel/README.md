@@ -1,3 +1,11 @@
+## Optional instant-target weapon delivery — 2026-11-02
+
+`ProjectileTurretConfig.DeliveryMode` defaults to `PhysicalProjectile`, preserving all existing physical bullet handling for Machine Gun, Cryo and Stasis without per-tower changes. The shared `ProjectileTurretBase` can instead opt into `InstantTarget`: a funded shot flashes its real muzzle, commits recoil/heat/cooldown, and delivers the immutable `DamageInfo` directly to the locked enemy through `WeaponHitDelivery` (after shot bookkeeping, so lethal callbacks cannot interrupt it). No `BasicProjectile` is spawned for those shots. Physical projectile behaviour is unchanged. The Sniper Tower explicitly opts in; this capability can be reused by future aimed towers.
+
+Delivery is separate from targeting, damage types, status effects, projectile handling and cosmetics. Instant shots ignore projectile speed/spread and have no shield-ricochet tracer, but preserve damage, XP, ammo and targeting rules. See [Delivery/README.md](../Delivery/README.md). Source implemented; owner gameplay validation pending.
+
+---
+
 ## Recoil scene contract — 2026-10-20
 
 The four current ProjectileTurretBase scenes (Machine Gun, Sniper, Cryo, Stasis) now put Sprite and Muzzles under TurretPivot/RecoilRoot, with BaseSprite outside the aim pivot. A cached optional Recoil controller receives one impulse after a funded volley snapshots all muzzle origins. Renderer remains under TurretPivot so launched flashes are not dragged by recoil. Existing barrel sequencing, ammo funding and total projectile cadence are retained. Base and gun share selection tint. Earlier Sprite/Muzzles direct-child and no-recoil wording below is historical and superseded by this layout. Presets are assigned on each scene's Recoil node; controller state remains per instance.

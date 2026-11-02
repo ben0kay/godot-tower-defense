@@ -5,6 +5,7 @@
 [ext_resource type="Resource" path="res://TOWERS/Offensive/SniperTower/Visuals/SniperAimLaserStyle.tres" id="pv_aim"]
 [resource]
 script = ExtResource("1")
+DeliveryMode = 1
 
 ProjectileVisual = ExtResource("pv_tracer")
 MuzzleFlash = ExtResource("pv_flash")

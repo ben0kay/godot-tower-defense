@@ -1,3 +1,9 @@
+## Reusable instant-target shots — 2026-11-02
+
+Sniper Tower now selects shared **InstantTarget** delivery: an aligned, funded shot deals immediate damage to the current valid target instead of spawning a travelling bullet. Shared `ProjectileTurretConfig.DeliveryMode` defaults to physical projectile, so Machine Gun, Cryo, Stasis and other towers keep their existing delivery. Sniper recoil, flash, ammo, heat, XP and shield/hull math remain; cosmetic ricochets require a physical impact. See [Sniper Tower](TOWERS/Offensive/SniperTower/README.md) and [shared delivery](TOWERS/Shared/Weapons/Delivery/README.md). Source implemented; Godot gameplay/visual checks remain with the owner.
+
+---
+
 ## Full-size Godot Wave Editor tab + Level003 .tres waves — 2026-10-29
 
 Added a `[Tool]` C# main-screen **Wave Editor** plugin (`addons/wave_editor/`), opened from the same workspace selector as Godot's 2D/3D/Script tabs. A resizable editor now opens/creates/saves native `WaveSetResource` `.tres` files with waves, ordered batches, counts, intervals, delays, weighted enemy entries, portal/shield/stealth and optional presentation fields, while preserving the existing immutable `WaveDefinition` runtime data and all weighted spawn mechanics. **Level003** now references `LEVELS/Level003/Level003Waves.tres` with identical 18/22/26/32 enemy counts; original `Level003Waves.cs` remains only as a comparison fixture. Other levels stay C# authored. Build the C# project, enable **Project Settings → Plugins → Wave Editor**, click the new tab. See [plugin guide](addons/wave_editor/README.md). Source checks added; Godot editor/runtime playtest remains pending.

@@ -11,8 +11,9 @@ public partial class SniperTowerConfig : ProjectileTurretConfig
     public SniperTowerConfig()
     {
         DisplayName = "Sniper Tower";
-        Description = "Long-range precision Kinetic turret; high damage, slow cadence, fast guided shot.";
+        Description = "Long-range precision Kinetic turret; high damage and instant target delivery.";
         FiringMode = BarrelFireMode.Single;
+        DeliveryMode = ShotDeliveryMode.InstantTarget;
         Levels = SniperTowerLevels.Create();
     }
 
