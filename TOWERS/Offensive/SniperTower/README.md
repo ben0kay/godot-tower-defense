@@ -1,3 +1,11 @@
+## Sniper Tower tier artwork and longer barrel — 2026-11-02
+
+Sniper Tower now shares the existing Battle/Machine Gun purchased-level art presentation. Levels 2 and 3 have their own reinforced bases, extended-barrel gun textures, and separate 35%/70% upgrade-scaffold composites. The existing Level 1 gun and catalog/placement composite also receive a visibly longer barrel. The single muzzle marker moves from `(0,-27)` to `(0,-39)` so aim/flash/origin stay aligned; the 64×80 extended gun/composite canvas preserves the original centred turret registration. The shared `ConstructionVisuals` node now swaps completed split base/gun imagery on upgrades; no new processing loop or altered work/damage rules. The existing **InstantTarget** damage delivery is unchanged.
+
+Config: `Artwork/Construction/SniperConstructionArt.tres`; new SVGs and authoring notes: [Artwork/Upgrades/README.md](Artwork/Upgrades/README.md). Initial paid build still uses its prior finished-art look; only paid **upgrades** gain staged composite art. Source implemented; owner to check in-editor zoom, beam/work stages, muzzle and save/load visuals.
+
+---
+
 ## Instant-target delivery — 2026-11-02
 
 Sniper now opts into the reusable `ShotDeliveryMode.InstantTarget` through `SniperTowerConfig` and `DefaultSniperTowerConfig.tres`. On a funded, aligned shot, the shared turret applies Kinetic `DamageInfo` directly to its **current valid locked enemy**, with no travelling `BasicProjectile` node, launch spread, interception, homing or physics raycast. Moving basic enemies can no longer dodge by moving between shot and impact. Target search, stealth detection, rotation/alignment, fire cadence, recoil, muzzle flash, ammo, heat, shield/hull resolution, damage XP and kills retain their existing owners. Hits still require a target valid for the tower's targeting rules; no through-wall line-of-sight restriction is added.
@@ -18,7 +26,7 @@ Fixed BaseSprite and rotating TurretPivot/RecoilRoot/Sprite now split the finish
 
 **Latest projectile-speed update (2026-10-18):** All three purchased levels now use **2,990 px/s** guided tracers, exactly double the prior **1,495 px/s**. Damage, rate, ammunition, targeting, costs and heat are unchanged. The table below also includes pre-existing range rebalances.
 
-Implemented via the shared `TOWERS/Shared/Weapons/MultiBarrel/ProjectileTurretBase.cs`; no bespoke targeting loop or HUD changes. The authored config enforces `Single` muzzle firing. Its one `Marker2D` sits at `TurretPivot/Muzzles/MuzzleA`; projectile launches from the barrel tip, follows the existing guided `BasicProjectile`, uses typed Kinetic shield/hull damage and standard tower XP. The scene is a 1×1 offensive tower available through `TOWERS/DefaultTowerCatalog.tres`.
+Implemented via the shared `TOWERS/Shared/Weapons/MultiBarrel/ProjectileTurretBase.cs`; no bespoke targeting loop or HUD changes. The authored config enforces `Single` muzzle firing. Its one `Marker2D` sits at `TurretPivot/RecoilRoot/Muzzles/MuzzleA`. In optional `PhysicalProjectile` delivery, projectiles launch from the updated barrel tip and use the shared `BasicProjectile`; the shipped `InstantTarget` delivery instead resolves a direct targeted hit. Both use typed Kinetic shield/hull damage and standard tower XP. The scene is a 1×1 offensive tower available through `TOWERS/DefaultTowerCatalog.tres`.
 
 | Purchased level | Credits (build/upgrade) | Damage/bullet | Total bullets/s | Range | Bullet speed | Penetration |
 |---|---:|---:|---:|---:|---:|---:|
@@ -32,7 +40,7 @@ Balance is provisional. Level 1 one-shots unshielded 60-HP Enemy001; its strengt
 
 ## Initial construction (C1/C2)
 
-Paid placement occupies its footprint immediately and takes **4 seconds**, authored in the Level1 WorkSeconds column of this tower's `*Levels.cs`. It cannot acquire targets/fire/consume ammunition or request deliveries until complete. Completion preserves stats, level, rank and stock. Direct scene fixtures remain operational by default. Current final artwork stays visible; stage SVGs/VFX (C4) remain deferred. C3 Inspector progress is implemented; purchased upgrades use their own WorkSeconds and retain old-tier operation until completion. Duplicate purchases are disabled while work is active. See `TOWERS/Shared/Construction/README.md`.
+Paid placement occupies its footprint immediately and takes **4 seconds**, authored in the Level1 WorkSeconds column of this tower's `*Levels.cs`. It cannot acquire targets/fire/consume ammunition or request deliveries until complete. Completion preserves stats, level, rank and stock. Direct scene fixtures remain operational by default. The existing finished-art appearance stays visible during initial construction; optional C4 initial-build stage SVGs remain deferred. L2/L3 upgrades now have separate 35% and 70% composite art. C3 Inspector progress is implemented; purchased upgrades use their own WorkSeconds and disable firing while upgrade work is active; the old tier's art remains visible until the upgrade-progress milestones. Duplicate purchases are disabled while work is active. See `TOWERS/Shared/Construction/README.md`.
 
 ## Projectile presentation — PV1/PV2
 

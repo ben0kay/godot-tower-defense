@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://TOWERS/Offensive/SniperTower/Visuals/SniperTracerStyle.tres" id="pv_tracer"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/SniperTower/Visuals/SniperMuzzleFlashStyle.tres" id="pv_flash"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/SniperTower/Visuals/SniperAimLaserStyle.tres" id="pv_aim"]
+[ext_resource type="Resource" path="res://TOWERS/Offensive/SniperTower/Artwork/Construction/SniperConstructionArt.tres" id="construction"]
 [resource]
 script = ExtResource("1")
 DeliveryMode = 1
@@ -10,5 +11,6 @@ DeliveryMode = 1
 ProjectileVisual = ExtResource("pv_tracer")
 MuzzleFlash = ExtResource("pv_flash")
 AimLaser = ExtResource("pv_aim")
+ConstructionArt = ExtResource("construction")
 
 ShieldRicochet = true

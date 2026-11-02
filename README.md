@@ -1,3 +1,9 @@
+## Sniper Tower upgrade art and extended barrel — 2026-11-02
+
+Sniper now has distinct Level 2/3 fixed-base + rotating-gun artwork and separate **35% / 70%** upgrade assembly composites, reusing the Battle/Machine Gun shared construction presenter. The original Sniper gun and catalog artwork also have a longer barrel, with the real muzzle marker aligned to the new tip. The visual-only changes preserve instant-target combat, recoil, placement footprint, paid upgrade timing and economy. See [Sniper artwork guide](TOWERS/Offensive/SniperTower/Artwork/Upgrades/README.md). Owner Godot/editor acceptance pending.
+
+---
+
 ## Machine Gun Level 2/3 upgrade artwork — 2026-11-02
 
 Machine Gun Tower now has its own split fixed-base and rotating **dual-barrel** art at Levels 2 and 3, plus distinct **35% and 70%** construction composites during each paid upgrade. It uses Battle Tower's existing shared event-driven presenter with two added sprite-path references; Level1, initial construction art, muzzle sockets, firing, heat and upgrade timing are unchanged. See [Machine Gun upgrade artwork](TOWERS/Offensive/MachineGunTower/Artwork/Upgrades/README.md). Source-only implementation; Godot appearance checks remain with the owner.
