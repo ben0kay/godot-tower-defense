@@ -8,17 +8,18 @@ public partial class WaveEditorPlugin : EditorPlugin
     private WaveEditorPanel _panel;
 
     // =========================================================
-    // Main-screen parent is a VBoxContainer: ExpandFill is required or our tab collapses into a short strip.
+    // The Godot main screen IS a VBoxContainer: child ExpandFill sizing controls its geometry.
+    // Don't apply FullRect anchors to a Container-managed child; the panel is itself the expanding VBox.
     public override void _EnterTree()
     {
         _panel = new WaveEditorPanel
         {
             Name = "Wave Editor", Visible = false,
             SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-            SizeFlagsVertical = Control.SizeFlags.ExpandFill
+            SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+            CustomMinimumSize = new Vector2(0, 320)
         };
         EditorInterface.Singleton.GetEditorMainScreen().AddChild(_panel);
-        _panel.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
     }
 
     // =========================================================
