@@ -157,7 +157,11 @@ public partial class WaveEditorPanel : VBoxContainer
     {
         if (!GodotObject.IsInstanceValid(_detailsScroll)) return;
         // Use deferred layout pass: Godot may not have measured ScrollContainer after a loaded document.
-        _detailsScroll.CallDeferred(ScrollContainer.MethodName.SetVScroll, 0);
+        _detailsScroll.ScrollVertical = 0;
+        Callable.From(() =>
+        {
+            if (GodotObject.IsInstanceValid(_detailsScroll)) _detailsScroll.ScrollVertical = 0;
+        }).CallDeferred();
     }
 
     // =========================================================
