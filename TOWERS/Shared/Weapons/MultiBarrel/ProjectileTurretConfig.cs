@@ -6,6 +6,7 @@ public partial class ProjectileTurretConfig : TowerConfig, ITowerTargetingPolicy
 {
     [ExportGroup("Firing")]
     [Export] public BarrelFireMode FiringMode { get; set; } = BarrelFireMode.Single;
+    [Export] public ShotDeliveryMode DeliveryMode { get; set; } = ShotDeliveryMode.PhysicalProjectile;
     [ExportGroup("Weapon Visuals")]
     [Export] public bool ShieldRicochet { get; set; }
     [Export] public ProjectileVisualStyle ProjectileVisual { get; set; }
@@ -35,8 +36,12 @@ public partial class ProjectileTurretConfig : TowerConfig, ITowerTargetingPolicy
 
     // =========================================================
     // Inspector and purchased-level preview display the same effective snapshots as combat.
-    public override string DescribeStats(TowerFinalStats final) =>
-        $"Range: {final.RangePixels:0} px\nRate: {final.ShotsPerSecond:0.##} bullets/s\nDamage: {final.DamagePerShot}\nProjectile: {final.ProjectileSpeed:0} px/s\nShield Penetration: {final.ShieldPenetration * 100:0.##}%\nFire mode: {FiringMode}\nTargeting: {TargetPriority}";
+    public override string DescribeStats(TowerFinalStats final)
+    {
+        string delivery = DeliveryMode == ShotDeliveryMode.InstantTarget ? "Delivery: Instant target"
+            : $"Projectile: {final.ProjectileSpeed:0} px/s";
+        return $"Range: {final.RangePixels:0} px\nRate: {final.ShotsPerSecond:0.##} bullets/s\nDamage: {final.DamagePerShot}\n{delivery}\nShield Penetration: {final.ShieldPenetration * 100:0.##}%\nFire mode: {FiringMode}\nTargeting: {TargetPriority}";
+    }
 
     // =========================================================
     // Display only changed stats; each level row replaces the previous one completely.
@@ -46,7 +51,8 @@ public partial class ProjectileTurretConfig : TowerConfig, ITowerTargetingPolicy
         if (now.DamagePerShot != future.DamagePerShot) changes += $"Damage: {now.DamagePerShot} → {future.DamagePerShot}\n";
         if (now.ShotsPerSecond != future.ShotsPerSecond) changes += $"Rate: {now.ShotsPerSecond:0.##} → {future.ShotsPerSecond:0.##} bullets/s\n";
         if (now.RangePixels != future.RangePixels) changes += $"Range: {now.RangePixels:0} → {future.RangePixels:0} px\n";
-        if (now.ProjectileSpeed != future.ProjectileSpeed) changes += $"Projectile: {now.ProjectileSpeed:0} → {future.ProjectileSpeed:0} px/s\n";
+        if (DeliveryMode != ShotDeliveryMode.InstantTarget && now.ProjectileSpeed != future.ProjectileSpeed)
+            changes += $"Projectile: {now.ProjectileSpeed:0} → {future.ProjectileSpeed:0} px/s\n";
         if (now.ShieldPenetration != future.ShieldPenetration) changes += $"Shield Penetration: {now.ShieldPenetration * 100:0.##}% → {future.ShieldPenetration * 100:0.##}%\n";
         return changes;
     }

@@ -1,3 +1,9 @@
+## Reusable instant-target shots — 2026-11-02
+
+Sniper Tower now selects shared **InstantTarget** delivery: an aligned, funded shot deals immediate damage to the current valid target instead of spawning a travelling bullet. Shared `ProjectileTurretConfig.DeliveryMode` defaults to physical projectile, so Machine Gun, Cryo, Stasis and other towers keep their existing delivery. Sniper recoil, flash, ammo, heat, XP and shield/hull math remain; cosmetic ricochets require a physical impact. See [Sniper Tower](TOWERS/Offensive/SniperTower/README.md) and [shared delivery](TOWERS/Shared/Weapons/Delivery/README.md). Source implemented; Godot gameplay/visual checks remain with the owner.
+
+---
+
 ## More opt-in tower heat profiles — 2026-10-26
 
 Machine Gun (2 min / 10s recovery), Laser (3.5 min / 10s), Blaster Cannon (4 min / 12s), Rocket (4 min / 12s) and Shockwave (3 min / 12s) now enable the existing shared heat capability in their shipped config resources. Laser calibrates heat per damaging beam-second, Shockwave per real pulse interval; shot weapons use their selected paid-level cadence. Battle remains 3 min / 9s; Sniper, Cryo and Stasis stay heatless. Each type exposes Inspector Heat Enabled / Overheat After Minutes / Recovery Seconds. Firing, ammo, price, tower stats and pause/save ownership are unchanged. This is source-implemented; desktop/.NET/Godot verification remains pending. See [heat conditions](TOWERS/Shared/Conditions/README.md).

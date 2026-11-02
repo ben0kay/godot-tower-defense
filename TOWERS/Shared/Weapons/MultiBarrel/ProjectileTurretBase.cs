@@ -1,4 +1,4 @@
-// Shared aimed projectile behavior for Sniper/MachineGun and future N-muzzle Kinetic turrets.
+// Shared aimed turret behavior: existing physical projectiles plus opt-in instant target delivery.
 using Godot;
 using System.Collections.Generic;
 
@@ -129,10 +129,19 @@ public abstract partial class ProjectileTurretBase : TowerBase
         int perBullet = Ammunition?.Stats.PerShot ?? 0;
         if (perBullet > 0 && (long)Ammunition.Inventory.Amount < (long)count * perBullet) return;
         DamageInfo hit = Config.CreateHit(FinalStats, DamageSource);
+        bool instant = Config.DeliveryMode == ShotDeliveryMode.InstantTarget;
+        Enemy instantTarget = instant ? _target : null;
+        StatusEffectPayload? instantEffect = instant ? CreateEffect(FinalStats) : null;
         for (int i = 0; i < count; i++)
         {
             if (Ammunition?.TryFire() == false) return;
             Marker2D muzzle = _muzzles[_barrels.MuzzleIndex(mode, i)];
+            if (instant)
+            {
+                // No projectile node or travel loop: retain the same muzzle flash and funded firing sequence.
+                _visuals.FlashAt(muzzle, Config.MuzzleFlash);
+                continue;
+            }
             BasicProjectile bullet = new();
             bullet.Initialize(_target, FinalStats.ProjectileSpeed, hit, CreateEffect(FinalStats), Config.ProjectileVisual, FinalStats.Handling, Config.ShieldRicochet);
             _projectiles.AddChild(bullet);
@@ -143,6 +152,9 @@ public abstract partial class ProjectileTurretBase : TowerBase
         RecordAttackHeat(count);
         // Preserve fractional frame remainder; never schedule multiple catch-up volleys after a long hitch.
         _shotTimer = Mathf.Max(0f, count / FinalStats.ShotsPerSecond + _shotTimer);
+        // Resolve immediate damage after committing the shot; lethal callbacks may tear down a wave or scene.
+        if (instant)
+            for (int i = 0; i < count; i++) WeaponHitDelivery.ApplyInstant(instantTarget, hit, instantEffect);
     }
     #endregion
 
