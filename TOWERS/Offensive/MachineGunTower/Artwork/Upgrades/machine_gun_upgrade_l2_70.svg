@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<defs>
+    <linearGradient id="machineHull" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8a9ca9"/><stop offset=".5" stop-color="#384b5b"/><stop offset="1" stop-color="#152533"/>
+    </linearGradient>
+    <linearGradient id="gunMetal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#243947"/><stop offset=".5" stop-color="#89a5ac"/><stop offset="1" stop-color="#2b4050"/>
+    </linearGradient>
+  </defs>
+<path d="M14 8H23L28 13H36L41 8H50L56 14V23L51 28V36L56 41V50L50 56H41L36 51H28L23 56H14L8 50V41L13 36V28L8 23V14Z" fill="#162c38" stroke="#54798b" stroke-width="1.4"/>
+<circle cx="32" cy="34" r="19.5" fill="url(#machineHull)" stroke="#81b7c6" stroke-width="1.7"/>
+<path d="M17 30L22 23H42L47 30V41L42 46H22L17 41Z" fill="#1b3342" stroke="#0f2029" stroke-width="1.5"/>
+<path d="M13 32H19M45 32H51" stroke="#64cddd" stroke-width="2"/>
+
+  <!-- L2: reinforced octagonal corners, paired cooler flanges and an upgraded rotary bearing. -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 20L15 14L22 19L20 27L11 29Z M55 20L49 14L42 19L44 27L53 29Z" fill="#476c7d" stroke="#0b202e" stroke-width="1.5"/>
+    <path d="M9 44L15 50L22 45L20 37L11 35Z M55 44L49 50L42 45L44 37L53 35Z" fill="#476c7d" stroke="#0b202e" stroke-width="1.5"/>
+    <path d="M12 22L17 20 M47 20L52 22 M12 42L17 44 M47 44L52 42" stroke="#b3e7e8" stroke-width="1.7"/>
+    <path d="M22 12H28 M36 12H42 M22 52H28 M36 52H42" stroke="#e5b16e" stroke-width="1.8"/>
+    <circle cx="32" cy="34" r="16.2" stroke="#72cbd8" stroke-width="1.0" fill="none" stroke-dasharray="5 3"/>
+    <path d="M12 31H18M46 31H52M12 35H18M46 35H52" stroke="#71d6df" stroke-width="1.4"/>
+  </g>
+
+<path d="M17 29L19 11L22 7H27L29 11L30 31Z" fill="url(#gunMetal)" stroke="#14232c" stroke-width="1.7"/>
+<path d="M34 31L35 11L38 7H43L46 11L47 29Z" fill="url(#gunMetal)" stroke="#14232c" stroke-width="1.7"/>
+<rect x="18" y="5" width="10" height="6" rx="2" fill="#233c4e" stroke="#faab68" stroke-width="1.4"/>
+<rect x="36" y="5" width="10" height="6" rx="2" fill="#233c4e" stroke="#8addf0" stroke-width="1.4"/>
+<path d="M23 13V26M41 13V26" stroke="#add5d9" stroke-width="1.2"/>
+<circle cx="32" cy="35" r="12" fill="#355263" stroke="#a4d1d5" stroke-width="1.8"/>
+<circle cx="32" cy="35" r="7" fill="#192d3a" stroke="#5cbecf" stroke-width="1.7"/>
+<circle cx="32" cy="35" r="3" fill="#f0aa66"/>
+
+  <!-- L2: twin parallel cooling rails and reinforced independent muzzle housings. -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 29L16 12L19 9L21 28L18 35L13 31Z M50 29L48 12L45 9L43 28L46 35L51 31Z" fill="#57788a" stroke="#152d3b" stroke-width="1.4"/>
+    <path d="M29 27L30 13L32 11L34 13L35 27" fill="#54798b" stroke="#1e3b49" stroke-width="1.2"/>
+    <path d="M17 14L17 26M47 14L47 26" stroke="#9ce4ed" stroke-width="1.6"/>
+    <path d="M21 17H26 M21 21H26 M38 17H43 M38 21H43" stroke="#d5f8f7" stroke-width="1.1"/>
+    <path d="M16 7H29L30 11H16Z M35 7H48L48 11H34Z" fill="#314e60" stroke="#101f2a" stroke-width="1.2"/>
+    <path d="M19 7H27M37 7H45" stroke="#f0c57f" stroke-width="1.6"/>
+    <path d="M22 33L27 28H37L42 33L40 43H24Z" fill="#395767" stroke="#182e3c" stroke-width="1.35"/>
+    <circle cx="32" cy="35" r="5" fill="#255767" stroke="#79e0e8" stroke-width="1.5"/>
+    <circle cx="32" cy="35" r="2" fill="#f7d28b"/>
+  </g>
+  <!-- Main plates are installed at 70%; only calibration fixtures remain around the gun. -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="7" y="7" width="50" height="50" rx="6" stroke="#6be2eb" stroke-width="1.05" stroke-dasharray="5 5" opacity=".65"/>
+    <path d="M8 16V8H16 M48 8H56V16 M8 48V56H16 M48 56H56V48" stroke="#f0c47b" stroke-width="1.95"/>
+    <path d="M10 32H18M46 32H54" stroke="#a8f4f3" stroke-width="1.8"/>
+    <path d="M15 51H23M41 51H49" stroke="#f4bc76" stroke-width="1.5" stroke-dasharray="2 2"/>
+    <path d="M17 6V13M47 6V13" stroke="#8feefa" stroke-width="1.4"/>
+    <circle cx="32" cy="34" r="23" stroke="#8be1ed" stroke-width=".8" stroke-dasharray="2 7" opacity=".6"/>
+  </g>
+</svg>

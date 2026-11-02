@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<defs>
+    <linearGradient id="machineHull" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8a9ca9"/><stop offset=".5" stop-color="#384b5b"/><stop offset="1" stop-color="#152533"/>
+    </linearGradient>
+    <linearGradient id="gunMetal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#243947"/><stop offset=".5" stop-color="#89a5ac"/><stop offset="1" stop-color="#2b4050"/>
+    </linearGradient>
+  </defs>
+<path d="M14 8H23L28 13H36L41 8H50L56 14V23L51 28V36L56 41V50L50 56H41L36 51H28L23 56H14L8 50V41L13 36V28L8 23V14Z" fill="#162c38" stroke="#54798b" stroke-width="1.4"/>
+<circle cx="32" cy="34" r="19.5" fill="url(#machineHull)" stroke="#81b7c6" stroke-width="1.7"/>
+<path d="M17 30L22 23H42L47 30V41L42 46H22L17 41Z" fill="#1b3342" stroke="#0f2029" stroke-width="1.5"/>
+<path d="M13 32H19M45 32H51" stroke="#64cddd" stroke-width="2"/>
+
+  <!-- L2: reinforced octagonal corners, paired cooler flanges and an upgraded rotary bearing. -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 20L15 14L22 19L20 27L11 29Z M55 20L49 14L42 19L44 27L53 29Z" fill="#476c7d" stroke="#0b202e" stroke-width="1.5"/>
+    <path d="M9 44L15 50L22 45L20 37L11 35Z M55 44L49 50L42 45L44 37L53 35Z" fill="#476c7d" stroke="#0b202e" stroke-width="1.5"/>
+    <path d="M12 22L17 20 M47 20L52 22 M12 42L17 44 M47 44L52 42" stroke="#b3e7e8" stroke-width="1.7"/>
+    <path d="M22 12H28 M36 12H42 M22 52H28 M36 52H42" stroke="#e5b16e" stroke-width="1.8"/>
+    <circle cx="32" cy="34" r="16.2" stroke="#72cbd8" stroke-width="1.0" fill="none" stroke-dasharray="5 3"/>
+    <path d="M12 31H18M46 31H52M12 35H18M46 35H52" stroke="#71d6df" stroke-width="1.4"/>
+  </g>
+  <!-- L3: external heavy armor and gold/acrylic heat sink rings; the centre remains fixed. -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 18L16 12L23 17L22 26L12 30L7 26Z M56 18L48 12L41 17L42 26L52 30L57 26Z" fill="#506b80" stroke="#102a39" stroke-width="1.5"/>
+    <path d="M8 46L16 52L23 47L22 38L12 34L7 38Z M56 46L48 52L41 47L42 38L52 34L57 38Z" fill="#506b80" stroke="#102a39" stroke-width="1.5"/>
+    <path d="M10 21L17 17M47 17L54 21M10 43L17 47M47 47L54 43" stroke="#e7c781" stroke-width="2.1"/>
+    <path d="M18 9L24 12H40L46 9 M18 55L24 52H40L46 55" fill="none" stroke="#a7cdd7" stroke-width="1.8"/>
+    <circle cx="32" cy="34" r="18.1" fill="none" stroke="#f4c676" stroke-width="1.4" stroke-dasharray="4 5"/>
+    <circle cx="32" cy="34" r="14.5" fill="none" stroke="#b1ecf2" stroke-width="1.2"/>
+    <path d="M12 32H20M44 32H52" stroke="#e7bd76" stroke-width="2.7"/>
+    <path d="M15 34V40 M49 34V40" stroke="#9ee4ed" stroke-width="1.6"/>
+  </g>
+</svg>

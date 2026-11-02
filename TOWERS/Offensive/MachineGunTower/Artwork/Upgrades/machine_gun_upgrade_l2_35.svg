@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<defs>
+    <linearGradient id="machineHull" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8a9ca9"/><stop offset=".5" stop-color="#384b5b"/><stop offset="1" stop-color="#152533"/>
+    </linearGradient>
+    <linearGradient id="gunMetal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#243947"/><stop offset=".5" stop-color="#89a5ac"/><stop offset="1" stop-color="#2b4050"/>
+    </linearGradient>
+  </defs>
+<path d="M14 8H23L28 13H36L41 8H50L56 14V23L51 28V36L56 41V50L50 56H41L36 51H28L23 56H14L8 50V41L13 36V28L8 23V14Z" fill="#162c38" stroke="#54798b" stroke-width="1.4"/>
+<circle cx="32" cy="34" r="19.5" fill="url(#machineHull)" stroke="#81b7c6" stroke-width="1.7"/>
+<path d="M17 30L22 23H42L47 30V41L42 46H22L17 41Z" fill="#1b3342" stroke="#0f2029" stroke-width="1.5"/>
+<path d="M13 32H19M45 32H51" stroke="#64cddd" stroke-width="2"/>
+
+<path d="M17 29L19 11L22 7H27L29 11L30 31Z" fill="url(#gunMetal)" stroke="#14232c" stroke-width="1.7"/>
+<path d="M34 31L35 11L38 7H43L46 11L47 29Z" fill="url(#gunMetal)" stroke="#14232c" stroke-width="1.7"/>
+<rect x="18" y="5" width="10" height="6" rx="2" fill="#233c4e" stroke="#faab68" stroke-width="1.4"/>
+<rect x="36" y="5" width="10" height="6" rx="2" fill="#233c4e" stroke="#8addf0" stroke-width="1.4"/>
+<path d="M23 13V26M41 13V26" stroke="#add5d9" stroke-width="1.2"/>
+<circle cx="32" cy="35" r="12" fill="#355263" stroke="#a4d1d5" stroke-width="1.8"/>
+<circle cx="32" cy="35" r="7" fill="#192d3a" stroke="#5cbecf" stroke-width="1.7"/>
+<circle cx="32" cy="35" r="3" fill="#f0aa66"/>
+  <!-- New armor is still schematic at 35%: a visible build frame and twin barrel guides. -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="6" y="6" width="52" height="52" rx="6" stroke="#63e0ed" stroke-width="1.25" stroke-dasharray="4 4" opacity=".9"/>
+    <path d="M7 18V7H18 M46 7H57V18 M7 46V57H18 M46 57H57V46" stroke="#f1bd77" stroke-width="2.1"/>
+    <path d="M9 31H17M47 31H55M32 7V14M32 50V57" stroke="#63e0ed" stroke-width="1.4"/>
+    <path d="M12 18L19 14L23 21L19 28L12 30Z M52 18L45 14L41 21L45 28L52 30Z" stroke="#8ee9f1" stroke-width="1.4" stroke-dasharray="3 2"/>
+    <path d="M16 29L17 10H29L30 29 M34 29L35 10H47L48 29" stroke="#f4c783" stroke-width="1.5" stroke-dasharray="3 3"/>
+    <circle cx="32" cy="35" r="21" stroke="#67d5e4" stroke-width="1" stroke-dasharray="2 5" opacity=".72"/>
+    <path d="M13 50H51" stroke="#67d5e4" stroke-width="1.3" stroke-dasharray="2 4"/>
+  </g>
+</svg>

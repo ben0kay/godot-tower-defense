@@ -1,3 +1,9 @@
+## Machine Gun Level 2/3 upgrade artwork — 2026-11-02
+
+Machine Gun Tower now has its own split fixed-base and rotating **dual-barrel** art at Levels 2 and 3, plus distinct **35% and 70%** construction composites during each paid upgrade. It uses Battle Tower's existing shared event-driven presenter with two added sprite-path references; Level1, initial construction art, muzzle sockets, firing, heat and upgrade timing are unchanged. See [Machine Gun upgrade artwork](TOWERS/Offensive/MachineGunTower/Artwork/Upgrades/README.md). Source-only implementation; Godot appearance checks remain with the owner.
+
+---
+
 ## Reusable instant-target shots — 2026-11-02
 
 Sniper Tower now selects shared **InstantTarget** delivery: an aligned, funded shot deals immediate damage to the current valid target instead of spawning a travelling bullet. Shared `ProjectileTurretConfig.DeliveryMode` defaults to physical projectile, so Machine Gun, Cryo, Stasis and other towers keep their existing delivery. Sniper recoil, flash, ammo, heat, XP and shield/hull math remain; cosmetic ricochets require a physical impact. See [Sniper Tower](TOWERS/Offensive/SniperTower/README.md) and [shared delivery](TOWERS/Shared/Weapons/Delivery/README.md). Source implemented; Godot gameplay/visual checks remain with the owner.

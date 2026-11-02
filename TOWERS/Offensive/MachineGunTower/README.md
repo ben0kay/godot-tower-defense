@@ -1,3 +1,16 @@
+## Purchased-level artwork: Level 2 / Level 3 — 2026-11-02
+
+Machine Gun now uses **the same shared purchased-level artwork presentation as Battle Tower**, with dedicated L2/L3 64×64 split base and dual-barrel gun SVGs and distinct **35% / 70%** upgrade assembly composites. Level 1's existing art and initial foundation/frame/assembly construction are preserved.
+
+- **L2:** reinforced side armor, cyan cooling rails, double-barrel jackets and stronger central mounting hardware.
+- **L3:** heavier modular armor, prominent dual shrouds and gold/cyan reactor details. Both tiers preserve muzzle positions **(-9, -25)** and **(9, -25)**, the same centered pivot and the existing rotating/recoiling `RecoilRoot`.
+- When upgrading, the previously completed tier stays drawn while awaiting the drone/beam and through the first 35% of active work; the composite assembly artwork replaces it at **35%** and **70%**, then the new separate fixed base and rotating gun appear at **100%**.
+- `MachineGunConstructionArt.tres` owns the milestone and completed textures; `MachineGunTower.tscn` now supplies the presenter's `FinishedBaseSpritePath` and `FinishedGunSpritePath`. No new script, processing tick, timer, damage/shot cadence, target acquisition, ammo or heat changes are needed.
+
+Art/source details: [Artwork/Upgrades/README.md](Artwork/Upgrades/README.md). Source implemented; build and normal gameplay-zoom visuals remain for owner testing.
+
+---
+
 ## HD4 heat (2026-10-26)
 
 The shipped Machine Gun config now enables shared heat: **2 minutes** of sustained shooting with continuous cooling, **10-second** recovery to 35% after overheating. It counts total successful bullets across both muzzles and uses the selected paid-level fire rate. Its 1,200-round reserve may require physical resupply to reach a full two-minute sustained run. Inspector Heat fields can disable or tune this without touching per-level damage/rate/price. Source-implemented; live runtime acceptance pending.
@@ -6,7 +19,7 @@ The shipped Machine Gun config now enables shared heat: **2 minutes** of sustain
 
 ## Shared C4 staged construction artwork — 2026-10-26
 
-The Machine Gun Tower now builds in **foundation (0%) → circular frame (35%) → twin-barrel assembly (70%) → completed tower (100%)**, using its own 64×64 SVGs in `Artwork/Construction/` and the same shared `TowerConstructionVisuals` presenter as Battle. Paid initial work remains **4 seconds**, beginning only after an available construction drone arrives and activates its beam. A composite construction overlay temporarily replaces the split finished base/gun; at completion the original fixed base, dual-muzzle gun and recoil resume unchanged. Selection tint applies to the construction overlay through the shared optional sprite path. Upgrades retain the existing finished look; optional Level2/3 artwork slots are empty. No new timers, per-frame callbacks, tower mechanics or tower-specific construction scripts were added.
+The Machine Gun Tower now builds in **foundation (0%) → circular frame (35%) → twin-barrel assembly (70%) → completed tower (100%)**, using its own 64×64 SVGs in `Artwork/Construction/` and the same shared `TowerConstructionVisuals` presenter as Battle. Paid initial work remains **4 seconds**, beginning only after an available construction drone arrives and activates its beam. A composite construction overlay temporarily replaces the split finished base/gun; at completion the original fixed base, dual-muzzle gun and recoil resume unchanged. Selection tint applies to the construction overlay through the shared optional sprite path. Level 2/3 now opt into distinct tier artwork and 35% / 70% upgrade-composite milestones through the same shared presenter. No new timers, per-frame callbacks, tower mechanics or tower-specific construction scripts were added.
 
 Configurable thresholds and art: `Artwork/Construction/MachineGunConstructionArt.tres` via `DefaultMachineGunTowerConfig.tres`. See `Artwork/Construction/README.md` for the authored stages, compatibility and desktop visual checklist. Brief source/resource checks only; Godot editor visual acceptance remains pending.
 
@@ -40,7 +53,7 @@ The config exposes optional `Single`, `Sequential`, and `Simultaneous` modes for
 
 ## Initial construction (C1/C2)
 
-Paid placement occupies its footprint immediately and takes **4 seconds**, authored in the Level1 WorkSeconds column of this tower's `*Levels.cs`. It cannot acquire targets/fire/consume ammunition or request deliveries until complete. Completion preserves stats, level, rank and stock. Direct scene fixtures remain operational by default. The shared C4 presenter now displays Machine Gun-specific construction stages while work is pending; completed artwork and all firing/recoil behavior are unchanged. C3 Inspector progress is implemented; purchased upgrades use their own WorkSeconds and retain old-tier operation until completion. Duplicate purchases are disabled while work is active. See `TOWERS/Shared/Construction/README.md`.
+Paid placement occupies its footprint immediately and takes **4 seconds**, authored in the Level1 WorkSeconds column of this tower's `*Levels.cs`. It cannot acquire targets/fire/consume ammunition or request deliveries until complete. Completion preserves stats, level, rank and stock. Direct scene fixtures remain operational by default. The shared C4 presenter now displays Machine Gun-specific construction stages while work is pending; completed artwork and all firing/recoil behavior are unchanged. C3 Inspector progress is implemented; purchased upgrades use their own WorkSeconds, suspend attacking during upgrade work, and show the new finished tier only upon completion. Duplicate purchases are disabled while work is active. See `TOWERS/Shared/Construction/README.md`.
 
 ## Projectile presentation — PV1/PV2
 
