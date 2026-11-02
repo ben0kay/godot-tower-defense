@@ -1,3 +1,24 @@
+## Stat number count-up — 2026-10-31
+
+Result statistics now count from zero as each row reveals. Counts retain thousands separators;
+mission duration keeps its clock format, completed waves keep the final total denominator,
+and Citadel integrity keeps its percent suffix. Zero and unavailable values appear directly;
+unknown Credits totals remain “—” until real telemetry supplies them.
+
+Inspector Presentation settings: AnimateStatNumbers (default true) and StatCountSeconds
+(default 0.35s, zero disables counting). Count-up runs in parallel with each row's existing
+fade/scale, then the original XP sequence follows. One results-owned tween drives the sequence;
+there is no new process loop, timer node, gameplay counter or reward write. Text changes only
+when the displayed number changes. Skip immediately cancels the tween and restores every
+exact final stat; reopen/hide/unload retain existing tween cancellation.
+
+Only number count-up was added. Level-up presentation, sound and scoring are unchanged.
+Validation: source/diff review only; no .NET/Godot executable is available here. Brief local
+check: normal reveal, Skip midway through a number, zero/unknown values, duration formatting
+and reopening after Skip. No extensive suite or profiling was run.
+
+---
+
 ## R2 neon vector Mission Debrief — 2026-10-21
 
 **Source implemented; Godot/.NET build and rendered QA not run in this environment.** R1 outcomes, immutable snapshots, locked actions, disabled Details, session navigation, and already-saved mission XP are unchanged.

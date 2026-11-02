@@ -14,6 +14,8 @@ public partial class LevelResults : CanvasLayer
     [ExportGroup("Presentation")]
     [Export(PropertyHint.Range, "0.05,1,0.05")] public float StatRevealSeconds { get; set; } = 0.24f;
     [Export(PropertyHint.Range, "0,1,0.05")] public float StatGapSeconds { get; set; } = 0.10f;
+    [Export] public bool AnimateStatNumbers { get; set; } = true;
+    [Export(PropertyHint.Range, "0,1,0.05")] public float StatCountSeconds { get; set; } = .35f;
     [Export] public bool PreviewOnReady { get; set; } = false;
     [ExportGroup("R2 Vector Debrief")]
     [Export] public bool ShowVectorGrid { get; set; } = true;
@@ -50,6 +52,9 @@ public partial class LevelResults : CanvasLayer
     private Button _primary, _details, _menu, _exit;
     private Button _skip;
     private Tween _reveal;
+    private string[] _statFinalValues = Array.Empty<string>();
+    private double?[] _statTargets = Array.Empty<double?>();
+    private int _statWaveTotal;
     private readonly List<(PanelContainer Panel, Label Value)> _stats = new();
 
     #region Layout
@@ -232,6 +237,15 @@ public partial class LevelResults : CanvasLayer
             snapshot.CitadelIntegrityPercent is int integrity ? integrity + "%" : "—",
             CountOrDash(snapshot.CreditsEarned), CountOrDash(snapshot.CreditsSpent)
         };
+        _statFinalValues = values;
+        _statWaveTotal = snapshot.TotalWaves;
+        _statTargets = new double?[]
+        {
+            snapshot.EnemiesKilled, snapshot.EnemiesBreached, snapshot.TowersPlaced, snapshot.TowersConstructed,
+            snapshot.UpgradesPurchased,
+            snapshot.MissionSeconds.HasValue && double.IsFinite(snapshot.MissionSeconds.Value) ? snapshot.MissionSeconds : null,
+            snapshot.WavesCompleted, snapshot.CitadelIntegrityPercent, snapshot.CreditsEarned, snapshot.CreditsSpent
+        };
         for (int i = 0; i < _stats.Count; i++)
         {
             _stats[i].Value.Text = values[i]; _stats[i].Panel.Hide();
@@ -247,12 +261,20 @@ public partial class LevelResults : CanvasLayer
         _reveal = CreateTween();
         _reveal.TweenProperty(_frame, "modulate:a", 1.0f, IntroSeconds)
             .SetTrans(Tween.TransitionType.Cubic).SetEase(Tween.EaseType.Out);
-        foreach (var stat in _stats)
+        float countSeconds = float.IsFinite(StatCountSeconds) ? Mathf.Clamp(StatCountSeconds, 0, 1) : .35f;
+        for (int i = 0; i < _stats.Count; i++)
         {
-            PanelContainer panel = stat.Panel;
-            _reveal.TweenCallback(Callable.From(() => panel.Show()));
+            int row = i; PanelContainer panel = _stats[row].Panel;
+            bool count = AnimateStatNumbers && countSeconds > 0 && _statTargets[row].GetValueOrDefault() > 0;
+            _reveal.TweenCallback(Callable.From(() =>
+            {
+                if (count) UpdateStatNumber(row, 0);
+                panel.Show();
+            }));
             _reveal.TweenProperty(panel, "modulate:a", 1.0f, StatRevealSeconds).SetTrans(Tween.TransitionType.Cubic);
             _reveal.Parallel().TweenProperty(panel, "scale:x", 1.0f, StatRevealSeconds)
+                .SetTrans(Tween.TransitionType.Cubic).SetEase(Tween.EaseType.Out);
+            if (count) _reveal.Parallel().TweenMethod(Callable.From<double>(progress => UpdateStatNumber(row, progress)), 0.0, 1.0, countSeconds)
                 .SetTrans(Tween.TransitionType.Cubic).SetEase(Tween.EaseType.Out);
             _reveal.TweenInterval(StatGapSeconds);
         }
@@ -261,6 +283,29 @@ public partial class LevelResults : CanvasLayer
         _reveal.TweenCallback(Callable.From(BeginXPReveal));
         _reveal.TweenInterval(XPFillSeconds * 2f + .12f);
         _reveal.TweenCallback(Callable.From(FinishReveal));
+    }
+
+    // =========================================================
+    // Count only the displayed row; duration, wave denominator and percentage keep their normal formatting.
+    private void UpdateStatNumber(int row, double progress)
+    {
+        if (progress >= 1) { _stats[row].Value.Text = _statFinalValues[row]; return; }
+        double number = Math.Floor(Math.Max(0, _statTargets[row].GetValueOrDefault()) * Math.Clamp(progress, 0, 1));
+        string text = row switch
+        {
+            5 => DurationOrDash(number),
+            6 => number.ToString("N0") + " / " + _statWaveTotal,
+            7 => number.ToString("N0") + "%",
+            _ => number.ToString("N0")
+        };
+        if (_stats[row].Value.Text != text) _stats[row].Value.Text = text;
+    }
+
+    // =========================================================
+    // Skip and completion always restore exact frozen values, including unavailable metrics.
+    private void CompleteStatNumbers()
+    {
+        for (int i = 0; i < _statFinalValues.Length; i++) _stats[i].Value.Text = _statFinalValues[i];
     }
 
     // =========================================================
@@ -350,14 +395,14 @@ public partial class LevelResults : CanvasLayer
         _frame.Modulate = Colors.White;
         foreach (var stat in _stats) { stat.Panel.Show(); stat.Panel.Modulate = Colors.White; stat.Panel.Scale = Vector2.One; }
         _experience.Show(); _experience.Modulate = Colors.White;
-        CompleteXPReveal(); FinishReveal();
+        CompleteStatNumbers(); CompleteXPReveal(); FinishReveal();
     }
 
     // =========================================================
     // Session controller handles retry/menu navigation; this overlay only emits intents.
     private void FinishReveal()
     {
-        CompleteXPReveal();
+        CompleteStatNumbers(); CompleteXPReveal();
         ActionsAvailable = true; _skip.Hide(); _actions.Show();
         _primary.Disabled = _won && !_hasNext; _menu.Disabled = false; _exit.Disabled = false;
         if (_primary.Disabled) _menu.GrabFocus(); else _primary.GrabFocus();
