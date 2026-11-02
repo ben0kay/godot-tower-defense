@@ -1,3 +1,9 @@
+## Layout V2 fix (2026-11-01)
+
+After further screenshot evidence showed the earlier nested anchored content could still collapse, the editor root was simplified to a directly expanding `VBoxContainer`. The toolbar and footer are short; the central wave/batch/details split fills available height. The versioned header identifies whether Godot loaded the updated C# plugin. Check this first before making more layout changes. No other backlog changes.
+
+---
+
 ## Editor-layout acceptance fix (2026-11-01)
 
 - Fixed collapse of the plugin's **inner** layout with a full-rect anchored content margin, after the outer tab `ExpandFill` fix proved insufficient in a user screenshot.
