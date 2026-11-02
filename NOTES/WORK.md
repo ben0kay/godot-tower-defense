@@ -1,3 +1,9 @@
+## 2026-11-01 — Wave Editor layout V2 direct VBoxContainer root
+
+The user's screenshot after the prior full-rect margin fix still displayed a collapsed ~100px editor strip with footer near the top, and the right panel scrolled to narration. Replaced `WaveEditorPanel : Control` plus anchored `MarginContainer -> VBoxContainer` with a direct `WaveEditorPanel : VBoxContainer` root, containing header, vertically expanding split controls and footer. Removed `FullRect` anchors on the `EditorMainScreen` VBox child; size flags now control the whole layout, with a 320px minimum-size fallback. Deferred the right-pane scroll reset to occur after Godot's layout, and marked the header **LAYOUT V2** to distinguish stale plugin assemblies. No gameplay or waves modified. Source-only verification; must rebuild/reopen Godot.NET for visual acceptance. [Wave Editor](../addons/wave_editor/README.md).
+
+---
+
 ## 2026-11-01 — Wave Editor real full-height layout + visible composition
 
 User screenshot confirmed prior plugin `ExpandFill` change fixed only the outer main-screen tab; the wave/batch lists and right details were still collapsed into a ~100px strip, with the footer immediately underneath despite ample viewport space. Replaced `WaveEditorPanel : PanelContainer` with `Control`, anchored a `MarginContainer` to `FullRect`, retained a flex-height split area, allowed only list columns to vertically expand, and made details sections compact. Moved live exact-count composition preview immediately below batch count/timings, and reset right scroll to top on wave/batch selection and file load. No waves or runtime resources touched; static checks done; in-editor visual confirmation pending. [Editor instructions](../addons/wave_editor/README.md).
