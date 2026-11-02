@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 [Tool]
-public partial class WaveEditorPanel : Control
+public partial class WaveEditorPanel : VBoxContainer
 {
     #region Document and Selection
     private const string ExamplePath = "res://LEVELS/Level003/Level003Waves.tres";
@@ -40,23 +40,18 @@ public partial class WaveEditorPanel : Control
     public override void _Ready()
     {
         SetProcess(false); SetPhysicsProcess(false);
-        // The former PanelContainer child stayed at its minimum height despite a full-size plugin tab.
-        // Anchor the content margin to the FULL Control workspace so both lists and the editor can expand.
-        var margin = new MarginContainer
-        {
-            SizeFlagsHorizontal = SizeFlags.ExpandFill,
-            SizeFlagsVertical = SizeFlags.ExpandFill
-        };
-        foreach (string edge in new[] { "left", "right", "top", "bottom" })
-            margin.AddThemeConstantOverride("margin_" + edge, 12);
-        AddChild(margin);
-        margin.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
-        var root = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
-        root.AddThemeConstantOverride("separation", 10); margin.AddChild(root);
+        // EditorMainScreen is itself a VBoxContainer. Make this editor the FULL-HEIGHT box directly:
+        // header (minimum), central splitter (ExpandFill), footer (minimum), with no nested anchored wrapper.
+        // The old Panel/Control -> Margin -> VBox chain left the inner box at its minimum height.
+        SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        SizeFlagsVertical = SizeFlags.ExpandFill;
+        AddThemeConstantOverride("separation", 8);
 
         var title = new HBoxContainer();
-        root.AddChild(title);
-        title.AddChild(new Label { Text = "WAVE EDITOR", ThemeTypeVariation = "HeaderSmall", CustomMinimumSize = new Vector2(120, 0) });
+        AddChild(title);
+        title.AddChild(new Label { Text = "WAVE EDITOR  ·  LAYOUT V2", ThemeTypeVariation = "HeaderSmall",
+            CustomMinimumSize = new Vector2(190, 0),
+            TooltipText = "Full-height container layout. If this label is missing after pulling, rebuild C# and restart the Godot editor." });
         _fileLabel = new Label { SizeFlagsHorizontal = SizeFlags.ExpandFill, ClipText = true };
         title.AddChild(_fileLabel);
         title.AddChild(Button("Open .tres", Open));
@@ -65,7 +60,7 @@ public partial class WaveEditorPanel : Control
         title.AddChild(Button("Reload", Reload));
 
         var split = new HSplitContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
-        root.AddChild(split);
+        AddChild(split);
         var wavePane = Pane("Waves", 205, expandHeight: true); split.AddChild(wavePane);
         _waves = CreateItemList(wavePane, index => { _waveIndex = index; _batchIndex = _enemyIndex = 0; Refresh(); ResetDetailsScroll(); });
         Buttons(wavePane, ("+ Wave", AddWave), ("Duplicate", DuplicateWave), ("Delete", DeleteWave));
@@ -150,7 +145,7 @@ public partial class WaveEditorPanel : Control
         details.AddChild(new Label { Text = "Enemy names and IDs are read from DefaultEnemyCatalog.tres.\n" +
             "Wave order = list order; counts are per batch, not per enemy entry.", AutowrapMode = TextServer.AutowrapMode.WordSmart });
 
-        var footer = new HBoxContainer(); root.AddChild(footer);
+        var footer = new HBoxContainer(); AddChild(footer);
         _status = new Label { Text = "Choose a .tres wave set.", SizeFlagsHorizontal = SizeFlags.ExpandFill };
         _totals = new Label(); footer.AddChild(_status); footer.AddChild(_totals);
         SetupDialogs(); ReloadEnemyCatalog(); LoadPath(ExamplePath);
@@ -160,7 +155,13 @@ public partial class WaveEditorPanel : Control
     // A new wave/batch selection should show its primary settings, not retain an old narration scroll offset.
     private void ResetDetailsScroll()
     {
-        if (GodotObject.IsInstanceValid(_detailsScroll)) _detailsScroll.ScrollVertical = 0;
+        if (!GodotObject.IsInstanceValid(_detailsScroll)) return;
+        // Use deferred layout pass: Godot may not have measured ScrollContainer after a loaded document.
+        _detailsScroll.ScrollVertical = 0;
+        Callable.From(() =>
+        {
+            if (GodotObject.IsInstanceValid(_detailsScroll)) _detailsScroll.ScrollVertical = 0;
+        }).CallDeferred();
     }
 
     // =========================================================
