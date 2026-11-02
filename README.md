@@ -1,3 +1,9 @@
+## World placement preview now uses completed Level 1 tower art — 2026-11-02
+
+The green/red placement ghost now mirrors the real built Level 1 sprites from each tower's scene, instead of the separate `TowerDefinition.Icon` resource. Shared `TowerPlacementGhost` makes an inert visual-only copy on tower choice changes, keeping authored base/gun layers, full dimensions and multi-cell scale. The Sniper's longer barrel is no longer compressed into a 64×64 icon. Build-tray thumbnails still have their own catalog icon. See [placement notes](TOWERS/Placement/README.md). Source validation only; owner should inspect in Godot.
+
+---
+
 ## Enemy001 hull damage artwork experiment — 2026-11-02
 
 Only the Standard Drone (`basic_mk1`, Enemy001) now opts into three static Sprite2D artwork stages: original healthy hull, scraped/broken armour and heavily damaged exposed machinery. The reusable `EnemyDefinition.DamageAppearance` profile automatically divides **hull HP** into equal bands from its texture count (3 states = thirds, 4 = quarters, etc.), without hardcoded thresholds or per-enemy processing loops. Other enemy types retain original art, shield-only damage never changes hull art, and gameplay rules are untouched. Toggle it off by clearing `Enemy001.tres → Damage Appearance`. See [shared enemy visual documentation](ENEMIES/Shared/Visuals/README.md) and [Enemy001 details](ENEMIES/Types/Enemy001/README.md). Source implemented; owner visual acceptance in Godot pending.

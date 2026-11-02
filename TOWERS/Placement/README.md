@@ -1,3 +1,15 @@
+## Placement ghost mirrors actual completed Level 1 tower art — 2026-11-02
+
+The green/red world placement preview is now a lightweight **visual-only copy of the selected tower's finished Level 1 scene artwork**, rather than the separate `TowerDefinition.Icon` catalog illustration. `TowerPlacementGhost.cs` instantiates the authored PackedScene **off-tree**, copies visible `Sprite2D` texture layers with their authored transforms, scale, rendering order, sprite settings and tint, then immediately frees the temporary source. The ghost is rebuilt only when the selected build type changes (not on mouse motion). The copied layers have no tower scripts, combat/production processing, construction, animation or physics. The existing placement controller retains cursor/validity, green/red tint, and footprint rectangle.
+
+The implementation handles **split finished artwork** (`BaseSprite` + `TurretPivot/RecoilRoot/Sprite`), single-sprite towers and larger multi-cell buildings. Hidden construction overlays remain hidden; authored `TowerConstructionArt` completed Level 1 base/gun overrides are respected. Native scene sizes and proportions remain intact: the Sniper's elongated 64×80 gun is no longer stretched/squashed into the 64×64 tile, and 3×2 / 2×2 sprites retain their built-in scale.
+
+`TowerDefinition.Icon` remains a distinct **catalog/tray thumbnail** resource. The world preview does **not** use it and needs no manually maintained composite preview asset. A small static Sprite2D copy is required to display art under a tint, but its textures and transforms come from the same tower scene as the placed Level 1 tower.
+
+No change to build prices, categories, input, navigation, occupancy, actual tower art, level-up art, or save format. Source reviewed; owner should check Sniper, split-sprite towers, plain-sprite towers, and multi-cell structures at normal Godot zoom.
+
+---
+
 ## CD1/CD2 successful paid construction drones — 2026-10-21
 
 Placement synchronously binds the optional World/ConstructionDrones service in Ready. Inside the existing paid commit, positive initial work is held before AddChild; only the later successful TowerPlaced event queues a drone. Failed/rolled-back transactions cannot dispatch. Zero-second sites, disabled/absent service, normal footprint/route validation, prices and placement/input behavior retain their prior semantics. See ../ConstructionDrones/README.md. Earlier planned-only notes below are historical.

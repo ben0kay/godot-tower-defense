@@ -30,7 +30,7 @@ public partial class TowerPlacementController : Node2D
     private Node2D _towers;
     private ConstructionWorkManager _construction;
     private ConstructionDroneManager _builders;
-    private Sprite2D _ghost;
+    private TowerPlacementGhost _ghost;
     private readonly Dictionary<Vector2I, TowerBase> _placedTowers = new();
     private Vector2I _hoverCell = new(int.MinValue, int.MinValue);
     private GameInput _input;
@@ -69,12 +69,13 @@ public partial class TowerPlacementController : Node2D
         foreach (TowerDefinition definition in Catalog.Definitions)
             if (definition.Available) { _buildDefinition = definition; break; }
         if (_buildDefinition?.DefaultConfig != null) _buildDefinition.DefaultConfig.Changed += OnPreviewConfigChanged;
-        _ghost = new Sprite2D
+        _ghost = new TowerPlacementGhost
         {
-            Name = "PlacementGhost", Texture = _buildDefinition?.Icon, Visible = false, ZIndex = 10,
+            Name = "PlacementGhost", Visible = false, ZIndex = 10,
             Modulate = new Color(0.45f, 1f, 0.73f, 0.66f)
         };
         AddChild(_ghost);
+        _ghost.LoadFinishedLevelOne(_buildDefinition);
         _economy.BalanceChanged += OnBalanceChanged;
         _hud.TowerChoiceRequested += OnTowerChoiceRequested; _hud.TowerPreviewRequested += OnTowerPreviewRequested;
         _hud.TowerBarOpened += OnBuildTrayOpened; _hud.TowerBarClosed += CancelPlacement; _hud.BuildCategoryChanged += CancelPlacement; _hud.InspectionClosed += OnInspectionClosed;
@@ -128,7 +129,7 @@ public partial class TowerPlacementController : Node2D
         if (choice == null || !choice.Available) return false;
         if (GodotObject.IsInstanceValid(_buildDefinition?.DefaultConfig)) _buildDefinition.DefaultConfig.Changed -= OnPreviewConfigChanged;
         _buildDefinition = choice; choice.DefaultConfig.Changed += OnPreviewConfigChanged;
-        _ghost.Texture = choice.Icon; SelectTower(null); _browsingBuild = true;
+        _ghost.LoadFinishedLevelOne(choice); SelectTower(null); _browsingBuild = true;
         _affordable = _economy.CanAfford(choice.DefaultConfig.ConstructionCosts);
         RefreshBuildDetails(); return true;
     }
@@ -196,8 +197,7 @@ public partial class TowerPlacementController : Node2D
         if (visible)
         {
             _ghost.GlobalPosition = _grid.FootprintCenter(cell, _buildDefinition.Footprint);
-            Vector2 pixels = (Vector2)_buildDefinition.Footprint * _grid.Config.CellSize;
-            if (_ghost.Texture != null) _ghost.Scale = pixels / _ghost.Texture.GetSize();
+            // Keep the finished scene's native proportions, including multi-cell scales and long barrels.
             _ghost.Modulate = valid ? new Color(0.45f, 1f, 0.73f, 0.66f)
                 : new Color(1f, 0.35f, 0.31f, 0.56f);
         }
