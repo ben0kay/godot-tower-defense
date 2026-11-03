@@ -1,3 +1,9 @@
+## Laser Tower purchased Level 3 — 2026-11-03
+
+Extended Laser from two to **three total purchased levels**: new Level 3 costs 250 Credits, takes 6 seconds, delivers 16 beam DPS at 345.4 px range, and has 1102.5 max HP. Added new finished L3 silver/yellow emitter art and 35%/70% assembly textures to the existing `LaserConstructionArt.tres` LevelArtwork, retaining its single rotating sprite, 0/35/70% initial build stages, L2 artwork, muzzle (0,-29), beam behaviour and existing shield/ammo/heat rules. See [Laser upgrade art](TOWERS/Offensive/LaserTower/Artwork/Upgrades/README.md). Source checks passed; live Godot check pending.
+
+---
+
 ## Laser Tower staged construction and Level 2 artwork — 2026-11-03
 
 Laser Tower now has three 0/35/70% initial construction SVGs and 35/70% Level 2 upgrade stages, plus distinct Level 2 completed silver/yellow art. The pre-existing **single rotating Sprite2D** is retained and connected directly to the shared event-driven `TowerConstructionVisuals`; no split-gun restructuring or combat changes. Original beam origin, beam renderer, 4-second build, 5-second/175-Credit Level 2 upgrade, DPS, ammunition and heat remain unchanged. See [Laser Tower artwork notes](TOWERS/Offensive/LaserTower/Artwork/Upgrades/README.md). Owner Godot visual acceptance pending.

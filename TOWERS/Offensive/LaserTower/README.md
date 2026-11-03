@@ -1,6 +1,12 @@
+## Purchased Level 3 — 2026-11-03
+
+Laser now has **three levels total** (initial Level 1 build followed by paid upgrades to Levels 2 and 3). Level 3 is **250 Credits / 6 seconds**, raising the authored beam output to **16 DPS**, range to **345.4 px**, and maximum health to **1102.5**. The new finished Level 3 silver/yellow high-output emitter art includes a 35% construction scaffold and 70% final-calibration image, using the existing `TowerConstructionVisuals` on the single rotating sprite. Level 1/2 art, prices and stats are unchanged; no new beam/controller path or per-frame work was introduced. See [upgrade artwork](Artwork/Upgrades/README.md).
+
+---
+
 ## Laser Tower Level 1 construction and Level 2 artwork — 2026-11-03
 
-Laser now uses the existing event-driven construction presenter on its original **single rotating `TurretPivot/Sprite`** (no new visual sprite, split-gun restructuring or gameplay code). Initial build now shows a bare silver mounting foundation (0%), exposed emitter frame (35%) and partially fitted low-power yellow emitter (70%), restoring the existing Level 1 laser art at 100%. Its one existing purchased Level 2 upgrade now has 35%/70% transitional scaffold/completed-machinery visuals and a distinct final Level 2 silver/yellow high-output laser body. See [construction](Artwork/Construction/README.md) and [upgrades](Artwork/Upgrades/README.md).
+Laser now uses the existing event-driven construction presenter on its original **single rotating `TurretPivot/Sprite`** (no new visual sprite, split-gun restructuring or gameplay code). Initial build now shows a bare silver mounting foundation (0%), exposed emitter frame (35%) and partially fitted low-power yellow emitter (70%), restoring the existing Level 1 laser art at 100%. Its paid Level 2 and Level 3 upgrades have distinct 35%/70% intermediate art and unique silver/yellow finished appearances. See [construction](Artwork/Construction/README.md) and [upgrades](Artwork/Upgrades/README.md).
 
 The existing `Muzzle` location (0,-29), 4-second build, Level 2 purchase price/work time (175 Credits, 5s), beam behaviour, shield preference, DPS, heat, ammo and targeting are untouched. Art changes are triggered by paid work progress; no new process loops. Source implemented; Godot visual acceptance pending.
 

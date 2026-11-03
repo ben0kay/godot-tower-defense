@@ -10,6 +10,10 @@
 [ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_upgrade_l2_35.svg" id="l2_35"]
 [ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_upgrade_l2_70.svg" id="l2_70"]
 
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_tower_l3.svg" id="l3_finished"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_upgrade_l3_35.svg" id="l3_35"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_upgrade_l3_70.svg" id="l3_70"]
+
 [sub_resource type="Resource" id="Stage0"]
 script = ExtResource("2_stage")
 Texture = ExtResource("build0")
@@ -34,6 +38,16 @@ script = ExtResource("2_stage")
 Progress = 0.7
 Texture = ExtResource("l2_70")
 
+[sub_resource type="Resource" id="UpgradeL3_35"]
+script = ExtResource("2_stage")
+Progress = 0.35
+Texture = ExtResource("l3_35")
+
+[sub_resource type="Resource" id="UpgradeL3_70"]
+script = ExtResource("2_stage")
+Progress = 0.7
+Texture = ExtResource("l3_70")
+
 [sub_resource type="Resource" id="Level2"]
 script = ExtResource("3_level")
 Level = 2
@@ -42,7 +56,15 @@ UpgradeTexture = ExtResource("l2_35")
 UpgradeProgress = 0.35
 UpgradeStages = Array[ExtResource("2_stage")]([SubResource("UpgradeL2_35"), SubResource("UpgradeL2_70")])
 
+[sub_resource type="Resource" id="Level3"]
+script = ExtResource("3_level")
+Level = 3
+FinishedTexture = ExtResource("l3_finished")
+UpgradeTexture = ExtResource("l3_35")
+UpgradeProgress = 0.35
+UpgradeStages = Array[ExtResource("2_stage")]([SubResource("UpgradeL3_35"), SubResource("UpgradeL3_70")])
+
 [resource]
 script = ExtResource("1_art")
 BuildStages = Array[ExtResource("2_stage")]([SubResource("Stage0"), SubResource("Stage1"), SubResource("Stage2")])
-LevelArtwork = Array[ExtResource("3_level")]([SubResource("Level2")])
+LevelArtwork = Array[ExtResource("3_level")]([SubResource("Level2"), SubResource("Level3")])

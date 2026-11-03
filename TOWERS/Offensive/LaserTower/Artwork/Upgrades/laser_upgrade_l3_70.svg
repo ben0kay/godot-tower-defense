@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<!-- Silver armoured housing with a recessed rotating gunmetal centre. -->
+  <circle cx="32" cy="34" r="22" fill="#202a34" stroke="#b9c7ce" stroke-width="3"/>
+  <circle cx="32" cy="34" r="18" fill="#667580" stroke="#313e48" stroke-width="2"/>
+  <path d="M14 27l6-6 7 6-3 12-6 6-5-8z M50 27l-6-6-7 6 3 12 6 6 5-8z" fill="#93a1ac" stroke="#3c4954" stroke-width="1.5"/>
+  <path d="M15 31l5-5 3 4-2 7-5 3z M49 31l-5-5-3 4 2 7 5 3z" fill="#d2dce0"/>
+  <path d="M18 42l8 8h12l8-8-5-5H23z" fill="#8796a1" stroke="#394750" stroke-width="1.5"/>
+  <path d="M26 48h12l3-4H23z" fill="#d8e1e4"/>
+  <!-- The existing Marker2D muzzle at (0,-29) coincides with the top emitter tip. -->
+  <path d="M23 35V12L29 5h6l6 7v23l-9 8z" fill="#c4d0d6" stroke="#35424c" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M26 13l5-6v29l-5-4z" fill="#ecf1f2"/>
+  <path d="M37 10l2 4v18l-6 4V7z" fill="#788a97"/>
+  <path d="M29 13V7h6v6z" fill="#f5d95b" stroke="#6c601f" stroke-width="1"/>
+  <path d="M30 4h4l2 5h-8z" fill="#fff1a1" stroke="#d8a928" stroke-width="1"/>
+  <rect x="29.5" y="14" width="5" height="17" rx="1" fill="#e1aa22"/>
+  <rect x="30.5" y="15" width="3" height="14" rx="0.5" fill="#fff2a3"/>
+  <path d="M23 20h4v3h-4z M37 20h4v3h-4z M25 35l7 5 7-5" fill="#f1c843" stroke="#70571e" stroke-width="1"/>
+  <circle cx="32" cy="41" r="5" fill="#37444f" stroke="#d2dde1" stroke-width="1.5"/>
+  <circle cx="32" cy="41" r="2.7" fill="#f1cd49"/>
+  <circle cx="32" cy="41" r="1.2" fill="#fff5bd"/>
+  <path d="M13 33h5M46 33h5" stroke="#ffda57" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- L2: reinforced silver reactor chassis, precision cooling fins and widened golden emitter sheath. -->
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <path d="M11 25L19 17L26 22L24 40L16 47L10 39z M53 25L45 17L38 22L40 40L48 47L54 39z" fill="#758b99" stroke="#273640" stroke-width="1.8"/>
+    <path d="M13 26l6-5 4 3-4 15-5 4z M51 26l-6-5-4 3 4 15 5 4z" fill="#dbe5e6" stroke="#6c7e86" stroke-width="1.2"/>
+    <path d="M15 26l5-3M49 26l-5-3M15 43l5-4M49 43l-5-4" stroke="#f9d868" stroke-width="2.2"/>
+    <path d="M12 33h7M45 33h7M12 37h7M45 37h7" stroke="#fff0a9" stroke-width="1.5"/>
+    <path d="M21 17l7-7h8l7 7-3 7H24z" fill="#627984" stroke="#263742" stroke-width="1.5"/>
+    <path d="M23 15l7-5h4l7 5" fill="none" stroke="#eed577" stroke-width="1.8"/>
+    <path d="M22 34V12L28 5H36L42 12V34L39 40H25z" fill="#7b919e" stroke="#293942" stroke-width="1.75"/>
+    <path d="M25 17V11l5-5h4l5 5v6" fill="#dde8e9" stroke="#899fa7" stroke-width="1.1"/>
+    <rect x="28" y="4" width="8" height="10" rx="2" fill="#2f404b" stroke="#ffdf70" stroke-width="1.8"/>
+    <path d="M30 6h4" stroke="#fff6ca" stroke-width="2.8"/>
+    <rect x="29" y="15" width="6" height="19" rx="1.3" fill="#e8b83c" stroke="#705a21" stroke-width=".9"/>
+    <rect x="30" y="16" width="4" height="17" rx=".8" fill="#fff2b2"/>
+    <path d="M23 22h6M35 22h6M23 27h6M35 27h6" stroke="#f2d67e" stroke-width="1.7"/>
+    <circle cx="32" cy="41" r="8" fill="#334653" stroke="#d7e0e1" stroke-width="1.8"/>
+    <circle cx="32" cy="41" r="4.5" fill="#f1c84b" stroke="#fff2aa" stroke-width="1.1"/>
+    <circle cx="32" cy="41" r="2" fill="#fffbe3"/>
+    <path d="M25 51h14" stroke="#dfe9e9" stroke-width="1.5"/>
+  </g>
+<!-- L3: upgraded high-output precision laser, larger outer armor and gold focusing brackets. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+  <path d="M8 23L16 14L24 18L24 29L16 39L8 38Z M56 23L48 14L40 18L40 29L48 39L56 38Z" fill="#576b78" stroke="#1c2a34" stroke-width="1.7"/>
+  <path d="M9 25L17 17L21 20L19 33L11 35Z M55 25L47 17L43 20L45 33L53 35Z" fill="#a7bdc8" stroke="#e9f0ed" stroke-width="1.2"/>
+  <path d="M9 43L18 38L24 44L21 55L13 52Z M55 43L46 38L40 44L43 55L51 52Z" fill="#758a95" stroke="#21323b" stroke-width="1.6"/>
+  <path d="M12 25L18 19M52 25L46 19M12 48L18 51M52 48L46 51" stroke="#ffe28c" stroke-width="2.2"/>
+  <circle cx="32" cy="34" r="23.5" fill="none" stroke="#e6d28a" stroke-width="1.2" stroke-dasharray="5 4"/>
+  <path d="M20 13L26 8H38L44 13V24L40 26H24L20 24Z" fill="#435965" stroke="#cfdce2" stroke-width="1.3"/>
+  <path d="M23 14L28 10H36L41 14" stroke="#fff1b5" stroke-width="1.8" fill="none"/>
+  <path d="M21 31V11L26 5H38L43 11V31L39 41H25Z" fill="#8097a4" stroke="#263742" stroke-width="1.8"/>
+  <path d="M24 19V12L29 7H35L40 12V19" fill="#dfe8eb" stroke="#6d838f" stroke-width="1.1"/>
+  <rect x="27" y="3" width="10" height="10" rx="2" fill="#253641" stroke="#f4d46a" stroke-width="1.8"/>
+  <path d="M30 5H34" stroke="#fff6cf" stroke-width="2.5"/>
+  <rect x="28.5" y="14" width="7" height="21" rx="1.3" fill="#c58f27" stroke="#6b531e" stroke-width="1"/>
+  <rect x="30" y="15" width="4" height="19" rx=".6" fill="#fff2b3"/>
+  <path d="M24 22H29M35 22H40M24 28H29M35 28H40" stroke="#fff0a7" stroke-width="1.8"/>
+  <path d="M22 36L27 32H37L42 36L42 45L37 50H27L22 45Z" fill="#4a606e" stroke="#c6d6db" stroke-width="1.3"/>
+  <circle cx="32" cy="41" r="8.5" fill="#263842" stroke="#eef1df" stroke-width="1.8"/>
+  <circle cx="32" cy="41" r="5" fill="#f9d65b" stroke="#fff5c5" stroke-width="1.1"/>
+  <circle cx="32" cy="41" r="2.5" fill="#fffce4"/>
+  <path d="M23 52H41" stroke="#e6eae5" stroke-width="1.7"/>
+</g>
+<!-- 70%: installed high-output weapon with final calibration rig -->
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+ <rect x="5" y="5" width="54" height="54" rx="6" stroke="#ffe5a1" stroke-width="1.2" stroke-dasharray="5 4"/>
+ <path d="M7 17V7H17 M47 7H57V17 M7 47V57H17 M47 57H57V47" stroke="#d3e2e6" stroke-width="2"/>
+ <path d="M14 20L22 13 M50 20L42 13 M14 48L23 53 M50 48L41 53" stroke="#f4d681" stroke-width="1.5" stroke-dasharray="3 2"/>
+ <path d="M12 34H20M44 34H52 M28 8H36 M28 55H36" stroke="#fef0b5" stroke-width="1.6"/>
+ <circle cx="32" cy="34" r="24" stroke="#d8e7e7" stroke-width=".85" stroke-dasharray="2 6"/>
+</g>
+</svg>
