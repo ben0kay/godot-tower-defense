@@ -1,3 +1,18 @@
+## Two-layer welding sparks — 2026-11-03
+
+Construction and timed upgrade work now uses **two GPU particle layers from one shared emitter scene**:
+
+- **Soft background layer:** The original warm, rounded amber/orange flecks, unmodified. Defaults remain 8 flecks/site, 0.48s lifetime, 55% tower-footprint coverage. It continues using `FEEDBACK/Shared/Particles/EnergySpark.svg`.
+- **Hot welding layer:** A separate `GPUParticles2D` child named `WeldingSparks`, with a sharply defined [white-hot streak SVG](Artwork/WeldingSpark.svg). The small streak aligns with travel direction, sprays across wider angles with faster random velocities, random tangential motion, short bursts, and falls/fades through bright white, pale yellow and brief orange. Defaults: 8 streaks/site, 0.34s lifetime, 38% footprint coverage. No CPU particle movement.
+
+Tune either via the same `DefaultConstructionSparkConfig.tres`: `WeldingEnabled`, `WeldingParticlesPerSite`, `WeldingLifetime`, `WeldingFootprintCoverage`, `WeldingTint` are **new** independent controls. Speed, spread, gravity, damping, size, colour ramp and burst randomness live in `ConstructionSparkEmitter.tscn`. The controller changed the original emitter tint from inherited `Modulate` to `SelfModulate`, **so the orange background never dyes the hot-white child**.
+
+Both layers begin only when construction or upgrade time actually starts (after any drone hold), and both stop/free on work completion, cancellation, unload or destruction. One scene/active work site, still capped at 24. No new CPU processing/timers/scans or impact on credits, drones, construction times, stage sprites, saving or combat. Default peak budget is **24 sites × (8 soft + 8 welding) = 384 GPU particle slots**; welding can be disabled while preserving the orange layer.
+
+**Desktop acceptance pending:** Compare before/after at normal camera zoom, confirm crisp brighter erratic strokes above faint amber, repeat for 1×1 and large buildings, toggled off, paused/finished, and 3/10/24 simultaneous tower projects. No renderer/FPS benchmark has been run.
+
+---
+
 # Shared GPU fabrication sparks
 
 Reusable warm **GPUParticles2D** sparks for paid **construction and upgrade work** on all tower types. The emitter scene uses the already-shared `FEEDBACK/Shared/Particles/EnergySpark.svg` texture. One dormant listener under `World/Effects/ConstructionSparks` uses existing `ConstructionWorkManager.JobRegistered/JobUnregistered` events, including saved/restored jobs; it never polls tower state or runs `_Process`.

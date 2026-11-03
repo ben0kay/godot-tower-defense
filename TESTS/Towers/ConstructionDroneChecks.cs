@@ -67,6 +67,9 @@ public partial class ConstructionDroneChecks : Node
         Require(tower.AwaitingConstructionDrone && !tower.IsOperational && clock.HeldCount == 1 && !clock.IsPhysicsProcessing(), "Held site sleeps in clock");
         var sites = f.Main.GetNode<ConstructionSiteHologram>("World/Effects/ConstructionSiteHolograms");
         Require(sites.HasSite(tower) && sites.ActiveSites == 1, "CV1 hologram exists while paid site is awaiting drone");
+        var sparks = f.Main.GetNode<ConstructionSparkController>("World/Effects/ConstructionSparks");
+        Require(sparks.HasEmitter(tower) && !sparks.IsEmitting(tower) && !sparks.IsWelding(tower),
+            "Both spark layers stay dormant during the construction drone hold");
         var status = f.Hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Heading/WorkSection/Status");
         Require(status.Text == "AWAITING CONSTRUCTION DRONE", "Inspector distinguishes hold");
         var target = f.Target(tower.GlobalPosition + Vector2.Right * 80); int rounds = tower.Ammunition.Inventory.Amount;
@@ -83,6 +86,8 @@ public partial class ConstructionDroneChecks : Node
         Require(drone.GlobalPosition == position && tower.ElapsedWorkSeconds == 0, "Pause freezes flight and work");
         Arrive(builders, tower);
         var beam = drone.GetNode<ConstructionBeam>("Beam");
+        Require(sparks.IsEmitting(tower) && sparks.IsWelding(tower),
+            "Soft orange and white-hot welding sparks start together when work releases");
         var flashes = builders.GetNode<ConstructionCompletionFlash>("CompletionFlashes");
         Require(drone.BeamVisible && beam.AnimationSeconds > 0 && status.Text == "CONSTRUCTING" &&
             builders.Releases == 1 && clock.HeldCount == 0, "Animated beam deployed before one release");
@@ -100,7 +105,8 @@ public partial class ConstructionDroneChecks : Node
             "Cached projection uses shared CanvasItem gradient material rather than stacked polygon passes");
         Require(!tower.ReleaseConstructionDrone(builders, token), "Repeated arrival cannot release twice");
         clock.Advance(1); Require(tower.ElapsedWorkSeconds == 1 && !tower.IsOperational, "Ordinary clock starts after arrival");
-        clock.Advance(2); Require(tower.IsOperational && !sites.HasSite(tower) && !drone.BeamVisible && builders.ActiveCount == 1 &&
+        clock.Advance(2); Require(!sparks.HasEmitter(tower), "Both GPU spark layers retire when construction completes");
+        Require(tower.IsOperational && !sites.HasSite(tower) && !drone.BeamVisible && builders.ActiveCount == 1 && 
             flashes.ActiveCount == 1 && flashes.IsProcessing(), "Site completion flashes once independently of return");
         Return(builders);
         Require(flashes.ActiveCount == 1, "Returning or pooling the drone does not remove the site flash");
@@ -129,6 +135,7 @@ public partial class ConstructionDroneChecks : Node
         var clock = f.Main.GetNode<ConstructionWorkManager>("World/ConstructionWork");
         var sites = f.Main.GetNode<ConstructionSiteHologram>("World/Effects/ConstructionSiteHolograms");
         BattleTower tower = f.Add<BattleTower>("battle", new Vector2(2200, 2000));
+        var upgradeSparks = f.Main.GetNode<ConstructionSparkController>("World/Effects/ConstructionSparks");
         Sprite2D overlay = tower.GetNode<Sprite2D>(BattleTower.ConstructionSpritePath);
         Sprite2D gun = tower.GetNode<Sprite2D>(BattleTower.GunSpritePath);
         string art = "res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/";
@@ -156,6 +163,8 @@ public partial class ConstructionDroneChecks : Node
                 "Beam release starts upgrade clock but does not enable attacks");
             Require(sites.HasSite(tower) && sites.ActiveSites == 1,
                 "Hologram remains during beam construction after drone hold releases");
+            Require(upgradeSparks.IsEmitting(tower) && upgradeSparks.IsWelding(tower),
+                "Timed paid upgrades emit soft and crisp sparks simultaneously");
             clock.Advance(level == 2 ? 1.6 : 2.0);
             Require(overlay.Visible && overlay.Texture == GD.Load<Texture2D>(art + "battle_upgrade_l" + level + ".svg"),
                 "First upgrade image appears at 35% of work");
@@ -167,6 +176,7 @@ public partial class ConstructionDroneChecks : Node
             Require(tower.UpgradeLevel == level && tower.CanAttack && !tower.IsDisabled &&
                 !overlay.Visible && gun.Texture == GD.Load<Texture2D>(art + "battle_gun_l" + level + ".svg")
                 && builders.PhaseFor(tower) == null, "Completed tier activates finished gun; drone returns independently");
+            Require(!upgradeSparks.HasEmitter(tower), "Upgrade completion stops both spark layers");
             Require(!sites.HasSite(tower) && sites.ActiveSites == 0 && !sites.IsProcessing(),
                 "Finished upgrade immediately removes the shared hologram and sleeps when empty");
             Return(builders);

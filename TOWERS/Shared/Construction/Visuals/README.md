@@ -1,3 +1,9 @@
+## Two-layer fabrication sparks — 2026-11-03
+
+The existing soft orange `GPUParticles2D` flecks are preserved. A new, brighter **white-hot/yellow welding streak** layer is added above them inside the same shared emitter scene. It has its own GPU motion material, velocity alignment and independently configurable density/lifetime/tint/enable flag. Both layers share the existing paid construction/upgrade start, drone hold-release and teardown notifications; no extra script update loops. Read the [Sparks guide](Sparks/README.md) and tune `Sparks/DefaultConstructionSparkConfig.tres` or `Sparks/ConstructionSparkEmitter.tscn`.
+
+---
+
 ## Shared construction / upgrade fabrication sparks — 2026-11-03
 
 A new capped, visual-only `World/Effects/ConstructionSparks` controller now adds small amber GPU sparks during any paid timed **initial construction or upgrade**. It subscribes to the shared work manager's existing events and adds one temporary `GPUParticles2D` child to an active tower, matching 1×1/2×2/3×2 footprints. Sparks **wait until the drone finishes deploying its beam** (or start immediately for work without a drone), then stop on the work-unregistration event. There is no extra animation/physics processing in the C# controller. Config, reusable scene and tuning: [Sparks](Sparks/README.md).

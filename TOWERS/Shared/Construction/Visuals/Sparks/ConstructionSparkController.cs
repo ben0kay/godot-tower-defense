@@ -19,6 +19,11 @@ public partial class ConstructionSparkController : Node
     public bool IsEmitting(TowerBase tower) => tower != null &&
         _emitters.TryGetValue(tower, out GpuParticles2D particles) &&
         GodotObject.IsInstanceValid(particles) && particles.Emitting;
+    // True only when the new sharp welding layer is actively emitting.
+    public bool IsWelding(TowerBase tower) => tower != null &&
+        _emitters.TryGetValue(tower, out GpuParticles2D particles) &&
+        GodotObject.IsInstanceValid(particles) &&
+        particles.GetNodeOrNull<GpuParticles2D>("WeldingSparks") is { } welding && welding.Emitting;
     #endregion
 
     #region Lifecycle
@@ -50,7 +55,9 @@ public partial class ConstructionSparkController : Node
             GD.PushWarning("Construction spark scene needs a GPUParticles2D root.");
             return;
         }
-        if (particles.ProcessMaterial is not ParticleProcessMaterial source)
+        GpuParticles2D welding = particles.GetNodeOrNull<GpuParticles2D>("WeldingSparks");
+        if (particles.ProcessMaterial is not ParticleProcessMaterial source ||
+            welding?.ProcessMaterial is not ParticleProcessMaterial weldingSource)
         {
             particles.Free();
             GD.PushWarning("Construction spark scene needs ParticleProcessMaterial.");
@@ -66,8 +73,21 @@ public partial class ConstructionSparkController : Node
             Mathf.Max(5f, area.X * coverage * .5f), Mathf.Max(5f, area.Y * coverage * .5f), 0f);
         particles.Amount = Mathf.Clamp(Config.ParticlesPerSite, 1, 32);
         particles.Lifetime = Mathf.Clamp(Config.ParticleLifetime, .1f, 1.5f);
-        particles.Modulate = Config.SparkTint;
+        // SelfModulate preserves the original orange flecks without tinting the new white-hot child.
+        particles.SelfModulate = Config.SparkTint;
         particles.Emitting = false;
+
+        // One private GPU material for each layer, sized once to this tower's footprint.
+        var hotMaterial = (ParticleProcessMaterial)weldingSource.Duplicate();
+        welding.ProcessMaterial = hotMaterial;
+        float hotCoverage = Mathf.Clamp(Config.WeldingFootprintCoverage, .15f, 1f);
+        hotMaterial.EmissionBoxExtents = new Vector3(
+            Mathf.Max(4f, area.X * hotCoverage * .5f),
+            Mathf.Max(4f, area.Y * hotCoverage * .5f), 0f);
+        welding.Amount = Mathf.Clamp(Config.WeldingParticlesPerSite, 1, 24);
+        welding.Lifetime = Mathf.Clamp(Config.WeldingLifetime, .1f, .8f);
+        welding.Modulate = Config.WeldingTint;
+        welding.Emitting = false;
         tower.AddChild(particles);
         _emitters.Add(tower, particles);
 
@@ -77,7 +97,7 @@ public partial class ConstructionSparkController : Node
             _waiting.Add(tower, release);
             tower.WorkProgressChanged += release;
         }
-        else particles.Emitting = true;
+        else StartLayers(particles);
     }
 
     // =========================================================
@@ -87,16 +107,27 @@ public partial class ConstructionSparkController : Node
         if (tower.AwaitingConstructionDrone || !tower.IsBusy) return;
         StopWaiting(tower);
         if (Config?.Enabled == true && _emitters.TryGetValue(tower, out GpuParticles2D particles) &&
-            GodotObject.IsInstanceValid(particles)) particles.Emitting = true;
+            GodotObject.IsInstanceValid(particles)) StartLayers(particles);
     }
 
     // =========================================================
-    // Existing cancellation/completion/destroy callbacks stop and retire the GPU emitter immediately.
+    // Both layers share the same work start; the welding layer is independently opt-out.
+    private void StartLayers(GpuParticles2D particles)
+    {
+        particles.Emitting = true;
+        GpuParticles2D hot = particles.GetNodeOrNull<GpuParticles2D>("WeldingSparks");
+        if (hot != null) hot.Emitting = Config?.WeldingEnabled == true;
+    }
+
+    // =========================================================
+    // Existing cancellation/completion/destroy callbacks stop and retire both emitters.
     private void OnUnregistered(TowerBase tower)
     {
         StopWaiting(tower);
         if (!_emitters.Remove(tower, out GpuParticles2D particles) || !GodotObject.IsInstanceValid(particles)) return;
         particles.Emitting = false;
+        if (particles.GetNodeOrNull<GpuParticles2D>("WeldingSparks") is { } welding)
+            welding.Emitting = false;
         if (particles.IsInsideTree()) particles.QueueFree(); else particles.Free();
     }
 
@@ -122,6 +153,8 @@ public partial class ConstructionSparkController : Node
         {
             if (!GodotObject.IsInstanceValid(particles)) continue;
             particles.Emitting = false;
+            if (particles.GetNodeOrNull<GpuParticles2D>("WeldingSparks") is { } welding)
+                welding.Emitting = false;
             if (particles.IsInsideTree()) particles.QueueFree(); else particles.Free();
         }
         _emitters.Clear(); _waiting.Clear(); _work = null;
