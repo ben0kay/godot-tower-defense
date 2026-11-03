@@ -1,0 +1,67 @@
+[gd_resource type="Resource" script_class="WaveSetResource" format=3]
+
+[ext_resource type="Script" path="res://LEVELS/Waves/Resources/WaveBatchResource.cs" id="batch"]
+[ext_resource type="Script" path="res://LEVELS/Waves/Resources/WaveEnemyResource.cs" id="enemy"]
+[ext_resource type="Script" path="res://LEVELS/Waves/Resources/WaveSetResource.cs" id="set"]
+[ext_resource type="Script" path="res://LEVELS/Waves/Resources/WaveResource.cs" id="wave"]
+
+[sub_resource type="Resource" id="E1_1_1"]
+script = ExtResource("enemy")
+
+[sub_resource type="Resource" id="B1_1"]
+script = ExtResource("batch")
+Count = 10
+Interval = 0.9
+Enemies = Array[ExtResource("enemy")]([SubResource("E1_1_1")])
+
+[sub_resource type="Resource" id="W1"]
+script = ExtResource("wave")
+Batches = Array[ExtResource("batch")]([SubResource("B1_1")])
+
+[sub_resource type="Resource" id="E2_1_1"]
+script = ExtResource("enemy")
+
+[sub_resource type="Resource" id="B2_1"]
+script = ExtResource("batch")
+Count = 14
+Interval = 0.8
+Enemies = Array[ExtResource("enemy")]([SubResource("E2_1_1")])
+
+[sub_resource type="Resource" id="W2"]
+script = ExtResource("wave")
+Number = 2
+Batches = Array[ExtResource("batch")]([SubResource("B2_1")])
+
+[sub_resource type="Resource" id="E3_1_1"]
+script = ExtResource("enemy")
+
+[sub_resource type="Resource" id="B3_1"]
+script = ExtResource("batch")
+Count = 10
+Interval = 0.75
+After = 1.0
+Enemies = Array[ExtResource("enemy")]([SubResource("E3_1_1")])
+
+[sub_resource type="Resource" id="E3_2_1"]
+script = ExtResource("enemy")
+Weight = 50.0
+
+[sub_resource type="Resource" id="E3_2_2"]
+script = ExtResource("enemy")
+EnemyId = "scout_mk1"
+Weight = 50.0
+
+[sub_resource type="Resource" id="B3_2"]
+script = ExtResource("batch")
+Count = 10
+Interval = 0.65
+Enemies = Array[ExtResource("enemy")]([SubResource("E3_2_1"), SubResource("E3_2_2")])
+
+[sub_resource type="Resource" id="W3"]
+script = ExtResource("wave")
+Number = 3
+Batches = Array[ExtResource("batch")]([SubResource("B3_1"), SubResource("B3_2")])
+
+[resource]
+script = ExtResource("set")
+Waves = Array[ExtResource("wave")]([SubResource("W1"), SubResource("W2"), SubResource("W3")])
