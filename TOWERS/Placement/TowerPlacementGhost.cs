@@ -56,7 +56,6 @@ public partial class TowerPlacementGhost : Node2D
                 Frame = original.Frame,
                 RegionEnabled = original.RegionEnabled,
                 RegionRect = original.RegionRect,
-                NormalMap = original.NormalMap,
                 TextureFilter = original.TextureFilter,
                 Material = original.Material,
                 Modulate = tint,
