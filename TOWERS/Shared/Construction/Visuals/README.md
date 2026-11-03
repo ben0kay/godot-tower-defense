@@ -1,3 +1,11 @@
+## Shared construction / upgrade fabrication sparks — 2026-11-03
+
+A new capped, visual-only `World/Effects/ConstructionSparks` controller now adds small amber GPU sparks during any paid timed **initial construction or upgrade**. It subscribes to the shared work manager's existing events and adds one temporary `GPUParticles2D` child to an active tower, matching 1×1/2×2/3×2 footprints. Sparks **wait until the drone finishes deploying its beam** (or start immediately for work without a drone), then stop on the work-unregistration event. There is no extra animation/physics processing in the C# controller. Config, reusable scene and tuning: [Sparks](Sparks/README.md).
+
+The cyan CV1 footprint hologram, builder beam/flight, stage artwork, build clock and save format are unchanged. The effect is GPU-driven and defaults to a cap of 24 sites with eight visible particle slots per active site. Desktop visual and F4 profiling remain with the owner.
+
+---
+
 ## CV1 extension — same site overlay during upgrades (2026-10-27)
 
 The existing **square cyan construction-site hologram** now appears on **all positive-duration paid upgrades** as well as initial builds, without replacing the tower sprite or restarting its initial build art. It is visible immediately after the purchase is accepted, while the upgrade drone is queued/flying/deploying, through beam time and both Battle Tower upgrade-art milestones, then disappears on the existing work-unregistration event at completion or removal. **The tower and its upgrade images remain visible underneath**: only the transparent footprint blueprint/corner brackets/perimeter dot/engineering rings are drawn over it. The same 1×1/2×2/3×2 footprint rules and waiting/building opacities apply.

@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3]
+[gd_scene load_steps=34 format=3]
 
 [ext_resource type="Script" path="res://WORLD/GRID/WorldGrid.cs" id="1_script"]
 [ext_resource type="Resource" path="res://WORLD/DefaultWorldConfig.tres" id="2_config"]
@@ -21,6 +21,9 @@
 [ext_resource type="Script" path="res://TOWERS/Shared/Construction/ConstructionWorkManager.cs" id="14_work"]
 [ext_resource type="Script" path="res://TOWERS/Shared/Construction/Visuals/ConstructionSiteHologram.cs" id="site_hologram"]
 [ext_resource type="Resource" path="res://TOWERS/Shared/Construction/Visuals/DefaultConstructionSiteVisualConfig.tres" id="site_hologram_config"]
+[ext_resource type="Script" path="res://TOWERS/Shared/Construction/Visuals/Sparks/ConstructionSparkController.cs" id="site_sparks"]
+[ext_resource type="Resource" path="res://TOWERS/Shared/Construction/Visuals/Sparks/DefaultConstructionSparkConfig.tres" id="site_sparks_config"]
+[ext_resource type="PackedScene" path="res://TOWERS/Shared/Construction/Visuals/Sparks/ConstructionSparkEmitter.tscn" id="site_sparks_scene"]
 
 [ext_resource type="Script" path="res://LEVELS/Runtime/WorldMapLoader.cs" id="loader"]
 
@@ -67,6 +70,11 @@ z_index = 7
 [node name="ConstructionSiteHolograms" type="Node2D" parent="Effects"]
 script = ExtResource("site_hologram")
 Config = ExtResource("site_hologram_config")
+
+[node name="ConstructionSparks" type="Node" parent="Effects"]
+script = ExtResource("site_sparks")
+Config = ExtResource("site_sparks_config")
+SparkScene = ExtResource("site_sparks_scene")
 
 [node name="EnemySystems" type="Node" parent="."]
 

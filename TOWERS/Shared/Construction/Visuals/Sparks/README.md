@@ -1,0 +1,11 @@
+# Shared GPU fabrication sparks
+
+Reusable warm **GPUParticles2D** sparks for paid **construction and upgrade work** on all tower types. The emitter scene uses the already-shared `FEEDBACK/Shared/Particles/EnergySpark.svg` texture. One dormant listener under `World/Effects/ConstructionSparks` uses existing `ConstructionWorkManager.JobRegistered/JobUnregistered` events, including saved/restored jobs; it never polls tower state or runs `_Process`.
+
+**Files:** `ConstructionSparkController.cs` owns the active site mapping and clean-up; `ConstructionSparkEmitter.tscn` contains motion/gradient/texture; `ConstructionSparkConfig.cs` and `DefaultConstructionSparkConfig.tres` provide Inspector tuning (Enabled, cap 24 sites, 8 particles/site, .48s lifetime, 55% footprint coverage and amber tint). One emitter is temporarily parented under each actively registered tower. Each active emitter gets its own one-time process-material copy *solely* to size the source box to the tower's rectangular footprint; the shared artwork is reused.
+
+**Timing:** emitters are dormant while waiting for a construction/upgrade drone. The existing `WorkProgressChanged` hold-release event starts sparks when paid work actually begins. Without a required drone, timed work emits immediately. Completing, cancelling, destroying, failing placement and world teardown all retire the effect. Direct/zero-duration/idle buildings have no emitters. Spark cap omits effects only; it never changes work, credits, progress, drone holds or gameplay. Pause is inherited from the tower scene tree.
+
+**Rendering/performance:** small soft orange flecks lift in random directions, fall and fade. GPU particles own their motion. Maximum default budget is 24 × 8 particle slots, with no extra CPU frame callbacks, timer nodes, active list scans, texture allocation or visual work when idle. Existing cyan construction-site holograms, beam and staged artwork are unchanged. Editing `Enabled` prevents new instances; active jobs retire normally (no idle polling for resource changes).
+
+**Godot acceptance:** inspect 1×1 Battle, 2×2 Depot and 3×2 Factory, construction and upgrade with and without a drone, pause/save/reload, and 3/10/24 overlapping sites. Confirm spark placement, brightness, lifetimes and FPS in F4. Source-only validation cannot verify GPU appearance.
