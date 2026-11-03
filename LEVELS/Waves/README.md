@@ -1,3 +1,9 @@
+## Level001 uses editable tutorial waves (2026-11-03)
+
+Level001 now loads **`Level001/Level001Waves.tres`** directly through its existing `LevelConfig.WaveSource`. The mission has three intro waves of **10, 14 and 20 enemies**, for 44 total. Waves 1–2 use only the unshielded Standard Drone; Wave 3 spawns ten Standards, then ten mixed Standard/Scout ships (5 of each), so fast Scouts first appear **halfway through the final wave**. No shield, stealth, Bulwark or other modifiers are used. Godot's Wave Editor opens the Level001 file for future banner and narrator text; all custom presentation fields are blank. The original `Level001Waves.cs` is a reference, not gameplay. Earlier Level001 shield-heavy 38/40/55 descriptions below are historical. [Level001](../Level001/README.md).
+
+---
+
 ## Editable .tres wave sets and main-screen Godot Wave Editor (pilot, 2026-10-29)
 
 `WaveSetSource` now has a data-only, `[Tool]` `WaveSetResource` alternative to the existing C# recipes. The **Wave Editor** main-screen plugin in `addons/wave_editor` opens, edits, validates and saves wave/batch/enemy `.tres` resources, including weights, count, interval, delay, portals, shield/stealth and optional narrated presentation. Existing `WaveCatalog` / `WaveManager` / weighted composition remain unchanged. **Level003** is the opt-in sample: `Level003Config.tres → Level003Waves.tres`; the previous C# file remains only as a test/reference. Levels001, 002, 020 and100 are still C# authored. See [Wave Editor guide](../../addons/wave_editor/README.md) and [resource model](Resources/README.md).
