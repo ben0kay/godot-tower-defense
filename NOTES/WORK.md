@@ -1,3 +1,9 @@
+## 2026-11-03 — Level001 rebuilt as beginner wave tutorial
+
+Replaced 133-enemy shield-heavy first-mission composition with **three gentle waves: 10 basic / 14 basic / 20 total**. Wave 3 begins with ten plain Standards, then a ten-ship 50/50 weighted mix of Standard/fast Scout after one second; no shields, stealth, Bulwarks or support enemies. All 44 ships fit the unchanged 1,000-starting-Credits mission and manually started waves. Added `LEVELS/Level001/Level001Waves.tres` and repointed `Level001Config.tres.WaveSource` so the user can later author per-wave banners and messages in the Godot Wave Editor. Presentation fields left blank; `Level001Waves.cs` mirrors the data only as legacy reference. Updated focused integration assertions against the authoritative resource and Level001 Mission/README. Source-level verification only; local Godot run pending. Earlier 38/40/55 Level001 shield-test descriptions in historical notes are superseded.
+
+---
+
 ## 2026-11-03 — Level003 Wave 4 stronger/weak mixed pressure
 
 Rebalanced only `LEVELS/Level003/Level003Waves.tres` Wave 4: old three distinct batches (16 mixed light + 8 Scout + 8 isolated Bulwark) now two **16-ship mixed batches**, each with 4 Bulwarks alongside weaker Standards/Scouts. Exact compositions: **8/4/4**, then **4/8/4** (Standard/Scout/Bulwark); 0.55s and 0.50s spawn intervals, 0.4s mid-wave pause instead of two 3s gaps. Overall 12/12/8 mix, 32 enemies, no new flags, wave 1–3 untouched. Focused WaveChecks preserves first-three-wave parity with old C# baseline and asserts mixed finale quotas/timings. The old C# file remains historical; Godot runtime check pending.
