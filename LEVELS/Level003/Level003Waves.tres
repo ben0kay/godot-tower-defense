@@ -1,14 +1,12 @@
-[gd_resource type="Resource" script_class="WaveSetResource" format=3]
+[gd_resource type="Resource" script_class="WaveSetResource" format=3 uid="uid://0kwebe4a53wd"]
 
-[ext_resource type="Script" path="res://LEVELS/Waves/Resources/WaveSetResource.cs" id="set"]
-[ext_resource type="Script" path="res://LEVELS/Waves/Resources/WaveResource.cs" id="wave"]
-[ext_resource type="Script" path="res://LEVELS/Waves/Resources/WaveBatchResource.cs" id="batch"]
-[ext_resource type="Script" path="res://LEVELS/Waves/Resources/WaveEnemyResource.cs" id="enemy"]
+[ext_resource type="Script" uid="uid://cd2q6k7jkfyaq" path="res://LEVELS/Waves/Resources/WaveBatchResource.cs" id="batch"]
+[ext_resource type="Script" uid="uid://cxnhgkjed2i8f" path="res://LEVELS/Waves/Resources/WaveEnemyResource.cs" id="enemy"]
+[ext_resource type="Script" uid="uid://di5hkaslgameh" path="res://LEVELS/Waves/Resources/WaveSetResource.cs" id="set"]
+[ext_resource type="Script" uid="uid://cqqx733te7g78" path="res://LEVELS/Waves/Resources/WaveResource.cs" id="wave"]
 
 [sub_resource type="Resource" id="E1_1_1"]
 script = ExtResource("enemy")
-EnemyId = "basic_mk1"
-Weight = 100.0
 
 [sub_resource type="Resource" id="B1_1"]
 script = ExtResource("batch")
@@ -20,24 +18,19 @@ Enemies = Array[ExtResource("enemy")]([SubResource("E1_1_1")])
 [sub_resource type="Resource" id="E1_2_1"]
 script = ExtResource("enemy")
 EnemyId = "scout_mk1"
-Weight = 100.0
 
 [sub_resource type="Resource" id="B1_2"]
 script = ExtResource("batch")
 Count = 6
 Interval = 0.95
-After = 0.0
 Enemies = Array[ExtResource("enemy")]([SubResource("E1_2_1")])
 
 [sub_resource type="Resource" id="W1"]
 script = ExtResource("wave")
-Number = 1
 Batches = Array[ExtResource("batch")]([SubResource("B1_1"), SubResource("B1_2")])
 
 [sub_resource type="Resource" id="E2_1_1"]
 script = ExtResource("enemy")
-EnemyId = "basic_mk1"
-Weight = 100.0
 
 [sub_resource type="Resource" id="B2_1"]
 script = ExtResource("batch")
@@ -49,13 +42,11 @@ Enemies = Array[ExtResource("enemy")]([SubResource("E2_1_1")])
 [sub_resource type="Resource" id="E2_2_1"]
 script = ExtResource("enemy")
 EnemyId = "scout_mk1"
-Weight = 100.0
 
 [sub_resource type="Resource" id="B2_2"]
 script = ExtResource("batch")
 Count = 8
 Interval = 0.85
-After = 0.0
 Enemies = Array[ExtResource("enemy")]([SubResource("E2_2_1")])
 
 [sub_resource type="Resource" id="W2"]
@@ -65,8 +56,6 @@ Batches = Array[ExtResource("batch")]([SubResource("B2_1"), SubResource("B2_2")]
 
 [sub_resource type="Resource" id="E3_1_1"]
 script = ExtResource("enemy")
-EnemyId = "basic_mk1"
-Weight = 100.0
 
 [sub_resource type="Resource" id="B3_1"]
 script = ExtResource("batch")
@@ -78,7 +67,6 @@ Enemies = Array[ExtResource("enemy")]([SubResource("E3_1_1")])
 [sub_resource type="Resource" id="E3_2_1"]
 script = ExtResource("enemy")
 EnemyId = "scout_mk1"
-Weight = 100.0
 
 [sub_resource type="Resource" id="B3_2"]
 script = ExtResource("batch")
@@ -90,13 +78,11 @@ Enemies = Array[ExtResource("enemy")]([SubResource("E3_2_1")])
 [sub_resource type="Resource" id="E3_3_1"]
 script = ExtResource("enemy")
 EnemyId = "medium_mk1"
-Weight = 100.0
 
 [sub_resource type="Resource" id="B3_3"]
 script = ExtResource("batch")
 Count = 4
 Interval = 1.3
-After = 0.0
 Enemies = Array[ExtResource("enemy")]([SubResource("E3_3_1")])
 
 [sub_resource type="Resource" id="W3"]
@@ -106,7 +92,6 @@ Batches = Array[ExtResource("batch")]([SubResource("B3_1"), SubResource("B3_2"),
 
 [sub_resource type="Resource" id="E4_1_1"]
 script = ExtResource("enemy")
-EnemyId = "basic_mk1"
 Weight = 75.0
 
 [sub_resource type="Resource" id="E4_1_2"]
@@ -124,25 +109,21 @@ Enemies = Array[ExtResource("enemy")]([SubResource("E4_1_1"), SubResource("E4_1_
 [sub_resource type="Resource" id="E4_2_1"]
 script = ExtResource("enemy")
 EnemyId = "scout_mk1"
-Weight = 100.0
 
 [sub_resource type="Resource" id="B4_2"]
 script = ExtResource("batch")
 Count = 8
-Interval = 0.8
 After = 3.0
 Enemies = Array[ExtResource("enemy")]([SubResource("E4_2_1")])
 
 [sub_resource type="Resource" id="E4_3_1"]
 script = ExtResource("enemy")
 EnemyId = "medium_mk1"
-Weight = 100.0
 
 [sub_resource type="Resource" id="B4_3"]
 script = ExtResource("batch")
 Count = 8
 Interval = 1.1
-After = 0.0
 Enemies = Array[ExtResource("enemy")]([SubResource("E4_3_1")])
 
 [sub_resource type="Resource" id="W4"]

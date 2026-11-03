@@ -1,4 +1,4 @@
-[gd_scene format=3]
+[gd_scene format=4 uid="uid://ovshlvskui7m"]
 
 [ext_resource type="Texture2D" uid="uid://dtgxtqxxwsmoc" path="res://WORLD/BACKGROUNDS/Stars/level001_space.svg" id="1_p5ed7"]
 [ext_resource type="TileSet" uid="uid://bwnwc1jg7xakk" path="res://WORLD/TERRAIN/TileSets/DecorationTerrain.tres" id="2_decorations"]
@@ -7,19 +7,16 @@
 [ext_resource type="TileSet" uid="uid://dbryu0fnchy4x" path="res://WORLD/TERRAIN/TileSets/PassableTerrain.tres" id="2_passable"]
 [ext_resource type="Script" uid="uid://cxu0tg3s3btvh" path="res://LEVELS/WorldLevel.cs" id="3_root"]
 [ext_resource type="Resource" path="res://LEVELS/Level003/Level003Config.tres" id="4_config"]
-[ext_resource type="PackedScene" path="res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn" id="5_portal"]
+[ext_resource type="PackedScene" uid="uid://pgmykoicpips" path="res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn" id="5_portal"]
 [ext_resource type="PackedScene" path="res://WORLD/OBJECTIVES/Citadel/Citadel.tscn" id="6_citadel"]
 [ext_resource type="Script" uid="uid://ceof7q2uqyh1q" path="res://DEBUG/Navigation/CheckpointDesignOverlay.cs" id="checkpoint_overlay"]
-
 [ext_resource type="PackedScene" path="res://DEBUG/LevelTools/LevelDebugTools.tscn" id="debug_tools"]
-
-[ext_resource type="Script" path="res://WORLD/VISUALS/LevelAtmosphereController.cs" id="ve1_controller"]
+[ext_resource type="Script" uid="uid://8mefrcgtbhru" path="res://WORLD/VISUALS/LevelAtmosphereController.cs" id="ve1_controller"]
 [ext_resource type="Resource" path="res://WORLD/VISUALS/Presets/CalmSpace.tres" id="ve1_preset"]
 
 [node name="Level003" type="Node2D" unique_id=864740696]
 script = ExtResource("3_root")
 Settings = ExtResource("4_config")
-
 
 [node name="SpaceBackground" type="Node2D" parent="." unique_id=1825087959]
 z_index = -20
@@ -36,7 +33,7 @@ centered = false
 
 [node name="Planets" type="Node2D" parent="SpaceBackground" unique_id=1684856347]
 
-[node name="VisualAtmosphere" type="Node2D" parent="SpaceBackground"]
+[node name="VisualAtmosphere" type="Node2D" parent="SpaceBackground" unique_id=535803022]
 visible = false
 script = ExtResource("ve1_controller")
 Config = ExtResource("ve1_preset")
@@ -44,12 +41,15 @@ Config = ExtResource("ve1_preset")
 [node name="Terrain" type="Node2D" parent="." unique_id=833107286]
 
 [node name="Passable" type="TileMapLayer" parent="Terrain" unique_id=1382848671]
+tile_map_data = PackedByteArray("AAA+AC4AAQADAAAAAAA+ACwAAQADAAAAAAA+ACoAAQADAAAAAAA+ACgAAQADAAAAAAA=")
 tile_set = ExtResource("2_passable")
 
 [node name="Impassable" type="TileMapLayer" parent="Terrain" unique_id=1176658847]
+tile_map_data = PackedByteArray("AAA+ADAAAQAAAAAAAAA8ADAAAQAAAAAAAAA8AC4AAQAAAAAAAAA9AC4AAQAAAAAAAAA/ADAAAQAAAAAAAABAADAAAQAAAAAAAABBADAAAQAAAAAAAAA9ACoAAQAAAAAAAABAACoAAQAAAAAAAAA/ACoAAQAAAAAAAAA9ACgAAQAAAAAAAAA/ACgAAQAAAAAAAABAACgAAQAAAAAAAAA/ACwAAQAAAAAAAABAACwAAQAAAAAAAAA9ACwAAQAAAAAAAAA8AC8AAQAAAAAAAAA8AC0AAQAAAAAAAAA8ACwAAQAAAAAAAAA8ACsAAQAAAAAAAAA8ACoAAQAAAAAAAAA8ACkAAQAAAAAAAAA8ACgAAQAAAAAAAAA8ACcAAQAAAAAAAAA8ACYAAQAAAAAAAAA8ACUAAQAAAAAAAAA8ACQAAQAAAAAAAAA9ACQAAQAAAAAAAAA+ACQAAQAAAAAAAAA/ACQAAQAAAAAAAABAACQAAQAAAAAAAABBACQAAQAAAAAAAABBACgAAQAAAAAAAABBACoAAQAAAAAAAABBACwAAQAAAAAAAAA/AC4AAQAAAAAAAABAAC4AAQAAAAAAAABBAC4AAQAAAAAAAABCADAAAQAAAAAAAABDADAAAQAAAAAAAABEADAAAQAAAAAAAABFADAAAQAAAAAAAABFAC8AAQAAAAAAAABFAC4AAQAAAAAAAABFAC0AAQAAAAAAAABFACwAAQAAAAAAAABFACsAAQAAAAAAAABFACoAAQAAAAAAAABFACkAAQAAAAAAAABFACgAAQAAAAAAAABFACcAAQAAAAAAAABFACYAAQAAAAAAAABFACUAAQAAAAAAAABFACQAAQAAAAAAAABEACQAAQAAAAAAAABDACQAAQAAAAAAAABCACQAAQAAAAAAAAA=")
 tile_set = ExtResource("2_impassable")
 
 [node name="Interactive" type="TileMapLayer" parent="Terrain" unique_id=421031592]
+tile_map_data = PackedByteArray("AABCACUAAQAAAAAAAABCACYAAQAAAAAAAABCACcAAQAAAAAAAABCACgAAQAAAAAAAABCACkAAQAAAAAAAABCACoAAQAAAAAAAABCACsAAQAAAAAAAABCACwAAQAAAAAAAABCAC0AAQAAAAAAAABCAC4AAQAAAAAAAABCAC8AAQAAAAAAAABDACUAAQAAAAAAAABDACYAAQAAAAAAAABDACcAAQAAAAAAAABDACgAAQAAAAAAAABDACkAAQAAAAAAAABDACoAAQAAAAAAAABDACsAAQAAAAAAAABDACwAAQAAAAAAAABDAC0AAQAAAAAAAABDAC4AAQAAAAAAAABDAC8AAQAAAAAAAABEACUAAQAAAAAAAABEACYAAQAAAAAAAABEACcAAQAAAAAAAABEACgAAQAAAAAAAABEACkAAQAAAAAAAABEACoAAQAAAAAAAABEACsAAQAAAAAAAABEACwAAQAAAAAAAABEAC0AAQAAAAAAAABEAC4AAQAAAAAAAABEAC8AAQAAAAAAAAA=")
 tile_set = ExtResource("2_interactive")
 
 [node name="Decorations" type="TileMapLayer" parent="Terrain" unique_id=1034975239]
@@ -60,12 +60,12 @@ tile_set = ExtResource("2_decorations")
 [node name="Portals" type="Node2D" parent="." unique_id=219222935]
 
 [node name="EnemyPortal1" parent="Portals" unique_id=1721559982 instance=ExtResource("5_portal")]
-position = Vector2(3424, 2592)
+position = Vector2(3936, 3232)
 
 [node name="Objectives" type="Node2D" parent="." unique_id=1539156350]
 
 [node name="Citadel" parent="Objectives" unique_id=1303919540 instance=ExtResource("6_citadel")]
-position = Vector2(3872, 2528)
+position = Vector2(3936, 2400)
 
 [node name="Debug" parent="." unique_id=1467647758 instance=ExtResource("debug_tools")]
 
