@@ -1,3 +1,9 @@
+## Cryo and Stasis construction/upgrade art — 2026-11-02
+
+Cryo and Stasis now have full event-driven initial-building visual stages (foundation/frame/assembly), independent Level 2/3 finished split base-and-emitter artwork, and 35%/70% staged upgrade composites, all using the existing `TowerConstructionVisuals` resources. Their original single muzzle, health, damage/status effects, work times, costs, targeting, recoil and ammo remain unchanged. The finished Level 1 world placement preview still uses actual tower scene art. See [Cryo](TOWERS/Offensive/CryoTower/Artwork/Upgrades/README.md) and [Stasis](TOWERS/Offensive/StasisTower/Artwork/Upgrades/README.md) notes. Godot visual acceptance pending.
+
+---
+
 ## Blaster Cannon and Rocket Tower purchased-tier artwork — 2026-11-02
 
 Blaster Cannon now has distinct finished Level 2 fixed-base/rotating-gun art and two upgrade-stage composites (35% and 70%). Rocket Tower now has separate Level 2 and Level 3 dual-launcher base/gun sets, with two 35%/70% upgrade-stage composites for each tier. Both reuse the already installed `TowerConstructionVisuals` and `TowerConstructionArt`; original initial-building stages are untouched. The existing Cannon **two** and Rocket **three** level tables, damage, work timers, recoil, projectile origins, launch behaviour, ammo and heat are unchanged. [Blaster artwork](TOWERS/Offensive/BlasterCannon/Artwork/Upgrades/README.md) · [Rocket artwork](TOWERS/Offensive/RocketTower/Artwork/Upgrades/README.md). Source implemented; owner runtime visual approval pending.

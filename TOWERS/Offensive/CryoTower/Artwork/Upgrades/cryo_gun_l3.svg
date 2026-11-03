@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<path d="M25 30V8H39V30" fill="#294b64" stroke="#9ceff7" stroke-width="2"/>
+<path d="M28 9V3H36V9Z" fill="#c4fcff" stroke="#4cc9e9" stroke-width="2"/>
+<circle cx="32" cy="33" r="11" fill="#0e263e" stroke="#74dfff" stroke-width="2"/>
+<path d="M32 25V41M25 29L39 37M25 37L39 29" stroke="#b9faff" stroke-width="2"/><!-- L2 insulated single-emitter jacket -->
+<g stroke-linecap="round" stroke-linejoin="round">
+<path d="M22 30L23 11L28 6L29 29L25 40L21 34Z M42 30L41 11L36 6L35 29L39 40L43 34Z" fill="#436b81" stroke="#10283e" stroke-width="1.4"/>
+<path d="M24 16H29 M35 16H40 M24 21H29 M35 21H40" stroke="#dcfcff" stroke-width="1.6"/>
+<rect x="26" y="5" width="12" height="7" rx="2" fill="#10283e" stroke="#dcfcff" stroke-width="1.4"/>
+<path d="M28 7H36" stroke="#75e8f9" stroke-width="2.3"/>
+<path d="M23 30L28 25H36L41 30L42 40L35 46H29L22 40Z" fill="#436b81" stroke="#dcfcff" stroke-width="1.4"/>
+<circle cx="32" cy="34" r="7" fill="#10283e" stroke="#75e8f9" stroke-width="1.7"/>
+<circle cx="32" cy="34" r="3.4" fill="#75e8f9" stroke="#dcfcff" stroke-width="1"/>
+</g><!-- L3 high-pressure cryo optic with heavy bracing -->
+<g stroke-linecap="round" stroke-linejoin="round">
+<path d="M20 30L21 8L27 4L29 28L25 41L20 36Z M44 30L43 8L37 4L35 28L39 41L44 36Z" fill="#436b81" stroke="#10283e" stroke-width="1.8"/>
+<path d="M22 15H29 M35 15H42 M22 20H29 M35 20H42" stroke="#dcfcff" stroke-width="1.6"/>
+<rect x="25" y="3" width="14" height="8" rx="2" fill="#10283e" stroke="#aacfe0" stroke-width="1.6"/>
+<path d="M28 6H36" stroke="#dcfcff" stroke-width="2.7"/>
+<path d="M20 32L27 25H37L44 32L42 44L36 49H28L22 44Z" fill="#436b81" stroke="#10283e" stroke-width="1.7"/>
+<circle cx="32" cy="35" r="9" fill="#10283e" stroke="#dcfcff" stroke-width="1.7"/>
+<circle cx="32" cy="35" r="5" fill="#75e8f9" stroke="#dcfcff" stroke-width="1.1"/>
+<circle cx="32" cy="35" r="2" fill="#dcfcff"/>
+</g>
+</svg>

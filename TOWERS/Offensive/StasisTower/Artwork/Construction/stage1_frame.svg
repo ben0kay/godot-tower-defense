@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<path d="M16 8H48L57 23V48L44 57H20L7 48V23Z" fill="#102719" stroke="#52996a" stroke-width="2"/>
+<path d="M16 24L24 16H40L48 24V44L40 51H24L16 44Z" fill="#204b2b" stroke="#6bef83" stroke-width="2"/>
+<path d="M10 29V41M54 29V41M25 54H39" stroke="#45d965" stroke-width="3"/><!-- L1 frame and field coil foundations only -->
+<g fill="none" stroke-linecap="round"><circle cx="32" cy="34" r="14" stroke="#6be987" stroke-width="2"/><path d="M17 20L25 27 M47 20L39 27 M17 48L25 41 M47 48L39 41" stroke="#d8ffd4" stroke-width="2"/><rect x="26" y="28" width="12" height="12" rx="2" stroke="#b5ed8e" stroke-width="1.4"/></g>
+</svg>

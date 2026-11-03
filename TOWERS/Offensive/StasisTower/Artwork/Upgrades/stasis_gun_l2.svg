@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<path d="M25 30V8H39V30" fill="#285b37" stroke="#a1ffac" stroke-width="2"/>
+<path d="M28 9V3H36V9Z" fill="#d8ffcf" stroke="#65ed78" stroke-width="2"/>
+<circle cx="32" cy="34" r="11" fill="#112d1c" stroke="#78ff89" stroke-width="2"/>
+<path d="M28 27V41M36 27V41" stroke="#cbffd0" stroke-width="4"/><!-- L2 stabilized freeze projector with twin green focus rails -->
+<g stroke-linecap="round" stroke-linejoin="round">
+<path d="M22 30L24 10L28 6L29 28L25 39L21 35Z M42 30L40 10L36 6L35 28L39 39L43 35Z" fill="#3b6849" stroke="#102d1b" stroke-width="1.4"/>
+<path d="M24 16H29M35 16H40M24 21H29M35 21H40" stroke="#d8ffd4" stroke-width="1.4"/>
+<rect x="26" y="5" width="12" height="7" rx="2" fill="#102d1b" stroke="#6be987" stroke-width="1.55"/>
+<path d="M29 8H35" stroke="#d8ffd4" stroke-width="2.2"/>
+<path d="M23 30L28 25H36L41 30L42 40L35 47H29L22 40Z" fill="#3b6849" stroke="#d8ffd4" stroke-width="1.45"/>
+<path d="M26 34H38 M32 28V41" stroke="#b5ed8e" stroke-width="1.4"/>
+<circle cx="32" cy="34" r="7.3" fill="#102d1b" stroke="#6be987" stroke-width="1.7"/>
+<circle cx="32" cy="34" r="3.6" fill="#6be987" stroke="#d8ffd4" stroke-width="1.2"/>
+</g>
+</svg>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<path d="M16 8H48L57 23V48L44 57H20L7 48V23Z" fill="#102719" stroke="#52996a" stroke-width="2"/>
+<path d="M16 24L24 16H40L48 24V44L40 51H24L16 44Z" fill="#204b2b" stroke="#6bef83" stroke-width="2"/>
+<path d="M10 29V41M54 29V41M25 54H39" stroke="#45d965" stroke-width="3"/><path d="M25 30V8H39V30" fill="#285b37" stroke="#a1ffac" stroke-width="2"/>
+<path d="M28 9V3H36V9Z" fill="#d8ffcf" stroke="#65ed78" stroke-width="2"/>
+<circle cx="32" cy="34" r="11" fill="#112d1c" stroke="#78ff89" stroke-width="2"/>
+<path d="M28 27V41M36 27V41" stroke="#cbffd0" stroke-width="4"/><!-- Basic containment calibration scaffolding -->
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+<rect x="7" y="7" width="50" height="50" rx="6" stroke="#6be987" stroke-width="1.25" stroke-dasharray="4 4"/>
+<path d="M8 18V8H18 M46 8H56V18 M8 46V56H18 M46 56H56V46" stroke="#d8ffd4" stroke-width="2"/>
+<path d="M14 34L20 28 M44 28L50 34 M14 42L20 48 M44 48L50 42" stroke="#b5ed8e" stroke-width="1.5" stroke-dasharray="3 2"/>
+<circle cx="32" cy="34" r="22" stroke="#6be987" stroke-width="1" stroke-dasharray="2 6"/>
+<path d="M32 7V14M32 50V57" stroke="#d8ffd4" stroke-width="1.55"/>
+</g>
+</svg>

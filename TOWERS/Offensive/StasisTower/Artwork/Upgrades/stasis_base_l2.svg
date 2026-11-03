@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<path d="M16 8H48L57 23V48L44 57H20L7 48V23Z" fill="#102719" stroke="#52996a" stroke-width="2"/>
+<path d="M16 24L24 16H40L48 24V44L40 51H24L16 44Z" fill="#204b2b" stroke="#6bef83" stroke-width="2"/>
+<path d="M10 29V41M54 29V41M25 54H39" stroke="#45d965" stroke-width="3"/><!-- L2 temporal capture stabilizers / side field pylons -->
+<g stroke-linecap="round" stroke-linejoin="round">
+<path d="M9 20L17 12L23 16L21 28L10 31Z M55 20L47 12L41 16L43 28L54 31Z M9 47L16 40L24 45L22 55L15 55L9 50Z M55 47L48 40L40 45L42 55L49 55L55 50Z" fill="#3b6849" stroke="#102d1b" stroke-width="1.6"/>
+<path d="M12 22L18 17M46 17L52 22M12 47L18 51M46 51L52 47" stroke="#d8ffd4" stroke-width="1.8"/>
+<path d="M13 34L19 28L26 34L19 40Z M51 34L45 28L38 34L45 40Z" fill="#102d1b" stroke="#6be987" stroke-width="1.25"/>
+<circle cx="32" cy="34" r="18.8" fill="none" stroke="#6be987" stroke-width="1.4" stroke-dasharray="3 4"/>
+<path d="M25 12H39 M25 54H39" stroke="#b5ed8e" stroke-width="1.7"/>
+</g>
+</svg>

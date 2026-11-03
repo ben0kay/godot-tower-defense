@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<path d="M17 9H47L57 22V48L45 57H19L7 48V22Z" fill="#101e2b" stroke="#4b7187" stroke-width="2"/>
+<path d="M15 23L23 15H41L49 23V43L41 51H23L15 43Z" fill="#203f52" stroke="#72e5ee" stroke-width="2"/>
+<path d="M10 29V41M54 29V41M25 54H39" stroke="#40c9ec" stroke-width="3"/><!-- L2 reinforced cooling fins -->
+<g stroke-linecap="round" stroke-linejoin="round">
+<path d="M8 21L17 12L24 16L22 27L10 30Z M56 21L47 12L40 16L42 27L54 30Z M8 47L17 54L24 49L22 39L10 36Z M56 47L47 54L40 49L42 39L54 36Z" fill="#436b81" stroke="#10283e" stroke-width="1.6"/>
+<path d="M12 21L19 16 M45 16L52 21 M12 47L19 52 M45 52L52 47" stroke="#dcfcff" stroke-width="2"/>
+<circle cx="32" cy="34" r="19.2" fill="none" stroke="#75e8f9" stroke-width="1.4" stroke-dasharray="5 3"/>
+<path d="M11 34H20 M44 34H53 M24 54H40" stroke="#75e8f9" stroke-width="1.8"/>
+</g><!-- L3 armored cryo rings -->
+<g stroke-linecap="round" stroke-linejoin="round">
+<path d="M6 19L16 9L25 14L24 27L10 31L6 26Z M58 19L48 9L39 14L40 27L54 31L58 26Z M6 48L15 40L25 45L24 57L16 57L6 51Z M58 48L49 40L39 45L40 57L48 57L58 51Z" fill="#436b81" stroke="#10283e" stroke-width="1.6"/>
+<circle cx="32" cy="34" r="21" fill="none" stroke="#dcfcff" stroke-width="1.4" stroke-dasharray="4 4"/>
+<circle cx="32" cy="34" r="17" fill="none" stroke="#75e8f9" stroke-width="1.2"/>
+<path d="M9 21L17 13 M47 13L55 21 M9 49L17 54 M47 54L55 49" stroke="#aacfe0" stroke-width="2.3"/>
+<path d="M9 34H19 M45 34H55" stroke="#dcfcff" stroke-width="2"/>
+</g>
+</svg>

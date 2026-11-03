@@ -1,10 +1,18 @@
+## Level 1 construction and Levels 2–3 artwork — 2026-11-02
+
+Cryo Tower now uses the existing shared event-driven `TowerConstructionVisuals` presenter and a new `Artwork/Construction/CryoConstructionArt.tres` resource. Initial Level 1 building has foundation (0%), structural frame (35%) and partial emitter (70%) artwork; 100% restores the original fixed base and rotating/recoiling gun. Paid Level 2/3 upgrades have distinct finished split base/gun SVGs plus 35% and 70% assembly-stage composites. The upgraded artwork follows its original cyan and ice-blue palette, with increasing armour, field stabilizers and emitter detail.
+
+The tower's existing single `MuzzleA` marker remains at **(0, -25)**; damage, permanent slow, projectile handling, aiming, recoil, ammunition, prices, existing 4/5/6-second work durations, construction drones and gameplay are unchanged. This is cosmetic only; no new per-frame loops. See [construction artwork](Artwork/Construction/README.md) and [upgrade artwork](Artwork/Upgrades/README.md). Godot visual acceptance pending.
+
+---
+
 ## PA3 projectile handling
 
 Existing level rows author ±1/.75/.5° launch spread. Selected rank totals reduce spread by 0/5/10/15/20%; reductions are not accumulated across ranks. Each emitted shot snapshots effective handling and samples once at its real muzzle. Straight is the default; see the shared projectile accuracy plan. Existing damage, cadence, ammunition and recoil values are retained.
 
 ## Recoil presentation — 2026-10-20
 
-Fixed BaseSprite and rotating TurretPivot/RecoilRoot/Sprite now split the finished artwork; Muzzles travel with that assembly. The original composite SVG remains the catalog/ghost icon. The scene's Recoil node assigns Visuals/CryoTowerRecoil.tres (Enabled, kick distance/duration, return duration, maximum accumulated offset). Each funded shot/volley snapshots its launch and flash before moving the gun. Generic disabling/destruction resets the pose; idle controllers sleep. Selection colors base and gun. Combat balance, upgrades, construction gates and targeting are unchanged. Runtime/build/visual verification is pending. See [shared recoil notes](../../Shared/Weapons/Recoil/README.md).
+Fixed BaseSprite and rotating TurretPivot/RecoilRoot/Sprite now split the finished artwork; Muzzles travel with that assembly. The original composite SVG remains the catalog icon; the world placement ghost mirrors the finished Level 1 scene sprites. The scene's Recoil node assigns Visuals/CryoTowerRecoil.tres (Enabled, kick distance/duration, return duration, maximum accumulated offset). Each funded shot/volley snapshots its launch and flash before moving the gun. Generic disabling/destruction resets the pose; idle controllers sleep. Selection colors base and gun. Combat balance, upgrades, construction gates and targeting are unchanged. Runtime/build/visual verification is pending. See [shared recoil notes](../../Shared/Weapons/Recoil/README.md).
 
 # Cryo Tower — CT1–CT3
 
