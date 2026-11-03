@@ -2,7 +2,10 @@
 
 [ext_resource type="Script" path="res://TOWERS/Offensive/LaserTower/LaserTowerConfig.cs" id="1"]
 
+[ext_resource type="Resource" path="res://TOWERS/Offensive/LaserTower/Artwork/Construction/LaserConstructionArt.tres" id="construction"]
+
 [resource]
 script = ExtResource("1")
+ConstructionArt = ExtResource("construction")
 HeatEnabled = true
 TargetPreference = 1

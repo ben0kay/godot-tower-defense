@@ -1,3 +1,9 @@
+## Laser Tower staged construction and Level 2 artwork — 2026-11-03
+
+Laser Tower now has three 0/35/70% initial construction SVGs and 35/70% Level 2 upgrade stages, plus distinct Level 2 completed silver/yellow art. The pre-existing **single rotating Sprite2D** is retained and connected directly to the shared event-driven `TowerConstructionVisuals`; no split-gun restructuring or combat changes. Original beam origin, beam renderer, 4-second build, 5-second/175-Credit Level 2 upgrade, DPS, ammunition and heat remain unchanged. See [Laser Tower artwork notes](TOWERS/Offensive/LaserTower/Artwork/Upgrades/README.md). Owner Godot visual acceptance pending.
+
+---
+
 ## Sniper Tower Level 1 construction artwork completed — 2026-11-03
 
 Added the missing initial-build 0% foundation, 35% structural-frame and 70% partial-barrel SVGs to `TOWERS/Offensive/SniperTower/Artwork/Construction/` and registered their `BuildStages` in `SniperConstructionArt.tres`. The existing shared presenter now shows unfinished artwork during the four-second construction work, then restores the finished Level 1 base/extended gun at 100%. Existing Level 2/3 upgrade stage textures, long muzzle at (0,-39), damage delivery, economy, work duration and drones are untouched. Source-only sanity review; owner should inspect the transitions in Godot. See [Sniper construction notes](TOWERS/Offensive/SniperTower/Artwork/Construction/README.md).

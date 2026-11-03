@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+
+  <!-- Laser Tower initial housing, with the original 64x64 proportions and pivot. -->
+  <circle cx="32" cy="34" r="22" fill="#202a34" stroke="#b9c7ce" stroke-width="3"/>
+  <circle cx="32" cy="34" r="18" fill="#667580" stroke="#313e48" stroke-width="2"/>
+  <path d="M14 27l6-6 7 6-3 12-6 6-5-8z M50 27l-6-6-7 6 3 12 6 6 5-8z" fill="#93a1ac" stroke="#3c4954" stroke-width="1.5"/>
+  <path d="M15 31l5-5 3 4-2 7-5 3z M49 31l-5-5-3 4 2 7 5 3z" fill="#d2dce0"/>
+  <path d="M18 42l8 8h12l8-8-5-5H23z" fill="#8796a1" stroke="#394750" stroke-width="1.5"/>
+  <path d="M26 48h12l3-4H23z" fill="#d8e1e4"/>
+  <!-- Stage 2: partial shorter silver emitter, dim yellow energy assembly. -->
+  <path d="M24 36V16L29 11H35L40 16V36L32 43z" fill="#a3b3bc" stroke="#35424c" stroke-width="1.8"/>
+  <path d="M27 17l4-5v24l-4-4z" fill="#d9e2e5"/>
+  <path d="M37 16l2 3v15l-6 3V12z" fill="#647886"/>
+  <rect x="29" y="13" width="6" height="17" rx="1.5" fill="#77652e" stroke="#e2bb51" stroke-width="1"/>
+  <path d="M31 15v13" stroke="#e5c969" stroke-width="2" stroke-dasharray="3 3"/>
+  <path d="M27 11h10" stroke="#f5e18c" stroke-width="1.2" stroke-dasharray="3 2"/>
+  <circle cx="32" cy="41" r="5.5" fill="#344550" stroke="#b3c5cc" stroke-width="1.35"/>
+  <circle cx="32" cy="41" r="2.5" fill="#dfc464" opacity=".7"/>
+</svg>
