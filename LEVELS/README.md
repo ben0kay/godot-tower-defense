@@ -1,3 +1,9 @@
+## Level001 beginner waves — 2026-11-03
+
+The first campaign mission is now a gentle tower-defense introduction: **10 unshielded Standards → 14 unshielded Standards → 10 Standards followed by 10 mixed Standards/Scouts**, first Scouts only halfway through Wave 3. Level001 has **44 enemies total**, with no Bulwarks, shields or stealth. Its authoritative data has moved to editable `LEVELS/Level001/Level001Waves.tres` and `Level001Config.tres` points directly to that resource. Open it in the Wave Editor to add banner/narrator messages later; no messages have been authored yet. Map, portal/Citadel geometry and runtime spawning are unchanged. Older references to C#-only authoring and shield-heavy Level001 waves below are superseded. [Details](Level001/README.md).
+
+---
+
 ## Level003 — blank designer map and four waves (2026-10-27)
 
 New `LEVELS/Level003/Level003.tscn` is a separate **unpainted LevelTemplate copy**: all four tile layers remain empty, with one movable enemy portal and the Citadel in their original template positions. `Level003Config.tres` contains its own 1,200 starting Credits / 1,000 Citadel HP and four manual waves (18/22/26/32 enemies). Enemy001/Enemy002 form waves 1–2; Enemy004 (Bulwark, `medium_mk1`) enters in wave 3 and joins the finale. No shields or extra types. Mission 003 is now in Campaign and is Level002's direct Next; **painting walkable tiles connecting the portal to the Citadel is required before combat works**. No extra launcher or duplicated services. [Level003 notes](Level003/README.md). Local Godot/.NET verification pending.
