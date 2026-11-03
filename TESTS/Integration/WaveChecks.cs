@@ -39,7 +39,7 @@ public static class WaveChecks
             WaveCatalog.CompositionCounts(levelOne[2].Batches[1]).SequenceEqual(new[] { 5, 5 }),
             "Scouts first appear after the first half of Wave 3, mixed with Standards");
         Require(levelOne.SelectMany(w => w.Batches).SelectMany(b => b.Entries)
-                .All(e => !e.SpawnWithShield && !e.SpawnWithStealth && e.EnemyId is "basic_mk1" or "scout_mk1"),
+                .All(e => !e.SpawnWithShield && !e.SpawnWithStealth && (e.EnemyId == "basic_mk1" || e.EnemyId == "scout_mk1")),
             "Level001 includes only basic and scout drones, without optional flags");
         WaveCatalog.Validate(levelOne, scenes);
         Require(levelOne.All(w => w.Presentation == null), "Level001 leaves banner/narrator fields empty for the author");
