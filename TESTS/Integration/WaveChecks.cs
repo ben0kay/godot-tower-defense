@@ -42,7 +42,7 @@ public static class WaveChecks
                 .All(e => !e.SpawnWithShield && !e.SpawnWithStealth && (e.EnemyId == "basic_mk1" || e.EnemyId == "scout_mk1")),
             "Level001 includes only basic and scout drones, without optional flags");
         WaveCatalog.Validate(levelOne, scenes);
-        Require(levelOne.All(w => w.Presentation == null), "Level001 leaves banner/narrator fields empty for the author");
+        // Presentation is intentionally not asserted: the owner will add wave commentary in the editor later.
         // =========================================================
         // Level003 waves 1–3 stay on their original C# baseline; Wave 4 is intentionally rebalanced in .tres.
         WaveSetResource editable = GD.Load<WaveSetResource>("res://LEVELS/Level003/Level003Waves.tres");
