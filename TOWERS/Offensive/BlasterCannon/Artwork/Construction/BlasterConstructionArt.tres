@@ -7,6 +7,11 @@
 [ext_resource type="Texture2D" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Construction/stage1_frame.svg" id="5_frame"]
 [ext_resource type="Texture2D" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Construction/stage2_assembly.svg" id="6_assembly"]
 
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Upgrades/blaster_base_l2.svg" id="l2_base"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Upgrades/blaster_gun_l2.svg" id="l2_gun"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Upgrades/blaster_upgrade_l2_35.svg" id="l2_35"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Upgrades/blaster_upgrade_l2_70.svg" id="l2_70"]
+
 [sub_resource type="Resource" id="Stage0"]
 script = ExtResource("2_stage")
 Texture = ExtResource("4_foundation")
@@ -21,9 +26,24 @@ script = ExtResource("2_stage")
 Progress = 0.7
 Texture = ExtResource("6_assembly")
 
+[sub_resource type="Resource" id="UpgradeL2_35"]
+script = ExtResource("2_stage")
+Progress = 0.35
+Texture = ExtResource("l2_35")
+
+[sub_resource type="Resource" id="UpgradeL2_70"]
+script = ExtResource("2_stage")
+Progress = 0.7
+Texture = ExtResource("l2_70")
+
 [sub_resource type="Resource" id="Level2"]
 script = ExtResource("3_level")
 Level = 2
+FinishedBaseTexture = ExtResource("l2_base")
+FinishedGunTexture = ExtResource("l2_gun")
+UpgradeTexture = ExtResource("l2_35")
+UpgradeProgress = 0.35
+UpgradeStages = Array[ExtResource("2_stage")]([SubResource("UpgradeL2_35"), SubResource("UpgradeL2_70")])
 
 [resource]
 script = ExtResource("1_art")

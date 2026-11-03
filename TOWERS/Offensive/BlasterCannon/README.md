@@ -1,3 +1,13 @@
+## Level 2 artwork makeover — 2026-11-02
+
+Blaster Cannon now has unique completed Level 2 **fixed base and rotating/recoiling single-gun SVGs**, plus distinct 35% and 70% paid-upgrade assembly composites. The Level 2 design adds reinforced armoured outriggers, a gold-braced barrel shroud, cooling vents and an improved orange core. The shared `ConstructionVisuals` has been wired to the original base/gun layers so it can swap the completed purchased level without affecting aim or recoil.
+
+The original Level 1 **0% foundation, 35% structural frame, 70% partial cannon and 100% finished** initial build sequence is preserved. During a paid upgrade the old finished tier remains until 35%; then scaffold visuals appear, at 70% the new cannon appears under final calibration, and at 100% the separate finished Level 2 base and gun take over. The existing **Level 2: 200 Credits and 6 seconds** is unchanged. Blaster currently has only Level 1 and Level 2; no Level 3 was added. `MuzzleA` remains **(0,-30)**.
+
+No changes to firing logic, splash, ammunition, heat, turn speed, recoil, upgrades, drones, or work timing. See [upgrade artwork](Artwork/Upgrades/README.md) and [construction](Artwork/Construction/README.md). Source implemented; owner visual check in Godot pending.
+
+---
+
 ## HD4 cannon heat (2026-10-26)
 
 The shipped Blaster Cannon preset now enables approximately **4-minute** continuous funded fire and **12-second** recovery to 35%. Per-shot heat uses each purchased level's authored rate; Heat Enabled/Minutes/Recovery are Inspector editable. Rocket Tower inherits the same policy in an independent resource. No new launch logic or damage/price/ammo changes; Godot/runtime acceptance pending.

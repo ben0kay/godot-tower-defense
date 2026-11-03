@@ -1,3 +1,13 @@
+## Rocket Level 2 / 3 artwork makeover — 2026-11-02
+
+Rocket Tower now has unique finished **fixed base / rotating twin-launcher** artwork at both Level 2 and Level 3 and separately illustrated 35% / 70% paid-upgrade assembly stages for each. L2 adds stronger external braces, cooled dual tubes and central reactor detailing. L3 becomes a heavier twin-launcher system with thick armoured hoods, gold/cyan trim, stabilizer arms and a brighter focusing core. Both keep the exact two launch points at **(-10,-25)** and **(10,-25)**.
+
+The original Level 1 **foundation 0% / frame 35% / partial twin launcher 70% / finished 100%** construction art remains intact. During paid Level 2 and Level 3 upgrades, previous completed hardware stays visible until 35%, then a schematic scaffold composite appears; 70% shows the next tier mostly assembled, and 100% restores the new separate fixed and rotating art. The existing `TowerConstructionVisuals` node now references `BaseSprite` and `TurretPivot/RecoilRoot/Sprite`; the typed art stages live in `Artwork/Construction/RocketConstructionArt.tres`.
+
+No changes to heat, ammunition, AoE, rocket flight, launch sequence, recoil, construction drones or **L2 6s / L3 7s** upgrade work. See [upgrade artwork](Artwork/Upgrades/README.md) and [original construction](Artwork/Construction/README.md). Source implemented, owner Godot visual check pending.
+
+---
+
 ## HD4 rocket heat (2026-10-26)
 
 The shipped Rocket config now enables approximately **4-minute** continuous firing heat and **12-second** recovery to 35%. It reuses its Blaster-derived Inspector heat policy but resolves heat against Rocket's own level-dependent rocket rate; Rocket settings stay independent of Blaster. Projectiles, splash, ammo and purchases are unchanged. Source-implemented; live runtime acceptance pending.

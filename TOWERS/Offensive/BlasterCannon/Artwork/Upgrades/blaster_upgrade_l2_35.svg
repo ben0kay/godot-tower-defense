@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<path d="M12 22 22 12H42L52 22V48L42 58H22L12 48Z" fill="#263b47" stroke="#e6a74b" stroke-width="2"/>
+<circle cx="32" cy="36" r="16" fill="#385563" stroke="#9ab5be" stroke-width="2"/>
+<path d="M24 34V7L20 3H44L40 7V34Z" fill="#7c6e4d" stroke="#ffb35a" stroke-width="2"/>
+<path d="M27 8H37V24H27Z" fill="#17232d"/>
+<circle cx="32" cy="36" r="7" fill="#f7a341"/>
+  <!-- 35%: visible temporary cannon cradle and armor blueprints over the current completed tier. -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="7" y="7" width="50" height="50" rx="6" stroke="#e6ac6b" stroke-width="1.3" stroke-dasharray="4 3"/>
+    <path d="M8 17V8H17 M47 8H56V17 M8 47V56H17 M47 56H56V47" stroke="#ffd290" stroke-width="2"/>
+    <path d="M18 29V8L23 4 M46 29V8L41 4" stroke="#91d8db" stroke-width="1.5" stroke-dasharray="3 3"/>
+    <path d="M12 20L21 12L26 15L24 26L12 28Z M52 20L43 12L38 15L40 26L52 28Z" stroke="#e8bf7f" stroke-width="1.35" stroke-dasharray="2 2"/>
+    <circle cx="32" cy="36" r="22" stroke="#a3dce3" stroke-width=".9" stroke-dasharray="2 5"/>
+    <path d="M16 51H48" stroke="#f3bf78" stroke-width="1.1" stroke-dasharray="3 4"/>
+  </g>
+</svg>

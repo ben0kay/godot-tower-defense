@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<path d="M13 22L23 13H41L51 22V46L42 55H22L13 46Z" fill="#293945" stroke="#8fb4bf" stroke-width="2"/>
+<path d="M18 27L24 20H40L46 27V43L39 49H25L18 43Z" fill="#405968" stroke="#162935" stroke-width="1.5"/>
+<path d="M15 44L24 51M49 44L40 51" stroke="#62c5df" stroke-width="2" stroke-linecap="round"/>
+  <!-- L2 Rocket launcher: braced chassis and dual coolant outlets. -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10 19L21 10L25 17L21 26L10 30Z M54 19L43 10L39 17L43 26L54 30Z" fill="#506a79" stroke="#1a3442" stroke-width="1.55"/>
+    <path d="M10 45L20 38L26 46L23 55L14 54Z M54 45L44 38L38 46L41 55L50 54Z" fill="#506a79" stroke="#1a3442" stroke-width="1.55"/>
+    <path d="M13 20L20 15 M44 15L51 20 M13 46L19 50 M45 50L51 46" stroke="#9fe8f6" stroke-width="2.0"/>
+    <circle cx="32" cy="36" r="18.5" fill="none" stroke="#72d7ea" stroke-width="1.3" stroke-dasharray="4 3"/>
+    <path d="M12 32H19 M45 32H52 M12 38H19 M45 38H52" stroke="#b9f4f6" stroke-width="1.75"/>
+    <path d="M25 13H39 M25 54H39" stroke="#cddfe5" stroke-width="1.5"/>
+    <circle cx="15" cy="35" r="1.5" fill="#b1f5fc"/>
+    <circle cx="49" cy="35" r="1.5" fill="#b1f5fc"/>
+  </g>
+  <!-- L3 Rocket launcher: heavy external shield plates and high-output reactor mounts. -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M7 19L18 8L25 13L25 25L13 32L7 27Z M57 19L46 8L39 13L39 25L51 32L57 27Z" fill="#587388" stroke="#152b3c" stroke-width="1.65"/>
+    <path d="M7 46L15 40L25 46L24 56L17 58L7 50Z M57 46L49 40L39 46L40 56L47 58L57 50Z" fill="#587388" stroke="#152b3c" stroke-width="1.65"/>
+    <path d="M10 21L19 13M45 13L54 21M10 48L18 54M46 54L54 48" stroke="#f3c681" stroke-width="2.25"/>
+    <circle cx="32" cy="36" r="20.1" fill="none" stroke="#ebc785" stroke-width="1.4" stroke-dasharray="4 4"/>
+    <circle cx="32" cy="36" r="16.8" fill="none" stroke="#c1f9ff" stroke-width="1.2"/>
+    <path d="M9 35H17 M47 35H55" stroke="#9eeaf6" stroke-width="2.4"/>
+    <path d="M17 44L23 48 M47 44L41 48" stroke="#b5e1ec" stroke-width="1.6"/>
+    <path d="M26 11H38M26 55H38" stroke="#f6d8a8" stroke-width="1.7"/>
+    <circle cx="14" cy="35" r="2.3" fill="#f1d8a3" stroke="#79cce1" stroke-width=".95"/>
+    <circle cx="50" cy="35" r="2.3" fill="#f1d8a3" stroke="#79cce1" stroke-width=".95"/>
+  </g>
+<path d="M16 31V10L21 5H28L29 31L25 38H20Z M48 31V10L43 5H36L35 31L39 38H44Z" fill="#a5bdc9" stroke="#234353" stroke-width="2"/>
+<path d="M19 11H26V28H19Z M38 11H45V28H38Z" fill="#263946"/>
+<path d="M20 13H25V23H20Z M39 13H44V23H39Z" fill="#71d9ed"/>
+<path d="M16 8L20 4H25L28 8H16Z M36 8L39 4H44L48 8H36Z" fill="#d9e9ec" stroke="#61bfd6" stroke-width="1.5"/>
+<circle cx="32" cy="38" r="10" fill="#203a46" stroke="#80b6c6" stroke-width="2"/>
+<circle cx="32" cy="38" r="5" fill="#4ebed8"/>
+<circle cx="32" cy="38" r="2.5" fill="#dcfdff"/>
+  <!-- L2 Rocket launcher: preserve exactly two tube centres and launch positions (+/-10,-25). -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M13 30L13 9L18 5L29 5L31 13L31 31L26 40H18Z M51 30L51 9L46 5L35 5L33 13L33 31L38 40H46Z" fill="#546f7d" stroke="#1a3644" stroke-width="1.5"/>
+    <path d="M17 11L19 9H27L28 31H19L17 27Z M47 11L45 9H37L36 31H45L47 27Z" fill="#284656" stroke="#afdeed" stroke-width="1.2"/>
+    <path d="M18 15H26M18 19H26M18 23H26 M38 15H46M38 19H46M38 23H46" stroke="#91cbdc" stroke-width="1.2"/>
+    <path d="M18 5.5H27M37 5.5H46" stroke="#eafaff" stroke-width="2"/>
+    <path d="M19 9L22 11L25 9 M39 9L42 11L45 9" fill="none" stroke="#92eafa" stroke-width="1.3"/>
+    <path d="M23 33L28 28H36L41 33L42 43L36 48H28L22 43Z" fill="#365568" stroke="#192c39" stroke-width="1.6"/>
+    <circle cx="32" cy="38" r="8" fill="#2c6075" stroke="#a9eaf5" stroke-width="1.6"/>
+    <circle cx="32" cy="38" r="4" fill="#9af4ff" stroke="#dbfeff" stroke-width="1"/>
+    <path d="M25 45H28M36 45H39" stroke="#8fdce9" stroke-width="1.5"/>
+  </g>
+  <!-- L3: twin missile capsules gain heavy armored launch hoods and active calibration bands. -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 29L12 7L18 2H28L32 10L32 30L26 41L15 36Z M53 29L52 7L46 2H36L32 10L32 30L38 41L49 36Z" fill="#627c8e" stroke="#162e40" stroke-width="1.8"/>
+    <path d="M16 11L18 7H28L29 31L24 35H17Z M48 11L46 7H36L35 31L40 35H47Z" fill="#244455" stroke="#b0eef7" stroke-width="1.15"/>
+    <path d="M15 4L20 1.8H27L30 6.8L27 10H16Z M49 4L44 1.8H37L34 6.8L37 10H48Z" fill="#294857" stroke="#f2cb88" stroke-width="1.4"/>
+    <path d="M20 5H25M39 5H44" stroke="#b8faff" stroke-width="2.8"/>
+    <path d="M17 14H28 M17 19H28 M17 24H28 M36 14H47 M36 19H47 M36 24H47" stroke="#9bd5e5" stroke-width="1.3"/>
+    <path d="M13 32L17 36L24 39 M51 32L47 36L40 39" fill="none" stroke="#edc77f" stroke-width="1.55"/>
+    <path d="M21 36L27 30H37L43 36L42 44L36 50H28L22 44Z" fill="#385b6c" stroke="#172e3c" stroke-width="1.7"/>
+    <path d="M24 38L28 34H36L40 38" fill="none" stroke="#ebc989" stroke-width="1.5"/>
+    <circle cx="32" cy="38" r="8.7" fill="#25536b" stroke="#b8f6ff" stroke-width="1.6"/>
+    <circle cx="32" cy="38" r="5.3" fill="#72d5ef" stroke="#e6ffff" stroke-width="1.15"/>
+    <circle cx="32" cy="38" r="2.2" fill="#efffff"/>
+    <path d="M24 46H29 M35 46H40" stroke="#9ce2eb" stroke-width="1.8"/>
+  </g>
+  <!-- 70% high-tier: newly armored twin launchers awaiting final alignment. -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="5" y="5" width="54" height="54" rx="6" stroke="#f0ca8a" stroke-width="1.15" stroke-dasharray="5 5"/>
+    <path d="M7 17V7H17 M47 7H57V17 M7 47V57H17 M47 57H57V47" stroke="#c3f5f8" stroke-width="2"/>
+    <path d="M11 32H19 M45 32H53" stroke="#edca90" stroke-width="1.65"/>
+    <circle cx="32" cy="36" r="23" stroke="#b2eaf3" stroke-width=".9" stroke-dasharray="2 6"/>
+    <path d="M16 10L20 13M48 10L44 13 M15 51L20 47 M49 51L44 47" stroke="#f7cd88" stroke-width="1.55"/>
+    <path d="M24 53H40" stroke="#9be7f1" stroke-width="1.2" stroke-dasharray="2 2"/>
+  </g>
+</svg>

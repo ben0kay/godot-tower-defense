@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<path d="M16 31V10L21 5H28L29 31L25 38H20Z M48 31V10L43 5H36L35 31L39 38H44Z" fill="#a5bdc9" stroke="#234353" stroke-width="2"/>
+<path d="M19 11H26V28H19Z M38 11H45V28H38Z" fill="#263946"/>
+<path d="M20 13H25V23H20Z M39 13H44V23H39Z" fill="#71d9ed"/>
+<path d="M16 8L20 4H25L28 8H16Z M36 8L39 4H44L48 8H36Z" fill="#d9e9ec" stroke="#61bfd6" stroke-width="1.5"/>
+<circle cx="32" cy="38" r="10" fill="#203a46" stroke="#80b6c6" stroke-width="2"/>
+<circle cx="32" cy="38" r="5" fill="#4ebed8"/>
+<circle cx="32" cy="38" r="2.5" fill="#dcfdff"/>
+  <!-- L2 Rocket launcher: preserve exactly two tube centres and launch positions (+/-10,-25). -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M13 30L13 9L18 5L29 5L31 13L31 31L26 40H18Z M51 30L51 9L46 5L35 5L33 13L33 31L38 40H46Z" fill="#546f7d" stroke="#1a3644" stroke-width="1.5"/>
+    <path d="M17 11L19 9H27L28 31H19L17 27Z M47 11L45 9H37L36 31H45L47 27Z" fill="#284656" stroke="#afdeed" stroke-width="1.2"/>
+    <path d="M18 15H26M18 19H26M18 23H26 M38 15H46M38 19H46M38 23H46" stroke="#91cbdc" stroke-width="1.2"/>
+    <path d="M18 5.5H27M37 5.5H46" stroke="#eafaff" stroke-width="2"/>
+    <path d="M19 9L22 11L25 9 M39 9L42 11L45 9" fill="none" stroke="#92eafa" stroke-width="1.3"/>
+    <path d="M23 33L28 28H36L41 33L42 43L36 48H28L22 43Z" fill="#365568" stroke="#192c39" stroke-width="1.6"/>
+    <circle cx="32" cy="38" r="8" fill="#2c6075" stroke="#a9eaf5" stroke-width="1.6"/>
+    <circle cx="32" cy="38" r="4" fill="#9af4ff" stroke="#dbfeff" stroke-width="1"/>
+    <path d="M25 45H28M36 45H39" stroke="#8fdce9" stroke-width="1.5"/>
+  </g>
+  <!-- L3: twin missile capsules gain heavy armored launch hoods and active calibration bands. -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 29L12 7L18 2H28L32 10L32 30L26 41L15 36Z M53 29L52 7L46 2H36L32 10L32 30L38 41L49 36Z" fill="#627c8e" stroke="#162e40" stroke-width="1.8"/>
+    <path d="M16 11L18 7H28L29 31L24 35H17Z M48 11L46 7H36L35 31L40 35H47Z" fill="#244455" stroke="#b0eef7" stroke-width="1.15"/>
+    <path d="M15 4L20 1.8H27L30 6.8L27 10H16Z M49 4L44 1.8H37L34 6.8L37 10H48Z" fill="#294857" stroke="#f2cb88" stroke-width="1.4"/>
+    <path d="M20 5H25M39 5H44" stroke="#b8faff" stroke-width="2.8"/>
+    <path d="M17 14H28 M17 19H28 M17 24H28 M36 14H47 M36 19H47 M36 24H47" stroke="#9bd5e5" stroke-width="1.3"/>
+    <path d="M13 32L17 36L24 39 M51 32L47 36L40 39" fill="none" stroke="#edc77f" stroke-width="1.55"/>
+    <path d="M21 36L27 30H37L43 36L42 44L36 50H28L22 44Z" fill="#385b6c" stroke="#172e3c" stroke-width="1.7"/>
+    <path d="M24 38L28 34H36L40 38" fill="none" stroke="#ebc989" stroke-width="1.5"/>
+    <circle cx="32" cy="38" r="8.7" fill="#25536b" stroke="#b8f6ff" stroke-width="1.6"/>
+    <circle cx="32" cy="38" r="5.3" fill="#72d5ef" stroke="#e6ffff" stroke-width="1.15"/>
+    <circle cx="32" cy="38" r="2.2" fill="#efffff"/>
+    <path d="M24 46H29 M35 46H40" stroke="#9ce2eb" stroke-width="1.8"/>
+  </g>
+</svg>

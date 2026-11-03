@@ -1,3 +1,9 @@
+## Blaster Cannon and Rocket Tower purchased-tier artwork — 2026-11-02
+
+Blaster Cannon now has distinct finished Level 2 fixed-base/rotating-gun art and two upgrade-stage composites (35% and 70%). Rocket Tower now has separate Level 2 and Level 3 dual-launcher base/gun sets, with two 35%/70% upgrade-stage composites for each tier. Both reuse the already installed `TowerConstructionVisuals` and `TowerConstructionArt`; original initial-building stages are untouched. The existing Cannon **two** and Rocket **three** level tables, damage, work timers, recoil, projectile origins, launch behaviour, ammo and heat are unchanged. [Blaster artwork](TOWERS/Offensive/BlasterCannon/Artwork/Upgrades/README.md) · [Rocket artwork](TOWERS/Offensive/RocketTower/Artwork/Upgrades/README.md). Source implemented; owner runtime visual approval pending.
+
+---
+
 ## World placement preview now uses completed Level 1 tower art — 2026-11-02
 
 The green/red placement ghost now mirrors the real built Level 1 sprites from each tower's scene, instead of the separate `TowerDefinition.Icon` resource. Shared `TowerPlacementGhost` makes an inert visual-only copy on tower choice changes, keeping authored base/gun layers, full dimensions and multi-cell scale. The Sniper's longer barrel is no longer compressed into a 64×64 icon. Build-tray thumbnails still have their own catalog icon. See [placement notes](TOWERS/Placement/README.md). Source validation only; owner should inspect in Godot.

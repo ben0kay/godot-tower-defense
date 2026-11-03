@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<path d="M13 22L23 13H41L51 22V46L42 55H22L13 46Z" fill="#293945" stroke="#8fb4bf" stroke-width="2"/>
+<path d="M18 27L24 20H40L46 27V43L39 49H25L18 43Z" fill="#405968" stroke="#162935" stroke-width="1.5"/>
+<path d="M15 44L24 51M49 44L40 51" stroke="#62c5df" stroke-width="2" stroke-linecap="round"/>
+  <!-- L2 Rocket launcher: braced chassis and dual coolant outlets. -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10 19L21 10L25 17L21 26L10 30Z M54 19L43 10L39 17L43 26L54 30Z" fill="#506a79" stroke="#1a3442" stroke-width="1.55"/>
+    <path d="M10 45L20 38L26 46L23 55L14 54Z M54 45L44 38L38 46L41 55L50 54Z" fill="#506a79" stroke="#1a3442" stroke-width="1.55"/>
+    <path d="M13 20L20 15 M44 15L51 20 M13 46L19 50 M45 50L51 46" stroke="#9fe8f6" stroke-width="2.0"/>
+    <circle cx="32" cy="36" r="18.5" fill="none" stroke="#72d7ea" stroke-width="1.3" stroke-dasharray="4 3"/>
+    <path d="M12 32H19 M45 32H52 M12 38H19 M45 38H52" stroke="#b9f4f6" stroke-width="1.75"/>
+    <path d="M25 13H39 M25 54H39" stroke="#cddfe5" stroke-width="1.5"/>
+    <circle cx="15" cy="35" r="1.5" fill="#b1f5fc"/>
+    <circle cx="49" cy="35" r="1.5" fill="#b1f5fc"/>
+  </g>
+<path d="M16 31V10L21 5H28L29 31L25 38H20Z M48 31V10L43 5H36L35 31L39 38H44Z" fill="#a5bdc9" stroke="#234353" stroke-width="2"/>
+<path d="M19 11H26V28H19Z M38 11H45V28H38Z" fill="#263946"/>
+<path d="M20 13H25V23H20Z M39 13H44V23H39Z" fill="#71d9ed"/>
+<path d="M16 8L20 4H25L28 8H16Z M36 8L39 4H44L48 8H36Z" fill="#d9e9ec" stroke="#61bfd6" stroke-width="1.5"/>
+<circle cx="32" cy="38" r="10" fill="#203a46" stroke="#80b6c6" stroke-width="2"/>
+<circle cx="32" cy="38" r="5" fill="#4ebed8"/>
+<circle cx="32" cy="38" r="2.5" fill="#dcfdff"/>
+  <!-- L2 Rocket launcher: preserve exactly two tube centres and launch positions (+/-10,-25). -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M13 30L13 9L18 5L29 5L31 13L31 31L26 40H18Z M51 30L51 9L46 5L35 5L33 13L33 31L38 40H46Z" fill="#546f7d" stroke="#1a3644" stroke-width="1.5"/>
+    <path d="M17 11L19 9H27L28 31H19L17 27Z M47 11L45 9H37L36 31H45L47 27Z" fill="#284656" stroke="#afdeed" stroke-width="1.2"/>
+    <path d="M18 15H26M18 19H26M18 23H26 M38 15H46M38 19H46M38 23H46" stroke="#91cbdc" stroke-width="1.2"/>
+    <path d="M18 5.5H27M37 5.5H46" stroke="#eafaff" stroke-width="2"/>
+    <path d="M19 9L22 11L25 9 M39 9L42 11L45 9" fill="none" stroke="#92eafa" stroke-width="1.3"/>
+    <path d="M23 33L28 28H36L41 33L42 43L36 48H28L22 43Z" fill="#365568" stroke="#192c39" stroke-width="1.6"/>
+    <circle cx="32" cy="38" r="8" fill="#2c6075" stroke="#a9eaf5" stroke-width="1.6"/>
+    <circle cx="32" cy="38" r="4" fill="#9af4ff" stroke="#dbfeff" stroke-width="1"/>
+    <path d="M25 45H28M36 45H39" stroke="#8fdce9" stroke-width="1.5"/>
+  </g>
+  <!-- 70%: dual launcher tubes fitted; technician scaffold marks final alignment. -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="7" y="7" width="50" height="50" rx="6" stroke="#a4e6f2" stroke-width="1.05" stroke-dasharray="5 5"/>
+    <path d="M8 17V8H17 M47 8H56V17 M8 47V56H17 M47 56H56V47" stroke="#d6eff1" stroke-width="1.9"/>
+    <path d="M12 32H17 M47 32H52 M12 38H17 M47 38H52" stroke="#8ddff2" stroke-width="1.6"/>
+    <path d="M18 11L24 8 M46 11L40 8" stroke="#f1d19a" stroke-width="1.4" stroke-dasharray="3 2"/>
+    <path d="M23 50H41" stroke="#87dbe8" stroke-width="1.2" stroke-dasharray="2 2"/>
+  </g>
+</svg>
