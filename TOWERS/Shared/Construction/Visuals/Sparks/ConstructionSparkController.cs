@@ -81,10 +81,11 @@ public partial class ConstructionSparkController : Node
         var hotMaterial = (ParticleProcessMaterial)weldingSource.Duplicate();
         welding.ProcessMaterial = hotMaterial;
         float hotCoverage = Mathf.Clamp(Config.WeldingFootprintCoverage, .15f, 1f);
-        // Shortest footprint axis keeps a central ring circular even on 2x2 / 3x2 buildings.
-        // Godot's radial velocity then pushes each spark outward from its spawn angle.
-        hotMaterial.EmissionSphereRadius = Mathf.Clamp(
-            Mathf.Min(area.X, area.Y) * hotCoverage * .5f, 3f, 24f);
+        // Keep the radial spawn circle close to the footprint boundary, even on large buildings.
+        // Use the shorter axis so its ring remains inside rectangular 2x2 / 3x2 sites.
+        // Radial velocity continues to carry each spark outward from its random ring angle.
+        hotMaterial.EmissionSphereRadius = Mathf.Max(
+            3f, Mathf.Min(area.X, area.Y) * hotCoverage * .5f);
         welding.Amount = Mathf.Clamp(Config.WeldingParticlesPerSite, 1, 24);
         welding.Lifetime = Mathf.Clamp(Config.WeldingLifetime, .1f, .8f);
         welding.Modulate = Config.WeldingTint;

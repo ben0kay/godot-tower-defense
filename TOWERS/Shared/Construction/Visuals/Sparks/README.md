@@ -1,3 +1,19 @@
+## Wide radial welding ring — 2026-11-03 (current default)
+
+The sharp white/yellow `WeldingSparks` layer now spawns from a **wide circle almost at the tower's footprint edge**. `WeldingFootprintCoverage` defaults to **85% of the shorter footprint axis** (previously 38%) and controls the ring **diameter**. Removed the previous **24 px radius cap**, which kept larger buildings looking center-focused. With the usual 64px cell size, examples are:
+
+| Building footprint | Short side | Hot spark ring diameter | Radius |
+| --- | ---: | ---: | ---: |
+| 1×1 | 64px | 54.4px | 27.2px |
+| 2×2 | 128px | 108.8px | 54.4px |
+| 3×2 | 128px | 108.8px | 54.4px |
+
+The ring remains round and centered inside rectangular footprints, so the long sides of a 3×2 building are not necessarily reached; outward movement can carry sparks farther. Godot's existing **360° outward radial velocity**, random starting angles, white-hot color ramp, short lifetime and tangential jitter are unchanged. The original soft orange **rectangle-distributed layer is completely unchanged**.
+
+Only the active site's GPU material emission radius is assigned **once** at work registration. No change to work timings, drone hold/release, particle counts, GPU motion, additional per-frame processing, pause, save or teardown. Inspector control remains `DefaultConstructionSparkConfig.tres → WeldingFootprintCoverage`; reduce it if you prefer a smaller welding ring. Desktop visual/FPS acceptance still pending.
+
+---
+
 ## Centered radial welding bursts — 2026-11-03
 
 The sharp white/yellow `WeldingSparks` layer now launches from a **small circular ring at the centre of the tower** instead of a rectangle with an upward-biased random direction. Its `ParticleProcessMaterial` uses `emission_shape = 2` (sphere surface, circular in 2D), a center `velocity_pivot`, **positive random radial velocity (72–132 px/s)**, mild tangential jitter (±18) and reduced gravity. Each spark starts at a random angle and moves outward along that angle, with enough speed and sideways variation to avoid a perfectly uniform pinwheel. The 0.34-second duration, crisp sprite, bright color gradient, density and small bursts remain unchanged.

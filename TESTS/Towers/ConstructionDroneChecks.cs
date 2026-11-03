@@ -94,6 +94,11 @@ public partial class ConstructionDroneChecks : Node
             radialMotion.EmissionSphereRadius > 0f && radialMotion.RadialVelocityMin > 0f &&
             Mathf.IsZeroApprox(radialMotion.InitialVelocityMax),
             "Hot sparks launch outward from a centered radial ring, not an upward cone");
+        float ringDiameter = Mathf.Min(tower.Footprint.X, tower.Footprint.Y) *
+            f.Spawns.Paths.Navigation.Grid.Config.CellSize * sparks.Config.WeldingFootprintCoverage;
+        Require(Mathf.IsEqualApprox(radialMotion.EmissionSphereRadius * 2f, ringDiameter) &&
+            radialMotion.EmissionSphereRadius > 24f,
+            "Hot welding ring reaches 85% of the shortest tower side with no old 24px cap");
         var flashes = builders.GetNode<ConstructionCompletionFlash>("CompletionFlashes");
         Require(drone.BeamVisible && beam.AnimationSeconds > 0 && status.Text == "CONSTRUCTING" &&
             builders.Releases == 1 && clock.HeldCount == 0, "Animated beam deployed before one release");
