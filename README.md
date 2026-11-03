@@ -1,3 +1,9 @@
+## Level001 gentle introductory waves and Wave Editor narration — 2026-11-03
+
+Replaced the first mission's previous shield-heavy stress-test waves with **three gentle tutorial encounters (10 / 14 / 20, total 44)**. Waves 1–2 contain only Standard Drones; Wave 3 spawns ten Standards before its second, ten-ship weighted batch introduces five faster Scouts mixed with five Standards. No shields, stealth, Bulwarks or support enemies. `Level001Config.tres.WaveSource` now points to the new `LEVELS/Level001/Level001Waves.tres`, editable through Godot's Wave Editor so the user can write **banner/commentary/narration** later. The presentation fields remain blank. Terrain, tower balance, money, mission progression and shared runtime unchanged. [Level001 design](LEVELS/Level001/README.md).
+
+---
+
 ## Level003 Wave 4 — integrated Bulwark escorts (2026-11-03)
 
 Wave 4 now interleaves eight stronger Bulwarks with the twelve Standard and twelve Scout ships across **two faster mixed batches** (8/4/4 and 4/8/4), instead of sending the eight Bulwarks alone at the end. The 0.55s/0.50s spawn intervals and 0.4s between batches make the finale denser without increasing the 32-ship total or changing waves 1–3. Authoritative source: `LEVELS/Level003/Level003Waves.tres` (Wave Editor). C# baseline remains a historical test reference; focused wave assertions updated. [Level003 details](LEVELS/Level003/README.md).
