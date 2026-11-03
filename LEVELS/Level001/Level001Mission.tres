@@ -4,6 +4,6 @@
 script = ExtResource("1")
 Number = 1
 Title = "DEFEND THE CITADEL"
-Description = "Initial combat test map with compact routes."
+Description = "Learn tower defense against Standard Drones; fast Scouts join midway through Wave 3."
 MapScenePath = "res://LEVELS/Level001/Level001.tscn"
 LegacyLauncher = "res://Main.tscn"

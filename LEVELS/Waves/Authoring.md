@@ -1,3 +1,11 @@
+## Level001 beginner mission and editable wave narration — 2026-11-03
+
+**Current authoritative source:** `LEVELS/Level001/Level001Waves.tres`, assigned in `Level001Config.tres.WaveSource`. The three introductory waves contain **10 Standard**, **14 Standard**, then **10 Standard followed by 10 mixed (5 Standard + 5 Scout)**. The fast Scouts first appear **after half of Wave 3's scheduled ships have spawned**. All 44 enemies are plain/unshielded/unstealthed; there are no Bulwarks or support units. Spawning intervals are 0.9s, 0.8s, and in Wave 3 0.75s/0.65s, with a one-second delay before the mixed half.
+
+Use **Godot → Wave Editor → Open .tres → Level001Waves.tres** to change the batches or write per-wave **Banner Title, Banner Description, Speaker, Narration, Alert** later. These presentation fields are intentionally blank so the user can author them. Keep the initial wave-start banner default until custom text is supplied. `Level001Waves.cs` mirrors the initial beginner data as an optional C# reference; it is **not** loaded by the mission. Historical references to Level001's old 38/40/55 shield-heavy combat stress recipe below are superseded, including shield counts, examples and guidance to edit Level001Waves.cs directly. Other levels and the shared wave scheduler are unchanged.
+
+---
+
 ## SE1 — stealth enemies and reveal beacon — implemented 2026-10-20 UTC
 
 Waves may now author `Enemy("basic_mk1", stealth: true)` independently of `shield: true`. Default spawns remain ordinary; no existing wave/map was changed. Stealth ships render at30% alpha, revealed ships at100%, with configurable/dimmed defense feedback that composes with Cryo/Stasis. All aimed towers share detection filtering and cached-lock validation; private TowerConfig.CanDetectStealth opts a specialist in without globally revealing enemies. Existing attacks already emitted, splash and untargeted Shockwave remain able to damage hidden ships (stealth is targeting, not immunity).

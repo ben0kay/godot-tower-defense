@@ -23,18 +23,26 @@ public static class WaveChecks
         NarrationChecks.Run(battle);
         var scenes = WaveCatalog.LoadScenes();
         // =========================================================
-        // Playtest wave data must retain authored counts/shield mixes without introducing support regen.
-        WaveDefinition[] levelOne = Level001Waves.Create();
+        // =========================================================
+        // Level001 is the beginner mission: two plain Standard waves, then Scouts halfway through Wave 3.
+        WaveSetResource levelOneResource = GD.Load<WaveSetResource>("res://LEVELS/Level001/Level001Waves.tres");
+        Require(levelOneResource != null, "Level001 uses an editor-authored wave resource");
+        WaveDefinition[] levelOne = levelOneResource.Build();
         int[] waveTotals = levelOne.Select(w => w.Batches.Sum(b => b.Count)).ToArray();
-        int[] shieldTotals = levelOne.Select(w => w.Batches.Sum(b =>
-            WaveCatalog.Compose(b, new RandomNumberGenerator { Seed = 17 }).Count(e => e.SpawnWithShield))).ToArray();
-        Require(waveTotals.SequenceEqual(new[] { 38, 40, 55 }) &&
-            shieldTotals.SequenceEqual(new[] { 7, 12, 18 }) &&
-            levelOne.SelectMany(w => w.Batches).SelectMany(b => b.Entries)
-                .All(e => e.EnemyId != "shield_emitter_mk1"),
-            "Level001 escalates 38/40/55 enemies with 7/12/18 explicit shields and no shield-restoration generators");
+        Require(waveTotals.SequenceEqual(new[] { 10, 14, 20 }), "Level001 builds confidence with 10/14/20 enemy waves");
+        Require(levelOne.Take(2).All(w => w.Batches.SelectMany(b => b.Entries)
+                .All(e => e.EnemyId == "basic_mk1")) &&
+            levelOne[2].Batches.Length == 2 && levelOne[2].Batches[0].Count == 10 &&
+            levelOne[2].Batches[0].Entries.All(e => e.EnemyId == "basic_mk1") &&
+            levelOne[2].Batches[1].Count == 10 &&
+            levelOne[2].Batches[1].Entries.Select(e => e.EnemyId).SequenceEqual(new[] { "basic_mk1", "scout_mk1" }) &&
+            WaveCatalog.CompositionCounts(levelOne[2].Batches[1]).SequenceEqual(new[] { 5, 5 }),
+            "Scouts first appear after the first half of Wave 3, mixed with Standards");
+        Require(levelOne.SelectMany(w => w.Batches).SelectMany(b => b.Entries)
+                .All(e => !e.SpawnWithShield && !e.SpawnWithStealth && (e.EnemyId == "basic_mk1" || e.EnemyId == "scout_mk1")),
+            "Level001 includes only basic and scout drones, without optional flags");
         WaveCatalog.Validate(levelOne, scenes);
-        Require(levelOne.All(w => w.Presentation == null), "Existing levels need no authored wave presentation metadata");
+        // Presentation is intentionally not asserted: the owner will add wave commentary in the editor later.
         // =========================================================
         // Level003 waves 1–3 stay on their original C# baseline; Wave 4 is intentionally rebalanced in .tres.
         WaveSetResource editable = GD.Load<WaveSetResource>("res://LEVELS/Level003/Level003Waves.tres");
