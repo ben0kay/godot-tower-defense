@@ -1,3 +1,9 @@
+## Level003 Wave 4 updated — 2026-11-03
+
+The current `Level003Waves.tres` Wave 4 has **two** mixed batches. In the live composition preview, **Wave 4 → Batch 1** now displays **16 total: 8 Standard + 4 Scout + 4 Bulwark**; **Batch 2** displays **16 total: 4 Standard + 8 Scout + 4 Bulwark**. The historical layout-test examples below describe an older 75/25 Wave 4 before this balance change; use these current values when testing the dropdown or preview. There are still 32 enemies in Wave 4. No plugin implementation changed for this balance pass.
+
+---
+
 ## 2026-11-01 — Wave Editor full-height layout correction, direct container (Layout V2)
 
 **Source fix; in-editor validation pending.** Two earlier attempts changed size flags / anchored an inner margin, but the user's screenshot still showed all controls compressed into a short strip and the right details scrolled down to narration, even though the available Godot main-screen viewport was tall. This correction removes the nested `PanelContainer/Control -> MarginContainer -> VBoxContainer` chain entirely. The `WaveEditorPanel` is now **itself a `VBoxContainer`**, attached directly to Godot's main-screen `VBoxContainer`, with `SizeFlagsVertical=ExpandFill`. Its first-level children are strictly: compact header, an expanding three-column split editor, and a compact status/footer. No `FullRect` anchors are set on a Container-managed child. The root has a modest minimum height safeguard.

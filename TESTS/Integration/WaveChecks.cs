@@ -36,26 +36,38 @@ public static class WaveChecks
         WaveCatalog.Validate(levelOne, scenes);
         Require(levelOne.All(w => w.Presentation == null), "Existing levels need no authored wave presentation metadata");
         // =========================================================
-        // Level003's visual-editor .tres must round-trip the exact original C# counts, timings, weights and flags.
+        // Level003 waves 1–3 stay on their original C# baseline; Wave 4 is intentionally rebalanced in .tres.
         WaveSetResource editable = GD.Load<WaveSetResource>("res://LEVELS/Level003/Level003Waves.tres");
         Require(editable != null && editable.Waves.Count == 4, "Editable Level003 resource loads with four waves");
         WaveDefinition[] converted = editable.Build(), original = Level003Waves.Create();
         Require(converted.Length == original.Length && converted.Length == 4, "Editable recipe retains all waves");
-        for (int w = 0; w < converted.Length; w++)
+        for (int w = 0; w < 3; w++)
         {
             Require(converted[w].Number == original[w].Number &&
                 converted[w].Presentation == original[w].Presentation &&
-                converted[w].Batches.Length == original[w].Batches.Length, "Editable wave identity and batch count");
+                converted[w].Batches.Length == original[w].Batches.Length, "Earlier Level003 wave identity and batch count");
             for (int b = 0; b < converted[w].Batches.Length; b++)
             {
                 WaveBatch a = converted[w].Batches[b], z = original[w].Batches[b];
                 Require(a.Count == z.Count && a.Interval == z.Interval && a.After == z.After &&
-                    a.Entries.SequenceEqual(z.Entries), "Editable batch recipe is identical to legacy C# for wave " + (w + 1));
+                    a.Entries.SequenceEqual(z.Entries), "Earlier Level003 wave batches still match original C#");
             }
         }
         WaveCatalog.Validate(converted, scenes);
         Require(converted.Select(w => w.Batches.Sum(b => b.Count)).SequenceEqual(new[] { 18, 22, 26, 32 }),
-            "Level003 editable resource still schedules 98 unshielded Enemy001/002/004 ships");
+            "Level003 still schedules 98 enemies across four waves");
+        // =========================================================
+        // Finale escorts and Bulwarks now share both rapid batches, rather than isolating the heavies at the end.
+        WaveDefinition finale = converted[3];
+        Require(finale.Number == 4 && finale.Batches.Length == 2 &&
+            finale.Batches[0].Count == 16 && finale.Batches[0].Interval == .55 && finale.Batches[0].After == .4 &&
+            finale.Batches[1].Count == 16 && finale.Batches[1].Interval == .5 && finale.Batches[1].After == 0,
+            "Finale has two quicker sixteen-ship batches with minimal downtime");
+        Require(WaveCatalog.CompositionCounts(finale.Batches[0]).SequenceEqual(new[] { 8, 4, 4 }) &&
+            WaveCatalog.CompositionCounts(finale.Batches[1]).SequenceEqual(new[] { 4, 8, 4 }) &&
+            finale.Batches.All(b => b.Entries.Select(e => e.EnemyId).SequenceEqual(new[] { "basic_mk1", "scout_mk1", "medium_mk1" }) &&
+                b.Entries.All(e => !e.SpawnWithShield && !e.SpawnWithStealth)),
+            "Both finale batches intermix unshielded Standard, Scout and Bulwark escorts in the original 12/12/8 totals");
         // Optional editor-authored flags and wave narrator metadata must also convert into immutable source data.
         var authored = new WaveSetResource();
         var one = new WaveResource { Number = 1, Alert = WaveAlertKind.Heavy, BannerTitle = "Heavy hostiles", NarrationText = "Watch your flank" };
