@@ -1,14 +1,20 @@
-# Laser Tower construction artwork
+# Laser Tower — staged construction with fixed base and rotating emitter
 
-The existing **single rotating Sprite2D** at `TurretPivot/Sprite` is the only artwork layer the tower uses. The shared event-driven `TowerConstructionVisuals` now targets that node directly; it swaps its texture during initial construction and paid upgrades. There is **no separate construction-overlay Sprite2D, split base/gun, animation loop or new attack controller**. The original 64×64 icon is also the completed Level 1 art.
+Laser uses the shared event-driven `TowerConstructionVisuals` for **one temporary composite** and **two finished sprites**:
 
-| Initial build progress | Texture | Appearance |
-| --- | --- | --- |
-| 0% | `stage0_foundation.svg` | Original silver chassis and empty mounting socket |
-| 35% | `stage1_frame.svg` | Emitter support structure and unpowered cradle |
-| 70% | `stage2_assembly.svg` | Partial silver energy emitter and dim gold core |
-| 100% | `../laser_tower.svg` | Finished existing Level 1 laser assembly |
+- `BaseSprite` lives directly under the LaserTower scene root and **does not rotate**.
+- `TurretPivot/Sprite` is the independently **rotating emitter**; the existing `TurretPivot/Muzzle` at `(0,-29)` rotates with it.
+- `TurretPivot/ConstructionSprite` contains complete temporary staged art and is hidden when finished.
 
-The existing **4-second** construction work is unchanged and remains gated by the Citadel drone. No shot/beam delivery, heat, ammo, purchase or targeting behaviour is changed. The original `TurretPivot/Muzzle` marker stays at **(0,-29)**; beam visuals retain their existing independent `BeamRenderer`.
+The presenter has `SpritePath=../TurretPivot/ConstructionSprite`, `FinishedBaseSpritePath=../BaseSprite`, `FinishedGunSpritePath=../TurretPivot/Sprite`, and both finished sprite paths in `FinishedVisualPaths`. It switches completed split artwork for a temporary single composite during initial build and upgrade stages, without changing the existing work/progress scheduling.
 
-The same `LaserConstructionArt.tres` config also owns Level 2 artwork and 35/70% staged upgrade textures. See [upgrade documentation](../Upgrades/README.md). Godot visual acceptance pending.
+| Level 1 initial build | Temporary image |
+| --- | --- |
+| 0% | `stage0_foundation.svg` (empty chassis mount) |
+| 35% | `stage1_frame.svg` (emitter support) |
+| 70% | `stage2_assembly.svg` (partial emitter) |
+| 100% | Separate original fixed base and rotating gold emitter |
+
+The existing `DefaultLaserTowerConfig.tres` references `LaserConstructionArt.tres`. Level 2 and 3 completed split base/gun art is also authored in that same resource; see [upgrade artwork](../Upgrades/README.md).
+
+This pass preserves Laser's 4-second initial build, construction drones, beam render controller, ammo, heat, target preference, shield multipliers, Level 2/3 economics and tower footprint. The original full `laser_tower.svg` remains the catalog icon and composite fallback. No additional per-frame work. Source-only sanity checked; owner should verify physical beam/rotation and stage appearance in Godot.

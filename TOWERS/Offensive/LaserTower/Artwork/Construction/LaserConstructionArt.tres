@@ -6,11 +6,13 @@
 [ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Construction/stage0_foundation.svg" id="build0"]
 [ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Construction/stage1_frame.svg" id="build1"]
 [ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Construction/stage2_assembly.svg" id="build2"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_tower_l2.svg" id="l2_finished"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_base_l2.svg" id="l2_base"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_gun_l2.svg" id="l2_gun"]
 [ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_upgrade_l2_35.svg" id="l2_35"]
 [ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_upgrade_l2_70.svg" id="l2_70"]
 
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_tower_l3.svg" id="l3_finished"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_base_l3.svg" id="l3_base"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_gun_l3.svg" id="l3_gun"]
 [ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_upgrade_l3_35.svg" id="l3_35"]
 [ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_upgrade_l3_70.svg" id="l3_70"]
 
@@ -51,7 +53,8 @@ Texture = ExtResource("l3_70")
 [sub_resource type="Resource" id="Level2"]
 script = ExtResource("3_level")
 Level = 2
-FinishedTexture = ExtResource("l2_finished")
+FinishedBaseTexture = ExtResource("l2_base")
+FinishedGunTexture = ExtResource("l2_gun")
 UpgradeTexture = ExtResource("l2_35")
 UpgradeProgress = 0.35
 UpgradeStages = Array[ExtResource("2_stage")]([SubResource("UpgradeL2_35"), SubResource("UpgradeL2_70")])
@@ -59,7 +62,8 @@ UpgradeStages = Array[ExtResource("2_stage")]([SubResource("UpgradeL2_35"), SubR
 [sub_resource type="Resource" id="Level3"]
 script = ExtResource("3_level")
 Level = 3
-FinishedTexture = ExtResource("l3_finished")
+FinishedBaseTexture = ExtResource("l3_base")
+FinishedGunTexture = ExtResource("l3_gun")
 UpgradeTexture = ExtResource("l3_35")
 UpgradeProgress = 0.35
 UpgradeStages = Array[ExtResource("2_stage")]([SubResource("UpgradeL3_35"), SubResource("UpgradeL3_70")])

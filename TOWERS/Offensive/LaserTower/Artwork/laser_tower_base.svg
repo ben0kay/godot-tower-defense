@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+
+  <!-- Silver armoured housing with a recessed rotating gunmetal centre. -->
+  <circle cx="32" cy="34" r="22" fill="#202a34" stroke="#b9c7ce" stroke-width="3"/>
+  <circle cx="32" cy="34" r="18" fill="#667580" stroke="#313e48" stroke-width="2"/>
+  <path d="M14 27l6-6 7 6-3 12-6 6-5-8z M50 27l-6-6-7 6 3 12 6 6 5-8z" fill="#93a1ac" stroke="#3c4954" stroke-width="1.5"/>
+  <path d="M15 31l5-5 3 4-2 7-5 3z M49 31l-5-5-3 4 2 7 5 3z" fill="#d2dce0"/>
+  <path d="M18 42l8 8h12l8-8-5-5H23z" fill="#8796a1" stroke="#394750" stroke-width="1.5"/>
+  <path d="M26 48h12l3-4H23z" fill="#d8e1e4"/>
+  
+</svg>

@@ -36,7 +36,7 @@ public partial class LaserTower : TowerBase
     private EnemyRegistry _registry;
     private Enemy _target;
     private Node2D _pivot;
-    private Sprite2D _sprite;
+    private Sprite2D _sprite, _baseSprite, _constructionSprite;
     private Marker2D _muzzle;
     private BeamRenderer _beam;
     private float _searchTimer;
@@ -65,7 +65,13 @@ public partial class LaserTower : TowerBase
     }
     // =========================================================
     // Selection tint affects artwork without rotating placement/grid identity.
-    public override void SetSelected(bool selected) => _sprite.Modulate = selected ? new Color(1, 0.9f, 0.68f) : Colors.White;
+    public override void SetSelected(bool selected)
+    {
+        Color tint = selected ? new Color(1, 0.9f, 0.68f) : Colors.White;
+        if (GodotObject.IsInstanceValid(_sprite)) _sprite.Modulate = tint;
+        if (GodotObject.IsInstanceValid(_baseSprite)) _baseSprite.Modulate = tint;
+        if (GodotObject.IsInstanceValid(_constructionSprite)) _constructionSprite.Modulate = tint;
+    }
     #endregion
     #region Attack Lifecycle
     // =========================================================
@@ -73,6 +79,8 @@ public partial class LaserTower : TowerBase
     public override void _Ready()
     {
         _pivot = GetNode<Node2D>("TurretPivot"); _sprite = GetNode<Sprite2D>("TurretPivot/Sprite");
+        _baseSprite = GetNodeOrNull<Sprite2D>("BaseSprite");
+        _constructionSprite = GetNodeOrNull<Sprite2D>("TurretPivot/ConstructionSprite");
         _muzzle = GetNodeOrNull<Marker2D>("TurretPivot/Muzzle"); _beam = GetNode<BeamRenderer>("BeamRenderer");
         _registry = GetNodeOrNull<EnemyRegistry>("../../EnemySystems/Registry");
         _ready = true; if (Config != null) Config.Changed += RebuildStats; RebuildStats();

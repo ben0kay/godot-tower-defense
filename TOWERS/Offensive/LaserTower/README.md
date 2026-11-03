@@ -1,12 +1,20 @@
+## Laser fixed base and independently rotating emitter — 2026-11-03
+
+Corrected the single-sprite Laser implementation to match the intended split-tower architecture. The original silver chassis is now a **stationary `BaseSprite`** while its energy emitter remains on the existing rotating `TurretPivot/Sprite`. Level 1, 2 and 3 each have distinct split base/gun textures derived from their authored composite SVGs. Existing 0/35/70% initial construction and paid L2/L3 35/70% upgrade artwork now uses a temporary `ConstructionSprite` overlay while the presenter hides both completed layers; completed construction restores the correct split tier automatically.
+
+The physical beam muzzle marker stays under the same `TurretPivot` at (0,-29); targeting, rotation timing, shield damage, DPS, ammo, heat, credit costs, 4/5/6-second work durations and beam rendering were left unchanged. Selection highlight now tints the fixed base, gun and temporary construction image consistently. [Construction artwork](Artwork/Construction/README.md) · [Purchased upgrades](Artwork/Upgrades/README.md). Source-only verification done; visual Godot review pending.
+
+---
+
 ## Purchased Level 3 — 2026-11-03
 
-Laser now has **three levels total** (initial Level 1 build followed by paid upgrades to Levels 2 and 3). Level 3 is **250 Credits / 6 seconds**, raising the authored beam output to **16 DPS**, range to **345.4 px**, and maximum health to **1102.5**. The new finished Level 3 silver/yellow high-output emitter art includes a 35% construction scaffold and 70% final-calibration image, using the existing `TowerConstructionVisuals` on the single rotating sprite. Level 1/2 art, prices and stats are unchanged; no new beam/controller path or per-frame work was introduced. See [upgrade artwork](Artwork/Upgrades/README.md).
+Laser now has **three levels total** (initial Level 1 build followed by paid upgrades to Levels 2 and 3). Level 3 is **250 Credits / 6 seconds**, raising the authored beam output to **16 DPS**, range to **345.4 px**, and maximum health to **1102.5**. The Level 3 silver/yellow high-output emitter art includes a 35% scaffold and 70% calibration image; the latest split-art pass keeps its base stationary. Level 1/2 art, prices and stats are unchanged; no new beam/controller path or per-frame work was introduced. See [upgrade artwork](Artwork/Upgrades/README.md).
 
 ---
 
 ## Laser Tower Level 1 construction and Level 2 artwork — 2026-11-03
 
-Laser now uses the existing event-driven construction presenter on its original **single rotating `TurretPivot/Sprite`** (no new visual sprite, split-gun restructuring or gameplay code). Initial build now shows a bare silver mounting foundation (0%), exposed emitter frame (35%) and partially fitted low-power yellow emitter (70%), restoring the existing Level 1 laser art at 100%. Its paid Level 2 and Level 3 upgrades have distinct 35%/70% intermediate art and unique silver/yellow finished appearances. See [construction](Artwork/Construction/README.md) and [upgrades](Artwork/Upgrades/README.md).
+Laser originally used the shared construction presenter on a single rotating sprite; this has since been corrected to **fixed base + rotating emitter** without changing gameplay code. Initial build now shows a bare silver mounting foundation (0%), exposed emitter frame (35%) and partially fitted low-power yellow emitter (70%), restoring the existing Level 1 laser art at 100%. Its paid Level 2 and Level 3 upgrades have distinct 35%/70% intermediate art and unique silver/yellow finished appearances. See [construction](Artwork/Construction/README.md) and [upgrades](Artwork/Upgrades/README.md).
 
 The existing `Muzzle` location (0,-29), 4-second build, Level 2 purchase price/work time (175 Credits, 5s), beam behaviour, shield preference, DPS, heat, ammo and targeting are untouched. Art changes are triggered by paid work progress; no new process loops. Source implemented; Godot visual acceptance pending.
 

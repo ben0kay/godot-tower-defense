@@ -1,3 +1,9 @@
+## Laser Tower fixed-base and rotating-emitter correction — 2026-11-03
+
+Laser Tower now separates the original silver base from its independently rotating gold energy emitter, consistent with other turret-style offensive towers. Finished artwork is split for Levels 1, 2 and 3; all original initial construction and 35%/70% purchased upgrade composites remain in use. The shared `TowerConstructionVisuals` presenter switches between the temporary construction sprite and two finished layers; selection tint now applies consistently. The `TurretPivot/Muzzle=(0,-29)` path, beam endpoint logic, costs, level stats and work timing remain unchanged. See [Laser split artwork notes](TOWERS/Offensive/LaserTower/Artwork/Upgrades/README.md). Godot visual acceptance pending.
+
+---
+
 ## Laser Tower purchased Level 3 — 2026-11-03
 
 Extended Laser from two to **three total purchased levels**: new Level 3 costs 250 Credits, takes 6 seconds, delivers 16 beam DPS at 345.4 px range, and has 1102.5 max HP. Added new finished L3 silver/yellow emitter art and 35%/70% assembly textures to the existing `LaserConstructionArt.tres` LevelArtwork, retaining its single rotating sprite, 0/35/70% initial build stages, L2 artwork, muzzle (0,-29), beam behaviour and existing shield/ammo/heat rules. See [Laser upgrade art](TOWERS/Offensive/LaserTower/Artwork/Upgrades/README.md). Source checks passed; live Godot check pending.
