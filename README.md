@@ -1,3 +1,9 @@
+## Level003 Wave 4 — integrated Bulwark escorts (2026-11-03)
+
+Wave 4 now interleaves eight stronger Bulwarks with the twelve Standard and twelve Scout ships across **two faster mixed batches** (8/4/4 and 4/8/4), instead of sending the eight Bulwarks alone at the end. The 0.55s/0.50s spawn intervals and 0.4s between batches make the finale denser without increasing the 32-ship total or changing waves 1–3. Authoritative source: `LEVELS/Level003/Level003Waves.tres` (Wave Editor). C# baseline remains a historical test reference; focused wave assertions updated. [Level003 details](LEVELS/Level003/README.md).
+
+---
+
 ## Laser Tower fixed-base and rotating-emitter correction — 2026-11-03
 
 Laser Tower now separates the original silver base from its independently rotating gold energy emitter, consistent with other turret-style offensive towers. Finished artwork is split for Levels 1, 2 and 3; all original initial construction and 35%/70% purchased upgrade composites remain in use. The shared `TowerConstructionVisuals` presenter switches between the temporary construction sprite and two finished layers; selection tint now applies consistently. The `TurretPivot/Muzzle=(0,-29)` path, beam endpoint logic, costs, level stats and work timing remain unchanged. See [Laser split artwork notes](TOWERS/Offensive/LaserTower/Artwork/Upgrades/README.md). Godot visual acceptance pending.
