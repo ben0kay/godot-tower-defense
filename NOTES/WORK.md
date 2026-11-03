@@ -1,3 +1,9 @@
+## 2026-11-03 — Level003 Wave 4 stronger/weak mixed pressure
+
+Rebalanced only `LEVELS/Level003/Level003Waves.tres` Wave 4: old three distinct batches (16 mixed light + 8 Scout + 8 isolated Bulwark) now two **16-ship mixed batches**, each with 4 Bulwarks alongside weaker Standards/Scouts. Exact compositions: **8/4/4**, then **4/8/4** (Standard/Scout/Bulwark); 0.55s and 0.50s spawn intervals, 0.4s mid-wave pause instead of two 3s gaps. Overall 12/12/8 mix, 32 enemies, no new flags, wave 1–3 untouched. Focused WaveChecks preserves first-three-wave parity with old C# baseline and asserts mixed finale quotas/timings. The old C# file remains historical; Godot runtime check pending.
+
+---
+
 ## 2026-11-01 — Wave Editor layout V2 direct VBoxContainer root
 
 The user's screenshot after the prior full-rect margin fix still displayed a collapsed ~100px editor strip with footer near the top, and the right panel scrolled to narration. Replaced `WaveEditorPanel : Control` plus anchored `MarginContainer -> VBoxContainer` with a direct `WaveEditorPanel : VBoxContainer` root, containing header, vertically expanding split controls and footer. Removed `FullRect` anchors on the `EditorMainScreen` VBox child; size flags now control the whole layout, with a 320px minimum-size fallback. Deferred the right-pane scroll reset to occur after Godot's layout, and marked the header **LAYOUT V2** to distinguish stale plugin assemblies. No gameplay or waves modified. Source-only verification; must rebuild/reopen Godot.NET for visual acceptance. [Wave Editor](../addons/wave_editor/README.md).
