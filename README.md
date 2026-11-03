@@ -1,3 +1,9 @@
+## Sniper Tower Level 1 construction artwork completed — 2026-11-03
+
+Added the missing initial-build 0% foundation, 35% structural-frame and 70% partial-barrel SVGs to `TOWERS/Offensive/SniperTower/Artwork/Construction/` and registered their `BuildStages` in `SniperConstructionArt.tres`. The existing shared presenter now shows unfinished artwork during the four-second construction work, then restores the finished Level 1 base/extended gun at 100%. Existing Level 2/3 upgrade stage textures, long muzzle at (0,-39), damage delivery, economy, work duration and drones are untouched. Source-only sanity review; owner should inspect the transitions in Godot. See [Sniper construction notes](TOWERS/Offensive/SniperTower/Artwork/Construction/README.md).
+
+---
+
 ## Cryo and Stasis construction/upgrade art — 2026-11-02
 
 Cryo and Stasis now have full event-driven initial-building visual stages (foundation/frame/assembly), independent Level 2/3 finished split base-and-emitter artwork, and 35%/70% staged upgrade composites, all using the existing `TowerConstructionVisuals` resources. Their original single muzzle, health, damage/status effects, work times, costs, targeting, recoil and ammo remain unchanged. The finished Level 1 world placement preview still uses actual tower scene art. See [Cryo](TOWERS/Offensive/CryoTower/Artwork/Upgrades/README.md) and [Stasis](TOWERS/Offensive/StasisTower/Artwork/Upgrades/README.md) notes. Godot visual acceptance pending.

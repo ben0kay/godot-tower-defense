@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="80" viewBox="0 -8 64 80">
+<defs>
+  <linearGradient id="constructionMetal" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#667e91"/><stop offset=".55" stop-color="#2c4859"/><stop offset="1" stop-color="#142836"/>
+  </linearGradient>
+</defs>
+<!-- Same 64x80 source coordinate registration as Sniper's completed composite. -->
+<path d="M15 9H22L28 14H36L42 9H49L55 15V22L50 28V36L55 42V49L49 55H42L36 50H28L22 55H15L9 49V42L14 36V28L9 22V15Z" fill="#172b38" stroke="#72a0b7" stroke-width="1.3"/>
+<path d="M20 19L27 15H37L44 19L49 28V40L42 48H22L15 40V28Z" fill="#213a4a" stroke="#537f92" stroke-width="1.25"/>
+<circle cx="32" cy="33" r="13.5" fill="#102431" stroke="#466b7d" stroke-width="1.4"/>
+<path d="M11 29H17M47 29H53M11 37H17M47 37H53" fill="none" stroke="#457f92" stroke-width="1.7"/>
+<!-- Stage 2: partly installed precision barrel stops short of the final long muzzle. -->
+<path d="M27 31V7L30 4H34L37 7V31Z" fill="#647e90" stroke="#102636" stroke-width="1.65"/>
+<path d="M29 26V10H35V26" fill="none" stroke="#83c4d5" stroke-width="1.1" stroke-dasharray="4 2"/>
+<rect x="27" y="4.5" width="10" height="5" rx="1" fill="#243f51" stroke="#7caeba" stroke-width="1.1"/>
+<path d="M23 27L27 22H37L41 27L42 39L35 45H29L22 39Z" fill="url(#constructionMetal)" stroke="#8fb8c5" stroke-width="1.4"/>
+<path d="M23 29L20 33M41 29L44 33" stroke="#8cabb7" stroke-width="1.8"/>
+<circle cx="32" cy="34" r="8" fill="#19394b" stroke="#6ba9ba" stroke-width="1.35"/>
+<path d="M32 29V39M27 34H37" stroke="#a1d6e4" stroke-width="1.05"/>
+<circle cx="32" cy="34" r="2.3" fill="#c68f5f" opacity=".7"/>
+<path d="M26 8H38" stroke="#e0c19b" stroke-width="1.1" stroke-dasharray="2 2"/>
+</svg>

@@ -2,7 +2,7 @@
 
 Sniper Tower now shares the existing Battle/Machine Gun purchased-level art presentation. Levels 2 and 3 have their own reinforced bases, extended-barrel gun textures, and separate 35%/70% upgrade-scaffold composites. The existing Level 1 gun and catalog/placement composite also receive a visibly longer barrel. The single muzzle marker moves from `(0,-27)` to `(0,-39)` so aim/flash/origin stay aligned; the 64×80 extended gun/composite canvas preserves the original centred turret registration. The shared `ConstructionVisuals` node now swaps completed split base/gun imagery on upgrades; no new processing loop or altered work/damage rules. The existing **InstantTarget** damage delivery is unchanged.
 
-Config: `Artwork/Construction/SniperConstructionArt.tres`; new SVGs and authoring notes: [Artwork/Upgrades/README.md](Artwork/Upgrades/README.md). Initial paid build still uses its prior finished-art look; only paid **upgrades** gain staged composite art. Source implemented; owner to check in-editor zoom, beam/work stages, muzzle and save/load visuals.
+Config: `Artwork/Construction/SniperConstructionArt.tres`; new SVGs and authoring notes: [Artwork/Upgrades/README.md](Artwork/Upgrades/README.md). Initial construction also has dedicated 0% foundation, 35% mounting frame and 70% incomplete barrel artwork, switching to the finished split base/gun at 100%. Paid **upgrades** retain their separate 35%/70% stages. Source implemented; owner to check in-editor zoom, beam/work stages, muzzle and save/load visuals.
 
 ---
 
@@ -40,7 +40,7 @@ Balance is provisional. Level 1 one-shots unshielded 60-HP Enemy001; its strengt
 
 ## Initial construction (C1/C2)
 
-Paid placement occupies its footprint immediately and takes **4 seconds**, authored in the Level1 WorkSeconds column of this tower's `*Levels.cs`. It cannot acquire targets/fire/consume ammunition or request deliveries until complete. Completion preserves stats, level, rank and stock. Direct scene fixtures remain operational by default. The existing finished-art appearance stays visible during initial construction; optional C4 initial-build stage SVGs remain deferred. L2/L3 upgrades now have separate 35% and 70% composite art. C3 Inspector progress is implemented; purchased upgrades use their own WorkSeconds and disable firing while upgrade work is active; the old tier's art remains visible until the upgrade-progress milestones. Duplicate purchases are disabled while work is active. See `TOWERS/Shared/Construction/README.md`.
+Paid placement occupies its footprint immediately and takes **4 seconds**, authored in the Level1 WorkSeconds column of this tower's `*Levels.cs`. It cannot acquire targets/fire/consume ammunition or request deliveries until complete. Completion preserves stats, level, rank and stock. Direct scene fixtures remain operational by default. Initial construction now displays authored 0% foundation, 35% frame and 70% incomplete sniper assembly sprites before restoring the finished split art at 100%. L2/L3 upgrades now have separate 35% and 70% composite art. C3 Inspector progress is implemented; purchased upgrades use their own WorkSeconds and disable firing while upgrade work is active; the old tier's art remains visible until the upgrade-progress milestones. Duplicate purchases are disabled while work is active. See `TOWERS/Shared/Construction/README.md`.
 
 ## Projectile presentation — PV1/PV2
 

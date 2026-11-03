@@ -12,6 +12,24 @@
 [ext_resource type="Texture2D" path="res://TOWERS/Offensive/SniperTower/Artwork/Upgrades/sniper_upgrade_l3_35.svg" id="l3_35"]
 [ext_resource type="Texture2D" path="res://TOWERS/Offensive/SniperTower/Artwork/Upgrades/sniper_upgrade_l3_70.svg" id="l3_70"]
 
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/SniperTower/Artwork/Construction/stage0_foundation.svg" id="build0"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/SniperTower/Artwork/Construction/stage1_frame.svg" id="build1"]
+[ext_resource type="Texture2D" path="res://TOWERS/Offensive/SniperTower/Artwork/Construction/stage2_assembly.svg" id="build2"]
+
+[sub_resource type="Resource" id="Stage0"]
+script = ExtResource("2_stage")
+Texture = ExtResource("build0")
+
+[sub_resource type="Resource" id="Stage1"]
+script = ExtResource("2_stage")
+Progress = 0.35
+Texture = ExtResource("build1")
+
+[sub_resource type="Resource" id="Stage2"]
+script = ExtResource("2_stage")
+Progress = 0.7
+Texture = ExtResource("build2")
+
 [sub_resource type="Resource" id="UpgradeL2_35"]
 script = ExtResource("2_stage")
 Progress = 0.35
@@ -52,4 +70,5 @@ UpgradeStages = Array[ExtResource("2_stage")]([SubResource("UpgradeL3_35"), SubR
 
 [resource]
 script = ExtResource("1_art")
+BuildStages = Array[ExtResource("2_stage")]([SubResource("Stage0"), SubResource("Stage1"), SubResource("Stage2")])
 LevelArtwork = Array[ExtResource("3_level")]([SubResource("Level2"), SubResource("Level3")])
