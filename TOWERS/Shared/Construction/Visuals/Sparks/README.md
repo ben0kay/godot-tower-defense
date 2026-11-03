@@ -1,3 +1,13 @@
+## Centered radial welding bursts — 2026-11-03
+
+The sharp white/yellow `WeldingSparks` layer now launches from a **small circular ring at the centre of the tower** instead of a rectangle with an upward-biased random direction. Its `ParticleProcessMaterial` uses `emission_shape = 2` (sphere surface, circular in 2D), a center `velocity_pivot`, **positive random radial velocity (72–132 px/s)**, mild tangential jitter (±18) and reduced gravity. Each spark starts at a random angle and moves outward along that angle, with enough speed and sideways variation to avoid a perfectly uniform pinwheel. The 0.34-second duration, crisp sprite, bright color gradient, density and small bursts remain unchanged.
+
+The existing `WeldingFootprintCoverage` Inspector setting now controls the **diameter of the small central emission circle relative to the shorter tower footprint axis**, capped at a 24 px radius. At the default 38% setting, a 64×64 tower starts on about a 12 px radius ring. The source controller adjusts this once per new paid work site; no continuous transform calculations or script animation were added. 1×1 and multi-cell towers stay centered on their own work site.
+
+**The original soft amber/orange root emitter is unchanged**, including its rectangular footprint coverage, motion, gradient, and count. All existing construction/upgrade work start, drone hold, pause, completion/cleanup, max-concurrency cap and save behaviour remain untouched. This is a small GPU material + one-time radius update; the desktop appearance and FPS still need the owner's Godot check.
+
+---
+
 ## Two-layer welding sparks — 2026-11-03
 
 Construction and timed upgrade work now uses **two GPU particle layers from one shared emitter scene**:

@@ -88,6 +88,12 @@ public partial class ConstructionDroneChecks : Node
         var beam = drone.GetNode<ConstructionBeam>("Beam");
         Require(sparks.IsEmitting(tower) && sparks.IsWelding(tower),
             "Soft orange and white-hot welding sparks start together when work releases");
+        var weldingSparks = tower.GetNode<GpuParticles2D>("ConstructionSparkEmitter/WeldingSparks");
+        var radialMotion = weldingSparks.ProcessMaterial as ParticleProcessMaterial;
+        Require(radialMotion != null && (int)radialMotion.EmissionShape == 2 &&
+            radialMotion.EmissionSphereRadius > 0f && radialMotion.RadialVelocityMin > 0f &&
+            Mathf.IsZeroApprox(radialMotion.InitialVelocityMax),
+            "Hot sparks launch outward from a centered radial ring, not an upward cone");
         var flashes = builders.GetNode<ConstructionCompletionFlash>("CompletionFlashes");
         Require(drone.BeamVisible && beam.AnimationSeconds > 0 && status.Text == "CONSTRUCTING" &&
             builders.Releases == 1 && clock.HeldCount == 0, "Animated beam deployed before one release");
