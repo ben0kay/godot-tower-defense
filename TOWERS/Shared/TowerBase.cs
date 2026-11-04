@@ -165,7 +165,7 @@ public abstract partial class TowerBase : Node2D
     }
 
     private void ShowUpgradeCelebration() => GetProgressPopup()?.ShowUpgrade(UpgradeLevel);
-    private void ShowRankCelebration() => GetProgressPopup()?.ShowRank(CurrentRank.Name);
+    private void ShowRankCelebration() => GetProgressPopup()?.ShowRank(CurrentRank.Rank.ToString());
 
     #region Construction
     public TowerWorkPhase WorkPhase { get; private set; } = TowerWorkPhase.Operational;
