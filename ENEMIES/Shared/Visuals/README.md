@@ -1,3 +1,9 @@
+## ET1 flame size + speed contribution — 2026-11-04
+
+ET1's rear flame **width still follows displayed hull height**, but **length now combines overall displayed hull dimensions and the enemy's authored max speed**. A slow Heavy Transporter or Cruiser now receives a substantially longer (and still broad) ignition, while small fast ships remain narrow with longer speed-driven plumes. The optional GPU fleck speed is scaled to the resulting flame length, rather than solely to authored speed, without increasing emitter/particle count. Settings and formulas: [Thrusters README](Thrusters/README.md). Source-only; visually verify in Godot.
+
+---
+
 ## ET1 — shared enemy engine ignition (source implemented 2026-11-03)
 
 All inherited enemy hulls now have a rear-centred optional `Thruster` scene. The shared [Thruster folder](Thrusters/README.md) owns a white/yellow/orange SVG flame, tiny GPU exhaust particles, `EnemyThrusterVisual.cs`, a typed `EnemyThrusterConfig` and the default `.tres` resource. **Width depends on actual displayed sprite height; length depends on authored `EnemyDefinition.MoveSpeed`.** Right-facing (+X) sprites exhaust toward -X and follow rotation. Per-ship Inspector `ThrusterEnabled` and `ThrusterMountOffset` are optional; no ship-ID or fleet-family switch.

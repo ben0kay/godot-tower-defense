@@ -1,5 +1,6 @@
 // ET1: one rear-facing ignition for all +X enemy hull sprites, with an optional capped GPU exhaust.
-// Static flame size uses artwork height and authored speed; slowdown changes are event-driven.
+// Flame width follows hull height; flame length combines hull mass impression and authored speed.
+// Status/stealth changes are event-driven, so there's no extra per-enemy tick.
 using Godot;
 
 public partial class EnemyThrusterVisual : Node2D
@@ -21,14 +22,16 @@ public partial class EnemyThrusterVisual : Node2D
 
     #region Setup
     // =========================================================
-    // Rendered hull size, not collision/navigation radius, determines ignition width.
-    // Speed determines length independently: thin/long scouts vs wide/short heavy ships.
+    // Rendered hull height sets width; both overall hull size and authored speed add to length.
+    // This makes slow capital ships burn broadly AND substantially, while fast scouts stay thin.
     internal static Vector2 ComputeFlameDimensions(Vector2 hull, float moveSpeed, EnemyThrusterConfig settings)
     {
+        float shipSize = Mathf.Sqrt(Mathf.Max(0f, hull.X * hull.Y));
         float width = Mathf.Clamp(hull.Y * (settings?.FlameWidthToHullHeight ?? .17f), 2.4f, 24f);
         float length = Mathf.Clamp((settings?.BaseFlameLengthPixels ?? 4f) +
-            Mathf.Max(0, moveSpeed) * (settings?.LengthPerSpeed ?? .10f), 5f,
-            Mathf.Max(5f, settings?.MaxFlameLengthPixels ?? 40f));
+            shipSize * (settings?.LengthPerHullSize ?? .12f) +
+            Mathf.Max(0f, moveSpeed) * (settings?.LengthPerSpeed ?? .10f),
+            5f, Mathf.Max(5f, settings?.MaxFlameLengthPixels ?? 55f));
         return new Vector2(length, width);
     }
 
@@ -104,8 +107,10 @@ public partial class EnemyThrusterVisual : Node2D
         _flame.Scale = new Vector2(length / 96f, _flameWidth / 24f);
         _flame.Position = new Vector2(_rearX - length * .5f, _rearY);
         _exhaust.Modulate = new Color(1f, 1f, 1f, _stealthed ? Config.StealthIntensity : 1f);
+        // Exhaust particle travel should match the displayed engine, not punish slow heavy hulls.
+        // The status fraction still reduces/halts it when Slow or Freeze affects the ship.
         _exhaust.SpeedScale = Mathf.Clamp(Config.ParticleSpeedMultiplier *
-            (_nominalSpeed / 100f) * fraction, .1f, 2.8f);
+            (_baseFlameLength / 16f) * fraction, .1f, 2.8f);
 
         if (!active) StopGpu();
         else TryStartGpu();

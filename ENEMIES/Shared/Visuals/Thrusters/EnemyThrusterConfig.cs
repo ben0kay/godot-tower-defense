@@ -8,8 +8,9 @@ public partial class EnemyThrusterConfig : Resource
     [Export] public bool Enabled { get; set; } = true;
     [Export(PropertyHint.Range, "0.05,0.5,0.01")] public float FlameWidthToHullHeight { get; set; } = .17f;
     [Export(PropertyHint.Range, "0,30,0.5")] public float BaseFlameLengthPixels { get; set; } = 4f;
+    [Export(PropertyHint.Range, "0,0.5,0.01")] public float LengthPerHullSize { get; set; } = .12f;
     [Export(PropertyHint.Range, "0.01,0.4,0.01")] public float LengthPerSpeed { get; set; } = .10f;
-    [Export(PropertyHint.Range, "8,80,1")] public float MaxFlameLengthPixels { get; set; } = 40f;
+    [Export(PropertyHint.Range, "8,100,1")] public float MaxFlameLengthPixels { get; set; } = 55f;
     [Export(PropertyHint.Range, "0,10,0.5")] public float RearNozzleInsetPixels { get; set; } = 1f;
 
     [ExportGroup("GPU Particle Budget")]
