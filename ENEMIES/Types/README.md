@@ -1,3 +1,9 @@
+## Create a new enemy — AI guide
+
+**[NEW_ENEMY_TEMPLATE.md](NEW_ENEMY_TEMPLATE.md)** is the preferred starting point for every new ship design or Mk variant. It includes the current **Class / Rank / Role** enum choices, a copyable AI design brief (visuals, size, stats, abilities, progression), and the safe implementation workflow for inherited enemy scenes, catalogue registration, wave isolation, performance and documentation. [ROSTER.md](ROSTER.md) remains the live inventory of existing classifications.
+
+---
+
 ## Enemy Class, Rank and Role — 2026-11-04
 
 See the **[canonical 14-ship roster and migration notes](ROSTER.md)**. Each `.tres` now exposes independent **Classification / Class, Rank, Role**. Wave Editor sorts by Class; F2 preserves catalog/preview order and shows separate details. These descriptive values impose no stats, abilities, dimensions or Mk progression. IDs, paths, balance and waves are unchanged. Source implemented; Godot validation pending. Older fleet-family tables below are historical.
