@@ -1,5 +1,6 @@
 // F2-only batch spawner: catalog choices and bounded portal delivery, isolated from authored wave ownership.
 using Godot;
+using System;
 using System.Collections.Generic;
 
 public partial class EnemySpawnMenu : CanvasLayer
@@ -61,13 +62,33 @@ public partial class EnemySpawnMenu : CanvasLayer
         box.AddChild(UIButtonFactory.Label("ENEMY SPAWNER · F2", 20));
         box.AddChild(UIButtonFactory.Label("Random valid portal per ship", 14));
         _enemy = new() { Name = "Enemy", SizeFlagsHorizontal = Control.SizeFlags.ExpandFill }; box.AddChild(_enemy);
-        // Keep catalogue index order for scene/hover previews; show metadata separately from ship names.
+        // Group by physical class, smallest to largest; keep every menu index aligned with its scene/definition.
+        // Non-selectable class headers occupy indices too, so they receive null placeholders.
+        List<(PackedScene Scene, EnemyDefinition Definition)> choices = new();
         foreach (var pair in spawns.Catalog.ToSceneMap())
+            choices.Add((pair.Value, spawns.Catalog.DefinitionFor(pair.Key)));
+        choices.Sort((a, b) =>
         {
-            EnemyDefinition definition = spawns.Catalog.DefinitionFor(pair.Key);
-            _scenes.Add(pair.Value); _definitions.Add(definition); _enemy.AddItem(definition.DisplayName);
-            _enemy.SetItemTooltip(_enemy.ItemCount - 1, EnemyNaming.ClassificationLabel(definition) + "\n" + definition.EnemyId);
+            int byClass = a.Definition.Class.CompareTo(b.Definition.Class);
+            return byClass != 0 ? byClass :
+                string.Compare(a.Definition.DisplayName, b.Definition.DisplayName, StringComparison.OrdinalIgnoreCase);
+        });
+        EnemyClass? lastClass = null;
+        foreach (var choice in choices)
+        {
+            if (lastClass != choice.Definition.Class)
+            {
+                _enemy.AddSeparator(EnemyNaming.Class(choice.Definition.Class).ToUpperInvariant());
+                _scenes.Add(null); _definitions.Add(null);
+                lastClass = choice.Definition.Class;
+            }
+            _scenes.Add(choice.Scene); _definitions.Add(choice.Definition);
+            _enemy.AddItem(choice.Definition.DisplayName);
+            _enemy.SetItemTooltip(_enemy.ItemCount - 1,
+                EnemyNaming.ClassificationLabel(choice.Definition) + "\n" + choice.Definition.EnemyId);
         }
+        // First entry is a class heading, never a selectable ship.
+        _enemy.Select(_scenes.FindIndex(scene => scene != null));
         _amount = Number(box, "Amount", "Amount", 1, 10000, 1, 10);
         _gap = Number(box, "Spawn gap (seconds)", "Gap", 0, 60, .01, .1);
         HBoxContainer flags = new(); box.AddChild(flags);
@@ -95,7 +116,7 @@ public partial class EnemySpawnMenu : CanvasLayer
     {
         if (!IsOpen) return;
         int hovered = _enemyPopup.GetFocusedItem();
-        if (hovered >= 0 && hovered < _scenes.Count) RefreshPreview(hovered);
+        if (hovered >= 0 && hovered < _scenes.Count && _scenes[hovered] != null) RefreshPreview(hovered);
     }
     // =========================================================
     // Keep mouse hover and arrow-key highlight updates contained to the visible dropdown.
@@ -109,9 +130,10 @@ public partial class EnemySpawnMenu : CanvasLayer
     {
         if (index == _previewEnemyIndex) return;
         _previewEnemyIndex = index;
-        SpritePreview.ShowScene(index >= 0 && index < _scenes.Count ? _scenes[index] : null);
+        bool isShip = index >= 0 && index < _scenes.Count && _scenes[index] != null;
+        SpritePreview.ShowScene(isShip ? _scenes[index] : null);
         Vector2 size = SpritePreview.ArtworkBounds.Size;
-        _previewCaption.Text = index >= 0 && index < _scenes.Count
+        _previewCaption.Text = isShip
             ? $"{_enemy.GetItemText(index)}\n{EnemyNaming.ClassificationLabel(_definitions[index])}\n" +
                 $"{_definitions[index].EnemyId} · {size.X:0.#} × {size.Y:0.#} px · 1:1"
             : "No enemy artwork available.";
@@ -140,7 +162,8 @@ public partial class EnemySpawnMenu : CanvasLayer
     // Each click captures an independent batch; editing controls cannot alter previously accepted deliveries.
     public bool StartBatch(int enemyIndex, int amount, double gap, bool shielded = false, bool stealthed = false)
     {
-        if (enemyIndex < 0 || enemyIndex >= _scenes.Count || amount < 1 || amount > 10000
+        if (enemyIndex < 0 || enemyIndex >= _scenes.Count || _scenes[enemyIndex] == null ||
+            amount < 1 || amount > 10000
             || !double.IsFinite(gap) || gap < 0 || gap > 60) return false;
         if (!IsSpawning) Spawned = 0;
         Batch batch = new() { Id = ++_nextId, Scene = _scenes[enemyIndex], Remaining = amount, Interval = gap,

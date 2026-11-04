@@ -42,7 +42,7 @@ Existing IDs, wave resources, catalog order, scene paths and gameplay values are
 ## Tool presentation and owner checks
 
 - **Wave Editor:** Class then name/ID sorting, Tiny through Titan. Short `Class · DisplayName` picker entries; selected Class/Rank/Role plus stable ID shown beneath, with metadata also in item tooltips. Only EnemyId is persisted to waves; opening/refreshing does not rewrite waves. Unknown IDs stay visibly unregistered.
-- **F2:** Short ship names in unchanged catalog order. Name, Class/Rank/Role, ID and actual artwork dimensions appear above the 1:1 preview. Hover/dismiss and committed scene mapping remain unchanged; spawning/batch logic is untouched.
+- **F2:** Ship names grouped under non-selectable **Class** headings, smallest to largest (Tiny through Titan), alphabetical within a class. Empty classes have no heading. Name, Class/Rank/Role, ID and actual artwork dimensions appear above the 1:1 preview. Catalog scene registration order is unchanged; the menu maintains a safe mapping for header indices. Hover/dismiss, spawning and batch logic are preserved.
 - Rebuild in Godot .NET, inspect several definition resources (including tiny Racer, Cargo transporters, Elite Cruiser), refresh Wave Editor and check sorting/details and retained IDs. In F2, hover/select ships and check labels, matching previews, and normal batch spawning. No gameplay or visual acceptance is claimed by source review.
 
 ## Optional future asset path migration (not yet implemented)

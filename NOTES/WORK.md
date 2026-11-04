@@ -1,3 +1,9 @@
+## 2026-11-04 — F2 enemy dropdown grouped by physical Class
+
+F2 now shows non-selectable class section headings for occupied sizes, **Tiny → Light → Standard → Heavy → Superheavy → Capital → Titan** (when populated), with enemy names alphabetized within each group. Enemy Rank, Role, ID and pixel-size preview remain in the side panel/tooltip. The menu has explicit aligned index slots for headings to avoid wrong sprites or spawns; hover ignores headers and direct header spawn requests reject. The corresponding F2 focused checks now resolve by stable EnemyId rather than former registration indices. No classification values, gameplay, resources, or default catalogue order changed. Focused source checks only; Godot/.NET owner visual and batch-spawn confirmation pending.
+
+---
+
 ## Enemy Class / Rank / Role reorganization — 2026-11-04
 
 **Source Implemented / Awaiting Owner Validation.** Replaced Fleet Family with explicit stable-value EnemyClass/EnemyRank/EnemyRole enums and independent Inspector fields. Migrated all 14 existing definition resources by EnemyId to the owner's suggested assignments after checking SVG dimensions/scene scale; removed old Family entries, property, enum and UID atomically. No behavior, balance, IDs, names, paths, waves or artwork changed. Class-sorted short Wave Editor options show selected metadata separately; F2 retains scene/preview order with full caption metadata. No classification ticking, rank scaling, capability restrictions or Mark system.

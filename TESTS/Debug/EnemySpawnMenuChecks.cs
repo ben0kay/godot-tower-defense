@@ -22,6 +22,7 @@ public partial class EnemySpawnMenuChecks : Node
                 Require(menu != null && !menu.IsOpen && !menu.IsSpawning, "Menu initializes closed and idle");
                 Preview(f, menu);
                 HoverPreview(f, menu);
+                int basicIndex = FindEnemyIndex(menu, "basic_mk1");
                 int before = f.Spawns.Registry.Living.Count;
                 debug._UnhandledKeyInput(new InputEventKey { Keycode = Key.F2, Pressed = true });
                 Require(menu.IsOpen && f.Spawns.Registry.Living.Count == before, "F2 opens without spawning");
@@ -30,16 +31,18 @@ public partial class EnemySpawnMenuChecks : Node
                 debug._Input(new InputEventKey { Keycode = Key.Escape, Pressed = true });
                 Require(!menu.IsOpen, "Escape closes");
                 int waveCreated = 0; f.Spawns.WaveEnemyCreated += _ => waveCreated++;
-                Require(!menu.StartBatch(-1, 2, 0) && !menu.StartBatch(0, 0, 0) && !menu.StartBatch(0, 1, double.NaN), "Reject invalid inputs");
+                Require(!menu.StartBatch(-1, 2, 0) && !menu.StartBatch(0, 2, 0) &&
+                    !menu.StartBatch(basicIndex, 0, 0) && !menu.StartBatch(basicIndex, 1, double.NaN),
+                    "Reject invalid inputs and class headers");
                 menu.MaxSpawnsPerTick = 2;
-                Require(menu.StartBatch(0, 5, 0), "First captured batch");
+                Require(menu.StartBatch(basicIndex, 5, 0), "First captured batch");
                 menu._PhysicsProcess(.016);
                 Require(menu.Spawned == 2 && menu.Remaining == 3, "Zero gap bounded per tick");
                 menu.Close(); menu._PhysicsProcess(.016); menu._PhysicsProcess(.016);
                 Require(menu.Spawned == 5 && !menu.IsSpawning && !menu.IsPhysicsProcessing(), "Exact count completes while closed and sleeps");
                 Require(waveCreated == 0, "Debug ships do not claim authored wave ownership");
                 foreach (Enemy e in f.Spawns.Registry.Living.ToArray()) e.Free();
-                Require(menu.StartBatch(0, 3, .2), "Timed batch starts");
+                Require(menu.StartBatch(basicIndex, 3, .2), "Timed batch starts");
                 menu._PhysicsProcess(.01); Require(menu.Spawned == 1, "First timed delivery");
                 menu._PhysicsProcess(.1); Require(menu.Spawned == 1, "Gap delays next ship");
                 GetTree().Paused = true; menu._PhysicsProcess(10); GetTree().Paused = false;
@@ -49,7 +52,7 @@ public partial class EnemySpawnMenuChecks : Node
                 Require(menu.Spawned == 2 && !menu.IsSpawning, "Cancel keeps existing ships, stops pending");
                 IndependentBatches(f, menu);
                 RandomPortals(f);
-                menu.StartBatch(0, 10, 0); debug.Enabled = false;
+                menu.StartBatch(basicIndex, 10, 0); debug.Enabled = false;
                 Require(!menu.IsSpawning && !menu.IsOpen, "Disabled level tool cancels batch");
             }
             await SubsystemBattlefield.DrainFreedFixtures(this);
@@ -62,30 +65,54 @@ public partial class EnemySpawnMenuChecks : Node
     private static void Preview(AmmoLoopFixture f, EnemySpawnMenu menu)
     {
         OptionButton choice = (OptionButton)menu.FindChild("Enemy", true, false);
-        int before = f.Spawns.Registry.Living.Count;
-        for (int index = 0; index < f.Spawns.Catalog.Scenes.Count; index++)
+        int before = f.Spawns.Registry.Living.Count, shipsSeen = 0, headersSeen = 0;
+        int previousClass = -1;
+        var occupiedClasses = new System.Collections.Generic.HashSet<EnemyClass>();
+        for (int index = 0; index < choice.ItemCount; index++)
         {
+            if (choice.GetPopup().IsItemSeparator(index))
+            {
+                headersSeen++;
+                Require(index == 0 || !choice.GetPopup().IsItemSeparator(index - 1),
+                    "Class headers are not duplicated or adjacent");
+                continue;
+            }
+            string id = choice.GetItemTooltip(index).Split('\n').Last();
+            EnemyDefinition definition = f.Spawns.Catalog.DefinitionFor(id);
+            Require(definition != null && choice.GetItemText(index) == definition.DisplayName,
+                "Every selectable entry resolves to its registered ship");
+            Require((int)definition.Class >= previousClass, "F2 enemy classes sorted Tiny through Titan");
+            if ((int)definition.Class != previousClass)
+                Require(index > 0 && choice.GetPopup().IsItemSeparator(index - 1) &&
+                    choice.GetItemText(index - 1) == EnemyNaming.Class(definition.Class).ToUpperInvariant(),
+                    "Each class begins with a nonselectable named heading");
+            previousClass = (int)definition.Class;
+            occupiedClasses.Add(definition.Class);
+            shipsSeen++;
             choice.Select(index); choice.EmitSignal(OptionButton.SignalName.ItemSelected, index);
-            Require(menu.SpritePreview.SpriteCount >= 1 && menu.SpritePreview.ArtworkBounds.Size.X > 0, "Catalog artwork preview populated");
-            Require(!menu.SpritePreview.IsProcessing() && !menu.SpritePreview.IsPhysicsProcessing(), "Static artwork preview does not tick");
-            Node source = f.Spawns.Catalog.Scenes[index].Instantiate();
+            Require(menu.SpritePreview.SpriteCount >= 1 && menu.SpritePreview.ArtworkBounds.Size.X > 0,
+                "Catalog artwork preview populated");
+            Require(!menu.SpritePreview.IsProcessing() && !menu.SpritePreview.IsPhysicsProcessing(),
+                "Static artwork preview does not tick");
+            Node source = f.Spawns.Catalog.Find(id).Instantiate();
             try
             {
                 Sprite2D hull = source.GetNode<Sprite2D>("Sprite");
                 Sprite2D copy = menu.SpritePreview.GetNode<Node2D>("Artwork").GetChildren().OfType<Sprite2D>().First();
                 Require(copy.Texture == hull.Texture && copy.Scale.IsEqualApprox(hull.Scale) && copy.GetScript().AsGodotObject() == null,
-                    "Native hull texture/scale copied without scripts");
+                    "Sorted F2 entry previews the corresponding hull without scripts");
                 if (source is Enemy enemy)
                 {
-                    Require(choice.GetItemText(index) == enemy.Definition.DisplayName &&
-                        choice.GetItemTooltip(index).Contains(EnemyNaming.ClassificationLabel(enemy.Definition)),
-                        "F2 name and classifications preserve scene-to-preview indices");
+                    Require(choice.GetItemTooltip(index).Contains(EnemyNaming.ClassificationLabel(enemy.Definition)),
+                        "F2 tooltip retains class/rank/role metadata");
                     if (enemy.Definition.EnemyId == "gunner_drone_mk1")
                         Require(menu.SpritePreview.SpriteCount == 2, "Separate gun artwork included");
                 }
             }
             finally { source.Free(); }
         }
+        Require(shipsSeen == f.Spawns.Catalog.Scenes.Count && headersSeen == occupiedClasses.Count,
+            "Every registered ship appears once under its class heading");
         Require(f.Spawns.Registry.Living.Count == before, "Preview never creates a live enemy");
         Node2D large = new() { Scale = Vector2.One * 2 };
         large.AddChild(new Sprite2D { Name = "Sprite", Texture = new PlaceholderTexture2D { Size = new(500, 300) } });
@@ -93,7 +120,8 @@ public partial class EnemySpawnMenuChecks : Node
         menu.SpritePreview.ShowScene(packed); large.Free();
         Require(menu.SpritePreview.ArtworkBounds.Size.IsEqualApprox(new Vector2(1000, 600))
             && menu.SpritePreview.CustomMinimumSize.X >= 1000, "Oversized artwork keeps authored scale instead of shrinking");
-        choice.Select(0); choice.EmitSignal(OptionButton.SignalName.ItemSelected, 0);
+        int firstShip = FindEnemyIndex(menu, "basic_mk1");
+        choice.Select(firstShip); choice.EmitSignal(OptionButton.SignalName.ItemSelected, firstShip);
     }
     // =========================================================
     // The popup highlight previews other enemy art without committing a new spawn type or creating gameplay ships.
@@ -124,7 +152,9 @@ public partial class EnemySpawnMenuChecks : Node
     {
         foreach (Enemy e in f.Spawns.Registry.Living.ToArray()) e.Free();
         menu.MaxSpawnsPerTick = 2;
-        Require(menu.StartBatch(0, 3, .5, true, false) && menu.StartBatch(1, 3, .1, false, true), "Concurrent batches accepted");
+        int basicIndex = FindEnemyIndex(menu, "basic_mk1");
+        int scoutIndex = FindEnemyIndex(menu, "scout_mk1");
+        Require(menu.StartBatch(basicIndex, 3, .5, true, false) && menu.StartBatch(scoutIndex, 3, .1, false, true), "Concurrent batches accepted");
         menu._PhysicsProcess(.016);
         Require(menu.ActiveBatchCount == 2 && menu.Spawned == 2 && menu.Remaining == 4, "Global budget shared by both ready batches");
         Enemy shield = f.Spawns.Registry.Living.Single(e => e.Definition.EnemyId == "basic_mk1");
@@ -147,7 +177,7 @@ public partial class EnemySpawnMenuChecks : Node
         menu._PhysicsProcess(.016);
         Enemy both = f.Spawns.Registry.Living.Single(); Require(both.HasStealth && both.CurrentShield > 0, "Shield and stealth combine"); both.Free();
         menu.MaxSpawnsPerTick = 1;
-        menu.StartBatch(0, 4, 0); menu.StartBatch(1, 4, 0);
+        menu.StartBatch(basicIndex, 4, 0); menu.StartBatch(scoutIndex, 4, 0);
         menu._PhysicsProcess(.016); menu._PhysicsProcess(.016);
         Require(menu.Spawned == 2 && f.Spawns.Registry.Living.Select(e => e.Definition.EnemyId).Distinct().Count() == 2, "One-per-tick budget rotates fairly");
         menu.FindChildren("*", "Button", true, false).OfType<Button>()
@@ -186,6 +216,17 @@ public partial class EnemySpawnMenuChecks : Node
         Require(first > 0 && second > 0, "Both portals used within one enemy batch");
         level.Settings.SpawnMode = LevelConfig.SpawnSourceMode.MapEdges; grid.RebuildTerrain();
         Require(f.Spawns.SpawnRandomPortal(f.Spawns.Catalog.Scenes[0], random) == null, "Portal-only delivery never falls back to edges");
+    }
+    // =========================================================
+    // Find a selectable F2 row by its stable enemy ID; class headings occupy popup indices too.
+    private static int FindEnemyIndex(EnemySpawnMenu menu, string enemyId)
+    {
+        OptionButton choice = (OptionButton)menu.FindChild("Enemy", true, false);
+        for (int index = 0; index < choice.ItemCount; index++)
+            if (!choice.GetPopup().IsItemSeparator(index) &&
+                choice.GetItemTooltip(index).EndsWith("\n" + enemyId, StringComparison.Ordinal))
+                return index;
+        throw new InvalidOperationException("Missing F2 enemy: " + enemyId);
     }
     // =========================================================
     // Fail fast with the behavior under test.
