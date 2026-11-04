@@ -5,9 +5,7 @@
 [resource]
 script = ExtResource("1_style")
 DurationSeconds = 1.35
-FadeInSeconds = 0.15
-FadeSeconds = 0.48
 RisePixels = 20.0
-StartScale = 0.96
+StartScale = 1.0
 EndScale = 1.14
 FontSize = 13
