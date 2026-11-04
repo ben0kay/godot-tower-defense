@@ -1,3 +1,9 @@
+## F2 friendly enemy labels — 2026-11-04
+
+The F2 enemy dropdown now shows **Role · DisplayName (stable EnemyId)** rather than only the ship name. It retains the **original scene-catalog order** and selected index → preview / batch mapping to avoid changing debug spawning behavior. Four vague display names were clarified via the underlying `EnemyDefinition.tres` resources. See [fleet roster](../../ENEMIES/Types/ROSTER.md) for numbered source folder mappings. No spawn frequencies, caps, wave ownership or scene assets changed.
+
+---
+
 ## F2 hover-to-preview enemy artwork — 2026-10-21
 
 Opening the F2 enemy OptionButton dropdown now previews the enemy under the mouse **immediately without selecting it**. Arrow-key-highlighted rows use the same behaviour. Clicking a row still commits the enemy used by "Spawn batch"; hovering alone never changes the chosen type or submits/spawns a batch. Dismissing the list with Escape, an outside click, or reopening F2 without choosing returns to the committed selection's artwork and native-size caption.

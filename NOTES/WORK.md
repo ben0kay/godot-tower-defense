@@ -1,3 +1,9 @@
+## 2026-11-04 — consistent fleet naming in Wave Editor/F2
+
+Created [ENEMIES/Types/ROSTER.md](../ENEMIES/Types/ROSTER.md), mapping all 14 current ship roles, player-visible names, stable EnemyIds and physical folders. Renamed only four vague `DisplayName` strings: Big mk.1 → Heavy Warship, Elite mk.1 → Elite Assault Ship, Racer → Racer Interceptor, Transporter → Drone Transporter. Added shared `EnemyNaming` helper for role text; Wave Editor choice list is grouped by `EnemyFamily`, and F2 shows the role/name/ID without changing scene index order. **No asset folder relocation**, no stable IDs, game stats, waves, or save data changed. Future physical folder/basename migration is separately documented. Focused source review; Godot.NET smoke check pending.
+
+---
+
 ## 2026-11-03 — Level001 rebuilt as beginner wave tutorial
 
 Replaced 133-enemy shield-heavy first-mission composition with **three gentle waves: 10 basic / 14 basic / 20 total**. Wave 3 begins with ten plain Standards, then a ten-ship 50/50 weighted mix of Standard/fast Scout after one second; no shields, stealth, Bulwarks or support enemies. All 44 ships fit the unchanged 1,000-starting-Credits mission and manually started waves. Added `LEVELS/Level001/Level001Waves.tres` and repointed `Level001Config.tres.WaveSource` so the user can later author per-wave banners and messages in the Godot Wave Editor. Presentation fields left blank; `Level001Waves.cs` mirrors the data only as legacy reference. Updated focused integration assertions against the authoritative resource and Level001 Mission/README. Source-level verification only; local Godot run pending. Earlier 38/40/55 Level001 shield-test descriptions in historical notes are superseded.

@@ -1,3 +1,9 @@
+## Fleet role labels in enemy picker — 2026-11-04
+
+The enemy dropdown now **groups registered types by fleet role** (Drone, Interceptor, Bulwark, Shield Ship, Carrier, Support, Capital Ship and Assault) and shows `Role · DisplayName (EnemyId)`. This distinguishes the old `Enemy001` source asset from the actual Standard Drone and gives more meaning to Racer/Bulwark/Transporter variants. The stored `EnemyId` remains unchanged, and the existing [enemy roster](../../ENEMIES/Types/ROSTER.md) maps all 14 types. Refresh list after updating a display name. No wave file migration or spawning logic changed; Godot.NET editor display requires a local smoke check.
+
+---
+
 ## Level003 Wave 4 updated — 2026-11-03
 
 The current `Level003Waves.tres` Wave 4 has **two** mixed batches. In the live composition preview, **Wave 4 → Batch 1** now displays **16 total: 8 Standard + 4 Scout + 4 Bulwark**; **Batch 2** displays **16 total: 4 Standard + 8 Scout + 4 Bulwark**. The historical layout-test examples below describe an older 75/25 Wave 4 before this balance change; use these current values when testing the dropdown or preview. There are still 32 enemies in Wave 4. No plugin implementation changed for this balance pass.

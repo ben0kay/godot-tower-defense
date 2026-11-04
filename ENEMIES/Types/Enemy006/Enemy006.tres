@@ -6,7 +6,7 @@
 script = ExtResource("1")
 EnemyId = "elite_mk1"
 Family = 7
-DisplayName = "Elite mk.1"
+DisplayName = "Elite Assault Ship"
 MaxHealth = 1000.0
 MaxShield = 250.0
 MoveSpeed = 100.0

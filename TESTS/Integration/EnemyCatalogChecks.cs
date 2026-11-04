@@ -23,7 +23,15 @@ public static class EnemyCatalogChecks
             && mediumDefinition.MoveSpeed == 75 && mediumDefinition.RadiusPixels == 22
             && mediumDefinition.KillRewardCredits == 7 && mediumDefinition.CitadelDamage == 2,
             "Enemy004 has independent medium-ship identity, size and balance");
+        // Role label mapping may change UI text but must never touch stable catalog IDs or family enum values.
+        Require(EnemyNaming.Role(EnemyFamily.Drone) == "Drone" &&
+            EnemyNaming.Role(EnemyFamily.CapitalShip) == "Capital Ship" &&
+            EnemyNaming.Role(EnemyFamily.ShieldShip) == "Shield Ship",
+            "F2 and wave authoring share readable fleet role names");
         EnemyCatalog catalog = spawns.Catalog;
+        Require(catalog.DefinitionFor("racer_mk1").DisplayName == "Racer Interceptor" &&
+            catalog.DefinitionFor("transporter_mk1").DisplayName == "Drone Transporter",
+            "Ambiguous placeholder ship names are replaced without changing their IDs");
         var scenes = WaveCatalog.LoadScenes();
         Require(catalog.Find("basic_mk1") == scenes["basic_mk1"] && catalog.Find("scout_mk1") == scenes["scout_mk1"] && catalog.Find("medium_mk1") == scenes["medium_mk1"] && catalog.Find("unknown") == null,
             "Wave adapter reads actual enemy registration");
@@ -90,7 +98,7 @@ public static class EnemyCatalogChecks
             "Medium ship's existing kill pipeline pays exactly seven Credits");
         // Big mk.1 is a separate plain heavy type: catalog/F2, clearance, credits and optional shields.
         EnemyDefinition bigData = GD.Load<EnemyDefinition>("res://ENEMIES/Types/Enemy005/Enemy005.tres");
-        Require(bigData.EnemyId == "big_mk1" && bigData.DisplayName == "Big mk.1"
+        Require(bigData.EnemyId == "big_mk1" && bigData.DisplayName == "Heavy Warship"
             && bigData.MaxHealth == 1000 && bigData.MaxShield == 200 && bigData.MoveSpeed == 80
             && bigData.CitadelDamage == 5 && bigData.KillRewardCredits == 10
             && bigData.RadiusPixels == 24 && catalog.Find("big_mk1") == scenes["big_mk1"],
@@ -134,7 +142,7 @@ public static class EnemyCatalogChecks
         // =========================================================
         // Elite mk.1 uses the ordinary inherited enemy scene and the existing shields/credits pipeline.
         EnemyDefinition eliteData = GD.Load<EnemyDefinition>("res://ENEMIES/Types/Enemy006/Enemy006.tres");
-        Require(eliteData.EnemyId == "elite_mk1" && eliteData.DisplayName == "Elite mk.1"
+        Require(eliteData.EnemyId == "elite_mk1" && eliteData.DisplayName == "Elite Assault Ship"
             && eliteData.MaxHealth == 1000 && eliteData.MaxShield == 250 && eliteData.MoveSpeed == 100
             && eliteData.RadiusPixels == 24 && eliteData.TurnSpeed == 6
             && eliteData.CitadelDamage == 5 && eliteData.KillRewardCredits == 10

@@ -24,7 +24,7 @@ public partial class WaveEditorPanel : VBoxContainer
     private OptionButton _alert, _enemyId;
     private LineEdit _bannerTitle, _bannerDescription, _speaker, _narration, _voiceCue, _portal;
     private EnemyCatalog _enemyCatalog;
-    private List<(string Id, string Name)> _enemyChoices = new();
+    private List<(string Id, string Name, EnemyFamily Family)> _enemyChoices = new();
     private CheckBox _shield, _stealth;
     private EditorFileDialog _openFile, _newFile;
     private ConfirmationDialog _discard, _confirmDelete;
@@ -226,8 +226,12 @@ public partial class WaveEditorPanel : VBoxContainer
             if (catalog == null) throw new InvalidOperationException("DefaultEnemyCatalog.tres could not be loaded.");
             catalog.Rebuild();
             var choices = catalog.ToSceneMap().Keys.Select(id =>
-                (Id: id, Name: catalog.DefinitionFor(id)?.DisplayName ?? id))
-                .OrderBy(e => e.Name, StringComparer.OrdinalIgnoreCase).ThenBy(e => e.Id, StringComparer.Ordinal).ToList();
+            {
+                EnemyDefinition definition = catalog.DefinitionFor(id);
+                return (Id: id, Name: definition?.DisplayName ?? id, Family: definition?.Family ?? EnemyFamily.Drone);
+            })
+                .OrderBy(e => e.Family).ThenBy(e => e.Name, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(e => e.Id, StringComparer.Ordinal).ToList();
             _enemyCatalog = catalog; _enemyChoices = choices;
             Refresh(); Message("Enemy list refreshed: " + choices.Count + " registered types.");
         }
@@ -254,7 +258,7 @@ public partial class WaveEditorPanel : VBoxContainer
         for (int i = 0; i < _enemyChoices.Count; i++)
         {
             var item = _enemyChoices[i];
-            _enemyId.AddItem(item.Name + " (" + item.Id + ")");
+            _enemyId.AddItem(EnemyNaming.Role(item.Family) + " · " + item.Name + " (" + item.Id + ")");
         }
         int selected = _enemyChoices.FindIndex(e => e.Id == id);
         if (selected < 0)
