@@ -1,4 +1,12 @@
-# Shared power generation — FUTURE / NOT IMPLEMENTED
+## PW1 topology ownership — 2026-11-04
+
+`PowerGridManager.cs` is the one scene-owned `World/PowerNetworks` service. It reads WorldGrid's cached conductivity after Grid initialization, listens to `TerrainRebuilt` and skips work unless `PowerTerrainRevision` changes. `PowerIslandMap.cs` uses two reusable int arrays for iterative four-neighbour regions, cell counts and multi-cell footprint queries. No process/physics callbacks, per-building nodes or scans of enemies/towers. Region IDs are snapshot-local (0 = none), not durable save IDs; topology rebuilds on loading. F4 reads cached diagnostics. See [PW0 audit and phases](../IMPLEMENTATION_PLAN.md) and [checks](../../../../TESTS/Power/README.md).
+
+Later Citadel starter power and all generator types will register with this authority. No generation, consumer registration, allocation, outage, fuel, relay graph or PowerMasterConfig is added by PW1. The original generator design below remains future work; owner Godot validation is pending.
+
+---
+
+# Shared power — PW1 topology; generator implementation planned
 
 ## Why one shared implementation?
 **Solar Generator, Industrial Generator and Fusion Reactor all perform the same job: produce electricity.** They should eventually share one PowerGenerator building implementation and one PowerGeneratorConfig shape, using separate stable tower IDs, authored settings, artwork and build-menu entries. Do not create three copies of electricity-generation logic.

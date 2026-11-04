@@ -8,21 +8,26 @@
 texture = ExtResource("1")
 texture_region_size = Vector2i(64, 64)
 2:0/0 = 0
+2:0/0/custom_data_2 = true
 2:0/0/custom_data_0 = true
 4:0/0 = 0
+4:0/0/custom_data_2 = true
 4:0/0/custom_data_0 = true
 
 [sub_resource type="TileSetAtlasSource" id="NewMetalFloor"]
 texture = ExtResource("2_new_metal")
 texture_region_size = Vector2i(64, 64)
 2:0/0 = 0
+2:0/0/custom_data_2 = true
 3:0/0 = 0
+3:0/0/custom_data_2 = true
 3:0/0/custom_data_0 = true
 
 [sub_resource type="TileSetAtlasSource" id="MarsDust"]
 texture = ExtResource("3_mars")
 texture_region_size = Vector2i(64, 64)
 0:0/0 = 0
+0:0/0/custom_data_2 = true
 
 [resource]
 tile_size = Vector2i(64, 64)
@@ -30,6 +35,8 @@ custom_data_layer_0/name = "can_build"
 custom_data_layer_0/type = 1
 custom_data_layer_1/name = "blocks_enemies"
 custom_data_layer_1/type = 1
+custom_data_layer_2/name = "conducts_power"
+custom_data_layer_2/type = 1
 sources/0 = SubResource("Atlas")
 sources/1 = SubResource("NewMetalFloor")
 sources/2 = SubResource("MarsDust")

@@ -1,3 +1,11 @@
+## PW1 independent power terrain facts — 2026-11-04
+
+WorldGrid now caches optional Boolean `conducts_power` alongside its existing terrain facts, using Passable → Interactive → Impassable precedence. Current gameplay palettes explicitly mark solid land true and Lava false; Decorations and empty space never conduct. Custom palettes missing the field default to conducting painted land; a present field of the wrong type rejects setup. When adding the field to a custom TileSet, author every desired conducting tile true (Godot's Boolean default is false). Build permission, enemy blockage, reservations and tower occupancy remain independent.
+
+`TerrainConductsPower(cell)` is a constant-time query. `PowerTerrainRevision` changes only when the effective conductivity mask changes; `TerrainRebuilt` still publishes normal explicit rebuild completion. Existing navigation revision/events retain their original rules. The new world-owned PowerGridManager listens to that event and skips identical masks. Runtime paint/erase or conductivity edits require `RebuildTerrain`; dimensions still require restart. See [power plan](../../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md). No per-frame terrain work or power-driven navigation work was added.
+
+---
+
 ## PF2 debug update (2026-10-20)
 
 Optional subsystem timing hooks feed the existing F4 panel (Shift+F4 toggles profiling; F5 saves a report). Old GridDebugOverlay/Info labels are retired; F2/F3 remain. See `DEBUG/README.md` for inclusive timing semantics, fixed sample storage and validation details. Historical notes below remain as reference.

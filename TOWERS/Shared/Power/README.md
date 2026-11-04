@@ -1,3 +1,9 @@
+## PW0 audit / PW1 boundary — 2026-11-04
+
+Terrain island detection is source implemented in [Economy Power](../../Economy/Power/IMPLEMENTATION_PLAN.md). Consumer code here remains planned for PW4. Reuse the existing TowerDisableReason.NoPower and owned ApplyDisable/RemoveDisable handles; do not create a second disable mechanism. Demand activity, generator accounting and consumer registration are later work; all current towers remain operational. Save priorities as durable input and rebuild derived NoPower allocation before resume. Full phase contracts and outstanding demand decisions are in the power plan.
+
+---
+
 # Per-building power use — FUTURE / NOT IMPLEMENTED
 
 ## Purpose

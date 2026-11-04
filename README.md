@@ -1,3 +1,9 @@
+## Power PW0/PW1 — 2026-11-04
+
+**PW0 audit complete; PW1 source implemented / owner Godot validation pending.** Cached four-neighbour power islands now come from independent `conducts_power` terrain metadata, with no per-frame manager work or rebuilds on tower occupancy. F4 reports topology/hovered island and rebuild timing. Tower operation remains unchanged; Citadel baseline output is planned for PW2. See [phased implementation plan](TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md) and [focused checks](TESTS/Power/README.md). Generation, consumption, shortages and relays are not yet implemented.
+
+---
+
 ## Enemy Class, Rank and Role — 2026-11-04
 
 All 14 enemy definitions now use independent descriptive Class/Rank/Role metadata. Wave Editor sorts by Class with separate metadata details; F2 keeps catalog order and matching 1:1 previews. Stats, abilities, art, IDs, paths and waves are unchanged. See [roster/migration notes](ENEMIES/Types/ROSTER.md), including external custom-resource and checkpoint-fingerprint caveats. Source implemented; owner Godot validation pending.

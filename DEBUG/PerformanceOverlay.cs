@@ -19,8 +19,9 @@ public partial class PerformanceOverlay : CanvasLayer
     [Export] public int QueueWarning { get; set; } = 32;
     [Export] public int QueueCritical { get; set; } = 128;
     private PanelContainer _panel;
-    private readonly Label[] _rows = new Label[21];
+    private readonly Label[] _rows = new Label[23];
     private PathRequestManager _paths;
+    private PowerGridManager _power;
     private EnemyRegistry _enemies;
     private Node _projectiles;
     private Control _topBar, _bottomArea;
@@ -61,6 +62,7 @@ public partial class PerformanceOverlay : CanvasLayer
     {
         if (!IsInsideTree()) return;
         Node battle = GetParent();
+        _power = battle.GetNodeOrNull<PowerGridManager>("World/PowerNetworks");
         _paths = battle.GetNodeOrNull<PathRequestManager>("World/EnemySystems/Paths");
         _enemies = battle.GetNodeOrNull<EnemyRegistry>("World/EnemySystems/Registry");
         _projectiles = battle.GetNodeOrNull<Node>("World/Projectiles");
@@ -183,7 +185,7 @@ public partial class PerformanceOverlay : CanvasLayer
         Write(5, paths ? $"Path queue {pending} · audit queue {_paths.PendingValidationCount} · audit peak {_validationPeak:0.00}ms" : "Route validation N/A", Pressure(pending, QueueWarning, QueueCritical));
         Write(6, _headless ? "Rendering N/A (headless)" : $"Draw calls {Performance.GetMonitor(Performance.Monitor.RenderTotalDrawCallsInFrame):0} · render objects {Performance.GetMonitor(Performance.Monitor.RenderTotalObjectsInFrame):0}", Normal);
         Write(7, "Shift+F4: profile " + (_profiler?.Running == true ? "ON" : "OFF") + " · F5: save report", new Color("#9aafbd"));
-        for (int i = 8; i < _rows.Length; i++) _rows[i].Visible = _profileRequested;
+        for (int i = 8; i <= 20; i++) _rows[i].Visible = _profileRequested;
         if (_profileRequested && _profiler != null)
         {
             for (int i = 0; i < SubsystemProfiler.CategoryCount; i++)
@@ -194,6 +196,14 @@ public partial class PerformanceOverlay : CanvasLayer
             Write(19, $"Mean / p95 / peak per sampled tick · n={_profiler.Samples} · stride={ProfileEveryTicks}", Normal);
             Write(20, $"Nested rows overlap · observer {_profiler.BookkeepingMeanMs:0.000}ms/tick (partial)", Warning);
         }
+        if (GodotObject.IsInstanceValid(_power) && GodotObject.IsInstanceValid(_power.Grid))
+        {
+            Vector2I cell = _power.Grid.WorldToCell(_power.Grid.GetGlobalMousePosition());
+            int region = _power.RegionAt(cell);
+            Write(21, $"Power islands {_power.IslandCount} · cells {_power.ConductingCellCount} · rebuild #{_power.RebuildCount} {_power.LastRebuildMilliseconds:0.00}ms · topology only", Normal);
+            Write(22, $"Power hover {cell}: island {region} · {_power.CellCount(region)} cells (0 = no island)", Normal);
+        }
+        else { Write(21, "Power topology N/A", Normal); Write(22, "Power hover N/A", Normal); }
         LayoutPanel();
     }
     #endregion

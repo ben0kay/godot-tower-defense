@@ -1,0 +1,111 @@
+// Focused PW1 checks: four-neighbour regions, real terrain precedence, cached invalidation and dormant lifecycle.
+using Godot;
+using System;
+
+public partial class PowerNetworkChecks : Node
+{
+    // =========================================================
+    // One small synthetic world uses production grid code and palettes without running combat or campaign fixtures.
+    public override void _Ready()
+    {
+        try
+        {
+            CheckRegions();
+            CheckTerrain();
+            GD.Print("PASS: power islands, merges/splits, metadata, precedence, occupancy isolation and dormant processing");
+            GetTree().Quit();
+        }
+        catch (Exception error) { GD.PushError(error.ToString()); GetTree().Quit(1); }
+    }
+
+    // =========================================================
+    // Check row-wrap, diagonals, footprint bounds and deterministic relabeling without scene-tree work.
+    private static void CheckRegions()
+    {
+        PowerIslandMap map = new();
+        bool[] cells = new bool[12]; cells[3] = cells[4] = true;
+        map.Rebuild(4, 3, cells);
+        Require(map.IslandCount == 2 && map.RegionAt(3, 0) != map.RegionAt(0, 1), "Rows never wrap into neighbours");
+        Array.Clear(cells); cells[0] = cells[5] = true; map.Rebuild(4, 3, cells);
+        Require(map.IslandCount == 2, "Diagonal-only contacts remain separate");
+        cells[1] = true; map.Rebuild(4, 3, cells);
+        Require(map.IslandCount == 1 && map.CellCount(1) == 3 && map.ConductingCellCount == 3, "Edge bridge merges islands");
+        Require(map.RegionForFootprint(0, 0, 2, 1) == 1 && map.RegionForFootprint(0, 0, 2, 2) == 0,
+            "Whole footprint must have conducting terrain, including holes");
+        Require(map.RegionAt(-1, 0) == 0 && map.RegionAt(4, 0) == 0 && map.CellCount(999) == 0 &&
+            map.RegionForFootprint(int.MaxValue, 0, 2, 1) == 0 && map.RegionForFootprint(0, 0, 0, 1) == 0,
+            "Outside/invalid queries return no island without overflowing");
+        cells[1] = false; map.Rebuild(4, 3, cells);
+        Require(map.IslandCount == 2 && map.RegionAt(0, 0) == 1 && map.RegionAt(1, 1) == 2, "Removing bridge splits and labels in row order");
+        map.Rebuild(4, 3, cells); Require(map.RegionAt(1, 1) == 2, "Same topology gives deterministic snapshot IDs");
+        Array.Clear(cells); map.Rebuild(4, 3, cells);
+        Require(map.IslandCount == 0 && map.ConductingCellCount == 0 && map.RegionAt(0, 0) == 0, "Empty rebuild clears old labels");
+    }
+
+    // =========================================================
+    // No services beyond Level/Grid/PowerNetworks; transformed coordinates use the normal WorldGrid conversion.
+    private void CheckTerrain()
+    {
+        Node2D world = new() { Position = new(100, -40), Rotation = .17f, Scale = new(1.2f, 1.2f) };
+        WorldLevel level = new() { Name = "Level", Settings = new LevelConfig() };
+        world.AddChild(level);
+        Node2D terrain = new() { Name = "Terrain" }; level.AddChild(terrain);
+        TileMapLayer passable = Layer(terrain, "Passable", "PassableTerrain");
+        TileMapLayer interactive = Layer(terrain, "Interactive", "InteractiveTerrain");
+        TileMapLayer impassable = Layer(terrain, "Impassable", "ImpassableTerrain");
+        TileMapLayer decorations = Layer(terrain, "Decorations", "DecorationTerrain");
+        Vector2I a = new(3, 3), b = new(5, 3), diagonal = new(6, 4), bridge = new(4, 3), join = new(6, 3);
+        foreach (Vector2I cell in new[] { a, b, diagonal }) passable.SetCell(cell, 0, new(2, 0));
+        decorations.SetCell(new(10, 8), 0, new(5, 0));
+        Node2D objectives = new() { Name = "Objectives" }; level.AddChild(objectives);
+        WorldObjectFootprint citadel = new() { Name = "Citadel", Position = new(224, 224), SizeCells = Vector2I.One, BlocksEnemies = true };
+        objectives.AddChild(citadel); citadel.AddChild(new CitadelHealth { Name = "Health" });
+        Node2D approaches = new() { Name = "ApproachPoints" }; citadel.AddChild(approaches);
+        approaches.AddChild(new Marker2D { Position = new(0, 64) });
+        WorldGrid grid = new() { Name = "Grid", Config = new WorldMasterConfig { WidthCells = 12, HeightCells = 10 } };
+        world.AddChild(grid);
+        PowerGridManager power = new() { Name = "PowerNetworks" }; world.AddChild(power);
+        try
+        {
+            AddChild(world);
+            Require(power.IslandCount == 3 && power.ConductingCellCount == 3 && power.RebuildCount == 1, "Startup discovers terrain islands");
+            Require(grid.WorldToCell(grid.CellToWorldCenter(a)) == a && power.RegionAt(a) != power.RegionAt(b), "Transforms retain correct cell ownership");
+            Require(grid.TerrainConductsPower(a) && !grid.CanBuild(a) && grid.TerrainBlocksEnemies(a), "Citadel reservations do not erase land conductivity");
+            Require(power.RegionAt(new(10, 8)) == 0 && power.RegionAt(new(2, 2)) == 0, "Decorations/empty space never join grids");
+            int rebuilds = power.RebuildCount, navigation = grid.NavigationRevision;
+            grid.RebuildTerrain();
+            Require(power.RebuildCount == rebuilds && grid.NavigationRevision == navigation, "Unchanged terrain skips topology and navigation rebuilds");
+            Require(grid.TryOccupy(b), "Test tower footprint occupies legal floor");
+            grid.RebuildTerrain(); grid.ReleaseOccupancy(b);
+            Require(power.RebuildCount == rebuilds && power.RegionAt(b) > 0, "Tower occupancy/removal never rebuilds or severs islands");
+            int notices = 0; power.NetworksChanged += () => notices++;
+            passable.SetCell(bridge, 0, new(2, 0)); grid.RebuildTerrain();
+            Require(power.IslandCount == 2 && notices == 1, "Terrain bridge merges, diagonal island remains separate");
+            passable.SetCell(join, 0, new(2, 0)); grid.RebuildTerrain();
+            Require(power.IslandCount == 1 && power.RegionForFootprint(a, new(3, 1)) > 0, "Second edge joins final island");
+            passable.EraseCell(bridge); grid.RebuildTerrain(); Require(power.IslandCount == 2, "Erased bridge splits grids");
+            navigation = grid.NavigationRevision;
+            interactive.SetCell(join, 1, new(0, 0)); grid.RebuildTerrain();
+            Require(power.IslandCount == 3 && power.RegionAt(join) == 0 && grid.NavigationRevision == navigation,
+                "Lava cuts conduction over floor without forcing a navigation revision");
+            interactive.SetCell(join, 0, new(1, 0)); grid.RebuildTerrain();
+            Require(power.IslandCount == 2 && grid.TerrainConductsPower(join) && grid.TerrainBlocksEnemies(join),
+                "Solid raised Foundation conducts independently of pathability");
+            impassable.SetCell(bridge, 0, new(0, 0)); grid.RebuildTerrain();
+            Require(power.IslandCount == 1 && grid.TerrainConductsPower(bridge) && !grid.CanBuild(bridge), "Nonbuildable wall joins the physical island");
+            interactive.SetCell(bridge, 1, new(0, 0)); grid.RebuildTerrain();
+            Require(power.IslandCount == 1 && grid.TerrainConductsPower(bridge), "Impassable wins over Interactive for conductivity too");
+            Require(!power.IsProcessing() && !power.IsPhysicsProcessing(), "Topology manager has no idle/frame callbacks");
+        }
+        finally { world.Free(); }
+    }
+
+    // =========================================================
+    // Authored production palettes are read-only; test paint exists only in disposable scene instances.
+    private static TileMapLayer Layer(Node parent, string name, string palette)
+    {
+        TileMapLayer layer = new() { Name = name, TileSet = GD.Load<TileSet>("res://WORLD/TERRAIN/TileSets/" + palette + ".tres") };
+        parent.AddChild(layer); return layer;
+    }
+    private static void Require(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
+}

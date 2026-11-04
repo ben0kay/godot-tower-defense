@@ -1,3 +1,11 @@
+## PW1 power conductivity metadata — 2026-11-04
+
+Appended Boolean **conducts_power** to Passable, Impassable, Interactive and the legacy WorldTerrain palette without renumbering existing fields or tile/source IDs. All existing gameplay land (including nonbuildable floors, walls/rock and raised Foundation) is explicitly true; Lava is false. Decorations contribute no power terrain regardless of artwork. WorldGrid uses normal gameplay-layer precedence, so an Impassable tile still wins over an Interactive overlay. Existing can_build/blocks_enemies/interaction values and painted maps are unchanged.
+
+This is independent descriptive terrain connectivity, not a live power requirement. Inspect the new flag in TileSet Custom Data. Custom palettes without it treat painted gameplay tiles as conducting; when adding it, set conducting tiles true explicitly because new Boolean custom data defaults false. Call WorldGrid.RebuildTerrain or restart after changes. See [PW0/PW1 plan](../../../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md).
+
+---
+
 ## Mars desert/rock terrain — additive 2026-10-18
 
 New editable `Tiles/Mars/mars_ground_atlas.svg` is a separate 128×64 vector source, registered as **source 2** in both Passable and Impassable palettes. Dust (0,0) is passable/unbuildable and dark rugged Mars rock (1,0) is impassable/unbuildable. `source 0` prototype and `source 1` metal art, metadata and authored map cells remain unchanged. See [Mars tiles](../Tiles/Mars/README.md) to add 64px variations without replacing existing coordinates. WorldGrid consumes ordinary cached Boolean rules; no extra runtime logic.

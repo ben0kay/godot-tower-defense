@@ -1,3 +1,9 @@
+## Planned starter power — PW2 (2026-11-04)
+
+The Citadel will supply configurable baseline electricity to its connected terrain island, enough for a deliberately tuned opening defense before extra generators. Each living/available Citadel registers as an independent producer with the shared PowerGridManager; no separate local-power logic or wave-only generation clock. Output amount, settings resource and registration remain PW2 work, not implemented by PW0/PW1. Current power work only identifies terrain islands. See [audit and phases](../../../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md).
+
+---
+
 ## Live Citadel critical-integrity warnings — 2026-10-21
 
 **Source implemented; Godot/.NET and in-game visual verification pending.** The existing F7-only `citadel_critical` major alert now also triggers automatically from **authoritative, event-driven `CitadelHealth.HealthChanged`** when a *living* Citadel enters the HUD's critical band (`UI/DefaultUIConfig.tres → HealthCriticalThreshold`, default **25%**, including exactly 25%). There is no HP polling, extra physics callback or duplicate notification system. Damage that jumps directly to **0 HP** uses the existing defeat flow; no pointless critical banner is queued behind the Results screen.

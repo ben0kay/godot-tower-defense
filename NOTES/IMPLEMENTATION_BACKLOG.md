@@ -1,3 +1,9 @@
+## Power PW0/PW1 update — 2026-11-04
+
+Terrain power islands and F4 topology diagnostics are now source implemented, with the phased audit recorded. Citadel starter generation is explicitly planned for PW2; no tower operation or consumer gating changed. This update supersedes the power item's earlier blanket not-implemented status; the November 3 audit below remains historical for other areas.
+
+---
+
 # Implementation Backlog — Current Status and Remaining Work
 
 > **Updated:** 2026-11-03 · Source: `dev` at [5aa469e](https://github.com/ben0kay/godot-tower-defense/commit/5aa469e40b2bd8e58cfbd00387c9981ade562b36). Original October 23 audit (on old `main` commit [4b7fbe3](https://github.com/ben0kay/godot-tower-defense/commit/4b7fbe3f4f8dbb0f8978062c38db03b892c995da)) preserved below as historical context.
@@ -31,7 +37,7 @@ The original 26-area order is preserved for continuity. **Not every ranked item 
 | # | Work area | Complexity | Suggested tool | Status on `dev` / next useful slice |
 | ---: | --- | --- | --- | --- |
 | 1 | [Campaign and battlefield saving](../SYSTEMS/Saving/README.md) | Very high | **Codex** | **SOURCE DONE (S0–S3), QA OPEN:** one-current-checkpoint between-wave save, profile store, Esc Save/Load and Campaign Continue. Verify resume in Godot, original reward tickets, active builders/ammo. Mid-combat save and multiple slots remain excluded. |
-| 2 | [Electricity / island power networks](../TOWERS/Economy/Power/README.md) | Very high | **Codex** | **NOT IMPLEMENTED:** island electricity networks, generators, consumers, priority shortages and relay joins. Stage terrain connectivity/accounting before tower shutdown behaviour. |
+| 2 | [Electricity / island power networks](../TOWERS/Economy/Power/README.md) | Very high | **Codex** | **PARTIAL (PW0/PW1):** source audit/phased plan, cached conducting terrain islands and F4 diagnostics implemented; owner Godot validation pending. **NEXT PW2:** Citadel baseline output + supply/demand accounting. Generators, consumers/shortages and relays remain planned. See [power phases](../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md). |
 | 3 | [PF0/PF3–PF5 combat performance](AGENT_FINDINGS/Performance.md) | Very high | **Codex + local measurements** | **PARTIAL / PROFILE NEXT:** PF1 routing/cache fixes and PF2 F4 profiling exist. Reproduce Level100 400/500-enemy CPU/GPU frame timings, then one measured PF4 fix and PF5 validation. |
 | 4 | [Research system expansion](../SYSTEMS/Progression/Research/README.md) | Very high | **Codex** | **PARTIAL:** foundation/research starter nodes exist; broader tree, prerequisites, unlocks, doctrines and story branches remain. |
 | 5 | [Wave Phase 3: advanced progression](../LEVELS/Waves/README.md) | High | **Codex** | **PARTIAL:** finite manual mixed waves, banners and narrator exist. Editor .tres pilot/WP1 delivered; auto start, history, extras and scripted encounters remain separate work. |

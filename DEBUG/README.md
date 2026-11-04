@@ -1,3 +1,9 @@
+## PW1 F4 power topology diagnostics — 2026-11-04
+
+F4 now includes two read-only rows showing cached island/cell totals, rebuild count/last topology milliseconds, and hovered cell/island/cell count. Island 0 means empty, nonconducting, decorative or outside terrain. Existing profiling rows keep their indices; these two rows remain visible without enabling subsystem profiling. Uses the existing throttled refresh, no terrain/tower/enemy scans or new polling loop; hiding F4 stops sampling. No capacity/powered status exists yet. See [power plan](../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md) and [owner checks](../TESTS/Power/README.md). Build/runtime/visual acceptance pending.
+
+---
+
 ## F2 hover-to-preview enemy artwork — 2026-10-21
 
 Opening the F2 enemy OptionButton dropdown now previews the enemy under the mouse **immediately without selecting it**. Arrow-key-highlighted rows use the same behaviour. Clicking a row still commits the enemy used by "Spawn batch"; hovering alone never changes the chosen type or submits/spawns a batch. Dismissing the list with Escape, an outside click, or reopening F2 without choosing returns to the committed selection's artwork and native-size caption.

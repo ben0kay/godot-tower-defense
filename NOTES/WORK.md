@@ -1,3 +1,9 @@
+## Power PW0/PW1 — 2026-11-04
+
+**PW0 audit complete; PW1 source implemented / owner Godot validation pending.** Cached four-neighbour power islands now come from independent `conducts_power` terrain metadata, with no per-frame manager work or rebuilds on tower occupancy. F4 reports topology/hovered island and rebuild timing. Tower operation remains unchanged; Citadel baseline output is planned for PW2. See [phased implementation plan](../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md) and [focused checks](../TESTS/Power/README.md). Generation, consumption, shortages and relays are not yet implemented.
+
+---
+
 ## 2026-11-04 — reusable enemy design template (documentation only)
 
 Created [ENEMIES/Types/NEW_ENEMY_TEMPLATE.md](../ENEMIES/Types/NEW_ENEMY_TEMPLATE.md) for future AI/Codex enemy authoring. The file documents the current independent Class/Rank/Role enums, how Mk variants and unusual/anomaly ships fit without rigid ability restrictions, a fill-in brief for visuals/stats/abilities, and a focused safe implementation checklist (reuse GenericEnemy, stable EnemyId, new folder, catalog, docs, no unrequested waves, performance). Linked from Types/README.md. **No code, gameplay, assets, balance, waves or classification values changed.** Documentation-only source review; no build necessary.
