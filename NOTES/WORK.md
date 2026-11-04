@@ -1,3 +1,9 @@
+## 2026-11-04 — reusable enemy design template (documentation only)
+
+Created [ENEMIES/Types/NEW_ENEMY_TEMPLATE.md](../ENEMIES/Types/NEW_ENEMY_TEMPLATE.md) for future AI/Codex enemy authoring. The file documents the current independent Class/Rank/Role enums, how Mk variants and unusual/anomaly ships fit without rigid ability restrictions, a fill-in brief for visuals/stats/abilities, and a focused safe implementation checklist (reuse GenericEnemy, stable EnemyId, new folder, catalog, docs, no unrequested waves, performance). Linked from Types/README.md. **No code, gameplay, assets, balance, waves or classification values changed.** Documentation-only source review; no build necessary.
+
+---
+
 ## 2026-11-04 — F2 enemy dropdown grouped by physical Class
 
 F2 now shows non-selectable class section headings for occupied sizes, **Tiny → Light → Standard → Heavy → Superheavy → Capital → Titan** (when populated), with enemy names alphabetized within each group. Enemy Rank, Role, ID and pixel-size preview remain in the side panel/tooltip. The menu has explicit aligned index slots for headings to avoid wrong sprites or spawns; hover ignores headers and direct header spawn requests reject. The corresponding F2 focused checks now resolve by stable EnemyId rather than former registration indices. No classification values, gameplay, resources, or default catalogue order changed. Focused source checks only; Godot/.NET owner visual and batch-spawn confirmation pending.
