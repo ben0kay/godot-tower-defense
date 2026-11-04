@@ -4,7 +4,7 @@
 [resource]
 script = ExtResource("1")
 EnemyId = "racer_mk1"
-DisplayName = "Racer"
+DisplayName = "Racer Interceptor"
 Family = 1
 MaxHealth = 20.0
 MaxShield = 0.0
