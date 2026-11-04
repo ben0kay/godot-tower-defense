@@ -64,13 +64,11 @@ public partial class ConstructionSparkController : Node
             return;
         }
 
-        // A tiny active-only material copy allows correct 1x1 / 2x2 / 3x2 emission bounds.
+        // Each active job gets private GPU material bounds; a real annulus leaves the center empty.
         var material = (ParticleProcessMaterial)source.Duplicate();
         particles.ProcessMaterial = material;
         Vector2 area = (Vector2)tower.Footprint * _cellSize;
-        float coverage = Mathf.Clamp(Config.FootprintCoverage, .15f, 1f);
-        material.EmissionBoxExtents = new Vector3(
-            Mathf.Max(5f, area.X * coverage * .5f), Mathf.Max(5f, area.Y * coverage * .5f), 0f);
+        ConfigurePerimeterRing(material, area, Config.FootprintCoverage, .86f);
         particles.Amount = Mathf.Clamp(Config.ParticlesPerSite, 1, 32);
         particles.Lifetime = Mathf.Clamp(Config.ParticleLifetime, .1f, 1.5f);
         // SelfModulate preserves the original orange flecks without tinting the new white-hot child.
@@ -81,11 +79,8 @@ public partial class ConstructionSparkController : Node
         var hotMaterial = (ParticleProcessMaterial)weldingSource.Duplicate();
         welding.ProcessMaterial = hotMaterial;
         float hotCoverage = Mathf.Clamp(Config.WeldingFootprintCoverage, .15f, 1f);
-        // Keep the radial spawn circle close to the footprint boundary, even on large buildings.
-        // Use the shorter axis so its ring remains inside rectangular 2x2 / 3x2 sites.
-        // Radial velocity continues to carry each spark outward from its random ring angle.
-        hotMaterial.EmissionSphereRadius = Mathf.Max(
-            3f, Mathf.Min(area.X, area.Y) * hotCoverage * .5f);
+        // Bright welding streaks begin in a narrow band close to the outer boundary.
+        ConfigurePerimeterRing(hotMaterial, area, Config.WeldingFootprintCoverage, .93f);
         welding.Amount = Mathf.Clamp(Config.WeldingParticlesPerSite, 1, 24);
         welding.Lifetime = Mathf.Clamp(Config.WeldingLifetime, .1f, .8f);
         welding.Modulate = Config.WeldingTint;
@@ -100,6 +95,23 @@ public partial class ConstructionSparkController : Node
             tower.WorkProgressChanged += release;
         }
         else StartLayers(particles);
+    }
+
+    // =========================================================
+    // Authoring uses Godot's Ring emission shape (6); scale its XY circumference to each footprint.
+    // The inner radius leaves the middle empty, so both spark types actually spawn near the edge.
+    // This is configured only on registration; GPU motion stays entirely autonomous.
+    private static void ConfigurePerimeterRing(
+        ParticleProcessMaterial material, Vector2 area, float coverage, float innerFraction)
+    {
+        float shorterSide = Mathf.Max(1f, Mathf.Min(area.X, area.Y));
+        float outer = Mathf.Max(3f, shorterSide * Mathf.Clamp(coverage, .15f, .98f) * .5f);
+        material.EmissionRingAxis = Vector3.Back;
+        material.EmissionRingHeight = 0f;
+        material.EmissionRingRadius = outer;
+        material.EmissionRingInnerRadius = outer * innerFraction;
+        material.EmissionShapeScale = new Vector3(
+            Mathf.Max(1f, area.X / shorterSide), Mathf.Max(1f, area.Y / shorterSide), 1f);
     }
 
     // =========================================================

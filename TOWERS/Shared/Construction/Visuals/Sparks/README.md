@@ -1,3 +1,19 @@
+## Perimeter-first sparks, not centre-spawn — 2026-11-03 (latest)
+
+**Screenshot-driven fix:** earlier passes adjusted the white-hot layer's radius but left the **orange soft layer spawning across a central box**. Worse, the sharp layer used `Sphere Surface` (shape `2`), which can visually project toward the centre in 2D. Both layers now explicitly use Godot's real **Ring** emission shape (`6`) in the XY plane, with a large hollow centre. <https://docs.godotengine.org/en/stable/tutorials/3d/particles/process_material_properties.html>
+
+- **Orange soft sparks:** start only in a narrow outer perimeter band, **92% footprint coverage**, inner radius **86% of outer radius**. Same soft sprite and orange tint; now they also travel radially outward instead of the previous central box/upward scatter.
+- **White-hot welding sparks:** start in an even thinner edge band, **94% footprint coverage**, inner radius **93% of outer radius**. Faster outward spray **125–210 px/s**, longer visible reach beyond the footprint; same crisp sprite, bright fade, particle count and 0.34-second lifetime.
+- **1×1 at 64px/cell:** soft ring approximately **25–29px radius**, hot ring approximately **28–30px radius**, so neither layer starts around the centre pixel. A hot spark can travel approximately another 43–71px during its lifetime before drift/gravity.
+- **2×2 / 3×2:** the ring scales with the full footprint, and on rectangular sites the emission shape stretches into a **perimeter-following ellipse** rather than being confined to the shorter axis. No hard-coded world-space cap.
+- Ring size and ellipse are set **once when each paid job registers**, not updated each frame. Both still obey the work clock, held-drone release, pause, cleanup and the existing cap (24 sites; eight particles per layer by default). No extra nodes, particle count or idle CPU loop.
+
+Tune `DefaultConstructionSparkConfig.tres → FootprintCoverage` and `WeldingFootprintCoverage`; default values are now `0.92` and `0.94`. To adjust ring *band thickness*, modify the shared controller's `ConfigurePerimeterRing` inner fractions; movement/radial speeds stay in the scene.
+
+**Visual QA:** confirm at normal camera zoom that *first appearances* form an outer halo near the building edge, not a central burst; both soft orange and hot white streaks should fly beyond the tile. Check 1×1, 2×2, 3×2 buildings and construction/upgrade with/without drones. Godot runtime rendering/FPS still requires a local test.
+
+---
+
 ## Wide radial welding ring — 2026-11-03 (current default)
 
 The sharp white/yellow `WeldingSparks` layer now spawns from a **wide circle almost at the tower's footprint edge**. `WeldingFootprintCoverage` defaults to **85% of the shorter footprint axis** (previously 38%) and controls the ring **diameter**. Removed the previous **24 px radius cap**, which kept larger buildings looking center-focused. With the usual 64px cell size, examples are:

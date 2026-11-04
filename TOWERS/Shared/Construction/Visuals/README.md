@@ -1,3 +1,9 @@
+## Corrected edge-origin construction sparks — 2026-11-03
+
+Screenshot feedback revealed the previous orange sparks still emerged from a central rectangular area, even after the crisp layer's ring radius increased. **Both** orange and sharp-white layers now use true hollow `ParticleProcessMaterial` rings close to the footprint perimeter (92%/94% of the relevant tower dimensions), with radial velocities that carry particles beyond the building. On rectangular sites, the ring stretches into an ellipse. The original texture, colour palette and separate work-driven lifecycle remain intact. See [Sparks/README.md](Sparks/README.md) for implementation details and tuning. No per-frame CPU updates were introduced; in-game visual verification is pending.
+
+---
+
 ## Two-layer fabrication sparks — 2026-11-03
 
 The existing soft orange `GPUParticles2D` flecks are preserved. A new, brighter **white-hot/yellow welding streak** layer is added above them inside the same shared emitter scene. It has its own GPU motion material, velocity alignment and independently configurable density/lifetime/tint/enable flag. Both layers share the existing paid construction/upgrade start, drone hold-release and teardown notifications; no extra script update loops. Read the [Sparks guide](Sparks/README.md) and tune `Sparks/DefaultConstructionSparkConfig.tres` or `Sparks/ConstructionSparkEmitter.tscn`.

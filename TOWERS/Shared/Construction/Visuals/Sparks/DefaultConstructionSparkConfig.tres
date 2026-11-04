@@ -5,5 +5,5 @@
 [resource]
 script = ExtResource("1")
 ParticleLifetime = 0.48
-FootprintCoverage = 0.55
-WeldingFootprintCoverage = 0.85
+FootprintCoverage = 0.92
+WeldingFootprintCoverage = 0.94

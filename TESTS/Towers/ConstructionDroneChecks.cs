@@ -90,15 +90,17 @@ public partial class ConstructionDroneChecks : Node
             "Soft orange and white-hot welding sparks start together when work releases");
         var weldingSparks = tower.GetNode<GpuParticles2D>("ConstructionSparkEmitter/WeldingSparks");
         var radialMotion = weldingSparks.ProcessMaterial as ParticleProcessMaterial;
-        Require(radialMotion != null && (int)radialMotion.EmissionShape == 2 &&
-            radialMotion.EmissionSphereRadius > 0f && radialMotion.RadialVelocityMin > 0f &&
-            Mathf.IsZeroApprox(radialMotion.InitialVelocityMax),
-            "Hot sparks launch outward from a centered radial ring, not an upward cone");
-        float ringDiameter = Mathf.Min(tower.Footprint.X, tower.Footprint.Y) *
-            f.Spawns.Paths.Navigation.Grid.Config.CellSize * sparks.Config.WeldingFootprintCoverage;
-        Require(Mathf.IsEqualApprox(radialMotion.EmissionSphereRadius * 2f, ringDiameter) &&
-            radialMotion.EmissionSphereRadius > 24f,
-            "Hot welding ring reaches 85% of the shortest tower side with no old 24px cap");
+        var softMotion = tower.GetNode<GpuParticles2D>("ConstructionSparkEmitter").ProcessMaterial as ParticleProcessMaterial;
+        float shortSide = Mathf.Min(tower.Footprint.X, tower.Footprint.Y) *
+            f.Spawns.Paths.Navigation.Grid.Config.CellSize;
+        Require(radialMotion != null && softMotion != null &&
+            (int)radialMotion.EmissionShape == 6 && (int)softMotion.EmissionShape == 6 &&
+            Mathf.IsEqualApprox(radialMotion.EmissionRingRadius * 2f, shortSide * sparks.Config.WeldingFootprintCoverage) &&
+            Mathf.IsEqualApprox(softMotion.EmissionRingRadius * 2f, shortSide * sparks.Config.FootprintCoverage) &&
+            radialMotion.EmissionRingInnerRadius >= radialMotion.EmissionRingRadius * .9f &&
+            softMotion.EmissionRingInnerRadius >= softMotion.EmissionRingRadius * .8f &&
+            radialMotion.RadialVelocityMin >= 125f && softMotion.RadialVelocityMin > 0f,
+            "Both spark layers spawn on a nearly-footprint-wide hollow ring and travel outward, not from the centre");
         var flashes = builders.GetNode<ConstructionCompletionFlash>("CompletionFlashes");
         Require(drone.BeamVisible && beam.AnimationSeconds > 0 && status.Text == "CONSTRUCTING" &&
             builders.Releases == 1 && clock.HeldCount == 0, "Animated beam deployed before one release");
