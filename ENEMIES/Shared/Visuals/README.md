@@ -1,3 +1,13 @@
+## ET1 — shared enemy engine ignition (source implemented 2026-11-03)
+
+All inherited enemy hulls now have a rear-centred optional `Thruster` scene. The shared [Thruster folder](Thrusters/README.md) owns a white/yellow/orange SVG flame, tiny GPU exhaust particles, `EnemyThrusterVisual.cs`, a typed `EnemyThrusterConfig` and the default `.tres` resource. **Width depends on actual displayed sprite height; length depends on authored `EnemyDefinition.MoveSpeed`.** Right-facing (+X) sprites exhaust toward -X and follow rotation. Per-ship Inspector `ThrusterEnabled` and `ThrusterMountOffset` are optional; no ship-ID or fleet-family switch.
+
+`Enemy.Initialize` configures each scene once. Slow/Freeze transitions notify it to adjust intensity; existing stealth events dim it along with the ship. Cosmetic only: combat, shields, movement math, rewards, saves and wave definitions remain unchanged.
+
+**Performance:** an inexpensive SVG flame draws on screen. An optional `GPUParticles2D` child has 4 particles/ship and wakes only from `VisibleOnScreenNotifier2D` signals or status changes, capped at 64 simultaneously active GPU emitters. There is **no new `_Process` or `_PhysicsProcess`**; emitters stop offscreen, on Freeze, on death/arrival, and on unload. Beyond the cap, ships retain the flame image without GPU flecks. Local Godot.NET visual/F4 acceptance is still pending.
+
+---
+
 # Shared static enemy hull-damage artwork
 
 This is a **cosmetic, opt-in, event-driven** feature for existing static `Sprite2D` enemies. No animation tree, extra enemy child node, recurring timer or per-frame traversal.

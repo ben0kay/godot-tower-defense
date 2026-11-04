@@ -1,3 +1,9 @@
+## ET1 — shared visible enemy thrusters (2026-11-03, source implemented)
+
+All enemies inherited from `Shared/GenericEnemy.tscn` now have one optional rear flame plus a capped on-screen `GPUParticles2D` exhaust. Displayed sprite height automatically determines flame **width**; authored maximum movement speed determines flame **length**. A larger slow hull therefore has wide/short exhaust, while a small fast scout has thin/long exhaust. One `ENEMIES/Shared/Visuals/Thrusters/DefaultEnemyThrusterConfig.tres` controls appearance and performance; each enemy definition can opt out or offset its rear mount. Slow/Freeze and stealth states adjust intensity without a new per-enemy process loop. Read [ET1 guide](Shared/Visuals/Thrusters/README.md). Visual/F4 acceptance is pending.
+
+---
+
 ## Numbered support enemy rename — 2026-10-26
 
 The Shield Emitter now lives at `Types/Enemy003/Enemy003.tscn` with `Enemy003.tres` and `Artwork/enemy003.svg`; its stable `shield_emitter_mk1` ID, abilities, balance, and save/wave references remain unchanged. This is a source-asset rename and **does not introduce it to early campaign waves**.

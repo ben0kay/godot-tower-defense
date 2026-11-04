@@ -18,7 +18,12 @@ public partial class Enemy
     }
     // =========================================================
     // Reapply when a reveal changes or a shield aura is attached later.
-    private void RefreshStealthVisual() => _stealthVisual?.Apply(IsEffectivelyStealthed, _shieldVisual);
+    private void RefreshStealthVisual()
+    {
+        _stealthVisual?.Apply(IsEffectivelyStealthed, _shieldVisual);
+        // A stealthed ship must not reveal itself through an undimmed engine plume.
+        _thruster?.SetStealthDimmed(IsEffectivelyStealthed);
+    }
     // =========================================================
     // Clear native references and subscription before scene reuse/unload.
     private void ClearStealth()

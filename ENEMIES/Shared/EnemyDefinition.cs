@@ -38,4 +38,11 @@ public partial class EnemyDefinition : Resource
     [Export(PropertyHint.Range, "1,24,1")] public float RadiusPixels { get; set; } = 12f;
     [Export(PropertyHint.Range, "0,30,0.1")] public float TurnSpeed { get; set; } = 8f;
     #endregion
+
+    #region Engine Exhaust Presentation
+    [ExportGroup("Engine Thruster Visual")]
+    [Export] public bool ThrusterEnabled { get; set; } = true;
+    /// <summary>Offset from automatic rear-center nozzle in unrotated local hull pixels.</summary>
+    [Export] public Vector2 ThrusterMountOffset { get; set; } = Vector2.Zero;
+    #endregion
 }

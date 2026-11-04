@@ -43,6 +43,7 @@ public partial class Enemy : Node2D
         }
         if (_statuses.HasTimed) { _statusClock ??= TimedStatusScheduler.For(_registry); _statusClock.Register(this); }
         RefreshStatusColor();
+        _thruster?.SetEffectiveSpeed(EffectiveMoveSpeed);
         return true;
     }
 
@@ -60,7 +61,13 @@ public partial class Enemy : Node2D
     internal bool AdvanceStatuses(float seconds)
     {
         if (!IsAlive || IsQueuedForDeletion() || _statuses == null) return false;
-        bool active = _statuses.Advance(seconds); if (!active) RefreshStatusColor(); return active;
+        bool active = _statuses.Advance(seconds);
+        if (!active)
+        {
+            RefreshStatusColor();
+            _thruster?.SetEffectiveSpeed(EffectiveMoveSpeed);
+        }
+        return active;
     }
     // =========================================================
     // One resolver composes concurrent Slow and Freeze without touching DefenseBar or Modulate.
@@ -81,6 +88,7 @@ public partial class Enemy : Node2D
     private Sprite2D _damageAppearanceSprite;
     private int _damageAppearanceStage = -1;
     private ShieldVisual _shieldVisual;
+    private EnemyThrusterVisual _thruster;
     private static PackedScene _shieldVisualScene;
     private double _initialDurability, _damageConsumed, _damageXpPool, _killXp;
     private int _xpCredits;
@@ -107,6 +115,9 @@ public partial class Enemy : Node2D
             && _damageAppearance.Stages.Count > 0 ? sprite : null;
         _damageAppearanceStage = -1;
         RefreshDamageAppearance();
+        // One ET1 visual on the shared enemy, sized from its displayed sprite and base speed.
+        _thruster = GetNodeOrNull<EnemyThrusterVisual>("Thruster");
+        _thruster?.Configure(sprite, Definition);
         if (_defenseBar != null && sprite?.Texture != null)
             _defenseBar.SetOwnerVisualHeight(sprite.GetRect().Size.Y * Mathf.Abs(sprite.Scale.Y));
         _defenseBar?.SetHealth(Health, Definition.MaxHealth);
@@ -279,6 +290,7 @@ public partial class Enemy : Node2D
     {
         if (!IsAlive) return;
         IsAlive = false; ClearStatuses(); Movement.SetPhysicsProcess(false);
+        _thruster?.Stop();
         if (!arrived)
         {
             KilledBeforeRemoval?.Invoke(this);
@@ -298,7 +310,7 @@ public partial class Enemy : Node2D
         ClearStatuses(); ClearStealth();
         _damageAppearance = null; _damageAppearanceSprite = null; _damageAppearanceStage = -1;
         if (GodotObject.IsInstanceValid(_shieldVisual)) _shieldVisual.ResetVisual();
-        _shieldVisual = null;
+        _shieldVisual = null; _thruster = null;
         bool unresolved = IsAlive; IsAlive = false; _registry?.Unregister(this);
         Terrain = null; if (unresolved) Removed?.Invoke(this);
     }

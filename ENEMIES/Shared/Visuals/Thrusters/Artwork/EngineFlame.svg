@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="24" viewBox="0 0 96 24">
+  <!-- +X-facing ship: hot nozzle at right, pointed outward exhaust at left. -->
+  <defs>
+    <linearGradient id="flame" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff560c" stop-opacity="0"/>
+      <stop offset=".18" stop-color="#ff6c10" stop-opacity=".45"/>
+      <stop offset=".52" stop-color="#ffb12c" stop-opacity=".83"/>
+      <stop offset=".78" stop-color="#ffe86f" stop-opacity=".97"/>
+      <stop offset="1" stop-color="#fff8da" stop-opacity="1"/>
+    </linearGradient>
+    <linearGradient id="core" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffb626" stop-opacity="0"/>
+      <stop offset=".38" stop-color="#ffe86b" stop-opacity=".82"/>
+      <stop offset=".76" stop-color="#fffcc8" stop-opacity="1"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="1"/>
+    </linearGradient>
+  </defs>
+  <path d="M95 12 C83 1 76 1 63 3.5 C44 6 30 5 1 12 C30 19 44 18 63 20.5 C76 23 83 23 95 12Z" fill="url(#flame)"/>
+  <path d="M94 12 C80 7.2 74 8.3 62 9 C43 9.8 29 10 13 12 C29 14 43 14.2 62 15 C74 15.7 80 16.8 94 12Z" fill="url(#core)"/>
+  <ellipse cx="91" cy="12" rx="4" ry="4.4" fill="#fffef1" opacity=".96"/>
+</svg>

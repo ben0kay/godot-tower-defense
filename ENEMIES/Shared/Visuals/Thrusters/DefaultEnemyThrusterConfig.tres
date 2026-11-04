@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyThrusterConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://ENEMIES/Shared/Visuals/Thrusters/EnemyThrusterConfig.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+Enabled = true
+FlameWidthToHullHeight = 0.17
+BaseFlameLengthPixels = 4.0
+LengthPerSpeed = 0.1
+MaxFlameLengthPixels = 40.0
+RearNozzleInsetPixels = 1.0
+GpuParticlesEnabled = true
+MaxActiveGpuEmitters = 64
+ParticlesPerShip = 4
+ParticleSpeedMultiplier = 1.0
+MinimumSpeedFraction = 0.05
+StealthIntensity = 0.3

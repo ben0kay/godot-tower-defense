@@ -1,3 +1,9 @@
+## ET1 engine thrusters — source implementation (2026-11-03)
+
+Every registered enemy now inherits the `ENEMIES/Shared/GenericEnemy.tscn` rear ignition visual. **Hull height → flame width**, **base MoveSpeed → flame length**, with Slow/Freeze intensity, stealth dimming, capped GPU exhaust and root rotation. Purely cosmetic. See [Visuals/Thrusters](Visuals/Thrusters/README.md). Godot visual and performance acceptance pending.
+
+---
+
 ## Opt-in hull damage appearances — 2026-11-02
 
 `EnemyDefinition.DamageAppearance` optionally references `Visuals/EnemyDamageAppearanceProfile.cs`, which holds an ordered array of `Texture2D` static art. The lightweight `EnemyDamageAppearance.StageForHealth` maps each ship's **hull HP fraction** to a stage by dividing health into equal bands based on array length; no fixed 66%/33% numbers. `Enemy` caches the assigned sprite/profile once at initialization and replaces the texture **only** on an actual stage change after a hull HP mutation. No process loop, extra scene node or updates for unrelated ships. Damage stages intentionally do not react to shield-only hits or interfere with Slow/Freeze/Stealth tint, and this does not alter defensive calculations. See [shared visual notes](Visuals/README.md).
