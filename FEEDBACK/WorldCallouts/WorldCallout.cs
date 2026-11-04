@@ -15,7 +15,7 @@ public partial class WorldCallout : Node2D
     private string _message = "";
     private Color _color;
     private WorldCalloutSymbol _symbol;
-    private float _timeLeft, _duration, _fade, _rise;
+    private float _timeLeft, _duration, _fade, _fadeIn, _rise, _startScale, _endScale;
     private int _fontSize;
 
     // =========================================================
@@ -44,8 +44,11 @@ public partial class WorldCallout : Node2D
         if (!Enabled || string.IsNullOrWhiteSpace(message)) return;
         _style ??= GD.Load<WorldCalloutStyle>("res://FEEDBACK/WorldCallouts/DefaultWorldCalloutStyle.tres");
         _duration = Mathf.Max(0.1f, _style?.DurationSeconds ?? 1.35f);
-        _fade = Mathf.Clamp(_style?.FadeSeconds ?? 0.4f, 0.01f, _duration);
+        _fadeIn = Mathf.Clamp(_style?.FadeInSeconds ?? 0.15f, 0.01f, _duration * 0.5f);
+        _fade = Mathf.Clamp(_style?.FadeSeconds ?? 0.48f, 0.01f, _duration - _fadeIn);
         _rise = Mathf.Max(0f, _style?.RisePixels ?? 20f);
+        _startScale = Mathf.Clamp(_style?.StartScale ?? 0.96f, 0.5f, 1f);
+        _endScale = Mathf.Clamp(_style?.EndScale ?? 1.14f, 1f, 1.5f);
         _fontSize = Mathf.Clamp(_style?.FontSize ?? 13, 8, 32);
         _message = message; _color = tint; _symbol = symbol; _timeLeft = _duration;
         GlobalPosition = worldPosition;
@@ -70,16 +73,23 @@ public partial class WorldCallout : Node2D
     public override void _Draw()
     {
         if (_timeLeft <= 0f) return;
-        float upward = _rise * (1f - _timeLeft / _duration);
-        float alpha = Mathf.Clamp(_timeLeft / _fade, 0f, 1f);
+        float elapsed = _duration - _timeLeft;
+        float progress = Mathf.Clamp(elapsed / _duration, 0f, 1f);
+        float upward = _rise * (1f - (1f - progress) * (1f - progress)); // Ease out toward the top.
+        float entrance = Mathf.SmoothStep(0f, 1f, Mathf.Clamp(elapsed / _fadeIn, 0f, 1f));
+        float exit = Mathf.SmoothStep(0f, 1f, Mathf.Clamp(1f - _timeLeft / _fade, 0f, 1f));
+        float alpha = entrance * (1f - exit);
+        float scale = Mathf.Lerp(_startScale, 1f, entrance) + (_endScale - 1f) * exit;
+        Vector2 drawScale = Vector2.One * scale;
         Color foreground = new(_color.R, _color.G, _color.B, alpha);
-        Color shadow = new(0f, 0.05f, 0.08f, alpha * 0.85f);
+        Color shadow = new(0f, 0.05f, 0.08f, alpha * 0.8f);
         float textX = _symbol == WorldCalloutSymbol.ThickUpArrow ? 23f : 0f;
         Font font = ThemeDB.FallbackFont;
-        DrawSetTransform(new Vector2(1f, 1f - upward));
+        // Shared transform keeps the arrow and text together as they swell and softly dissolve.
+        DrawSetTransform(new Vector2(1f, 1f - upward), 0f, drawScale);
         if (_symbol == WorldCalloutSymbol.ThickUpArrow) DrawColoredPolygon(Arrow, shadow);
         if (font != null) DrawString(font, new Vector2(textX, 7f), _message, HorizontalAlignment.Left, -1, _fontSize, shadow);
-        DrawSetTransform(new Vector2(0f, -upward));
+        DrawSetTransform(new Vector2(0f, -upward), 0f, drawScale);
         if (_symbol == WorldCalloutSymbol.ThickUpArrow) DrawColoredPolygon(Arrow, foreground);
         if (font != null) DrawString(font, new Vector2(textX, 7f), _message, HorizontalAlignment.Left, -1, _fontSize, foreground);
     }
