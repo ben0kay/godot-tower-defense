@@ -1,3 +1,9 @@
+## Ammunition Factory construction and future upgrade artwork — 2026-11-03
+
+The existing single stationary 3×2 Ammunition Factory has full 0/35/70% initial building stage SVGs, powered by the shared event-driven construction presenter. Nine new SVGs also include future-only Level 2/3 completed designs and intermediate 35/70% upgrade artwork; **factory paid upgrades remain unimplemented** (no economic data or purchase flow was invented). The original icon, 200-Credit/8s build, ammunition production, logistics, drones and save data are unchanged. Config resource ordering follows the Resource Tower fix from `3ae0e25`. [Factory artwork notes](TOWERS/Economy/Ammunition/AmmunitionFactory/Artwork/Construction/README.md). Source checks done; Godot visual acceptance pending.
+
+---
+
 ## Selected-tower tactical overlay — 2026-11-03
 
 Placed-tower selection now adds a stronger translucent aqua tactical screen wash and grid, the selected tower's name and state anchored in world space beside its right edge, and one softly pulsing holographic frame padded beyond its footprint. Disabled/upgrading towers switch the palette to red using existing state signals. The shared renderer is dormant when unselected, preserves the existing radius/Inspector and supports multi-cell buildings. See [Selection Feedback](FEEDBACK/Selection/README.md). Source implemented; owner visual QA pending.
