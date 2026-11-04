@@ -31,7 +31,7 @@ public partial class LevelResults : CanvasLayer
     public Button PrimaryButton => _primary;
     public Button DetailsButton => _details;
     private bool _won, _hasNext;
-    private static readonly Color VictoryAccent = new("#65e8cf"), DefeatAccent = new("#f16472");
+    private static readonly Color VictoryAccent = new("#57d3ee"), DefeatAccent = new("#f16472");
     private Color _outcomeAccent = VictoryAccent;
     private MissionRewardResult _rewardForReveal;
     private Tween _xpTween;
@@ -181,7 +181,7 @@ public partial class LevelResults : CanvasLayer
     private void ApplyOutcomeStyle(bool won)
     {
         _outcomeAccent = won ? VictoryAccent : DefeatAccent;
-        Color dark = won ? new Color("#092d35") : new Color("#36141d");
+        Color dark = won ? new Color("#092633") : new Color("#36141d");
         Color outline = _outcomeAccent.Darkened(.22f);
         StyleBoxFlat frameStyle = UIButtonFactory.Box(dark, _outcomeAccent);
         frameStyle.BorderWidthLeft = 2; frameStyle.BorderWidthRight = 2;
@@ -194,7 +194,7 @@ public partial class LevelResults : CanvasLayer
             UIButtonFactory.Apply(button, won ? UIButtonStyle.Action : UIButtonStyle.Danger, actionsPalette);
         foreach (var stat in _stats)
         {
-            StyleBoxFlat row = UIButtonFactory.Box(won ? new Color("#102c38") : new Color("#2b1824"), outline);
+            StyleBoxFlat row = UIButtonFactory.Box(won ? new Color("#102735") : new Color("#2b1824"), outline);
             row.BorderWidthLeft = 3; row.ContentMarginTop = 6; row.ContentMarginBottom = 6;
             stat.Panel.AddThemeStyleboxOverride("panel", row);
             stat.Value.AddThemeColorOverride("font_color", _outcomeAccent);

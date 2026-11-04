@@ -1,3 +1,9 @@
+## Victory palette — cooler cyan-aqua (2026-11-04)
+
+The shared mission-results victory screen now uses a cooler blue-cyan aqua (`#57d3ee`) instead of mint-green `#65e8cf` for its heading, row values/borders, action accents, XP track and soft frame glow. The victory frame/row fills lean slightly more navy and the passive vector background accents use `#4cbadf`. **Defeat's crimson/red palette is unchanged.** The layout, reveal animation, XP calculations, skip controls and session outcomes were not modified. Source review only; owner visual approval pending.
+
+---
+
 ## Stat number count-up — 2026-10-31
 
 Result statistics now count from zero as each row reveals. Counts retain thousands separators;

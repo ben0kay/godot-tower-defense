@@ -5,7 +5,7 @@ public partial class ResultsVectorBackdrop : Control
 {
     #region Vector Presentation
     public bool IsDefeat { get; private set; }
-    private static readonly Color Victory = new("#48bacc"), Defeat = new("#e85b68");
+    private static readonly Color Victory = new("#4cbadf"), Defeat = new("#e85b68");
     // =========================================================
     // Switch the visual palette only; do not touch gameplay or start update loops.
     public void SetOutcome(bool defeat) { IsDefeat = defeat; QueueRedraw(); }
