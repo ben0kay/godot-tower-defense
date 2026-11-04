@@ -1,16 +1,15 @@
-[gd_resource type="Resource" script_class="WaveSetResource" format=3]
+[gd_resource type="Resource" script_class="WaveSetResource" format=3 uid="uid://cgao0momng87t"]
 
-[ext_resource type="Script" path="res://LEVELS/Waves/Resources/WaveBatchResource.cs" id="batch"]
-[ext_resource type="Script" path="res://LEVELS/Waves/Resources/WaveEnemyResource.cs" id="enemy"]
-[ext_resource type="Script" path="res://LEVELS/Waves/Resources/WaveSetResource.cs" id="set"]
-[ext_resource type="Script" path="res://LEVELS/Waves/Resources/WaveResource.cs" id="wave"]
+[ext_resource type="Script" uid="uid://cd2q6k7jkfyaq" path="res://LEVELS/Waves/Resources/WaveBatchResource.cs" id="batch"]
+[ext_resource type="Script" uid="uid://cxnhgkjed2i8f" path="res://LEVELS/Waves/Resources/WaveEnemyResource.cs" id="enemy"]
+[ext_resource type="Script" uid="uid://di5hkaslgameh" path="res://LEVELS/Waves/Resources/WaveSetResource.cs" id="set"]
+[ext_resource type="Script" uid="uid://cqqx733te7g78" path="res://LEVELS/Waves/Resources/WaveResource.cs" id="wave"]
 
 [sub_resource type="Resource" id="E1_1_1"]
 script = ExtResource("enemy")
 
 [sub_resource type="Resource" id="B1_1"]
 script = ExtResource("batch")
-Count = 10
 Interval = 0.9
 Enemies = Array[ExtResource("enemy")]([SubResource("E1_1_1")])
 
@@ -24,7 +23,6 @@ script = ExtResource("enemy")
 [sub_resource type="Resource" id="B2_1"]
 script = ExtResource("batch")
 Count = 14
-Interval = 0.8
 Enemies = Array[ExtResource("enemy")]([SubResource("E2_1_1")])
 
 [sub_resource type="Resource" id="W2"]
@@ -37,7 +35,6 @@ script = ExtResource("enemy")
 
 [sub_resource type="Resource" id="B3_1"]
 script = ExtResource("batch")
-Count = 10
 Interval = 0.75
 After = 1.0
 Enemies = Array[ExtResource("enemy")]([SubResource("E3_1_1")])
@@ -53,7 +50,6 @@ Weight = 50.0
 
 [sub_resource type="Resource" id="B3_2"]
 script = ExtResource("batch")
-Count = 10
 Interval = 0.65
 Enemies = Array[ExtResource("enemy")]([SubResource("E3_2_1"), SubResource("E3_2_2")])
 
