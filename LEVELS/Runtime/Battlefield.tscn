@@ -20,6 +20,7 @@
 [ext_resource type="Script" path="res://DEBUG/PerformanceOverlay.cs" id="perf_overlay"]
 
 [ext_resource type="Script" path="res://LEVELS/Runtime/BattlefieldLauncher.cs" id="launcher"]
+[ext_resource type="Resource" path="res://WORLD/OBJECTIVES/Citadel/DefaultCitadelPower.tres" id="citadel_power"]
 
 [node name="Battlefield" type="Node2D" unique_id=1543557823]
 script = ExtResource("launcher")
@@ -43,6 +44,7 @@ CreditsResource = ExtResource("12_credits")
 
 [node name="CitadelSession" type="Node" parent="." unique_id=1730288833]
 script = ExtResource("14_citadel")
+PowerConfig = ExtResource("citadel_power")
 
 [node name="Waves" type="Node" parent="." unique_id=251792812]
 script = ExtResource("13_waves")

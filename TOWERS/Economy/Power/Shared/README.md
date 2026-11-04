@@ -1,3 +1,19 @@
+## PW2 — Citadel starter power and island accounting (2026-11-04)
+
+**Source Implemented / Awaiting Owner Validation.** Each initialized living Citadel now registers a producer on its conducting island. `WORLD/OBJECTIVES/Citadel/DefaultCitadelPower.tres → Output` defaults to **100 provisional power**; the shared Battlefield's CitadelSession exports the resource under **Citadel Starter Power**. This is a capacity/rate budget, not a battery that accumulates over time. Output remains available between waves and is removed on death or objective removal. Multiple Citadels use distinct stable objective IDs.
+
+The existing PowerGridManager now caches per-island supply/requested-demand, margins and producer/consumer counts. `SetProducer`, `SetRequestedDemand`, `RemoveEndpoint` and `TotalsForRegion` are the shared registration/query API for later generators/consumers. IDs are world-scoped and owned by the calling feature; repeated identical updates are no-ops. Different islands do not pool power. Region 0 registrations are counted as unassigned but contribute no usable supply/demand. Every footprint cell must be on one conducting island.
+
+Accounting is event-driven: ordinary updates adjust only affected cached totals, and a changed terrain topology remaps existing registrations once. No per-frame scans/timers or extra per-Citadel nodes were added. F4 shows world-summed supply/requested demand and hovered-island totals; the sum is diagnostic, not a shared cross-island pool. Demand is normally **0**, because no actual tower consumers are attached until PW4. No priority allocation, shutdown, draw settings, generator buildings, relays or fuel mechanics are implemented in PW2.
+
+Live edits to the bound resource's Output refresh sources through Resource.Changed; replace the resource reference before startup/restart. Runtime Citadel relocation requires the existing explicit WorldGrid.RebuildTerrain call. Custom Citadel roots must expose WorldObjectFootprint geometry; unassigned terrain is visible in F4. Health changes that remain alive do not rewrite generation. All binding/event cleanup is owned by CitadelSession.
+
+Save/Continue derives the same registrations from authored config and restored objective identity/health; no energy balance, region ID or native handle is serialized and no schema bump is needed. Registration replaces stable IDs rather than duplicating output. The existing dependency-byte fingerprint can still reject checkpoints from an earlier source/resource version; this guard is unchanged.
+
+**Brief checks:** source/resource review only; Godot/.NET is unavailable. Existing focused PowerNetworkChecks gained registration/update/removal, island-split, unassigned source, invalid input and config-change checks; they were not executed here. Owner: rebuild C#, inspect F4 on the Citadel island and an isolated island, edit Output, and check a new Save/Load/Continue without duplicate output. Generation values and future opening demand require tuning together before consumer enforcement.
+
+---
+
 ## PW1 topology ownership — 2026-11-04
 
 `PowerGridManager.cs` is the one scene-owned `World/PowerNetworks` service. It reads WorldGrid's cached conductivity after Grid initialization, listens to `TerrainRebuilt` and skips work unless `PowerTerrainRevision` changes. `PowerIslandMap.cs` uses two reusable int arrays for iterative four-neighbour regions, cell counts and multi-cell footprint queries. No process/physics callbacks, per-building nodes or scans of enemies/towers. Region IDs are snapshot-local (0 = none), not durable save IDs; topology rebuilds on loading. F4 reads cached diagnostics. See [PW0 audit and phases](../IMPLEMENTATION_PLAN.md) and [checks](../../../../TESTS/Power/README.md).

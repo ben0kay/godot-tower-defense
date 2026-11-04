@@ -87,6 +87,7 @@ public partial class CitadelSession : Node
             _criticalHandlers.Add(objective, handler);
             _income.Add(objective, new Income(CreditBufferCapacity, CreditsPerCycle, CreditCycleSeconds));
         }
+        InitializePower();
         _hud.BindCitadels(Objectives, this);
         foreach (var objective in Objectives)
         {
@@ -100,6 +101,7 @@ public partial class CitadelSession : Node
     // Remove both subscriptions on unload, avoiding dangling listeners across levels.
     public override void _ExitTree()
     {
+        ClearPower();
         if (GodotObject.IsInstanceValid(_registry)) _registry.EnemyArrived -= OnEnemyArrived;
         if (GodotObject.IsInstanceValid(Health)) Health.HealthChanged -= UpdateHud;
         if (Objectives != null) foreach (var objective in Objectives)

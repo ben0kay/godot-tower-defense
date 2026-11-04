@@ -1,8 +1,15 @@
+## PW2 implementation update — 2026-11-04
+
+`PowerGridManager.Accounting.cs` adds shared registration and cached per-island totals. `CitadelSession.Power.cs` owns source lifetime/config subscriptions after health initialization; `CitadelPowerConfig`/`DefaultCitadelPower.tres` supply a configurable provisional Output=100. F4 reads global diagnostic sums and local totals. Sources persist as derived registrations, not a saved energy balance. No frame callbacks or power gating. See [shared guide](Shared/README.md) for exact API, lifecycle and validation limits. The PW0 audit below remains design context; PW1-only statements describe that original phase, not a reason to reimplement it.
+
+---
+
 # Electricity networks — PW0 audit and PW1 foundation
 
-**2026-11-04 · dev · PW0 Complete; PW1 Source Implemented / Awaiting Owner Validation.**
-Only PW0/PW1 are authorized in this pass. Existing towers remain fully operational. Citadel output,
-generation/demand, shortages, generator buildings and relays belong to the later phases below.
+**2026-11-04 · dev · PW0 Complete; PW1 Source Implemented (owner reports working); PW2 Source Implemented / Awaiting Owner Validation.**
+PW0/PW1 and the next PW2 pass are now source implemented. Existing towers remain fully operational.
+PW2 adds Citadel output and shared supply/requested-demand accounting; shortages, generator buildings,
+consumers and relays remain later phases.
 Follow `NOTES/CodePreferences.md`: brief source checks, one basic build if readily available;
 extended gameplay/visual/performance acceptance stays with the owner.
 
@@ -11,7 +18,7 @@ extended gameplay/visual/performance acceptance stays with the owner.
 - Each edge-connected eligible terrain landmass is one local power grid. Diagonals never join.
 - The **Citadel supplies configurable basic generation** so the player can establish an opening
   defense before adding generators. Output is continuous while the objective is available/alive,
-  not limited to active waves like its independent Credits production. No number is chosen yet.
+  not limited to active waves like its independent Credits production. The PW2 default is 100 provisional power; configure DefaultCitadelPower.tres and tune against future opening demand.
 - Solar, Industrial and Fusion are separate build choices sharing generator logic, not successive
   purchased levels of one building. Each may have its own purchased upgrades later.
 - No compulsory wires, transmission radii, batteries, loss simulation or fuel logistics initially.
@@ -97,7 +104,7 @@ future relay changes rebuild only network unions, not terrain islands. Never sca
 | --- | --- | --- |
 | **PW0** | This audit, terrain/membership decisions, folder ownership and staged contracts | Complete; remaining balancing/UI decisions above are explicitly deferred. |
 | **PW1** | `Shared/PowerIslandMap.cs`, `PowerGridManager.cs`, WorldGrid conductivity, appended palette metadata, shared scene attachment and F4 diagnostics | Source implemented; check separated/diagonal land, bridges, erasure, Foundation/Lava/wall precedence, unchanged rebuilds, occupancy and level teardown. No generation or shutdown. |
-| **PW2** | Shared producer/demand accounting + configurable Citadel baseline registration | Planned. Show supply/requested demand without enforcing outages; check multiple Citadels, isolated islands, death/removal and restoring a battlefield. Set starter output deliberately after choosing opening needs. |
+| **PW2** | Shared producer/demand accounting + configurable Citadel baseline registration | Source implemented / owner validation pending. DefaultCitadelPower.tres Output=100 provisional; event-driven source lifetime, per-island cached totals and F4 accounting. No actual consumers/outages yet. Check multiple Citadels, isolation, death/removal and a new Save/Load. |
 | **PW3** | Shared generator/config in `Shared/`, Industrial scene/config/art in its type folder | Planned. Add one catalog build choice; verify work lifecycle, destruction and save restoration without free stock/power registration duplicates. |
 | **PW4** | Consumer capability in `TOWERS/Shared/Power/`, selected Inspector, shared NoPower gate | Planned. Approve demand transitions/balance first; test priorities, deterministic ties, anti-flicker, EMP/heat overlap, production and save/load. |
 | **PW5** | `TOWERS/Utility/PowerRelay/`, manual peer selection, small network graph | Planned. One peer per relay initially; joins/splits/alternate links, invalid targets, removal and durable peer IDs. Range/UI choices remain open. |

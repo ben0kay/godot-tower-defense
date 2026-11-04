@@ -1,3 +1,9 @@
+## Power PW2 — Citadel starter generation and accounting — 2026-11-04
+
+Citadels now contribute configurable starter power (100 provisional) to their own islands. Shared event-driven accounting and F4 show supply/requested demand without disabling towers; no consumers or generators are added yet. Edit `WORLD/OBJECTIVES/Citadel/DefaultCitadelPower.tres`. See [power details](TOWERS/Economy/Power/Shared/README.md). Source/resource review only; Godot/.NET build/runtime validation pending.
+
+---
+
 ## Power PW0/PW1 — 2026-11-04
 
 **PW0 audit complete; PW1 source implemented / owner Godot validation pending.** Cached four-neighbour power islands now come from independent `conducts_power` terrain metadata, with no per-frame manager work or rebuilds on tower occupancy. F4 reports topology/hovered island and rebuild timing. Tower operation remains unchanged; Citadel baseline output is planned for PW2. See [phased implementation plan](TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md) and [focused checks](TESTS/Power/README.md). Generation, consumption, shortages and relays are not yet implemented.

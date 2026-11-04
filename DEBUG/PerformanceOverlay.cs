@@ -19,7 +19,7 @@ public partial class PerformanceOverlay : CanvasLayer
     [Export] public int QueueWarning { get; set; } = 32;
     [Export] public int QueueCritical { get; set; } = 128;
     private PanelContainer _panel;
-    private readonly Label[] _rows = new Label[23];
+    private readonly Label[] _rows = new Label[25];
     private PathRequestManager _paths;
     private PowerGridManager _power;
     private EnemyRegistry _enemies;
@@ -200,10 +200,14 @@ public partial class PerformanceOverlay : CanvasLayer
         {
             Vector2I cell = _power.Grid.WorldToCell(_power.Grid.GetGlobalMousePosition());
             int region = _power.RegionAt(cell);
-            Write(21, $"Power islands {_power.IslandCount} · cells {_power.ConductingCellCount} · rebuild #{_power.RebuildCount} {_power.LastRebuildMilliseconds:0.00}ms · topology only", Normal);
+            Write(21, $"Power islands {_power.IslandCount} · cells {_power.ConductingCellCount} · rebuild #{_power.RebuildCount} {_power.LastRebuildMilliseconds:0.00}ms", Normal);
             Write(22, $"Power hover {cell}: island {region} · {_power.CellCount(region)} cells (0 = no island)", Normal);
+            PowerNetworkTotals totals = _power.Totals, local = _power.TotalsForRegion(region);
+            Write(23, $"Power Σ supply {totals.Supply:0.##} · requested {totals.RequestedDemand:0.##} · unassigned {_power.UnassignedProducers} sources / {_power.UnassignedConsumers} consumers", Normal);
+            Write(24, $"Hovered island supply {local.Supply:0.##} · requested {local.RequestedDemand:0.##} · margin {local.Margin:0.##} · accounting only", Normal);
         }
-        else { Write(21, "Power topology N/A", Normal); Write(22, "Power hover N/A", Normal); }
+        else { Write(21, "Power topology N/A", Normal); Write(22, "Power hover N/A", Normal);
+            Write(23, "Power accounting N/A", Normal); Write(24, "Power island totals N/A", Normal); }
         LayoutPanel();
     }
     #endregion

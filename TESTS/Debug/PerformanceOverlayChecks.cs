@@ -35,9 +35,10 @@ public partial class PerformanceOverlayChecks : Node
                 await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
                 await ToSignal(GetTree().CreateTimer(.35), SceneTreeTimer.SignalName.Timeout);
                 Label[] rows = overlay.FindChildren("*", "Label", true, false).OfType<Label>().ToArray();
-                Require(rows.Length == 23 && rows.Any(row => row.Text.Contains("Enemies 1") && row.Text.Contains("projectile nodes 1")),
+                Require(rows.Length == 25 && rows.Any(row => row.Text.Contains("Enemies 1") && row.Text.Contains("projectile nodes 1")),
                     "Throttled display reads cached actual service/container counts: " + string.Join(" | ", rows.Select(row => row.Text)));
                 Require(rows[21].Text.Contains("Power islands") && rows[22].Text.Contains("Power hover"), "Power topology has a cached readout");
+                Require(rows[23].Text.Contains("Power Σ supply") && rows[24].Text.Contains("accounting only"), "Power accounting is readable without gating gameplay");
                 Require(f.Spawns.Paths.TotalCalculations == queries, "Reading diagnostics never performs new route searches");
                 Require(overlay.FindChildren("*", "Control", true, false).OfType<Control>().All(c => c.MouseFilter == Control.MouseFilterEnum.Ignore),
                     "No overlay Control can intercept build/selection mouse input");

@@ -1,4 +1,4 @@
-// World-owned power topology foundation; listens only to terrain changes and never gates tower gameplay in PW1.
+// World-owned island topology and cached power accounting; no gameplay gating or per-frame processing.
 using Godot;
 using System;
 
@@ -33,7 +33,9 @@ public partial class PowerGridManager : Node
         ulong start = Time.GetTicksUsec();
         _islands.Rebuild(_grid.Config.WidthCells, _grid.Config.HeightCells, _grid.PowerConductivity);
         _terrainRevision = _grid.PowerTerrainRevision; Revision++; RebuildCount++;
+        ReindexAccounting();
         LastRebuildMilliseconds = (Time.GetTicksUsec() - start) / 1000.0;
+        AccountingChanged?.Invoke();
         NetworksChanged?.Invoke();
     }
 
@@ -49,6 +51,6 @@ public partial class PowerGridManager : Node
     public override void _ExitTree()
     {
         if (GodotObject.IsInstanceValid(_grid)) _grid.TerrainRebuilt -= RefreshTerrain;
-        _grid = null;
+        ClearAccounting(); _grid = null;
     }
 }

@@ -1,3 +1,11 @@
+## Starter power implemented — PW2 (2026-11-04)
+
+`CitadelSession.Power.cs` registers each initialized, living/available Citadel with the shared world PowerGridManager. **`DefaultCitadelPower.tres → Output = 100`** is a provisional baseline independent of health, Credits and wave activity. The resource is assigned on `LEVELS/Runtime/Battlefield.tscn → CitadelSession → Citadel Starter Power / Power Config`; its scalar Output supports live change notifications. Source registration is event-driven, removed on death/tree exit and rebuilt normally on Save/Load/Continue without accumulating or duplicating energy. A Citadel needs its full WorldObjectFootprint on one conducting island; F4 reports unassigned sources if ground is missing. No extra processing node per objective.
+
+F4 shows supply and requested demand for the hovered island. Current demand stays 0 until consumers are implemented. Output replacement references and map dimensions require restart; moving the authored Citadel at runtime requires explicit WorldGrid.RebuildTerrain. No Credits, HP, damage, mission, reward or save-schema rules changed. See [power implementation](../../../TOWERS/Economy/Power/Shared/README.md). Source review only; Godot runtime acceptance pending. The planned PW2 entry below is historical and superseded.
+
+---
+
 ## Planned starter power — PW2 (2026-11-04)
 
 The Citadel will supply configurable baseline electricity to its connected terrain island, enough for a deliberately tuned opening defense before extra generators. Each living/available Citadel registers as an independent producer with the shared PowerGridManager; no separate local-power logic or wave-only generation clock. Output amount, settings resource and registration remain PW2 work, not implemented by PW0/PW1. Current power work only identifies terrain islands. See [audit and phases](../../../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md).

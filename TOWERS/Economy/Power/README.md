@@ -1,3 +1,9 @@
+## PW2 accounting and Citadel generation — 2026-11-04
+
+Citadel baseline output is now source implemented (**100 provisional power**, editable in `WORLD/OBJECTIVES/Citadel/DefaultCitadelPower.tres`). Shared per-island accounting tracks supply, requested demand, margin and unassigned registrations; F4 displays these totals. It is event-driven and adds no frame/physics callback. No tower draw, outages, generators or relays yet. See [current shared implementation](Shared/README.md) and [updated phases](IMPLEMENTATION_PLAN.md). Owner build/runtime review pending; PW3 Industrial Generator is next.
+
+---
+
 ## PW0/PW1 power foundation — 2026-11-04
 
 The power [audit and phased plan](IMPLEMENTATION_PLAN.md) are now written. `Shared/PowerGridManager.cs` owns cached four-neighbour terrain islands in `World/PowerNetworks`; `Shared/PowerIslandMap.cs` handles reusable flood-fill buffers. WorldGrid caches independent Boolean `conducts_power` metadata in normal terrain precedence. Floors/Foundation/walls/rock conduct; Lava, space and Decorations do not. F4 shows counts and the hovered island. No power is generated/consumed and no tower is disabled yet. **Source implemented / awaiting owner Godot validation.**

@@ -95,9 +95,45 @@ public partial class PowerNetworkChecks : Node
             Require(power.IslandCount == 1 && grid.TerrainConductsPower(bridge) && !grid.CanBuild(bridge), "Nonbuildable wall joins the physical island");
             interactive.SetCell(bridge, 1, new(0, 0)); grid.RebuildTerrain();
             Require(power.IslandCount == 1 && grid.TerrainConductsPower(bridge), "Impassable wins over Interactive for conductivity too");
-            Require(!power.IsProcessing() && !power.IsPhysicsProcessing(), "Topology manager has no idle/frame callbacks");
+            CheckAccounting(power, grid, impassable, interactive, bridge, a, b);
+            Require(!power.IsProcessing() && !power.IsPhysicsProcessing(), "Topology/accounting manager has no idle/frame callbacks");
         }
         finally { world.Free(); }
+    }
+
+    // =========================================================
+    // Small explicit registrations exercise replacement, isolation and remapping without a combat simulation.
+    private static void CheckAccounting(PowerGridManager power, WorldGrid grid, TileMapLayer impassable,
+        TileMapLayer interactive, Vector2I bridge, Vector2I a, Vector2I b)
+    {
+        power.SetProducer("test:source-a", a, Vector2I.One, 100);
+        power.SetProducer("test:source-b", b, Vector2I.One, 50);
+        power.SetRequestedDemand("test:demand", b, Vector2I.One, 40);
+        Require(power.Totals.Supply == 150 && power.Totals.RequestedDemand == 40 && power.Totals.Margin == 110,
+            "Supply/requested demand totals are cached in common capacity units");
+        int revision = power.AccountingRevision;
+        power.SetProducer("test:source-a", a, Vector2I.One, 100);
+        Require(power.AccountingRevision == revision && power.Totals.Producers == 2, "Repeated registration never duplicates or emits a change");
+        power.SetProducer("test:source-a", a, Vector2I.One, 125);
+        Require(power.Totals.Supply == 175, "Output updates replace the old contribution once");
+        impassable.EraseCell(bridge); interactive.EraseCell(bridge); grid.RebuildTerrain();
+        Require(power.RegionAt(a) != power.RegionAt(b) && power.TotalsForRegion(power.RegionAt(a)).Supply == 125 &&
+            power.TotalsForRegion(power.RegionAt(a)).RequestedDemand == 0 &&
+            power.TotalsForRegion(power.RegionAt(b)).Supply == 50 && power.TotalsForRegion(power.RegionAt(b)).RequestedDemand == 40,
+            "A terrain split redistributes existing registrations without pooling islands");
+        power.SetProducer("test:source-b", new(0, 0), Vector2I.One, 50);
+        Require(power.UnassignedProducers == 1 && power.Totals.Supply == 125 && power.TotalsForRegion(0) == default,
+            "Unassigned source remains diagnosable and contributes no phantom supply");
+        bool rejected = false;
+        try { power.SetProducer("test:source-a", a, Vector2I.One, float.NaN); } catch (ArgumentException) { rejected = true; }
+        Require(rejected && power.Totals.Supply == 125, "Invalid amounts reject before mutating totals");
+        power.RemoveEndpoint("test:source-b"); power.RemoveEndpoint("test:source-b");
+        power.RemoveEndpoint("test:source-a"); power.RemoveEndpoint("test:demand");
+        Require(power.Totals == default && power.UnassignedProducers == 0 && power.UnassignedConsumers == 0,
+            "Unregistering twice is safe and the last member clears totals exactly");
+        CitadelPowerConfig config = new(); int changes = 0; config.Changed += () => changes++;
+        config.Output = 125; config.Output = 125;
+        Require(changes == 1 && config.Output == 125, "Citadel setting emits only actual valid changes"); config.Dispose();
     }
 
     // =========================================================

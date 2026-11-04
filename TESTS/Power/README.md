@@ -1,3 +1,11 @@
+## PW2 additions — 2026-11-04
+
+Focused source checks were extended for stable-ID producer updates without duplicates, requested demand, per-island split/remapping, unassigned supply, idempotent removals and invalid amounts. CitadelPowerConfig emits one Changed signal per actual output change. No fixture/build/runtime tests were executed here (Godot/.NET unavailable), and no benchmark or broad regression run was attempted.
+
+Owner check: rebuild C#, hover the Citadel's island in F4 and expect 100 supply / 0 requested for one normally grounded Citadel. Isolated islands have no supply unless they contain their own Citadel; unassigned source count explains missing/insulating ground. Edit DefaultCitadelPower.tres Output and restart (or edit the bound resource live) to see the change. Check source removal on Citadel death and a fresh Save/Load/Continue for no duplicate output. This is capacity accounting, not stored energy. Demand 0 is expected until PW4. Existing strict checkpoint fingerprint rules remain.
+
+---
+
 # Power foundation checks — PW1
 
 **Source checks authored; Godot/.NET execution pending.** No runtime, timing or FPS result is claimed.
