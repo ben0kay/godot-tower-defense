@@ -1,3 +1,7 @@
+## Selected tower presentation — aqua/red overlay (2026-11-03)
+
+`Selection/` contains one reusable selected-tower hologram and subtle screen grid/tint + name caption. The current `TowerPlacementController` selection and disabled/work events drive it, so normal states use aqua and disabled/upgrading states use soft red. No additional per-tower nodes or gameplay change. Configure colours, grid, pulse, text and opacity in [`Selection/DefaultTowerSelectionStyle.tres`](Selection/DefaultTowerSelectionStyle.tres). Source implemented; owner in-game review pending.
+
 ## Shield ricochet — SR1–SR4 (2026-10-21)
 
 `Ricochet/` owns a bounded world-space cosmetic streak buffer with angle-aware shield reflections. Only opted Kinetic projectiles with confirmed shield absorption request it. Master toggle ShieldRicochetsEnabled; shared DefaultRicochetStyle controls chance/motion/cap. No per-round nodes, collisions or gameplay effects. See Ricochet/README.md for tuning, checks and pending desktop review.

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="TowerSelectionStyle" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://FEEDBACK/Selection/TowerSelectionStyle.cs" id="1_style"]
+
+[resource]
+script = ExtResource("1_style")
+NormalColor = Color(0.313725, 0.85098, 0.862745, 1)
+DisabledColor = Color(0.941176, 0.419608, 0.462745, 1)
+TintOpacity = 0.025
+GridSpacingPixels = 96
+GridOpacity = 0.055
+NameFontSize = 18
+NameAboveBottomPixels = 46.0
+FootprintInsetPixels = 3.0
+CornerLengthPixels = 14.0
+FootprintFillOpacity = 0.045
+BorderOpacity = 0.62
+PulseSeconds = 2.8
+RedrawHertz = 20

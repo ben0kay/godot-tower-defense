@@ -1,3 +1,9 @@
+## Shared selected-tower overlay (2026-11-03)
+
+A single shared `FEEDBACK/Selection/TowerSelectionOverlay` follows this controller's existing `SelectTower` lifecycle. On selecting a placed tower, a faint HUD tactical grid and centred name caption appear, together with a pulsing world-space footprint bracket. Status uses the existing selected tower disable/work signals (aqua operational, red disabled/upgrading), with no new gameplay polling. Overlay clears when inspection closes, selection is removed, build previews start or the tower exits. The pre-existing selection range and lower-right Inspector are untouched. Settings and owner QA: [Selection feedback](../../FEEDBACK/Selection/README.md).
+
+---
+
 ## Placement ghost mirrors actual completed Level 1 tower art — 2026-11-02
 
 The green/red world placement preview is now a lightweight **visual-only copy of the selected tower's finished Level 1 scene artwork**, rather than the separate `TowerDefinition.Icon` catalog illustration. `TowerPlacementGhost.cs` instantiates the authored PackedScene **off-tree**, copies visible `Sprite2D` texture layers with their authored transforms, scale, rendering order, sprite settings and tint, then immediately frees the temporary source. The ghost is rebuilt only when the selected build type changes (not on mouse motion). The copied layers have no tower scripts, combat/production processing, construction, animation or physics. The existing placement controller retains cursor/validity, green/red tint, and footprint rectangle.

@@ -39,6 +39,7 @@ public partial class TowerPlacementController : Node2D
     private bool _placing, _previewVisible, _previewValid, _rightShiftHeld;
     private readonly Dictionary<TowerBase, Action> _placementExits = new();
     private TowerBase _selected;
+    private TowerSelectionOverlay _selectionOverlay;
     private int _displayedUpgradeLevel;
     private ulong _lastUpgradeFrame = ulong.MaxValue;
     #endregion
@@ -64,6 +65,9 @@ public partial class TowerPlacementController : Node2D
         _construction = GetNode<ConstructionWorkManager>("../World/ConstructionWork");
         _builders = GetNodeOrNull<ConstructionDroneManager>("../World/ConstructionDrones"); _builders?.Bind(this);
         _hud = GetNode<GameplayHUD>("../UI/GameplayHUD");
+        _selectionOverlay = new TowerSelectionOverlay { Name = "SelectedTowerOverlay" };
+        AddChild(_selectionOverlay);
+        _selectionOverlay.Configure(_grid, _hud);
         Catalog.Rebuild();
         _hud.BindCatalog(Catalog);
         foreach (TowerDefinition definition in Catalog.Definitions)
@@ -409,6 +413,8 @@ public partial class TowerPlacementController : Node2D
             _hud.SetRankDetails(_selected); _hud.SetDefenseDetails(_selected); _hud.SetWorkDetails(_selected); _hud.SetConditionDetails(_selected);
         }
         RefreshUpgradePreview();
+        if (GodotObject.IsInstanceValid(_selected)) _selectionOverlay?.ShowTower(_selected);
+        else _selectionOverlay?.Clear();
         QueueRedraw();
     }
 
@@ -459,6 +465,7 @@ public partial class TowerPlacementController : Node2D
     // Retain existing selection semantics but stop hidden progress notifications until reselected.
     private void OnInspectionClosed()
     {
+        _selectionOverlay?.Clear();
         _browsingBuild = false;
         ObserveWork(null);
         if (GodotObject.IsInstanceValid(_selected))
@@ -467,11 +474,12 @@ public partial class TowerPlacementController : Node2D
     // =========================================================
     // Start/completion refresh purchase availability once; intermediate ticks never resolve combat stats.
     private void OnSelectedWorkStarted()
-    { OnSelectedWorkProgress(); if (_hud.IsInspectionVisible) RefreshUpgradePreview(); }
+    { _selectionOverlay?.RefreshState(); OnSelectedWorkProgress(); if (_hud.IsInspectionVisible) RefreshUpgradePreview(); }
     private void OnSelectedWorkProgress()
     { if (_hud.IsInspectionVisible && GodotObject.IsInstanceValid(_selected)) { _hud.SetWorkDetails(_selected); _hud.SetConditionDetails(_selected); } }
     private void OnSelectedWorkCompleted()
     {
+        _selectionOverlay?.RefreshState();
         OnSelectedWorkProgress(); OnSelectedRuntimeChanged();
         if (_hud.IsInspectionVisible) RefreshUpgradePreview();
     }
@@ -481,6 +489,7 @@ public partial class TowerPlacementController : Node2D
     // One pending callback reads the current selection, so switching/closing cannot publish a stale tower card.
     private void OnSelectedConditionsChanged()
     {
+        _selectionOverlay?.RefreshState();
         if (_conditionRefreshQueued || !_hud.IsInspectionVisible) return;
         _conditionRefreshQueued = true; Callable.From(() =>
         {

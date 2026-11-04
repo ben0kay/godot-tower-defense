@@ -1,3 +1,9 @@
+## Selected-tower tactical overlay — 2026-11-03
+
+Placed-tower selection now adds a subtle aqua tactical screen wash and grid, the selected tower's name above the lower HUD, and one softly pulsing holographic footprint frame. Disabled/upgrading towers switch the palette to red using existing state signals. The shared renderer is dormant when unselected, preserves the existing radius/Inspector and supports multi-cell buildings. See [Selection Feedback](FEEDBACK/Selection/README.md). Source implemented; owner visual QA pending.
+
+---
+
 ## Resource Tower construction and purchased upgrade artwork — 2026-11-03
 
 Resource Tower now has staged initial assembly at 0/35/70% and separate finished Level 2 and 3 green industrial artwork with 35%/70% intermediate upgrade images. It remains **one stationary 112×112 Sprite2D** on a 2×2 footprint. Shared `TowerConstructionVisuals` controls cosmetic texture changes; no new tower logic or processing loops were added. The producer's credit payout rates, storage capacities, existing prices, 2-second work durations, collection flow and save data are unaffected. See [Resource artwork notes](TOWERS/Economy/ResourceTower/Artwork/Upgrades/README.md). Godot visual acceptance pending.
