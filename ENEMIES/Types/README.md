@@ -1,3 +1,9 @@
+## Current fleet naming and roles — 2026-11-04
+
+**[Canonical 14-ship roster](ROSTER.md)** now maps readable names, stable IDs, `EnemyFamily`, and their legacy/descriptive asset folders. Player/editor-facing names were standardized for four vague entries: **Heavy Warship** (`big_mk1`, old Big mk.1), **Elite Assault Ship** (`elite_mk1`, old Elite mk.1), **Racer Interceptor** (`racer_mk1`, old Racer), and **Drone Transporter** (`transporter_mk1`, old Transporter). The Wave Editor dropdown now groups by family; F2 also shows role and stable ID. Existing asset paths (`Enemy001` etc.), `EnemyId` values, enum ordering, wave schedules, stats and gameplay are untouched. The optional future asset folder rename mapping is recorded in the roster; don't treat historical headings below as current display names.
+
+---
+
 ## Gunner Drone — EG3 (2026-10-20, source implementation)
 
 Catalog/F2 count is now14. GunnerDrone/gunner_drone_mk1 inherits GenericEnemy and adds an optional enemy minigun with independent hull/gun SVGs. Its64×48 hull matches Enemy004/Bulwark Drone's size; shape is distinct. Provisional Drone family,180HP,0shield,75px/s,22px radius,2 Citadel damage,8 Credits. Gun defaults:260px range,6 bullets/s,1.5s burst/1s rest,2 Kinetic damage,1200px/s. All13 previous entries stay unchanged/unarmed and existing waves omit the new gunner. See GunnerDrone/README.md. Godot build/runtime and visual acceptance remain pending; previous13-ship counts below record earlier fleet history.
