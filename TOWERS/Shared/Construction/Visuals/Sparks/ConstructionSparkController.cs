@@ -64,23 +64,22 @@ public partial class ConstructionSparkController : Node
             return;
         }
 
-        // Each active job gets private GPU material bounds; a real annulus leaves the center empty.
+        // Explicit 64-point perimeter texture. Unlike procedural ring/sphere shapes, every
+        // authored spawn point is away from the center, so GPU selection cannot pick (0, 0).
         var material = (ParticleProcessMaterial)source.Duplicate();
         particles.ProcessMaterial = material;
         Vector2 area = (Vector2)tower.Footprint * _cellSize;
-        ConfigurePerimeterRing(material, area, Config.FootprintCoverage, .86f);
+        ConfigurePerimeterPoints(material, area, Config.FootprintCoverage);
         particles.Amount = Mathf.Clamp(Config.ParticlesPerSite, 1, 32);
         particles.Lifetime = Mathf.Clamp(Config.ParticleLifetime, .1f, 1.5f);
         // SelfModulate preserves the original orange flecks without tinting the new white-hot child.
         particles.SelfModulate = Config.SparkTint;
         particles.Emitting = false;
 
-        // One private GPU material for each layer, sized once to this tower's footprint.
+        // The crisp welding layer gets its own slightly wider explicit perimeter points.
         var hotMaterial = (ParticleProcessMaterial)weldingSource.Duplicate();
         welding.ProcessMaterial = hotMaterial;
-        float hotCoverage = Mathf.Clamp(Config.WeldingFootprintCoverage, .15f, 1f);
-        // Bright welding streaks begin in a narrow band close to the outer boundary.
-        ConfigurePerimeterRing(hotMaterial, area, Config.WeldingFootprintCoverage, .93f);
+        ConfigurePerimeterPoints(hotMaterial, area, Config.WeldingFootprintCoverage);
         welding.Amount = Mathf.Clamp(Config.WeldingParticlesPerSite, 1, 24);
         welding.Lifetime = Mathf.Clamp(Config.WeldingLifetime, .1f, .8f);
         welding.Modulate = Config.WeldingTint;
@@ -97,22 +96,40 @@ public partial class ConstructionSparkController : Node
         else StartLayers(particles);
     }
 
+    #region Explicit Spawn Geometry
+    internal const int PerimeterPointCount = 64;
+
     // =========================================================
-    // Authoring uses Godot's Ring emission shape (6); scale its XY circumference to each footprint.
-    // The inner radius leaves the middle empty, so both spark types actually spawn near the edge.
-    // This is configured only on registration; GPU motion stays entirely autonomous.
-    private static void ConfigurePerimeterRing(
-        ParticleProcessMaterial material, Vector2 area, float coverage, float innerFraction)
+    // Generated once per paid work site. Each source pixel is a 32-bit floating-point
+    // local XY position, not a colour or a mask; Godot's GPU samples one at particle birth.
+    // Even the innermost jittered point stays beyond 95% of the configured radius.
+    internal static ImageTexture CreatePerimeterPoints(Vector2 footprint, float coverage)
     {
-        float shorterSide = Mathf.Max(1f, Mathf.Min(area.X, area.Y));
-        float outer = Mathf.Max(3f, shorterSide * Mathf.Clamp(coverage, .15f, .98f) * .5f);
-        material.EmissionRingAxis = Vector3.Back;
-        material.EmissionRingHeight = 0f;
-        material.EmissionRingRadius = outer;
-        material.EmissionRingInnerRadius = outer * innerFraction;
-        material.EmissionShapeScale = new Vector3(
-            Mathf.Max(1f, area.X / shorterSide), Mathf.Max(1f, area.Y / shorterSide), 1f);
+        float halfWidth = Mathf.Max(3f, footprint.X * Mathf.Clamp(coverage, .15f, .98f) * .5f);
+        float halfHeight = Mathf.Max(3f, footprint.Y * Mathf.Clamp(coverage, .15f, .98f) * .5f);
+        using Image image = Image.CreateEmpty(PerimeterPointCount, 1, false, Image.Format.Rgbaf);
+        for (int i = 0; i < PerimeterPointCount; i++)
+        {
+            float angle = Mathf.Tau * (i + .5f) / PerimeterPointCount;
+            float radiusJitter = .975f + .025f * Mathf.Sin(i * 2.39996f);
+            image.SetPixel(i, 0, new Color(
+                Mathf.Cos(angle) * halfWidth * radiusJitter,
+                Mathf.Sin(angle) * halfHeight * radiusJitter, 0f, 1f));
+        }
+        return ImageTexture.CreateFromImage(image);
     }
+
+    // =========================================================
+    // A single GPU source lookup selects an explicit edge point at spawn.
+    // No 2D sphere projection, ring-axis assumptions or per-frame position calculations.
+    private static void ConfigurePerimeterPoints(ParticleProcessMaterial material, Vector2 area, float coverage)
+    {
+        material.EmissionPointTexture = CreatePerimeterPoints(area, coverage);
+        material.EmissionPointCount = PerimeterPointCount;
+        material.EmissionShapeScale = Vector3.One;
+        material.EmissionShapeOffset = Vector3.Zero;
+    }
+    #endregion
 
     // =========================================================
     // This fires when a construction/upgrade drone releases its hold, before work time advances.

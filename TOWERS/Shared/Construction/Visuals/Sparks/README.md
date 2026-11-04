@@ -1,3 +1,19 @@
+## Authoritative perimeter spawn fix — November 3, 2026
+
+**Why the previous attempts were not accepted:** increasing `EmissionSphereRadius`, switching one layer to `Ring` and adjusting the scene resource values did **not** produce the outside-edge spark sources seen in the user's game. Do not treat old ring-geometry assertions as visual validation; screenshots of Battle and Laser still showed a central burst.
+
+**Now:** both soft amber and sharp welding `GPUParticles2D` process materials use **`emission_shape = 4` (Points)**. On each paid work registration, the shared `ConstructionSparkController` creates an independent, 64×1 `RGBAF` float texture with 64 **explicit noncentral positions** on a footprint-scaled ellipse. The GPU samples one of these positions when each particle spawns. This bypasses any engine ring/sphere projection interpretations; code-side focused checks verify the *actual RGBAF pixel positions* rather than merely checking a radius parameter.
+
+- Each generated position is **95–100%** of the current `FootprintCoverage` (92% default) or `WeldingFootprintCoverage` (94% default). On a 64×64 tile, the white-hot streak birth positions are roughly 29–30 world pixels from the tower centre, leaving a large empty middle.
+- Distinct soft/hot point textures match each layer's actual `TowerBase.Footprint` and `WorldGrid.Config.CellSize`. Wider rectangular structures get an ellipse approaching all four sides, rather than a central circle capped by the short side.
+- Existing outward radial velocity (soft 70–120 px/s, hot 125–210 px/s), color gradients, soft orange/white-hot sprites, random point selection, count/lifetime, work ownership, idle behavior and completion cleanup remain.
+- **Cost:** two tiny float textures (64×1 positions) uploaded once for a paid active site, with no position work each frame. GPU particle budget and emitter count unchanged. Images and textures are tied to active material lifecycle, not cached per map or continuously rebuilt.
+- **Source test:** checks both `EmissionShape==Points` and reads the 64 stored spawn pixels, confirming every normalized radial distance is above 94.9% of the desired outer ellipse. This is geometry verification, **not** a completed Godot rendered/FPS test.
+
+**Critical acceptance:** pull latest `dev`, rebuild Godot.NET, construct a new Battle/Laser tower (and later a 2×2) and watch where particles **first appear**. They should first appear close to the footprint edge, not travel from the centre to it. If the centre still glows, distinguish construction beam/hologram from orange/white sparks; capture a screenshot/video and record which layer is visible. Do not keep increasing `EmissionRingRadius` because this implementation no longer uses that property.
+
+---
+
 ## Perimeter-first sparks, not centre-spawn — 2026-11-03 (latest)
 
 **Screenshot-driven fix:** earlier passes adjusted the white-hot layer's radius but left the **orange soft layer spawning across a central box**. Worse, the sharp layer used `Sphere Surface` (shape `2`), which can visually project toward the centre in 2D. Both layers now explicitly use Godot's real **Ring** emission shape (`6`) in the XY plane, with a large hollow centre. <https://docs.godotengine.org/en/stable/tutorials/3d/particles/process_material_properties.html>

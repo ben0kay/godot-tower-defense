@@ -12,13 +12,10 @@ gradient = SubResource("fade")
 
 [sub_resource type="ParticleProcessMaterial" id="motion"]
 particle_flag_disable_z = true
-# A thin hollow annulus around the tower's OUTER perimeter; radius/ellipse set by controller.
-emission_shape = 6
-emission_ring_axis = Vector3(0, 0, 1)
-emission_ring_height = 0.0
-emission_ring_cone_angle = 90.0
-emission_ring_radius = 29.4
-emission_ring_inner_radius = 25.3
+# Positions for BOTH layers come from explicit floating-point emission point textures.
+# The controller creates 64 2D perimeter positions after measuring the actual tower footprint.
+emission_shape = 4
+emission_point_count = 64
 velocity_pivot = Vector3(0, 0, 0)
 gravity = Vector3(0, 48, 0)
 initial_velocity_min = 0.0
@@ -41,14 +38,10 @@ gradient = SubResource("weld_fade")
 [sub_resource type="ParticleProcessMaterial" id="weld_motion"]
 particle_flag_disable_z = true
 particle_flag_align_y = true
-# True thin XY annulus (NOT a 3D sphere projected into the center).
-# Start near the construction perimeter, then fly well outside its bounds.
-emission_shape = 6
-emission_ring_axis = Vector3(0, 0, 1)
-emission_ring_height = 0.0
-emission_ring_cone_angle = 90.0
-emission_ring_radius = 30.1
-emission_ring_inner_radius = 28.0
+# Identical explicit geometry pipeline, independently sized to the hot coverage.
+# GPU randomly chooses a stored non-center point at spawn; outward radial motion is unchanged.
+emission_shape = 4
+emission_point_count = 64
 velocity_pivot = Vector3(0, 0, 0)
 gravity = Vector3(0, 42, 0)
 initial_velocity_min = 0.0

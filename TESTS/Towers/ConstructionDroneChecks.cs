@@ -52,6 +52,26 @@ public partial class ConstructionDroneChecks : Node
         Require(builders.ActiveCount == 0 && builders.PendingCount == 0 && !builders.IsPhysicsProcessing(), "All return flights retire and manager sleeps");
     }
     #endregion
+    // =========================================================
+    // Assert *actual stored spawn positions* rather than only checking a configured shape/radius.
+    // Float-texture pixels contain local XY positions, and none may originate in the central 95%.
+    private static void CheckPerimeterPoints(ParticleProcessMaterial material, Vector2 size, float coverage)
+    {
+        Require(material.EmissionPointTexture != null, "Perimeter spawn texture must be assigned");
+        using Image image = material.EmissionPointTexture.GetImage();
+        Require(image != null && image.GetWidth() == ConstructionSparkController.PerimeterPointCount &&
+            image.GetHeight() == 1, "Perimeter lookup must contain one row of exact spawn positions");
+        float rx = size.X * coverage * .5f, ry = size.Y * coverage * .5f;
+        for (int i = 0; i < ConstructionSparkController.PerimeterPointCount; i++)
+        {
+            Color point = image.GetPixel(i, 0);
+            float normalizedRadius = Mathf.Sqrt((point.R / rx) * (point.R / rx) +
+                (point.G / ry) * (point.G / ry));
+            Require(normalizedRadius > .949f && normalizedRadius <= 1.001f,
+                "Every GPU spark spawn must be on the outer perimeter, never near the centre");
+        }
+    }
+
     #region Paid Flow and Queue
     // =========================================================
     // Real successful placement pays/reserves once before its drone can exist; waiting clocks and artwork stay at zero.
@@ -91,16 +111,16 @@ public partial class ConstructionDroneChecks : Node
         var weldingSparks = tower.GetNode<GpuParticles2D>("ConstructionSparkEmitter/WeldingSparks");
         var radialMotion = weldingSparks.ProcessMaterial as ParticleProcessMaterial;
         var softMotion = tower.GetNode<GpuParticles2D>("ConstructionSparkEmitter").ProcessMaterial as ParticleProcessMaterial;
-        float shortSide = Mathf.Min(tower.Footprint.X, tower.Footprint.Y) *
+        Vector2 footprintPixels = (Vector2)tower.Footprint *
             f.Spawns.Paths.Navigation.Grid.Config.CellSize;
         Require(radialMotion != null && softMotion != null &&
-            (int)radialMotion.EmissionShape == 6 && (int)softMotion.EmissionShape == 6 &&
-            Mathf.IsEqualApprox(radialMotion.EmissionRingRadius * 2f, shortSide * sparks.Config.WeldingFootprintCoverage) &&
-            Mathf.IsEqualApprox(softMotion.EmissionRingRadius * 2f, shortSide * sparks.Config.FootprintCoverage) &&
-            radialMotion.EmissionRingInnerRadius >= radialMotion.EmissionRingRadius * .9f &&
-            softMotion.EmissionRingInnerRadius >= softMotion.EmissionRingRadius * .8f &&
+            (int)radialMotion.EmissionShape == 4 && (int)softMotion.EmissionShape == 4 &&
+            radialMotion.EmissionPointCount == ConstructionSparkController.PerimeterPointCount &&
+            softMotion.EmissionPointCount == ConstructionSparkController.PerimeterPointCount &&
             radialMotion.RadialVelocityMin >= 125f && softMotion.RadialVelocityMin > 0f,
-            "Both spark layers spawn on a nearly-footprint-wide hollow ring and travel outward, not from the centre");
+            "Both spark layers use explicit 64-point GPU spawn textures and outward motion");
+        CheckPerimeterPoints(radialMotion, footprintPixels, sparks.Config.WeldingFootprintCoverage);
+        CheckPerimeterPoints(softMotion, footprintPixels, sparks.Config.FootprintCoverage);
         var flashes = builders.GetNode<ConstructionCompletionFlash>("CompletionFlashes");
         Require(drone.BeamVisible && beam.AnimationSeconds > 0 && status.Text == "CONSTRUCTING" &&
             builders.Releases == 1 && clock.HeldCount == 0, "Animated beam deployed before one release");

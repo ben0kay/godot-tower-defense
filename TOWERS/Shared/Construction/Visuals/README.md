@@ -1,3 +1,9 @@
+## GPU sparks now use explicit perimeter points — November 3, 2026
+
+Both orange and white-hot construction/upgrade `GPUParticles2D` layers are now sourced from **64 explicit outer-footprint positions** supplied in a small float emission texture on paid work registration. This replaces prior ring/sphere spawn settings that still looked centre-biased in user screenshots. All resulting sparks travel radially outward; no additional processing loops or render emitters. Read [Sparks](Sparks/README.md) for the authoritative source geometry and source-level regression check. In-game visual/FPS acceptance remains pending.
+
+---
+
 ## Corrected edge-origin construction sparks — 2026-11-03
 
 Screenshot feedback revealed the previous orange sparks still emerged from a central rectangular area, even after the crisp layer's ring radius increased. **Both** orange and sharp-white layers now use true hollow `ParticleProcessMaterial` rings close to the footprint perimeter (92%/94% of the relevant tower dimensions), with radial velocities that carry particles beyond the building. On rectangular sites, the ring stretches into an ellipse. The original texture, colour palette and separate work-driven lifecycle remain intact. See [Sparks/README.md](Sparks/README.md) for implementation details and tuning. No per-frame CPU updates were introduced; in-game visual verification is pending.
