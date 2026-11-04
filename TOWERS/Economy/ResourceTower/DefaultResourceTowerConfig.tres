@@ -35,6 +35,9 @@ RangePixels = 0.0
 HullHealth = 1653.75
 WorkSeconds = 2.0
 
+[ext_resource type="Resource" path="res://TOWERS/Economy/ResourceTower/Artwork/Construction/ResourceConstructionArt.tres" id="construction"]
+
 [resource]
 script = ExtResource("1")
+ConstructionArt = ExtResource("construction")
 ProductionLevels = Array[ExtResource("2")]([SubResource("Tier1"), SubResource("Tier2"), SubResource("Tier3")])

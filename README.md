@@ -1,3 +1,9 @@
+## Resource Tower construction and purchased upgrade artwork — 2026-11-03
+
+Resource Tower now has staged initial assembly at 0/35/70% and separate finished Level 2 and 3 green industrial artwork with 35%/70% intermediate upgrade images. It remains **one stationary 112×112 Sprite2D** on a 2×2 footprint. Shared `TowerConstructionVisuals` controls cosmetic texture changes; no new tower logic or processing loops were added. The producer's credit payout rates, storage capacities, existing prices, 2-second work durations, collection flow and save data are unaffected. See [Resource artwork notes](TOWERS/Economy/ResourceTower/Artwork/Upgrades/README.md). Godot visual acceptance pending.
+
+---
+
 ## Shared world callouts for tower levels and ranks — 2026-11-03
 
 Finished paid upgrades now display a thick-arrow **aqua LEVEL** popup; XP promotions display a **gold RANK UP** popup to the right of the tower. Both use a generic `FEEDBACK/WorldCallouts/` animated text component suitable for future plain status notices (for example OVERHEATED), with Inspector-editable duration, rise and font size. Dormant effects do not process. Newer `dev` timed upgrade drones and combat are unchanged. [World Callouts](FEEDBACK/WorldCallouts/README.md). Source implemented; owner Godot visuals/compile review pending.
