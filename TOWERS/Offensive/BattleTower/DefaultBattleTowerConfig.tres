@@ -9,6 +9,7 @@
 [resource]
 script = ExtResource("1")
 HeatEnabled = true
+FireSoundId = "tower_battle_fire"
 HullHitSparkCount = 4
 Recoil = ExtResource("recoil")
 ProjectileVisual = ExtResource("pv_tracer")

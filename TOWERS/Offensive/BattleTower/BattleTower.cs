@@ -51,6 +51,7 @@ public partial class BattleTower : TowerBase
     private Marker2D _muzzle;
     private WeaponVisualRenderer _visuals;
     private EnemyRegistry _registry;
+    private AudioManager _audio;
     private Node2D _projectiles;
     private Enemy _target;
     private float _searchTimer, _shotTimer;
@@ -77,6 +78,7 @@ public partial class BattleTower : TowerBase
         RebuildStats(); SynchronizeRecoil();
         _registry = GetNodeOrNull<EnemyRegistry>("../../EnemySystems/Registry");
         _projectiles = GetNodeOrNull<Node2D>("../../Projectiles");
+        _audio = AudioManager.Find(this); // Reuse the autoload; never create per-tower players.
         _searchTimer = (GetInstanceId() % 97) / 97f * (FinalStats?.TargetSearchInterval ?? 0.15f);
         SetOperationalPhysicsProcess(_registry != null && _projectiles != null);
     }
@@ -103,6 +105,8 @@ public partial class BattleTower : TowerBase
             new DamageInfo(FinalStats.DamagePerShot, DamageType.Kinetic, shieldPenetration: FinalStats.ShieldPenetration, source: DamageSource), visual: Config.ProjectileVisual, handling: FinalStats.Handling, shieldRicochet: Config.ShieldRicochet,
             hullHitSparkCount: Config.HullHitSparkCount);
         _projectiles.AddChild(bullet); WeaponVisuals.Present(bullet, _muzzle, Config, _visuals);
+        // The shot exists and ammunition was paid; audio may be culled without affecting combat.
+        if (!string.IsNullOrWhiteSpace(Config.FireSoundId)) _audio?.PlayFrom(Config.FireSoundId, this);
         _recoil.Kick(); // Snapshot the real barrel-tip launch and flash before starting visual motion.
         _shotTimer = Mathf.Max(0, 1f / FinalStats.ShotsPerSecond + _shotTimer);
         RecordAttackHeat();

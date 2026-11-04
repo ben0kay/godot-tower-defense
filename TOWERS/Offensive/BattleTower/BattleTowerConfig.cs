@@ -15,6 +15,8 @@ public partial class BattleTowerConfig : TowerConfig, ITowerTargetingPolicy, IPr
     }
 
     [Export] public bool ShieldRicochet { get; set; } = true;
+    [ExportGroup("Audio")]
+    [Export] public string FireSoundId { get; set; } = "tower_battle_fire";
     [ExportGroup("Hull Hit Feedback")]
     [Export(PropertyHint.Range, "0,8,1")] public int HullHitSparkCount { get; set; } = 4;
     private bool _heatEnabled;

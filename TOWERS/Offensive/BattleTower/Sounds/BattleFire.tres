@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="AudioDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://AUDIO/AudioDefinition.cs" id="1"]
+[ext_resource type="AudioStream" path="res://TOWERS/Offensive/BattleTower/Sounds/BattleFire.wav" id="2"]
+
+[resource]
+script = ExtResource("1")
+Id = "tower_battle_fire"
+Stream = ExtResource("2")
+Mode = 0
+Category = 0
+Priority = 40
+CooldownSeconds = 0.12
+MaximumInstances = 8
+Positional = true
+AllowOffscreen = false
+MaxDistance = 550.0
+Attenuation = 1.0
+VolumeDb = -4.0
+PitchScale = 1.0

@@ -1,3 +1,9 @@
+## TA1 — authored Battle Tower firing audio (2026-11-04)
+
+Battle Tower now fires a **real original 0.26s WAV** (metallic sci-fi cannon impulse with descending energy tail) whenever it successfully launches a paid projectile. The clip and Inspector-editable `AudioDefinition` live under [Sounds/](Sounds/README.md), not in the global audio folder. Its stable ID `tower_battle_fire` is registered in `AUDIO/DefaultAudioCatalog.tres`. `BattleTowerConfig.FireSoundId` defaults to that ID and may be cleared to silence an individual authored config. `BattleTower` caches the shared `AudioManager` on readiness, calls `PlayFrom` on successful firing, and lets the manager enforce positional attenuation, off-screen/range culling, priority 40, per-tower 0.12s cooldown, max 8 overlapping instances and the existing WorldSFX cap. **No sound player node, process loop or gameplay dependency added to individual towers.** Source/clip verified; Godot sound balance and FPS remain for local testing.
+
+---
+
 ## CV1 construction square during Battle upgrades (2026-10-27)
 
 When Battle upgrades 1→2 or 2→3, the original transparent cyan **square construction overlay** now frames the existing tower immediately after purchase, stays while the drone travels/beams and the 35%/70% staged SVGs show, and vanishes at 100% on the same work-completion event. The new tier's base and recoiling gun appear unchanged. This is shared for other timed upgrading towers too; no new Battle-only renderer. [Shared visuals](../../Shared/Construction/Visuals/README.md).

@@ -1,3 +1,9 @@
+## Battle Tower gunshot audio — first tower shot hook (2026-11-04)
+
+A new original 0.26-second PCM WAV is stored in `TOWERS/Offensive/BattleTower/Sounds/BattleFire.wav`, with an adjacent `BattleFire.tres` audio definition registered in `DefaultAudioCatalog.tres` as `tower_battle_fire`. Battle Tower requests `AudioManager.PlayFrom` only **after an actual funded projectile launch**, using the placed tower as the owner for independent cooldown and positional origin. It inherits the existing 24-world-shot budget, pooled players, listener distance and screen culling; default 550px max distance, off-screen disabled, owner cooldown 0.12s, per-ID cap 8 and priority 40. Gameplay never depends on sound availability. See [Battle Sounds](../TOWERS/Offensive/BattleTower/Sounds/README.md). Godot import/playback and mixing QA pending.
+
+---
+
 ## First imported voice cue: Welcome Commander (2026-10-20; engine QA pending)
 
 Registered the uploaded `VoiceAssistant/Welcome_Commander.mp3` with the shared audio catalog as `voice_profile_welcome`. Boot selection and successful new-profile creation trigger `VoiceAssistant.Say()` through the persistent GameAudio manager; the cue plays during transition into Main Menu. See [VoiceAssistant organization](VoiceAssistant/README.md) for the planned `Cues/Profiles`, `Waves`, `Combat`, `Systems`, `Missions` grouping. No redundant audio manager, profile save change or wave narration/audio hook was added. Godot MP3 import and audible playback require local verification.
