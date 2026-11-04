@@ -6,6 +6,13 @@ public partial class TowerProgressPopup : Node2D
     private static readonly Color Aqua = new("#4beadf");
     private static readonly Color Gold = new("#ffd36b");
     private const float Duration = 1.35f;
+    // =========================================================
+    // Reuse immutable polygon points on every visible frame; no redraw-time array allocations.
+    private static readonly Vector2[] Arrow =
+    {
+        new(0f, 0f), new(9f, -10f), new(18f, 0f),
+        new(13f, 0f), new(13f, 12f), new(5f, 12f), new(5f, 0f)
+    };
     private float _remaining;
     private string _message = "";
     private Color _color;
@@ -44,19 +51,16 @@ public partial class TowerProgressPopup : Node2D
         float rise = 20f * progress;
         Color color = new(_color.R, _color.G, _color.B, alpha);
         Color shadow = new(0f, .05f, .08f, alpha * .85f);
-        // Thick, filled upward arrow followed by a compact readable label.
-        Vector2[] arrow =
-        {
-            new(0, 0), new(9, -10), new(18, 0),
-            new(13, 0), new(13, 12), new(5, 12), new(5, 0)
-        };
-        Vector2 offset = new(20f, -rise);
-        DrawColoredPolygon(System.Array.ConvertAll(arrow, p => p + offset + new Vector2(1, 1)), shadow);
-        DrawColoredPolygon(System.Array.ConvertAll(arrow, p => p + offset), color);
+        // Thick filled arrow and text share the same float offset, without allocating geometry.
+        DrawSetTransform(new Vector2(21f, 1f - rise));
+        DrawColoredPolygon(Arrow, shadow);
         Font font = ThemeDB.FallbackFont;
-        if (font == null) return;
-        Vector2 textPosition = offset + new Vector2(23f, 7f);
-        DrawString(font, textPosition + new Vector2(1, 1), _message, HorizontalAlignment.Left, -1, 13, shadow);
-        DrawString(font, textPosition, _message, HorizontalAlignment.Left, -1, 13, color);
+        if (font != null)
+            DrawString(font, new Vector2(23f, 7f), _message, HorizontalAlignment.Left, -1, 13, shadow);
+
+        DrawSetTransform(new Vector2(20f, -rise));
+        DrawColoredPolygon(Arrow, color);
+        if (font != null)
+            DrawString(font, new Vector2(23f, 7f), _message, HorizontalAlignment.Left, -1, 13, color);
     }
 }
