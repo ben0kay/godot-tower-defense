@@ -38,6 +38,9 @@ public abstract partial class TowerBase : Node2D
     private TowerMasterConfig _experienceRules;
     private TowerResearchBonuses _research;
     private DamageSource _damageSource;
+    private WorldCallout _worldCallout;
+    private static readonly Color LevelCalloutColor = new("#4beadf");
+    private static readonly Color RankCalloutColor = new("#ffd36b");
     public TowerMasterConfig ExperienceRules => _experienceRules ?? TowerRankController.DefaultRules;
     public DamageSource DamageSource => _damageSource ??= new DamageSource(this);
     public abstract System.Collections.Generic.List<TowerLevel> Levels { get; }
@@ -107,7 +110,12 @@ public abstract partial class TowerBase : Node2D
     {
         double before = RankProgress.TotalXp;
         bool promoted = RankProgress.Add(amount, AuthoredConfig.Ranks);
-        if (promoted) { FinalStats = ResolveLevel(UpgradeLevel); NotifyStatsChanged(); }
+        if (promoted)
+        {
+            FinalStats = ResolveLevel(UpgradeLevel); NotifyStatsChanged();
+            if (GodotObject.IsInstanceValid(this) && IsInsideTree() && !IsQueuedForDeletion())
+                ShowWorldCallout($"RANK UP  {CurrentRank.Rank}", RankCalloutColor, WorldCalloutSymbol.ThickUpArrow);
+        }
         if (RankProgress.TotalXp != before) ExperienceChanged?.Invoke();
     }
 
@@ -163,8 +171,26 @@ public abstract partial class TowerBase : Node2D
         else if (instant)
         {
             NotifyStatsChanged();
-            if (GodotObject.IsInstanceValid(this) && IsInsideTree() && !IsQueuedForDeletion()) WorkCompleted?.Invoke();
+            if (GodotObject.IsInstanceValid(this) && IsInsideTree() && !IsQueuedForDeletion())
+            {
+                ShowWorldCallout($"LEVEL {UpgradeLevel}", LevelCalloutColor, WorldCalloutSymbol.ThickUpArrow);
+                WorkCompleted?.Invoke();
+            }
         }
+    }
+
+    // =========================================================
+    // Generic event-driven callout; heat/disable notices may reuse this later.
+    public void ShowWorldCallout(string message, Color tint, WorldCalloutSymbol symbol = WorldCalloutSymbol.None)
+    {
+        if (!WorldCallout.Enabled || !IsInsideTree() || IsQueuedForDeletion() || IsDestroyed || string.IsNullOrWhiteSpace(message))
+            return;
+        if (!GodotObject.IsInstanceValid(_worldCallout))
+        {
+            _worldCallout = new WorldCallout { Name = "WorldCallout" };
+            AddChild(_worldCallout);
+        }
+        _worldCallout.Play(GlobalPosition + new Vector2(32f, -8f), message, tint, symbol);
     }
 
     #region Construction
@@ -245,7 +271,12 @@ public abstract partial class TowerBase : Node2D
             }
             else { SetPhysicsProcess(_operationalPhysics); OnBecameOperational(); }
             // A stat/inventory observer may have removed this building during activation.
-            if (GodotObject.IsInstanceValid(this) && IsInsideTree() && !IsQueuedForDeletion()) WorkCompleted?.Invoke();
+            if (GodotObject.IsInstanceValid(this) && IsInsideTree() && !IsQueuedForDeletion())
+            {
+                if (upgrading)
+                    ShowWorldCallout($"LEVEL {UpgradeLevel}", LevelCalloutColor, WorldCalloutSymbol.ThickUpArrow);
+                WorkCompleted?.Invoke();
+            }
             return;
         }
         ElapsedWorkSeconds += delta;

@@ -10,4 +10,5 @@ public partial class FeedbackMasterConfig : Resource
 	[Export] public bool DeathExplosionsEnabled { get; set; } = true;
 	[Export] public bool DamageNumbersEnabled { get; set; } = true;
 	[Export] public bool CameraEffectsEnabled { get; set; } = true;
+    [Export] public bool WorldCalloutsEnabled { get; set; } = true;
 }

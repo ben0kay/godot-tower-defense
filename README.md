@@ -1,3 +1,9 @@
+## Shared world callouts for tower levels and ranks — 2026-11-03
+
+Finished paid upgrades now display a thick-arrow **aqua LEVEL** popup; XP promotions display a **gold RANK UP** popup to the right of the tower. Both use a generic `FEEDBACK/WorldCallouts/` animated text component suitable for future plain status notices (for example OVERHEATED), with Inspector-editable duration, rise and font size. Dormant effects do not process. Newer `dev` timed upgrade drones and combat are unchanged. [World Callouts](FEEDBACK/WorldCallouts/README.md). Source implemented; owner Godot visuals/compile review pending.
+
+---
+
 ## Shockwave Tower construction and purchased artwork — 2026-11-03
 
 Shockwave now has 0/35/70% initial construction SVGs and a distinct Level 2 completed purple resonator plus 35%/70% upgrade scaffolds. The pre-existing stationary **single Sprite2D** remains the only tower art, with its texture controlled by shared `TowerConstructionVisuals`. No turret, muzzle, gameplay logic, cooldown, wave effect, resource balance or per-frame presentation work was added. Level 1 build remains 5 seconds; the Level 2 upgrade remains 225 Credits / 6 seconds. See [Shockwave artwork notes](TOWERS/Offensive/ShockwaveTower/Artwork/Upgrades/README.md). Source wiring checked; owner Godot visual acceptance pending.
