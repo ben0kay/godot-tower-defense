@@ -60,8 +60,9 @@ public partial class EnemySpawnMenu : CanvasLayer
         box.AddChild(UIButtonFactory.Label("ENEMY SPAWNER · F2", 20));
         box.AddChild(UIButtonFactory.Label("Random valid portal per ship", 14));
         _enemy = new() { Name = "Enemy", SizeFlagsHorizontal = Control.SizeFlags.ExpandFill }; box.AddChild(_enemy);
+        // Keep catalogue index order (F2 sprite/scene fixtures depend on it), but label each ship by fleet role.
         foreach (var pair in spawns.Catalog.ToSceneMap())
-        { _scenes.Add(pair.Value); _enemy.AddItem(spawns.Catalog.DefinitionFor(pair.Key).DisplayName); }
+        { _scenes.Add(pair.Value); _enemy.AddItem(EnemyNaming.EditorLabel(spawns.Catalog.DefinitionFor(pair.Key))); }
         _amount = Number(box, "Amount", "Amount", 1, 10000, 1, 10);
         _gap = Number(box, "Spawn gap (seconds)", "Gap", 0, 60, .01, .1);
         HBoxContainer flags = new(); box.AddChild(flags);
