@@ -1,3 +1,9 @@
+## F2 Class-grouped enemy list — 2026-11-04 (source implemented)
+
+The F2 enemy picker now sorts ship definitions by **Class (Tiny → Titan)**, then alphabetically by `DisplayName`, and adds **non-selectable class headings** for occupied classes. Names remain short in the dropdown; Rank/Role/EnemyId and actual-size sprite still appear in the right-side preview and tooltip. The menu index has a matched scene/definition slot for every row including each heading (null marker), so hovering a heading does nothing and clicking or attempting to spawn a heading is rejected; no erroneous sprite or enemy is spawned. Each type's stable `EnemyId` resolves to its original registered scene. Batch behaviour, spawn cap, portals, shields, stealth and enemy stats are unchanged. `TESTS/Debug/EnemySpawnMenuChecks.cs` now checks class ordering, header mapping and preview/spawn correspondence without assuming menu index equals catalogue index. Godot.NET interactive verification pending.
+
+---
+
 ## F2 classification details — 2026-11-04
 
 The picker uses short enemy display names in the existing catalog order. The preview caption shows **Name, Class, Rank, Role, stable ID and 1:1 artwork dimensions**; tooltips include metadata/ID. Highlighting and dismissing the popup continue to use the same scene indices; no spawn/batch processing changed. Classification text updates only when the previewed type changes. See [roster](../../ENEMIES/Types/ROSTER.md). Owner Godot preview/spawn check pending.
