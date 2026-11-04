@@ -1,6 +1,6 @@
 ## Shared selected-tower overlay (2026-11-03)
 
-A single shared `FEEDBACK/Selection/TowerSelectionOverlay` follows this controller's existing `SelectTower` lifecycle. On selecting a placed tower, a faint HUD tactical grid and centred name caption appear, together with a pulsing world-space footprint bracket. Status uses the existing selected tower disable/work signals (aqua operational, red disabled/upgrading), with no new gameplay polling. Overlay clears when inspection closes, selection is removed, build previews start or the tower exits. The pre-existing selection range and lower-right Inspector are untouched. Settings and owner QA: [Selection feedback](../../FEEDBACK/Selection/README.md).
+A single shared `FEEDBACK/Selection/TowerSelectionOverlay` follows this controller's existing `SelectTower` lifecycle. On selecting a placed tower, a stronger but translucent HUD tactical grid/tint appears, together with a world-space caption to the tower's right and a slightly oversized pulsing footprint bracket. Status uses the existing selected tower disable/work signals (aqua operational, red disabled/upgrading), with no new gameplay polling. Overlay clears when inspection closes, selection is removed, build previews start or the tower exits. The pre-existing selection range and lower-right Inspector are untouched. Settings and owner QA: [Selection feedback](../../FEEDBACK/Selection/README.md).
 
 ---
 

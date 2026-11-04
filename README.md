@@ -1,6 +1,6 @@
 ## Selected-tower tactical overlay — 2026-11-03
 
-Placed-tower selection now adds a subtle aqua tactical screen wash and grid, the selected tower's name above the lower HUD, and one softly pulsing holographic footprint frame. Disabled/upgrading towers switch the palette to red using existing state signals. The shared renderer is dormant when unselected, preserves the existing radius/Inspector and supports multi-cell buildings. See [Selection Feedback](FEEDBACK/Selection/README.md). Source implemented; owner visual QA pending.
+Placed-tower selection now adds a stronger translucent aqua tactical screen wash and grid, the selected tower's name and state anchored in world space beside its right edge, and one softly pulsing holographic frame padded beyond its footprint. Disabled/upgrading towers switch the palette to red using existing state signals. The shared renderer is dormant when unselected, preserves the existing radius/Inspector and supports multi-cell buildings. See [Selection Feedback](FEEDBACK/Selection/README.md). Source implemented; owner visual QA pending.
 
 ---
 

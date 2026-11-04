@@ -1,6 +1,6 @@
 ## Selected tower presentation — aqua/red overlay (2026-11-03)
 
-`Selection/` contains one reusable selected-tower hologram and subtle screen grid/tint + name caption. The current `TowerPlacementController` selection and disabled/work events drive it, so normal states use aqua and disabled/upgrading states use soft red. No additional per-tower nodes or gameplay change. Configure colours, grid, pulse, text and opacity in [`Selection/DefaultTowerSelectionStyle.tres`](Selection/DefaultTowerSelectionStyle.tres). Source implemented; owner in-game review pending.
+`Selection/` contains one reusable selected-tower hologram and stronger aqua/red screen grid/tint + a world-anchored name caption to the tower's right. The current `TowerPlacementController` selection and disabled/work events drive it, so normal states use aqua and disabled/upgrading states use soft red. No additional per-tower nodes or gameplay change. Configure colours, grid, pulse, text and opacity in [`Selection/DefaultTowerSelectionStyle.tres`](Selection/DefaultTowerSelectionStyle.tres). Source implemented; owner in-game review pending.
 
 ## Shield ricochet — SR1–SR4 (2026-10-21)
 
