@@ -1,6 +1,6 @@
-## Fleet role labels in enemy picker — 2026-11-04
+## Class-sorted enemy picker — 2026-11-04
 
-The enemy dropdown now **groups registered types by fleet role** (Drone, Interceptor, Bulwark, Shield Ship, Carrier, Support, Capital Ship and Assault) and shows `Role · DisplayName (EnemyId)`. This distinguishes the old `Enemy001` source asset from the actual Standard Drone and gives more meaning to Racer/Bulwark/Transporter variants. The stored `EnemyId` remains unchanged, and the existing [enemy roster](../../ENEMIES/Types/ROSTER.md) maps all 14 types. Refresh list after updating a display name. No wave file migration or spawning logic changed; Godot.NET editor display requires a local smoke check.
+Registered enemies sort by **Class (Tiny → Titan)**, then readable name and stable ID. Compact `Class · DisplayName` entries keep the picker readable; **Class, Rank, Role and ID** appear below the selected type and in option tooltips. `EnemyId` alone remains persisted in waves, including existing/unknown-ID handling. Classification is cached catalog metadata, with no per-frame processing. Refresh list after editing definitions; rebuild Godot .NET/restart the plugin to load the new code. See [roster and migration notes](../../ENEMIES/Types/ROSTER.md). Source implemented; editor UI validation pending.
 
 ---
 

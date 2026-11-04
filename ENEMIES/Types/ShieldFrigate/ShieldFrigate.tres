@@ -4,8 +4,10 @@
 [resource]
 script = ExtResource("1")
 EnemyId = "shield_frigate_mk1"
+Class = 3
+Rank = 1
+Role = 3
 DisplayName = "Shield Frigate"
-Family = 3
 MaxHealth = 120.0
 MaxShield = 350.0
 MoveSpeed = 65.0

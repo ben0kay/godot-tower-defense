@@ -23,11 +23,13 @@ public static class EnemyCatalogChecks
             && mediumDefinition.MoveSpeed == 75 && mediumDefinition.RadiusPixels == 22
             && mediumDefinition.KillRewardCredits == 7 && mediumDefinition.CitadelDamage == 2,
             "Enemy004 has independent medium-ship identity, size and balance");
-        // Role label mapping may change UI text but must never touch stable catalog IDs or family enum values.
-        Require(EnemyNaming.Role(EnemyFamily.Drone) == "Drone" &&
-            EnemyNaming.Role(EnemyFamily.CapitalShip) == "Capital Ship" &&
-            EnemyNaming.Role(EnemyFamily.ShieldShip) == "Shield Ship",
-            "F2 and wave authoring share readable fleet role names");
+        // Readable labels do not expose the old family system or alter the stable gameplay IDs.
+        Require(EnemyNaming.Class(EnemyClass.Capital) == "Capital" &&
+            EnemyNaming.Rank(EnemyRank.Miniboss) == "Miniboss" && EnemyNaming.Role(EnemyRole.Support) == "Support",
+            "F2 and wave authoring share readable classification names");
+        Require(EnemyNaming.EditorLabel(mediumDefinition) == "Standard · Bulwark Drone" &&
+            EnemyNaming.ClassificationLabel(mediumDefinition) == "Class: Standard · Rank: Common · Role: Fighter",
+            "Short picker names and separate classification details match authored metadata");
         EnemyCatalog catalog = spawns.Catalog;
         Require(catalog.DefinitionFor("racer_mk1").DisplayName == "Racer Interceptor" &&
             catalog.DefinitionFor("transporter_mk1").DisplayName == "Drone Transporter",

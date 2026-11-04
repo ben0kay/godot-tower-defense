@@ -1,3 +1,9 @@
+## F2 classification details — 2026-11-04
+
+The picker uses short enemy display names in the existing catalog order. The preview caption shows **Name, Class, Rank, Role, stable ID and 1:1 artwork dimensions**; tooltips include metadata/ID. Highlighting and dismissing the popup continue to use the same scene indices; no spawn/batch processing changed. Classification text updates only when the previewed type changes. See [roster](../../ENEMIES/Types/ROSTER.md). Owner Godot preview/spawn check pending.
+
+---
+
 ## F2 friendly enemy labels — 2026-11-04
 
 The F2 enemy dropdown now shows **Role · DisplayName (stable EnemyId)** rather than only the ship name. It retains the **original scene-catalog order** and selected index → preview / batch mapping to avoid changing debug spawning behavior. Four vague display names were clarified via the underlying `EnemyDefinition.tres` resources. See [fleet roster](../../ENEMIES/Types/ROSTER.md) for numbered source folder mappings. No spawn frequencies, caps, wave ownership or scene assets changed.

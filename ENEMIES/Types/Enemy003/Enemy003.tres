@@ -3,7 +3,9 @@
 [resource]
 script = ExtResource("1")
 EnemyId = "shield_emitter_mk1"
-Family = 5
+Class = 2
+Rank = 0
+Role = 3
 DisplayName = "Shield Emitter"
 MaxHealth = 100.0
 MaxShield = 80.0

@@ -15,6 +15,7 @@ public partial class EnemySpawnMenu : CanvasLayer
     private SpawnManager _spawns;
     private readonly RandomNumberGenerator _random = new();
     private readonly List<PackedScene> _scenes = new();
+    private readonly List<EnemyDefinition> _definitions = new();
     private PanelContainer _panel;
     private OptionButton _enemy;
     private PopupMenu _enemyPopup;
@@ -60,9 +61,13 @@ public partial class EnemySpawnMenu : CanvasLayer
         box.AddChild(UIButtonFactory.Label("ENEMY SPAWNER · F2", 20));
         box.AddChild(UIButtonFactory.Label("Random valid portal per ship", 14));
         _enemy = new() { Name = "Enemy", SizeFlagsHorizontal = Control.SizeFlags.ExpandFill }; box.AddChild(_enemy);
-        // Keep catalogue index order (F2 sprite/scene fixtures depend on it), but label each ship by fleet role.
+        // Keep catalogue index order for scene/hover previews; show metadata separately from ship names.
         foreach (var pair in spawns.Catalog.ToSceneMap())
-        { _scenes.Add(pair.Value); _enemy.AddItem(EnemyNaming.EditorLabel(spawns.Catalog.DefinitionFor(pair.Key))); }
+        {
+            EnemyDefinition definition = spawns.Catalog.DefinitionFor(pair.Key);
+            _scenes.Add(pair.Value); _definitions.Add(definition); _enemy.AddItem(definition.DisplayName);
+            _enemy.SetItemTooltip(_enemy.ItemCount - 1, EnemyNaming.ClassificationLabel(definition) + "\n" + definition.EnemyId);
+        }
         _amount = Number(box, "Amount", "Amount", 1, 10000, 1, 10);
         _gap = Number(box, "Spawn gap (seconds)", "Gap", 0, 60, .01, .1);
         HBoxContainer flags = new(); box.AddChild(flags);
@@ -107,7 +112,8 @@ public partial class EnemySpawnMenu : CanvasLayer
         SpritePreview.ShowScene(index >= 0 && index < _scenes.Count ? _scenes[index] : null);
         Vector2 size = SpritePreview.ArtworkBounds.Size;
         _previewCaption.Text = index >= 0 && index < _scenes.Count
-            ? $"{_enemy.GetItemText(index)} · {size.X:0.#} × {size.Y:0.#} px · 1:1"
+            ? $"{_enemy.GetItemText(index)}\n{EnemyNaming.ClassificationLabel(_definitions[index])}\n" +
+                $"{_definitions[index].EnemyId} · {size.X:0.#} × {size.Y:0.#} px · 1:1"
             : "No enemy artwork available.";
     }
     // =========================================================

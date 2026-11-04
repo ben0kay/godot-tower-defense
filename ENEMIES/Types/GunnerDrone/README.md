@@ -5,7 +5,7 @@ Continuous6/s firing is now default (UseBursts=false), with1s closest-target rec
 
 # Gunner Drone — EG3
 
-Stable ID gunner_drone_mk1; family Drone. GenericEnemy inherited scene, optional enemy minigun, no unique enemy gameplay script. Appended to DefaultEnemyCatalog as entry14, so F2/F3 pick it up automatically. Current Level001/002/020 waves omit it.
+Stable ID gunner_drone_mk1; Class Standard, Rank Common, Role Fighter (metadata only). GenericEnemy inherited scene, optional enemy minigun, no unique enemy gameplay script. Appended to DefaultEnemyCatalog as entry14, so F2/F3 pick it up automatically. Current Level001/002/020 waves omit it.
 
 ## Size and artwork
 

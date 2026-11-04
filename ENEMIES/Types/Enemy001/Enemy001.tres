@@ -6,6 +6,9 @@
 [resource]
 script = ExtResource("1")
 EnemyId = "basic_mk1"
+Class = 0
+Rank = 0
+Role = 0
 DisplayName = "Standard Drone"
 MaxShield = 20.0
 KillRewardCredits = 3

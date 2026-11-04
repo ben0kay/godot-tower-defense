@@ -5,7 +5,9 @@
 [resource]
 script = ExtResource("1")
 EnemyId = "big_mk1"
-Family = 6
+Class = 4
+Rank = 1
+Role = 0
 DisplayName = "Heavy Warship"
 MaxHealth = 1000.0
 MaxShield = 200.0

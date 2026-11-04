@@ -49,7 +49,8 @@ public partial class EnemyCatalog : Resource
         if (string.IsNullOrWhiteSpace(definition.EnemyId) || definition.EnemyId != definition.EnemyId.Trim() ||
             !Positive(definition.MaxHealth) || !Positive(definition.MoveSpeed) || !Positive(definition.RadiusPixels) ||
             !Nonnegative(definition.MaxShield) || !Nonnegative(definition.TurnSpeed) || !Nonnegative(definition.DeathExplosionMultiplier) ||
-            !Enum.IsDefined(definition.Family) || definition.CitadelDamage < 0 || definition.KillRewardCredits < 0 || definition.Armor < 0)
+            !Enum.IsDefined(definition.Class) || !Enum.IsDefined(definition.Rank) || !Enum.IsDefined(definition.Role) ||
+            definition.CitadelDamage < 0 || definition.KillRewardCredits < 0 || definition.Armor < 0)
             throw new ArgumentException("Invalid enemy identity/balance: " + definition.EnemyId);
     }
     // =========================================================

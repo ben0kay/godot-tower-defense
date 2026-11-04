@@ -1,6 +1,12 @@
+## Independent enemy classifications — 2026-11-04
+
+All 14 enemy definitions now explicitly author **Class, Rank and Role** under **Classification**. These replace Fleet Family as descriptive metadata only: stats, sprite size, speed, weapons/abilities, wave IDs and Mk progression are independent. Wave Editor sorts by Class with separate selected metadata; F2 retains catalog/scene/preview indices and displays full details. See [the canonical roster](Types/ROSTER.md) for assignments, enum extension rules, source migration, external custom resource guidance and the existing checkpoint content-hash caveat. Source implemented; owner Godot validation pending.
+
+---
+
 ## Enemy naming clarity — 2026-11-04
 
-For a complete **role → display name → stable wave ID → scene folder** mapping across the 14 registered types, see [Types/ROSTER.md](Types/ROSTER.md). Four ambiguous display names were clarified (Big mk.1 → Heavy Warship, Elite mk.1 → Elite Assault Ship, Racer → Racer Interceptor, Transporter → Drone Transporter). Shared `EnemyNaming` now provides human-readable fleet role labels to F2 and the Godot Wave Editor. Scene/artwork folders stay at their current paths to avoid breaking linked scenes and waves; an optional later path migration is documented. Historical text below may still use the former development names.
+For a complete **role → display name → stable wave ID → scene folder** mapping across the 14 registered types, see [Types/ROSTER.md](Types/ROSTER.md). Four ambiguous display names were clarified (Big mk.1 → Heavy Warship, Elite mk.1 → Elite Assault Ship, Racer → Racer Interceptor, Transporter → Drone Transporter). Shared `EnemyNaming` now provides readable Class/Rank/Role metadata to F2 and the Godot Wave Editor. Scene/artwork folders stay at their current paths to avoid breaking linked scenes and waves; an optional later path migration is documented. Historical text below may still use the former development names.
 
 ---
 
@@ -50,7 +56,7 @@ New Ctrl / Utility Stealth Beacon:250 Credits,1×1,2s build,180 HP,256px range, 
 
 ## Fleet families and six new types — 2026-10-18
 
-The catalog now holds 13 ships. All definitions expose **Identity / Family** through the stable `EnemyFamily` enum. This is role metadata, independent of Mk progression and future threat tiers. New types reuse GenericEnemy; Heavy Transporter reuses two DeathSpawn jobs for six Drones + four Interceptors. Full balance, family mappings, shield opt-in and future work are in `ENEMIES/Types/README.md` (repository root). Historical counts/plans below are retained.
+Historical expansion: the catalog grew to 13 ships using Fleet Family metadata. The current 14-ship roster now uses independent Class/Rank/Role; see the classification section above. New types reuse GenericEnemy, and Heavy Transporter reuses two DeathSpawn jobs.
 
 ---
 

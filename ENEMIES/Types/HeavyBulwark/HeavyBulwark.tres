@@ -4,8 +4,10 @@
 [resource]
 script = ExtResource("1")
 EnemyId = "heavy_bulwark_mk1"
+Class = 3
+Rank = 1
+Role = 0
 DisplayName = "Heavy Bulwark"
-Family = 2
 MaxHealth = 500.0
 MaxShield = 0.0
 MoveSpeed = 50.0

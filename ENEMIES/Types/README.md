@@ -1,12 +1,12 @@
-## Current fleet naming and roles — 2026-11-04
+## Enemy Class, Rank and Role — 2026-11-04
 
-**[Canonical 14-ship roster](ROSTER.md)** now maps readable names, stable IDs, `EnemyFamily`, and their legacy/descriptive asset folders. Player/editor-facing names were standardized for four vague entries: **Heavy Warship** (`big_mk1`, old Big mk.1), **Elite Assault Ship** (`elite_mk1`, old Elite mk.1), **Racer Interceptor** (`racer_mk1`, old Racer), and **Drone Transporter** (`transporter_mk1`, old Transporter). The Wave Editor dropdown now groups by family; F2 also shows role and stable ID. Existing asset paths (`Enemy001` etc.), `EnemyId` values, enum ordering, wave schedules, stats and gameplay are untouched. The optional future asset folder rename mapping is recorded in the roster; don't treat historical headings below as current display names.
+See the **[canonical 14-ship roster and migration notes](ROSTER.md)**. Each `.tres` now exposes independent **Classification / Class, Rank, Role**. Wave Editor sorts by Class; F2 preserves catalog/preview order and shows separate details. These descriptive values impose no stats, abilities, dimensions or Mk progression. IDs, paths, balance and waves are unchanged. Source implemented; Godot validation pending. Older fleet-family tables below are historical.
 
 ---
 
 ## Gunner Drone — EG3 (2026-10-20, source implementation)
 
-Catalog/F2 count is now14. GunnerDrone/gunner_drone_mk1 inherits GenericEnemy and adds an optional enemy minigun with independent hull/gun SVGs. Its64×48 hull matches Enemy004/Bulwark Drone's size; shape is distinct. Provisional Drone family,180HP,0shield,75px/s,22px radius,2 Citadel damage,8 Credits. Gun defaults:260px range,6 bullets/s,1.5s burst/1s rest,2 Kinetic damage,1200px/s. All13 previous entries stay unchanged/unarmed and existing waves omit the new gunner. See GunnerDrone/README.md. Godot build/runtime and visual acceptance remain pending; previous13-ship counts below record earlier fleet history.
+Catalog/F2 count is now14. GunnerDrone/gunner_drone_mk1 inherits GenericEnemy and adds an optional enemy minigun with independent hull/gun SVGs. Its64×48 hull matches Enemy004/Bulwark Drone's size; shape is distinct. Standard/Common/Fighter metadata,180HP,0shield,75px/s,22px radius,2 Citadel damage,8 Credits. Gun defaults:260px range,6 bullets/s,1.5s burst/1s rest,2 Kinetic damage,1200px/s. All13 previous entries stay unchanged/unarmed and existing waves omit the new gunner. See GunnerDrone/README.md. Godot build/runtime and visual acceptance remain pending; previous13-ship counts below record earlier fleet history.
 
 ## Fleet expansion and enemy families — 2026-10-18 (implemented)
 
@@ -21,13 +21,13 @@ Six new inherited enemy types bring the catalog to **13**. Each has independent 
 | Cruiser / `cruiser_mk1` | CapitalShip | 3000 | 400 | 30 | 12 | 35 |
 | Heavy Transporter / `heavy_transporter_mk1` | Carrier | 1400 | 0 | 35 | 8 | 25 |
 
-**Family authoring:** select any enemy `.tres` → **Identity / Family**. `ENEMIES/Shared/EnemyFamily.cs` provides the fixed-value Inspector enum: Drone, Interceptor, Bulwark, ShieldShip, Carrier, Support, CapitalShip, Assault. Append future values; do not renumber existing serialized values. Original types are explicitly assigned: Standard→Drone, Swift→Interceptor, Bulwark→Bulwark, Big→CapitalShip, Elite→Assault, Shield Emitter→Support, Transporter→Carrier. Family describes role only, adds no ticking/automatic combat bonuses and does not determine Mk generation, size, spawn order or a future Common/Champion/Elite/Boss threat class. `Elite mk.1` remains a name rather than a threat-class system. Missing family on an old/custom resource defaults to Drone for compatibility; invalid enum values reject during catalog validation.
+**Current classification authoring:** use the three independent fields documented in [ROSTER.md](ROSTER.md). Fleet Family has been fully migrated and removed; the old family column above records the original expansion only.
 
 **Shields:** capacity remains opt-in for every type. Author `Enemy("shield_frigate_mk1", shield: true)` for the intended shield-heavy threat; plain/F2 spawns are unshielded. No passive regeneration or new shield mechanic. Heavy Transporter uses two existing DeathSpawn components: six Standard Drones plus four Swift Interceptors, staggered by independent 0.16s jobs under the shared per-frame queue budget. Both reserve wave ownership before parent removal and inherit destination/checkpoints. No payload on arrival/unload and no living launches. Configs are local to its folder; shared Transporter defaults are unchanged.
 
-**Large hulls:** Cruiser art 168×96; Heavy Transporter 144×100; both retain 24px navigation radius. Art extends beyond clearance, as with Big mk.1. Hull-shaped routing/large-footprint clearance and tight-corridor appearance remain future work. No immunity or weapon behavior is implied by size/family.
+**Large hulls:** Cruiser art 168×96; Heavy Transporter 144×100; both retain 24px navigation radius. Art extends beyond clearance, as with Big mk.1. Hull-shaped routing/large-footprint clearance and tight-corridor appearance remain future work. No immunity or weapon behavior is implied by Class/Rank/Role.
 
-**Follow-up planning:** balance and schedule appearances in mission waves; add Mk.2+ as deliberate per-type definitions/art; design boss abilities and threat classes separately. These are deferred, not completed by assigning Family. Existing future plans below remain intact. Verification is recorded in `TESTS/Enemies/FleetExpansion.md`.
+**Follow-up planning:** balance and schedule appearances in mission waves; add Mk.2+ as deliberate per-type definitions/art; design boss abilities separately. Class/Rank/Role metadata is implemented; Mk progression, automatic scaling and boss abilities remain deferred. Existing future plans below remain intact. Verification is recorded in `TESTS/Enemies/FleetExpansion.md`.
 
 ---
 

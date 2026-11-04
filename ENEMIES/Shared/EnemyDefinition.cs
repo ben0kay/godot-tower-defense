@@ -8,8 +8,13 @@ public partial class EnemyDefinition : Resource
     [ExportGroup("Identity")]
     [Export] public string EnemyId { get; set; } = "";
     [Export] public string DisplayName { get; set; } = "Unnamed Enemy";
-    /// <summary>Fleet role only; does not imply mark, threat tier, resistances or abilities.</summary>
-    [Export] public EnemyFamily Family { get; set; } = EnemyFamily.Drone;
+    [ExportGroup("Classification")]
+    /// <summary>Physical scale/presence only; never derives stats, sprite dimensions or capabilities.</summary>
+    [Export] public EnemyClass Class { get; set; } = EnemyClass.Tiny;
+    /// <summary>Threat metadata only; independent of physical class and without automatic stat scaling.</summary>
+    [Export] public EnemyRank Rank { get; set; } = EnemyRank.Common;
+    /// <summary>Descriptive purpose; actual behaviour comes from scenes, stats and optional abilities.</summary>
+    [Export] public EnemyRole Role { get; set; } = EnemyRole.Fighter;
     #endregion
 
     #region Balance and Feedback

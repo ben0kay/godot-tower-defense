@@ -75,8 +75,14 @@ public partial class EnemySpawnMenuChecks : Node
                 Sprite2D copy = menu.SpritePreview.GetNode<Node2D>("Artwork").GetChildren().OfType<Sprite2D>().First();
                 Require(copy.Texture == hull.Texture && copy.Scale.IsEqualApprox(hull.Scale) && copy.GetScript().AsGodotObject() == null,
                     "Native hull texture/scale copied without scripts");
-                if (source is Enemy enemy && enemy.Definition.EnemyId == "gunner_drone_mk1")
-                    Require(menu.SpritePreview.SpriteCount == 2, "Separate gun artwork included");
+                if (source is Enemy enemy)
+                {
+                    Require(choice.GetItemText(index) == enemy.Definition.DisplayName &&
+                        choice.GetItemTooltip(index).Contains(EnemyNaming.ClassificationLabel(enemy.Definition)),
+                        "F2 name and classifications preserve scene-to-preview indices");
+                    if (enemy.Definition.EnemyId == "gunner_drone_mk1")
+                        Require(menu.SpritePreview.SpriteCount == 2, "Separate gun artwork included");
+                }
             }
             finally { source.Free(); }
         }

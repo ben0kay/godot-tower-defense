@@ -4,8 +4,10 @@
 [resource]
 script = ExtResource("1")
 EnemyId = "heavy_transporter_mk1"
+Class = 4
+Rank = 1
+Role = 1
 DisplayName = "Heavy Transporter"
-Family = 4
 MaxHealth = 1400.0
 MaxShield = 0.0
 MoveSpeed = 35.0

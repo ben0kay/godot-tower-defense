@@ -4,8 +4,10 @@
 [resource]
 script = ExtResource("1")
 EnemyId = "reinforced_drone_mk1"
+Class = 1
+Rank = 1
+Role = 0
 DisplayName = "Reinforced Drone"
-Family = 0
 MaxHealth = 110.0
 MaxShield = 20.0
 MoveSpeed = 100.0

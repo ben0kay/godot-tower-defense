@@ -1,24 +1,19 @@
-// Shared human-readable fleet role labels for editor/debug menus; gameplay IDs and serialized family values stay stable.
+// Shared readable classification labels for editor/debug menus; stable IDs and gameplay remain independent.
 public static class EnemyNaming
 {
     // =========================================================
-    // Keep labels independent of existing integer enum assignments and scene folder names.
-    public static string Role(EnemyFamily family) => family switch
-    {
-        EnemyFamily.Drone => "Drone",
-        EnemyFamily.Interceptor => "Interceptor",
-        EnemyFamily.Bulwark => "Bulwark",
-        EnemyFamily.ShieldShip => "Shield Ship",
-        EnemyFamily.Carrier => "Carrier",
-        EnemyFamily.Support => "Support",
-        EnemyFamily.CapitalShip => "Capital Ship",
-        EnemyFamily.Assault => "Assault",
-        _ => "Other"
-    };
+    // Centralize readable labels independently of serialized enum numbers.
+    public static string Class(EnemyClass value) => value.ToString();
+    public static string Rank(EnemyRank value) => value.ToString();
+    public static string Role(EnemyRole value) => value.ToString();
 
     // =========================================================
-    // Show role + display name + stable wave ID without changing anything persisted to waves/saves.
-    public static string EditorLabel(EnemyDefinition definition) =>
-        definition == null ? "Unregistered enemy" :
-        Role(definition.Family) + " · " + definition.DisplayName + " (" + definition.EnemyId + ")";
+    // A short picker label keeps long future ship names usable; details are displayed separately.
+    public static string EditorLabel(EnemyDefinition definition) => definition == null ? "Unregistered enemy" :
+        Class(definition.Class) + " · " + definition.DisplayName;
+
+    // =========================================================
+    // Used only on editor/debug selection changes, never by enemy simulation or combat rules.
+    public static string ClassificationLabel(EnemyDefinition definition) => definition == null ? "Unregistered enemy" :
+        "Class: " + Class(definition.Class) + " · Rank: " + Rank(definition.Rank) + " · Role: " + Role(definition.Role);
 }

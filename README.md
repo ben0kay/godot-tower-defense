@@ -1,3 +1,9 @@
+## Enemy Class, Rank and Role — 2026-11-04
+
+All 14 enemy definitions now use independent descriptive Class/Rank/Role metadata. Wave Editor sorts by Class with separate metadata details; F2 keeps catalog order and matching 1:1 previews. Stats, abilities, art, IDs, paths and waves are unchanged. See [roster/migration notes](ENEMIES/Types/ROSTER.md), including external custom-resource and checkpoint-fingerprint caveats. Source implemented; owner Godot validation pending.
+
+---
+
 ## Ammunition Factory construction and future upgrade artwork — 2026-11-03
 
 The existing single stationary 3×2 Ammunition Factory has full 0/35/70% initial building stage SVGs, powered by the shared event-driven construction presenter. Nine new SVGs also include future-only Level 2/3 completed designs and intermediate 35/70% upgrade artwork; **factory paid upgrades remain unimplemented** (no economic data or purchase flow was invented). The original icon, 200-Credit/8s build, ammunition production, logistics, drones and save data are unchanged. Config resource ordering follows the Resource Tower fix from `3ae0e25`. [Factory artwork notes](TOWERS/Economy/Ammunition/AmmunitionFactory/Artwork/Construction/README.md). Source checks done; Godot visual acceptance pending.

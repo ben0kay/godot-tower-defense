@@ -15,7 +15,7 @@ public partial class WaveEditorPanel : VBoxContainer
     private string _path = "";
     private int _waveIndex, _batchIndex, _enemyIndex;
     private bool _refreshing, _dirty;
-    private Label _fileLabel, _status, _totals;
+    private Label _fileLabel, _status, _totals, _enemyClassification;
     private Button _saveButton;
     private ItemList _waves, _batches, _enemies;
     private ScrollContainer _detailsScroll;
@@ -24,7 +24,7 @@ public partial class WaveEditorPanel : VBoxContainer
     private OptionButton _alert, _enemyId;
     private LineEdit _bannerTitle, _bannerDescription, _speaker, _narration, _voiceCue, _portal;
     private EnemyCatalog _enemyCatalog;
-    private List<(string Id, string Name, EnemyFamily Family)> _enemyChoices = new();
+    private List<(string Id, string Name, EnemyClass Class)> _enemyChoices = new();
     private CheckBox _shield, _stealth;
     private EditorFileDialog _openFile, _newFile;
     private ConfirmationDialog _discard, _confirmDelete;
@@ -118,6 +118,8 @@ public partial class WaveEditorPanel : VBoxContainer
             if (Entry.EnemyId == id) return;
             Entry.EnemyId = id; Dirty(); Refresh();
         };
+        _enemyClassification = new Label { AutowrapMode = TextServer.AutowrapMode.WordSmart };
+        _enemyFields.AddChild(_enemyClassification);
         _weight = Number(_enemyFields, "Weight", 0, 10000, .01, v => { Entry.Weight = v; RefreshComposition(); });
         _weight.TooltipText = "Relative share of this batch, not a ship count or an independent spawn chance. Example 75 and 25 with Count 20 means exactly 15 and 5, shuffled.";
         _portal = Text(_enemyFields, "Required portal (blank = any)", v => Entry.Portal = v);
@@ -228,9 +230,9 @@ public partial class WaveEditorPanel : VBoxContainer
             var choices = catalog.ToSceneMap().Keys.Select(id =>
             {
                 EnemyDefinition definition = catalog.DefinitionFor(id);
-                return (Id: id, Name: definition?.DisplayName ?? id, Family: definition?.Family ?? EnemyFamily.Drone);
+                return (Id: id, Name: definition?.DisplayName ?? id, Class: definition?.Class ?? EnemyClass.Tiny);
             })
-                .OrderBy(e => e.Family).ThenBy(e => e.Name, StringComparer.OrdinalIgnoreCase)
+                .OrderBy(e => e.Class).ThenBy(e => e.Name, StringComparer.OrdinalIgnoreCase)
                 .ThenBy(e => e.Id, StringComparer.Ordinal).ToList();
             _enemyCatalog = catalog; _enemyChoices = choices;
             Refresh(); Message("Enemy list refreshed: " + choices.Count + " registered types.");
@@ -258,7 +260,9 @@ public partial class WaveEditorPanel : VBoxContainer
         for (int i = 0; i < _enemyChoices.Count; i++)
         {
             var item = _enemyChoices[i];
-            _enemyId.AddItem(EnemyNaming.Role(item.Family) + " · " + item.Name + " (" + item.Id + ")");
+            EnemyDefinition definition = _enemyCatalog.DefinitionFor(item.Id);
+            _enemyId.AddItem(EnemyNaming.EditorLabel(definition));
+            _enemyId.SetItemTooltip(i, EnemyNaming.ClassificationLabel(definition) + "\n" + item.Id);
         }
         int selected = _enemyChoices.FindIndex(e => e.Id == id);
         if (selected < 0)
@@ -267,6 +271,7 @@ public partial class WaveEditorPanel : VBoxContainer
             selected = _enemyId.ItemCount - 1;
         }
         _enemyId.Select(selected);
+        _enemyClassification.Text = EnemyNaming.ClassificationLabel(_enemyCatalog?.DefinitionFor(id)) + "\nID: " + id;
         _enemyId.Disabled = _enemyChoices.Count == 0;
     }
     #endregion

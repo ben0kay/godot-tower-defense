@@ -57,28 +57,40 @@ public partial class FleetExpansionChecks : Node
         foreach (var pair in map)
         {
             EnemyDefinition data = f.Spawns.Catalog.DefinitionFor(pair.Key);
-            Require(Enum.IsDefined(data.Family), "Every registered type has a valid family");
+            Require(Enum.IsDefined(data.Class) && Enum.IsDefined(data.Rank) && Enum.IsDefined(data.Role),
+                "Every registered type has valid independent classifications");
         }
-        EnemyDefinition bad = new() { EnemyId = "invalid_family", Family = (EnemyFamily)999 };
-        bool rejected = false;
-        try { EnemyCatalog.ValidateDefinition(bad); } catch (ArgumentException) { rejected = true; }
-        Require(rejected, "Invalid serialized family values fail catalog validation"); bad.Dispose();
+        foreach (Action<EnemyDefinition> corrupt in new Action<EnemyDefinition>[] {
+            d => d.Class = (EnemyClass)999, d => d.Rank = (EnemyRank)999, d => d.Role = (EnemyRole)999 })
+        {
+            EnemyDefinition bad = new() { EnemyId = "invalid_classification" }; corrupt(bad);
+            bool rejected = false;
+            try { EnemyCatalog.ValidateDefinition(bad); } catch (ArgumentException) { rejected = true; }
+            Require(rejected, "Invalid serialized classification fails catalog validation"); bad.Dispose();
+        }
+        // Metadata must permit a Tiny Boss and a Common Capital without deriving stats or abilities.
+        EnemyDefinition unusual = new() { EnemyId = "unusual", Class = EnemyClass.Tiny, Rank = EnemyRank.Boss, Role = EnemyRole.Miner };
+        EnemyCatalog.ValidateDefinition(unusual);
+        unusual.Class = EnemyClass.Capital; unusual.Rank = EnemyRank.Common;
+        EnemyCatalog.ValidateDefinition(unusual);
+        Require(unusual.MaxHealth == 60f && unusual.MoveSpeed == 100f && unusual.MaxShield == 0,
+            "Changing class/rank/role never derives gameplay values"); unusual.Dispose();
         var cases = new[] {
-            ("reinforced_drone_mk1", EnemyFamily.Drone, 110f, 100f, new Vector2(40, 30)),
-            ("racer_mk1", EnemyFamily.Interceptor, 20f, 230f, new Vector2(34, 18)),
-            ("shield_frigate_mk1", EnemyFamily.ShieldShip, 120f, 65f, new Vector2(72, 48)),
-            ("heavy_bulwark_mk1", EnemyFamily.Bulwark, 500f, 50f, new Vector2(88, 64)),
-            ("cruiser_mk1", EnemyFamily.CapitalShip, 3000f, 30f, new Vector2(168, 96)),
-            ("heavy_transporter_mk1", EnemyFamily.Carrier, 1400f, 35f, new Vector2(144, 100)) };
+            ("reinforced_drone_mk1", EnemyClass.Light, EnemyRank.Veteran, EnemyRole.Fighter, 110f, 100f, new Vector2(40, 30)),
+            ("racer_mk1", EnemyClass.Tiny, EnemyRank.Veteran, EnemyRole.Fighter, 20f, 230f, new Vector2(34, 18)),
+            ("shield_frigate_mk1", EnemyClass.Heavy, EnemyRank.Veteran, EnemyRole.Support, 120f, 65f, new Vector2(72, 48)),
+            ("heavy_bulwark_mk1", EnemyClass.Heavy, EnemyRank.Veteran, EnemyRole.Fighter, 500f, 50f, new Vector2(88, 64)),
+            ("cruiser_mk1", EnemyClass.Capital, EnemyRank.Elite, EnemyRole.Fighter, 3000f, 30f, new Vector2(168, 96)),
+            ("heavy_transporter_mk1", EnemyClass.Superheavy, EnemyRank.Veteran, EnemyRole.Cargo, 1400f, 35f, new Vector2(144, 100)) };
         var wallet = f.Main.GetNode<EconomyManager>("Economy");
-        foreach (var (id, family, hull, speed, size) in cases)
+        foreach (var (id, shipClass, rank, role, hull, speed, size) in cases)
         {
             Enemy ship = f.Spawns.Spawn(id, true);
             Require(ship != null, "Catalog ship can spawn at an actual portal: " + id);
             AmmoLoopFixture.Disable(ship);
-            Require(ship.Definition.Family == family && ship.Health == hull && ship.Definition.MoveSpeed == speed
+            Require(ship.Definition.Class == shipClass && ship.Definition.Rank == rank && ship.Definition.Role == role && ship.Health == hull && ship.Definition.MoveSpeed == speed
                 && ship.CurrentShield == 0 && ship.GetNode<Sprite2D>("Sprite").Texture.GetSize() == size,
-                "Authored family/balance/texture and unshielded default: " + id);
+                "Authored classification/balance/texture and unshielded default: " + id);
             ship.TakeDamage(1); Require(ship.Health == hull - 1, "Shared hull damage: " + id);
             int hp = f.Mission.Health.CurrentHealth;
             ship.Arrive(); ship.Arrive();

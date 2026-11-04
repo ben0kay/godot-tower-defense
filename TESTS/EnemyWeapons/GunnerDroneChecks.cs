@@ -44,7 +44,7 @@ public partial class GunnerDroneChecks : Node
             Require(waves.SelectMany(w => w.Batches).SelectMany(b => b.Entries).All(e => e.EnemyId != "gunner_drone_mk1"),
                 "Current authored waves do not include the new armed ship");
         EnemyDefinition definition = catalog.DefinitionFor("gunner_drone_mk1");
-        Require(definition.Family == EnemyFamily.Drone && definition.MaxHealth == 180 && definition.MoveSpeed == 75
+        Require(definition.Class == EnemyClass.Standard && definition.Rank == EnemyRank.Common && definition.Role == EnemyRole.Fighter && definition.MaxHealth == 180 && definition.MoveSpeed == 75
             && definition.RadiusPixels == 22 && definition.KillRewardCredits == 8 && definition.MaxShield == 0,
             "Gunner has independent editable playtest balance");
         Enemy preview = catalog.Find("gunner_drone_mk1").Instantiate<Enemy>();

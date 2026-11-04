@@ -1,3 +1,11 @@
+## Enemy Class / Rank / Role reorganization — 2026-11-04
+
+**Source Implemented / Awaiting Owner Validation.** Replaced Fleet Family with explicit stable-value EnemyClass/EnemyRank/EnemyRole enums and independent Inspector fields. Migrated all 14 existing definition resources by EnemyId to the owner's suggested assignments after checking SVG dimensions/scene scale; removed old Family entries, property, enum and UID atomically. No behavior, balance, IDs, names, paths, waves or artwork changed. Class-sorted short Wave Editor options show selected metadata separately; F2 retains scene/preview order with full caption metadata. No classification ticking, rank scaling, capability restrictions or Mark system.
+
+Updated existing catalog/fleet/Gunner/F2 checks and owning documentation. Validation: focused source/diff and resource invariant checks; no Godot/.NET executable available, so no build/runtime tests. Owner: rebuild C#, inspect Classification fields, Wave Editor sorting/details/ID persistence and F2 hover/select/preview/spawns. **Compatibility:** external custom legacy resources require explicit metadata authoring; existing dependency-byte checkpoint fingerprints may reject older battlefield checkpoints without deleting them. Save validation remains unchanged. See [roster](../ENEMIES/Types/ROSTER.md).
+
+---
+
 ## 2026-11-04 — consistent fleet naming in Wave Editor/F2
 
 Created [ENEMIES/Types/ROSTER.md](../ENEMIES/Types/ROSTER.md), mapping all 14 current ship roles, player-visible names, stable EnemyIds and physical folders. Renamed only four vague `DisplayName` strings: Big mk.1 → Heavy Warship, Elite mk.1 → Elite Assault Ship, Racer → Racer Interceptor, Transporter → Drone Transporter. Added shared `EnemyNaming` helper for role text; Wave Editor choice list is grouped by `EnemyFamily`, and F2 shows the role/name/ID without changing scene index order. **No asset folder relocation**, no stable IDs, game stats, waves, or save data changed. Future physical folder/basename migration is separately documented. Focused source review; Godot.NET smoke check pending.

@@ -1,11 +1,15 @@
+## Classification migration — 2026-11-04
+
+Existing fleet, catalog, Gunner and F2 source checks were updated for Class/Rank/Role, compact names and preserved scene-preview indices. These checks were **not executed** in this environment (Godot/.NET unavailable); focused resource/diff checks only. See the [roster](../../ENEMIES/Types/ROSTER.md) for editor acceptance and checkpoint compatibility caveats.
+
 # Fleet expansion verification — 2026-10-18
 
 Run `TESTS/Enemies/FleetExpansionChecks.tscn` in Godot .NET headless after importing assets and building C#.
 
-Verified with Godot 4.7.2 / .NET 8:
+Historical validation of the original fleet expansion with Godot 4.7.2 / .NET 8 (before the 2026-11-04 classification changes):
 
 - C# build: zero errors/warnings; all new SVG textures imported successfully and their dimensions verified through actual spawned Sprite2D textures. Enlarged vector renders visually reviewed.
-- 13 registered definitions, valid family values, rejection of invalid enum values; each new type spawns at a real portal with its own authored family, health, speed and art size.
+- At that time: 13 registered definitions, valid family values and invalid-enum rejection; each new type spawned with its authored family, health, speed and art size. Current source instead checks all three independent classifications, Tiny Boss/Common Capital flexibility, and 14 registered types; those changed assertions await owner execution.
 - Normal spawns start unshielded; Shield Frigate starts at 350 SP when wave-opted, uses the shared aura and absorbs damage before hull.
 - Hull hits, once-only kill rewards, once-only Citadel damage and no carrier payload on arrival.
 - Heavy Transporter reserves both payloads before removal, releases six Drones plus four Interceptors under existing queue budgets, transfers wave ownership and destination, and blocks victory until every child is defeated. Verified on both Level001 and Level020 with actual results snapshots (11 kills).
