@@ -1,3 +1,9 @@
+## Enemy naming clarity — 2026-11-04
+
+For a complete **role → display name → stable wave ID → scene folder** mapping across the 14 registered types, see [Types/ROSTER.md](Types/ROSTER.md). Four ambiguous display names were clarified (Big mk.1 → Heavy Warship, Elite mk.1 → Elite Assault Ship, Racer → Racer Interceptor, Transporter → Drone Transporter). Shared `EnemyNaming` now provides human-readable fleet role labels to F2 and the Godot Wave Editor. Scene/artwork folders stay at their current paths to avoid breaking linked scenes and waves; an optional later path migration is documented. Historical text below may still use the former development names.
+
+---
+
 ## ET1 — shared visible enemy thrusters (2026-11-03, source implemented)
 
 All enemies inherited from `Shared/GenericEnemy.tscn` now have one optional rear flame plus a capped on-screen `GPUParticles2D` exhaust. Displayed sprite height automatically determines flame **width**; authored maximum movement speed determines flame **length**. A larger slow hull therefore has wide/short exhaust, while a small fast scout has thin/long exhaust. One `ENEMIES/Shared/Visuals/Thrusters/DefaultEnemyThrusterConfig.tres` controls appearance and performance; each enemy definition can opt out or offset its rear mount. Slow/Freeze and stealth states adjust intensity without a new per-enemy process loop. Read [ET1 guide](Shared/Visuals/Thrusters/README.md). Visual/F4 acceptance is pending.
