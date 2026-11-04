@@ -159,7 +159,12 @@ public abstract partial class TowerBase : Node2D
     {
         if (!IsInsideTree() || IsQueuedForDeletion()) return null;
         if (GodotObject.IsInstanceValid(_progressPopup)) return _progressPopup;
-        _progressPopup = new TowerProgressPopup { Name = "ProgressPopup", Position = new Vector2(12f, -8f) };
+        // Top-level keeps the popup screen-upright and prevents selected-tower tint changing aqua/gold.
+        _progressPopup = new TowerProgressPopup
+        {
+            Name = "ProgressPopup", TopLevel = true,
+            Position = GlobalPosition + new Vector2(32f, -8f)
+        };
         AddChild(_progressPopup);
         return _progressPopup;
     }
