@@ -1,4 +1,4 @@
-[gd_scene load_steps=34 format=3]
+[gd_scene load_steps=36 format=3]
 
 [ext_resource type="Script" path="res://WORLD/GRID/WorldGrid.cs" id="1_script"]
 [ext_resource type="Resource" path="res://WORLD/DefaultWorldConfig.tres" id="2_config"]
@@ -40,6 +40,8 @@
 [ext_resource type="Script" path="res://FEEDBACK/Ricochet/RicochetController.cs" id="ricochet"]
 [ext_resource type="Resource" path="res://FEEDBACK/Ricochet/DefaultRicochetStyle.tres" id="ricochet_style"]
 [ext_resource type="Resource" path="res://FEEDBACK/DefaultFeedbackConfig.tres" id="feedback_master"]
+[ext_resource type="Script" path="res://FEEDBACK/HullHitSparks/HullHitSparkController.cs" id="hull_hit_sparks"]
+[ext_resource type="Resource" path="res://FEEDBACK/HullHitSparks/DefaultHullHitSparkStyle.tres" id="hull_hit_spark_style"]
 
 [ext_resource type="Script" path="res://TOWERS/ConstructionDrones/ConstructionDroneManager.cs" id="builders"]
 [ext_resource type="Resource" path="res://TOWERS/ConstructionDrones/DefaultConstructionDroneConfig.tres" id="builder_config"]
@@ -70,6 +72,11 @@ z_index = 7
 [node name="ConstructionSiteHolograms" type="Node2D" parent="Effects"]
 script = ExtResource("site_hologram")
 Config = ExtResource("site_hologram_config")
+
+[node name="HullHitSparks" type="Node2D" parent="Effects"]
+script = ExtResource("hull_hit_sparks")
+Style = ExtResource("hull_hit_spark_style")
+Master = ExtResource("feedback_master")
 
 [node name="ConstructionSparks" type="Node" parent="Effects"]
 script = ExtResource("site_sparks")

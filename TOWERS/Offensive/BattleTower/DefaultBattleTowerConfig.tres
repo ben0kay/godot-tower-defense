@@ -9,6 +9,7 @@
 [resource]
 script = ExtResource("1")
 HeatEnabled = true
+HullHitSparkCount = 4
 Recoil = ExtResource("recoil")
 ProjectileVisual = ExtResource("pv_tracer")
 MuzzleFlash = ExtResource("pv_flash")

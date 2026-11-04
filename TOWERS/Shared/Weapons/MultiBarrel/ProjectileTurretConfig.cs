@@ -9,6 +9,8 @@ public partial class ProjectileTurretConfig : TowerConfig, ITowerTargetingPolicy
     [Export] public ShotDeliveryMode DeliveryMode { get; set; } = ShotDeliveryMode.PhysicalProjectile;
     [ExportGroup("Weapon Visuals")]
     [Export] public bool ShieldRicochet { get; set; }
+    [ExportGroup("Hull Hit Feedback")]
+    [Export(PropertyHint.Range, "0,8,1")] public int HullHitSparkCount { get; set; } = 0;
     [Export] public ProjectileVisualStyle ProjectileVisual { get; set; }
     [Export] public MuzzleFlashStyle MuzzleFlash { get; set; }
     [Export] public AimLaserStyle AimLaser { get; set; }

@@ -5,8 +5,11 @@ public partial class BasicProjectile : Node2D
 {
     #region Launch State
     private static readonly NodePath RicochetPath = new("../../Effects/Ricochets");
+    private static readonly NodePath HullSparkPath = new("../../Effects/HullHitSparks");
     private bool _shieldRicochet;
     private RicochetController _ricochets;
+    private HullHitSparkController _hullSparks;
+    private int _hullSparkCount;
     private Enemy _target;
     private EnemyRegistry _registry;
     private Vector2 _initialTarget;
@@ -27,7 +30,8 @@ public partial class BasicProjectile : Node2D
     // =========================================================
     // Capture value payloads once; straight shots keep no original-target reference after initialization.
     public void Initialize(Enemy target, float speed, DamageInfo damage, StatusEffectPayload? effect = null,
-        ProjectileVisualStyle visual = null, ProjectileHandlingStats? handling = null, bool shieldRicochet = false)
+        ProjectileVisualStyle visual = null, ProjectileHandlingStats? handling = null, bool shieldRicochet = false,
+        int hullHitSparkCount = 0)
     {
         if (!float.IsFinite(speed) || speed <= 0) throw new System.ArgumentOutOfRangeException(nameof(speed));
         _handling = ProjectileHandlingStats.Sanitize(handling ?? new());
@@ -36,6 +40,7 @@ public partial class BasicProjectile : Node2D
         _target = _handling.Guidance == ProjectileGuidance.Homing ? target : null;
         _speed = speed; _damage = damage; _effect = effect; _visual = visual?.Capture();
         _shieldRicochet = shieldRicochet;
+        _hullSparkCount = Mathf.Clamp(hullHitSparkCount, 0, 8);
         _life = 5; _impacted = false; _launched = false;
     }
     // =========================================================
@@ -45,6 +50,7 @@ public partial class BasicProjectile : Node2D
         if (_launched) return;
         if (!worldPosition.IsFinite()) { _impacted = true; QueueFree(); return; }
         _ricochets = _shieldRicochet ? GetNodeOrNull<RicochetController>(RicochetPath) : null;
+        _hullSparks = _hullSparkCount > 0 ? GetNodeOrNull<HullHitSparkController>(HullSparkPath) : null;
         GlobalPosition = worldPosition;
         _travelDirection = ProjectileLaunch.Direction(forward ?? (_initialTarget - worldPosition), _handling.SpreadDegrees, spreadSample);
         GlobalRotation = _travelDirection.Angle(); _launched = true;
@@ -83,9 +89,15 @@ public partial class BasicProjectile : Node2D
                 GodotObject.IsInstanceValid(_ricochets) && _ricochets.Available && hit.TryGetShieldRim(out var ellipse) &&
                 RicochetGeometry.Reflect(ellipse, GlobalPosition - _travelDirection * (2 * (ellipse.X.Length() + ellipse.Y.Length()) + 1),
                     GlobalPosition, _travelDirection, out point, out normal, out reflected);
+            // Hull-only feedback compares authoritative HP before and after this single hit.
+            float hullBefore = hit.Health;
             float absorbed = hit.ApplyDamageWithShieldAbsorption(_damage);
             if (bounce && absorbed > 0 && GodotObject.IsInstanceValid(_ricochets))
                 _ricochets.Spawn(point, normal, reflected, _speed, _visual.Value);
+            if (_damage.Type == DamageType.Kinetic && _hullSparkCount > 0 &&
+                GodotObject.IsInstanceValid(hit) && hit.Health < hullBefore &&
+                GodotObject.IsInstanceValid(_hullSparks))
+                _hullSparks.Spawn(GlobalPosition, _travelDirection, _hullSparkCount);
             if (_effect.HasValue && GodotObject.IsInstanceValid(hit) && hit.IsAlive && !hit.IsQueuedForDeletion()) hit.ApplyStatus(_effect.Value);
             return;
         }
@@ -94,7 +106,8 @@ public partial class BasicProjectile : Node2D
     }
     // =========================================================
     // World unload is terminal even if a caller manually ticks a retained managed wrapper.
-    public override void _ExitTree() { _impacted = true; _target = null; _registry = null; _ricochets = null; }
+    public override void _ExitTree()
+    { _impacted = true; _target = null; _registry = null; _ricochets = null; _hullSparks = null; }
     #endregion
 
     // =========================================================

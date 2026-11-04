@@ -1,3 +1,9 @@
+## HI1 — confirmed hull damage sparks (2026-11-04)
+
+`BasicProjectile` snapshots an optional **0–8 hull spark count at launch** (default zero). When an opted-in kinetic round hits, it retains the exact swept contact point, commits damage exactly once and requests pooled `FEEDBACK/HullHitSparks` only if `Enemy.Health` actually decreased. Shield-only hits continue to use their existing shield response and optional ricochet without metallic hull sparks; misses and zero-effect hits draw nothing. World-owned sparks outlive a lethal enemy's `QueueFree` and do not alter damage/XP/status/ammo. Battle, Machine Gun and Sniper opt in; other projectile consumers remain unchanged. See [Hit Sparks](../../../FEEDBACK/HullHitSparks/README.md).
+
+---
+
 ## Cosmetic shield-hit bridge — 2026-10-21
 
 BasicProjectile appends an optional immutable shieldRicochet launch flag (default false). Battle/Machine Gun/Sniper opt in via typed configs. On Kinetic contact it captures optional shield geometry, commits damage once via Enemy.ApplyDamageWithShieldAbsorption, then requests a purely cosmetic reflected tracer only for positive absorption. Original disposal/status/XP remain unchanged. Fixed world effects have no contact/targeting logic. Geometry may reconcile an earlier visible rim along the incoming line without changing gameplay contact. See FEEDBACK/Ricochet/README.md.

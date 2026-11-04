@@ -15,6 +15,8 @@ public partial class BattleTowerConfig : TowerConfig, ITowerTargetingPolicy, IPr
     }
 
     [Export] public bool ShieldRicochet { get; set; } = true;
+    [ExportGroup("Hull Hit Feedback")]
+    [Export(PropertyHint.Range, "0,8,1")] public int HullHitSparkCount { get; set; } = 4;
     private bool _heatEnabled;
     private double _overheatMinutes = 3, _recoverySeconds = 9;
     [ExportGroup("Heat")]

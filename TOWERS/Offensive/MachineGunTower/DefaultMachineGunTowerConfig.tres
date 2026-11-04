@@ -12,3 +12,4 @@ MuzzleFlash = ExtResource("pv_flash")
 ConstructionArt = ExtResource("construction")
 
 ShieldRicochet = true
+HullHitSparkCount = 2

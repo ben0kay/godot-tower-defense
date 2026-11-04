@@ -22,6 +22,7 @@ public abstract partial class ProjectileTurretBase : TowerBase
     private Sprite2D _sprite, _baseSprite, _constructionSprite;
     private TowerRecoilController _recoil;
     private EnemyRegistry _registry;
+    private HullHitSparkController _hullSparks;
     private Enemy _target;
     private float _searchTimer, _shotTimer;
     private readonly List<Marker2D> _muzzles = new();
@@ -86,6 +87,7 @@ public abstract partial class ProjectileTurretBase : TowerBase
         if (Config != null) Config.Changed += RebuildStats;
         RebuildStats();
         _registry = GetNodeOrNull<EnemyRegistry>("../../EnemySystems/Registry");
+        _hullSparks = GetNodeOrNull<HullHitSparkController>("../../Effects/HullHitSparks");
         _projectiles = GetNodeOrNull<Node2D>("../../Projectiles");
         _searchTimer = (GetInstanceId() % 97) / 97f * (FinalStats?.TargetSearchInterval ?? .15f);
         SetOperationalPhysicsProcess(_registry != null && _projectiles != null);
@@ -131,6 +133,8 @@ public abstract partial class ProjectileTurretBase : TowerBase
         DamageInfo hit = Config.CreateHit(FinalStats, DamageSource);
         bool instant = Config.DeliveryMode == ShotDeliveryMode.InstantTarget;
         Enemy instantTarget = instant ? _target : null;
+        // Source snapshot before the barrel controller commits its volley.
+        Vector2 instantMuzzle = instant ? _muzzles[_barrels.MuzzleIndex(mode, 0)].GlobalPosition : Vector2.Zero;
         StatusEffectPayload? instantEffect = instant ? CreateEffect(FinalStats) : null;
         for (int i = 0; i < count; i++)
         {
@@ -143,7 +147,8 @@ public abstract partial class ProjectileTurretBase : TowerBase
                 continue;
             }
             BasicProjectile bullet = new();
-            bullet.Initialize(_target, FinalStats.ProjectileSpeed, hit, CreateEffect(FinalStats), Config.ProjectileVisual, FinalStats.Handling, Config.ShieldRicochet);
+            bullet.Initialize(_target, FinalStats.ProjectileSpeed, hit, CreateEffect(FinalStats), Config.ProjectileVisual, FinalStats.Handling, Config.ShieldRicochet,
+                Config.HullHitSparkCount);
             _projectiles.AddChild(bullet);
             WeaponVisuals.Present(bullet, muzzle, Config, _visuals);
         }
@@ -154,7 +159,9 @@ public abstract partial class ProjectileTurretBase : TowerBase
         _shotTimer = Mathf.Max(0f, count / FinalStats.ShotsPerSecond + _shotTimer);
         // Resolve immediate damage after committing the shot; lethal callbacks may tear down a wave or scene.
         if (instant)
-            for (int i = 0; i < count; i++) WeaponHitDelivery.ApplyInstant(instantTarget, hit, instantEffect);
+            for (int i = 0; i < count; i++)
+                WeaponHitDelivery.ApplyInstant(instantTarget, hit, instantEffect,
+                    _hullSparks, instantMuzzle, Config.HullHitSparkCount);
     }
     #endregion
 

@@ -1,3 +1,9 @@
+## HI1 — hull-only kinetic impact sparks (2026-11-04, source implemented)
+
+Confirmed **hull HP loss** from Battle, Machine Gun and Sniper shots now requests tiny white-hot/yellow/orange streaks from one pooled, capped `World/Effects/HullHitSparks` renderer. Shield-only contacts, missed shots and zero effective hull damage emit **nothing**; an actual penetrating hull hit can spark even if shield absorption also occurred. No `GPUParticles2D`, per-impact nodes, new hit collisions or modified damage resolution. One sleeping CanvasItem manages short-lived line fragments with a default maximum of 320 simultaneously active flecks. Per-weapon burst sizes: Battle 4, Machine Gun 2, Sniper 6. See [Hull Hit Sparks](HullHitSparks/README.md) for Inspector controls and the two hit paths. In-game visual/F4 FPS acceptance pending.
+
+---
+
 ## Selected tower presentation — aqua/red overlay (2026-11-03)
 
 `Selection/` contains one reusable selected-tower hologram and stronger aqua/red screen grid/tint + a world-anchored name caption to the tower's right. The current `TowerPlacementController` selection and disabled/work events drive it, so normal states use aqua and disabled/upgrading states use soft red. No additional per-tower nodes or gameplay change. Configure colours, grid, pulse, text and opacity in [`Selection/DefaultTowerSelectionStyle.tres`](Selection/DefaultTowerSelectionStyle.tres). Source implemented; owner in-game review pending.

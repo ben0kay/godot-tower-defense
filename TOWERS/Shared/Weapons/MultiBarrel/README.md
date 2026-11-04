@@ -1,3 +1,9 @@
+## HI1 — reusable per-weapon hull spark opt-in (2026-11-04)
+
+The shared `ProjectileTurretConfig.HullHitSparkCount` defaults to **0**, with explicit **2** for Machine Gun and **6** for Sniper in their authored `.tres` resources. Battle exposes its equivalent with default **4**. Physical rounds capture the count at launch; Sniper's current `InstantTarget` path passes the same setting to its direct damage bridge. All feed one fixed-capacity cosmetic effect under `FEEDBACK/HullHitSparks` without introducing projectile nodes or GPU emitters. See the [effect guide](../../../../FEEDBACK/HullHitSparks/README.md). Visual/FPS acceptance pending.
+
+---
+
 ## Optional instant-target weapon delivery — 2026-11-02
 
 `ProjectileTurretConfig.DeliveryMode` defaults to `PhysicalProjectile`, preserving all existing physical bullet handling for Machine Gun, Cryo and Stasis without per-tower changes. The shared `ProjectileTurretBase` can instead opt into `InstantTarget`: a funded shot flashes its real muzzle, commits recoil/heat/cooldown, and delivers the immutable `DamageInfo` directly to the locked enemy through `WeaponHitDelivery` (after shot bookkeeping, so lethal callbacks cannot interrupt it). No `BasicProjectile` is spawned for those shots. Physical projectile behaviour is unchanged. The Sniper Tower explicitly opts in; this capability can be reused by future aimed towers.

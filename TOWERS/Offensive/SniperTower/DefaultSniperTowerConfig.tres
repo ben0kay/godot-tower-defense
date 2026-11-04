@@ -14,3 +14,4 @@ AimLaser = ExtResource("pv_aim")
 ConstructionArt = ExtResource("construction")
 
 ShieldRicochet = true
+HullHitSparkCount = 6

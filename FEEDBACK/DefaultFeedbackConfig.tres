@@ -6,3 +6,4 @@
 script = ExtResource("1_master")
 DeathExplosionsEnabled = false
 ShieldRicochetsEnabled = true
+HullHitSparksEnabled = true

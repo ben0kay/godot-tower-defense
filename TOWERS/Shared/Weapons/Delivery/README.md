@@ -1,3 +1,9 @@
+## HI1 — Sniper instant-hit hull sparks (2026-11-04)
+
+The instant-target weapon helper accepts an **optional** cached `HullHitSparkController`, muzzle position and count; existing callsites with no extra arguments remain valid. Sniper passes its actual muzzle snapshot and requests a small hull-edge burst only after a confirmed decrease in `Enemy.Health`. Its damage, target validation, recoil, XP and status effects are unchanged. Other instant-delivery weapons remain opt-out by default; physical projectile weapons use their swept collision point instead. Source implemented, Godot presentation still to verify.
+
+---
+
 # Shared weapon hit delivery
 
 Reusable **opt-in** delivery for aimed turret shots. `ShotDeliveryMode` has `PhysicalProjectile = 0` (default) and `InstantTarget = 1`. `ProjectileTurretConfig.DeliveryMode` exposes the choice under the Inspector's **Firing** group and is retained when the resource is duplicated for placed towers.
