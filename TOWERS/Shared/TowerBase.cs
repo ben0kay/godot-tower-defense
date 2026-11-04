@@ -38,6 +38,7 @@ public abstract partial class TowerBase : Node2D
     private TowerMasterConfig _experienceRules;
     private TowerResearchBonuses _research;
     private DamageSource _damageSource;
+    private TowerProgressPopup _progressPopup;
     public TowerMasterConfig ExperienceRules => _experienceRules ?? TowerRankController.DefaultRules;
     public DamageSource DamageSource => _damageSource ??= new DamageSource(this);
     public abstract System.Collections.Generic.List<TowerLevel> Levels { get; }
@@ -107,7 +108,11 @@ public abstract partial class TowerBase : Node2D
     {
         double before = RankProgress.TotalXp;
         bool promoted = RankProgress.Add(amount, AuthoredConfig.Ranks);
-        if (promoted) { FinalStats = ResolveLevel(UpgradeLevel); NotifyStatsChanged(); }
+        if (promoted)
+        {
+            FinalStats = ResolveLevel(UpgradeLevel); NotifyStatsChanged();
+            ShowRankCelebration();
+        }
         if (RankProgress.TotalXp != before) ExperienceChanged?.Invoke();
     }
 
@@ -141,9 +146,26 @@ public abstract partial class TowerBase : Node2D
         else if (instant)
         {
             NotifyStatsChanged();
-            if (GodotObject.IsInstanceValid(this) && IsInsideTree() && !IsQueuedForDeletion()) WorkCompleted?.Invoke();
+            if (GodotObject.IsInstanceValid(this) && IsInsideTree() && !IsQueuedForDeletion())
+            {
+                ShowUpgradeCelebration(); WorkCompleted?.Invoke();
+            }
         }
     }
+
+    // =========================================================
+    // Lazily create one cosmetic popup only after an actual completed upgrade or rank promotion.
+    private TowerProgressPopup GetProgressPopup()
+    {
+        if (!IsInsideTree() || IsQueuedForDeletion()) return null;
+        if (GodotObject.IsInstanceValid(_progressPopup)) return _progressPopup;
+        _progressPopup = new TowerProgressPopup { Name = "ProgressPopup", Position = new Vector2(12f, -8f) };
+        AddChild(_progressPopup);
+        return _progressPopup;
+    }
+
+    private void ShowUpgradeCelebration() => GetProgressPopup()?.ShowUpgrade(UpgradeLevel);
+    private void ShowRankCelebration() => GetProgressPopup()?.ShowRank(CurrentRank.Name);
 
     #region Construction
     public TowerWorkPhase WorkPhase { get; private set; } = TowerWorkPhase.Operational;
@@ -218,7 +240,11 @@ public abstract partial class TowerBase : Node2D
             if (upgrading) NotifyStatsChanged();
             else { SetPhysicsProcess(_operationalPhysics); OnBecameOperational(); }
             // A stat/inventory observer may have removed this building during activation.
-            if (GodotObject.IsInstanceValid(this) && IsInsideTree() && !IsQueuedForDeletion()) WorkCompleted?.Invoke();
+            if (GodotObject.IsInstanceValid(this) && IsInsideTree() && !IsQueuedForDeletion())
+            {
+                if (upgrading) ShowUpgradeCelebration();
+                WorkCompleted?.Invoke();
+            }
             return;
         }
         ElapsedWorkSeconds += delta;
