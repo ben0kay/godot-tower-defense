@@ -1,3 +1,9 @@
+## Shockwave Tower construction and purchased artwork — 2026-11-03
+
+Shockwave now has 0/35/70% initial construction SVGs and a distinct Level 2 completed purple resonator plus 35%/70% upgrade scaffolds. The pre-existing stationary **single Sprite2D** remains the only tower art, with its texture controlled by shared `TowerConstructionVisuals`. No turret, muzzle, gameplay logic, cooldown, wave effect, resource balance or per-frame presentation work was added. Level 1 build remains 5 seconds; the Level 2 upgrade remains 225 Credits / 6 seconds. See [Shockwave artwork notes](TOWERS/Offensive/ShockwaveTower/Artwork/Upgrades/README.md). Source wiring checked; owner Godot visual acceptance pending.
+
+---
+
 ## Level001 gentle introductory waves and Wave Editor narration — 2026-11-03
 
 Replaced the first mission's previous shield-heavy stress-test waves with **three gentle tutorial encounters (10 / 14 / 20, total 44)**. Waves 1–2 contain only Standard Drones; Wave 3 spawns ten Standards before its second, ten-ship weighted batch introduces five faster Scouts mixed with five Standards. No shields, stealth, Bulwarks or support enemies. `Level001Config.tres.WaveSource` now points to the new `LEVELS/Level001/Level001Waves.tres`, editable through Godot's Wave Editor so the user can write **banner/commentary/narration** later. The presentation fields remain blank. Terrain, tower balance, money, mission progression and shared runtime unchanged. [Level001 design](LEVELS/Level001/README.md).

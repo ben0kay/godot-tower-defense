@@ -1,3 +1,11 @@
+## Construction and Level 2 artwork — 2026-11-03
+
+Shockwave now has three initial paid construction textures (foundation 0%, emitter frame 35%, partial resonator 70%) and an explicit Level 2 upgrade appearance (35% scaffolding, 70% near-complete resonator, 100% upgraded pulse core). It retains the original stationary **single root Sprite2D**, with no turret or muzzle: the existing shared `TowerConstructionVisuals` presenter changes that one texture only during work milestones. Completed Level 1 retains the original 48×48 purple asset; Level 2 gets distinct purple/lilac reinforced ring art.
+
+All combat, travelling-wave logic, initial 5s work and Level 2 225-Credit/6s upgrade, heat, ammo and effects are unchanged. See [construction art](Artwork/Construction/README.md) and [upgrade art](Artwork/Upgrades/README.md). Source-checked; owner visual acceptance pending.
+
+---
+
 ## HD4 pulse heat (2026-10-26)
 
 The shipped Shockwave config now enables approximately **3-minute** sustained emission heat and **12-second** recovery to 35%. The shared stat resolver uses each purchased wave's actual interval rather than zero `ShotsPerSecond`; each funded pulse charges once, including a pulse emitted without a current target. Inspector Heat fields can turn it off or retune it. Damage/wave mechanics, prices and ammo are unchanged. Source-implemented; runtime acceptance pending.
@@ -45,4 +53,4 @@ Current complete ShockwaveTowerLevels.cs rows include 400 reserve / 5 per emitte
 
 ## Initial construction (C1/C2)
 
-Paid placement occupies its footprint immediately and takes **5 seconds**, authored in the Level1 WorkSeconds column of this tower's `*Levels.cs`. It cannot acquire targets/fire/consume ammunition or request deliveries until complete. Completion preserves stats, level, rank and stock. Direct scene fixtures remain operational by default. Current final artwork stays visible; stage SVGs/VFX (C4) remain deferred. C3 Inspector progress is implemented; purchased upgrades use their own WorkSeconds and retain old-tier operation until completion. Duplicate purchases are disabled while work is active. See `TOWERS/Shared/Construction/README.md`.
+Paid placement occupies its footprint immediately and takes **5 seconds**, authored in the Level1 WorkSeconds column of this tower's `*Levels.cs`. It cannot acquire targets/fire/consume ammunition or request deliveries until complete. Completion preserves stats, level, rank and stock. Direct scene fixtures remain operational by default. Initial construction now displays dedicated stage SVGs at 0%, 35% and 70% before restoring the original completed Level 1 art. VFX remain handled separately. C3 Inspector progress is implemented; purchased upgrades use their own WorkSeconds and retain old-tier operation until completion. Duplicate purchases are disabled while work is active. See `TOWERS/Shared/Construction/README.md`.
