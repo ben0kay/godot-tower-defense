@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://ENEMIES/Shared/EnemyDefinition.cs" id="definition"]
+
+[resource]
+script = ExtResource("definition")
+EnemyId = "heavy_gunner_drone_mk1"
+Class = 3
+Rank = 1
+Role = 0
+DisplayName = "Heavy Gunner Drone"
+MaxHealth = 260.0
+MaxShield = 0.0
+MoveSpeed = 52.0
+RadiusPixels = 24.0
+TurnSpeed = 4.4
+CitadelDamage = 4
+KillRewardCredits = 14
+DeathExplosionMultiplier = 1.65

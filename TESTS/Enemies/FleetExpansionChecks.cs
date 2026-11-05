@@ -40,7 +40,7 @@ public partial class FleetExpansionChecks : Node
                     && f.Mission.Session.Snapshot.EnemiesKilled == 11, "Victory accounts for carrier and all ten children");
             }
             await SubsystemBattlefield.DrainFreedFixtures(this);
-            GD.Print("PASS: fleet families, all 14 catalog ships, new hulls/shields/rewards/arrival and mixed carrier victory on both maps");
+            GD.Print("PASS: fleet families, all 15 catalog ships, new hulls/shields/rewards/arrival and mixed carrier victory on both maps");
             GetTree().Quit();
         }
         catch (Exception error) { GD.PushError(error.ToString()); GetTree().Paused = false; GetTree().Quit(1); }
@@ -53,7 +53,7 @@ public partial class FleetExpansionChecks : Node
     private static void CheckDefinitionsAndSpawns(DeathSpawnFixture f)
     {
         var map = f.Spawns.Catalog.ToSceneMap();
-        Require(map.Count == 14, "Thirteen existing types and the EG3 Gunner Drone are registered");
+        Require(map.Count == 15, "Original 14 types plus the Heavy Gunner Drone are registered");
         foreach (var pair in map)
         {
             EnemyDefinition data = f.Spawns.Catalog.DefinitionFor(pair.Key);
@@ -79,6 +79,7 @@ public partial class FleetExpansionChecks : Node
             ("reinforced_drone_mk1", EnemyClass.Light, EnemyRank.Veteran, EnemyRole.Fighter, 110f, 100f, new Vector2(40, 30)),
             ("racer_mk1", EnemyClass.Tiny, EnemyRank.Veteran, EnemyRole.Fighter, 20f, 230f, new Vector2(34, 18)),
             ("shield_frigate_mk1", EnemyClass.Heavy, EnemyRank.Veteran, EnemyRole.Support, 120f, 65f, new Vector2(72, 48)),
+            ("heavy_gunner_drone_mk1", EnemyClass.Heavy, EnemyRank.Veteran, EnemyRole.Fighter, 260f, 52f, new Vector2(62, 42)),
             ("heavy_bulwark_mk1", EnemyClass.Heavy, EnemyRank.Veteran, EnemyRole.Fighter, 500f, 50f, new Vector2(88, 64)),
             ("cruiser_mk1", EnemyClass.Capital, EnemyRank.Elite, EnemyRole.Fighter, 3000f, 30f, new Vector2(168, 96)),
             ("heavy_transporter_mk1", EnemyClass.Superheavy, EnemyRank.Veteran, EnemyRole.Cargo, 1400f, 35f, new Vector2(144, 100)) };

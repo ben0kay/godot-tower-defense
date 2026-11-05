@@ -1,3 +1,9 @@
+## Heavy Gunner Drone — new armed enemy (2026-11-05)
+
+Added `heavy_gunner_drone_mk1` as a separate **Heavy/Veteran/Fighter** enemy with a 62×42 armoured SVG hull, independent 18×50 long-barrel cannon and 260 HP at 52px/s. Dedicated weapon config uses 4-damage Kinetic shots at 3.5/s, slower 850px/s travel, 275px range and larger **red 11×2.2 tapered tracers**. The original lightweight starter Gunner and its bullets remain completely unchanged. The new enemy is appended to the 15-entry default catalog (available in F2/Wave Editor); no authored waves were changed. Focused catalog/weapon checks and roster docs updated. **Source checks only; Godot owner validation pending.** [Heavy Gunner details](ENEMIES/Types/HeavyGunnerDrone/README.md).
+
+---
+
 ## Stealth Beacon slower scan, three coverage tiers and split upgrade art — 2026-11-05
 
 Stealth Beacon Level 1 now revolves every 4.5s (was 3s). Paid Level 2/3 retain that slower speed but expand genuine effective cone coverage to 80°/90° and radius to 280/304px, with +5% Max HP per tier, tier-specific Inspector previews and distinct native SVG fixed-base/rotating-head artwork. The existing 0/35/70% initial construction visuals are preserved; paid upgrades have new 35/70% stage composites. Core stealth indexing, rotation pause/disable handling and gameplay combat remain unchanged. [Stealth Beacon details](TOWERS/Utility/StealthBeacon/README.md). Source implemented; Godot validation pending.

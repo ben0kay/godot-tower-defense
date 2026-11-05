@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="18" height="50" viewBox="0 0 18 50">
+<!-- Heavy turret centre (9,25), actual muzzle at (9,4), Marker2D(0,-21). -->
+<defs>
+  <linearGradient id="armour" x1="0" y1="0" x2="1" y2="1">
+    <stop stop-color="#cedee0"/><stop offset=".32" stop-color="#859eaa"/>
+    <stop offset=".67" stop-color="#496473"/><stop offset="1" stop-color="#253947"/>
+  </linearGradient>
+  <linearGradient id="barrel" x1="0" y1="0" x2="1" y2="0">
+    <stop stop-color="#142330"/><stop offset=".3" stop-color="#708b99"/>
+    <stop offset=".57" stop-color="#d1e0dd"/><stop offset="1" stop-color="#152f40"/>
+  </linearGradient>
+</defs>
+<g stroke-linecap="round" stroke-linejoin="round">
+  <!-- Longer, thicker single central autocannon barrel: distinct from starter's skinny tube. -->
+  <path d="M6.3 29V7L7.6 4H10.4L11.7 7V29Z"
+        fill="url(#barrel)" stroke="#071d2b" stroke-width="1.0"/>
+  <path d="M7.8 8V25" stroke="#d6e9e6" stroke-width="1.1" opacity=".78"/>
+  <path d="M10.1 8V25" stroke="#233d4a" stroke-width="1"/>
+  <path d="M6.4 4H11.6V7.2H6.4Z" fill="#304b58" stroke="#aec2c8" stroke-width="1"/>
+  <!-- Exposed side cooling conduits, not a wide flat blaster block. -->
+  <path d="M4.2 13L5.7 10V28H4.2Z M12.3 10L13.8 13V28H12.3Z"
+        fill="#415d6a" stroke="#9ab3b9" stroke-width=".75"/>
+  <path d="M3.2 17H14.8V20H3.2Z M3.2 25H14.8V28H3.2Z"
+        fill="#7d98a4" stroke="#203443" stroke-width=".9"/>
+  <path d="M4.5 21H5.3M12.7 21H13.5" stroke="#d6a09a" stroke-width="1"/>
+  <!-- Compact but armoured breech, rotor and stabilizer. -->
+  <path d="M3.8 28L6.1 26H11.9L14.2 28L16 34L14.8 42L12 45H6L3.2 42L2 34Z"
+        fill="url(#armour)" stroke="#c2d3d8" stroke-width="1.2"/>
+  <path d="M5 30H13L14.2 36L12 40H6L3.8 36Z" fill="#273e4a" stroke="#91a8b1" stroke-width=".75"/>
+  <path d="M2.4 34L5 36V40L3.1 39Z M15.6 34L13 36V40L14.9 39Z" fill="#a86a66"/>
+  <circle cx="9" cy="37.1" r="5.3" fill="#112734" stroke="#a3bfc5" stroke-width="1.3"/>
+  <circle cx="9" cy="37.1" r="3.1" fill="#4e6c75" stroke="#c1d0cc" stroke-width=".8"/>
+  <circle cx="9" cy="37.1" r="1.7" fill="#e4876c" stroke="#712e2c" stroke-width=".7"/>
+  <path d="M6 45H12L12.8 48H5.2Z" fill="#476571" stroke="#a1bbc2" stroke-width=".9"/>
+  <path d="M6.5 47H11.5" stroke="#f0a085" stroke-width="1.3"/>
+</g>
+</svg>

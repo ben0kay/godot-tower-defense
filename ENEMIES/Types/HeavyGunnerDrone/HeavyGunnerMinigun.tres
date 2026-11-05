@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EnemyMinigunConfig" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://ENEMIES/Weapons/Minigun/EnemyMinigunConfig.cs" id="config"]
+[ext_resource type="Resource" path="res://ENEMIES/Types/HeavyGunnerDrone/Visuals/HeavyGunnerTracer.tres" id="tracer"]
+[ext_resource type="Resource" path="res://ENEMIES/Types/HeavyGunnerDrone/Visuals/HeavyGunnerMuzzleFlash.tres" id="flash"]
+
+[resource]
+script = ExtResource("config")
+RangePixels = 275.0
+TargetSearchSeconds = 0.2
+LockedTargetSearchSeconds = 1.0
+RotationSpeedDegrees = 180.0
+AimToleranceDegrees = 6.0
+DamagePerBullet = 4.0
+BulletSpeedPixels = 850.0
+ShotsPerSecond = 3.5
+BulletLifetimeSeconds = 2.8
+UseBursts = false
+ProjectileVisual = ExtResource("tracer")
+MuzzleFlash = ExtResource("flash")

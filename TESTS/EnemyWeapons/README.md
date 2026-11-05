@@ -1,3 +1,11 @@
+## Heavy Gunner Drone new variant checks — 2026-11-05
+
+The existing `GunnerDroneChecks.tscn` now validates both the untouched starter and the new Heavy Gunner: 15-entry catalog; two opt-in armed enemies; no automatic wave inclusion; 62×42 hull and 18×50 up-facing gun; separate `Muzzle=(0,-21)`; 260 HP/52 speed/24 radius; 3.5 shots/s, 850 bullet speed and 4 damage; 11×2.2 enlarged red snapshot; live world-owned muzzle-origin projectile and real tower damage. `FleetExpansionChecks` covers heavy metadata, portal spawning, ordinary hull damage, single arrival damage and kill reward.
+
+No Godot/.NET runtime tests run in this pass; owner can run the two focused scenes after importing the new SVGs. Existing 14-ship test references are historical.
+
+---
+
 ## Compact starter Gunner regression expectations — 2026-11-04
 
 The existing GunnerDroneChecks definitions check has been updated for **52×38 hull art**, **20×40 thin gun art**, **135 HP**, and **18 px movement radius**. The authoritative `Muzzle=(0,-18)` still has the same world-shot position; no changes were made to gunner bullet requests, tracer/head/tail, muzzle flash, 6/s firing or hit damage. No test suite was executed for this cosmetic/stat edit, per the project's light-testing preference; run the focused Gunner test only if the owner requests validation. Existing older EG3 records below describe the original 64×48/180HP baseline at the time.
