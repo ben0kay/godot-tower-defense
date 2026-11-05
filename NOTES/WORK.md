@@ -1,3 +1,9 @@
+## Runtime map bounds link restored — 2026-11-05
+
+Level011Config now explicitly assigns WorldConfig = Level011WorldConfig.tres. Without that link, WorldMapLoader retained the shared 100×80 grid, so the camera stopped at X=6400 even though the separate local resource said 192×120. Restored the resource reference and property only; current terrain, three portals, waves, Credits and Citadel placement are preserved. The existing loader applies the 192×120 bounds before grid/camera initialization. Minimal source/reference checks only; restart/redeploy Level011 in Godot to verify right-edge pan and Citadel access. No build/runtime claim.
+
+---
+
 ## Shared power rollout to offensive towers and Repair — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** All nine offensive types plus Restoration Tower now use PW4-A–D capacitors and the existing Inspector ENERGY/power details. Each has a configurable per-type profile with modest provisional rates; Battle's baseline is unchanged. Atomic projectile/volley/pulse payments and duration-limited Laser/repair payments reuse the shared service and NoPower recovery. Active replaces idle; no new polling, generator, relay, priority slider or save schema. Existing combat, ammo, heat, construction, upgrades and checkpoint owners are preserved. Source/resource checks only; .NET unavailable, owner Godot validation pending. [Rate table and accounting](../TOWERS/Shared/Power/README.md).

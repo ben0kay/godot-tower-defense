@@ -3,8 +3,11 @@
 [ext_resource type="Script" uid="uid://d3rj1iimghlhl" path="res://LEVELS/LevelConfig.cs" id="config"]
 [ext_resource type="Resource" uid="uid://tq3v2ktadfkg" path="res://LEVELS/Level011/Level011Waves.tres" id="waves"]
 
+[ext_resource type="Resource" path="res://LEVELS/Level011/Level011WorldConfig.tres" id="world"]
+
 [resource]
 script = ExtResource("config")
+WorldConfig = ExtResource("world")
 StartingCredits = 4000
 ActivePortals = Array[NodePath]([NodePath("Portals/EnemyPortal1"), NodePath("Portals/EnemyPortal2"), NodePath("Portals/EnemyPortal3")])
 WaveSource = ExtResource("waves")

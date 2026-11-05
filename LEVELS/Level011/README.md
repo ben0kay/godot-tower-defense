@@ -19,11 +19,11 @@ The authored `Level011Waves.tres` remains a native editable `WaveSetResource` fo
 
 ## Existing map and editing
 
-- **Map dimensions:** `Level011WorldConfig.tres` = 192×120 cells at 64px, leaving all other maps' dimensions unchanged.
+- **Map dimensions:** `Level011Config.tres → WorldConfig` explicitly references `Level011WorldConfig.tres` = 192×120 cells at 64px. The runtime loader applies it before Grid/Camera initialize; an unassigned link falls back to the shared 100×80 default.
 - **Inheritance:** `Level011.tscn` inherits `LEVELS/Shared/BaseLevelMap.tscn`, with four level-local paintable TileMapLayers; its authored terrain is untouched.
 - **Existing routes:** upper portal at (1504,2016), middle at (1504,3424), lower at (1440,4832). Each portal references its own `Checkpoints/RouteCheckpoint*` chain. Do not rename portal paths without updating the config and wave entry selectors.
 - **Citadel:** `Objectives/Citadel` at (10336,3488), unchanged.
-- **Level config:** `Level011Config.tres` has three active portals, 2,000 starting Credits, 1,000 Citadel HP and wave ID `level011`.
+- **Level config:** `Level011Config.tres` has three active portals, 4,000 starting Credits, 1,000 Citadel HP and wave ID `level011`.
 - **Campaign:** `Level011Mission.tres` remains enabled and deploys through shared Battlefield/World services.
 
 To rebalance, enable the existing Godot Wave Editor, open `res://LEVELS/Level011/Level011Waves.tres`, change batches/enemies and Save. For map edits open `res://LEVELS/Level011/Level011.tscn` in the 2D editor. Confirm all three routes are reachable before judging balance. Wave 6 onward should shift toward more Heavy/Superheavy ships, with Capital/Titan only after those types actually exist.
