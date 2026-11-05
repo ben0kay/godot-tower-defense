@@ -1,3 +1,9 @@
+## 2026-11-04 — Revised PW4 capacitor / distance-falloff plan (docs only)
+
+Updated [TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md](../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md) and related consumer/relay guides. **Planned:** each powered tower banks actual energy, recharges slower along long conductive terrain paths, and spends faster during combat. Refill cannot exceed finite island generation and uses 0–100 priorities when contested. Source loss leaves stored energy intact, and a threshold-based NoPower uses the shared disable system. PW4-A buffer/draw, PW4-B spatial recharge efficiency, PW4-C finite refill allocation, PW4-D Heat/Ammo-like energy bar/priority; PW5 relays will boost distribution without producing energy and can manually bridge islands. **PW1–PW3 unchanged; no code or gameplay implemented by this documentation pass.**
+
+---
+
 ## Power PW3 — buildable Industrial Generator — 2026-11-04
 
 Economy now offers Industrial Generator: provisional **250 power, 300 Credits, 5s construction, 1200 HP, 2×2**. Shared generator code uses existing construction/art, disable, selection and checkpoint lifecycle without a frame-processing loop. No consumers/outages yet. The selected-tower power bar matching heat/ammo is recorded for PW4. See [Industrial guide](../TOWERS/Economy/Power/IndustrialGenerator/README.md). Source checks only; owner Godot validation pending.
