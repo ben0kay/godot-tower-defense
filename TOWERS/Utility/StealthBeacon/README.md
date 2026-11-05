@@ -1,3 +1,21 @@
+## Stealth Beacon paid scanner tiers and artwork (2026-11-05)
+
+**Source Implemented / Awaiting Owner Validation.** Stealth Beacon now has three consecutive purchased levels. Level 1 slows its clockwise sweep from **3s to 4.5s per full revolution**. All three levels retain the same 4.5s sweep speed; coverage increases by tier instead:
+
+| Level | Credits (build / upgrade) | Work | Full cone | Range | Max HP |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 1 | 250 | 2s | 70° | 256px | 1,800 |
+| 2 | 175 | 3s | 80° | 280px | 1,890 |
+| 3 | 250 | 4s | 90° | 304px | 1,984.5 |
+
+**Core semantics:** The authored cone angle is now an optional value on the existing immutable `TowerStatBlock` and `TowerFinalStats` (0 when no scanner). `StealthBeacon` draws its sector from `FinalStats.ScanConeDegrees`; the shared `StealthRevealSystem` uses the same effective value to compute the real indexed detection angle, so changing the purchased level changes actual reveal coverage. Config exports for Level 1/2/3 cone and range are editable separately. Existing indexed, bounded sweep, overlap, EMP, construction, pause and stealth-handling logic are unchanged. The normal Inspector's tier description and `DescribeChanges` preview show cone/range changes.
+
+**Finished art:** Distinct native 64×64 SVG fixed bases and independently rotating forward-facing scanner heads for Levels 2 and 3 in [Artwork/Upgrades](Artwork/Upgrades/README.md). The existing `TowerConstructionVisuals` switches finished base/head art at paid completion, with separate 35% and 70% scaffold composites while upgrading. The original Level 1 SVGs and build stages are untouched.
+
+**Source checks only:** Godot build/editor play and visual checks remain with the owner. Verify detection against stationary stealthed enemies near the new angle/range boundaries, pause/disable, upgrade preview, payment/2→3 work, the 35/70% stages, saved/restored tiers and layered rotation. Older SE1/SE2 notes below describe the historic one-tier state, now superseded for tier count and scan speed.
+
+---
+
 ## SE2 — directional scanner implemented (2026-11-05)
 
 **Source Implemented / Awaiting Owner Validation.** The prepared head now rotates clockwise while operational and its `TurretPivot/ScanCone` placeholder owns one faint 24-segment Polygon2D sector. Defaults: **70° full cone, 3s revolution, 0.1s detection refresh, 0.08 opacity**, still **256px / 250 Credits / 1800 HP / 2s / 1×1**. No artwork, scene paths, waves, prices, power requirement or tower upgrades changed.

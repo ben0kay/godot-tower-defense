@@ -1,3 +1,11 @@
+## Level 2 and 3 finished art (2026-11-05)
+
+Two additional finished **native 64×64 SVG** split sets are now authored under [Upgrades](Upgrades/README.md). Level 2 strengthens the silver-green base rim, corner sensor accents and widens the head's aqua scan aperture with twin winglets. Level 3 uses a brighter reinforced silver chassis, concentric detector rings and a larger double receiver/optic arrangement. Both heads still point up (local -Y) and remain centred at (32,32) so they rotate around the existing `TurretPivot` with no new scene nodes.
+
+The existing `Artwork/stealth_beacon_base.svg`, `stealth_beacon_head.svg` and catalog composite `stealth_beacon.svg` remain Level 1. `TowerConstructionVisuals` uses the optional `TowerLevelArtwork.FinishedBaseTexture` and `FinishedGunTexture` references for the paid tiers. Scanner function and appearance change together without reparenting the pivot. Godot preview pending.
+
+---
+
 # Stealth Beacon — split scanner artwork (2026-11-05)
 
 The beacon now has three authored native **64×64** SVGs:

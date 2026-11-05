@@ -1,3 +1,5 @@
+> **2026-11-05 amendment:** SE2 baseline remains implemented, but Stealth Beacon subsequently gained purchased Level 2/3 tiers with larger indexed detection cones/ranges and native split finished/upgrade SVGs. The original 70°/3-second and one-tier statements below are historical. Current authoritative defaults and artwork are documented in [README.md](README.md): 70°/80°/90°, 256/280/304px, 4.5s rotation at all levels.
+
 # SE2 — Stealth Beacon actual rotating cone reveal (Codex implementation handoff)
 
 **Status: Source Implemented / Awaiting Owner Validation — 2026-11-05, `dev`.** SE2 now uses the prepared split art, construction visuals, `TurretPivot` and unchanged `ScanCone` placeholder path. No SVG or scene/resource path was recreated. The contract below remains the design reference.

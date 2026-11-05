@@ -1,3 +1,9 @@
+## Stealth Beacon paid tiers (2026-11-05)
+
+The focused `StealthChecks.cs` source now asserts three paid scanner levels, Level 1's 4.5-second revolution and Level 2/3 80°/90° coverage and 280/304px ranges. Earlier SE2 timing assertions were adjusted for the slower revolution without changing the expected in-place heading refresh or independent reveal handles. These checks are **authored but not executed** in this tool environment; the owner handles Godot validation.
+
+---
+
 # SE2 focused verification — 2026-11-05
 
 **Source checks completed; fixture updated but not executed.** .NET is unavailable here; no installation, large suite or benchmark. After rebuilding C# in Godot .NET, optionally run `StealthChecks.tscn` once.

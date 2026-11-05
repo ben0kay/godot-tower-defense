@@ -7,6 +7,8 @@ public static class SafetyClampsStage
     // Nonfinite values resolve to safe minima; authored Resources are never changed.
     public static TowerStatBlock Apply(TowerStatBlock stats, TowerStatContext context) => stats with
     {
+        // Zero is the default for towers without a directional sensor.
+        ScanConeDegrees = Mathf.Min(180f, FiniteMinimum(stats.ScanConeDegrees, 0)),
         Repair = stats.Repair.HasValue ? new RepairStats(FiniteMinimum(stats.Repair.Value.HullPerSecond, 0)) : null,
         Handling = stats.Handling.HasValue ? ProjectileHandlingStats.Sanitize(stats.Handling.Value) : null,
         Freeze = stats.Freeze.HasValue ? new FreezeStats(FiniteMinimum(stats.Freeze.Value.DurationSeconds, 0)) : null,

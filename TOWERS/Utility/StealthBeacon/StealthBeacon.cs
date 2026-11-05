@@ -49,7 +49,7 @@ public partial class StealthBeacon : TowerBase
         if (!Config.IsValid || _sector == null) return;
         const int segments = 24;
         Vector2[] points = new Vector2[segments + 2]; points[0] = Vector2.Zero;
-        float half = Mathf.DegToRad(Config.ScanConeDegrees * .5f);
+        float half = Mathf.DegToRad(FinalStats.ScanConeDegrees * .5f);
         for (int i = 0; i <= segments; i++)
             points[i + 1] = Vector2.Up.Rotated(-half + 2 * half * i / segments) * FinalStats.RangePixels;
         _sector.Polygon = points; _sector.Color = new Color(.35f, .95f, .8f, Config.ScanConeOpacity);

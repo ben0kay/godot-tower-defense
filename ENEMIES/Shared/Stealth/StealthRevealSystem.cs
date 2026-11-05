@@ -42,7 +42,7 @@ public partial class StealthRevealSystem : Node
     {
         if (beacon.Config?.IsValid != true || !beacon.GlobalPosition.IsFinite() || !ValidHeading(beacon.ScanHeading)) return;
         float radius = beacon.FinalStats.RangePixels;
-        float cosine = Mathf.Cos(Mathf.DegToRad(beacon.Config.ScanConeDegrees * .5f));
+        float cosine = Mathf.Cos(Mathf.DegToRad(beacon.FinalStats.ScanConeDegrees * .5f));
         bool exists = _areas.TryGetValue(beacon, out Area area);
         if (!exists)
         {

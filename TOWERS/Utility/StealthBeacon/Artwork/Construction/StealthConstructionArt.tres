@@ -1,10 +1,19 @@
-[gd_resource type="Resource" script_class="TowerConstructionArt" load_steps=9 format=3]
+[gd_resource type="Resource" script_class="TowerConstructionArt" load_steps=24 format=3]
 
 [ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="art"]
 [ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="stage"]
 [ext_resource type="Texture2D" path="res://TOWERS/Utility/StealthBeacon/Artwork/Construction/stage0_foundation.svg" id="foundation"]
 [ext_resource type="Texture2D" path="res://TOWERS/Utility/StealthBeacon/Artwork/Construction/stage1_frame.svg" id="frame"]
 [ext_resource type="Texture2D" path="res://TOWERS/Utility/StealthBeacon/Artwork/Construction/stage2_assembly.svg" id="assembly"]
+[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerLevelArtwork.cs" id="level"]
+[ext_resource type="Texture2D" path="res://TOWERS/Utility/StealthBeacon/Artwork/Upgrades/stealth_beacon_base_l2.svg" id="l2_base"]
+[ext_resource type="Texture2D" path="res://TOWERS/Utility/StealthBeacon/Artwork/Upgrades/stealth_beacon_head_l2.svg" id="l2_head"]
+[ext_resource type="Texture2D" path="res://TOWERS/Utility/StealthBeacon/Artwork/Upgrades/stealth_upgrade_l2_35.svg" id="l2_35"]
+[ext_resource type="Texture2D" path="res://TOWERS/Utility/StealthBeacon/Artwork/Upgrades/stealth_upgrade_l2_70.svg" id="l2_70"]
+[ext_resource type="Texture2D" path="res://TOWERS/Utility/StealthBeacon/Artwork/Upgrades/stealth_beacon_base_l3.svg" id="l3_base"]
+[ext_resource type="Texture2D" path="res://TOWERS/Utility/StealthBeacon/Artwork/Upgrades/stealth_beacon_head_l3.svg" id="l3_head"]
+[ext_resource type="Texture2D" path="res://TOWERS/Utility/StealthBeacon/Artwork/Upgrades/stealth_upgrade_l3_35.svg" id="l3_35"]
+[ext_resource type="Texture2D" path="res://TOWERS/Utility/StealthBeacon/Artwork/Upgrades/stealth_upgrade_l3_70.svg" id="l3_70"]
 
 [sub_resource type="Resource" id="Stage0"]
 script = ExtResource("stage")
@@ -20,6 +29,45 @@ script = ExtResource("stage")
 Progress = 0.7
 Texture = ExtResource("assembly")
 
+[sub_resource type="Resource" id="UpgradeL2_35"]
+script = ExtResource("stage")
+Progress = 0.35
+Texture = ExtResource("l2_35")
+
+[sub_resource type="Resource" id="UpgradeL2_70"]
+script = ExtResource("stage")
+Progress = 0.7
+Texture = ExtResource("l2_70")
+
+[sub_resource type="Resource" id="UpgradeL3_35"]
+script = ExtResource("stage")
+Progress = 0.35
+Texture = ExtResource("l3_35")
+
+[sub_resource type="Resource" id="UpgradeL3_70"]
+script = ExtResource("stage")
+Progress = 0.7
+Texture = ExtResource("l3_70")
+
+[sub_resource type="Resource" id="Level2"]
+script = ExtResource("level")
+Level = 2
+FinishedBaseTexture = ExtResource("l2_base")
+FinishedGunTexture = ExtResource("l2_head")
+UpgradeTexture = ExtResource("l2_35")
+UpgradeProgress = 0.35
+UpgradeStages = Array[ExtResource("stage")]([SubResource("UpgradeL2_35"), SubResource("UpgradeL2_70")])
+
+[sub_resource type="Resource" id="Level3"]
+script = ExtResource("level")
+Level = 3
+FinishedBaseTexture = ExtResource("l3_base")
+FinishedGunTexture = ExtResource("l3_head")
+UpgradeTexture = ExtResource("l3_35")
+UpgradeProgress = 0.35
+UpgradeStages = Array[ExtResource("stage")]([SubResource("UpgradeL3_35"), SubResource("UpgradeL3_70")])
+
 [resource]
 script = ExtResource("art")
 BuildStages = Array[ExtResource("stage")]([SubResource("Stage0"), SubResource("Stage1"), SubResource("Stage2")])
+LevelArtwork = Array[ExtResource("level")]([SubResource("Level2"), SubResource("Level3")])

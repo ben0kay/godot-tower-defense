@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<defs>
+<linearGradient id="beaconMetal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7196a3"/><stop offset=".52" stop-color="#243b43"/><stop offset="1" stop-color="#10242c"/></linearGradient>
+<linearGradient id="beaconRim" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#a0c6b2"/><stop offset=".48" stop-color="#548982"/><stop offset="1" stop-color="#2d575b"/></linearGradient>
+</defs><g stroke-linejoin="round" stroke-linecap="round">
+<path d="M19 4H45L60 19V45L45 60H19L4 45V19Z" fill="#0f252d" stroke="#5c8581" stroke-width="2.5"/>
+<path d="M21 9H43L55 21V43L43 55H21L9 43V21Z" fill="url(#beaconMetal)" stroke="#b9ecf3" stroke-width="1.2"/>
+<path d="M20 9L9 20M44 9L55 20M9 44L20 55M55 44L44 55" stroke="#172d34" stroke-width="3"/>
+<path d="M19 6H45M19 58H45M6 19V45M58 19V45" stroke="#9bb9a0" stroke-width="1.7"/>
+<path d="M14 28H20M44 28H50M14 36H20M44 36H50" stroke="#457f7b" stroke-width="2"/>
+<circle cx="32" cy="32" r="19" fill="#102930" stroke="#6fe4ef" stroke-width="2"/>
+<circle cx="32" cy="32" r="15.3" fill="#18353a" stroke="#83aaa0" stroke-width="1.5"/>
+<circle cx="32" cy="32" r="11.3" fill="#0c2229" stroke="#346266" stroke-width="1.3"/>
+<path d="M32 14v7M32 43v7M14 32h7M43 32h7" stroke="#91edf7" stroke-width="1.7"/>
+<circle cx="16" cy="16" r="1.7" fill="#9fb8a9"/><circle cx="48" cy="16" r="1.7" fill="#9fb8a9"/>
+<circle cx="16" cy="48" r="1.7" fill="#9fb8a9"/><circle cx="48" cy="48" r="1.7" fill="#9fb8a9"/>
+</g>
+
+<!-- L3: silver reinforced outer chassis and concentric high-gain detector arrays. -->
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+<path d="M20 4.5H44M20 59.5H44M4.5 20V44M59.5 20V44" stroke="#e5faff" stroke-width="2"/>
+<path d="M20 9H44M20 55H44M9 20V44M55 20V44" stroke="#73f6fa" stroke-width="1.5" stroke-dasharray="7 3"/>
+<circle cx="32" cy="32" r="17.6" stroke="#84faff" stroke-width="1.7" stroke-dasharray="6 2.5"/>
+<circle cx="32" cy="32" r="13.6" stroke="#d5ffff" stroke-width="1" stroke-dasharray="2.4 3" opacity=".85"/>
+<path d="M24 6h16M24 58h16M6 24v16M58 24v16" stroke="#a9fcff" stroke-width="1.4"/>
+</g>
+<g fill="#dcffff" stroke="#1f788c" stroke-width=".6">
+<rect x="28" y="4.5" width="8" height="3" rx="1"/>
+<rect x="28" y="56.5" width="8" height="3" rx="1"/>
+<rect x="4.5" y="28" width="3" height="8" rx="1"/>
+<rect x="56.5" y="28" width="3" height="8" rx="1"/>
+</g>
+<defs>
+<linearGradient id="scannerMetal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e2f4fa"/><stop offset=".45" stop-color="#79abb8"/><stop offset="1" stop-color="#315b70"/></linearGradient>
+<radialGradient id="scannerOptic" cx=".5" cy=".35" r=".68"><stop stop-color="#e8fff5"/><stop offset=".32" stop-color="#afffe1"/><stop offset=".75" stop-color="#67f2fa"/><stop offset="1" stop-color="#0b9db6"/></radialGradient>
+</defs><g stroke-linejoin="round" stroke-linecap="round">
+<!-- Forward direction: UP (-Y), pivot at canvas centre (32,32). -->
+<path d="M32 8L42 16L42 25L39 34L43 43L38 49H26L21 43L25 34L22 25L22 16Z" fill="#102b34" stroke="#91b9ac" stroke-width="1.8"/>
+<path d="M32 11L39 18L39 27L35 36H29L25 27L25 18Z" fill="url(#scannerMetal)" stroke="#c5e0c6" stroke-width="1"/>
+<path d="M32 8L41 17L38 23H26L23 17Z" fill="#254b51" stroke="#b7dcc5" stroke-width="1.6"/>
+<path d="M26 17L32 12L38 17L36 21H28Z" fill="url(#scannerOptic)" stroke="#dcfff1" stroke-width=".9"/>
+<path d="M22 22L17 28L20 32L25 28M42 22L47 28L44 32L39 28" fill="#477e7c" stroke="#b1d9bd" stroke-width="1.2"/>
+<path d="M21 28L15 23M43 28L49 23" stroke="#77c4b4" stroke-width="1.5"/>
+<circle cx="32" cy="33" r="9.1" fill="#102a34" stroke="#89bfb1" stroke-width="1.6"/>
+<circle cx="32" cy="33" r="6.8" fill="#3b7775" stroke="#bcdfc6" stroke-width=".9"/>
+<circle cx="32" cy="33" r="3.5" fill="#f1ffff" stroke="#2f9f98" stroke-width="1.1"/>
+<path d="M26 42L29 46H35L38 42L36 40H28Z" fill="#1d4650" stroke="#9ac4ab" stroke-width="1.1"/>
+<path d="M29 45H35" stroke="#70a89d" stroke-width="1.4"/>
+</g>
+
+<!-- L3 directional-array crown: dual optics, extended side receivers, brighter silver rings. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M19 17L10 24L13 30L23 27M45 17L54 24L51 30L41 27" fill="#b7d0d8" stroke="#f4ffff" stroke-width="1.4"/>
+<path d="M12 25L18 21M52 25L46 21" stroke="#5af0ff" stroke-width="2.4"/>
+<path d="M32 3L45 15L40 21H24L19 15Z" fill="#e5f5fa" stroke="#a2cbd8" stroke-width="1.8"/>
+<path d="M32 6L41 15L38 18H26L23 15Z" fill="#5be8f6" stroke="#d9ffff" stroke-width="1.1"/>
+<path d="M24 17L27 12M40 17L37 12" stroke="#fbffff" stroke-width="1.2"/>
+<path d="M23 30L14 34L19 38L24 35M41 30L50 34L45 38L40 35" fill="#a0bdc8" stroke="#ecffff" stroke-width="1"/>
+<circle cx="32" cy="33" r="9.8" fill="none" stroke="#ddffff" stroke-width="1.5"/>
+<circle cx="32" cy="33" r="5.2" fill="#a7ffff" stroke="#55dfe9" stroke-width="1.6"/>
+<circle cx="32" cy="33" r="1.8" fill="#ffffff"/>
+</g>
+
+<!-- 70% upgrade: almost-complete optic with temporary calibration cradle. -->
+<g fill="none" stroke-linejoin="round" stroke-linecap="round">
+<path d="M12 16H19M45 16H52M12 48H19M45 48H52" stroke="#e2f7fa" stroke-width="2"/>
+<path d="M13 22V17H20M44 17H51V22M13 42V47H20M44 47H51V42" stroke="#74dfe8" stroke-width="1.6"/>
+<circle cx="32" cy="32" r="22" stroke="#c1f9ff" stroke-width="1.2" stroke-dasharray="3 5" opacity=".85"/>
+<path d="M30 5H34M30 59H34" stroke="#e5ffff" stroke-width="2"/>
+</g>
+</svg>

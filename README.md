@@ -1,3 +1,9 @@
+## Stealth Beacon slower scan, three coverage tiers and split upgrade art — 2026-11-05
+
+Stealth Beacon Level 1 now revolves every 4.5s (was 3s). Paid Level 2/3 retain that slower speed but expand genuine effective cone coverage to 80°/90° and radius to 280/304px, with +5% Max HP per tier, tier-specific Inspector previews and distinct native SVG fixed-base/rotating-head artwork. The existing 0/35/70% initial construction visuals are preserved; paid upgrades have new 35/70% stage composites. Core stealth indexing, rotation pause/disable handling and gameplay combat remain unchanged. [Stealth Beacon details](TOWERS/Utility/StealthBeacon/README.md). Source implemented; Godot validation pending.
+
+---
+
 ## Lightweight Gunner Drone — second visual refinement (2026-11-05)
 
 The starter Gunner's hull SVG is now **48×30** (down from 52×38), with a slimmer small-fighter silhouette; its separate gun SVG is now **12×44** (down from 20px wide and up from 40px long), using a long visible barrel and compact breech. The gun muzzle is still physically at the existing local marker **(0,-18)**, without any scene or weapon changes. **135 HP**, 18px navigation radius, projectile visuals and all firing/movement settings remain unchanged. [Gunner artwork notes](ENEMIES/Types/GunnerDrone/Artwork/README.md). Source checks only; owner visual validation pending.

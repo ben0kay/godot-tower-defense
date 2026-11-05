@@ -52,6 +52,13 @@ public partial class StealthChecks : Node
         Vector2 center = beacon.GlobalPosition;
         hidden.GlobalPosition = center + Vector2.Up * 100; normal.GlobalPosition = center + new Vector2(180,0);
         Require(hidden.IsEffectivelyStealthed && beacon.IsBusy, "Unfinished paid beacon does not reveal");
+        Require(beacon.Levels.Count == 3, "Stealth Beacon has three purchased tiers");
+        Near(beacon.Config.ScanRotationSeconds, 4.5f, "Level 1 scan rotates more slowly");
+        Near(beacon.ResolveLevel(1).ScanConeDegrees, 70f, "Level 1 full cone");
+        Near(beacon.ResolveLevel(2).ScanConeDegrees, 80f, "Level 2 expanded full cone");
+        Near(beacon.ResolveLevel(3).ScanConeDegrees, 90f, "Level 3 expanded full cone");
+        Near(beacon.ResolveLevel(2).RangePixels, 280f, "Level 2 range");
+        Near(beacon.ResolveLevel(3).RangePixels, 304f, "Level 3 range");
         float unfinishedHeading = beacon.GetNode<Node2D>("TurretPivot").Rotation;
         beacon._PhysicsProcess(.75);
         Require(beacon.GetNode<Node2D>("TurretPivot").Rotation == unfinishedHeading
@@ -86,7 +93,7 @@ public partial class StealthChecks : Node
         beacon._PhysicsProcess(.64);
         Require(hidden.IsEffectivelyStealthed && transitions == 1 && !TowerTargeting.Valid(hidden, center, 256),
             "Actual head sweep restores stealth for stationary target and invalidates cached lock");
-        beacon._PhysicsProcess(2.25);
+        beacon._PhysicsProcess(beacon.Config.ScanRotationSeconds - .75f);
         Require(!hidden.IsEffectivelyStealthed && transitions == 2, "Returning scan reveals stationary enemy again");
         hidden.Stealth.Changed -= changed;
         Require((beacon.ScanHeading - Vector2.Up).Length() < .001f, "Head and sampled heading complete one clockwise revolution");
@@ -111,7 +118,7 @@ public partial class StealthChecks : Node
 
         beacon._PhysicsProcess(.75);
         Require(hidden.Stealth.RevealCount == 1 && !hidden.IsEffectivelyStealthed, "Cone rotating away removes only its own overlapping source");
-        beacon._PhysicsProcess(2.25);
+        beacon._PhysicsProcess(beacon.Config.ScanRotationSeconds - .75f);
         var disabled = beacon.ApplyDisable(TowerDisableReason.EMP);
         Require(!hidden.IsEffectivelyStealthed && hidden.Stealth.RevealCount == 1, "Disabling one overlap retains other reveal");
         float stopped = pivot.Rotation; samples = scanSystem.DirectionUpdates;
