@@ -1,3 +1,15 @@
+## PW4-D — selected power feedback — 2026-11-05
+
+**Source Implemented / Awaiting Owner Validation.** The existing right-column ENERGY current/capacity bar remains. A compact three-line **PowerDetails** label in the Inspector Main column shows **actual Refill +X/s**, **distance-limited Limit +Y/s**, **actual Use −Z/s**, conductive distance, efficiency and connection state. Tooltips explain measured versus potential rates, authored idle/total-active draw and the recovery threshold. Full, charging, awaiting refill, supply-limited, connected/starved, disconnected/no-live-source, recharge-disabled and work-paused are distinct. Recovery is shown separately; no incoming supply does not erase stored energy.
+
+`TowerPowerInspection.cs` owns a typed derived snapshot and service samples; `PowerInspectionText.cs` owns formatting. Successful funded attack payments and settled idle energy losses are counted once; rejected ammunition and config capacity clamps are not consumption. Rates use the existing shared game-time service (default 0.25s), not an instantaneous frame estimate. Full/work/disconnected states suppress stale incoming rates; one final zero sample after activity ends lets the existing shared service return to sleep. Restore/detach resets derived samples, with no save-schema change. Pause freezes both power and its displayed samples.
+
+UI uses the existing selected-only/coalesced RuntimeChanged path and hides for build previews/non-capacitor towers/closed inspection. No new UI or per-tower processing loop, source scan, stat-grid reconstruction or allocation change. PowerPriority remains inactive with no slider; PW5 relays and additional consumers are not implemented. Existing Inspector dimensions/fonts and targeting controls are preserved; the new Main label can wrap, so desktop geometry at small resolutions remains an owner check.
+
+Focused PowerAllocationChecks now covers typed starved/full/disconnected samples, actual-versus-ceiling formatting, paid consumption and zero-rate dormancy. Authored but not executed here. Source/scene checks only; Godot/.NET unavailable, no layout/runtime/benchmark claim. Owner: inspect a selected Battle Tower charging, firing, full, behind other near consumers under shortage, without a source, during work/pause, then switch/close/reselect and check a fresh Save/Load. Check Heat/Ammo/ENERGY and the new detail lines at normal and small window sizes.
+
+---
+
 ## RT1 repair capability labels — 2026-11-05
 
 Restoration Tower's optional RepairStats uses the existing comparison/current table: **Repair (HP/s)** and Range, with **HULL REPAIR** in the header. It does not show projectile Damage/DPS, fire rate or a fictitious Kinetic type. Non-repair rows remain unchanged. No friend-policy selector, new layout, purchased tier preview or RT3 expansion is implemented. Source review only; Godot layout acceptance pending.
@@ -92,3 +104,4 @@ The width default is maintained in `InspectorPanel.tscn`, `UIMasterConfig.cs` an
 ## Selected tower defense meters (2026-10-17)
 
 The right column now uses the compact `Combat Rank: Standard` label directly above the existing XP meter; the redundant rank heading is removed. The title displays `Battle Tower · Lv 1 (Standard)` and updates on promotions and paid upgrades. Two 6px event-driven bars show selected tower hull HP and available ammunition (the latter hidden on towers without ammo). The former numeric runtime line becomes just its logistical status (e.g. `Ammo ready`); Ammo Capacity is not repeated in the left current/next/gain table. The left table continues showing Ammo/Shot or Ammo/s and other relevant level changes. Heat remains below the new defense meters. No polling or new gameplay state; `TowerPlacementController` reuses its existing selected-only `RuntimeChanged` and `ExperienceChanged` subscriptions. The 560×330 target width/height, targeting buttons and placement browser remain unchanged. Runtime UI geometry verification in Godot is pending.
+

@@ -1,3 +1,15 @@
+## PW4-D — selected power feedback — 2026-11-05
+
+**Source Implemented / Awaiting Owner Validation.** The existing right-column ENERGY current/capacity bar remains. A compact three-line **PowerDetails** label in the Inspector Main column shows **actual Refill +X/s**, **distance-limited Limit +Y/s**, **actual Use −Z/s**, conductive distance, efficiency and connection state. Tooltips explain measured versus potential rates, authored idle/total-active draw and the recovery threshold. Full, charging, awaiting refill, supply-limited, connected/starved, disconnected/no-live-source, recharge-disabled and work-paused are distinct. Recovery is shown separately; no incoming supply does not erase stored energy.
+
+`TowerPowerInspection.cs` owns a typed derived snapshot and service samples; `PowerInspectionText.cs` owns formatting. Successful funded attack payments and settled idle energy losses are counted once; rejected ammunition and config capacity clamps are not consumption. Rates use the existing shared game-time service (default 0.25s), not an instantaneous frame estimate. Full/work/disconnected states suppress stale incoming rates; one final zero sample after activity ends lets the existing shared service return to sleep. Restore/detach resets derived samples, with no save-schema change. Pause freezes both power and its displayed samples.
+
+UI uses the existing selected-only/coalesced RuntimeChanged path and hides for build previews/non-capacitor towers/closed inspection. No new UI or per-tower processing loop, source scan, stat-grid reconstruction or allocation change. PowerPriority remains inactive with no slider; PW5 relays and additional consumers are not implemented. Existing Inspector dimensions/fonts and targeting controls are preserved; the new Main label can wrap, so desktop geometry at small resolutions remains an owner check.
+
+Focused PowerAllocationChecks now covers typed starved/full/disconnected samples, actual-versus-ceiling formatting, paid consumption and zero-rate dormancy. Authored but not executed here. Source/scene checks only; Godot/.NET unavailable, no layout/runtime/benchmark claim. Owner: inspect a selected Battle Tower charging, firing, full, behind other near consumers under shortage, without a source, during work/pause, then switch/close/reselect and check a fresh Save/Load. Check Heat/Ammo/ENERGY and the new detail lines at normal and small window sizes.
+
+---
+
 ## PW4-C — distance-first scarce-supply allocation — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** The existing shared capacitor service now allocates finite island generation in ascending cached conductive-path distance, breaking ties by ordinal Tower SaveId. Every request is capped by eligible elapsed recharge at its PW4-B ceiling and remaining capacitor headroom. Unused energy goes immediately to later requests; zero supply/route/ineligible state delivers zero. Stored energy, shot spending and NoPower recovery remain independent. No priority slider or bias, new consumer, relay, balance change or save schema is introduced.
@@ -227,7 +239,7 @@ future relay changes rebuild only network unions, not terrain islands. Never sca
 | **PW1** | `Shared/PowerIslandMap.cs`, `PowerGridManager.cs`, WorldGrid conductivity, appended palette metadata, shared scene attachment and F4 diagnostics | Source implemented; check separated/diagonal land, bridges, erasure, Foundation/Lava/wall precedence, unchanged rebuilds, occupancy and level teardown. No generation or shutdown. |
 | **PW2** | Shared producer/demand accounting + configurable Citadel baseline registration | Source implemented / owner validation pending. DefaultCitadelPower.tres Output=100 provisional; event-driven source lifetime, per-island cached totals and F4 accounting. No actual consumers/outages yet. Check multiple Citadels, isolation, death/removal and a new Save/Load. |
 | **PW3** | Shared generator/config in `Shared/`, Industrial scene/config/art in its type folder | Source implemented / owner validation pending. `industrial_generator` in Economy, provisional 250 output / 300 Credits / 5s / 1200 HP / 2×2, assembly stages, work/disable/lifetime registration and existing checkpoint reconstruction. |
-| **PW4-A–D** | Tower buffers and charge/use (A); cached distance recharge (B); distance-first finite supply allocation (C); Inspector stored-energy bar/rates (D) | **PW4-A/B/C source implemented / owner validation pending; remaining D planned.** Follow the authoritative PW4 subpass table above. Protect existing power topology and generator output. |
+| **PW4-A–D** | Tower buffers and charge/use (A); cached distance recharge (B); distance-first finite supply allocation (C); Inspector stored-energy bar/rates (D) | **PW4-A/B/C/D source implemented / owner validation pending.** Follow the authoritative PW4 subpass table above. Protect existing power topology and generator output. |
 | **PW5** | Non-generating local distribution booster plus optional manually paired relays bridging isolated islands | Planned. Boost local recharge efficiency without creating energy; preserve finite shared production and safe network merges/splits. See the PW4 revision above. |
 | **PW6** | Solar/Fusion variants, shared status feedback and tuning | Planned. Distinct IDs/configs, one producer implementation; readable capacity/shortage feedback and measured desktop cost. |
 
@@ -242,4 +254,5 @@ Focused source/resource checks only in this environment; no .NET/Godot executabl
 No runtime pass, FPS improvement or visual acceptance is claimed. See `TESTS/Power/README.md`
 for the focused fixture and a short in-editor check. Existing authored missions, tiles' previous
 gameplay flags, waves, costs, combat and tower operation are preserved.
+
 

@@ -20,13 +20,20 @@ internal static class PowerAllocationChecks
             Near(Energy(c), 0, "Reachable far tower can receive zero under scarcity");
             Near(c.Power.RechargeCeilingPerSecond, 5, "Potential ceiling remains positive while starved");
             Near(c.Power.LastDeliveredRefillPerSecond, 0, "Actual delivery is distinct from ceiling");
+            var starved = c.Power.Inspect();
+            Require(starved.State == PowerDeliveryState.Starved && starved.Received == 0 && starved.Possible == 5
+                && starved.Distance > 0 && starved.Efficiency == 1, "PW4-D distinguishes connected/starved from disconnected");
+            Require(PowerInspectionText.Details(starved).Contains("STARVED")
+                && PowerInspectionText.Details(starved).Contains("Limit +5/s"), "Typed Inspector formats actual versus potential");
             int sorts = power.AllocationOrderRebuildCount, bfs = power.DistanceRebuildCount;
             a.Power.SetPriority(0); c.Power.SetPriority(100); power._PhysicsProcess(1);
             Near(Energy(a), 10, "Priority metadata cannot override proximity"); Near(Energy(c), 0, "Far high-priority metadata stays dormant");
             Require(power.AllocationOrderRebuildCount == sorts && power.DistanceRebuildCount == bfs,
                 "Unchanged service steps reuse sort and distance caches");
             Restore(a, 99); double before = Sum(); power._PhysicsProcess(1);
-            Near(Energy(a), 100, "Near request is limited by headroom"); Near(Energy(b), 15, "Middle keeps full request");
+            Near(Energy(a), 100, "Near request is limited by headroom");
+            Require(a.Power.Inspect().State == PowerDeliveryState.Full && a.Power.Inspect().Received == 0,
+                "Full buffer does not display stale incoming refill"); Near(Energy(b), 15, "Middle keeps full request");
             Near(Energy(c), 4, "Unused near allocation reaches far tower in the same interval");
             Near(Sum() - before, 10, "Credited refill conserves the finite island budget");
             power.SetProducer("allocation:source", near, Vector2I.One, 20);
@@ -53,11 +60,19 @@ internal static class PowerAllocationChecks
             c.Power.Publish(); double stored = Energy(c);
             power.RemoveEndpoint("allocation:source"); before = Sum(); power._PhysicsProcess(1);
             Near(Sum(), before, "Source removal preserves all stored energy without phantom refill");
+            var disconnected = c.Power.Inspect();
+            Require(disconnected.State == PowerDeliveryState.Disconnected && disconnected.Received == 0
+                && disconnected.Possible == 0, "Lost source/route never presents stale delivery");
+            Near(disconnected.Consumed, 1.2, "Paid attack energy is counted once in the actual-use sample");
             power.SetProducer("allocation:source", near, Vector2I.One, 5); power._PhysicsProcess(1);
             Near(Energy(c), stored, "Source restoration never credits a disconnected island");
             before = Sum(); world.GetTree().Paused = true;
             try { power._PhysicsProcess(1); } finally { world.GetTree().Paused = false; }
             Near(Sum(), before, "Paused time produces no allocation");
+            Restore(a, 100); Restore(b, 100);
+            power._PhysicsProcess(1);
+            Require(a.Power.Inspect().Received == 0 && c.Power.Inspect().Consumed == 0
+                && !power.IsPhysicsProcessing(), "Rates settle to zero and shared service returns to sleep");
         }
         finally
         {
@@ -78,3 +93,4 @@ internal static class PowerAllocationChecks
     private static void Near(double actual, double expected, string message) => Require(Math.Abs(actual - expected) < 1e-8, message);
     private static void Require(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
 }
+
