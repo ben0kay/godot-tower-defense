@@ -6,6 +6,6 @@
 [resource]
 script = ExtResource("config")
 StartingCredits = 4000
-ActivePortals = Array[NodePath]([NodePath("Portals/EnemyPortal1")])
+ActivePortals = Array[NodePath]([NodePath("Portals/EnemyPortal1"), NodePath("Portals/EnemyPortal2"), NodePath("Portals/EnemyPortal3")])
 WaveSource = ExtResource("waves")
 WaveSetId = "level011"

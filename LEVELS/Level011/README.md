@@ -1,26 +1,31 @@
-# Level011 — large authoring map
+# Level011 — Three-Lane Fleet Defence
 
-**Source implemented / awaiting owner validation (2026-11-05).** Now inherits `LEVELS/Shared/BaseLevelMap.tscn`, with four local editable terrain layers and independent objects/settings. The shared base owns common structure/background/debug. A focused before/after property comparison preserved every original node property, terrain layer and instance reference; no runtime test was run for this migration.
+## Waves 1–5 (2026-11-05)
 
-- **192 × 120 cells at 64px** = **12,288 × 7,680 world pixels**. `Level011WorldConfig.tres` is used only by this mission through `Level011Config.WorldConfig`. Existing levels still use `WORLD/DefaultWorldConfig.tres` (100 × 80).
-- **Local and paintable:** Passable, Impassable, Interactive and Decorations remain independently editable. The initially blank map now contains owner-authored terrain. All original TileSet references, background hierarchy, optional atmosphere, checkpoints and F2/F3 debug tools from the template are present.
-- **One movable portal** `Portals/EnemyPortal1` at (2080,3872) and **one movable Citadel** `Objectives/Citadel` at (8224,3872). These are initial positions, not a prescribed map design. Portal/Citadel footprints and approach markers come from their existing shared scenes.
-- **Dedicated settings:** `Level011Config.tres` with 2,000 starting Credits, 1,000 Citadel HP, a single active portal and unique `level011` wave ID. Edit this file for settings, portal NodePaths and new CitadelPaths. Do not edit the common World config when tuning Level011's bounds.
-- **Editable placeholder wave:** `Level011Waves.tres` has one short 10-Standard-Drone batch purely to let you test a painted route. Customize it in the existing Wave Editor; no other mission's waves are changed.
-- **Campaign:** `Level011Mission.tres` is enabled as mission 11. Launch via Campaign list; it does not become Level003's Next because missions 004–010 do not exist. No new launcher/world scene needed.
+**Source Implemented / Awaiting Owner Gameplay Validation.** The current painted **192×120** map (64px cells = 12,288×7,680 world pixels) retains its existing terrain, background, route checkpoints, three portal positions, Citadel, and independent WorldConfig. This pass changes only the Level011 wave resource, local active-portal list, mission description and this README.
 
-## Right-edge bounds correction — 2026-11-05
+| Wave | Name | Scheduled | Content |
+| --- | --- | ---: | --- |
+| 1 | Three-Lane Contact | 54 | Standard Drones and Swift Interceptors from all three entrances |
+| 2 | Interceptor Wings | 84 | Reinforced/Racer ships, Gunner Drones and Shield Emitters |
+| 3 | Crossfire Formation | 120 | Bulwarks, Heavy Gunners, shielded Shield Frigates and fast flanking groups |
+| 4 | Armoured Breakthrough | 162 | Heavy Bulwarks, Elite Assault Ships and two Drone Transporters |
+| 5 | Fleet Spearhead | 204 | A shielded Cruiser, three Heavy Warships, a Heavy Transporter and varied escorts |
+| **Total** | **First half of ten-wave plan** | **624** | Plus transported drones/interceptors released on death |
 
-Level011's authored terrain now reaches cell X=175 and its Citadel is at X=10336px, beyond the old 160-cell/10240px limit. Its local WorldConfig is now **192×120** (12288×7680px), with room around the current right edge. Camera, navigation, power and placement all reuse these bounds; no camera code, scene paint, objects or global defaults changed. Restart/redeploy the mission to rebuild its grids. Brief source/coordinate comparison only; gameplay not run.
+The authored `Level011Waves.tres` remains a native editable `WaveSetResource` for the existing **Wave Editor**. Each batch uses explicit `Portals/EnemyPortal1` (upper), `Portals/EnemyPortal2` (middle), or `Portals/EnemyPortal3` (lower). Batches may mix entries from multiple lanes; exact weighted enemy quotas are deterministically shuffled by the existing scheduler. Intervals and pauses vary, and several entries opt into shields. All 15 registered enemy types appear across the five waves: Tiny, Light, Standard, Heavy and Superheavy physical Classes. **Capital and Titan have no registered ships yet.**
 
-## Painting
+**Important:** only waves 1–5 are authored. The game will currently award mission victory after clearing wave 5; waves 6–10 can be appended later as heavier encounters. Carrier DeathSpawn children can increase the real enemy total beyond 624. Counts, timing, bonuses, waves and difficulty are provisional until you test them; no global enemy/tower balance changed.
 
-1. Open `res://LEVELS/Level011/Level011.tscn` in the Godot 2D editor.
-2. Paint connected Passable cells between the portal's spawn exit and the Citadel's approach points. Add Impassable/Interactive/Decorations as desired. Empty terrain is intentionally unbuildable and cannot route enemies.
-3. Move/add Portals or Citadels freely, updating `Level011Config.tres` references as required. Keep objects and their approach/spawn markers on the 64px grid.
-4. Launch from Campaign and run the short wave after you have a valid route.
+## Existing map and editing
 
-**Design note:** `LevelConfig.WorldConfig` is optional. `WorldMapLoader` applies it to the existing shared `World/Grid` before navigation/grid initialization. It does not introduce new gameplay services, extra processing or any map streaming. The 192×120 grid has 2.88× the cell count of existing maps; check navigation, power and camera performance in Godot before enlarging it again.
+- **Map dimensions:** `Level011WorldConfig.tres` = 192×120 cells at 64px, leaving all other maps' dimensions unchanged.
+- **Inheritance:** `Level011.tscn` inherits `LEVELS/Shared/BaseLevelMap.tscn`, with four level-local paintable TileMapLayers; its authored terrain is untouched.
+- **Existing routes:** upper portal at (1504,2016), middle at (1504,3424), lower at (1440,4832). Each portal references its own `Checkpoints/RouteCheckpoint*` chain. Do not rename portal paths without updating the config and wave entry selectors.
+- **Citadel:** `Objectives/Citadel` at (10336,3488), unchanged.
+- **Level config:** `Level011Config.tres` has three active portals, 2,000 starting Credits, 1,000 Citadel HP and wave ID `level011`.
+- **Campaign:** `Level011Mission.tres` remains enabled and deploys through shared Battlefield/World services.
 
-**Validation:** source/resource shape reviewed only; Godot import/playback and desktop performance remain owner-side.
+To rebalance, enable the existing Godot Wave Editor, open `res://LEVELS/Level011/Level011Waves.tres`, change batches/enemies and Save. For map edits open `res://LEVELS/Level011/Level011.tscn` in the 2D editor. Confirm all three routes are reachable before judging balance. Wave 6 onward should shift toward more Heavy/Superheavy ships, with Capital/Titan only after those types actually exist.
 
+**Validation:** source/resource structure reviewed; Godot editor import, active portal reachability, in-game performance and balance not tested here.

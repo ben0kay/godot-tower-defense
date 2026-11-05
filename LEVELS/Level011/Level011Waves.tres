@@ -5,18 +5,614 @@
 [ext_resource type="Script" uid="uid://di5hkaslgameh" path="res://LEVELS/Waves/Resources/WaveSetResource.cs" id="set"]
 [ext_resource type="Script" uid="uid://cqqx733te7g78" path="res://LEVELS/Waves/Resources/WaveResource.cs" id="wave"]
 
-[sub_resource type="Resource" id="basic"]
+[sub_resource type="Resource" id="W1B1E1"]
 script = ExtResource("enemy")
+EnemyId = "basic_mk1"
+Weight = 12.0
+Portal = "Portals/EnemyPortal1"
 
-[sub_resource type="Resource" id="batch1"]
+[sub_resource type="Resource" id="W1B1E2"]
+script = ExtResource("enemy")
+EnemyId = "scout_mk1"
+Weight = 6.0
+Portal = "Portals/EnemyPortal1"
+
+[sub_resource type="Resource" id="W1B1"]
 script = ExtResource("batch")
-Interval = 0.85
-Enemies = Array[ExtResource("enemy")]([SubResource("basic")])
+Count = 18
+Interval = 0.65
+After = 2.00
+Enemies = Array[ExtResource("enemy")]([SubResource("W1B1E1"), SubResource("W1B1E2")])
 
-[sub_resource type="Resource" id="wave1"]
+[sub_resource type="Resource" id="W1B2E1"]
+script = ExtResource("enemy")
+EnemyId = "basic_mk1"
+Weight = 12.0
+Portal = "Portals/EnemyPortal2"
+
+[sub_resource type="Resource" id="W1B2E2"]
+script = ExtResource("enemy")
+EnemyId = "scout_mk1"
+Weight = 6.0
+Portal = "Portals/EnemyPortal2"
+
+[sub_resource type="Resource" id="W1B2"]
+script = ExtResource("batch")
+Count = 18
+Interval = 0.60
+After = 2.00
+Enemies = Array[ExtResource("enemy")]([SubResource("W1B2E1"), SubResource("W1B2E2")])
+
+[sub_resource type="Resource" id="W1B3E1"]
+script = ExtResource("enemy")
+EnemyId = "basic_mk1"
+Weight = 12.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W1B3E2"]
+script = ExtResource("enemy")
+EnemyId = "scout_mk1"
+Weight = 6.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W1B3"]
+script = ExtResource("batch")
+Count = 18
+Interval = 0.55
+After = 0.00
+Enemies = Array[ExtResource("enemy")]([SubResource("W1B3E1"), SubResource("W1B3E2")])
+
+[sub_resource type="Resource" id="W1"]
 script = ExtResource("wave")
-Batches = Array[ExtResource("batch")]([SubResource("batch1")])
+Number = 1
+BannerTitle = "Three-Lane Contact"
+BannerDescription = "Light drone formations probe all three approaches."
+Batches = Array[ExtResource("batch")]([SubResource("W1B1"), SubResource("W1B2"), SubResource("W1B3")])
+
+[sub_resource type="Resource" id="W2B1E1"]
+script = ExtResource("enemy")
+EnemyId = "basic_mk1"
+Weight = 12.0
+Portal = "Portals/EnemyPortal1"
+
+[sub_resource type="Resource" id="W2B1E2"]
+script = ExtResource("enemy")
+EnemyId = "reinforced_drone_mk1"
+Weight = 6.0
+Portal = "Portals/EnemyPortal1"
+
+[sub_resource type="Resource" id="W2B1E3"]
+script = ExtResource("enemy")
+EnemyId = "racer_mk1"
+Weight = 6.0
+Portal = "Portals/EnemyPortal1"
+
+[sub_resource type="Resource" id="W2B1"]
+script = ExtResource("batch")
+Count = 24
+Interval = 0.55
+After = 1.50
+Enemies = Array[ExtResource("enemy")]([SubResource("W2B1E1"), SubResource("W2B1E2"), SubResource("W2B1E3")])
+
+[sub_resource type="Resource" id="W2B2E1"]
+script = ExtResource("enemy")
+EnemyId = "basic_mk1"
+Weight = 12.0
+Portal = "Portals/EnemyPortal2"
+
+[sub_resource type="Resource" id="W2B2E2"]
+script = ExtResource("enemy")
+EnemyId = "gunner_drone_mk1"
+Weight = 12.0
+Portal = "Portals/EnemyPortal2"
+
+[sub_resource type="Resource" id="W2B2E3"]
+script = ExtResource("enemy")
+EnemyId = "shield_emitter_mk1"
+Weight = 6.0
+Portal = "Portals/EnemyPortal2"
+
+[sub_resource type="Resource" id="W2B2"]
+script = ExtResource("batch")
+Count = 30
+Interval = 0.55
+After = 1.50
+Enemies = Array[ExtResource("enemy")]([SubResource("W2B2E1"), SubResource("W2B2E2"), SubResource("W2B2E3")])
+
+[sub_resource type="Resource" id="W2B3E1"]
+script = ExtResource("enemy")
+EnemyId = "scout_mk1"
+Weight = 12.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W2B3E2"]
+script = ExtResource("enemy")
+EnemyId = "racer_mk1"
+Weight = 12.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W2B3E3"]
+script = ExtResource("enemy")
+EnemyId = "reinforced_drone_mk1"
+Weight = 6.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W2B3"]
+script = ExtResource("batch")
+Count = 30
+Interval = 0.50
+After = 0.00
+Enemies = Array[ExtResource("enemy")]([SubResource("W2B3E1"), SubResource("W2B3E2"), SubResource("W2B3E3")])
+
+[sub_resource type="Resource" id="W2"]
+script = ExtResource("wave")
+Number = 2
+BannerTitle = "Interceptor Wings"
+BannerDescription = "Fast skirmishers, armed drones and shield support attack three lanes."
+Batches = Array[ExtResource("batch")]([SubResource("W2B1"), SubResource("W2B2"), SubResource("W2B3")])
+
+[sub_resource type="Resource" id="W3B1E1"]
+script = ExtResource("enemy")
+EnemyId = "basic_mk1"
+Weight = 10.0
+Portal = "Portals/EnemyPortal1"
+
+[sub_resource type="Resource" id="W3B1E2"]
+script = ExtResource("enemy")
+EnemyId = "reinforced_drone_mk1"
+Weight = 10.0
+Portal = "Portals/EnemyPortal1"
+
+[sub_resource type="Resource" id="W3B1E3"]
+script = ExtResource("enemy")
+EnemyId = "medium_mk1"
+Weight = 5.0
+Portal = "Portals/EnemyPortal1"
+
+[sub_resource type="Resource" id="W3B1E4"]
+script = ExtResource("enemy")
+EnemyId = "shield_emitter_mk1"
+Weight = 5.0
+Portal = "Portals/EnemyPortal1"
+
+[sub_resource type="Resource" id="W3B1"]
+script = ExtResource("batch")
+Count = 30
+Interval = 0.48
+After = 1.50
+Enemies = Array[ExtResource("enemy")]([SubResource("W3B1E1"), SubResource("W3B1E2"), SubResource("W3B1E3"), SubResource("W3B1E4")])
+
+[sub_resource type="Resource" id="W3B2E1"]
+script = ExtResource("enemy")
+EnemyId = "scout_mk1"
+Weight = 12.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W3B2E2"]
+script = ExtResource("enemy")
+EnemyId = "racer_mk1"
+Weight = 12.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W3B2E3"]
+script = ExtResource("enemy")
+EnemyId = "gunner_drone_mk1"
+Weight = 6.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W3B2"]
+script = ExtResource("batch")
+Count = 30
+Interval = 0.45
+After = 1.50
+Enemies = Array[ExtResource("enemy")]([SubResource("W3B2E1"), SubResource("W3B2E2"), SubResource("W3B2E3")])
+
+[sub_resource type="Resource" id="W3B3E1"]
+script = ExtResource("enemy")
+EnemyId = "medium_mk1"
+Weight = 10.0
+Portal = "Portals/EnemyPortal2"
+
+[sub_resource type="Resource" id="W3B3E2"]
+script = ExtResource("enemy")
+EnemyId = "gunner_drone_mk1"
+Weight = 10.0
+Portal = "Portals/EnemyPortal2"
+
+[sub_resource type="Resource" id="W3B3E3"]
+script = ExtResource("enemy")
+EnemyId = "heavy_gunner_drone_mk1"
+Weight = 5.0
+Portal = "Portals/EnemyPortal2"
+
+[sub_resource type="Resource" id="W3B3E4"]
+script = ExtResource("enemy")
+EnemyId = "shield_frigate_mk1"
+Weight = 5.0
+Portal = "Portals/EnemyPortal2"
+Shield = true
+
+[sub_resource type="Resource" id="W3B3"]
+script = ExtResource("batch")
+Count = 30
+Interval = 0.55
+After = 1.00
+Enemies = Array[ExtResource("enemy")]([SubResource("W3B3E1"), SubResource("W3B3E2"), SubResource("W3B3E3"), SubResource("W3B3E4")])
+
+[sub_resource type="Resource" id="W3B4E1"]
+script = ExtResource("enemy")
+EnemyId = "reinforced_drone_mk1"
+Weight = 10.0
+Portal = "Portals/EnemyPortal1"
+
+[sub_resource type="Resource" id="W3B4E2"]
+script = ExtResource("enemy")
+EnemyId = "medium_mk1"
+Weight = 10.0
+Portal = "Portals/EnemyPortal2"
+
+[sub_resource type="Resource" id="W3B4E3"]
+script = ExtResource("enemy")
+EnemyId = "racer_mk1"
+Weight = 10.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W3B4"]
+script = ExtResource("batch")
+Count = 30
+Interval = 0.48
+After = 0.00
+Enemies = Array[ExtResource("enemy")]([SubResource("W3B4E1"), SubResource("W3B4E2"), SubResource("W3B4E3")])
+
+[sub_resource type="Resource" id="W3"]
+script = ExtResource("wave")
+Number = 3
+BannerTitle = "Crossfire Formation"
+BannerDescription = "Bulwarks and veteran gunships support rapid flanking attacks."
+Batches = Array[ExtResource("batch")]([SubResource("W3B1"), SubResource("W3B2"), SubResource("W3B3"), SubResource("W3B4")])
+
+[sub_resource type="Resource" id="W4B1E1"]
+script = ExtResource("enemy")
+EnemyId = "reinforced_drone_mk1"
+Weight = 12.0
+Portal = "Portals/EnemyPortal1"
+
+[sub_resource type="Resource" id="W4B1E2"]
+script = ExtResource("enemy")
+EnemyId = "medium_mk1"
+Weight = 12.0
+Portal = "Portals/EnemyPortal1"
+
+[sub_resource type="Resource" id="W4B1E3"]
+script = ExtResource("enemy")
+EnemyId = "heavy_bulwark_mk1"
+Weight = 6.0
+Portal = "Portals/EnemyPortal1"
+
+[sub_resource type="Resource" id="W4B1E4"]
+script = ExtResource("enemy")
+EnemyId = "shield_frigate_mk1"
+Weight = 6.0
+Portal = "Portals/EnemyPortal1"
+Shield = true
+
+[sub_resource type="Resource" id="W4B1"]
+script = ExtResource("batch")
+Count = 36
+Interval = 0.48
+After = 1.50
+Enemies = Array[ExtResource("enemy")]([SubResource("W4B1E1"), SubResource("W4B1E2"), SubResource("W4B1E3"), SubResource("W4B1E4")])
+
+[sub_resource type="Resource" id="W4B2E1"]
+script = ExtResource("enemy")
+EnemyId = "gunner_drone_mk1"
+Weight = 12.0
+Portal = "Portals/EnemyPortal2"
+
+[sub_resource type="Resource" id="W4B2E2"]
+script = ExtResource("enemy")
+EnemyId = "heavy_gunner_drone_mk1"
+Weight = 12.0
+Portal = "Portals/EnemyPortal2"
+
+[sub_resource type="Resource" id="W4B2E3"]
+script = ExtResource("enemy")
+EnemyId = "medium_mk1"
+Weight = 6.0
+Portal = "Portals/EnemyPortal2"
+
+[sub_resource type="Resource" id="W4B2E4"]
+script = ExtResource("enemy")
+EnemyId = "shield_emitter_mk1"
+Weight = 6.0
+Portal = "Portals/EnemyPortal2"
+
+[sub_resource type="Resource" id="W4B2"]
+script = ExtResource("batch")
+Count = 36
+Interval = 0.45
+After = 1.50
+Enemies = Array[ExtResource("enemy")]([SubResource("W4B2E1"), SubResource("W4B2E2"), SubResource("W4B2E3"), SubResource("W4B2E4")])
+
+[sub_resource type="Resource" id="W4B3E1"]
+script = ExtResource("enemy")
+EnemyId = "racer_mk1"
+Weight = 12.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W4B3E2"]
+script = ExtResource("enemy")
+EnemyId = "scout_mk1"
+Weight = 6.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W4B3E3"]
+script = ExtResource("enemy")
+EnemyId = "elite_mk1"
+Weight = 6.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W4B3E4"]
+script = ExtResource("enemy")
+EnemyId = "gunner_drone_mk1"
+Weight = 12.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W4B3"]
+script = ExtResource("batch")
+Count = 36
+Interval = 0.42
+After = 2.00
+Enemies = Array[ExtResource("enemy")]([SubResource("W4B3E1"), SubResource("W4B3E2"), SubResource("W4B3E3"), SubResource("W4B3E4")])
+
+[sub_resource type="Resource" id="W4B4E1"]
+script = ExtResource("enemy")
+EnemyId = "transporter_mk1"
+Weight = 2.0
+Portal = "Portals/EnemyPortal1"
+
+[sub_resource type="Resource" id="W4B4E2"]
+script = ExtResource("enemy")
+EnemyId = "medium_mk1"
+Weight = 14.0
+Portal = "Portals/EnemyPortal1"
+
+[sub_resource type="Resource" id="W4B4E3"]
+script = ExtResource("enemy")
+EnemyId = "heavy_gunner_drone_mk1"
+Weight = 12.0
+Portal = "Portals/EnemyPortal2"
+
+[sub_resource type="Resource" id="W4B4E4"]
+script = ExtResource("enemy")
+EnemyId = "shield_frigate_mk1"
+Weight = 6.0
+Portal = "Portals/EnemyPortal2"
+Shield = true
+
+[sub_resource type="Resource" id="W4B4E5"]
+script = ExtResource("enemy")
+EnemyId = "racer_mk1"
+Weight = 12.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W4B4E6"]
+script = ExtResource("enemy")
+EnemyId = "heavy_bulwark_mk1"
+Weight = 8.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W4B4"]
+script = ExtResource("batch")
+Count = 54
+Interval = 0.55
+After = 0.00
+Enemies = Array[ExtResource("enemy")]([SubResource("W4B4E1"), SubResource("W4B4E2"), SubResource("W4B4E3"), SubResource("W4B4E4"), SubResource("W4B4E5"), SubResource("W4B4E6")])
+
+[sub_resource type="Resource" id="W4"]
+script = ExtResource("wave")
+Number = 4
+Alert = 1
+BannerTitle = "Armoured Breakthrough"
+BannerDescription = "Veteran escorts screen elite assault ships and the first drone carriers."
+Batches = Array[ExtResource("batch")]([SubResource("W4B1"), SubResource("W4B2"), SubResource("W4B3"), SubResource("W4B4")])
+
+[sub_resource type="Resource" id="W5B1E1"]
+script = ExtResource("enemy")
+EnemyId = "reinforced_drone_mk1"
+Weight = 15.0
+Portal = "Portals/EnemyPortal1"
+
+[sub_resource type="Resource" id="W5B1E2"]
+script = ExtResource("enemy")
+EnemyId = "medium_mk1"
+Weight = 15.0
+Portal = "Portals/EnemyPortal1"
+
+[sub_resource type="Resource" id="W5B1E3"]
+script = ExtResource("enemy")
+EnemyId = "heavy_bulwark_mk1"
+Weight = 9.0
+Portal = "Portals/EnemyPortal1"
+
+[sub_resource type="Resource" id="W5B1E4"]
+script = ExtResource("enemy")
+EnemyId = "shield_frigate_mk1"
+Weight = 6.0
+Portal = "Portals/EnemyPortal1"
+Shield = true
+
+[sub_resource type="Resource" id="W5B1"]
+script = ExtResource("batch")
+Count = 45
+Interval = 0.45
+After = 1.50
+Enemies = Array[ExtResource("enemy")]([SubResource("W5B1E1"), SubResource("W5B1E2"), SubResource("W5B1E3"), SubResource("W5B1E4")])
+
+[sub_resource type="Resource" id="W5B2E1"]
+script = ExtResource("enemy")
+EnemyId = "scout_mk1"
+Weight = 15.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W5B2E2"]
+script = ExtResource("enemy")
+EnemyId = "racer_mk1"
+Weight = 15.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W5B2E3"]
+script = ExtResource("enemy")
+EnemyId = "gunner_drone_mk1"
+Weight = 10.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W5B2E4"]
+script = ExtResource("enemy")
+EnemyId = "elite_mk1"
+Weight = 5.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W5B2"]
+script = ExtResource("batch")
+Count = 45
+Interval = 0.38
+After = 1.50
+Enemies = Array[ExtResource("enemy")]([SubResource("W5B2E1"), SubResource("W5B2E2"), SubResource("W5B2E3"), SubResource("W5B2E4")])
+
+[sub_resource type="Resource" id="W5B3E1"]
+script = ExtResource("enemy")
+EnemyId = "heavy_gunner_drone_mk1"
+Weight = 15.0
+Portal = "Portals/EnemyPortal2"
+
+[sub_resource type="Resource" id="W5B3E2"]
+script = ExtResource("enemy")
+EnemyId = "gunner_drone_mk1"
+Weight = 15.0
+Portal = "Portals/EnemyPortal2"
+
+[sub_resource type="Resource" id="W5B3E3"]
+script = ExtResource("enemy")
+EnemyId = "shield_emitter_mk1"
+Weight = 10.0
+Portal = "Portals/EnemyPortal2"
+
+[sub_resource type="Resource" id="W5B3E4"]
+script = ExtResource("enemy")
+EnemyId = "elite_mk1"
+Weight = 5.0
+Portal = "Portals/EnemyPortal2"
+
+[sub_resource type="Resource" id="W5B3"]
+script = ExtResource("batch")
+Count = 45
+Interval = 0.42
+After = 2.00
+Enemies = Array[ExtResource("enemy")]([SubResource("W5B3E1"), SubResource("W5B3E2"), SubResource("W5B3E3"), SubResource("W5B3E4")])
+
+[sub_resource type="Resource" id="W5B4E1"]
+script = ExtResource("enemy")
+EnemyId = "big_mk1"
+Weight = 3.0
+Portal = "Portals/EnemyPortal1"
+
+[sub_resource type="Resource" id="W5B4E2"]
+script = ExtResource("enemy")
+EnemyId = "cruiser_mk1"
+Weight = 1.0
+Portal = "Portals/EnemyPortal2"
+Shield = true
+
+[sub_resource type="Resource" id="W5B4E3"]
+script = ExtResource("enemy")
+EnemyId = "heavy_transporter_mk1"
+Weight = 1.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W5B4E4"]
+script = ExtResource("enemy")
+EnemyId = "medium_mk1"
+Weight = 10.0
+Portal = "Portals/EnemyPortal1"
+
+[sub_resource type="Resource" id="W5B4E5"]
+script = ExtResource("enemy")
+EnemyId = "heavy_gunner_drone_mk1"
+Weight = 10.0
+Portal = "Portals/EnemyPortal2"
+
+[sub_resource type="Resource" id="W5B4E6"]
+script = ExtResource("enemy")
+EnemyId = "racer_mk1"
+Weight = 10.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W5B4E7"]
+script = ExtResource("enemy")
+EnemyId = "reinforced_drone_mk1"
+Weight = 10.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W5B4"]
+script = ExtResource("batch")
+Count = 45
+Interval = 0.65
+After = 2.50
+Enemies = Array[ExtResource("enemy")]([SubResource("W5B4E1"), SubResource("W5B4E2"), SubResource("W5B4E3"), SubResource("W5B4E4"), SubResource("W5B4E5"), SubResource("W5B4E6"), SubResource("W5B4E7")])
+
+[sub_resource type="Resource" id="W5B5E1"]
+script = ExtResource("enemy")
+EnemyId = "heavy_bulwark_mk1"
+Weight = 6.0
+Portal = "Portals/EnemyPortal1"
+
+[sub_resource type="Resource" id="W5B5E2"]
+script = ExtResource("enemy")
+EnemyId = "gunner_drone_mk1"
+Weight = 2.0
+Portal = "Portals/EnemyPortal1"
+
+[sub_resource type="Resource" id="W5B5E3"]
+script = ExtResource("enemy")
+EnemyId = "heavy_gunner_drone_mk1"
+Weight = 6.0
+Portal = "Portals/EnemyPortal2"
+
+[sub_resource type="Resource" id="W5B5E4"]
+script = ExtResource("enemy")
+EnemyId = "shield_frigate_mk1"
+Weight = 2.0
+Portal = "Portals/EnemyPortal2"
+Shield = true
+
+[sub_resource type="Resource" id="W5B5E5"]
+script = ExtResource("enemy")
+EnemyId = "elite_mk1"
+Weight = 3.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W5B5E6"]
+script = ExtResource("enemy")
+EnemyId = "reinforced_drone_mk1"
+Weight = 5.0
+Portal = "Portals/EnemyPortal3"
+
+[sub_resource type="Resource" id="W5B5"]
+script = ExtResource("batch")
+Count = 24
+Interval = 0.45
+After = 0.00
+Enemies = Array[ExtResource("enemy")]([SubResource("W5B5E1"), SubResource("W5B5E2"), SubResource("W5B5E3"), SubResource("W5B5E4"), SubResource("W5B5E5"), SubResource("W5B5E6")])
+
+[sub_resource type="Resource" id="W5"]
+script = ExtResource("wave")
+Number = 5
+Alert = 1
+BannerTitle = "Fleet Spearhead"
+BannerDescription = "A mass assault culminates in cruisers, warships and heavy transports."
+Batches = Array[ExtResource("batch")]([SubResource("W5B1"), SubResource("W5B2"), SubResource("W5B3"), SubResource("W5B4"), SubResource("W5B5")])
 
 [resource]
 script = ExtResource("set")
-Waves = Array[ExtResource("wave")]([SubResource("wave1")])
+Waves = Array[ExtResource("wave")]([SubResource("W1"), SubResource("W2"), SubResource("W3"), SubResource("W4"), SubResource("W5")])
