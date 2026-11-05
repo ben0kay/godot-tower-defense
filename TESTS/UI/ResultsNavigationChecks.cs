@@ -45,6 +45,7 @@ internal static class ResultsNavigationChecks
             && retry.GetNode<LevelSessionController>("LevelSession").State == LevelSessionState.Playing,
             "Retry replaces the actual current launcher, unpaused and fresh");
         // A win follows enabled consecutive missions; Level020 remains a separate direct destination.
+        retry.GetNode<LevelSessionController>("LevelSession").VictoryResultsDelaySeconds = 0;
         WaveManager waves = retry.GetNode<WaveManager>("Waves"); SpawnManager spawns = retry.GetNode<SpawnManager>("World/EnemySystems/Spawning");
         waves.Configure(new[] { WaveBuilder.Wave(1, WaveBuilder.Batch(1, 0, 0, WaveBuilder.Enemy("basic_mk1"))) }, spawns.Catalog.ToSceneMap());
         Require(waves.StartWave(), "Navigation fixture starts a real wave"); spawns.Registry.Living[0].TakeDamage(999999);
@@ -53,6 +54,7 @@ internal static class ResultsNavigationChecks
         Require(!results.PrimaryButton.Disabled, "Level001 advances to the playable tutorial Level002");
         results.PrimaryButton.EmitSignal(Button.SignalName.Pressed);
         Node next = await Scene<Node2D>(owner);
+        next.GetNode<LevelSessionController>("LevelSession").VictoryResultsDelaySeconds = 0;
         Require(next.SceneFilePath == MenuNavigation.Level002Scene && !tree.Paused && next.GetNode<CitadelSession>("CitadelSession").Health.CurrentHealth > 0,
             "Next loads the tutorial Level002 battlefield, never the raw map");
         // The tutorial can now advance to the editable Level003 mission after victory.

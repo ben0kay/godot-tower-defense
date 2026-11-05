@@ -17,6 +17,7 @@ internal sealed class MissionFixture : IDisposable
     internal MissionFixture(Node parent, string path = MenuNavigation.Level001Scene)
     {
         Main = GD.Load<PackedScene>(path).Instantiate(); parent.AddChild(Main); StopTicks(Main);
+        Session.VictoryResultsDelaySeconds = 0; // Outcome/reward fixtures intentionally skip the presentation-only hold.
         Results.StatRevealSeconds = .05f; Results.StatGapSeconds = 0;
     }
     private static void StopTicks(Node node)

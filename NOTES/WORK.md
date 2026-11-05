@@ -1,3 +1,9 @@
+## Victory Results hold — 2026-11-05
+
+LevelSessionController now holds the frozen winning battlefield for **4 seconds** before showing Mission Results. Configure `LevelSession → VictoryResultsDelaySeconds` in the shared battlefield Inspector; 0 restores immediate presentation. Outcome arbitration, final counters and pause/input locks still latch immediately; defeat presentation is unchanged. One child Timer runs during the results-owned pause, and stop/unsubscribe on controller exit prevents a delayed popup after unloading. No idle processing loop or terrain work. Existing outcome/reward/navigation fixtures explicitly use 0 to retain their immediate-presentation assertions. Source review only; Godot build/play validation pending.
+
+---
+
 ## PW4-B — cached distance-limited recharge — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** Existing power manager now owns one coalesced multi-source conductive BFS; valid Citadel/generator footprints anchor delivery. Shared Inspector curve: 4 full cells, 12 soft falloff cells, 10% reachable-route floor. Recharge ceiling = nominal refill × efficiency; no route means zero. Capacity/drain/attack funding/source output and stored charge are unchanged; no new consumers, priority scheduling or relays. Cached consumer APIs expose distance/efficiency/ceiling; final derived cache is rebuilt before checkpoint unpause without new saved fields. Performance: reused arrays, no per-tower pathfinding/frame flood fill, no distance rebuild for positive output or curve-only edits. Narrow fixture updated; source/resource review only (environment unavailable), no build/runtime/benchmark claim. [Power guide](../TOWERS/Economy/Power/Shared/README.md).

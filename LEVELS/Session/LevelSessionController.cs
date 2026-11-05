@@ -7,6 +7,9 @@ public enum LevelSessionState { Playing, Victory, Defeat }
 
 public partial class LevelSessionController : Node
 {
+    [Export(PropertyHint.Range, "0,10,0.5,or_greater")]
+    public double VictoryResultsDelaySeconds { get; set; } = 4;
+    private Timer _victoryResultsTimer;
     public LevelSessionState State { get; private set; } = LevelSessionState.Playing;
     public LevelResultSnapshot Snapshot { get; private set; }
     public MissionRewardResult Reward { get; private set; }
@@ -99,8 +102,20 @@ public partial class LevelSessionController : Node
             || _waves.State != WaveManager.WaveState.AllWavesComplete) return;
         if (_citadels.AnyIsDestroyed) { Defeat(); return; }
         State = LevelSessionState.Victory;
-        Capture(); Freeze(); Present();
+        Capture(); Freeze(); DelayVictoryResults();
     }
+
+    // =========================================================
+    // Hold the completed battlefield briefly; one owned timer runs through results-owned pause and dies on unload.
+    private void DelayVictoryResults()
+    {
+        double seconds = double.IsFinite(VictoryResultsDelaySeconds) ? Math.Max(0, VictoryResultsDelaySeconds) : 4;
+        if (seconds == 0) { Present(); return; }
+        _victoryResultsTimer = new Timer { OneShot = true, ProcessMode = ProcessModeEnum.Always, WaitTime = seconds };
+        AddChild(_victoryResultsTimer); _victoryResultsTimer.Timeout += PresentVictoryResults; _victoryResultsTimer.Start();
+    }
+    private void PresentVictoryResults()
+    { if (IsInsideTree() && !IsQueuedForDeletion() && State == LevelSessionState.Victory) Present(); }
 
     // =========================================================
     // Latch/freeze defeat immediately. Settle this enemy's synchronous tally/wave callbacks before freezing the DTO.
@@ -193,6 +208,8 @@ public partial class LevelSessionController : Node
     // Unload retires callbacks/provenance; external scene replacement cannot leave the next screen paused.
     public override void _ExitTree()
     {
+        if (GodotObject.IsInstanceValid(_victoryResultsTimer))
+        { _victoryResultsTimer.Stop(); _victoryResultsTimer.Timeout -= PresentVictoryResults; }
         if (GodotObject.IsInstanceValid(_spawns)) _spawns.WaveEnemyCreated -= TrackWaveEnemy;
         if (GodotObject.IsInstanceValid(_registry)) { _registry.EnemyKilled -= CountKill; _registry.EnemyArrived -= CountBreach; }
         if (GodotObject.IsInstanceValid(_citadels)) _citadels.AnyDestroyed -= Defeat;

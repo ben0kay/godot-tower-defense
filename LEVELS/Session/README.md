@@ -1,3 +1,9 @@
+## Victory Results hold — 2026-11-05
+
+LevelSessionController now holds the frozen winning battlefield for **4 seconds** before showing Mission Results. Configure `LevelSession → VictoryResultsDelaySeconds` in the shared battlefield Inspector; 0 restores immediate presentation. Outcome arbitration, final counters and pause/input locks still latch immediately; defeat presentation is unchanged. One child Timer runs during the results-owned pause, and stop/unsubscribe on controller exit prevents a delayed popup after unloading. No idle processing loop or terrain work. Existing outcome/reward/navigation fixtures explicitly use 0 to retain their immediate-presentation assertions. Source review only; Godot build/play validation pending.
+
+---
+
 ## Between-wave checkpoint integration — 2026-10-26
 
 S2/S3 now provide source-owned capture/restore seams for this feature through
