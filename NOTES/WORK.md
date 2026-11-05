@@ -1,3 +1,9 @@
+## Level011 shared map migration — 2026-11-05
+
+**Source Implemented / Awaiting Owner Validation.** Level011 now inherits BaseLevelMap with four local editable terrain layers. Focused before/after comparison preserved every original node property, scene header, terrain block, object position and resource reference. Independent 160×120 WorldConfig, LevelConfig, waves and mission registration are untouched. Updated Level011/shared authoring notes and added its migration inventory. Source comparison only; no repeated Godot probe, build or gameplay test. Owner: reopen Level011, paint local layers and deploy through Campaign. [Level011](../LEVELS/Level011/README.md).
+
+---
+
 ## LM1 — shared map scene architecture — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** Added LEVELS/Shared/BaseLevelMap.tscn with WorldLevel root, common background/container/debug structure and safe dormant atmosphere defaults. Chose the hybrid: each child keeps four local editable TileMapLayers sharing existing TileSets. Migrated Level001/002/003/020/100 and LevelTemplate; exact terrain blocks, transforms, object/config/resource properties, original scene UIDs and existing node IDs/paths matched the before/after inventory. Level001 retains active atmosphere; Level020 retains its floor offset. Added an unregistered authoring probe and original map inventory; updated concise level/shared/runtime authoring docs. No Level011, dimensions, runtime-service code, waves/catalog, balance, gameplay or save-schema changes. One small native Godot 4.6.3 hybrid save/reopen probe passed using script-free stand-ins; no .NET build, full Campaign launch, manual editor acceptance, broad suite or benchmark. Owner: inspect inherited maps/local paint, Campaign/F2/retry and fresh checkpoints in Godot .NET. [Shared map guide](../LEVELS/Shared/README.md).

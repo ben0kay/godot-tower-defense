@@ -1,0 +1,59 @@
+{
+  "status": "Before/after scene-text inventory matched; gameplay/editor QA remains pending",
+  "maps": {
+    "LEVELS/Level011/Level011.tscn": {
+      "scene_uid": null,
+      "nodes": {
+        ".": {
+          "script": "Resource(res://LEVELS/WorldLevel.cs)",
+          "Settings": "Resource(res://LEVELS/Level011/Level011Config.tres)"
+        },
+        "SpaceBackground": {
+          "z_index": "-20"
+        },
+        "SpaceBackground/Nebulae": {},
+        "SpaceBackground/Stars": {},
+        "SpaceBackground/Stars/Space": {
+          "position": "Vector2(93, 7)",
+          "scale": "Vector2(4, 4)",
+          "texture": "Resource(res://WORLD/BACKGROUNDS/Stars/level001_space.svg)",
+          "centered": "false"
+        },
+        "SpaceBackground/Planets": {},
+        "SpaceBackground/VisualAtmosphere": {
+          "visible": "false",
+          "script": "Resource(res://WORLD/VISUALS/LevelAtmosphereController.cs)",
+          "Config": "Resource(res://WORLD/VISUALS/Presets/CalmSpace.tres)"
+        },
+        "Terrain": {},
+        "Terrain/Passable": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/PassableTerrain.tres)"
+        },
+        "Terrain/Impassable": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/ImpassableTerrain.tres)"
+        },
+        "Terrain/Interactive": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/InteractiveTerrain.tres)"
+        },
+        "Terrain/Decorations": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/DecorationTerrain.tres)"
+        },
+        "Checkpoints": {},
+        "Portals": {},
+        "Portals/EnemyPortal1": {
+          "position": "Vector2(2080, 3872)"
+        },
+        "Objectives": {},
+        "Objectives/Citadel": {
+          "position": "Vector2(8224, 3872)"
+        },
+        "Debug": {},
+        "Debug/CheckpointOverlay": {
+          "z_index": "4090",
+          "z_as_relative": "false",
+          "script": "Resource(res://DEBUG/Navigation/CheckpointDesignOverlay.cs)"
+        }
+      }
+    }
+  }
+}

@@ -23,5 +23,6 @@ The three existing launchers remain F6 shortcuts. An optional new shortcut can i
 
 The common `WORLD/DefaultWorldConfig.tres` remains the default for existing maps (100×80 cells, 64px each). For a larger map, create a dedicated `WorldMasterConfig` resource in its level folder and set `LevelConfig.WorldConfig` to it. The existing `WorldMapLoader` supplies that resource to the same `World/Grid` before `_Ready`/navigation setup. This **does not** change other missions, TileSet cell size, or duplicate world services.
 
-For a paint-ready larger-map example, open `LEVELS/Level011/`. Its blank 160×120 map reuses `LevelTemplate.tscn`, and its resource-based wave is editable in the Wave Editor. Level011 was added independently while LM1 was in progress and remains unchanged as a standalone map. LM1 migrates the five earlier production maps plus LevelTemplate; new maps should use the inherited workflow above. The unregistered `TESTS/Levels/LM1AuthoringProbe.tscn` demonstrates local paint and objects under inherited containers.
+For a paint-ready larger-map example, open `LEVELS/Level011/`. Its blank 160×120 map reuses `LevelTemplate.tscn`, and its resource-based wave is editable in the Wave Editor. Level011 now also inherits BaseLevelMap, with its independent larger dimensions, local terrain and objects preserved. All six production maps plus LevelTemplate use the inherited workflow above. The unregistered `TESTS/Levels/LM1AuthoringProbe.tscn` demonstrates local paint and objects under inherited containers.
+
 

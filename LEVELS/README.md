@@ -1,12 +1,12 @@
 ## LM1 — shared map authoring (2026-11-05)
 
-All five production maps and LevelTemplate now inherit `Shared/BaseLevelMap.tscn`. The base owns common structure/background/debug; the **four editable terrain layers and every authored object/config remain local**. Scene UIDs, original terrain data/transforms and object/resource properties were preserved by inventory comparison. Existing Battlefield/World services and initialization are unchanged. New maps inherit the base, then copy only the four local layers from LevelTemplate. [Authoring](AUTHORING.md) · [ownership, native probe and editor acceptance limits](Shared/README.md). No Level011 or larger world dimensions are implemented.
+All six production maps (001/002/003/011/020/100) and LevelTemplate now inherit `Shared/BaseLevelMap.tscn`. The base owns common structure/background/debug; the **four editable terrain layers and every authored object/config remain local**. Scene UIDs, original terrain data/transforms and object/resource properties were preserved by inventory comparison. Existing Battlefield/World services and initialization are unchanged. New maps inherit the base, then copy only the four local layers from LevelTemplate. [Authoring](AUTHORING.md) · [ownership, native probe and editor acceptance limits](Shared/README.md). LM1 leaves the existing per-level dimensions system unchanged.
 
 ---
 
 #### Level011 — large blank paint-ready map (2026-11-05)
 
-New independent **160×120-cell** Level011 using the existing LevelTemplate, with four empty paintable tile layers, one movable portal, one Citadel, a 10-drone editable starter wave and a directly selectable Campaign mission. Only Level011 opts into a local `WorldMasterConfig` through `LevelConfig.WorldConfig`; existing maps keep 100×80. Shared Battlefield/World systems are reused, and its standalone scene remains unchanged by LM1. The five earlier production maps plus LevelTemplate now inherit BaseLevelMap. [Level011 authoring notes](Level011/README.md). Source-implemented; Godot validation pending.
+New independent **160×120-cell** Level011 using the existing LevelTemplate, with four empty paintable tile layers, one movable portal, one Citadel, a 10-drone editable starter wave and a directly selectable Campaign mission. Only Level011 opts into a local `WorldMasterConfig` through `LevelConfig.WorldConfig`; existing maps keep 100×80. Shared Battlefield/World systems are reused, and Level011 now also inherits BaseLevelMap while preserving its independent larger dimensions and local editable layers. [Level011 authoring notes](Level011/README.md). Source-implemented; Godot validation pending.
 
 ---
 
@@ -154,4 +154,5 @@ Terrain/Interactive now exposes raised Foundation (source0 atlas1,0) and Lava (s
 ## Multiple Citadel authoring — MC1/MC2
 
 LevelConfig / Destination / CitadelPaths is an optional ordered array relative to WorldLevel. Empty preserves legacy CitadelPath. Each reference requires a CitadelHealth child named Health and ApproachPoints markers; additional actual Citadels are discovered. Authored order breaks neutral path-length ties. CitadelMaxHealth currently initializes each independent objective with deployment research applied. Citadel roster changes require a new level session; terrain/goal rebuilds refresh future-source assignments but existing enemies retain their identity. Multi-objective maps must use portals; MapEdges disabled, Both portal-only. See WORLD/OBJECTIVES/Citadel/README.md. No existing saved map or wave was edited.
+
 

@@ -1,6 +1,6 @@
 # Level011 — blank large authoring map
 
-**Source implemented / awaiting owner validation (2026-11-05).** A direct copy of the current `LEVELS/LevelTemplate.tscn`; no shared `BaseLevelMap.tscn` migration has been applied to this branch yet.
+**Source implemented / awaiting owner validation (2026-11-05).** Now inherits `LEVELS/Shared/BaseLevelMap.tscn`, with four local editable terrain layers and independent objects/settings. The shared base owns common structure/background/debug. A focused before/after property comparison preserved every original node property, terrain layer and instance reference; no runtime test was run for this migration.
 
 - **160 × 120 cells at 64px** = **10,240 × 7,680 world pixels**. `Level011WorldConfig.tres` is used only by this mission through `Level011Config.WorldConfig`. Existing levels still use `WORLD/DefaultWorldConfig.tres` (100 × 80).
 - **Empty and paintable:** Passable, Impassable, Interactive and Decorations all start with no tiles. All original TileSet references, background hierarchy, optional atmosphere, checkpoints and F2/F3 debug tools from the template are present.
@@ -19,3 +19,4 @@
 **Design note:** `LevelConfig.WorldConfig` is optional. `WorldMapLoader` applies it to the existing shared `World/Grid` before navigation/grid initialization. It does not introduce new gameplay services, extra processing or any map streaming. The 160×120 grid has 2.4× the cell count of existing maps; check navigation, power and camera performance in Godot before enlarging it again.
 
 **Validation:** source/resource shape reviewed only; Godot import/playback and desktop performance remain owner-side.
+
