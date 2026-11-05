@@ -7,6 +7,9 @@ public sealed class PowerIslandMap
     private int _width, _height;
     private int[] _regions = Array.Empty<int>(), _queue = Array.Empty<int>();
     private readonly List<int> _sizes = new();
+    internal int Width => _width;
+    internal int Height => _height;
+    internal ReadOnlySpan<int> Regions => _regions;
     public int IslandCount => _sizes.Count;
     public int ConductingCellCount { get; private set; }
 

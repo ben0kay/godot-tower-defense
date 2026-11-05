@@ -1,4 +1,4 @@
-// World-owned island topology and cached power accounting; no gameplay gating or per-frame processing.
+// World-owned island topology, accounting and derived delivery; capacitor processing lives in its shared partial.
 using Godot;
 using System;
 
@@ -21,7 +21,7 @@ public partial class PowerGridManager : Node
     {
         SetProcess(false); SetPhysicsProcess(false);
         _grid = GetNode<WorldGrid>("../Grid");
-        _grid.TerrainRebuilt += RefreshTerrain;
+        BindDelivery(); _grid.TerrainRebuilt += RefreshTerrain;
         RefreshTerrain();
     }
 
@@ -34,7 +34,7 @@ public partial class PowerGridManager : Node
         ulong start = Time.GetTicksUsec();
         _islands.Rebuild(_grid.Config.WidthCells, _grid.Config.HeightCells, _grid.PowerConductivity);
         _terrainRevision = _grid.PowerTerrainRevision; Revision++; RebuildCount++;
-        ReindexAccounting();
+        ReindexAccounting(); InvalidateDelivery();
         LastRebuildMilliseconds = (Time.GetTicksUsec() - start) / 1000.0;
         AccountingChanged?.Invoke();
         NetworksChanged?.Invoke(); WakeCapacitors();
@@ -52,6 +52,6 @@ public partial class PowerGridManager : Node
     public override void _ExitTree()
     {
         if (GodotObject.IsInstanceValid(_grid)) _grid.TerrainRebuilt -= RefreshTerrain;
-        ClearCapacitors(); ClearAccounting(); _grid = null;
+        ClearCapacitors(); ClearDelivery(); ClearAccounting(); _grid = null;
     }
 }

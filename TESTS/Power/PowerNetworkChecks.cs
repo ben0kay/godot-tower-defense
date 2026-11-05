@@ -1,4 +1,4 @@
-// Focused PW1 checks: four-neighbour regions, real terrain precedence, cached invalidation and dormant lifecycle.
+// Focused PW1/PW4-B checks: terrain islands, cached conductive delivery, real capacitors and dormant lifecycle.
 using Godot;
 using System;
 
@@ -10,9 +10,9 @@ public partial class PowerNetworkChecks : Node
     {
         try
         {
-            CheckRegions();
+            CheckRegions(); PowerDistanceChecks.Run();
             CheckTerrain();
-            GD.Print("PASS: power islands, merges/splits, metadata, precedence, occupancy isolation and dormant processing");
+            GD.Print("PASS: power islands, conductive distance/curve/cache, near/far capacitor refill, isolation and dormant processing");
             GetTree().Quit();
         }
         catch (Exception error) { GD.PushError(error.ToString()); GetTree().Quit(1); }
@@ -95,10 +95,60 @@ public partial class PowerNetworkChecks : Node
             Require(power.IslandCount == 1 && grid.TerrainConductsPower(bridge) && !grid.CanBuild(bridge), "Nonbuildable wall joins the physical island");
             interactive.SetCell(bridge, 1, new(0, 0)); grid.RebuildTerrain();
             Require(power.IslandCount == 1 && grid.TerrainConductsPower(bridge), "Impassable wins over Interactive for conductivity too");
+            CheckDelivery(power, grid, world, a, b);
             CheckAccounting(power, grid, impassable, interactive, bridge, a, b);
             Require(!power.IsProcessing() && !power.IsPhysicsProcessing(), "Topology/accounting manager has no idle/frame callbacks");
         }
         finally { world.Free(); }
+    }
+
+    // =========================================================
+    // Existing transformed grid plus two actual Battle capacitors; no scene/gameplay simulation or profile I/O.
+    private static void CheckDelivery(PowerGridManager power, WorldGrid grid, Node2D world, Vector2I near, Vector2I far)
+    {
+        power.DeliveryConfig = new PowerDeliveryConfig { FullEfficiencyCells = 0, FalloffCells = 2, MinimumEfficiency = .1 };
+        int rebuilds = power.DistanceRebuildCount;
+        power.SetProducer("distance:source", near, Vector2I.One, 100);
+        power.SetProducer("distance:zero", far, Vector2I.One, 0);
+        Require(power.DistanceRebuildCount == rebuilds, "Source registration batches remain lazy");
+        Require(power.DeliveryForFootprint(far, Vector2I.One) == new PowerDelivery(2, .5)
+            && power.DistanceRebuildCount == rebuilds + 1, "One shared BFS computes conductive distance; zero-output source is not an anchor");
+        rebuilds = power.DistanceRebuildCount;
+        power.SetProducer("distance:source", near, Vector2I.One, 125);
+        power.DeliveryConfig.MinimumEfficiency = .2;
+        Require(power.DeliveryForFootprint(far, Vector2I.One).Efficiency == .5 && power.DistanceRebuildCount == rebuilds,
+            "Positive rate and curve edits reuse the distance field");
+        Node2D towers = new() { Name = "Towers" }; world.AddChild(towers);
+        TowerDefinition definition = GD.Load<TowerDefinition>("res://TOWERS/Offensive/BattleTower/BattleTowerDefinition.tres");
+        BattleTower a = definition.Scene.Instantiate<BattleTower>(), b = definition.Scene.Instantiate<BattleTower>();
+        try
+        {
+            a.InitializeDefinition(definition); b.InitializeDefinition(definition);
+            a.Position = world.ToLocal(grid.CellToWorldCenter(near)); b.Position = world.ToLocal(grid.CellToWorldCenter(far));
+            towers.AddChild(a); towers.AddChild(b);
+            Require(a.Power.RechargeCeilingPerSecond == 10 && b.Power.RechargeCeilingPerSecond == 5,
+                "Consumer mapping respects transformed grid and independently capped recharge");
+            power._PhysicsProcess(1);
+            Require(Math.Abs(a.Power.Capacitor.Energy - 10) < 1e-6 && Math.Abs(b.Power.Capacitor.Energy - 5) < 1e-6,
+                "Actual capacitors credit near/far ceilings without reducing capacity");
+            power.RemoveEndpoint("distance:source"); power._PhysicsProcess(1);
+            Require(a.Power.RechargeCeilingPerSecond == 0 && b.Power.DeliveryEfficiency == 0
+                && a.Power.Capacitor.Energy == 10 && b.Power.Capacitor.Energy == 5,
+                "Last source loss stops refill, preserves charge and never applies the efficiency floor without a route");
+            power.SetProducer("distance:source", near, Vector2I.One, 100);
+            power.SetProducer("distance:other", far, Vector2I.One, 50);
+            rebuilds = power.DistanceRebuildCount; power.RefreshConsumerDelivery();
+            Require(b.Power.ConductiveDistanceCells == 0 && b.Power.RechargeCeilingPerSecond == 10
+                && power.DistanceRebuildCount == rebuilds + 1, "Multiple source updates coalesce; closer source improves ceiling without extra energy");
+            b.GlobalPosition = grid.CellToWorldCenter(new(0, 0)); b.ForceUpdateTransform();
+            Require(b.Power.RechargeCeilingPerSecond == 0, "Consumer relocation to nonconducting space invalidates stale delivery");
+        }
+        finally
+        {
+            a.Free(); b.Free(); towers.Free();
+            power.RemoveEndpoint("distance:source"); power.RemoveEndpoint("distance:zero"); power.RemoveEndpoint("distance:other");
+            power.DeliveryConfig = null;
+        }
     }
 
     // =========================================================
@@ -127,6 +177,7 @@ public partial class PowerNetworkChecks : Node
         bool rejected = false;
         try { power.SetProducer("test:source-a", a, Vector2I.One, float.NaN); } catch (ArgumentException) { rejected = true; }
         Require(rejected && power.Totals.Supply == 125, "Invalid amounts reject before mutating totals");
+        Require(power.DeliveryForFootprint(b, Vector2I.One).Efficiency == 0, "Unassigned source cannot power its former island");
         power.RemoveEndpoint("test:source-b"); power.RemoveEndpoint("test:source-b");
         power.RemoveEndpoint("test:source-a"); power.RemoveEndpoint("test:demand");
         Require(power.Totals == default && power.UnassignedProducers == 0 && power.UnassignedConsumers == 0,
