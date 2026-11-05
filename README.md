@@ -1,3 +1,9 @@
+## SE2 — directional Stealth Beacon scanning — 2026-11-05
+
+**Source Implemented / Awaiting Owner Validation.** Prepared head now rotates clockwise and existing ScanCone path owns one faint sector; real 70° / 256px cone, 3s revolution, 0.1s sampled detection, alpha 0.08. Existing world reveal index/source identities are reused; capped nearby queries update stationary enemies, retained members do not flicker and independent overlaps remain revealed. Pause freezes scanning; disabled/unfinished/destroyed/removed sources sleep/hide/release. Source/config edits and index teardown retain cleanup. Art/scene paths, 250 Credits, 1800 HP, 2s build, waves and other mechanics are unchanged; no power/upgrade/bubble. Focused stealth checks updated; source review only (.NET unavailable), owner build/runtime/visual validation pending. [SE2 record](TOWERS/Utility/StealthBeacon/DIRECTIONAL_SCAN_IMPLEMENTATION_PLAN.md).
+
+---
+
 ## Stealth Beacon split radar-scanner artwork and SE2 handoff — 2026-11-05
 
 Stealth Beacon now has fixed base + independently rotatable head SVGs, a matching composite catalog icon and initial 0/35/70% construction artwork, wired through the shared split-layer presenter. The existing reveal mechanic **still reveals all stealthed enemies in radius**; real 70° rotating-cone detection and a faint swept wedge are designed in [SE2 Codex handoff](TOWERS/Utility/StealthBeacon/DIRECTIONAL_SCAN_IMPLEMENTATION_PLAN.md) but **not implemented** in this artwork pass. Scanner head and cone placeholder are prepared for Codex. Prices, 2-second construction, 1×1 footprint, 1800 HP and 256px range are unchanged. Source checks only; Godot visual validation pending.

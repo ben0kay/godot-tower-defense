@@ -1,6 +1,6 @@
 # SE2 — Stealth Beacon actual rotating cone reveal (Codex implementation handoff)
 
-**Status: directional mechanics NOT implemented.** New split Stealth Beacon art, construction visuals, `TurretPivot` and empty `ScanCone` placeholder are committed separately in this same artwork pass. Codex should implement this plan on **`dev`** without redoing the SVG art.
+**Status: Source Implemented / Awaiting Owner Validation — 2026-11-05, `dev`.** SE2 now uses the prepared split art, construction visuals, `TurretPivot` and unchanged `ScanCone` placeholder path. No SVG or scene/resource path was recreated. The contract below remains the design reference.
 
 Read `AGENTS.md` if present, `NOTES/CodePreferences.md`, root README, `TOWERS/Utility/StealthBeacon/README.md`, `ENEMIES/Shared/Stealth/README.md`, `ENEMIES/Shared/Stealth/StealthRevealSystem.cs`, and `TESTS/Stealth/StealthChecks.cs` before editing. Work modularly and keep validation light. Push to `dev`.
 
@@ -53,3 +53,14 @@ Update `TESTS/Stealth/StealthChecks.cs` SE1 assumptions: old tests assumed any i
 ## Explicit exclusions
 
 Do not automatically make the scanner a weapon. Do not add a passive reveal radius, LOS walls, target tracking, on-hit effect, power consumption or tower upgrades. Do not alter tower buffs/debuffs or wave generation. Do not treat new artwork's presence as proof that the cone mechanics are implemented.
+
+## SE2 implementation record — 2026-11-05
+
+- `StealthBeaconConfig` exports the four requested settings; finite bounds are cone 10–180°, revolution 0.1–3600s, refresh 0.01–1s, opacity 0–0.3. Invalid edits withdraw coverage and stop the scan until corrected. Existing range/price/HP/work remain unchanged.
+- `StealthBeacon` caches prepared nodes, creates/reuses one `ScanCone/Sector` Polygon2D, builds 24 segments only on setup/stats/config changes, and rotates the parent head. One accumulator samples the actual current world facing at the configured interval, staggered initially by instance ID. Large steps issue at most one final-heading update, not catch-up loops. Pause is explicitly guarded; inactive beacons hide the cone, release membership and stop their physics clock.
+- `StealthRevealSystem.Register` keeps an existing Area identity during config/teleport changes, rebuilding bucket coverage only for changed position/radius. `UpdateBeaconDirection` changes only the retained Area heading and queries nearby enemies; `StealthRevealSystem.Scanning.cs` owns exact inclusion and diffing. Cosine is computed on registration/config updates, not per enemy. Retained members are untouched; old members absent from the new candidate query are removed. Buffers/sets and source-list capacity are reused across sweeps.
+- Detection resolution is the configured interval (default 0.1s), while the head rotates continuously; movement events use the latest sampled heading. There is no always-on inner radius. A tiny coincident-centre epsilon follows the design predicate. Normal gameplay tower roots retain their existing unit-scale scene convention.
+- Root transform notifications also call the existing TowerBase spatial bridge. World index exit sleeps scanners and releases handles; tower exit releases only its own source. Existing detection/weapon gates and all enemy policy enum values are unchanged. No power, upgrades, LOS, passive bubble or extra gameplay was added.
+- Focused stealth fixture now covers in/front vs side/behind, stationary rotation and re-stealth, inclusive range, stable identity/no retained-target flicker, overlap, pause, construction/EMP/death/removal, live cone/cadence/range/opacity edits, source teleport and index unload. Laser cached locks are checked after the last cone rotates away. Weapon-only fixture configs omit Power to isolate SE1/SE2 detection from Battle's separate PW4 charge requirement; shipped configs are unchanged.
+
+**Validation:** source/diff/resource sanity only. No .NET toolchain is available; no build, runtime suite or benchmark was run or claimed. Owner should rebuild and briefly run the focused fixture if desired, then inspect visual direction, faintness, construction hiding, overlap and pause in Godot.

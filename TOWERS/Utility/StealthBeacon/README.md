@@ -1,8 +1,20 @@
+## SE2 — directional scanner implemented (2026-11-05)
+
+**Source Implemented / Awaiting Owner Validation.** The prepared head now rotates clockwise while operational and its `TurretPivot/ScanCone` placeholder owns one faint 24-segment Polygon2D sector. Defaults: **70° full cone, 3s revolution, 0.1s detection refresh, 0.08 opacity**, still **256px / 250 Credits / 1800 HP / 2s / 1×1**. No artwork, scene paths, waves, prices, power requirement or tower upgrades changed.
+
+Only in-cone, in-range stealthed enemy centres receive this source's reveal. Rotation resamples stationary enemies through the existing enemy spatial index; movement/registration use the same exact cone predicate. Leaving one source restores stealth only when no independent reveal source remains. Heading updates mutate the existing indexed Area in place, without unregister/register or retained-member hide/reveal flicker. Detection follows the configured discrete refresh (default 10Hz); head rotation is continuous. There is no passive detection bubble.
+
+The beacon alone owns an active physics rotation/accumulator; disabled/unfinished/upgrading/destroyed/removed beacons stop processing and hide the sector. Pause freezes both heading and sampling. Activation finds stationary enemies immediately, retaining facing. The world reveal system remains event/callback-driven with no frame loop. Reused query/diff buffers, retained membership sets and pooled per-enemy source lists avoid per-sweep collection creation; no full enemy scan, per-enemy node, particle system or redraw per frame. [SE2 implementation details](DIRECTIONAL_SCAN_IMPLEMENTATION_PLAN.md).
+
+Source/diff/resource checks only; .NET is unavailable. Updated focused `TESTS/Stealth/StealthChecks.tscn` is authored but not executed here. Owner: rebuild, inspect head/sector at normal zoom, enemy entry/exit and overlap, pause/EMP/construction, stationary sweeps and scene reload. Earlier dated notes below are historical.
+
+---
+
 ## Stealth Beacon split scanner artwork — 2026-11-05
 
 The original single 64×64 artwork is now split into a **fixed octagonal base (`Sprite`)** and an independent **`TurretPivot/BeaconHeadSprite`** with a pronounced forward-facing teal scan lens. The composite `Artwork/stealth_beacon.svg` remains the catalog icon and construction overlay fallback. Dedicated initial **0/35/70%** construction SVGs are wired to the existing shared split-layer construction presenter. The existing 1×1 footprint, Level 1 cost 250 Credits, build 2 seconds, 1800 HP and 256px radius are unchanged. There are no authored purchased upgrades.
 
-**Only artwork/scene presentation is implemented so far. The head does not yet rotate and `ScanCone` is an empty placeholder. Reveal remains the original 360° radius until Codex implements SE2.** For the requested genuine directional Option B, see the complete [SE2 Codex implementation plan](DIRECTIONAL_SCAN_IMPLEMENTATION_PLAN.md), including proposed 70° cone, 3-second sweep, 0.1-second spatial update, exact dot-product predicate, shared membership and lifecycle requirements. No gameplay code changed and no Godot runtime validation was run.
+**Historical artwork-only boundary (superseded by SE2 above).** This art pass originally left mechanics radial and the head stationary. For the requested genuine directional Option B, see the complete [SE2 Codex implementation plan](DIRECTIONAL_SCAN_IMPLEMENTATION_PLAN.md), including proposed 70° cone, 3-second sweep, 0.1-second spatial update, exact dot-product predicate, shared membership and lifecycle requirements. No gameplay code changed and no Godot runtime validation was run.
 
 ---
 
@@ -20,9 +32,9 @@ The original single 64×64 artwork is now split into a **fixed octagonal base (`
 
 # Stealth Beacon — SE1
 
-Registered as `stealth_beacon` under Ctrl → Utility. One1×1 paid tier:250 Credits,2 seconds construction,180 HP and256px reveal range. Artwork is an original muted teal/green antenna beacon. Uses existing paid placement, footprint, construction, hull/destruction, selection and range-ring flows. No attack, ammo, earned combat ranks, artificial firing loop or paid upgrades are authored.
+Registered as `stealth_beacon` under Ctrl → Utility. One1×1 paid tier:250 Credits,2 seconds construction,1800 HP and256px reveal range. Artwork is an original muted teal/green antenna beacon. Uses existing paid placement, footprint, construction, hull/destruction, selection and range-ring flows. No attack, ammo, earned combat ranks, artificial firing loop or paid upgrades are authored.
 
-DefaultStealthBeaconConfig.tres exposes RevealRange (1–1024px) and MaxHealth; default cost/work are in StealthBeaconConfig's single level row. Private placed configs prevent changes leaking across towers. Operational beacons reveal enemies inside their inclusive center-to-center radius for all ordinary towers. Leaving the radius restores stealth unless another source still reveals the enemy. The beacon does not grant detection to nearby towers.
+DefaultStealthBeaconConfig.tres exposes RevealRange (1–1024px) and MaxHealth; default cost/work are in StealthBeaconConfig's single level row. Private placed configs prevent changes leaking across towers. Historical SE1 beacons revealed enemies inside their inclusive center-to-center radius for all ordinary towers. Leaving the radius restores stealth unless another source still reveals the enemy. The beacon does not grant detection to nearby towers.
 
 Construction, upgrade work, generic disable and destruction/removal all stop revealing. Reactivation/range edits/source relocation refresh stationary enemies without waiting for a scan interval. The shared world index consumes movement events and uses spatial buckets; this tower has no Process/PhysicsProcess callback. World/Registry unload and tower removal release source references.
 

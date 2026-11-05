@@ -1,3 +1,17 @@
+# SE2 focused verification — 2026-11-05
+
+**Source checks completed; fixture updated but not executed.** .NET is unavailable here; no installation, large suite or benchmark. After rebuilding C# in Godot .NET, optionally run `StealthChecks.tscn` once.
+
+Directional assertions replace SE1's radial assumptions: default up-facing 70° cone, front vs side/behind (including close sideways targets), inclusive 256px edge, continuous head movement and one bounded polygon, stationary enemies revealed/re-hidden by rotation, retained source identity without transition flicker, independent overlapping source departure, construction/EMP/death/removal, paused heading/membership, live cone/range/revolution/refresh/opacity edits, source teleport with absent-member cleanup, and index subtree unload sleeping scanners/releasing handles. Existing wave flags, shield/stealth visuals, status composition, six policies, private specialist detection and aimed-weapon gates remain checked. A cached Laser lock is stepped after the last scan rotates away and must not damage or consume ammo.
+
+Only private weapon fixture configs omit Power so the specialist Battle assertion tests detection independently of PW4 charge. No shipped config, map, wave, price or combat stat is changed. Source review confirms the manager has no frame callback and source heading refresh does not register/unregister or rebuild source buckets. Detection is sampled (default 0.1s), not a per-enemy frame loop.
+
+Owner visual check: build/place Utility → Stealth Beacon, inspect split fixed base/clockwise head and faint sector, watch stationary stealth ships in front vs side/behind, overlap two sources, pause/resume, and disable/remove a beacon. Check construction art hides the sector and normal zoom keeps it subtle. The scan phase is transient presentation state and starts fresh on checkpoint reconstruction, like other non-durable target/presentation state.
+
+---
+
+## Historical SE1 validation record (superseded for directional assertions)
+
 # SE1 verification — 2026-10-20 UTC
 
 Run `res://TESTS/Stealth/StealthChecks.tscn` after building C#.

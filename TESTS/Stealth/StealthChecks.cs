@@ -1,4 +1,4 @@
-// Real wave flags, spatial detection, paid beacon lifecycle and all aimed-weapon hidden-target gates.
+// SE2 focused cone scanning: real wave flags, indexed reveal/overlap/lifecycle and aimed-weapon detection gates.
 using Godot;
 using System;
 using System.Linq;
@@ -18,7 +18,7 @@ public partial class StealthChecks : Node
             using (AmmoLoopFixture f = new(this)) Check(f);
             GetTree().Paused = false;
             await SubsystemBattlefield.DrainFreedFixtures(this);
-            GD.Print("PASS: stealth wave flags, visuals/status composition, detection/locks, paid overlapping beacons, lifecycle and all aimed weapons");
+            GD.Print("PASS: stealth wave flags, visuals/status composition, detection/locks, directional stationary sweeps, stable overlaps, lifecycle and aimed weapons");
             GetTree().Quit();
         }
         catch (Exception error) { GD.PushError(error.ToString()); GetTree().Paused = false; GetTree().Quit(1); }
@@ -50,8 +50,12 @@ public partial class StealthChecks : Node
         f.Hud.GetBuildCategoryButton("Utility").EmitSignal(Button.SignalName.Pressed);
         StealthBeacon beacon = f.Purchase<StealthBeacon>("stealth_beacon", false);
         Vector2 center = beacon.GlobalPosition;
-        hidden.GlobalPosition = center + new Vector2(100,0); normal.GlobalPosition = center + new Vector2(180,0);
+        hidden.GlobalPosition = center + Vector2.Up * 100; normal.GlobalPosition = center + new Vector2(180,0);
         Require(hidden.IsEffectivelyStealthed && beacon.IsBusy, "Unfinished paid beacon does not reveal");
+        float unfinishedHeading = beacon.GetNode<Node2D>("TurretPivot").Rotation;
+        beacon._PhysicsProcess(.75);
+        Require(beacon.GetNode<Node2D>("TurretPivot").Rotation == unfinishedHeading
+            && !beacon.GetNode<Node2D>("TurretPivot/ScanCone").Visible, "Initial construction has no rotation or visible cone");
         Require(!TowerDetection.CanDetect(hidden) && TowerDetection.CanDetect(hidden, true), "Specialist override does not globally reveal");
         foreach (var mode in Enum.GetValues<TowerTargeting.Priority>())
             Require(TowerTargeting.Find(f.Spawns.Registry, center, 256, mode) != hidden, "Hidden enemy excluded before priority scoring");
@@ -60,9 +64,33 @@ public partial class StealthChecks : Node
         Require(TowerTargeting.Find(f.Spawns.Registry, center, 256, TowerTargeting.Priority.Closest, detectsStealth: true) == hidden,
             "Specialist acquisition finds closest hidden ship");
         ConstructionTestClock.FinishWork(f.Main);
-        Require(!hidden.IsEffectivelyStealthed && hidden.Stealth.RevealCount == 1, "Completing construction reveals existing in-range ship");
+        Require(!hidden.IsEffectivelyStealthed && hidden.Stealth.RevealCount == 1, "Completing construction reveals existing in-cone ship");
         Near(sprite.Modulate.A, 1, "Revealed ship alpha");
-        Enemy newcomer = f.Target(center + new Vector2(50,0));
+        var pivot = beacon.GetNode<Node2D>("TurretPivot");
+        var cone = beacon.GetNode<Node2D>("TurretPivot/ScanCone");
+        var sector = cone.GetNode<Polygon2D>("Sector");
+        var scanSystem = f.Spawns.Registry.GetNode<StealthRevealSystem>("StealthReveals");
+        Require(cone.Visible && sector.Polygon.Length == 26, "Prepared cone owns one bounded sector polygon");
+        Near(sector.Color.A, .08f, "Default faint scan opacity");
+        hidden.GlobalPosition = center + Vector2.Down * 100;
+        Require(hidden.IsEffectivelyStealthed, "Behind scanner is not revealed");
+        hidden.GlobalPosition = center + Vector2.Right;
+        Require(hidden.IsEffectivelyStealthed, "No passive close-range detection bubble");
+        hidden.GlobalPosition = center + Vector2.Up * 100;
+        int transitions = 0; Action changed = () => transitions++;
+        hidden.Stealth.Changed += changed;
+        int samples = scanSystem.DirectionUpdates;
+        beacon._PhysicsProcess(.11);
+        Require(scanSystem.DirectionUpdates == samples + 1 && hidden.Stealth.RevealCount == 1 && transitions == 0,
+            "In-place direction update preserves source identity and retained reveal without hide/reveal flicker");
+        beacon._PhysicsProcess(.64);
+        Require(hidden.IsEffectivelyStealthed && transitions == 1 && !TowerTargeting.Valid(hidden, center, 256),
+            "Actual head sweep restores stealth for stationary target and invalidates cached lock");
+        beacon._PhysicsProcess(2.25);
+        Require(!hidden.IsEffectivelyStealthed && transitions == 2, "Returning scan reveals stationary enemy again");
+        hidden.Stealth.Changed -= changed;
+        Require((beacon.ScanHeading - Vector2.Up).Length() < .001f, "Head and sampled heading complete one clockwise revolution");
+        Enemy newcomer = f.Target(center + Vector2.Up * 50);
         newcomer.Initialize(f.Spawns.Registry, f.Spawns.Paths, spawnWithStealth: true);
         Require(newcomer.Stealth.RevealCount == 1, "A new stealth spawn inside existing coverage is immediately revealed");
         EnemyStealthState removedState = newcomer.Stealth;
@@ -72,27 +100,78 @@ public partial class StealthChecks : Node
         hidden.ApplyStatus(new(StatusEffectId.Slow, .67f));
         hidden.ApplyStatus(new(StatusEffectId.Freeze, 0, 3));
         Color statusTint = sprite.SelfModulate;
-        hidden.GlobalPosition = center + new Vector2(256,0);
+        hidden.GlobalPosition = center + Vector2.Up * 256;
         Require(!hidden.IsEffectivelyStealthed, "Inclusive exact radius boundary");
-        hidden.GlobalPosition = center + new Vector2(257,0);
+        hidden.GlobalPosition = center + Vector2.Up * 257;
         Require(hidden.IsEffectivelyStealthed && !TowerTargeting.Valid(hidden, center, 500), "Leaving range immediately invalidates cached lock");
         Require(sprite.SelfModulate == statusTint, "Stealth alpha preserves concurrent Cryo/Stasis tint"); Near(sprite.Modulate.A, .3f, "Leaving restores hidden alpha");
-        hidden.GlobalPosition = center + new Vector2(100,0);
+        hidden.GlobalPosition = center + Vector2.Up * 100;
         StealthBeacon second = f.Add<StealthBeacon>("stealth_beacon", center);
         Require(hidden.Stealth.RevealCount == 2, "Overlapping beacons own independent handles: " + hidden.Stealth.RevealCount + " / " + second.DescribeRuntime() + " / " + second.GlobalPosition + " vs " + hidden.GlobalPosition + " / " + f.Spawns.Registry.GetNode<StealthRevealSystem>("StealthReveals").ActiveBeacons);
+
+        beacon._PhysicsProcess(.75);
+        Require(hidden.Stealth.RevealCount == 1 && !hidden.IsEffectivelyStealthed, "Cone rotating away removes only its own overlapping source");
+        beacon._PhysicsProcess(2.25);
         var disabled = beacon.ApplyDisable(TowerDisableReason.EMP);
         Require(!hidden.IsEffectivelyStealthed && hidden.Stealth.RevealCount == 1, "Disabling one overlap retains other reveal");
+        float stopped = pivot.Rotation; samples = scanSystem.DirectionUpdates;
+        beacon._PhysicsProcess(.75);
+        Require(pivot.Rotation == stopped && !cone.Visible && !beacon.IsPhysicsProcessing() && scanSystem.DirectionUpdates == samples,
+            "Disabled scan/head/cone sleep without a detection tick");
         second.ApplyDamage(new DamageInfo(99999, DamageType.Kinetic));
         Require(hidden.IsEffectivelyStealthed && hidden.Stealth.RevealCount == 0, "Destroying last active source immediately restores stealth");
         beacon.RemoveDisable(disabled); Require(!hidden.IsEffectivelyStealthed, "Re-enable reveals stationary enemy");
         GetTree().Paused = true;
-        Require(!hidden.IsEffectivelyStealthed, "Pause does not expire a range-only reveal"); GetTree().Paused = false;
+        stopped = pivot.Rotation; samples = scanSystem.DirectionUpdates;
+        beacon._PhysicsProcess(.75);
+        Require(!hidden.IsEffectivelyStealthed && pivot.Rotation == stopped && scanSystem.DirectionUpdates == samples,
+            "Pause freezes visual heading and sampled membership"); GetTree().Paused = false;
         beacon.Config.RevealRange = 64; Require(hidden.IsEffectivelyStealthed, "Shrinking Inspector range releases existing target");
         beacon.Config.RevealRange = 256; Require(!hidden.IsEffectivelyStealthed, "Expanding range reveals stationary target");
+        hidden.GlobalPosition = center + Vector2.Up.Rotated(Mathf.DegToRad(40)) * 100;
+        Require(hidden.IsEffectivelyStealthed, "Outside default 35 degree half-angle is hidden");
+        beacon.Config.ScanConeDegrees = 90; Require(!hidden.IsEffectivelyStealthed, "Cone angle edit resamples stationary enemy");
+        beacon.Config.ScanConeDegrees = 70; Require(hidden.IsEffectivelyStealthed, "Restored cone removes out-of-angle member");
+        beacon.Config.ScanConeOpacity = .12f; Near(sector.Color.A, .12f, "Live opacity edit updates existing polygon");
+        beacon.Config.ScanRotationSeconds = 0;
+        Require(!beacon.IsPhysicsProcessing() && !cone.Visible && scanSystem.ActiveBeacons == 0, "Invalid cadence safely disables only source");
+        beacon.Config.ScanRotationSeconds = 6;
+        hidden.GlobalPosition = center + Vector2.Up * 100;
+        beacon._PhysicsProcess(.5);
+        Near(pivot.Rotation, Mathf.DegToRad(30), "Edited revolution changes angular speed");
+        beacon.Config.ScanRotationSeconds = 3;
+        beacon._PhysicsProcess(2.75);
+        beacon.Config.ScanUpdateIntervalSeconds = .2f;
+        beacon._PhysicsProcess(.2);
+        Require(!hidden.IsEffectivelyStealthed, "Edited sample interval keeps retained target inside actual cone");
+        beacon.Config.ScanUpdateIntervalSeconds = .1f;
+        beacon._PhysicsProcess(2.8);
+        beacon.GlobalPosition += new Vector2(1000,0);
+        Require(hidden.IsEffectivelyStealthed, "Source teleport removes old members absent from new spatial query");
+        hidden.GlobalPosition = beacon.GlobalPosition + Vector2.Up * 100;
+        Require(!hidden.IsEffectivelyStealthed, "Moving enemy enters relocated cone");
+        beacon.GlobalPosition = hidden.GlobalPosition - Vector2.Up * 100;
+        Require(!hidden.IsEffectivelyStealthed, "Idempotent source placement preserves reveal");
+        hidden.GlobalPosition = center + Vector2.Up * 100;
+        beacon.GlobalPosition = center;
+        Require(!hidden.IsEffectivelyStealthed, "Source teleport picks up stationary enemy at destination");
+        LaserTower cached = f.Add<LaserTower>("laser", center);
+        typeof(LaserTower).GetMethod("SetTarget", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(cached, new object[] { hidden });
+        int rounds = cached.Ammunition.Inventory.Amount; float hull = hidden.Health, shield = hidden.CurrentShield;
+        beacon._PhysicsProcess(.75); cached._PhysicsProcess(.001);
+        Require(hidden.IsEffectivelyStealthed && hidden.Health == hull && hidden.CurrentShield == shield && cached.Ammunition.Inventory.Amount == rounds,
+            "Last cone rotating away prevents cached Laser damage and ammo use");
+        cached.Free(); beacon._PhysicsProcess(2.25);
         beacon.GlobalPosition += new Vector2(1000,0); Require(hidden.IsEffectivelyStealthed, "Moving source releases old coverage");
         var system = f.Spawns.Registry.GetNode<StealthRevealSystem>("StealthReveals");
         Require(system.ActiveBeacons == 1, "Destroyed source is removed from index immediately");
         f.Towers.RemoveChild(beacon); beacon.Free(); Require(system.ActiveBeacons == 0, "Removal leaves no registered source");
+        StealthBeacon teardown = f.Add<StealthBeacon>("stealth_beacon", center);
+        Require(!hidden.IsEffectivelyStealthed, "Fresh source reveals before index teardown");
+        f.Spawns.Registry.RemoveChild(system);
+        Require(hidden.IsEffectivelyStealthed && !teardown.IsPhysicsProcessing()
+            && !teardown.GetNode<Node2D>("TurretPivot/ScanCone").Visible, "Index subtree unload releases handles and sleeps scanners");
+        system.Free(); teardown.Free();
         hidden.Initialize(f.Spawns.Registry, f.Spawns.Paths, spawnWithStealth: true);
         CheckWeapons(f, hidden, normal, center);
         hidden.Initialize(f.Spawns.Registry, f.Spawns.Paths);
@@ -111,7 +190,7 @@ public partial class StealthChecks : Node
         foreach (Type type in types)
         {
             var definition = f.Placement.Catalog.Definitions.First(d => { Node n = d.Scene.Instantiate(); bool match = n.GetType() == type; n.Free(); return match; });
-            TowerBase tower = f.Add<TowerBase>(definition.TowerId, center);
+            TowerBase tower = f.Add<TowerBase>(definition.TowerId, center, config => config.Power = null); // Isolate detection from PW4 charge.
             int ammo = tower.Ammunition?.Inventory.Amount ?? 0; int shots = f.Main.GetNode("World/Projectiles").GetChildCount();
             float health = hidden.Health;
             tower.Call("_physics_process", 1.0);
