@@ -5,9 +5,6 @@
 [resource]
 script = ExtResource("1")
 EnemyId = "transporter_mk1"
-Class = 3
-Rank = 0
-Role = 1
 DisplayName = "Drone Transporter"
 MaxHealth = 500.0
 MoveSpeed = 45.0
