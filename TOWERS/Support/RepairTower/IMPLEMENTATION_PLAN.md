@@ -1,6 +1,6 @@
 # RT0–RT4 — Restoration Tower / Shared Friendly Targeting
 
-> **Status: RT0 Source Implemented / Awaiting Owner Validation (2026-11-05); RT1–RT4 PLANNED.** Target repository: `ben0kay/godot-tower-defense`, branch `dev` only. Codex should implement **one pass at a time** when asked; do not merge or edit `main`. The intended class/file name is `RepairTower` for the existing planned folder, with the in-game display name **Restoration Tower**.
+> **Status: RT0–RT1 Source Implemented / Awaiting Owner Validation (2026-11-05); RT2–RT4 PLANNED.** Target repository: `ben0kay/godot-tower-defense`, branch `dev` only. Codex should implement **one pass at a time** when asked; do not merge or edit `main`. The intended class/file name is `RepairTower` for the existing planned folder, with the in-game display name **Restoration Tower**.
 >
 > Owner intent: a sleek white/silver 2D support tower with pale aqua accents, a fixed base and rotating laser head. It never damages enemies. It locks onto **damaged friendly towers** within range, turns toward them, projects a healing beam from its physical muzzle, restores structural hull and uses the existing shared heat and eventual per-tower capacitor-based power systems. Friendly/hostile selection must be reusable, but should not destabilize existing enemy targeting.
 
@@ -109,7 +109,7 @@ Level 2/3 (separate approved phase) should increase absolute repair HP/s, perhap
 - Narrow optional `TESTS/Towers/FriendlyTowerTargetingChecks.tscn` fixture covers 1×1/multi-cell roots, fraction scoring/ties, work, target/healer disables, full/queued/detached/destroyed targets, malformed radius and world isolation. Authored, not executed here: .NET unavailable. Source/diff review only.
 - Implementation: `TargetDomain.cs` and `FriendlyTowerTargeting.cs` under shared Targeting. Only LowestIntegrity is enabled; no friend-specific policy enum/UI yet. Caller owns scratch, staggered queries and cached target lifetime; `Valid` rechecks in O(1). No registry or enemy targeting source changed.
 
-### RT1 — Restoration Tower playable baseline
+### RT1 — Restoration Tower playable baseline — Source Implemented / Awaiting Owner Validation
 - Add `RepairStats` optional shared capability, forward through existing pipeline and clamp safely; do not treat it as offensive `BeamStats`.
 - Add `RepairTower` scene/config/definition/Level 1 absolute row and register it in `TOWERS/DefaultTowerCatalog.tres`, in **Support** category.
 - Add white/silver/aqua base/emitter SVGs, muzzle, existing `TurretAiming`, `BeamRenderer` with unique style. Use `RestoreHealth`, pause/disable/work gates and the existing construction-drone/selection/health-bar/Inspector plumbing. Repair only hull and only eligible friendly towers.
@@ -141,4 +141,14 @@ Codex: perform source/diff review and at most one basic C# build if readily avai
 - Heat increments only while actually repairing, cools between beams and respects existing overheat logic. When PW4 is present, energy is actually charged for applied repairs and a depleted capacitor blocks them.
 - Works with normal selection-radius, placement, construction drones, Save/Load, 1×1/multi-cell neighbor queries and the current default tower catalog.
 
-**RT0 source implemented; RT1–RT4 remain PLANNED.** No playable Restoration Tower, repair stats, beam, heat/power integration or HUD changes have shipped. Owner build/runtime acceptance is pending. Do not implement the remaining roadmap without an explicit pass request.
+**RT0–RT1 source implemented; RT2–RT4 remain PLANNED.** Level 1 Restoration Tower, repair stats, shared beam and basic correctly labelled Inspector rows are present. Heat/power, tiers and policy UI are not implemented. Owner build/runtime acceptance is pending. Do not implement the remaining roadmap without an explicit pass request.
+
+## RT1 implementation record — 2026-11-05
+
+Delivered the `repair` Support definition, private config/absolute single level, scene, simple native white/silver/aqua SVG layers and composite icon, initial foundation via shared construction, physical muzzle and unique shared BeamStyle. Provisional defaults: 350 Credits, 5s, 1000 HP, 1×1, 320px, 16 HP/s, 210°/s, 12° tolerance, 0.3s staggered acquisition. RT0 selector and existing hull RestoreHealth remain authoritative; HealthChanged/work/spatial/death/exit callbacks invalidate cached locks without new acquisitions. No new registry, health, save or damage architecture.
+
+RepairStats is appended (not reordered), sanitized in Stage07 and forwarded in Stage08; existing old-capability values and enemy policy enum IDs are unchanged. A minimal capability branch keeps the ordinary Inspector's current rows/header labelled Hull Repair rather than Damage/Kinetic; RT3's tiers and policy UI are still future work. Existing Support-category smoke expectation is updated for the populated category. Optional RepairTowerChecks covers real catalog/scene/beam/hull/disable/pause/work and checkpoint-input seams; it is authored, not run.
+
+**RT1 resource boundary:** consistent with the approved baseline description, repair currently has no operating resource cost and no heat. RT2 must extend the real shared capacitor seam for continuous applied repair seconds and add heat; no fake Power profile, ammo substitution or partial RT2 is shipped here. This clarifies the broader future “funded repair” language above. No other tower stats, authored waves, enemy targeting or save schema changed. Existing strict content fingerprints may reject pre-change checkpoints.
+
+Validation is source/resource review only because the execution environment is unavailable. No build, runtime/visual acceptance, large suite or benchmark. Owner: rebuild/import, place Support → Restoration Tower and inspect actual hull gain/muzzle/full/out-of-range/EMP/pause/construction, and a new Save/Load before moving on to RT2.

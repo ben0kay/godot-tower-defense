@@ -1,3 +1,9 @@
+## RT1 optional hull repair — 2026-11-05
+
+`RepairStats(float HullPerSecond)` is appended as nullable `Repair` at the end of TowerStatBlock and TowerFinalStats. Existing positional call sites retain all old argument meanings. Stages01–06 carry this independent capability through ordinary copied snapshots; damage/rank bonuses do not scale repair. Stage07 clamps it to finite/nonnegative and Stage08 forwards it to the immutable final result. Restoration Tower uses it with existing RestoreHealth; it is not BeamStats damage, weapon type, ammo or heat. Existing offensive values are unchanged. Inspector capability rows label repair independently. Source review only, owner build/runtime pending.
+
+---
+
 ## Projectile handling update (PA1–PA3)
 
 Optional immutable handling now carries launch spread and explicit Straight/Homing guidance through level → selected rank → captured research → safety → final snapshots. Projectile towers default to straight physical shots; splash uses a fixed launch destination. See `TOWERS/Shared/Projectiles/PROJECTILE_GUIDANCE_ACCURACY_PLAN.md` for implementation decisions and retained pass history.

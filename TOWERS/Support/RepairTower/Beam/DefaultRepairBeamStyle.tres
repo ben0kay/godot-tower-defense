@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="BeamStyle" load_steps=2 format=3]
+[ext_resource type="Script" path="res://TOWERS/Shared/Weapons/Beams/BeamStyle.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+CoreColor = Color(0.88, 1, 1, 1)
+OuterColor = Color(0.23, 0.88, 0.8, 0.28)
+CoreWidth = 1.8
+OuterWidth = 6.0
+PulseAmount = 0.025
+PulseFrequency = 1.3
+RippleAmplitude = 0.0
+ImpactWanderRadius = 0.0
+ImpactGlowRadius = 2.5
+ImpactGlowOpacity = 0.3
+ImpactGlowFlicker = 0.03
+ImpactParticlesEnabled = false
+MuzzleParticlesEnabled = false

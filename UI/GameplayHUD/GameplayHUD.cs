@@ -526,7 +526,7 @@ public partial class GameplayHUD : Control
         bool present = !_buildPreview && (preview.Length > 0 || button.Length > 0);
         _upgradeTitle.Visible = present || _upgradeComparison.Visible;
         _upgradeTitle.Text = (_comparisonNext != null ? "STATS · PAID UPGRADE" : "CURRENT STATS")
-            + (_comparisonNow != null ? " · " + (_comparisonNow.Weapon?.Type ?? DamageType.Kinetic).ToString().ToUpperInvariant() : "");
+            + (_comparisonNow != null ? " · " + (_comparisonNow.Repair.HasValue ? "HULL REPAIR" : (_comparisonNow.Weapon?.Type ?? DamageType.Kinetic).ToString().ToUpperInvariant()) : "");
         _upgradeDivider.Hide();
         _upgradeButton.TooltipText = "";
         // Busy status already appears in the header/button; retain the full explanation as a tooltip.

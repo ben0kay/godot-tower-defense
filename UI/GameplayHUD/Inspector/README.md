@@ -1,3 +1,9 @@
+## RT1 repair capability labels — 2026-11-05
+
+Restoration Tower's optional RepairStats uses the existing comparison/current table: **Repair (HP/s)** and Range, with **HULL REPAIR** in the header. It does not show projectile Damage/DPS, fire rate or a fictitious Kinetic type. Non-repair rows remain unchanged. No friend-policy selector, new layout, purchased tier preview or RT3 expansion is implemented. Source review only; Godot layout acceptance pending.
+
+---
+
 ## Stored Energy meter + compact rank (2026-11-05)
 
 **Source implemented; Godot visual acceptance pending.** Placed power-capable towers now show a **separate ENERGY: stored / capacity** text and slim 6px `EnergyBar` beneath Heat, consistent with HP and Ammo. The fill blends **red when depleted → yellow at 50% → green when full**; colours are Inspector-editable via `UI/DefaultUIConfig.tres` (`EnergyLowColor`, `EnergyMidColor`, `EnergyFullColor`). The meter reads `TowerBase.Power.Capacitor.Energy` and `Settings.Capacity` directly, follows existing selected-only `RuntimeChanged` updates, and hides for generator/passive/other towers without a capacitor or during build previews. The former inline `Ammo ready · Energy ...` runtime footer now shows just contextual ammo status because the bar owns energy quantities.

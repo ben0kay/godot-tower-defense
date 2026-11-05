@@ -25,6 +25,12 @@ public static class TowerUpgradeComparison
             { Add(rows, "Credits / cycle", income.PerCycle, future.PerCycle, 0); Add(rows, "Cycle (s)", income.CycleSeconds, future.CycleSeconds, 1, false); }
             return rows;
         }
+        if (current.Repair is RepairStats repair && next.Repair is RepairStats futureRepair)
+        {
+            Add(rows, "Repair (HP/s)", repair.HullPerSecond, futureRepair.HullPerSecond, 2);
+            Add(rows, "Range (px)", current.RangePixels, next.RangePixels, 1);
+            return rows;
+        }
         bool beam = current.Beam.HasValue && next.Beam.HasValue;
         bool wave = current.Shockwave.HasValue && next.Shockwave.HasValue;
         bool projectile = !beam && !wave;

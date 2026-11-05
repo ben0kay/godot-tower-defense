@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="TowerConstructionArt" load_steps=5 format=3]
+[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="art"]
+[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="stage"]
+[ext_resource type="Texture2D" path="res://TOWERS/Support/RepairTower/Artwork/Construction/foundation.svg" id="foundation"]
+
+[sub_resource type="Resource" id="Stage0"]
+script = ExtResource("stage")
+Texture = ExtResource("foundation")
+
+[resource]
+script = ExtResource("art")
+BuildStages = Array[ExtResource("stage")]([SubResource("Stage0")])
