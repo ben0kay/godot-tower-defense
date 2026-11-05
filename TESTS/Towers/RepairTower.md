@@ -1,3 +1,9 @@
+## Restoration Tower paid levels 2–3 (2026-11-05)
+
+The focused `RepairTowerChecks.cs` now expects three absolute support tiers, checks L2/L3 price/work and 20/24 hull HP/s, 344/368 px range, 1,050/1,102.5 hull cap, and confirms the Repair/Range Inspector descriptions. These are lightweight authored checks **not executed** in this connector session. Owner should visually confirm finished SVG split layers, rotating gun on each tier, staged 35%/70% upgrade overlays, and saved/restored progression.
+
+---
+
 # RT1 Restoration Tower — focused owner check
 
 **Source/resource review completed; fixture authored but not run.** Execution environment unavailable. No tooling installation, broad regression suite, gameplay/visual acceptance or benchmark. Rebuild C# and import new SVGs in Godot .NET; optionally run `RepairTowerChecks.tscn` with F6 once.

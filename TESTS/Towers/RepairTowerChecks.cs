@@ -34,8 +34,18 @@ public partial class RepairTowerChecks : Node
             config => { config.Power = null; config.MaxHealth = 100; });
         TowerDefinition definition = f.Placement.Catalog.Find("repair");
         Require(definition.Category == TowerDefinition.TowerCategory.Support && definition.Footprint == Vector2I.One
-            && healer.Levels.Count == 1 && healer.AuthoredConfig.BuildSeconds == 5 && healer.Levels[0].Costs[0].Amount == 350,
-            "Single Support tier retains provisional cost/work/footprint");
+            && healer.Levels.Count == 3 && healer.AuthoredConfig.BuildSeconds == 5 && healer.Levels[0].Costs[0].Amount == 350,
+            "Three support tiers preserve Level 1 cost, work and footprint");
+        Require(healer.Levels[1].Costs[0].Amount == 225 && healer.Levels[2].Costs[0].Amount == 325
+            && healer.Levels[1].WorkSeconds == 6 && healer.Levels[2].WorkSeconds == 7,
+            "Support upgrades use the existing paid level and construction clocks");
+        TowerFinalStats second = healer.ResolveLevel(2), third = healer.ResolveLevel(3);
+        Require(second.Repair?.HullPerSecond == 20 && second.RangePixels == 344 && second.MaxHealth == 1050
+            && third.Repair?.HullPerSecond == 24 && third.RangePixels == 368 && third.MaxHealth == 1102.5f,
+            "Purchased tiers improve hull repair and range while preserving +5% hull progression");
+        Require(healer.Config.DescribeChanges(healer.FinalStats, second).Contains("Repair:")
+            && healer.Config.DescribeChanges(healer.FinalStats, second).Contains("Range:"),
+            "Upgrade Inspector reports repair and radius gains");
         Require(healer.FinalStats.Repair?.HullPerSecond == 16 && healer.FinalStats.RangePixels == 320
             && healer.FinalStats.MaxHealth == 1000 && healer.Ammunition == null && healer.Power == null && healer.FinalStats.Beam == null,
             "Independent repair capability has no fabricated damage/ammo/power");

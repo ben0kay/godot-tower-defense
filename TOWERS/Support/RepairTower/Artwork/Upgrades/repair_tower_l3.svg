@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<g stroke-linejoin="round">
+<path d="M18 5H46L59 18V46L46 59H18L5 46V18Z" fill="#476477" stroke="#ecf9ff" stroke-width="2"/>
+<path d="M20 10H44L54 20V44L44 54H20L10 44V20Z" fill="#edf7fc" stroke="#9abccc" stroke-width="1.5"/>
+<path d="M20 13H44M13 20V44M20 51H44M51 20V44" stroke="#f5fbff" stroke-width="2"/>
+<circle cx="32" cy="32" r="17" fill="#aecbd8" stroke="#f0f9ff" stroke-width="2"/>
+<circle cx="32" cy="32" r="12" fill="#2b5a70" stroke="#b5f8ff" stroke-width="1.3"/>
+<path d="M17 9H23M41 9H47M9 41V47M55 17V23M17 55H23M41 55H47" stroke="#78f4ff" stroke-width="2"/>
+<circle cx="16" cy="16" r="2" fill="#596f80"/><circle cx="48" cy="16" r="2" fill="#596f80"/>
+<circle cx="16" cy="48" r="2" fill="#596f80"/><circle cx="48" cy="48" r="2" fill="#596f80"/>
+</g>
+
+<!-- L3: refined silver armoured rim and concentric advanced restoration-energy conduits. -->
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M18 6H46M6 18V46M58 18V46M18 58H46" stroke="#ffffff" stroke-width="1.8"/>
+ <path d="M19 10H26M38 10H45M10 19V26M54 19V26M10 38V45M54 38V45M19 54H26M38 54H45" stroke="#88f5fa" stroke-width="1.8"/>
+ <circle cx="32" cy="32" r="15.5" stroke="#a1faff" stroke-width="1.5" stroke-dasharray="6 2.8"/>
+ <circle cx="32" cy="32" r="13.3" stroke="#e7ffff" stroke-width=".75" stroke-dasharray="2.5 3.5"/>
+ <path d="M20 13L13 20M44 13L51 20M13 44L20 51M51 44L44 51" stroke="#d2faff" stroke-width="1.3"/>
+</g>
+<g fill="#c5ffff" stroke="#476d80" stroke-width=".5">
+ <rect x="28" y="5" width="8" height="3" rx="1"/>
+ <rect x="28" y="56" width="8" height="3" rx="1"/>
+</g>
+<g stroke-linejoin="round">
+<path d="M26 7H38L41 25L44 38L39 48H25L20 38L23 25Z" fill="#d6e9f2" stroke="#ffffff" stroke-width="1.5"/>
+<path d="M28 3H36V15H28Z" fill="#fcffff" stroke="#98f0fa" stroke-width="1.3"/>
+<path d="M30 4H34V14H30Z" fill="#d0ffff"/>
+<path d="M26 17H38L40 27H24Z" fill="#f4fbff" stroke="#8fb5c6" stroke-width="1.1"/>
+<circle cx="32" cy="34" r="10" fill="#f4fdff" stroke="#8cb4c6" stroke-width="1.5"/>
+<circle cx="32" cy="34" r="6" fill="#83f6fc" stroke="#e3fff7" stroke-width="1.1"/>
+<circle cx="32" cy="34" r="2.5" fill="#eaffff"/>
+<path d="M24 25L21 33M40 25L43 33M28 44H36" stroke="#b8fcff" stroke-width="1.6"/>
+</g>
+
+<!-- L3: polished dual receiver arms, reinforced aperture crown and concentric emitter. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+ <path d="M23 16L14 22L16 30L24 27M41 16L50 22L48 30L40 27" fill="#b9d5df" stroke="#efffff" stroke-width="1.3"/>
+ <path d="M17 24L21 22M47 24L43 22" stroke="#8ffaff" stroke-width="2.3"/>
+ <path d="M24 15H40L43 22L39 26H25L21 22Z" fill="#effaff" stroke="#98b9c8" stroke-width="1.2"/>
+ <path d="M26 19H38" stroke="#77f3fb" stroke-width="2.1"/>
+ <circle cx="32" cy="34" r="9" fill="none" stroke="#e5ffff" stroke-width="1.5"/>
+ <circle cx="32" cy="34" r="4.4" fill="none" stroke="#56e6ed" stroke-width="1"/>
+ <path d="M27 45L32 49L37 45" fill="none" stroke="#8cf8fa" stroke-width="1.7"/>
+</g>
+</svg>

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<g stroke-linejoin="round">
+<path d="M26 7H38L41 25L44 38L39 48H25L20 38L23 25Z" fill="#c1d3df" stroke="#f7ffff" stroke-width="1.5"/>
+<path d="M28 3H36V15H28Z" fill="#f6ffff" stroke="#7fdde8" stroke-width="1.3"/>
+<path d="M30 4H34V14H30Z" fill="#b4fbfa"/>
+<path d="M26 17H38L40 27H24Z" fill="#ecf7fb" stroke="#83a1b4" stroke-width="1.1"/>
+<circle cx="32" cy="34" r="10" fill="#f0faff" stroke="#769db1" stroke-width="1.5"/>
+<circle cx="32" cy="34" r="6" fill="#75e6e8" stroke="#e3fff7" stroke-width="1.1"/>
+<circle cx="32" cy="34" r="2.5" fill="#eaffff"/>
+<path d="M24 25L21 33M40 25L43 33M28 44H36" stroke="#a9f6f2" stroke-width="1.6"/>
+</g>
+
+<!-- L2: slim twin stabilisers, wider forward lens, and a second precision repair coil. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+ <path d="M24 19L17 24L19 29L24 28M40 19L47 24L45 29L40 28" fill="#a3c3d1" stroke="#f0ffff" stroke-width="1.15"/>
+ <path d="M18.5 24L22 23M45.5 24L42 23" stroke="#62edf0" stroke-width="1.9"/>
+ <path d="M25 17H39L42 24H22Z" fill="#e1f3f8" stroke="#8cb0c0" stroke-width="1.1"/>
+ <path d="M28 19H36" stroke="#63ecf0" stroke-width="2"/>
+ <circle cx="32" cy="34" r="8" fill="none" stroke="#b7fbff" stroke-width="1"/>
+ <path d="M27 42L32 46L37 42" fill="none" stroke="#72e7eb" stroke-width="1.2"/>
+</g>
+</svg>

@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<g stroke-linejoin="round">
+<path d="M18 5H46L59 18V46L46 59H18L5 46V18Z" fill="#415968" stroke="#daebf1" stroke-width="2"/>
+<path d="M20 10H44L54 20V44L44 54H20L10 44V20Z" fill="#e4f0f5" stroke="#90aab9" stroke-width="1.5"/>
+<path d="M20 13H44M13 20V44M20 51H44M51 20V44" stroke="#f5fbff" stroke-width="2"/>
+<circle cx="32" cy="32" r="17" fill="#93adba" stroke="#f0f9ff" stroke-width="2"/>
+<circle cx="32" cy="32" r="12" fill="#315a69" stroke="#95e9ed" stroke-width="1.3"/>
+<path d="M17 9H23M41 9H47M9 41V47M55 17V23M17 55H23M41 55H47" stroke="#65e8ed" stroke-width="2"/>
+<circle cx="16" cy="16" r="2" fill="#596f80"/><circle cx="48" cy="16" r="2" fill="#596f80"/>
+<circle cx="16" cy="48" r="2" fill="#596f80"/><circle cx="48" cy="48" r="2" fill="#596f80"/>
+</g>
+
+<!-- L2: silver corner reinforcement, sensor ferrules and a brighter but restrained aqua ring. -->
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M18 7H26M38 7H46M7 18V26M57 18V26M7 38V46M57 38V46M18 57H26M38 57H46" stroke="#f5ffff" stroke-width="1.4"/>
+ <path d="M16 13L13 16M48 13L51 16M16 51L13 48M48 51L51 48" stroke="#67e1e8" stroke-width="1.9"/>
+ <circle cx="32" cy="32" r="15" stroke="#a2edf1" stroke-width="1.2" stroke-dasharray="5 4"/>
+ <path d="M24 10H40M24 54H40" stroke="#c2f7fa" stroke-width="1.8"/>
+</g>
+<g fill="#94f9fa"><circle cx="14" cy="32" r="1.4"/><circle cx="50" cy="32" r="1.4"/></g>
+<g stroke-linejoin="round">
+<path d="M26 7H38L41 25L44 38L39 48H25L20 38L23 25Z" fill="#c1d3df" stroke="#f7ffff" stroke-width="1.5"/>
+<path d="M28 3H36V15H28Z" fill="#f6ffff" stroke="#7fdde8" stroke-width="1.3"/>
+<path d="M30 4H34V14H30Z" fill="#b4fbfa"/>
+<path d="M26 17H38L40 27H24Z" fill="#ecf7fb" stroke="#83a1b4" stroke-width="1.1"/>
+<circle cx="32" cy="34" r="10" fill="#f0faff" stroke="#769db1" stroke-width="1.5"/>
+<circle cx="32" cy="34" r="6" fill="#75e6e8" stroke="#e3fff7" stroke-width="1.1"/>
+<circle cx="32" cy="34" r="2.5" fill="#eaffff"/>
+<path d="M24 25L21 33M40 25L43 33M28 44H36" stroke="#a9f6f2" stroke-width="1.6"/>
+</g>
+
+<!-- L2: slim twin stabilisers, wider forward lens, and a second precision repair coil. -->
+<g stroke-linejoin="round" stroke-linecap="round">
+ <path d="M24 19L17 24L19 29L24 28M40 19L47 24L45 29L40 28" fill="#a3c3d1" stroke="#f0ffff" stroke-width="1.15"/>
+ <path d="M18.5 24L22 23M45.5 24L42 23" stroke="#62edf0" stroke-width="1.9"/>
+ <path d="M25 17H39L42 24H22Z" fill="#e1f3f8" stroke="#8cb0c0" stroke-width="1.1"/>
+ <path d="M28 19H36" stroke="#63ecf0" stroke-width="2"/>
+ <circle cx="32" cy="34" r="8" fill="none" stroke="#b7fbff" stroke-width="1"/>
+ <path d="M27 42L32 46L37 42" fill="none" stroke="#72e7eb" stroke-width="1.2"/>
+</g>
+
+<g fill="none" stroke-linejoin="round" stroke-linecap="round">
+ <!-- pre-commission calibration rails -->
+ <path d="M11 20V12H20M44 12H52V20M11 44V52H20M44 52H52V44" stroke="#d9fbff" stroke-width="1.5"/>
+ <path d="M12 25H21M43 25H52M12 39H21M43 39H52" stroke="#9fe9ef" stroke-width="1.2" stroke-dasharray="3 3"/>
+ <circle cx="32" cy="32" r="21.5" stroke="#a3ecf2" stroke-width=".8" stroke-dasharray="2.8 5"/>
+</g>
+</svg>

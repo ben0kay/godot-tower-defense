@@ -1,3 +1,5 @@
+> **2026-11-05 amendment:** The owner's requested paid **Level 2/3 repair throughput/radius upgrades and split SVG upgrade art have now been source-implemented** (see [README.md](README.md)). This completes the paid-tier/art subset originally planned for RT3; RT3's optional friendly-target policy selector and support-XP design, plus RT2 actual shared power/heat, remain future work. Existing 1-tier wording further below is historical.
+
 # RT0–RT4 — Restoration Tower / Shared Friendly Targeting
 
 > **Status: RT0–RT1 Source Implemented / Awaiting Owner Validation (2026-11-05); RT2–RT4 PLANNED.** Target repository: `ben0kay/godot-tower-defense`, branch `dev` only. Codex should implement **one pass at a time** when asked; do not merge or edit `main`. The intended class/file name is `RepairTower` for the existing planned folder, with the in-game display name **Restoration Tower**.

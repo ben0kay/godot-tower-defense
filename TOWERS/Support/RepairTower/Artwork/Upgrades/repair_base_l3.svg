@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<g stroke-linejoin="round">
+<path d="M18 5H46L59 18V46L46 59H18L5 46V18Z" fill="#476477" stroke="#ecf9ff" stroke-width="2"/>
+<path d="M20 10H44L54 20V44L44 54H20L10 44V20Z" fill="#edf7fc" stroke="#9abccc" stroke-width="1.5"/>
+<path d="M20 13H44M13 20V44M20 51H44M51 20V44" stroke="#f5fbff" stroke-width="2"/>
+<circle cx="32" cy="32" r="17" fill="#aecbd8" stroke="#f0f9ff" stroke-width="2"/>
+<circle cx="32" cy="32" r="12" fill="#2b5a70" stroke="#b5f8ff" stroke-width="1.3"/>
+<path d="M17 9H23M41 9H47M9 41V47M55 17V23M17 55H23M41 55H47" stroke="#78f4ff" stroke-width="2"/>
+<circle cx="16" cy="16" r="2" fill="#596f80"/><circle cx="48" cy="16" r="2" fill="#596f80"/>
+<circle cx="16" cy="48" r="2" fill="#596f80"/><circle cx="48" cy="48" r="2" fill="#596f80"/>
+</g>
+
+<!-- L3: refined silver armoured rim and concentric advanced restoration-energy conduits. -->
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M18 6H46M6 18V46M58 18V46M18 58H46" stroke="#ffffff" stroke-width="1.8"/>
+ <path d="M19 10H26M38 10H45M10 19V26M54 19V26M10 38V45M54 38V45M19 54H26M38 54H45" stroke="#88f5fa" stroke-width="1.8"/>
+ <circle cx="32" cy="32" r="15.5" stroke="#a1faff" stroke-width="1.5" stroke-dasharray="6 2.8"/>
+ <circle cx="32" cy="32" r="13.3" stroke="#e7ffff" stroke-width=".75" stroke-dasharray="2.5 3.5"/>
+ <path d="M20 13L13 20M44 13L51 20M13 44L20 51M51 44L44 51" stroke="#d2faff" stroke-width="1.3"/>
+</g>
+<g fill="#c5ffff" stroke="#476d80" stroke-width=".5">
+ <rect x="28" y="5" width="8" height="3" rx="1"/>
+ <rect x="28" y="56" width="8" height="3" rx="1"/>
+</g>
+</svg>

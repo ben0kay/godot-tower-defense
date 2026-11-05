@@ -1,3 +1,23 @@
+## Purchased Levels 2–3 — gameplay and SVG upgrade art (2026-11-05)
+
+**Source Implemented / Awaiting Owner Validation.** Restoration Tower now supports three consecutive purchased levels using the existing `TowerUpgradeController`, absolute level rows, construction drones/work clock, immutable repair stats and owner Inspector. Baseline Level 1 gameplay and its 64×64 art are unchanged.
+
+| Level | Price (build / upgrade) | Work | Range | Hull repair | Max HP |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 1 | 350 Credits | 5s | 320 px | 16 HP/s | 1,000 |
+| 2 | 225 Credits | 6s | 344 px | 20 HP/s | 1,050 |
+| 3 | 325 Credits | 7s | 368 px | 24 HP/s | 1,102.5 |
+
+A purchased tier increases **repair throughput** and **healing reach**, not attack damage. Level 2/3 Inspector exports provide authorable range and repair HP/s without modifying Level 1. The tier preview includes **Repair** and **Range** deltas; the normal 5%-per-level max hull values are complete absolute snapshots. Rotation and target priority are unchanged; the ongoing target lock remains sticky and recovers its larger range on upgrade completion.
+
+**Artwork:** [Upgrades/](Artwork/Upgrades/README.md) contains distinct top-down native 64×64 white/silver/aqua fixed base and independently rotating repair emitter for Level 2 and Level 3; matching composites are available for reference. [RepairConstructionArt.tres](Artwork/Construction/RepairConstructionArt.tres) uses the same shared `TowerLevelArtwork` and existing `TowerConstructionVisuals` presenter for **35% and 70% paid upgrade** states; at work completion it restores the level's own split finished art. No new scene node, timing script, beam renderer, targeting subsystem or animation loop was introduced.
+
+**Scope boundary:** RT2 heat and shared funded power remain separate planned work; adding tiers does **not** change the current cost-free repair baseline or award support XP. Older RT1 documentation below describes the historical one-level state and is superseded for purchased tiers.
+
+**Owner QA:** Pull `dev`, allow Godot to import the new SVGs, purchase L2/L3, confirm prices/preview/repair rate/radius, 35/70% construction images, gun head rotation/muzzle position, 1×1 footprint, and save/restore. Source + resource sanity checks only; actual Godot runtime/visual verification has not been run.
+
+---
+
 # Restoration Tower — RT0 / RT1
 
 **Source Implemented / Awaiting Owner Validation · 2026-11-05 · dev.** Build **Restoration Tower** from **Support** (stable ID `repair`). One 1×1 paid tier: **350 Credits / 5s construction / 1000 hull HP / 320px range / 16 hull HP/s**, 210°/s turn, 12° aim tolerance and 0.3s staggered search. These are provisional baseline values, not changes to other towers.
