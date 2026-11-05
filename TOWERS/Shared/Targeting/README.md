@@ -1,3 +1,15 @@
+## RT0 — friendly-tower selection (2026-11-05)
+
+**Source Implemented / Awaiting Owner Validation.** `TargetDomain` is optional vocabulary (`HostileEnemy = 0`, `FriendlyTower = 1`), not a replacement for existing typed backends or enums. `TowerTargeting`, `ITowerTargetingPolicy`, hostile targeting, stealth/shield preferences and all six serialized enemy priorities are unchanged.
+
+`FriendlyTowerTargeting.Find(registry, healer, range, scratch)` selects the lowest finite **Health / MaxHealth**, breaking exact ties by `TowerRegistry.RegistrationOrder`. Keep one owned `List<TowerBase>` on the caller; its capacity is retained and contents cleared after acquisition. The helper uses the existing footprint-indexed `GetNearby` broadphase and then applies inclusive **world-root-to-root** radius with double intermediates. Zero radius permits coincident roots; negative/nonfinite radius or invalid source/registry returns no target. A null scratch list is a programmer error.
+
+Eligible targets are damaged living members of the same registry, excluding self, queued/detached/destroyed towers and initial construction/timed upgrades. EMP/heat/NoPower on the **target** does not exclude it. The **healer** must be a live member, operational, not busy and not disabled. `Valid(registry, healer, target, range)` shares these rules and performs O(1) membership/state/range checks without a spatial query. Pause, staggered acquisition, owned lock/beam cleanup and actual repair belong to the future caller; the helper owns no Node, tick, event subscription, static scratch storage or retained target.
+
+Only the LowestIntegrity policy is implemented in RT0; other friendly policies and typed UI remain future work. Citadel, shields and mobile units are excluded. No new repair gameplay, health/stat capability, scene/catalog entry, save field, power consumer or HUD change. Run the optional narrow [fixture](../../../TESTS/Towers/FriendlyTowerTargeting.md) after rebuilding C# if desired. Source/diff checks only here; .NET is unavailable and runtime/performance acceptance remains for owner.
+
+---
+
 ## SE1 — stealth enemies and reveal beacon — implemented 2026-10-20 UTC
 
 Waves may now author `Enemy("basic_mk1", stealth: true)` independently of `shield: true`. Default spawns remain ordinary; no existing wave/map was changed. Stealth ships render at30% alpha, revealed ships at100%, with configurable/dimmed defense feedback that composes with Cryo/Stasis. All aimed towers share detection filtering and cached-lock validation; private TowerConfig.CanDetectStealth opts a specialist in without globally revealing enemies. Existing attacks already emitted, splash and untargeted Shockwave remain able to damage hidden ships (stealth is targeting, not immunity).

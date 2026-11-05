@@ -1,6 +1,6 @@
-# RT0–RT4 — Restoration Tower / Shared Friendly Targeting (PLANNED)
+# RT0–RT4 — Restoration Tower / Shared Friendly Targeting
 
-> **Status: DESIGN ONLY — NOT IMPLEMENTED.** Target repository: `ben0kay/godot-tower-defense`, branch `dev` only. Codex should implement **one pass at a time** when asked; do not merge or edit `main`. The intended class/file name is `RepairTower` for the existing planned folder, with the in-game display name **Restoration Tower**.
+> **Status: RT0 Source Implemented / Awaiting Owner Validation (2026-11-05); RT1–RT4 PLANNED.** Target repository: `ben0kay/godot-tower-defense`, branch `dev` only. Codex should implement **one pass at a time** when asked; do not merge or edit `main`. The intended class/file name is `RepairTower` for the existing planned folder, with the in-game display name **Restoration Tower**.
 >
 > Owner intent: a sleek white/silver 2D support tower with pale aqua accents, a fixed base and rotating laser head. It never damages enemies. It locks onto **damaged friendly towers** within range, turns toward them, projects a healing beam from its physical muzzle, restores structural hull and uses the existing shared heat and eventual per-tower capacitor-based power systems. Friendly/hostile selection must be reusable, but should not destabilize existing enemy targeting.
 
@@ -18,7 +18,7 @@ New design **differs intentionally**: 1×1 aimed turret, continuous repair laser
 2. `TOWERS/Shared/Targeting/TowerTargeting.cs`, `ITowerTargetingPolicy.cs`, `TOWERS/Shared/Registry/TowerRegistry.cs`, `TowerBase.Spatial.cs`.
 3. `TOWERS/Offensive/LaserTower/LaserTower.cs`, `LaserTowerConfig.cs`, `LaserTowerLevels.cs`, `LaserTower.tscn`; `TOWERS/Shared/Weapons/TurretAiming.cs`, `TOWERS/Shared/Weapons/Beams/BeamRenderer.cs` and `BeamStyle.cs`.
 4. `TOWERS/Shared/Durability/TowerBase.Durability.cs`, `TOWERS/Shared/Stats/{TowerStatBlock,TowerFinalStats,RepairStats}.cs` (RepairStats not yet created), `TOWERS/Shared/Stats/Pipeline/`, `TOWERS/Shared/Conditions/TowerBase.Conditions.cs`.
-5. `TOWERS/Shared/Power/README.md`, `TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md` and actual PW4 code **at implementation time**. The current source docs mark PW4 consumers/capacitors as planned; PW0–PW3 cover generation/topology only.
+5. `TOWERS/Shared/Power/README.md`, `TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md` and actual PW4 code **at implementation time**. PW4-A now provides the Battle Tower projectile-funded capacitor; future continuous repair needs an extension of that shared funding seam. Distance/priority/Inspector phases remain separate.
 6. `TOWERS/Shared/Construction/TowerConstructionVisuals.cs`, `TowerConstructionArt.cs`, `TOWERS/DefaultTowerCatalog.tres`, `TOWERS/Shared/TowerDefinition.cs`, `UI/GameplayHUD/GameplayHUD.cs` and `UI/GameplayHUD/Inspector/`.
 
 ## Architecture: friend/foe target domains
@@ -103,10 +103,11 @@ Level 2/3 (separate approved phase) should increase absolute repair HP/s, perhap
 
 ## Phased implementation contracts
 
-### RT0 — Shared friendly targeting groundwork
+### RT0 — Shared friendly targeting groundwork — Source Implemented / Awaiting Owner Validation
 - Implement the small target-domain separation plus `FriendlyTowerTargeting` using `TowerRegistry.GetNearby` and a reused scratch buffer.
 - Add deterministic lowest-integrity selection, self/full/destroyed/constructing/upgrading filters, proper radius, stable tie-breaks and fast lock validation. **Do not change enemy targeting or the HUD.**
-- Narrow checks for 1×1, multi-cell, ties, out-of-range and destroyed targets.
+- Narrow optional `TESTS/Towers/FriendlyTowerTargetingChecks.tscn` fixture covers 1×1/multi-cell roots, fraction scoring/ties, work, target/healer disables, full/queued/detached/destroyed targets, malformed radius and world isolation. Authored, not executed here: .NET unavailable. Source/diff review only.
+- Implementation: `TargetDomain.cs` and `FriendlyTowerTargeting.cs` under shared Targeting. Only LowestIntegrity is enabled; no friend-specific policy enum/UI yet. Caller owns scratch, staggered queries and cached target lifetime; `Valid` rechecks in O(1). No registry or enemy targeting source changed.
 
 ### RT1 — Restoration Tower playable baseline
 - Add `RepairStats` optional shared capability, forward through existing pipeline and clamp safely; do not treat it as offensive `BeamStats`.
@@ -140,4 +141,4 @@ Codex: perform source/diff review and at most one basic C# build if readily avai
 - Heat increments only while actually repairing, cools between beams and respects existing overheat logic. When PW4 is present, energy is actually charged for applied repairs and a depleted capacitor blocks them.
 - Works with normal selection-radius, placement, construction drones, Save/Load, 1×1/multi-cell neighbor queries and the current default tower catalog.
 
-**Implementation status is PLANNED.** Do not mark complete, alter combat code or implement this entire roadmap just because this plan was committed.
+**RT0 source implemented; RT1–RT4 remain PLANNED.** No playable Restoration Tower, repair stats, beam, heat/power integration or HUD changes have shipped. Owner build/runtime acceptance is pending. Do not implement the remaining roadmap without an explicit pass request.

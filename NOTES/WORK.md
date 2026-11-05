@@ -1,3 +1,9 @@
+## RT0 — reusable friendly-tower targeting — 2026-11-05
+
+**Source Implemented / Awaiting Owner Validation.** Added optional TargetDomain vocabulary and FriendlyTowerTargeting using the existing TowerRegistry, caller-retained scratch and O(1) lock validation. Lowest finite hull fraction wins; exact ties use registration order. Root-range/self/full/dead/queued/detached/constructing/upgrading filters; disabled targets remain repairable while disabled/busy healers cannot acquire/retain locks. Existing enemy targeting/enums, registry, HUD, catalog, waves and stats are untouched. Optional narrow fixture authored; source checks only because .NET is unavailable. **RT1–RT4 remain planned.** [Repair plan](../TOWERS/Support/RepairTower/IMPLEMENTATION_PLAN.md).
+
+---
+
 ## Power PW4-A update — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** Battle-only optional capacitor and paid-shot energy use; finite provisional full-efficiency recharge in the existing manager; owned hysteretic NoPower; checkpoint charge/priority/recovery. Defaults 100 capacity, 10/s refill, 0/s idle, 12/s active, empty initial, 15% restart. No other consumers or combat/source balance changes. **Next PW4-B distance**, then C priority allocation and D selected energy bar; relays remain PW5. Lightweight source review only; Godot .NET build/play remains for owner. [Details](../TOWERS/Shared/Power/README.md). Earlier dated updates below are historical.

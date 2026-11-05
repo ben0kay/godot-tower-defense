@@ -1,3 +1,9 @@
+## RT0 friendly query client — 2026-11-05
+
+The existing registry implementation is unchanged. `FriendlyTowerTargeting` reuses `GetNearby`, `Contains` and `RegistrationOrder` for lowest-integrity damaged-friendly selection. Registry membership remains broad enough for hostile damage (including busy/disabled structures); friendly eligibility filters work phases separately and permits disabled targets. Multi-cell footprint broadphase does not change the root-distance rule. See [targeting API](../Targeting/README.md). No new index, registry events or processing loop.
+
+---
+
 ## EG2 swept footprint API — 2026-10-20
 
 GetSegmentCandidates deduplicates spatial candidates along a segment's world AABB, then rejects world-AABB misses. TryIntersectFootprint clips through the cached grid-space rectangle for exact first-contact fractions, including multi-cell and rotated/scaled grid geometry; TowerFootprintCollision supplies a reusable inclusive double-precision slab solver. Tower roots may relocate through existing transform notifications; the battlefield grid transform is assumed fixed during play. An EG2 shot rechecks membership before each collision and is consumed before ApplyDamage callbacks, so destruction cannot absorb repeated hits from one round. Registry queries and damage callbacks never share an active dictionary enumeration. Earlier “no bullet delivery” statements describe EG1. Build/runtime verification remains pending.
