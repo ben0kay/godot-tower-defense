@@ -1,3 +1,56 @@
+# PW5 AUTHORITATIVE REVISION — Two separate power buildings (2026-11-05)
+
+**APPROVED DESIGN / NOT YET IMPLEMENTED.** This decision supersedes every earlier PW5 plan below or in older READMEs that describes **pairable Power Relays**. PW0–PW4-D are already source implemented; preserve all existing behavior. Codex must implement **only the separately requested phase**, not the whole roadmap. See [Relay](../../Utility/PowerRelay/README.md), [Transmitter](../../Utility/PowerTransmitter/README.md), and [Backlog](../../../NOTES/IMPLEMENTATION_BACKLOG.md).
+
+| Building | Exclusive gameplay responsibility | Player-visible minimum |
+| --- | --- | --- |
+| **Power Relay (PW5-A)** | Boost *local* rechargeable efficiency along conducting terrain on its own powered island. No inter-island link or pairing. | Cyan live core, dim inactive core and informative selected status; selected coverage/source route in PW5-C. |
+| **Power Transmitter (PW5-B)** | Pair with *one other Transmitter* across distinct conducting islands; join real electricity networks. Never grants local recharge boosts. | Actual thin cyan/blue visible energy line between an operational pair in PW5-B; polish in PW5-C. |
+| **Citadel / generators (existing)** | Only these create electricity; towers hold their own capacitor energy. | Existing Inspector/diagnostic output. |
+
+Two separate Utility catalog entries, scenes, configs and art folders; recommend stable IDs `power_relay` and `power_transmitter` after checking the catalog. Initial one level each. Construction cost, build seconds, HP/footprint and distribution settings should be conservative, Inspector-configurable and labelled **provisional**, not silently treated as approved balance.
+
+## Shared invariant/architecture contract
+
+1. **One authority:** use existing `World/PowerNetworks`, `PowerGridManager`, PW1 cached four-neighbour islands, PW2/3 producers, PW4-A capacitor/NoPower/Save, PW4-B cached conductive distance, PW4-C **nearer-source-first allocation** and PW4-D energy Inspector. No second manager, global battery, new update loop or per-tower per-frame traversal.
+2. **Power conservation:** for each effective connected power network and shared service interval, total allocated recharge is at most the sum of **distinct live sources' output × elapsed game-time**. Relays/Transmitters create zero electricity; joining islands, overlapping coverage and transmitter chains cannot double-count producers.
+3. **Charge persists:** disconnection/disabling affects *future refill only*. Do not wipe existing tower capacitors; existing owned NoPower, EMP, heat, work, spend/rollback, hysteresis and pause behavior remain authoritative.
+4. **Physical validity:** source, relay, transmitter and consumer footprints must respect existing valid conducting-cell rules. Diagonal, empty space, Lava and unrelated islands never connect except by a **valid active Transmitter pair**. One remote side can be source-less and still receive power; an island does not need its own generator merely to receive a linked supply.
+5. **Cached lifecycle:** recompute relevant distribution/network caches only on placement, completion/upgrading, detach/death, disable/recovery, terrain rebuild, producer live-output/availability, link/unlink and restore. No full-map/registry rescan every frame, repeated sorting or drawing-dependent energy logic. Reuse existing cached snapshots/arrays.
+6. **Saving:** peer references are durable **Tower SaveIds** (not runtime instance IDs or transient region labels). Restore all buildings before resolving and verifying reciprocal links, then rebuild effective network and derived recharge before unpause. Existing power save fields and content-hash guard remain unchanged; broken peers fail safely.
+7. **Allocation ordering:** PW4-C remains primarily distance-first. A local Relay increases a consumer's possible recharge **ceiling**, not its scarcity priority or its generator's output. PW5-B must specify/cache a deterministic meaningful source-to-consumer cost over conductive segments plus transmitter hops. No costless cycle/teleport ranking, no automatic energy priority slider.
+
+## PW5-A — Power Relay, local booster ONLY (Codex pass 1)
+
+- New small buildable `TOWERS/Utility/PowerRelay/` scene + definition/config/art, normal tower work/health/disable/selection/Inspector and saving lifecycle. No pairing or Transmitter.
+- Once complete and operational, Relay becomes an eligible **non-generating secondary distribution anchor** only when its full footprint is on an island with a *reachable live Citadel or generator*. A disconnected or source-less Relay never boosts. Show understandable BOOSTING / NO LIVE SOURCE / DISCONNECTED / DISABLED states, and lit versus dim core; use shared disabled tint/badge when appropriate.
+- Configurable range measured in **four-neighbour conducting cells** and capped improvement to PW4-B effective recharge rate (never over nominal per-type rate). Prefer shared cached relay-distance field. Multiple Relays use the **best eligible ceiling**, not additive bonuses, and must not endlessly relay-hop to magnify efficiency. The original producer-distance route is still valid fallback.
+- Retain **original source distance as PW4-C scarcity ordering**; boosted far towers do not jump in front of nearer towers simply by building a Relay. Actual refill still obeys existing source budget and request/headroom. Don't add relay upkeep/fuel/charges without later approval.
+- Acceptance (focused): near/far same-island recharge, relay on source-less island, terrain gaps/diagonals, multiple overlapping relays, source death, work/EMP/disable, destroy/rebuild, pause, shortage conservation and a new save. **Done:** eligible far towers have higher *possible* refill; without Relay the PW4-B falloff immediately returns and stored charge remains.
+
+## PW5-B — Power Transmitter, cross-island ONLY (Codex pass 2, separate approval)
+
+- Add distinct buildable `TOWERS/Utility/PowerTransmitter/` with its own ID/art/config/scene; no local booster behavior and no shared Relay pair control.
+- Selected transmitter Inspector: **Link** then choose an eligible completed second Transmitter on another conducting island; **Unlink** to remove. Exactly **one reciprocal peer per transmitter** initially. Reject self, same-island, missing, dead, incomplete or occupied target with useful feedback. Do not auto-pair by proximity.
+- Operational pair adds an undirected edge to a **small cached graph of physical islands**. One/both sides may produce; both generator-free means zero supply. Join budgets once per effective graph component; power reaches remote island through actual viable endpoints and valid conducting cells. Multiple pairs/chain paths must not duplicate output or form infinite-distance discounts.
+- Temporary disable/EMP **suspends** a retained player pairing without deleting stable peer IDs; construction/destroy/removal/unlink removes active connectivity. Return to operation revalidates pairing. Save peers with stable Tower SaveIds; rebuild network after restore *before gameplay resumes*.
+- Define deterministic link-hop attenuation/segment distance policy in typed Inspector configuration; retain the PW4-C distance-first intent. No first-pass throughput/fuel, arbitrary link range, purchased tiers or global battery without separate design approval.
+- **REQUIRED in B:** visible thin subdued blue/cyan straight energy link between an active pair; one renderer per pair, clear inactive/broken/unpowered indication, no constant clutter or duplicate drawings. Animation and richer feedback are for C.
+- Acceptance: an unlinked unit does nothing; manual pair crosses vacuum; a generator-free receiving island charges correctly; both producers counted once; unlink, source death, EMP, destruction, alternate links, save/retry, pause and budget conservation behave predictably.
+
+## PW5-C — power-link visualization/UX polish (Codex pass 3, separate approval)
+
+- When Relay is selected, show translucent cyan **actual reachable conducting cells** within its booster range, *not* a misleading Euclidean circle spanning gaps. Show thin dashed shortest conductive path to **nearest live source**; label `Nearest live source — island supply shared` because a network may pool multiple generators. Reuse/cache predecessor data or compute only when selected/invalidated, never each frame.
+- Transmitter links: build on B's static line with a narrow cyan core, faint halo and occasional controlled pulses. Active vs suspended/unlinked status is obvious; minimize overlap with combat beams. On selection or F4, expose partner identity and effective island network info using existing throttled diagnostics.
+- Respect existing selection visuals, compact fixed-size Inspector, shared disabled badge, gameplay pause, viewport culling and bounded visual update rates. Visual effects do not affect energy calculation and must remain cheap on big Level011.
+- Done when player can understand exactly where **local boosting** applies and exactly which **different islands** are electrically linked, with no FPS-heavy per-frame route drawing.
+
+## Deferred (not PW5 work)
+
+PW6 Solar/Fusion, fuel/upkeep, premium relay tiers, persistent power beams from Relay to generator, arbitrary remote wireless power, mandatory transmitter throughput caps or maximum length, power-priority slider, additional autoloads and broad generator/power rewrites. Balance values and optional link losses/range require later owner approval.
+
+---
+
 ## Offensive and Repair power rollout — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** All nine implemented offensive types plus Restoration Tower now use the existing `TowerPowerConsumer`, `PowerCapacitor`, `PowerGridManager` and owned `NoPower` handle. No additional power clock, per-tower polling, source, relay or priority slider is added. Existing selected ENERGY bar and PW4-D actual refill/limit/use/distance/status details automatically apply to every consumer. Earlier Battle-only phase notes below are historical.
@@ -122,7 +175,9 @@ The entire four-neighbour **conducting island** still shares a finite generation
 | **PW4-B — Distance-limited recharge** | `TOWERS/Economy/Power/Shared/` cached generator/Citadel anchors, four-neighbour conductive distances, editable falloff/efficiency; expose a per-consumer current delivery ceiling. | Near and distant towers both eventually fill while idle; far tower charges slower and drains earlier during continuous fire. Source death / isolation updates efficiency; no repeated pathfinding every tick. |
 | **PW4-C — Distance-first supply allocation** | Extend existing `PowerGridManager` accounting with finite time-integrated allocation favouring nearer towers by cached conductive-path distance; no active priority slider yet. | Total credited refill never exceeds generated energy for each interval, even across many towers or overlapping generators. Shortages reduce **recharge**, and stored energy continues to be usable until depleted. No flicker/over-allocation. |
 | **PW4-D — Selected tower Inspector** | Reuse selected Inspector's Heat/Ammo bar design; display **Stored Energy / Capacity** as primary bar (not full/empty grid service), live **actual Recharge +X/s, possible Recharge +Y/s, Drain −Z/s, Distance and Efficiency %**; clear NoPower/charging state and zero-draw/zero-capacity policy. | Player can distinguish **full but slowly recharging** from **empty/no generation** and understand actual received recharge versus distance-limited potential. UI refreshes on meaningful/capped state changes, not a custom per-tower UI frame loop. |
-| **PW5 — Power Relays** | `TOWERS/Utility/PowerRelay/`: reinforce local effective signal as a non-generating distribution anchor on an existing powered island; optionally pair two relays across isolated islands to join network budgets and propagate signal. | Nearby towers recharge faster with a viable, powered relay; removing it returns natural falloff; remote island only charges when a valid powered pair connects it. Chaining never creates energy. |
+| **PW5-A Power Relay** | Local-only boost to rechargeable efficiency on its own powered island. | Does not pair or create power. |
+| **PW5-B Power Transmitter** | A separate Utility building, manually paired to another Transmitter on a different island. | Visible basic link, real finite network union and checkpointed reciprocal peer IDs. |
+| **PW5-C Visual polish** | Selection-only conductive Relay coverage/source route, animated link and Inspector/F4 feedback. | Distinct roles clearly shown without costly per-frame map traversal. |
 
 **PW4-A/C dependency note:** PW4-A may introduce a tiny provisional single-network recharge service for integration, but **PW4-C owns authoritative finite production allocation**. Don't accidentally ship an unlimited refill loop as final PW4-A; wire the same owner/seam to be replaced/extended by PW4-C. PW4-B's efficiency is a capped ceiling, not a promise of delivered power. Keep these phases focused; don't build a new parallel power manager.
 
@@ -249,7 +304,7 @@ future relay changes rebuild only network unions, not terrain islands. Never sca
 | **PW2** | Shared producer/demand accounting + configurable Citadel baseline registration | Source implemented / owner validation pending. DefaultCitadelPower.tres Output=100 provisional; event-driven source lifetime, per-island cached totals and F4 accounting. No actual consumers/outages yet. Check multiple Citadels, isolation, death/removal and a new Save/Load. |
 | **PW3** | Shared generator/config in `Shared/`, Industrial scene/config/art in its type folder | Source implemented / owner validation pending. `industrial_generator` in Economy, provisional 250 output / 300 Credits / 5s / 1200 HP / 2×2, assembly stages, work/disable/lifetime registration and existing checkpoint reconstruction. |
 | **PW4-A–D** | Tower buffers and charge/use (A); cached distance recharge (B); distance-first finite supply allocation (C); Inspector stored-energy bar/rates (D) | **PW4-A/B/C/D source implemented / owner validation pending.** Follow the authoritative PW4 subpass table above. Protect existing power topology and generator output. |
-| **PW5** | Non-generating local distribution booster plus optional manually paired relays bridging isolated islands | Planned. Boost local recharge efficiency without creating energy; preserve finite shared production and safe network merges/splits. See the PW4 revision above. |
+| **PW5-A/B/C** | **Two building types:** local-only Power Relay (A), manually paired cross-island Power Transmitter + basic visible link (B), advanced connection/coverage visuals (C). | **Approved design, not implemented.** See canonical PW5 revision at TOP, which supersedes combined-Relay descriptions below. Implement one pass per request. |
 | **PW6** | Solar/Fusion variants, shared status feedback and tuning | Planned. Distinct IDs/configs, one producer implementation; readable capacity/shortage feedback and measured desktop cost. |
 
 Each phase includes its relevant save integration, feature documentation and brief source/build checks.

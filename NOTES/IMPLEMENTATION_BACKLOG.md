@@ -18,12 +18,13 @@
 | Phase | Status | Codex-sized scope |
 | --- | --- | --- |
 | PW0–PW4-D | **Source implemented; owner acceptance pending** | Inspect near/far consumers, brownouts, buffer recovery, same-distance ties, pause/EMP, save/load, and GPU/CPU at normal game scale. **Do not reimplement.** |
-| **PW5-A (suggested split)** | **OPEN** | Local **non-generating** Power Relay on a powered conducting island; serve as a cached distribution anchor and improve nearby recharge efficiency, never adding supply or bypassing conductive routes. |
-| **PW5-B (suggested split)** | **OPEN** | Optional manually paired relays between islands; finite merged supply budgets, link/UI/validation, destruction/disconnection, chain/cycle safety and checkpoint identity. |
+| **PW5-A — local Power Relay** | **Approved design / OPEN** | Non-generating local recharge booster on its *own* powered island; cannot pair or transport. Basic powered-state visual. |
+| **PW5-B — Power Transmitter** | **Approved design / OPEN** | **Separate building**, manual Transmitter-to-Transmitter cross-island link, finite merged supply, saved reciprocal IDs and **required visible beam**. |
+| **PW5-C — Power visuals** | **Approved design / OPEN** | Selected Relay actual conducting coverage and source route; restrained animated cross-island link and Inspector/F4 feedback. |
 | **PW6** | **OPEN** | Independent Solar Generator and Fusion Reactor types using existing shared producer implementation; balance and status/performance polish. |
 | Optional bounded priority | **NOT APPROVED** | Persisted 0–100 PowerPriority is currently inactive. Later UI/limited bias must not override distance-first policy. |
 
-**PW5 handoff:** [Power plan](../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md) and [Relay design](../TOWERS/Utility/PowerRelay/README.md). Start with PW5-A after the owner checks a short PW4 scarce-supply example. PW5-B and PW6 are separate jobs. Do not introduce a second power manager, global battery, new per-tower tick or unrestricted cross-island energy creation.
+**PW5 handoff:** [Authoritative plan](../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md), [local Relay](../TOWERS/Utility/PowerRelay/README.md), [separate Power Transmitter](../TOWERS/Utility/PowerTransmitter/README.md). The prior combined Relay design is obsolete: A local booster, B transmitter/link/basic beam, C visual polish. Implement one requested phase at a time; PW6 remains separate. No new manager, battery, per-tower tick or free energy.
 
 ## Other priority work still open
 
@@ -132,7 +133,7 @@ Terrain power islands and F4 topology diagnostics are now source implemented, wi
 | Priority | Job | Scope |
 | ---: | --- | --- |
 | 1 | **PW4 in-game acceptance / PW5-A relay booster** | Short near/far shortage check first; then add only local non-generating distribution anchors. |
-| 2 | **PW5-B paired relays** | Separate follow-up after local booster, with finite merged islands, save identity and link UI. |
+| 2 | **PW5-B Power Transmitters** | Separate cross-island building/link, finite merged supply, save identity, basic visible beam and link UI. |
 | 3 | **RT2 heat and tower-shield design** | Restoration now repairs hulls, has L2/L3 and consumes real energy; only heat and advanced policy/shields remain. |
 | 4 | **Level011 Waves 6–10** | Heavier mixed fleets on existing three lanes; Capital/Titan only after matching enemy assets are designed. |
 | 5 | **WP2/WP3/WP4 Wave Editor polish** | Real sprite/stat preview, action button arrangement and useful wave summary. |

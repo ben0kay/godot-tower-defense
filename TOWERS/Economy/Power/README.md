@@ -1,3 +1,9 @@
+## PW5 — Local Relay and separate cross-island Transmitter (2026-11-05)
+
+**Approved design / not implemented.** PW5-A Power Relay only boosts local recharge across conducting cells; Relays do **not** pair. PW5-B adds a distinct Power Transmitter building which pairs with another Transmitter on a different island to share existing finite producer output and displays a real blue connection beam. PW5-C polishes selected Relay coverage/nearest-live-source conductive route and transmitter beam pulses. This supersedes older combined Relay/pair wording further down. [Canonical Codex pass plan](IMPLEMENTATION_PLAN.md), [Relay owner](../../Utility/PowerRelay/README.md), [Transmitter owner](../../Utility/PowerTransmitter/README.md).
+
+---
+
 ## PW4-C updated direction — distance-first shortage allocation (2026-11-05)
 
 **Planning only.** Under finite island power, towers with shorter conducting-terrain paths to Citadel/generator sources receive their requested capacitor refill **before farther towers**. PW4-B already slows recharge with distance; PW4-C will additionally allow distant towers to get **zero actual refill** in a shortage while nearer capacitors take available output. As nearby batteries fill, power reaches farther structures. Stored energy is never wiped by lack of incoming power. The existing 0–100 PowerPriority saved value stays unused; a possible **later** slider can add a small bounded bias rather than override distance. PW4-D should show actual recharge separately from its distance-limited maximum. [The updated PW4-C plan](IMPLEMENTATION_PLAN.md) supersedes older priority-first notes below.
