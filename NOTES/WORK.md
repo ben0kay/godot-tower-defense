@@ -1,3 +1,10 @@
+## Shared power rollout to offensive towers and Repair — 2026-11-05
+
+**Source Implemented / Awaiting Owner Validation.** All nine offensive types plus Restoration Tower now use PW4-A–D capacitors and the existing Inspector ENERGY/power details. Each has a configurable per-type profile with modest provisional rates; Battle's baseline is unchanged. Atomic projectile/volley/pulse payments and duration-limited Laser/repair payments reuse the shared service and NoPower recovery. Active replaces idle; no new polling, generator, relay, priority slider or save schema. Existing combat, ammo, heat, construction, upgrades and checkpoint owners are preserved. Source/resource checks only; .NET unavailable, owner Godot validation pending. [Rate table and accounting](../TOWERS/Shared/Power/README.md).
+
+
+---
+
 ## Level011 right-edge bounds fix — 2026-11-05
 
 Expanded only Level011WorldConfig WidthCells 160→192 (height120/cell64 unchanged). Current paint reaches X=175 and the Citadel sits past old X=10240px, so the camera correctly clamped short and grid ignored right-side content. New local bounds12288×7680 contain current layout with margin. Authored scene/objects, shared camera code, other missions and global defaults untouched. Updated Level011 notes. Minimal coordinate/config review only; restart/redeploy and inspect right-edge pan/placement in Godot. No runtime/benchmark claim.

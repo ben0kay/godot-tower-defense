@@ -57,16 +57,33 @@ public sealed partial class TowerPowerConsumer : IDisposable
     }
     // =========================================================
     // Only this consumer settles on a shot; no scan/sort of the other towers is performed.
-    public bool TryFundAttack(double seconds, TowerAmmunition ammo)
+    public bool TryFundAttack(double seconds, TowerAmmunition ammo, int shots = 1)
     {
         Settle();
         if (Capacitor.RecoveryRequired) { Publish(); return false; }
         PowerSaveData before = Capacitor.Capture(_priority);
         if (!Capacitor.TryPayAttack(seconds)) { Publish(); return false; }
-        if (ammo?.TryFire() == false) { Capacitor.Restore(before); return false; }
+        if (ammo?.TryFire(shots) == false) { Capacitor.Restore(before); return false; }
         RecordEnergySpent(before.Energy - Capacitor.Energy);
         // Publication waits until the projectile exists: disabling clears Battle Tower's target.
         _grid?.WakeCapacitors(); return true;
+    }
+    // =========================================================
+    // Continuous work buys only a deliverable slice; cap by energy before consuming beam ammunition.
+    public double FundWorkSeconds(double seconds, TowerAmmunition ammo = null)
+    {
+        if (!double.IsFinite(seconds) || seconds <= 0) return 0;
+        Settle();
+        if (Capacitor.RecoveryRequired) { Publish(); return 0; }
+        double rate = Capacitor.Settings.Active;
+        double funded = rate > 0 ? Math.Min(seconds, Capacitor.Energy / rate) : seconds;
+        if (ammo != null) funded = ammo.FundBeamSeconds(funded);
+        if (funded <= 0) return 0;
+        double before = Capacitor.Energy;
+        Capacitor.PayWork(funded);
+        RecordEnergySpent(before - Capacitor.Energy);
+        // As with shots, defer NoPower callbacks until the already-paid work has been delivered.
+        _grid?.WakeCapacitors(); return funded;
     }
     // =========================================================
     // Capture at the shared service boundary; source energy and elapsed idle spend cannot be replayed.

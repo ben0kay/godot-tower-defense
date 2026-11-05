@@ -1,3 +1,11 @@
+## Offensive and Repair power rollout — 2026-11-05
+
+**Source Implemented / Awaiting Owner Validation.** All nine implemented offensive types plus Restoration Tower now use the existing `TowerPowerConsumer`, `PowerCapacitor`, `PowerGridManager` and owned `NoPower` handle. No additional power clock, per-tower polling, source, relay or priority slider is added. Existing selected ENERGY bar and PW4-D actual refill/limit/use/distance/status details automatically apply to every consumer. Earlier Battle-only phase notes below are historical.
+
+The existing allocator now serves all nine offensive towers and Repair, with independent per-type profiles. Distribution/cache/service cadence is unchanged. See [consumer rates and payment policy](../../../Shared/Power/README.md). Source/resource checks only; owner Godot validation pending.
+
+---
+
 ## PW4-C — distance-first scarce-supply allocation — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** The existing shared capacitor service now allocates finite island generation in ascending cached conductive-path distance, breaking ties by ordinal Tower SaveId. Every request is capped by eligible elapsed recharge at its PW4-B ceiling and remaining capacitor headroom. Unused energy goes immediately to later requests; zero supply/route/ineligible state delivers zero. Stored energy, shot spending and NoPower recovery remain independent. No priority slider or bias, new consumer, relay, balance change or save schema is introduced.

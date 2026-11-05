@@ -35,11 +35,14 @@ public sealed class TowerAmmunition
 
     // =========================================================
     // Called only after target/cooldown/launch preconditions succeed, never for impact or each splash recipient.
-    public bool TryFire()
+    public bool TryFire() => TryFire(1);
+    public bool TryFire(int shots)
     {
+        if (shots <= 0) throw new ArgumentOutOfRangeException(nameof(shots));
         if (Stats.PerShot <= 0) return true;
-        if (!Inventory.TryConsume(Stats.PerShot)) return false;
-        ConsumedRounds += Stats.PerShot; return true;
+        long rounds = (long)Stats.PerShot * shots;
+        if (rounds > int.MaxValue || !Inventory.TryConsume((int)rounds)) return false;
+        ConsumedRounds += rounds; return true;
     }
 
     // =========================================================

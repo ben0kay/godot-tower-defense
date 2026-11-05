@@ -1,3 +1,11 @@
+## Shared power consumption — 2026-11-05
+
+**Source Implemented / Awaiting Owner Validation.** Restoration now opts into the PW4-A–D shared capacitor via `DefaultRepairTowerConfig.tres → RepairTowerPower.tres`: provisional 100 capacity, 10/s nominal recharge, 0.15/s idle, 8/s total active, empty initial fill, 15% restart. Existing selected ENERGY bar and power details apply automatically. Earlier cost-free RT1 notes are historical.
+
+Only aligned repair of actual missing hull prepays active energy, capped by delivered repair seconds. Seeking/alignment/full targets use idle while operational. Active replaces idle; construction/upgrades pause both recharge and use; built disables recharge without idle. NoPower is published after repair delivery, preserving callback safety and existing sticky target selection while operational. Existing tiers, hull repair rates, ordinary RestoreHealth, beam, heatless/ammo-free behavior, construction and checkpoints remain with their current owners. [Shared policy/rates](../../Shared/Power/README.md). Source/resource checks only; Godot build/runtime and fresh save/load remain for owner.
+
+---
+
 ## Purchased Levels 2–3 — gameplay and SVG upgrade art (2026-11-05)
 
 **Source Implemented / Awaiting Owner Validation.** Restoration Tower now supports three consecutive purchased levels using the existing `TowerUpgradeController`, absolute level rows, construction drones/work clock, immutable repair stats and owner Inspector. Baseline Level 1 gameplay and its 64×64 art are unchanged.

@@ -1,3 +1,39 @@
+## Offensive and Repair power rollout — 2026-11-05
+
+**Source Implemented / Awaiting Owner Validation.** All nine implemented offensive types plus Restoration Tower now use the existing `TowerPowerConsumer`, `PowerCapacitor`, `PowerGridManager` and owned `NoPower` handle. No additional power clock, per-tower polling, source, relay or priority slider is added. Existing selected ENERGY bar and PW4-D actual refill/limit/use/distance/status details automatically apply to every consumer. Earlier Battle-only phase notes below are historical.
+
+| Tower | Capacity | Nominal recharge/s | Idle/s | Total active/s |
+| --- | ---: | ---: | ---: | ---: |
+| Battle (unchanged reference) | 100 | 10 | 0 | 12 |
+| Machine Gun | 100 | 10 | 0.15 | 10 |
+| Sniper | 100 | 10 | 0.10 | 8 |
+| Cryo | 100 | 10 | 0.10 | 8 |
+| Stasis | 100 | 10 | 0.10 | 8 |
+| Blaster Cannon | 120 | 12 | 0.15 | 14 |
+| Rocket | 120 | 12 | 0.15 | 14 |
+| Laser | 100 | 10 | 0.20 | 12 |
+| Shockwave | 120 | 12 | 0.20 | 14 |
+| Restoration / Repair | 100 | 10 | 0.15 | 8 |
+
+
+These are modest provisional rates, not final balance. Each type's `Default*Config.tres → Power` references its own `*Power.tres` beside the config; Battle retains `BattlePower.tres`. All start empty with 15% restart. Config/private-instance cloning already preserves independent profiles; capacity, recharge, idle/active draw, creation fill and restart remain Inspector-editable. Rates stay separate from combat/rank stats and currently remain the same across paid levels.
+
+### Payment and lifecycle
+
+- Projectiles and instant-target shots prepay total active draw × firing interval before launch. Shared multibarrel weapons fund the whole volley once using `count / ShotsPerSecond`, with atomic ammunition consumption and power rollback on rejection. No per-barrel duplicate energy payment; heat, recoil, audio, cooldown and damage retain their existing owners.
+- Shockwave pays once per emitted pulse using its interval. Its existing automatic emission even without targets is unchanged; travelling fronts/splash victims never pay again. Already-launched attacks continue independently of later source disable/destruction.
+- Laser calls the shared `FundPoweredWork` from its existing damage tick: heat-limited duration is capped by available energy **before** beam ammunition is bought. Only the resulting funded duration deals damage/records heat. Repair uses the same seam capped by delta and actual missing hull / repair rate; seeking, aligning and a full target incur no active payment. No new repair heat/ammo behavior is introduced.
+- The existing paid active-time remainder suppresses idle draw during paid work windows, so active replaces idle rather than adding to it. Only operational time outside paid windows incurs idle draw. Payment is recorded once in existing service samples. No global wave-active drain is used.
+- Power depletion is published after the paid attack/work is committed, so NoPower callbacks cannot clear a lock before delivery. Existing hysteretic recovery and independent heat/EMP/work disables remain authoritative. Timed construction/upgrades preserve charge and neither charge nor spend; their clocks remain unchanged. Built disabled towers can recharge without idle draw.
+- The existing shared finite distance-first allocator, cached conductive distance/efficiency, pause rules, event cleanup, capacity-preserving config edits/upgrades and save state (including paid remainder) are reused. No save schema or compatibility bypass. The existing content fingerprint can reject pre-change checkpoints; validate with a fresh save.
+
+### Minimal validation / owner handoff
+
+Focused source/diff and resource-wiring checks only; .NET is unavailable here. No build, Godot gameplay, visual acceptance or benchmark is claimed. Owner: rebuild in Godot .NET; select a projectile, Laser, Shockwave and Repair tower, inspect charging and active/idle Use, then let stored energy deplete/recover. Check a full repair target, simultaneous volley/ammo starvation, source loss, heat/EMP, construction/upgrade and a fresh between-wave Save/Load. Preserve broad testing for owner playtesting.
+
+
+---
+
 ## PW4-D — selected power feedback — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** The existing right-column ENERGY current/capacity bar remains. A compact three-line **PowerDetails** label in the Inspector Main column shows **actual Refill +X/s**, **distance-limited Limit +Y/s**, **actual Use −Z/s**, conductive distance, efficiency and connection state. Tooltips explain measured versus potential rates, authored idle/total-active draw and the recovery threshold. Full, charging, awaiting refill, supply-limited, connected/starved, disconnected/no-live-source, recharge-disabled and work-paused are distinct. Recovery is shown separately; no incoming supply does not erase stored energy.

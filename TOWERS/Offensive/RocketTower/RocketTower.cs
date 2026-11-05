@@ -3,6 +3,7 @@ using Godot;
 
 public partial class RocketTower : TowerBase
 {
+    public override bool SupportsPowerCapacitor => true;
     // =========================================================
     // Generic disabling clears this weapon's live lock/continuous presentation immediately.
     protected override void OnDisableChanged() { if (IsDisabled) { _target = null; _searchTimer = 0; } }
@@ -94,7 +95,7 @@ public partial class RocketTower : TowerBase
         bool aligned = TurretAiming.Track(_turret, _target.GlobalPosition, FinalStats.RotationSpeedDegrees,
             FinalStats.AimToleranceDegrees, Config.RotateWhileTracking, delta);
         if (!aligned || _shotTimer > 0f || FinalStats.ShotsPerSecond <= 0f) return;
-        if (Ammunition?.TryFire() == false) return;
+        if (!TryFundProjectileAttack(1.0 / FinalStats.ShotsPerSecond)) return;
         DamageInfo hit = Config.CreateHit(FinalStats, DamageSource);
         Marker2D muzzle = _barrels.MuzzleIndex(BarrelFireMode.Sequential, 0) == 0 ? _muzzleA : _muzzleB;
         SplashProjectile bullet = new() { ProjectileColor = new Color(0.33f, 0.88f, 1f) };
@@ -105,7 +106,7 @@ public partial class RocketTower : TowerBase
         _recoil.Kick(); // Projectile and flash snapshot the barrel before cosmetic recoil.
         _barrels.Commit(BarrelFireMode.Sequential);
         _shotTimer = 1f / FinalStats.ShotsPerSecond;
-        RecordAttackHeat();
+        RecordAttackHeat(); CompletePowerAttack();
     }
     #endregion
 

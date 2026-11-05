@@ -29,6 +29,14 @@ public sealed class PowerCapacitor
         Reconcile(); return true;
     }
     // =========================================================
+    // Caller has capped continuous work by available energy; spend once and retain the paid idle exclusion.
+    internal void PayWork(double seconds)
+    {
+        Energy = Math.Max(0, Energy - Settings.Active * seconds);
+        ActiveSecondsRemaining = Math.Max(ActiveSecondsRemaining, seconds);
+        Reconcile();
+    }
+    // =========================================================
     // No global wave flag: only time outside a paid attack interval incurs the idle rate.
     public void Advance(double seconds, bool idleAllowed)
     {

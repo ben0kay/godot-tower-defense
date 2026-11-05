@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="TowerPowerConfig" format=3]
+
+[ext_resource type="Script" path="res://TOWERS/Shared/Power/TowerPowerConfig.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+Capacity = 100.0
+RechargeRatePerSecond = 10.0
+IdleDrawPerSecond = 0.15
+ActiveDrawPerSecond = 8.0
+InitialFillFraction = 0.0
+RestartFraction = 0.15

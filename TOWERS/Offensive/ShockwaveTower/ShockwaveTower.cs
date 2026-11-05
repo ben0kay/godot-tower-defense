@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public partial class ShockwaveTower : TowerBase
 {
+    public override bool SupportsPowerCapacitor => true;
     private ShockwaveTowerConfig _config;
     private bool _ready;
     private double _cooldown;
@@ -64,13 +65,14 @@ public partial class ShockwaveTower : TowerBase
         _cooldown -= delta;
         if (wave.DamagePerWave <= 0) { _cooldown = System.Math.Max(0, _cooldown); return; }
         if (_cooldown > 1e-8) return;
-        if (Ammunition?.TryFire() == false) return;
+        if (!TryFundProjectileAttack(wave.IntervalSeconds)) return;
         ShockwaveEmitter emission = new();
         emission.Initialize(_registry, GlobalPosition, Config.CreateHit(FinalStats, DamageSource), FinalStats.RangePixels,
             wave.ExpansionSpeedPixelsPerSecond, wave.EdgeDamageFraction, _effects, Config.WaveStyle);
         _delivery.AddChild(emission);
         RecordAttackHeat();
         _cooldown = _cooldown > -wave.IntervalSeconds ? _cooldown + wave.IntervalSeconds : wave.IntervalSeconds;
+        CompletePowerAttack();
     }
 
     // =========================================================

@@ -1,3 +1,11 @@
+## Offensive and Repair power rollout — 2026-11-05
+
+**Source Implemented / Awaiting Owner Validation.** All nine implemented offensive types plus Restoration Tower now use the existing `TowerPowerConsumer`, `PowerCapacitor`, `PowerGridManager` and owned `NoPower` handle. No additional power clock, per-tower polling, source, relay or priority slider is added. Existing selected ENERGY bar and PW4-D actual refill/limit/use/distance/status details automatically apply to every consumer. Earlier Battle-only phase notes below are historical.
+
+Projectile volleys, instant shots and pulses pay once before emission; Laser pays its energy/heat/ammo-limited delivered duration. Each default config links its own editable Power resource. See [rate table and lifecycle](../Shared/Power/README.md). Existing weapon stats, targeting, ammo, heat and effects are unchanged. Source checks only; owner Godot validation pending.
+
+---
+
 ## Tower durability rebalance — 2026-10-20 (source updated; Godot runtime tests pending)
 
 **Current authoritative defaults supersede older HP references below:** Base/max hull health for every available player-built tower/structure is **10× the previous level-1 value**. All **nine offensive towers** (Battle, Laser, Blaster Cannon, Shockwave, Machine Gun, Sniper, Rocket, Cryo, Stasis) have explicit, independent paid level snapshots: **1,000 → 1,050 → 1,102.5 HP** (two-level towers stop at 1,050). **Every purchased upgrade adds 5% of the previous tier's Max HP**, compounded, not 5 percentage points of the original at every tier; the values are authored as complete absolute tier stats, not runtime additive bonuses.

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public partial class RepairTower : TowerBase
 {
+    public override bool SupportsPowerCapacitor => true;
     #region Configuration and Cached State
     private RepairTowerConfig _config;
     private bool _ready, _repairing;
@@ -82,7 +83,7 @@ public partial class RepairTower : TowerBase
 
     #region Repair and Lock Lifetime
     // =========================================================
-    // Real missing hull caps the applied interval. RT2 owns actual heat/power funding; RT1 is explicitly cost-free.
+    // Real missing hull caps the paid interval; aiming and seeking never spend active power.
     public override void _PhysicsProcess(double delta)
     {
         if (!CanAttack || IsBusy || !double.IsFinite(delta) || delta <= 0) return;
@@ -101,11 +102,14 @@ public partial class RepairTower : TowerBase
         TowerBase locked = _target;
         double missing = (double)locked.MaxHealth - locked.Health;
         double seconds = System.Math.Min(delta, missing / repair.HullPerSecond);
+        seconds = FundPoweredWork(seconds);
+        if (seconds <= 0) { StopBeam(); return; }
         float before = locked.Health;
         locked.RestoreHealth((float)System.Math.Min(missing, repair.HullPerSecond * seconds));
+        CompletePowerAttack();
         // HealthChanged can clear a full lock or remove either participant synchronously.
         if (!GodotObject.IsInstanceValid(this) || !IsInsideTree() || IsQueuedForDeletion()) return;
-        if (_target != locked || !ValidateLock() || locked.Health <= before) { StopBeam(); return; }
+        if (!CanOperate || _target != locked || !ValidateLock() || locked.Health <= before) { StopBeam(); return; }
         _beam.SetBeam(_muzzle.GlobalPosition, locked.GlobalPosition, true); SetRepairing(true);
     }
     // =========================================================

@@ -2,6 +2,7 @@
 using Godot;
 public partial class LaserTower : TowerBase
 {
+    public override bool SupportsPowerCapacitor => true;
     // =========================================================
     // Generic disabling clears this weapon's live lock/continuous presentation immediately.
     protected override void OnDisableChanged() { if (IsDisabled) { SetTarget(null); _searchTimer = 0; } }
@@ -110,13 +111,14 @@ public partial class LaserTower : TowerBase
         double permitted = delta;
         if (FinalStats.Heat is HeatStats heat && heat.PerBeamSecond > 0)
             permitted = System.Math.Min(permitted, System.Math.Max(0, (heat.Capacity - CurrentHeat) / heat.PerBeamSecond));
-        double funded = Ammunition?.FundBeamSeconds(permitted) ?? permitted;
+        double funded = FundPoweredWork(permitted, useBeamAmmo: true);
         if (funded <= 0) { ClearBeam(); return; }
         double amount = FinalStats.Beam.Value.DamagePerSecond * funded;
         float healthBefore = locked.Health, shieldBefore = locked.CurrentShield;
         locked.ApplyDamage(Config.CreateHit((float)System.Math.Min(float.MaxValue, amount), FinalStats, DamageSource));
         if (!GodotObject.IsInstanceValid(locked) || locked.Health < healthBefore || locked.CurrentShield < shieldBefore)
             RecordAttackHeat(0, funded);
+        CompletePowerAttack();
         if (IsDisabled) { ClearBeam(); return; }
         // Removal callbacks may clear/change the lock; never apply this tick to a replacement enemy.
         if (locked != _target || !TowerTargeting.Valid(locked, GlobalPosition, FinalStats.RangePixels, Config.CanDetectStealth))

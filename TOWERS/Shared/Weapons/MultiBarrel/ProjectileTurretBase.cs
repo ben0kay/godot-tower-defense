@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public abstract partial class ProjectileTurretBase : TowerBase
 {
+    public override bool SupportsPowerCapacitor => true;
     // =========================================================
     // Generic disabling clears this weapon's live lock/continuous presentation immediately.
     protected override void OnDisableChanged() { if (IsDisabled) { _target = null; _searchTimer = 0; _visuals?.SetAim(null, Vector2.Zero, 0, null, false); } }
@@ -138,9 +139,9 @@ public abstract partial class ProjectileTurretBase : TowerBase
         // Source snapshot before the barrel controller commits its volley.
         Vector2 instantMuzzle = instant ? _muzzles[_barrels.MuzzleIndex(mode, 0)].GlobalPosition : Vector2.Zero;
         StatusEffectPayload? instantEffect = instant ? CreateEffect(FinalStats) : null;
+        if (!TryFundProjectileAttack(count / (double)FinalStats.ShotsPerSecond, count)) return;
         for (int i = 0; i < count; i++)
         {
-            if (Ammunition?.TryFire() == false) return;
             Marker2D muzzle = _muzzles[_barrels.MuzzleIndex(mode, i)];
             if (instant)
             {
@@ -164,6 +165,7 @@ public abstract partial class ProjectileTurretBase : TowerBase
         RecordAttackHeat(count);
         // Preserve fractional frame remainder; never schedule multiple catch-up volleys after a long hitch.
         _shotTimer = Mathf.Max(0f, count / FinalStats.ShotsPerSecond + _shotTimer);
+        CompletePowerAttack();
         // Resolve immediate damage after committing the shot; lethal callbacks may tear down a wave or scene.
         if (instant)
             for (int i = 0; i < count; i++)

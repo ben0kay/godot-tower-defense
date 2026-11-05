@@ -1,3 +1,10 @@
+## Shared power rollout to offensive towers and Repair — 2026-11-05
+
+**Source Implemented / Awaiting Owner Validation.** All nine offensive types plus Restoration Tower now use PW4-A–D capacitors and the existing Inspector ENERGY/power details. Each has a configurable per-type profile with modest provisional rates; Battle's baseline is unchanged. Atomic projectile/volley/pulse payments and duration-limited Laser/repair payments reuse the shared service and NoPower recovery. Active replaces idle; no new polling, generator, relay, priority slider or save schema. Existing combat, ammo, heat, construction, upgrades and checkpoint owners are preserved. Source/resource checks only; .NET unavailable, owner Godot validation pending. [Rate table and accounting](TOWERS/Shared/Power/README.md).
+
+
+---
+
 ## Heavy Gunner slower, heavier red ammunition — 2026-11-05
 
 The Heavy Gunner's dedicated minigun now fires a roughly **33% longer/wider red tapered projectile** (14.6×2.9px, previously 11×2.2), travelling at **650px/s** (was 850). Its firing rate is **2.5/s** (was 3.5/s) with **5 Kinetic damage** per bullet (was 4). The starter Gunner and its bullet style are unchanged, as are the Heavy Gunner's hull, movement speed, 260 HP, 275px range, muzzle flash and 2.8s bullet lifetime. Focused test expectations updated; Godot visual verification pending. [Heavy Gunner notes](ENEMIES/Types/HeavyGunnerDrone/README.md).

@@ -19,7 +19,10 @@ public abstract partial class TowerBase
     }
     // =========================================================
     // Ammunition rejection rolls back energy; successful depletion is published AFTER projectile creation.
-    protected bool TryFundProjectileAttack(double seconds) => Power?.TryFundAttack(seconds, Ammunition) ?? (Ammunition?.TryFire() != false);
+    protected bool TryFundProjectileAttack(double seconds, int shots = 1) => Power?.TryFundAttack(seconds, Ammunition, shots) ?? (Ammunition?.TryFire(shots) != false);
+    // Continuous weapons and repair reuse the same capacitor/payment/inspection owner, without new polling.
+    protected double FundPoweredWork(double seconds, bool useBeamAmmo = false) => Power?.FundWorkSeconds(seconds, useBeamAmmo ? Ammunition : null)
+        ?? (useBeamAmmo ? Ammunition?.FundBeamSeconds(seconds) ?? seconds : seconds);
     protected void CompletePowerAttack() => Power?.Publish();
     private PowerSaveData? CapturePowerCheckpoint() => Power?.Capture();
     private void RestorePowerCheckpoint(PowerSaveData? saved)

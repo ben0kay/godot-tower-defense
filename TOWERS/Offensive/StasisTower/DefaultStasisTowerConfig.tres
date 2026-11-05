@@ -1,10 +1,13 @@
-[gd_resource type="Resource" script_class="StasisTowerConfig" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="StasisTowerConfig" format=3]
 [ext_resource type="Script" path="res://TOWERS/Offensive/StasisTower/StasisTowerConfig.cs" id="1"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/StasisTower/Visuals/StasisTracerStyle.tres" id="pv_tracer"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/StasisTower/Visuals/StasisMuzzleFlashStyle.tres" id="pv_flash"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/StasisTower/Artwork/Construction/StasisConstructionArt.tres" id="construction"]
 
+[ext_resource type="Resource" path="res://TOWERS/Offensive/StasisTower/StasisTowerPower.tres" id="power"]
+
 [resource]
+Power = ExtResource("power")
 script = ExtResource("1")
 ConstructionArt = ExtResource("construction")
 

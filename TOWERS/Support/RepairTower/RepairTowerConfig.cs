@@ -5,7 +5,7 @@ using Godot;
 public partial class RepairTowerConfig : TowerConfig
 {
     // =========================================================
-    // No offensive policy, ammo, heat, power or combat-rank progression is invented for this baseline.
+    // Shared Power is inherited; no offensive policy, ammo, heat or combat-rank progression is added.
     public RepairTowerConfig()
     {
         DisplayName = "Restoration Tower";

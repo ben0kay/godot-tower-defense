@@ -4,7 +4,10 @@
 
 [ext_resource type="Resource" path="res://TOWERS/Offensive/LaserTower/Artwork/Construction/LaserConstructionArt.tres" id="construction"]
 
+[ext_resource type="Resource" path="res://TOWERS/Offensive/LaserTower/LaserTowerPower.tres" id="power"]
+
 [resource]
+Power = ExtResource("power")
 script = ExtResource("1")
 ConstructionArt = ExtResource("construction")
 HeatEnabled = true

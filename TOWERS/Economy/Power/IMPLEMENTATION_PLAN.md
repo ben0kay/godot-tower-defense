@@ -1,3 +1,12 @@
+## Offensive and Repair power rollout — 2026-11-05
+
+**Source Implemented / Awaiting Owner Validation.** All nine implemented offensive types plus Restoration Tower now use the existing `TowerPowerConsumer`, `PowerCapacitor`, `PowerGridManager` and owned `NoPower` handle. No additional power clock, per-tower polling, source, relay or priority slider is added. Existing selected ENERGY bar and PW4-D actual refill/limit/use/distance/status details automatically apply to every consumer. Earlier Battle-only phase notes below are historical.
+
+Shared projectile/volley/pulse funding is atomic; continuous Laser/Repair funds only the deliverable duration. Paid active time excludes idle draw and power is published after delivery. Per-type configurable resources use modest provisional values with Battle unchanged; see the [consumer guide](../../Shared/Power/README.md) for the complete rate table and accounting policy. Existing combat/repair/heat/ammo/work/upgrades and checkpoint owners remain in place; no schema change. Source/resource checks only; .NET unavailable and Godot owner validation pending. No PW5/relays, new generators or slider.
+
+
+---
+
 ## PW4-D — selected power feedback — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** The existing right-column ENERGY current/capacity bar remains. A compact three-line **PowerDetails** label in the Inspector Main column shows **actual Refill +X/s**, **distance-limited Limit +Y/s**, **actual Use −Z/s**, conductive distance, efficiency and connection state. Tooltips explain measured versus potential rates, authored idle/total-active draw and the recovery threshold. Full, charging, awaiting refill, supply-limited, connected/starved, disconnected/no-live-source, recharge-disabled and work-paused are distinct. Recovery is shown separately; no incoming supply does not erase stored energy.

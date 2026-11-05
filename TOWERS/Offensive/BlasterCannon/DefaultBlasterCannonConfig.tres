@@ -8,7 +8,10 @@
 
 [ext_resource type="Resource" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Construction/BlasterConstructionArt.tres" id="construction"]
 
+[ext_resource type="Resource" path="res://TOWERS/Offensive/BlasterCannon/BlasterCannonPower.tres" id="power"]
+
 [resource]
+Power = ExtResource("power")
 script = ExtResource("1")
 HeatEnabled = true
 ConstructionArt = ExtResource("construction")
