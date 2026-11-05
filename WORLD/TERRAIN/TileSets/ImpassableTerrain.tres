@@ -31,7 +31,6 @@ texture_region_size = Vector2i(64, 64)
 1:0/0 = 0
 1:0/0/custom_data_1 = true
 1:0/0/custom_data_2 = true
-
 2:0/0 = 0
 2:0/0/custom_data_1 = true
 2:0/0/custom_data_2 = true
@@ -53,5 +52,3 @@ custom_data_layer_4/type = 1
 sources/0 = SubResource("Atlas")
 sources/1 = SubResource("NewMetalWalls")
 sources/2 = SubResource("MarsRock")
-
-
