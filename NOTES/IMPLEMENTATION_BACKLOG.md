@@ -1,3 +1,9 @@
+## Power PW4 revised roadmap — 2026-11-04 (planning, no implementation)
+
+The owner revised PW4 from instant full/on-off grid allocation to **per-building rechargeable internal buffers with conductive-distance-dependent charging**. A tower far from a source can slowly reach full stored energy while idle, then drain faster than it recharges while firing. Live generation is shared and limited per connected island; priorities govern available refill, and NoPower applies only when the stored reserve is exhausted/low. Relays in PW5 will reinforce charging near themselves **without generating electricity**, while retaining future cross-island links. PW4-D Inspector should show the **stored-energy bar**, charge/drain/efficiency and priority beside Heat/Ammo. Follow [revised PW4-A–D and PW5 plan](../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md) rather than earlier full/empty planned bar or immediate blackout language. **PW0–PW3 remain unchanged; PW4/PW5 not implemented.**
+
+---
+
 ## Power PW3 update — 2026-11-04
 
 Industrial Generator/shared producer building implementation is source implemented. PW4 must include the owner's selected-tower **power bar styled like heat/ammo**, with supplied/required power and priority. No consumption/shutdown is active yet; Godot owner review remains pending. See [Industrial notes](../TOWERS/Economy/Power/IndustrialGenerator/README.md).
