@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="TowerDisabledStyle" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://FEEDBACK/Disabled/TowerDisabledStyle.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+ArtTint = Color(1, 0.78, 0.78, 1)
+WarningColor = Color(1, 0.68, 0.22, 1)
+WarningSizePixels = 16.0
+CornerOffset = Vector2(4, -4)

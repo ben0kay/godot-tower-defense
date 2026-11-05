@@ -443,9 +443,9 @@ public partial class GameplayHUD : Control
         bool valid = GodotObject.IsInstanceValid(tower) && !_buildPreview;
         HeatStats? heat = valid ? tower.FinalStats?.Heat : null;
         bool disabled = valid && tower.IsDisabled;
-        _conditionSection.Visible = heat.HasValue || disabled;
+        _conditionSection.Visible = heat.HasValue;
         _heatText.Visible = _heatBar.Visible = heat.HasValue;
-        _disableReasons.Visible = disabled;
+        _disableReasons.Hide(); _disableReasons.Text = "";
         if (!valid) return;
         if (heat.HasValue)
         {
@@ -461,6 +461,8 @@ public partial class GameplayHUD : Control
             bool first = true;
             foreach (TowerDisableReason reason in Enum.GetValues<TowerDisableReason>())
             {
+                // Energy meter/disabled header already explain NoPower; never add a duplicate layout row.
+                if (reason == TowerDisableReason.NoPower) continue;
                 int count = 0;
                 for (int i = 0; i < tower.DisableCount; i++) if (tower.GetDisableReason(i) == reason) count++;
                 if (count == 0) continue;
@@ -468,7 +470,8 @@ public partial class GameplayHUD : Control
                 text.Append(reason == TowerDisableReason.NoPower ? "NO POWER" : reason.ToString().ToUpperInvariant());
                 if (count > 1) text.Append(" ×").Append(count);
             }
-            _disableReasons.Text = text.ToString(); _disableReasons.TooltipText = _disableReasons.Text;
+            _disableReasons.Visible = !first;
+            _disableReasons.Text = first ? "" : text.ToString(); _disableReasons.TooltipText = _disableReasons.Text;
         }
         if (!tower.IsBusy) _workStatus.Text = disabled ? "DISABLED" : "OPERATIONAL";
     }
@@ -957,5 +960,6 @@ public partial class GameplayHUD : Control
 
     #endregion
 }
+
 
 

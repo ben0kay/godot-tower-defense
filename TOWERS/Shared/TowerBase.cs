@@ -301,6 +301,7 @@ public abstract partial class TowerBase : Node2D
         ConstructionWorkManager manager = _construction; _construction = null; _constructionDroneOwner = null;
         if (GodotObject.IsInstanceValid(manager)) manager.Unregister(this);
     }
-    public override void _ExitTree() { Power?.Dispose(); Power = null; Ready -= InitializeDurability; _conditions?.Clear(); _conditions = null; CancelConstruction(); }
+    public override void _ExitTree() { DetachDisabledVisual(); Power?.Dispose(); Power = null; Ready -= InitializeDurability; _conditions?.Clear(); _conditions = null; CancelConstruction(); }
     #endregion
 }
+

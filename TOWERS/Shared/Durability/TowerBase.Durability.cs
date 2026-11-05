@@ -30,7 +30,7 @@ public abstract partial class TowerBase
             float cellSize = GetNodeOrNull<WorldGrid>("../../Grid")?.Config.CellSize ?? 64;
             _defenseBar.SetOwnerVisualHeight(Footprint.Y * cellSize);
         }
-        RefreshDefenseBar();
+        RefreshDefenseBar(); InitializeDisabledVisual();
     }
 
     // =========================================================
@@ -103,3 +103,4 @@ public abstract partial class TowerBase
         return $"HP: {Health:0.#} / {MaxHealth:0.#}" + (string.IsNullOrEmpty(runtime) ? "" : " · " + runtime);
     }
 }
+

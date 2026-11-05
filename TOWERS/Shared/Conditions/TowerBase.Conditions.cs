@@ -41,7 +41,7 @@ public abstract partial class TowerBase
         ? TowerDisableReason.Upgrading : _conditions.ReasonAt(index - (WorkPhase == TowerWorkPhase.Upgrading ? 1 : 0));
     // =========================================================
     // Shared notification is immediate for beam/aim shutdown; ongoing timers/cooling stay enabled.
-    internal void PublishDisableChanged() { OnDisableChanged(); DisableStateChanged?.Invoke(); NotifyRuntimeChanged(); }
+    internal void PublishDisableChanged() { RefreshDisabledVisual(); OnDisableChanged(); DisableStateChanged?.Invoke(); NotifyRuntimeChanged(); }
     // =========================================================
     // Derived presentation/targeting cleanup belongs to its weapon, not to the generic state container.
     protected virtual void OnDisableChanged() { }
@@ -60,3 +60,4 @@ public abstract partial class TowerBase
     // Deterministic explicit stepping is also useful to gameplay tools; engine normally owns this clock.
     public void AdvanceConditions(double delta) => _conditions?.Advance(delta);
 }
+

@@ -1,3 +1,15 @@
+## Disabled tower feedback and stable NoPower presentation — 2026-11-05
+
+**Source Implemented / Awaiting Owner Validation.** Placed disabled towers now show a small amber outlined exclamation triangle above the upper-right footprint corner and a subtle red art tint. `FEEDBACK/Disabled/DefaultTowerDisabledStyle.tres` tunes tint, badge color/size/offset. The shared TowerBase condition notification attaches one lazy `TowerDisabledVisual` only after native artwork initialization and only when needed. Initial construction sites hide the warning; completed disabled structures and paid upgrades show it. Work/disable/death events update presentation. No polling, bobbing animation, timer, active shader or per-frame redraw; active/never-disabled towers allocate no helper.
+
+The helper caches Sprite2D descendants in scriptless art branches once, excluding scripted feedback/effect and GUI subtrees. Sprite SelfModulate multiplies a captured authored tint, leaving selection Modulate intact; split art, recoil and texture swaps keep their existing owners. All captured colors restore exactly on recovery/removal; overlapping reasons never compound the tint or clear it prematurely. Custom future art under a scripted container will need an explicit presenter extension rather than tinting arbitrary effects.
+
+Inspector no longer emits a duplicate `NO POWER` entry in the Main warning row; other reasons retain their counts. The shared disabled header and ENERGY bar remain. PowerDetails keeps its three explicit lines at a fixed 48px minimum with wrapping disabled/clipping enabled, so changing connection/recovery text cannot add rows or grow the panel. Full power explanations remain in the existing tooltip. No power arithmetic, disable ownership, upgrade behavior, save data, gameplay balance or selection semantics change.
+
+Focused HeatInspectorChecks expectations now omit duplicate NoPower and include dormant badge lifecycle. Source/scene review only; no Godot/.NET runtime or desktop layout test run. Owner: select an empty/recovering Battle, watch the panel during charge/depletion, inspect unselected disabled towers, EMP plus NoPower/heat overlaps, recovery, selection changes, upgrade art, 2×2/3×2 buildings and a fresh Save/Load. Verify that icons stay at the fixed upper-right corner and other gameplay effects retain their normal colors.
+
+---
+
 ## PW4-D — selected power feedback — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** The existing right-column ENERGY current/capacity bar remains. A compact three-line **PowerDetails** label in the Inspector Main column shows **actual Refill +X/s**, **distance-limited Limit +Y/s**, **actual Use −Z/s**, conductive distance, efficiency and connection state. Tooltips explain measured versus potential rates, authored idle/total-active draw and the recovery threshold. Full, charging, awaiting refill, supply-limited, connected/starved, disconnected/no-live-source, recharge-disabled and work-paused are distinct. Recovery is shown separately; no incoming supply does not erase stored energy.
@@ -104,4 +116,5 @@ The width default is maintained in `InspectorPanel.tscn`, `UIMasterConfig.cs` an
 ## Selected tower defense meters (2026-10-17)
 
 The right column now uses the compact `Combat Rank: Standard` label directly above the existing XP meter; the redundant rank heading is removed. The title displays `Battle Tower · Lv 1 (Standard)` and updates on promotions and paid upgrades. Two 6px event-driven bars show selected tower hull HP and available ammunition (the latter hidden on towers without ammo). The former numeric runtime line becomes just its logistical status (e.g. `Ammo ready`); Ammo Capacity is not repeated in the left current/next/gain table. The left table continues showing Ammo/Shot or Ammo/s and other relevant level changes. Heat remains below the new defense meters. No polling or new gameplay state; `TowerPlacementController` reuses its existing selected-only `RuntimeChanged` and `ExperienceChanged` subscriptions. The 560×330 target width/height, targeting buttons and placement browser remain unchanged. Runtime UI geometry verification in Godot is pending.
+
 

@@ -15,7 +15,7 @@ public partial class HeatInspectorChecks : Node
             using (AmmoLoopFixture f = new(this))
             {
                 SubsystemBattlefield.DetachSession(f.Main);
-                BattleTower battle = f.Add<BattleTower>("battle", new(2000,2128), c => c.SetLevelStats(1, c.Levels[0].Stats with { Heat = new(10, 10, 0, 1, .35f) }));
+                BattleTower battle = f.Add<BattleTower>("battle", new(2000,2128), c => { c.Power = null; c.SetLevelStats(1, c.Levels[0].Stats with { Heat = new(10, 10, 0, 1, .35f) }); });
                 battle.SetTargetPriority(TowerTargeting.Priority.Closest);
                 f.Placement.Call("SelectTower", battle); await Frames();
                 ProgressBar bar = f.Hud.GetNode<ProgressBar>(Card + "/HeatBar");
@@ -28,8 +28,11 @@ public partial class HeatInspectorChecks : Node
                 Require(bar.Value == 10 && heat.Text.Contains("OVERHEATED / COOLING") && reasons.Text.Contains("OVERHEATED"), "Overheat updates selected bar/state automatically");
                 Require(f.Hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Heading/WorkSection/Status").Text == "DISABLED", "Header does not call a disabled tower operational");
                 TowerDisableHandle emp1 = battle.ApplyDisable(TowerDisableReason.EMP), emp2 = battle.ApplyDisable(TowerDisableReason.EMP);
-                var power = battle.ApplyDisable(TowerDisableReason.NoPower); var other = battle.ApplyDisable(TowerDisableReason.Other); Freeze(battle);
-                await Frames(); Require(reasons.Text.Contains("EMP ×2") && reasons.Text.Contains("NO POWER") && reasons.Text.Contains("OTHER"), "Overlapping reasons grouped with independent source counts");
+                var power = battle.ApplyDisable(TowerDisableReason.NoPower);
+                var disabledVisual = battle.GetNode<TowerDisabledVisual>("DisabledVisual");
+                Require(disabledVisual.Visible && !disabledVisual.IsProcessing() && !disabledVisual.IsPhysicsProcessing(),
+                    "Shared disabled badge is visible and has no animation/tick loop"); var other = battle.ApplyDisable(TowerDisableReason.Other); Freeze(battle);
+                await Frames(); Require(reasons.Text.Contains("EMP ×2") && !reasons.Text.Contains("NO POWER") && reasons.Text.Contains("OTHER"), "Other overlapping reasons retain counts without a duplicate NoPower row");
                 battle.AdvanceConditions(7); Freeze(battle); await Frames();
                 Require(Math.Abs(bar.Value - 3) < .001 && heat.Text.Contains("COOLING") && !reasons.Text.Contains("OVERHEATED") && reasons.Text.Contains("EMP ×2"), "Cooling removes only overheat UI cause: " + bar.Value + " | " + heat.Text + " | " + reasons.Text);
                 Require(ReferenceEquals(cache, battle.FinalStats) && grid.GetChild(0).GetInstanceId() == firstCell, "Heat-only updates preserve stat cache and comparison cells");
@@ -42,7 +45,8 @@ public partial class HeatInspectorChecks : Node
                 battle.AdvanceConditions(1); Freeze(battle); await Frames(); Require(!bar.Visible && reasons.Text == "DISABLED: EMP", "Old tower cannot overwrite new selection");
                 f.Placement.Call("SelectTower", battle); await Frames();
                 battle.RemoveDisable(emp1); Freeze(battle); await Frames(); Require(reasons.Text.Contains("EMP") && !reasons.Text.Contains("×2"), "Individual source removal updates remaining count");
-                battle.RemoveDisable(emp2); battle.RemoveDisable(power); battle.RemoveDisable(other); Freeze(battle); await Frames(); Require(!reasons.Visible && bar.Visible, "Final reason clears while heat remains visible");
+                battle.RemoveDisable(emp2); battle.RemoveDisable(power); battle.RemoveDisable(other); Freeze(battle);
+                Require(!disabledVisual.Visible, "Final disable removal hides shared badge"); await Frames(); Require(!reasons.Visible && bar.Visible, "Final reason clears while heat remains visible");
                 GetTree().Paused = true; double paused = bar.Value; battle.AdvanceConditions(20); await Frames();
                 Require(bar.Value == paused, "Paused gameplay freezes displayed heat"); GetTree().Paused = false;
                 f.Wallet.Initialize(new LevelConfig { StartingCredits = 1000 });
@@ -66,7 +70,7 @@ public partial class HeatInspectorChecks : Node
     // Worst current card: Legendary rank, all disable reasons, hot bar and busy purchased upgrade.
     private async System.Threading.Tasks.Task StressLayout(AmmoLoopFixture f)
     {
-        BattleTower tower = f.Add<BattleTower>("battle", new(2000,2128), c => c.SetLevelStats(1, c.Levels[0].Stats with { Heat = new(10, 10, 0, 1, .35f) }));
+        BattleTower tower = f.Add<BattleTower>("battle", new(2000,2128), c => { c.Power = null; c.SetLevelStats(1, c.Levels[0].Stats with { Heat = new(10, 10, 0, 1, .35f) }); });
         tower.SetTargetPriority(TowerTargeting.Priority.Closest); Enemy enemy = f.Target(new(2000,2000)); tower._PhysicsProcess(1);
         tower.ApplyDisable(TowerDisableReason.EMP); tower.ApplyDisable(TowerDisableReason.EMP);
         tower.ApplyDisable(TowerDisableReason.NoPower); tower.ApplyDisable(TowerDisableReason.Other);
@@ -115,3 +119,4 @@ public partial class HeatInspectorChecks : Node
     private async System.Threading.Tasks.Task Frames()
     { await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame); await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame); }
 }
+
