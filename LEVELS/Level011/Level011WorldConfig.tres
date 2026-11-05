@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="WorldMasterConfig" format=3]
+
+[ext_resource type="Script" path="res://WORLD/WorldMasterConfig.cs" id="world"]
+
+[resource]
+script = ExtResource("world")
+WidthCells = 160
+HeightCells = 120
+CellSize = 64

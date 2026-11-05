@@ -1,3 +1,9 @@
+## Level011 — large blank paint-ready map (2026-11-05)
+
+New independent **160×120-cell** Level011 using the existing LevelTemplate, with four empty paintable tile layers, one movable portal, one Citadel, a 10-drone editable starter wave and a directly selectable Campaign mission. Only Level011 opts into a local `WorldMasterConfig` through `LevelConfig.WorldConfig`; existing maps keep 100×80. Shared Battlefield/World systems are reused, and no shared BaseLevelMap inheritance migration has occurred yet. [Level011 authoring notes](Level011/README.md). Source-implemented; Godot validation pending.
+
+---
+
 ## Level001 beginner waves — 2026-11-03
 
 The first campaign mission is now a gentle tower-defense introduction: **10 unshielded Standards → 14 unshielded Standards → 10 Standards followed by 10 mixed Standards/Scouts**, first Scouts only halfway through Wave 3. Level001 has **44 enemies total**, with no Bulwarks, shields or stealth. Its authoritative data has moved to editable `LEVELS/Level001/Level001Waves.tres` and `Level001Config.tres` points directly to that resource. Open it in the Wave Editor to add banner/narrator messages later; no messages have been authored yet. Map, portal/Citadel geometry and runtime spawning are unchanged. Older references to C#-only authoring and shield-heavy Level001 waves below are superseded. [Details](Level001/README.md).

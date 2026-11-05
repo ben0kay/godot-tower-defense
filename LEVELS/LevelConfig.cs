@@ -11,6 +11,9 @@ public partial class LevelConfig : Resource
     [Export(PropertyHint.Range, "0,1000000,1,or_greater")] public int VictoryBaseXP { get; set; } = 500;
     [Export(PropertyHint.Range, "0,1000000,1,or_greater")] public int DefeatBaseXP { get; set; }
 
+    [ExportGroup("Map Size (optional)")]
+    [Export] public WorldMasterConfig WorldConfig { get; set; }
+
     [ExportGroup("Starting Resources")]
     [Export(PropertyHint.Range, "0,2000000000,100")] public int StartingCredits { get; set; } = 0;
 

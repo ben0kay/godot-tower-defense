@@ -18,14 +18,18 @@ public partial class MissionCatalogChecks : Node
         try
         {
             GetTree().CurrentScene = null;
-            Require(catalog.Entries().Select(m => m.Number).SequenceEqual(new[] { 1, 2, 3, 20, 100 }), "Campaign order includes newly registered Level003");
+            Require(catalog.Entries().Select(m => m.Number).SequenceEqual(new[] { 1, 2, 3, 11, 20, 100 }), "Campaign order includes paint-ready Level011");
             foreach (var mission in catalog.Entries())
             {
                 BattlefieldLauncher root = GD.Load<PackedScene>(mission.LaunchPath).Instantiate<BattlefieldLauncher>();
                 AddChild(root);
                 Require(root.GetNode<WorldGrid>("World/Grid").Level.SceneFilePath == mission.MapScene.ResourcePath,
                     "Shared world installs correct authored map before Grid Ready");
-                Require(root.GetNode<WaveManager>("Waves").TotalWaves == WaveCatalog.GetWaves(root.GetNode<WorldGrid>("World/Grid").Level.Settings).Length,
+                WorldGrid grid = root.GetNode<WorldGrid>("World/Grid");
+                Require(grid.Config.WidthCells == (mission.Number == 11 ? 160 : 100)
+                    && grid.Config.HeightCells == (mission.Number == 11 ? 120 : 80)
+                    && grid.Config.CellSize == 64, "Map-local world dimensions do not affect other missions");
+                Require(root.GetNode<WaveManager>("Waves").TotalWaves == WaveCatalog.GetWaves(grid.Level.Settings).Length,
                     "Assigned wave resource initializes existing scheduler");
                 RemoveChild(root); root.Free();
             }

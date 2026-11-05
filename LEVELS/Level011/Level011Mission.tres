@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="MissionDefinition" format=3]
+
+[ext_resource type="Script" path="res://LEVELS/Catalog/MissionDefinition.cs" id="mission"]
+
+[resource]
+script = ExtResource("mission")
+Number = 11
+Title = "LEVEL 11 — OPEN EXPANSE"
+Description = "Large 160x120 blank battlefield to paint. Place or move portals and Citadels, then paint a connected route. One starter test wave."
+MapScenePath = "res://LEVELS/Level011/Level011.tscn"
+Enabled = true

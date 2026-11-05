@@ -15,7 +15,10 @@ public partial class WorldMapLoader : Node2D
         if (GetNodeOrNull<Node>("Level") != null) return;
         if (MapScene == null) throw new InvalidOperationException("World has no map scene.");
         Node level = MapScene.Instantiate();
-        if (level is not WorldLevel) { level.Free(); throw new InvalidOperationException("World map must use WorldLevel."); }
+        if (level is not WorldLevel map) { level.Free(); throw new InvalidOperationException("World map must use WorldLevel."); }
+        // Configure the live grid before Grid/Navigation _Ready; legacy maps keep the shared 100x80 default.
+        if (map.Settings?.WorldConfig != null)
+            GetNode<WorldGrid>("Grid").Config = map.Settings.WorldConfig;
         level.Name = "Level"; AddChild(level); MoveChild(level, 0);
     }
 }

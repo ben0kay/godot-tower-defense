@@ -18,3 +18,9 @@ Your design workflow stays the same: duplicate LevelTemplate.tscn into a LevelXX
 No new WORLD/WorldLevel004, MainLevel004, menu button code or C# catalog case is required. Number controls sorting and mission identity; resource-array order is not progression. Next Level only advances to the immediate enabled number: 003 cannot skip a missing004 and jump to020. Retry reloads the same mission with fresh world/wallet/waves. Menu title/description are data too.
 
 The three existing launchers remain F6 shortcuts. An optional new shortcut can inherit `LEVELS/Runtime/Battlefield.tscn` and assign Mission; it contains no duplicate service tree. Wave batches can now be C# or `.tres` based. Only Level003 was migrated for the Wave Editor pilot; other existing maps retain their C# wave recipes. This does not change map tiles, wave scheduling, level completion or campaign save formats.
+
+## Optional per-level map dimensions (Level011)
+
+The common `WORLD/DefaultWorldConfig.tres` remains the default for existing maps (100×80 cells, 64px each). For a larger map, create a dedicated `WorldMasterConfig` resource in its level folder and set `LevelConfig.WorldConfig` to it. The existing `WorldMapLoader` supplies that resource to the same `World/Grid` before `_Ready`/navigation setup. This **does not** change other missions, TileSet cell size, or duplicate world services.
+
+For a paint-ready larger-map example, open `LEVELS/Level011/`. Its blank 160×120 map reuses `LevelTemplate.tscn`, and its resource-based wave is editable in the Wave Editor. The previously proposed shared `BaseLevelMap.tscn` refactor is not yet on this branch; this example does not depend on it.
