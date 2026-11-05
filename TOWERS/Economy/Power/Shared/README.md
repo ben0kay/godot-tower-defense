@@ -1,3 +1,9 @@
+## PW4-C scarcity direction revised — 2026-11-05 (plan only)
+
+The owner requires **distance-based precedence** when the finite per-island generator budget cannot satisfy all capacitor requests: nearer valid conductive-path consumers charge first, equal-distance consumers share any insufficient remainder proportionally, and more distant ones may receive zero. PW4-B's cached nearest-source distance and recharge ceiling stay authoritative; the existing PW4-A/B proportional budget allocation will be replaced in PW4-C. Saved `PowerPriority` is **not** used to choose recipients; a future small and bounded per-tower slider bias may be introduced only with separate authorization. Retain source accounting, buffers, no-power recovery and event-driven service. Details: [implementation plan](../IMPLEMENTATION_PLAN.md). No code changed by this note.
+
+---
+
 ## PW4-B — conductive-distance recharge — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** The existing PowerGridManager now caps recharge by cached shortest **four-neighbour conductive distance** to a positive-output Citadel/generator footprint. Source footprints seed all valid cells at distance zero; a consumer receives at its nearest valid footprint cell. Both footprints must lie wholly on one island. Vacuum/Lava/diagonal gaps, unassigned footprints and zero-output sources cannot invent a route. Stored energy, capacity, spending and owned NoPower hysteresis are unchanged.
