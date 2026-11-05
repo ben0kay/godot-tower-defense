@@ -1,10 +1,34 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-<path d="M19 4h26l15 15v26L45 60H19L4 45V19z" fill="#152c32" stroke="#587b7d" stroke-width="3"/>
-<path d="M22 10h20l12 12v20L42 54H22L10 42V22z" fill="#253e43" stroke="#819d96"/>
-<circle cx="32" cy="32" r="17" fill="#11292f" stroke="#49a5a2" stroke-width="2"/>
-<path d="M16 32h32M32 16v32" stroke="#366366"/>
-<path d="M23 26a12 12 0 0 1 18 0M19 22a18 18 0 0 1 26 0" fill="none" stroke="#91c5ad" stroke-width="2"/>
-<path d="m32 27 7 11H25z" fill="#b3dac2" stroke="#4ca39a" stroke-width="2"/>
-<circle cx="32" cy="32" r="3" fill="#ddf4d4"/>
-<path d="M7 22v20M57 22v20M22 7h20M22 57h20" stroke="#749480" stroke-width="2"/>
+<defs>
+<linearGradient id="beaconMetal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#405b61"/><stop offset=".52" stop-color="#243b43"/><stop offset="1" stop-color="#10242c"/></linearGradient>
+<linearGradient id="beaconRim" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#a0c6b2"/><stop offset=".48" stop-color="#548982"/><stop offset="1" stop-color="#2d575b"/></linearGradient>
+</defs><defs>
+<linearGradient id="scannerMetal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a1c5b5"/><stop offset=".45" stop-color="#4d7977"/><stop offset="1" stop-color="#23454f"/></linearGradient>
+<radialGradient id="scannerOptic" cx=".5" cy=".35" r=".68"><stop stop-color="#e8fff5"/><stop offset=".32" stop-color="#afffe1"/><stop offset=".75" stop-color="#47d1bd"/><stop offset="1" stop-color="#147c7c"/></radialGradient>
+</defs><g stroke-linejoin="round" stroke-linecap="round">
+<path d="M19 4H45L60 19V45L45 60H19L4 45V19Z" fill="#0f252d" stroke="#5c8581" stroke-width="2.5"/>
+<path d="M21 9H43L55 21V43L43 55H21L9 43V21Z" fill="url(#beaconMetal)" stroke="#789b8e" stroke-width="1.2"/>
+<path d="M20 9L9 20M44 9L55 20M9 44L20 55M55 44L44 55" stroke="#172d34" stroke-width="3"/>
+<path d="M19 6H45M19 58H45M6 19V45M58 19V45" stroke="#9bb9a0" stroke-width="1.7"/>
+<path d="M14 28H20M44 28H50M14 36H20M44 36H50" stroke="#457f7b" stroke-width="2"/>
+<circle cx="32" cy="32" r="19" fill="#102930" stroke="#467f7d" stroke-width="2"/>
+<circle cx="32" cy="32" r="15.3" fill="#18353a" stroke="#83aaa0" stroke-width="1.5"/>
+<circle cx="32" cy="32" r="11.3" fill="#0c2229" stroke="#346266" stroke-width="1.3"/>
+<path d="M32 14v7M32 43v7M14 32h7M43 32h7" stroke="#72afa6" stroke-width="1.7"/>
+<circle cx="16" cy="16" r="1.7" fill="#9fb8a9"/><circle cx="48" cy="16" r="1.7" fill="#9fb8a9"/>
+<circle cx="16" cy="48" r="1.7" fill="#9fb8a9"/><circle cx="48" cy="48" r="1.7" fill="#9fb8a9"/>
+</g><g stroke-linejoin="round" stroke-linecap="round">
+<!-- Forward direction: UP (-Y), pivot at canvas centre (32,32). -->
+<path d="M32 8L42 16L42 25L39 34L43 43L38 49H26L21 43L25 34L22 25L22 16Z" fill="#102b34" stroke="#91b9ac" stroke-width="1.8"/>
+<path d="M32 11L39 18L39 27L35 36H29L25 27L25 18Z" fill="url(#scannerMetal)" stroke="#c5e0c6" stroke-width="1"/>
+<path d="M32 8L41 17L38 23H26L23 17Z" fill="#254b51" stroke="#b7dcc5" stroke-width="1.6"/>
+<path d="M26 17L32 12L38 17L36 21H28Z" fill="url(#scannerOptic)" stroke="#dcfff1" stroke-width=".9"/>
+<path d="M22 22L17 28L20 32L25 28M42 22L47 28L44 32L39 28" fill="#477e7c" stroke="#b1d9bd" stroke-width="1.2"/>
+<path d="M21 28L15 23M43 28L49 23" stroke="#77c4b4" stroke-width="1.5"/>
+<circle cx="32" cy="33" r="9.1" fill="#102a34" stroke="#89bfb1" stroke-width="1.6"/>
+<circle cx="32" cy="33" r="6.8" fill="#3b7775" stroke="#bcdfc6" stroke-width=".9"/>
+<circle cx="32" cy="33" r="3.5" fill="#d5ffdc" stroke="#2f9f98" stroke-width="1.1"/>
+<path d="M26 42L29 46H35L38 42L36 40H28Z" fill="#1d4650" stroke="#9ac4ab" stroke-width="1.1"/>
+<path d="M29 45H35" stroke="#70a89d" stroke-width="1.4"/>
+</g>
 </svg>

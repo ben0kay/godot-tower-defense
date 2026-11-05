@@ -1,3 +1,9 @@
+## Stealth Beacon split radar-scanner artwork and SE2 handoff — 2026-11-05
+
+Stealth Beacon now has fixed base + independently rotatable head SVGs, a matching composite catalog icon and initial 0/35/70% construction artwork, wired through the shared split-layer presenter. The existing reveal mechanic **still reveals all stealthed enemies in radius**; real 70° rotating-cone detection and a faint swept wedge are designed in [SE2 Codex handoff](TOWERS/Utility/StealthBeacon/DIRECTIONAL_SCAN_IMPLEMENTATION_PLAN.md) but **not implemented** in this artwork pass. Scanner head and cone placeholder are prepared for Codex. Prices, 2-second construction, 1×1 footprint, 1800 HP and 256px range are unchanged. Source checks only; Godot visual validation pending.
+
+---
+
 ## Gunner Drone compact starter-ship revision — 2026-11-04
 
 The Gunner enemy now uses a compact **52×38** swept-fighter silhouette (formerly 64×48), a **20×40** minigun image narrowed 20% (formerly 24×40), and **135 max HP** (formerly 180, exactly 25% less). Movement/corridor radius was reduced 22→18 px to fit the smaller ship. Its separate rotating gun, barrel-tip muzzle marker, original projectile look/damage/cadence, 75px/s movement, catalog ID, loot and classification remain unchanged. Existing focused test expectations and enemy roster documentation were updated; no runtime tests run. See [Gunner details](ENEMIES/Types/GunnerDrone/README.md).

@@ -1,3 +1,11 @@
+## Stealth Beacon split scanner artwork — 2026-11-05
+
+The original single 64×64 artwork is now split into a **fixed octagonal base (`Sprite`)** and an independent **`TurretPivot/BeaconHeadSprite`** with a pronounced forward-facing teal scan lens. The composite `Artwork/stealth_beacon.svg` remains the catalog icon and construction overlay fallback. Dedicated initial **0/35/70%** construction SVGs are wired to the existing shared split-layer construction presenter. The existing 1×1 footprint, Level 1 cost 250 Credits, build 2 seconds, 1800 HP and 256px radius are unchanged. There are no authored purchased upgrades.
+
+**Only artwork/scene presentation is implemented so far. The head does not yet rotate and `ScanCone` is an empty placeholder. Reveal remains the original 360° radius until Codex implements SE2.** For the requested genuine directional Option B, see the complete [SE2 Codex implementation plan](DIRECTIONAL_SCAN_IMPLEMENTATION_PLAN.md), including proposed 70° cone, 3-second sweep, 0.1-second spatial update, exact dot-product predicate, shared membership and lifecycle requirements. No gameplay code changed and no Godot runtime validation was run.
+
+---
+
 ## Tower durability rebalance — 2026-10-20 (source updated; Godot runtime tests pending)
 
 **Current authoritative defaults supersede older HP references below:** Base/max hull health for every available player-built tower/structure is **10× the previous level-1 value**. All **nine offensive towers** (Battle, Laser, Blaster Cannon, Shockwave, Machine Gun, Sniper, Rocket, Cryo, Stasis) have explicit, independent paid level snapshots: **1,000 → 1,050 → 1,102.5 HP** (two-level towers stop at 1,050). **Every purchased upgrade adds 5% of the previous tier's Max HP**, compounded, not 5 percentage points of the original at every tier; the values are authored as complete absolute tier stats, not runtime additive bonuses.
