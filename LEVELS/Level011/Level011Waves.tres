@@ -1,23 +1,20 @@
-[gd_resource type="Resource" script_class="WaveSetResource" format=3]
+[gd_resource type="Resource" script_class="WaveSetResource" format=3 uid="uid://tq3v2ktadfkg"]
 
-[ext_resource type="Script" path="res://LEVELS/Waves/Resources/WaveBatchResource.cs" id="batch"]
-[ext_resource type="Script" path="res://LEVELS/Waves/Resources/WaveEnemyResource.cs" id="enemy"]
-[ext_resource type="Script" path="res://LEVELS/Waves/Resources/WaveResource.cs" id="wave"]
-[ext_resource type="Script" path="res://LEVELS/Waves/Resources/WaveSetResource.cs" id="set"]
+[ext_resource type="Script" uid="uid://cd2q6k7jkfyaq" path="res://LEVELS/Waves/Resources/WaveBatchResource.cs" id="batch"]
+[ext_resource type="Script" uid="uid://cxnhgkjed2i8f" path="res://LEVELS/Waves/Resources/WaveEnemyResource.cs" id="enemy"]
+[ext_resource type="Script" uid="uid://di5hkaslgameh" path="res://LEVELS/Waves/Resources/WaveSetResource.cs" id="set"]
+[ext_resource type="Script" uid="uid://cqqx733te7g78" path="res://LEVELS/Waves/Resources/WaveResource.cs" id="wave"]
 
 [sub_resource type="Resource" id="basic"]
 script = ExtResource("enemy")
-EnemyId = "basic_mk1"
 
 [sub_resource type="Resource" id="batch1"]
 script = ExtResource("batch")
-Count = 10
 Interval = 0.85
 Enemies = Array[ExtResource("enemy")]([SubResource("basic")])
 
 [sub_resource type="Resource" id="wave1"]
 script = ExtResource("wave")
-Number = 1
 Batches = Array[ExtResource("batch")]([SubResource("batch1")])
 
 [resource]
