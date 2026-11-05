@@ -166,7 +166,7 @@ public sealed partial class TowerPowerConsumer : IDisposable
     internal bool NeedsService => Live && (_energySpent > 0 || LastConsumedPerSecond > 0 || LastDeliveredRefillPerSecond > 0
         || _idleAllowed && Capacitor.Settings.Idle > 0 && Capacitor.Energy > 0
         || _chargeAllowed && RechargeCeilingPerSecond > 0 && Capacitor.Energy < Capacitor.Settings.Capacity
-        && Region > 0 && _grid.TotalsForRegion(Region).Supply > 0);
+        && Region > 0 && _grid.EffectiveSupply(Region) > 0);
     // =========================================================
     // One owned NoPower handle; heat, EMP, upgrades and other NoPower sources remain independent.
     public void Publish()

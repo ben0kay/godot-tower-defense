@@ -54,9 +54,9 @@ public partial class PowerGridManager
             foreach (TowerPowerConsumer consumer in _capacitorOrder)
             {
                 if (!consumer.Live) continue;
-                int region = consumer.Region;
+                int region = EffectiveNetwork(consumer.Region);
                 if (!_refillBudgets.TryGetValue(region, out double remaining))
-                    remaining = Math.Max(0, TotalsForRegion(region).Supply * elapsed);
+                    remaining = Math.Max(0, EffectiveSupply(consumer.Region) * elapsed);
                 double granted = Math.Min(remaining, consumer.DesiredRefill);
                 double credited = consumer.CreditRefill(granted, elapsed);
                 _refillBudgets[region] = Math.Max(0, remaining - credited);

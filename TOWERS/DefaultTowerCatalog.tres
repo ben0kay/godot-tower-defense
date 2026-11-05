@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TowerCatalog" load_steps=18 format=3]
+[gd_resource type="Resource" script_class="TowerCatalog" format=3]
 [ext_resource type="Script" path="res://TOWERS/Shared/TowerCatalog.cs" id="1"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/BattleTowerDefinition.tres" id="2"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/LaserTower/LaserTowerDefinition.tres" id="3"]
@@ -18,6 +18,9 @@
 
 [ext_resource type="Resource" path="res://TOWERS/Support/RepairTower/RepairTowerDefinition.tres" id="repair"]
 
+[ext_resource type="Resource" path="res://TOWERS/Utility/PowerRelay/PowerRelayDefinition.tres" id="power_relay"]
+[ext_resource type="Resource" path="res://TOWERS/Utility/PowerTransmitter/PowerTransmitterDefinition.tres" id="power_transmitter"]
+
 [resource]
 script = ExtResource("1")
-Definitions = [ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10"), ExtResource("10_rocket"), ExtResource("stasis"), ExtResource("resource_income"), ExtResource("arg_income"), ExtResource("stealth_beacon"), ExtResource("industrial_power"), ExtResource("repair")]
+Definitions = [ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10"), ExtResource("10_rocket"), ExtResource("stasis"), ExtResource("resource_income"), ExtResource("arg_income"), ExtResource("stealth_beacon"), ExtResource("industrial_power"), ExtResource("repair"), ExtResource("power_relay"), ExtResource("power_transmitter")]

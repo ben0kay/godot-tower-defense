@@ -48,6 +48,9 @@ public static class SaveValidation
             if (tower.Tier < 1 || !float.IsFinite(tower.Health) || tower.Health <= 0 || (tower.Priority.HasValue && !Enum.IsDefined(tower.Priority.Value)) ||
                 !Enum.IsDefined(tower.Work.Phase) || Math.Abs((long)tower.X) > 1000000 || Math.Abs((long)tower.Y) > 1000000)
                 throw new InvalidDataException("Invalid tower checkpoint.");
+            if (tower.PowerPeerId == null) throw new InvalidDataException("Invalid transmitter peer identity.");
+            if (tower.PowerPeerId.Length > 0)
+            { Text(tower.PowerPeerId); if (tower.TypeId != "power_transmitter") throw new InvalidDataException("Unexpected transmitter peer."); }
             if (tower.Power is PowerSaveData power)
             {
                 Number(power.Energy); Number(power.RestartEnergy); Number(power.ActiveSecondsRemaining);

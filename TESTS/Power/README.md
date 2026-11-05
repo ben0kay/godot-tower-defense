@@ -1,3 +1,9 @@
+## PW5-A/B narrow checks — 2026-11-05
+
+Existing optional PowerNetworkChecks calls `PowerDistributionChecks` for real reciprocal manual pairs, source-less remote refill from one finite budget, both producer totals, save peer reconstruction, EMP suspension/recovery/removal, Relay source eligibility/ceiling/original distance/fallback. PowerDistanceChecks adds a three-island weighted chain with a more costly alternate route, empty-source graph and unlink fallback. No long simulations, profile disk I/O or broad regression suite. Source-authored but **not executed**: .NET unavailable. Focused source/resource/SVG review only; owner Godot .NET build and playtest pending.
+
+---
+
 ## PW4-D — selected power feedback — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** The existing right-column ENERGY current/capacity bar remains. A compact three-line **PowerDetails** label in the Inspector Main column shows **actual Refill +X/s**, **distance-limited Limit +Y/s**, **actual Use −Z/s**, conductive distance, efficiency and connection state. Tooltips explain measured versus potential rates, authored idle/total-active draw and the recovery threshold. Full, charging, awaiting refill, supply-limited, connected/starved, disconnected/no-live-source, recharge-disabled and work-paused are distinct. Recovery is shown separately; no incoming supply does not erase stored energy.

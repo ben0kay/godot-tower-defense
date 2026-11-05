@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="PowerTransmitterConfig" format=3]
+[ext_resource type="Script" path="res://TOWERS/Utility/PowerTransmitter/PowerTransmitterConfig.cs" id="1"]
+[ext_resource type="Resource" path="res://TOWERS/Utility/PowerTransmitter/Artwork/ConstructionArt.tres" id="construction"]
+[resource]
+script = ExtResource("1")
+ConstructionArt = ExtResource("construction")
+ConstructionCredits = 200
+ConstructionSeconds = 4.0
+MaxHealth = 900.0
+HopCostCells = 8

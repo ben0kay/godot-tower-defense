@@ -34,7 +34,7 @@ public partial class PowerGridManager : Node
         ulong start = Time.GetTicksUsec();
         _islands.Rebuild(_grid.Config.WidthCells, _grid.Config.HeightCells, _grid.PowerConductivity);
         _terrainRevision = _grid.PowerTerrainRevision; Revision++; RebuildCount++;
-        ReindexAccounting(); InvalidateDelivery();
+        ReindexAccounting(); _connectionsDirty = true; InvalidateDelivery();
         LastRebuildMilliseconds = (Time.GetTicksUsec() - start) / 1000.0;
         AccountingChanged?.Invoke();
         NetworksChanged?.Invoke(); WakeCapacitors();
@@ -52,6 +52,6 @@ public partial class PowerGridManager : Node
     public override void _ExitTree()
     {
         if (GodotObject.IsInstanceValid(_grid)) _grid.TerrainRebuilt -= RefreshTerrain;
-        ClearCapacitors(); ClearDelivery(); ClearAccounting(); _grid = null;
+        ClearCapacitors(); ClearDelivery(); ClearDistribution(); ClearAccounting(); _grid = null;
     }
 }

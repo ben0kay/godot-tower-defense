@@ -1,6 +1,42 @@
+## PW5-A/B — Relay and Transmitter implemented — 2026-11-05
+
+**Source Implemented / Awaiting Owner Validation.** Two distinct Utility entries now reuse the existing tower construction/health/disable/placement/catalog/Inspector and `World/PowerNetworks` owner. PW5-C coverage routes/animation and PW6/new generators/priority slider remain deferred.
+
+| Building | Provisional settings | Role |
+| --- | --- | --- |
+| Power Relay (`power_relay`) | 150 Credits, 3s, 800 HP, 1×1; 10 conducting-cell coverage, 85% nominal recharge ceiling | Local best-only booster; never pairs or generates |
+| Power Transmitter (`power_transmitter`) | 200 Credits, 4s, 900 HP, 1×1; 8 source-distance cost cells per hop | Manually pairs with one Transmitter on another physical island; no local boost |
+
+Each has its own typed `Default*Config.tres`, definition, scene and native SVG finished/core/0–35–70% construction artwork. Tune these provisional settings in its config; existing sources and tower power/combat profiles are unchanged.
+
+### Shared power/cache policy
+
+- Physical PW1 islands remain authoritative. Every footprint cell must be on one physical conducting island. Electricity crosses a gap only through a valid reciprocal, operational Transmitter pair. Work, EMP/disable, death/removal, movement, terrain, config/source changes, manual link/unlink and restore update cached inputs; no new per-building processing or per-frame map/registry traversal.
+- Relays use one cached best-efficiency field, populated with bounded four-neighbour searches from eligible Relay footprints. Coverage stays on that Relay's physical island, never traverses Transmitter links and never seeds another Relay. A Relay needs a live source route (including an active Transmitter route after B). No source means zero boost. Take max(original distance efficiency, best eligible Relay ceiling), capped at 100%; overlaps never add. Original source distance still orders scarce supply.
+- Active Transmitter pairs join physical islands using a small cached union graph. Source totals remain counted once per physical island and each effective component has **one finite shared service budget**. No relay/transmitter output, global battery, upkeep, throughput cap or arbitrary maximum link length.
+- Source distance uses ordinary conductive segments (1 per cell) plus a positive link-hop cost: **max(both endpoints' HopCostCells)**, provisionally 8. The electrical port is the first footprint cell (current buildings are 1×1). Existing PW4-B falloff then applies to total cost. Multi-source Dijkstra runs only on a dirty linked graph; without active links, the original linear BFS is retained. Positive costs prevent zero-cost cycles and preserve meaningful nearer-source-first allocation. Link cost is distance attenuation, not a second energy deduction. A Relay can improve recharge ceiling but cannot remove distance/hop scarcity cost.
+- Cached roots/totals, distance/relay arrays, bounded search buffers, edge lists and priority queue are reused. Positive→positive source-output changes update network budgets without rerunning the source field. Dirty topology/link/Relay inputs rebuild on query/service, never each frame. Old elapsed intervals flush before input mutation. Existing capacitor energy, spending/rollback, owned NoPower, heat/ammo, work clocks and pause remain unchanged.
+
+### Controls and presentation
+
+Select a completed operational **Power Transmitter**, click **LINK**, then click an unpaired completed operational Transmitter on a **different physical island**. No generator is required to create the pair. Self/same-island/incomplete/disabled/occupied/missing targets report a reason; another world click can retry. Right-click or Escape cancels; selection/tray/Inspector closure also retires pending linking. **UNLINK** removes both peer IDs. Temporary disable suspends connectivity while retaining IDs; recovery revalidates them.
+
+Relay status: BOOSTING / NO LIVE SOURCE / DISCONNECTED / DISABLED, with cyan live core and dim inactive core. Transmitters report UNLINKED / LINKED / NO LIVE SOURCE / LINK SUSPENDED / DISABLED. One lower-SaveId endpoint draws a thin static cyan line when powered; a retained inactive/unpowered link is subdued amber. Removing/unlinking a pair clears the line. Lines/core/status update only on input/state events; no animation loop. Existing generic disabled tint/triangle still applies. Selected distribution status reserves three lines to avoid status-induced Inspector growth. Consumer ENERGY and PW4-D power details remain intact; tooltip now explains Relay ceilings and hop distance. Richer selection-only coverage/source routes, animated pulses and F4 network UI remain PW5-C.
+
+### Saving and minimal checks
+
+`TowerSaveData.PowerPeerId` is optional (default empty), bounded/typed by existing save validation and stores durable Tower SaveIds. Existing power fields/schema guard are preserved. After **all** buildings/conditions restore, `CampaignSession` resolves reciprocal peer references, safely drops missing/self/nonreciprocal peers and warms effective networks/delivery before unpause. Disabled pairs retain identity and resume when valid; same-island/invalid footprints remain suspended. Destruction/removal clears the surviving peer. Charge is never erased by a dropped link. The existing dependency content fingerprint can reject older checkpoints; do not bypass it.
+
+Minimal source/diff, native resource-reference and SVG XML checks only. .NET is unavailable; **no C# build, Godot gameplay, visuals, FPS or benchmark acceptance is claimed**. Optional existing PowerNetworkChecks now includes narrow source-authored PW5 checks for positive-hop shortest paths/no-source/unlink, real manual pairing, finite remote recharge, two producers counted once, saved peer reconstruction, EMP suspension/recovery/removal, and Relay ceiling/source-loss/fallback. These C# fixtures were not executed here.
+
+Owner: rebuild in Godot .NET, place both Utility types, select/link two islands and inspect remote ENERGY refill, disable/unlink/remove an endpoint, overlap Relays and check original scarcity ordering, then try a fresh between-wave Save/Load. Confirm line/cores, fixed Inspector and construction presentation in Level011. Broader acceptance remains owner playtesting.
+
+
+---
+
 # PW5 AUTHORITATIVE REVISION — Two separate power buildings (2026-11-05)
 
-**APPROVED DESIGN / NOT YET IMPLEMENTED.** This decision supersedes every earlier PW5 plan below or in older READMEs that describes **pairable Power Relays**. PW0–PW4-D are already source implemented; preserve all existing behavior. Codex must implement **only the separately requested phase**, not the whole roadmap. See [Relay](../../Utility/PowerRelay/README.md), [Transmitter](../../Utility/PowerTransmitter/README.md), and [Backlog](../../../NOTES/IMPLEMENTATION_BACKLOG.md).
+**PW5-A/B SOURCE IMPLEMENTED / AWAITING OWNER VALIDATION; PW5-C PLANNED.** This decision supersedes every earlier PW5 plan below or in older READMEs that describes **pairable Power Relays**. PW0–PW4-D are already source implemented; preserve all existing behavior. Codex must implement **only the separately requested phase**, not the whole roadmap. See [Relay](../../Utility/PowerRelay/README.md), [Transmitter](../../Utility/PowerTransmitter/README.md), and [Backlog](../../../NOTES/IMPLEMENTATION_BACKLOG.md).
 
 | Building | Exclusive gameplay responsibility | Player-visible minimum |
 | --- | --- | --- |
@@ -304,7 +340,7 @@ future relay changes rebuild only network unions, not terrain islands. Never sca
 | **PW2** | Shared producer/demand accounting + configurable Citadel baseline registration | Source implemented / owner validation pending. DefaultCitadelPower.tres Output=100 provisional; event-driven source lifetime, per-island cached totals and F4 accounting. No actual consumers/outages yet. Check multiple Citadels, isolation, death/removal and a new Save/Load. |
 | **PW3** | Shared generator/config in `Shared/`, Industrial scene/config/art in its type folder | Source implemented / owner validation pending. `industrial_generator` in Economy, provisional 250 output / 300 Credits / 5s / 1200 HP / 2×2, assembly stages, work/disable/lifetime registration and existing checkpoint reconstruction. |
 | **PW4-A–D** | Tower buffers and charge/use (A); cached distance recharge (B); distance-first finite supply allocation (C); Inspector stored-energy bar/rates (D) | **PW4-A/B/C/D source implemented / owner validation pending.** Follow the authoritative PW4 subpass table above. Protect existing power topology and generator output. |
-| **PW5-A/B/C** | **Two building types:** local-only Power Relay (A), manually paired cross-island Power Transmitter + basic visible link (B), advanced connection/coverage visuals (C). | **Approved design, not implemented.** See canonical PW5 revision at TOP, which supersedes combined-Relay descriptions below. Implement one pass per request. |
+| **PW5-A/B/C** | **Two building types:** local-only Power Relay (A), manually paired cross-island Power Transmitter + basic visible link (B), advanced connection/coverage visuals (C). | **A/B source implemented / owner validation pending; C planned.** See canonical PW5 revision at TOP, which supersedes combined-Relay descriptions below. Implement one pass per request. |
 | **PW6** | Solar/Fusion variants, shared status feedback and tuning | Planned. Distinct IDs/configs, one producer implementation; readable capacity/shortage feedback and measured desktop cost. |
 
 Each phase includes its relevant save integration, feature documentation and brief source/build checks.

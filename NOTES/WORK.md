@@ -1,3 +1,11 @@
+## PW5-A/B — two Utility power buildings — 2026-11-05
+
+**Source Implemented / Awaiting Owner Validation.** Power Relay locally boosts capacitor recharge on conducting terrain (best-only 10-cell/85% provisional ceiling). Separate Power Transmitter supports explicit LINK → another island’s Transmitter / UNLINK, one retained reciprocal peer and a thin static cyan/amber link. Shared cached networks count real output once, use positive-hop source distance and retain finite distance-first allocation. Provisional Relay 150 Credits/3s/800 HP; Transmitter 200/4s/900 HP; both 1×1, no generation/upkeep or local boost from Transmitters. Existing energy/heat/ammo/work/disable/save owners are reused; optional durable peer IDs resolve before unpause. Minimal source/resource/SVG checks only; .NET unavailable, C# fixtures authored but unrun. PW5-C visual polish, PW6 and priority slider remain planned.
+
+[Full details and owner checks](../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md).
+
+---
+
 ## Runtime map bounds link restored — 2026-11-05
 
 Level011Config now explicitly assigns WorldConfig = Level011WorldConfig.tres. Without that link, WorldMapLoader retained the shared 100×80 grid, so the camera stopped at X=6400 even though the separate local resource said 192×120. Restored the resource reference and property only; current terrain, three portals, waves, Credits and Citadel placement are preserved. The existing loader applies the 192×120 bounds before grid/camera initialization. Minimal source/reference checks only; restart/redeploy Level011 in Godot to verify right-edge pan and Citadel access. No build/runtime claim.

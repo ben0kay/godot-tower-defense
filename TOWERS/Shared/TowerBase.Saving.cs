@@ -26,7 +26,7 @@ public abstract partial class TowerBase
             StoredCredits = (this as CreditProducerTower)?.Buffer?.Current,
             CreditSeconds = (this as CreditProducerTower)?.SavedCreditSeconds ?? 0,
             AmmoSeconds = (this as AmmunitionFactory)?.Production.ProgressSeconds ?? 0,
-            Produced = (this as AmmunitionFactory)?.ProducedRounds ?? 0, WeaponCooldown = CaptureWeaponCooldown(), Power = power
+            Produced = (this as AmmunitionFactory)?.ProducedRounds ?? 0, WeaponCooldown = CaptureWeaponCooldown(), Power = power, PowerPeerId = (this as PowerTransmitter)?.PeerSaveId ?? ""
         };
     }
 

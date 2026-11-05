@@ -12,10 +12,10 @@ public static class PowerInspectionText
     }
     public static string Tooltip(PowerInspectionSnapshot value) =>
         "Refill: actual energy received per second in the latest shared service sample.\n"
-        + "Limit: maximum distance-adjusted recharge, before island shortages and buffer headroom.\n"
+        + "Limit: best source-distance/Relay recharge ceiling, before network shortages and buffer headroom.\n"
         + "Use: actual paid attack energy plus idle losses per second in that sample.\n"
         + $"Authored draw: idle {value.IdleDraw:0.##}/s; active {value.ActiveDraw:0.##}/s total (not added to idle).\n"
-        + "Distance follows conductive tiles to the nearest live source. Connected does not guarantee supply.\n"
+        + "Distance follows conductive tiles plus configured Transmitter hop costs to a live source. Relay boosts do not change scarcity distance. Connected does not guarantee supply.\n"
         + $"Recovery needs {value.RestartEnergy:0.##} stored energy. No incoming refill does not erase reserves.\n"
         + "Rates settle on the shared service cadence and freeze during pause.";
     private static string Status(PowerDeliveryState state) => state switch

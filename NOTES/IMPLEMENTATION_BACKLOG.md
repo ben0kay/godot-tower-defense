@@ -1,3 +1,11 @@
+## PW5-A/B — two Utility power buildings — 2026-11-05
+
+**Source Implemented / Awaiting Owner Validation.** Power Relay locally boosts capacitor recharge on conducting terrain (best-only 10-cell/85% provisional ceiling). Separate Power Transmitter supports explicit LINK → another island’s Transmitter / UNLINK, one retained reciprocal peer and a thin static cyan/amber link. Shared cached networks count real output once, use positive-hop source distance and retain finite distance-first allocation. Provisional Relay 150 Credits/3s/800 HP; Transmitter 200/4s/900 HP; both 1×1, no generation/upkeep or local boost from Transmitters. Existing energy/heat/ammo/work/disable/save owners are reused; optional durable peer IDs resolve before unpause. Minimal source/resource/SVG checks only; .NET unavailable, C# fixtures authored but unrun. PW5-C visual polish, PW6 and priority slider remain planned.
+
+[Full details and owner checks](../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md).
+
+---
+
 # Implementation Backlog — Live Status (2026-11-05)
 
 > **Current snapshot checked against `dev` at [f90010ba7](https://github.com/ben0kay/godot-tower-defense/commit/f90010ba7db42eda2408532692c7cb57cac8b3a3); source evidence, not Godot gameplay acceptance.** The dated entries farther down preserve their original implementation history, which may contain superseded `PLANNED` wording. For task planning, use this section, the ranked table and each feature's newest owning README/plan rather than older notes. No gameplay code is authorized by this backlog update.
@@ -148,7 +156,7 @@ The original 26-area order is preserved for continuity. **Not every ranked item 
 | # | Work area | Complexity | Suggested tool | Status on `dev` / next useful slice |
 | ---: | --- | --- | --- | --- |
 | 1 | [Campaign and battlefield saving](../SYSTEMS/Saving/README.md) | Very high | **Codex** | **SOURCE DONE (S0–S3), QA OPEN:** one-current-checkpoint between-wave save, profile store, Esc Save/Load and Campaign Continue. Verify resume in Godot, original reward tickets, active builders/ammo. Mid-combat save and multiple slots remain excluded. |
-| 2 | [Electricity / island power networks](../TOWERS/Economy/Power/README.md) | Very high | **Codex** | **PW0–PW4-D source implemented / owner validation pending:** cached conducting islands, Citadel/Industrial generation, distance-first finite delivery, per-type capacitors for all nine offensive towers and Repair, NoPower recovery and selected ENERGY/rate feedback. **Remaining:** owner balance/playtesting; PW5 relays/distribution boosters, future generator variants and separately authorized optional mild priority control. See [power phases](../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md). |
+| 2 | [Electricity / island power networks](../TOWERS/Economy/Power/README.md) | Very high | **Codex** | **PW0–PW4-D source implemented / owner validation pending:** cached conducting islands, Citadel/Industrial generation, distance-first finite delivery, per-type capacitors for all nine offensive towers and Repair, NoPower recovery and selected ENERGY/rate feedback. **Remaining:** owner balance/playtesting; PW5-C distribution/link visual polish, future generator variants and separately authorized optional mild priority control. See [power phases](../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md). |
 | 3 | [PF0/PF3–PF5 combat performance](AGENT_FINDINGS/Performance.md) | Very high | **Codex + local measurements** | **PARTIAL / PROFILE NEXT:** PF1 routing/cache fixes and PF2 F4 profiling exist. Reproduce Level100 400/500-enemy CPU/GPU frame timings, then one measured PF4 fix and PF5 validation. |
 | 4 | [Research system expansion](../SYSTEMS/Progression/Research/README.md) | Very high | **Codex** | **PARTIAL:** foundation/research starter nodes exist; broader tree, prerequisites, unlocks, doctrines and story branches remain. |
 | 5 | [Wave Phase 3: advanced progression](../LEVELS/Waves/README.md) | High | **Codex** | **PARTIAL:** finite manual mixed waves, banners and narrator exist. Editor .tres pilot/WP1 delivered; auto start, history, extras and scripted encounters remain separate work. |

@@ -1,0 +1,17 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://TOWERS/Utility/PowerRelay/PowerRelay.cs" id="1"]
+[ext_resource type="Resource" path="res://TOWERS/Utility/PowerRelay/DefaultPowerRelayConfig.tres" id="2"]
+[ext_resource type="Texture2D" path="res://TOWERS/Utility/PowerRelay/Artwork/power_relay.svg" id="3"]
+[ext_resource type="Texture2D" path="res://TOWERS/Utility/PowerRelay/Artwork/power_relay_core.svg" id="core"]
+[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionVisuals.cs" id="4"]
+[node name="PowerRelay" type="Node2D"]
+script = ExtResource("1")
+Config = ExtResource("2")
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("3")
+[node name="Core" type="Sprite2D" parent="."]
+texture = ExtResource("core")
+self_modulate = Color(0.12, 0.22, 0.27, 1)
+[node name="ConstructionVisuals" type="Node" parent="."]
+script = ExtResource("4")
+SpritePath = NodePath("../Sprite")

@@ -159,7 +159,9 @@ public sealed class CampaignSession
         session.RestoreCheckpoint(data, towers.Values);
         _battle.GetNode<WaveManager>("Waves").RestoreCheckpoint(data.CompletedWaves, data.WaveRandomState);
         _battle.GetNode<CameraController>("CameraRig").RestoreCamera(data.CameraPosition, data.CameraZoom);
-        _battle.GetNode<PowerGridManager>("World/PowerNetworks").RefreshConsumerDelivery();
+        var power = _battle.GetNode<PowerGridManager>("World/PowerNetworks");
+        power.RestoreTransmitterLinks(towers, data.Towers);
+        power.RefreshConsumerDelivery();
     }
 
     // =========================================================

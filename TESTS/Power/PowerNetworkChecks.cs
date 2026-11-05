@@ -72,6 +72,7 @@ public partial class PowerNetworkChecks : Node
             Require(grid.WorldToCell(grid.CellToWorldCenter(a)) == a && power.RegionAt(a) != power.RegionAt(b), "Transforms retain correct cell ownership");
             Require(grid.TerrainConductsPower(a) && !grid.CanBuild(a) && grid.TerrainBlocksEnemies(a), "Citadel reservations do not erase land conductivity");
             Require(power.RegionAt(new(10, 8)) == 0 && power.RegionAt(new(2, 2)) == 0, "Decorations/empty space never join grids");
+            PowerDistributionChecks.Links(power, grid, world, a, b);
             int rebuilds = power.RebuildCount, navigation = grid.NavigationRevision;
             grid.RebuildTerrain();
             Require(power.RebuildCount == rebuilds && grid.NavigationRevision == navigation, "Unchanged terrain skips topology and navigation rebuilds");
@@ -96,6 +97,7 @@ public partial class PowerNetworkChecks : Node
             interactive.SetCell(bridge, 1, new(0, 0)); grid.RebuildTerrain();
             Require(power.IslandCount == 1 && grid.TerrainConductsPower(bridge), "Impassable wins over Interactive for conductivity too");
             CheckDelivery(power, grid, world, a, b);
+            PowerDistributionChecks.Relay(power, grid, world, a, b);
             PowerAllocationChecks.Run(power, grid, world, a, b);
             CheckAccounting(power, grid, impassable, interactive, bridge, a, b);
             Require(!power.IsProcessing() && !power.IsPhysicsProcessing(), "Topology/accounting manager has no idle/frame callbacks");

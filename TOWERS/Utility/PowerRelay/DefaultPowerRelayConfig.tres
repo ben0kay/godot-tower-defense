@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PowerRelayConfig" format=3]
+[ext_resource type="Script" path="res://TOWERS/Utility/PowerRelay/PowerRelayConfig.cs" id="1"]
+[ext_resource type="Resource" path="res://TOWERS/Utility/PowerRelay/Artwork/ConstructionArt.tres" id="construction"]
+[resource]
+script = ExtResource("1")
+ConstructionArt = ExtResource("construction")
+ConstructionCredits = 150
+ConstructionSeconds = 3.0
+MaxHealth = 800.0
+RangeCells = 10
+BoostEfficiency = 0.85

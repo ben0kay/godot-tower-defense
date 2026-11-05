@@ -111,7 +111,7 @@ public partial class PowerGridManager
 
     // =========================================================
     // Listeners see a completed change; identical values never emit another accounting event.
-    private void PublishAccounting() { AccountingRevision++; AccountingChanged?.Invoke(); WakeCapacitors(); }
+    private void PublishAccounting() { _connectionsDirty = true; AccountingRevision++; AccountingChanged?.Invoke(); WakeCapacitors(); }
 
     // =========================================================
     // No durable state or Node references live in accounting; future saves restore inputs through their owning features.

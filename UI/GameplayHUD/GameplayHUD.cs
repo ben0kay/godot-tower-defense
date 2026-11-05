@@ -137,6 +137,7 @@ public partial class GameplayHUD : Control
             if (GodotObject.IsInstanceValid(_creditProducer)) { _creditProducer.TryCollect(); SetDefenseDetails(_creditProducer); }
         }, UIButtonStyle.Compact, 24, Config);
         _collectCredits.Name = "CollectCredits"; _collectCredits.Hide(); _defenseMeters.AddChild(_collectCredits);
+        SetupPowerLinkActions();
         _rankSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/Columns/Side/RankSection");
         _rankLabel = _rankSection.GetNode<Label>("Rank");
         _experienceText = _rankSection.GetNode<Label>("ExperienceText");
@@ -322,7 +323,7 @@ public partial class GameplayHUD : Control
     public void ShowTowerDetails(string name, string category, string stats, string notes = "", bool newSelection = false)
     {
         bool preview = category.EndsWith("Build Preview", StringComparison.Ordinal) || category == "Placement rejected";
-        _buildPreview = preview;
+        _buildPreview = preview; SetPowerLinkActions(null);
         SetRuntimeDetails(""); SetWorkDetails(null); SetConditionDetails(null); SetUpgradeComparison(null, null); SetUpgradeDetails("", "", false);
         _targetSection.Hide(); _rankSection.Hide(); _defenseMeters.Hide(); _powerMeters.Hide(); _powerDetails.Hide();
         _towerName.Text = name; _towerName.TooltipText = category + "\n" + notes + "\n" + stats;
@@ -383,13 +384,14 @@ public partial class GameplayHUD : Control
     // =========================================================
     // Update inventory/status only; leave numeric stats, rank progress and upgrade previews untouched.
     public void SetRuntimeDetails(string text)
-    { _runtimeStats.Text = text; RefreshDetailsVisibility(); }
+    { _runtimeStats.Text = text; _runtimeStats.TooltipText = text; RefreshDetailsVisibility(); }
 
     // =========================================================
     // Display actual per-instance HP and ammunition through compact, event-driven meters.
     // Preserve the logistical status line; do not repeat numerical HP/ammo in RuntimeStats.
     public void SetDefenseDetails(TowerBase tower)
     {
+        SetPowerLinkActions(tower);
         _creditProducer = tower is CreditProducerTower producer && producer.UsesManualCollection ? producer : null;
         if (!GodotObject.IsInstanceValid(tower) || _buildPreview)
         { _creditProducer = null; _collectCredits.Hide(); _defenseMeters.Hide(); _powerMeters.Hide(); _powerDetails.Hide(); SetRuntimeDetails(""); return; }

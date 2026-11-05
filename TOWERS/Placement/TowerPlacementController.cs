@@ -71,6 +71,7 @@ public partial class TowerPlacementController : Node2D
         _selectionOverlay.Configure(_grid, _hud);
         _rangeOverlay = new TowerRangeOverlay { Name = "SelectedTowerRange", ZIndex = 9 };
         AddChild(_rangeOverlay); _rangeOverlay.Configure(_grid, Settings);
+        BindPowerLinkActions();
         Catalog.Rebuild();
         _hud.BindCatalog(Catalog);
         foreach (TowerDefinition definition in Catalog.Definitions)
@@ -90,7 +91,7 @@ public partial class TowerPlacementController : Node2D
         SetProcessUnhandledInput(true);
         _input = GetNode<GameInput>("/root/GameInput");
         _input.Bind(this, GameInput.BackAction, () =>
-        { if (!_placing && !_browsingBuild) return false; CancelPlacement(); return true; }, 10);
+        { if (CancelPowerLink()) return true; if (!_placing && !_browsingBuild) return false; CancelPlacement(); return true; }, 10);
     }
 
     // =========================================================
@@ -102,6 +103,7 @@ public partial class TowerPlacementController : Node2D
     // Avoid subscriptions retaining scenes that are no longer alive.
     public override void _ExitTree()
     {
+        UnbindPowerLinkActions();
         ObserveWork(null);
         foreach (var pair in _placementExits) if (GodotObject.IsInstanceValid(pair.Key)) pair.Key.TreeExiting -= pair.Value;
         _placementExits.Clear();
@@ -215,6 +217,7 @@ public partial class TowerPlacementController : Node2D
     // Clear build previews without closing the tray or a placed-tower Inspector.
     private void CancelPlacement()
     {
+        CancelPowerLink();
         bool clearPreview = _placing || _browsingBuild;
         if (clearPreview || _hud.IsPlacementPresentation) _ignorePreviewFrame = Engine.GetProcessFrames();
         _placing = false; _browsingBuild = false;
@@ -237,6 +240,8 @@ public partial class TowerPlacementController : Node2D
         if (input is InputEventKey key && !key.Echo && key.Location == KeyLocation.Right &&
             (key.PhysicalKeycode == Key.Shift || key.Keycode == Key.Shift))
         { _rightShiftHeld = key.Pressed; return; }
+        if (input is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Right } && CancelPowerLink())
+        { GetViewport().SetInputAsHandled(); return; }
         if ((!_placing && !_browsingBuild) || input is not InputEventMouseButton mouse || !mouse.Pressed
             || mouse.ButtonIndex != MouseButton.Right) return;
         CancelPlacement();
@@ -258,6 +263,7 @@ public partial class TowerPlacementController : Node2D
     // One placement press cannot also inspect; a later independent click uses the normal selection path.
     private void HandleWorldClick(Vector2I cell)
     {
+        if (TryPowerLinkClick(cell)) return;
         if (Engine.GetProcessFrames() == _placedInputFrame) return;
         if (_placing) TryPlace(cell);
         else if (TryCollectCitadelAt(cell)) return;
@@ -399,6 +405,7 @@ public partial class TowerPlacementController : Node2D
     // A selected placed tower shares the existing HUD Inspector with build previews.
     private void SelectTower(TowerBase tower)
     {
+        if (tower != _selected) CancelPowerLink();
         if (_selected == tower && (tower == null || _hud.IsInspectionVisible)) return;
         if (GodotObject.IsInstanceValid(_selected))
         { _selected.StatsChanged -= OnSelectedStatsChanged; _selected.TargetPriorityChanged -= OnSelectedTargetPriorityChanged; _selected.ExperienceChanged -= OnSelectedExperienceChanged; _selected.RuntimeChanged -= OnSelectedRuntimeChanged; _selected.HeatChanged -= OnSelectedConditionsChanged; _selected.DisableStateChanged -= OnSelectedConditionsChanged; _selected.SetSelected(false); }
@@ -469,6 +476,7 @@ public partial class TowerPlacementController : Node2D
     // Retain existing selection semantics but stop hidden progress notifications until reselected.
     private void OnInspectionClosed()
     {
+        CancelPowerLink();
         _selectionOverlay?.Clear();
         _rangeOverlay?.Clear();
         _browsingBuild = false;

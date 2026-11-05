@@ -1,3 +1,11 @@
+## PW5-A/B — two Utility power buildings — 2026-11-05
+
+**Source Implemented / Awaiting Owner Validation.** Power Relay locally boosts capacitor recharge on conducting terrain (best-only 10-cell/85% provisional ceiling). Separate Power Transmitter supports explicit LINK → another island’s Transmitter / UNLINK, one retained reciprocal peer and a thin static cyan/amber link. Shared cached networks count real output once, use positive-hop source distance and retain finite distance-first allocation. Provisional Relay 150 Credits/3s/800 HP; Transmitter 200/4s/900 HP; both 1×1, no generation/upkeep or local boost from Transmitters. Existing energy/heat/ammo/work/disable/save owners are reused; optional durable peer IDs resolve before unpause. Minimal source/resource/SVG checks only; .NET unavailable, C# fixtures authored but unrun. PW5-C visual polish, PW6 and priority slider remain planned.
+
+[Full details and owner checks](TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md).
+
+---
+
 ## Shared power rollout to offensive towers and Repair — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** All nine offensive types plus Restoration Tower now use PW4-A–D capacitors and the existing Inspector ENERGY/power details. Each has a configurable per-type profile with modest provisional rates; Battle's baseline is unchanged. Atomic projectile/volley/pulse payments and duration-limited Laser/repair payments reuse the shared service and NoPower recovery. Active replaces idle; no new polling, generator, relay, priority slider or save schema. Existing combat, ammo, heat, construction, upgrades and checkpoint owners are preserved. Source/resource checks only; .NET unavailable, owner Godot validation pending. [Rate table and accounting](TOWERS/Shared/Power/README.md).

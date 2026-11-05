@@ -47,13 +47,15 @@ public partial class PowerGridManager
     private void InvalidateDelivery() { _distancesDirty = true; WakeCapacitors(); }
     public void EnsureDelivery()
     {
+        EnsureConnections();
         if (!_distancesDirty || _grid == null) return;
         ulong start = Time.GetTicksUsec(); _anchors.Clear();
         foreach (Endpoint endpoint in _endpoints.Values)
             if (endpoint.Producer && endpoint.Amount > 0 && endpoint.Region > 0)
                 _anchors.Add(new(endpoint.Anchor.X, endpoint.Anchor.Y, endpoint.Size.X, endpoint.Size.Y));
         // Read island labels, not live terrain: an old elapsed interval may be settled during TerrainRebuilt.
-        _distances.Rebuild(_islands.Width, _islands.Height, _islands.Regions, _anchors);
+        _distances.Rebuild(_islands.Width, _islands.Height, _islands.Regions, _anchors, _transmitterLinks);
+        RebuildRelayBoost();
         _anchors.Clear(); _distancesDirty = false; _deliveryRevision++; DistanceRebuildCount++;
         LastDistanceRebuildMilliseconds = (Time.GetTicksUsec() - start) / 1000.0;
     }
@@ -63,11 +65,19 @@ public partial class PowerGridManager
     {
         EnsureDelivery();
         if (_grid == null || RegionForFootprint(anchor, size) == 0) return new(-1, 0);
+        int steps = DistanceFor(anchor, size);
+        double efficiency = _deliverySettings.Efficiency(steps);
+        if (steps >= 0)
+            for (int y = anchor.Y; y < anchor.Y + size.Y; y++) for (int x = anchor.X; x < anchor.X + size.X; x++)
+                efficiency = Math.Max(efficiency, _relayBoost[y * _islands.Width + x]);
+        return new(steps, Math.Min(1, efficiency));
+    }
+    private int DistanceFor(Vector2I anchor, Vector2I size)
+    {
         int best = int.MaxValue;
         for (int y = anchor.Y; y < anchor.Y + size.Y; y++) for (int x = anchor.X; x < anchor.X + size.X; x++)
         { int distance = _distances.DistanceAt(x, y); if (distance >= 0) best = Math.Min(best, distance); }
-        int steps = best == int.MaxValue ? -1 : best;
-        return new(steps, _deliverySettings.Efficiency(steps));
+        return best == int.MaxValue ? -1 : best;
     }
     // =========================================================
     // Checkpoints restore all source inputs first, then warm this derived cache once before unpausing.
