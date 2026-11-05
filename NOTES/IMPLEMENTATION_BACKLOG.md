@@ -1,3 +1,46 @@
+# Implementation Backlog — Live Status (2026-11-05)
+
+> **Current snapshot checked against `dev` at [f90010ba7](https://github.com/ben0kay/godot-tower-defense/commit/f90010ba7db42eda2408532692c7cb57cac8b3a3); source evidence, not Godot gameplay acceptance.** The dated entries farther down preserve their original implementation history, which may contain superseded `PLANNED` wording. For task planning, use this section, the ranked table and each feature's newest owning README/plan rather than older notes. No gameplay code is authorized by this backlog update.
+
+## Recent completed source work (November 4–5)
+
+| Area | Verified current source status | Remaining boundary |
+| --- | --- | --- |
+| **Power PW0–PW4-D** | Conducting islands, 100/s Citadel and 250/s Industrial output, tower capacitors, cached distance falloff, **distance-first finite allocation**, selected ENERGY/rate feedback. All **nine offensive types plus Restoration** opt into shared consumer funding; NoPower uses the existing disable system. | Owner tuning/QA; **PW5 relays** and **PW6 Solar/Fusion** unimplemented. Saved PowerPriority is dormant; any mild priority bias needs separate approval. |
+| **Restoration RT0/RT1 and tiers** | Friendly hull-targeting, aimed healing beam, sticky target until fully repaired, purchased **Levels 2–3** with tier art, and actual shared funded power consumption. | **RT2 heat is not yet wired**; additional friendly-target selector/support-XP choices and RT4 multi-target/shield/drone/material extensions require separate approval. |
+| **LM1 and large Level011** | Shared `LEVELS/Shared/BaseLevelMap.tscn` with local paintable layers; Level001/002/003/011/020/100 and template now inherit it. Level011 has **192×120** local dimensions, **three portals/checkpoint routes**, and **five** escalating authored waves (**54/84/120/162/204 = 624** scheduled ships) across all 15 registered enemy types. | Godot owner route/performance/balance QA; **Waves 6–10** remain to author. Mission currently ends after Wave 5; transport death children increase actual counts. |
+| **Enemies and debug** | Separate physical **Class / threat Rank / functional Role** metadata; 15-ship roster and size-class boundaries now reserve Capital/Titan for future huge ships. F2 groups by physical Class, shows native art; existing wave editor keeps IDs. New Heavy Gunner included. | No registered Capital/Titan yet; EG4 larger armed groups and multi-weapon ships remain future design/profile work. |
+| **Map, tower and UI improvements** | Mars mountains with cached visuals and tower sight blocking; selected range marks obscured sectors red; Restoration holds target; selected Inspector PowerDetails no longer resizes for NoPower; shared warning triangle and tint indicate disabled placed towers. Three-tier directional Stealth Beacon, Results victory hold and Level011 authored terrain are in source. | Desktop visual checks, mountain sight/visual sorting, and selected-panel viewport acceptance remain. |
+| **Audio** | Original Battle Tower shot variant WAV and Machine Gun per-shot clip are wired through the shared positional audio system; profile greeting also exists. | Owner mix/voice/latency validation, more tower/enemy cues, wave/combat voice hooks, ambience and player Options. |
+
+## Remaining power roadmap — use the current owner decision
+
+| Phase | Status | Codex-sized scope |
+| --- | --- | --- |
+| PW0–PW4-D | **Source implemented; owner acceptance pending** | Inspect near/far consumers, brownouts, buffer recovery, same-distance ties, pause/EMP, save/load, and GPU/CPU at normal game scale. **Do not reimplement.** |
+| **PW5-A (suggested split)** | **OPEN** | Local **non-generating** Power Relay on a powered conducting island; serve as a cached distribution anchor and improve nearby recharge efficiency, never adding supply or bypassing conductive routes. |
+| **PW5-B (suggested split)** | **OPEN** | Optional manually paired relays between islands; finite merged supply budgets, link/UI/validation, destruction/disconnection, chain/cycle safety and checkpoint identity. |
+| **PW6** | **OPEN** | Independent Solar Generator and Fusion Reactor types using existing shared producer implementation; balance and status/performance polish. |
+| Optional bounded priority | **NOT APPROVED** | Persisted 0–100 PowerPriority is currently inactive. Later UI/limited bias must not override distance-first policy. |
+
+**PW5 handoff:** [Power plan](../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md) and [Relay design](../TOWERS/Utility/PowerRelay/README.md). Start with PW5-A after the owner checks a short PW4 scarce-supply example. PW5-B and PW6 are separate jobs. Do not introduce a second power manager, global battery, new per-tower tick or unrestricted cross-island energy creation.
+
+## Other priority work still open
+
+| Domain | Recommended next task | Distinction |
+| --- | --- | --- |
+| **Level011 content** | Author **Waves 6–10** with increasing Heavy/Superheavy counts; use future Capital/Titan only after actual enemy types exist. | First five editable waves already implemented; layout and three routes already authored. |
+| **Repair/durability** | Decide RT2 heat profile and repair support-XP/target policy; design true **tower shields** as a separate durability feature. | Hull repair, sticky targeting, L2/L3 and funded power are already functional in source. |
+| **Performance** | PF0/PF3 Level100 measured 400/500-ship baseline, then one evidenced PF4 optimization and PF5 retest; EG4 gunner groups. | PF1 routing/cache work and PF2 F4 instrumention exist; no FPS gain should be claimed without measurements. |
+| **Wave Editor** | WP2 sprite/stats preview, WP3 action buttons, WP4 composition summary, WP5 renumber, WP6 Save As, WP7 enemy search. | Editor core/WP1/Layout V2 exist; Level001/003/011 currently use editable wave resources. |
+| **Progression/encounters** | Campaign enemy/tower unlock ladder, research/doctrines, advanced enemy EMP/abilities, boss encounter scripting and remaining wave controls. | Keep Class, Rank and Role independent; avoid inventing Capital/Titan entries for existing small ships. |
+| **Feedback and menus** | Floating damage numbers, camera shake, player Options, more audio/voice cues, richer Results telemetry and replay policy. | Existing Results XP/number count-up and current Battle/Machine Gun sounds need not be rebuilt. |
+| **World/visuals** | E3 rock/edge transitions; VE3 industrial materials, VE4 ambience, VE5 lighting, VE6 local FX, VE7 responsive atmosphere. | E1/E2 and VE1/VE2 exist; E2 visual is default-off; do **not** restore reverted VE5C bloom. |
+| **Longer-term extensions** | Tower magazines/reloads, real armor/resistance variations, Radar/Missile towers, player combat drone, selling/refunds, resource/fuel logistics. | Many are proposals only, not approved passes. |
+| **Maintenance** | Verify Save/Load, power, repair, LM1 terrain/portals and Level011 checkpoint routes; reconcile older misleading README/WORK statements. | These are acceptance/documentation tasks, not missing foundation code. |
+
+---
+
 ## Shared power rollout to offensive towers and Repair — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** All nine offensive types plus Restoration Tower now use PW4-A–D capacitors and the existing Inspector ENERGY/power details. Each has a configurable per-type profile with modest provisional rates; Battle's baseline is unchanged. Atomic projectile/volley/pulse payments and duration-limited Laser/repair payments reuse the shared service and NoPower recovery. Active replaces idle; no new polling, generator, relay, priority slider or save schema. Existing combat, ammo, heat, construction, upgrades and checkpoint owners are preserved. Source/resource checks only; .NET unavailable, owner Godot validation pending. [Rate table and accounting](../TOWERS/Shared/Power/README.md).
@@ -73,29 +116,29 @@ Terrain power islands and F4 topology diagnostics are now source implemented, wi
 
 # Implementation Backlog — Current Status and Remaining Work
 
-> **Updated:** 2026-11-03 · Source: `dev` at [5aa469e](https://github.com/ben0kay/godot-tower-defense/commit/5aa469e40b2bd8e58cfbd00387c9981ade562b36). Original October 23 audit (on old `main` commit [4b7fbe3](https://github.com/ben0kay/godot-tower-defense/commit/4b7fbe3f4f8dbb0f8978062c38db03b892c995da)) preserved below as historical context.
+> **Updated:** 2026-11-05 · Verified `dev` at [f90010ba7](https://github.com/ben0kay/godot-tower-defense/commit/f90010ba7db42eda2408532692c7cb57cac8b3a3). The November 3 and original October 23 audits remain below as historical context; newer deliveries are summarized at the very top. No main/dev merge implied.
 > **Scope:** Status/documentation update only, not gameplay implementation, merge permission or Godot runtime acceptance. Recheck current source and each linked feature README before work. Follow [CodePreferences](CodePreferences.md) and [root README](../README.md).
 
-## Current snapshot (November 3)
+## Current snapshot (November 5)
 
-- **Delivered in source:** S0–S3 between-wave Save/Load and Campaign Continue; CD1–CD4 builder drones and paid-upgrade service; DU1/DU2 upgrade disabling; CV1 build/upgrade holograms; organic flight, slower 280px/s travel and cached soft-shader beams; HD1–HD4 heat; the core Godot Wave Editor and WP1; Level003 mission/wave resources; Results R2 XP presentation and **skippable stat-number count-up**; multiple tower construction/tier-art sets.
-- **Main missing systems:** island electricity/generator grids, tower shields and repair, expanded research/doctrine/unlocks, advanced EMP/support/boss abilities, offensive player combat drone, magazines/reloads, map-edge spawning, environment effects, floating damage numbers and camera reactions.
-- **Partial / content development:** campaign enemy/tower introduction order, Level003 terrain painting, real scoring/credits telemetry and replay policy, future level unlocks, advanced wave mechanics, audio/settings, more tier artwork and detailed performance measurement.
-- **Acceptance caveat:** many recent features are *source-implemented*, but local Godot.NET builds, editor screenshots, runtime saving/reloading, visual checks and GPU benchmarks remain explicitly outstanding. Do not count QA work as missing foundational implementation.
-- **Branch caution:** `dev` and `main` diverged when reviewed (28 commits ahead / 3 behind). Inspect changes before a requested merge; **never auto-merge `main` into `dev`**. The previous warning that Results stat count-up exists only on `main` is obsolete: `dev` now contains `AnimateStatNumbers` and `UpdateStatNumber`.
+- **Delivered in source:** S0–S3 saves; CD1–CD4 construction/upgrade drones; HD1–HD4 heat; shared power PW0–PW4-D and ten powered tower types; Restoration tower L1–L3 with sticky hull repair; disabled tower visual feedback; selected PowerDetails; LM1 shared map scenes; Level011 three checkpoint-guided lanes with Waves 1–5; size-based enemy classes; Stealth Beacon directional scan/tier art; painted mountain/sight blocking; Battle/Machine Gun fire audio, and prior Results R2/stat count-up.
+- **Main remaining gameplay:** PW5 relays, PW6 Solar/Fusion, optional RT2 heat and tower shields, advanced enemy EMP/special abilities, research/doctrines/unlocks, the player combat drone, reload/magazine variation, future major visual FX, player options, floating numbers and camera feedback. Map-edge **candidate spawning** exists in SpawnManager; per-wave edge preferences/custom edge-region authoring remain proposed.
+- **Content:** Level011 Waves **6–10 are not yet authored** (only 5 exist, 624 scheduled enemies), Capital/Titan classes have no registered ship yet; Wave Editor WP2–WP7 and campaign unlock ladder remain open. Level003 currently contains painted terrain, contrary to older blank-template notes; maintain/verify its routes rather than declaring it entirely blank.
+- **Acceptance caveat:** most changes above are source-implemented, with pending owner Godot.NET editor, UI, gameplay, saving and profiling verification. Never infer benchmark FPS or gameplay balance from source review.
+- **Branch:** Work on `dev`; do not merge or alter `main` without an explicit release request. The old November 3 ahead/behind figures are historical, not a current branch comparison.
 
 ## Suggested next jobs
 
 | Priority | Job | Scope |
 | ---: | --- | --- |
-| 1 | **WP2 Wave Editor sprite/stat preview** | Show real registered enemy artwork, name, HP, optional shields and speed without creating live enemy simulation. |
-| 2 | **WP3 Wave Editor button arrangement** | Move Add/Duplicate/Delete/Move controls above lists; retain confirmation and disabled states. |
-| 3 | **Campaign introduction hierarchy** | Plan which enemies appear in each level, final-wave previews, returning enemy mixes and newly available towers. Do not change internal IDs for campaign order. |
-| 4 | **WP4 wave summary** | Display authored totals, shield/stealth mix and estimated spawn scheduling duration, not a made-up difficulty score. |
-| 5 | **Branch comparison before release** | Reconcile divergent dev/main commits deliberately; **do not reimplement Results count-up**. |
-| 6 | **Floating damage numbers** | Pool/cap visual-only combat feedback; aggregate very rapid hits. |
-| 7 | **Camera impact shake** | Opt-in bounded feedback; preserve camera controls. |
-| 8 | **Player Options/settings** | Implement settings UI separately from completed Save/Load. |
+| 1 | **PW4 in-game acceptance / PW5-A relay booster** | Short near/far shortage check first; then add only local non-generating distribution anchors. |
+| 2 | **PW5-B paired relays** | Separate follow-up after local booster, with finite merged islands, save identity and link UI. |
+| 3 | **RT2 heat and tower-shield design** | Restoration now repairs hulls, has L2/L3 and consumes real energy; only heat and advanced policy/shields remain. |
+| 4 | **Level011 Waves 6–10** | Heavier mixed fleets on existing three lanes; Capital/Titan only after matching enemy assets are designed. |
+| 5 | **WP2/WP3/WP4 Wave Editor polish** | Real sprite/stat preview, action button arrangement and useful wave summary. |
+| 6 | **PF0/PF3 Level100 measurements** | Profile current 400/500-enemy workload, then choose one evidence-based optimization. |
+| 7 | **PW6 Solar/Fusion** | Two distinct production buildings; don't reuse one generator's tier slots for the other. |
+| 8 | **Campaign progression / research / Options / feedback** | Scoped independent passes; see ranked table and the remaining-work sections above. |
 
 ## A. Ranked work areas — largest to smallest
 
@@ -109,13 +152,13 @@ The original 26-area order is preserved for continuity. **Not every ranked item 
 | 4 | [Research system expansion](../SYSTEMS/Progression/Research/README.md) | Very high | **Codex** | **PARTIAL:** foundation/research starter nodes exist; broader tree, prerequisites, unlocks, doctrines and story branches remain. |
 | 5 | [Wave Phase 3: advanced progression](../LEVELS/Waves/README.md) | High | **Codex** | **PARTIAL:** finite manual mixed waves, banners and narrator exist. Editor .tres pilot/WP1 delivered; auto start, history, extras and scripted encounters remain separate work. |
 | 6 | [E3B remaining enemy attack/ability types](../ENEMIES/README.md) | High | **Codex** | **PARTIAL:** Gunner Drone weapons and shared hostile bullets implemented; EMP, electrical pulses, support buffs/healing and complex bosses not. |
-| 7 | [Tower shields and repair producers](../TOWERS/Shared/Durability/README.md) | High | **Codex** | **NOT IMPLEMENTED extension:** tower HP/damage/destruction exists; tower shields, absorption and repair producers not. |
+| 7 | [Tower shields and repair producers](../TOWERS/Shared/Durability/README.md) | High | **Codex** | **PARTIAL:** Restoration now provides aimed/sticky hull healing, 3 purchased tiers and funded PW4 power consumption. **Real tower shields/absorption remain unimplemented**; RT2 heat, ally policy/support XP and RT4 extensions remain separate. |
 | 8 | [EG4 armed-enemy stress verification / multi-gun groundwork](../ENEMIES/Weapons/README.md) | High | **Codex + local measurements** | **OPEN QA/EXTENSION:** stress-test realistic gunner counts and eventually design independent Cruiser multi-guns. |
 | 9 | [VE5 environmental lighting](../WORLD/BACKGROUNDS/README.md) | High | **Codex** | **NOT IMPLEMENTED:** ambient/local 2D lighting. Do not reinstate user-reverted VE5C bloom. |
 | 10 | [VE7 battle-responsive atmosphere](../WORLD/BACKGROUNDS/README.md) | High | **Codex** | **NOT IMPLEMENTED:** battle-responsive event-driven bounded motes/dust. |
 | 11 | [Player combat drone ability](../DRONES/Combat/README.md) | High | **Codex** | **CONCEPT ONLY:** offensive player ability drone, not ammo couriers or Citadel construction drones. |
 | 12 | [Optional magazines, reloads and ammo variations](../TOWERS/Shared/Ammunition/README.md) | Medium–high | **Codex** | **NOT IMPLEMENTED extension:** reload/magazine/ammo variations; functioning Factory → Depot → Tower pipeline already exists. |
-| 13 | [Map-edge spawning](../ENEMIES/Spawning/MapEdges/README.md) | Medium–high | **Codex** | **NOT IMPLEMENTED:** non-portal map-edge spawning compatible with route, wave and save ownership. |
+| 13 | [Map-edge spawning](../ENEMIES/Spawning/MapEdges/README.md) | Medium–high | **Codex** | **PARTIAL:** `SpawnManager` already enumerates reachability-filtered permitted map-edge candidates for `SpawnMode.MapEdges/Both` using the live grid; the MapEdges README is historical. Dedicated per-wave edge selectors/weights and authorable edge regions remain future work and need verification. |
 | 14 | [VE3 industrial corridor/material accents](../WORLD/BACKGROUNDS/README.md) | Medium–high | **Codex** | **NOT IMPLEMENTED:** VE3 industrial material/foundation accents. |
 | 15 | [Organic terrain edges E3](../WORLD/TERRAIN/Edges/IMPLEMENTATION_PLAN.md) | Medium–high | **Codex** | **NOT IMPLEMENTED extension:** E1/E2 atlas and generic mask source are done; E3 rock shapes and material transitions still planned. |
 | 16 | [VE6 local environmental FX](../WORLD/BACKGROUNDS/README.md) | Medium | Codex / Regular | **NOT IMPLEMENTED:** opt-in lava shimmer, steam, smoke and vents. |
@@ -124,11 +167,11 @@ The original 26-area order is preserved for continuity. **Not every ranked item 
 | 19 | [NP3 wave narration follow-through](../LEVELS/Waves/Presentation/README.md) | Medium | **Regular** | **SOURCE DONE / QA:** NP1 wave banners and NP2 tactical narration exist; NP3 regression/viewport/skip/voice follow-through remains. |
 | 20 | [CD3 builder-drone UX / desktop QA](../TOWERS/ConstructionDrones/README.md) | Medium | **Regular** | **CD1–CD4 SOURCE DONE / QA:** build/upgrade drones, eased 280px/s flight, cached shader cone and 24Hz scan lines, CV1 holograms. Check overlaps, clipping, 20-build GPU load, tier transitions, mid-upgrade Save/Load. |
 | 21 | [Player options/settings](../UI/Menus/Pause/README.md) | Medium | **Regular** | **PARTIAL:** Esc Save and Load implemented under S3; **Options/settings remains a placeholder**. |
-| 22 | [Audio and tactical voice event wiring](../AUDIO/README.md) | Medium | **Regular** | **PARTIAL:** Welcome Commander cue and foundation exist; combat/wave voice wiring, ambience and settings missing. |
+| 22 | [Audio and tactical voice event wiring](../AUDIO/README.md) | Medium | **Regular** | **PARTIAL:** welcome-profile cue and actual Battle Tower / Machine Gun Tower positional gunfire exist; most combat/wave voice hooks, ambient content and saved audio settings remain. |
 | 23 | [Floating damage numbers](../FEEDBACK/DamageNumbers/README.md) | Small–medium | **Regular** | **NOT IMPLEMENTED:** capped, merged hit/damage numbers. |
 | 24 | [Camera shake and impact reactions](../FEEDBACK/CameraEffects/README.md) | Small–medium | **Regular** | **NOT IMPLEMENTED:** bounded camera shake/impact feedback. |
 | 25 | More research nodes using **existing** effect kinds | Small–medium | **Regular** | **OPEN content:** author approved research nodes/effects. Homing/precision unlock requires separate mechanic work. |
-| 26 | Authored mixed-wave content and balance | Small | **Regular** | **ONGOING CONTENT:** Level003's editable wave resource exists, but **map tiles remain blank**; paint a connected walkable path and balance encounter/new tower introductions. |
+| 26 | Authored mixed-wave content and balance | Small | **Regular** | **ONGOING CONTENT:** Level003 has painted tile layers and editable waves (verify complete connected routes); Level011 is a painted 192×120 three-lane mission with **five/ten planned waves** and 624 scheduled enemies, requiring balancing and Waves 6–10. |
 
 ### Useful scoping notes
 
@@ -139,7 +182,7 @@ The original 26-area order is preserved for continuity. **Not every ranked item 
 
 ## A2. Wave Editor backlog — newer than the original audit
 
-The `addons/wave_editor` Godot main-screen plugin and native `.tres` wave resources are implemented in source. Level003 uses these resources; older levels still author waves in C#. See [Wave Editor guide](../addons/wave_editor/README.md) and [WP plan](../addons/wave_editor/PLAN.md).
+The `addons/wave_editor` Godot main-screen plugin and native `.tres` wave resources are implemented in source. **Level001, Level003 and Level011** use editable wave resources; other missions may use existing C# recipes. See [Wave Editor guide](../addons/wave_editor/README.md) and [WP plan](../addons/wave_editor/PLAN.md).
 
 | Phase | Status | Scope / next step |
 | --- | --- | --- |
@@ -158,9 +201,9 @@ The `addons/wave_editor` Godot main-screen plugin and native `.tres` wave resour
 
 - **Enemy introduction hierarchy:** decide first encounters and later combinations, e.g. Enemy001 → Enemy002 late in Level001, then progressive new threats. **Enemy003 is Shield Emitter**, a support ship; asset numbering does *not* dictate campaign introduction order. Do not rename stable Enemy IDs for an authoring sequence.
 - **Tower availability per mission:** choose new towers or research unlocks per level; there is not yet an authoritative campaign release/unlock ladder.
-- **Level003 map authoring:** mission and four-wave `Level003Waves.tres` exist, but the TileMap is an intentionally empty template; connected Passable tiles are necessary before waves can run.
+- **Level003 map authoring:** mission and four-wave `Level003Waves.tres` exist, and the current scene has painted TileMap layers; check connectivity/actual playable path in Godot rather than relying on the older blank-template README.
 - **Results beyond R2:** Credits earned/spent, first-clear/replay policies, anti-farming, mission-time/performance bonuses, enhanced level-up celebration. **Skippable stat count-up is already delivered in `dev`**.
-- **Tower artwork completeness:** staged and tier-specific art already covers multiple towers (Battle, Machine Gun, Blaster, Rocket, Sniper, Cryo, Stasis, Laser); determine any remaining tiers per tower instead of rebuilding the shared presenter.
+- **Tower artwork completeness:** staged/tier-specific art covers several towers (including Battle, Machine Gun, Blaster, Rocket, Sniper, Cryo, Stasis, Laser, Stealth Beacon and Restoration); inspect remaining types/tiers instead of rebuilding the shared presenter.
 - **Enemy hull-damage artwork:** Enemy001 has an implemented optional multi-stage damaged sprite; rolling out to other enemy types is a separate optional art pass, not a new damage system.
 
 ## B. Additional unimplemented ideas — not necessarily approved phases
@@ -171,7 +214,7 @@ These are ideas or lightweight folder notes. **Do not treat this section as auth
 | --- | --- | --- |
 | [Missile Tower](../TOWERS/Offensive/MissileTower/README.md) | Offensive tower folder | README-only; start with a narrow variant of existing projectile/AoE infrastructure, not a new projectile engine. |
 | [Radar Tower](../TOWERS/Support/RadarTower/README.md) | Support folder | Planned; **Stealth Beacon already reveals stealth**. Decide what Radar adds before coding. |
-| [Repair Tower](../TOWERS/Support/RepairTower/README.md) | Support folder | Planned; should use actual capped tower HP and construction/disable rules. |
+| [Restoration Tower](../TOWERS/Support/RepairTower/README.md) | Support folder | **L1–L3 hull-repair baseline implemented**, with sticky lock, upgrade artwork and funded shared power. **Remaining:** optional RT2 heat, advanced ally targeting/support XP, shields and RT4 extensions. |
 | [Scrap Refinery](../TOWERS/Economy/ScrapRefinery/README.md) | Economy folder | Planned raw-resource processing; new resource economy needs separate decisions. |
 | [Hybrid Solar Tower](../TOWERS/Economy/SolarTower/README.md) | Old solar concept | Distinguish from planned **pure** Solar Generator to avoid duplicate catalog roles. |
 | Tower selling/refunds | [Tower roadmap](../TOWERS/README.md) | Choose transaction/salvage/destruction policy separately. |
@@ -181,7 +224,7 @@ These are ideas or lightweight folder notes. **Do not treat this section as auth
 | Advanced ammo/resource logistics | [Economy roadmap](../TOWERS/Economy/README.md) | Fuel, raw materials, specialized ammo or research throughput are *not* needed for the current working loop. |
 | Research doctrine slots, respec, DME story and Zy0n unlocks | [Progression plan](../SYSTEMS/Progression/PLAYER_XP_RESEARCH_FOUNDATION_PASS.md) | Long-term design beyond the small existing research graph. |
 | Wave preview/history and auto start | [Waves phase 3](../LEVELS/Waves/README.md) | Could become small independent UI/timing passes instead of one big rewrite. |
-| Level authoring convenience | [Authoring](../LEVELS/AUTHORING.md) | Shared Battlefield/MissionDefinition catalog already removes per-level service copies; optional visual editor remains future. |
+| Level authoring convenience | [Authoring](../LEVELS/AUTHORING.md) | **LM1 shared BaseLevelMap inheritance now exists**, with level-local paintable layers for all existing maps including Level011. A richer visual authoring tool remains optional future work. |
 | Homing unlock, prediction, terrain line-of-sight | [Projectile plan](../TOWERS/Shared/Projectiles/PROJECTILE_GUIDANCE_ACCURACY_PLAN.md) | Straight shots are now default; explicit homing handling already exists, but **research unlock and leading/LOS are not shipped**. |
 | Future multi-genre empire/space shooter | [Root project vision](../README.md) | Deliberately **not** current TD scope; do not extract the game into a speculative cross-mode framework. |
 
@@ -189,7 +232,7 @@ The uploaded childhood GameMaker game notes are historical design inspiration; t
 
 ## C. Already implemented — don't assign the same work again
 
-**Added since the original October 23 audit (source delivered through November 3):** S0–S3 checkpoint saving; CD4 upgrade-service drones, CV1 upgrade holograms, DU1/DU2 disable; cached soft-gradient construction beams and organic travel; Level003 mission plus `.tres` authoring; Wave Editor core/WP1/Layout V2; Results stat count-up; Enemy003 source rename (Shield Emitter, stable `shield_emitter_mk1`), new ship art and Enemy001 damage sprites; authored staged construction/purchased-tier art for several offensive towers; Sniper InstantTarget delivery. See owning feature docs and root README for exact per-tower coverage. **Desktop acceptance remains separate.**
+**Added since the original October 23 audit (historical source rollup through November 3):** S0–S3 checkpoint saving; CD4 upgrade-service drones, CV1 upgrade holograms, DU1/DU2 disable; cached soft-gradient construction beams and organic travel; Level003 mission plus `.tres` authoring; Wave Editor core/WP1/Layout V2; Results stat count-up; Enemy003 source rename (Shield Emitter, stable `shield_emitter_mk1`), new ship art and Enemy001 damage sprites; authored staged construction/purchased-tier art for several offensive towers; Sniper InstantTarget delivery. See owning feature docs and root README for exact per-tower coverage. **Desktop acceptance remains separate.**
 
 
 - **HD4 authored heat presets (2026-10-26):** Machine Gun (2min), Laser (3.5min), Blaster Cannon/Rocket (4min), Shockwave (3min), each with a modest independent recovery setting; shared beam/pulse timing, Inspector opt-in and source-level focused checks are implemented. Battle remains unchanged; desktop Godot acceptance pending. [Conditions](../TOWERS/Shared/Conditions/README.md).
@@ -214,6 +257,9 @@ This list describes **source delivery**, not universal desktop approval.
 | **VE1/VE2/E2** | Desktop shader import/render appearance and ON/OFF GPU checks at gameplay zoom; E2 remains default-off. |
 | **Results R2 and number count-up** | Test victory/defeat, Skip, stat number count-up, XP-bar/level-up presentation and responsive layout on desktop; source implementation exists on `dev`. |
 | **Broad regression suites** | Re-run before attributing historical failures to new code: some older all-in-one fixtures had map assumptions, old enemy counts or assertion mismatches. Record actual runs; **this documentation pass executes no tests**. |
+| **Power PW4 and Restoration** | Desktop scarce-supply allocation, distant recharge, repair beam and L2/L3 tiers, disable layering, selected fixed-height Inspector and new Save/Load; shared implementation is already authored. |
+| **Shared map LM1 / Level011** | Open/move/paint inherited local layers, inspect all three checkpoint routes and 192×120 bounds, ensure active portal list matches wave selectors; profile the first five 624 scheduled enemies across real gameplay. |
+| **Tower sight and disabled state** | Verify mountain red masked selection range, blocked acquisition, art tint/exclamation badge restoration and small-window Inspector appearance. |
 
 ## E. Outdated Markdown flags — clean later, not edited in this audit
 
@@ -253,8 +299,8 @@ This list describes **source delivery**, not universal desktop approval.
 
 ## F. Suggested delegation
 
-**Codex next:** PF0/PF3 measured Level100 baseline and one evidenced fix; staged island-power/research/tower-shield/advanced-enemy tasks when approved. **Do not implement S0–S3 again; fix only demonstrated runtime issues.**  
-**Regular ChatGPT next:** WP2/WP3/WP4 Wave Editor improvements, campaign introduction ladder, floating damage numbers, camera impact reactions, real Options menu, wave content or a Markdown-only stale-notes cleanup.
+**Codex next:** PW5-A local relay efficiency booster (after focused PW4 QA), PW5-B explicit paired-island links, then PW6 Solar/Fusion; separate RT2 heat/tower shield/research/advanced-enemy passes if approved; PF0/PF3 measured Level100 workload followed by one evidenced optimization. **Do not reimplement PW0–PW4-D, S0–S3 or Restoration L1–L3; fix only demonstrated runtime issues.**  
+**Regular ChatGPT next:** Level011 Waves 6–10 when ready, WP2/WP3/WP4 Wave Editor improvements, campaign introduction ladder, floating damage numbers, camera impact reactions, real Options menu, audio cues or a Markdown-only stale-notes cleanup.
 
 For every job: **read root README + CodePreferences + the linked feature README**, verify current HEAD/code, keep scope narrow, make new work opt-in/configurable when sensible, avoid per-frame full-registry scans, run truthful focused tests where possible, update relevant notes and make **one commit per job**. Source-only verification is not an in-editor visual or GPU benchmark.
 
