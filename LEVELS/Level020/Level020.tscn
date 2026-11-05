@@ -1,39 +1,32 @@
 [gd_scene format=4 uid="uid://dgjaduoinixnf"]
 
-[ext_resource type="Texture2D" uid="uid://dtgxtqxxwsmoc" path="res://WORLD/BACKGROUNDS/Stars/level001_space.svg" id="1_bg"]
 [ext_resource type="TileSet" uid="uid://dbryu0fnchy4x" path="res://WORLD/TERRAIN/TileSets/PassableTerrain.tres" id="2_passable"]
 [ext_resource type="TileSet" uid="uid://bxlqc3wy16uoh" path="res://WORLD/TERRAIN/TileSets/ImpassableTerrain.tres" id="3_walls"]
 [ext_resource type="TileSet" uid="uid://cx81pmlj50tpq" path="res://WORLD/TERRAIN/TileSets/InteractiveTerrain.tres" id="4_interactive"]
 [ext_resource type="TileSet" uid="uid://bwnwc1jg7xakk" path="res://WORLD/TERRAIN/TileSets/DecorationTerrain.tres" id="5_decorations"]
-[ext_resource type="Script" uid="uid://cxu0tg3s3btvh" path="res://LEVELS/WorldLevel.cs" id="6_root"]
 [ext_resource type="Resource" uid="uid://cn6w08ihbndqm" path="res://LEVELS/Level020/Level020Config.tres" id="7_config"]
 [ext_resource type="PackedScene" uid="uid://pgmykoicpips" path="res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn" id="8_portal"]
 [ext_resource type="PackedScene" path="res://WORLD/OBJECTIVES/Citadel/Citadel.tscn" id="9_citadel"]
-[ext_resource type="Script" uid="uid://x78ylg3dne5d" path="res://DEBUG/LevelTools/LevelDebugController.cs" id="10_debug"]
-[ext_resource type="Script" uid="uid://ceof7q2uqyh1q" path="res://DEBUG/Navigation/CheckpointDesignOverlay.cs" id="checkpoint_overlay"]
 
-[node name="Level020" type="Node2D" unique_id=1426546349]
-script = ExtResource("6_root")
+[ext_resource type="PackedScene" path="res://LEVELS/Shared/BaseLevelMap.tscn" id="lm1_base"]
+
+[node name="Level020" unique_id=1426546349 instance=ExtResource("lm1_base")]
 Settings = ExtResource("7_config")
 
-[node name="Checkpoints" type="Node" parent="." unique_id=1625000831]
+[node name="Checkpoints" parent="." unique_id=1625000831 index="0"]
 
-[node name="SpaceBackground" type="Node2D" parent="." unique_id=512607865]
-z_index = -20
+[node name="SpaceBackground" parent="." unique_id=512607865 index="1"]
 
-[node name="Nebulae" type="Node2D" parent="SpaceBackground" unique_id=1823869249]
+[node name="Nebulae" parent="SpaceBackground" unique_id=1823869249 index="0"]
 
-[node name="Stars" type="Node2D" parent="SpaceBackground" unique_id=1323883628]
+[node name="Stars" parent="SpaceBackground" unique_id=1323883628 index="1"]
 
-[node name="Space" type="Sprite2D" parent="SpaceBackground/Stars" unique_id=697722500]
+[node name="Space" parent="SpaceBackground/Stars" unique_id=697722500 index="0"]
 position = Vector2(1, 1)
-scale = Vector2(4, 4)
-texture = ExtResource("1_bg")
-centered = false
 
-[node name="Planets" type="Node2D" parent="SpaceBackground" unique_id=2101939022]
+[node name="Planets" parent="SpaceBackground" unique_id=2101939022 index="2"]
 
-[node name="Terrain" type="Node2D" parent="." unique_id=1589209871]
+[node name="Terrain" parent="." unique_id=1589209871 index="2"]
 
 [node name="Passable" type="TileMapLayer" parent="Terrain" unique_id=1130090969]
 position = Vector2(0, 3)
@@ -50,7 +43,7 @@ tile_set = ExtResource("4_interactive")
 [node name="Decorations" type="TileMapLayer" parent="Terrain" unique_id=425050064]
 tile_set = ExtResource("5_decorations")
 
-[node name="Portals" type="Node2D" parent="." unique_id=392524588]
+[node name="Portals" parent="." unique_id=392524588 index="3"]
 
 [node name="EnemyPortal01" parent="Portals" unique_id=1274959124 instance=ExtResource("8_portal")]
 position = Vector2(3936, 2595)
@@ -67,15 +60,12 @@ SizeMultiplier = 0.9
 position = Vector2(3168, 3363)
 SizeMultiplier = 1.1
 
-[node name="Objectives" type="Node2D" parent="." unique_id=343975502]
+[node name="Objectives" parent="." unique_id=343975502 index="4"]
 
 [node name="Citadel" parent="Objectives" unique_id=97552924 instance=ExtResource("9_citadel")]
 position = Vector2(3104, 2531)
 
-[node name="Debug" type="Node" parent="." unique_id=1262761477]
-script = ExtResource("10_debug")
+[node name="Debug" parent="." unique_id=1262761477 index="5"]
 
-[node name="CheckpointOverlay" type="Node2D" parent="Debug" unique_id=593809922]
-z_index = 4090
-z_as_relative = false
-script = ExtResource("checkpoint_overlay")
+[node name="CheckpointOverlay" parent="Debug" unique_id=593809922 index="0"]
+

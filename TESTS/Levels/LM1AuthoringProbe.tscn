@@ -1,0 +1,35 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://LEVELS/Shared/BaseLevelMap.tscn" id="base"]
+[ext_resource type="Resource" path="res://LEVELS/DefaultLevelConfig.tres" id="config"]
+[ext_resource type="TileSet" path="res://WORLD/TERRAIN/TileSets/PassableTerrain.tres" id="passable"]
+[ext_resource type="TileSet" path="res://WORLD/TERRAIN/TileSets/ImpassableTerrain.tres" id="impassable"]
+[ext_resource type="TileSet" path="res://WORLD/TERRAIN/TileSets/InteractiveTerrain.tres" id="interactive"]
+[ext_resource type="TileSet" path="res://WORLD/TERRAIN/TileSets/DecorationTerrain.tres" id="decorations"]
+[ext_resource type="PackedScene" path="res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn" id="portal"]
+[ext_resource type="PackedScene" path="res://WORLD/OBJECTIVES/Citadel/Citadel.tscn" id="citadel"]
+
+[node name="LM1AuthoringProbe" instance=ExtResource("base")]
+Settings = ExtResource("config")
+
+[node name="Passable" type="TileMapLayer" parent="Terrain" index="0"]
+tile_map_data = PackedByteArray("AAACAAIAAAACAAAAAAA=")
+tile_set = ExtResource("passable")
+
+[node name="Impassable" type="TileMapLayer" parent="Terrain" index="1"]
+tile_map_data = PackedByteArray("AAADAAIAAAAAAAAAAAA=")
+tile_set = ExtResource("impassable")
+
+[node name="Interactive" type="TileMapLayer" parent="Terrain" index="2"]
+tile_map_data = PackedByteArray("AAAEAAIAAAABAAAAAAA=")
+tile_set = ExtResource("interactive")
+
+[node name="Decorations" type="TileMapLayer" parent="Terrain" index="3"]
+tile_map_data = PackedByteArray("AAAFAAIAAAAFAAAAAAA=")
+tile_set = ExtResource("decorations")
+
+[node name="EnemyPortal1" parent="Portals" instance=ExtResource("portal")]
+position = Vector2(224, 224)
+
+[node name="Citadel" parent="Objectives" instance=ExtResource("citadel")]
+position = Vector2(480, 224)

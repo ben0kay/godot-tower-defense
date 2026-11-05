@@ -1,6 +1,6 @@
 # Creating another playable level
 
-Your design workflow stays the same: duplicate LevelTemplate.tscn into a LevelXXX folder, then paint its tiles and place/snapped Portals and Citadels in Godot. This pass changes the runtime wiring, not map painting.
+Maps now inherit `LEVELS/Shared/BaseLevelMap.tscn`; common containers/background/debug stay centralized while each child keeps four local editable TileMapLayers. [Architecture and verification limits](Shared/README.md).
 
 | File in the level folder | Responsibility |
 | --- | --- |
@@ -9,7 +9,7 @@ Your design workflow stays the same: duplicate LevelTemplate.tscn into a LevelXX
 | Level004Waves.cs **or** Level004Waves.tres | Optional C# recipe or editable Godot waves from the custom Wave Editor |
 | Level004Mission.tres | Number/title/menu description and map file path |
 
-1. Duplicate the template into `LEVELS/Level004/Level004.tscn`. Duplicate DefaultLevelConfig into Level004Config.tres and assign it to the map's Settings. Keep each map's config independent.
+1. Create a **New Inherited Scene** from `LEVELS/Shared/BaseLevelMap.tscn`, saved as `LEVELS/Level004/Level004.tscn`. Copy only the four local TileMapLayers from LevelTemplate into its inherited Terrain container, retaining their shared TileSets. Create independent Level004Config.tres and assign Settings; add local Portal/Citadel instances under the inherited containers.
 2. Paint and place objects normally. Set active Portal paths and Citadel references on the config as before. Preview plain maps in the editor; gameplay needs the shared battlefield.
 3. **Two supported wave-authoring modes**: (a) for C# waves, copy a LevelXXXWaves.cs recipe, rename its class, preserve WaveSetSource + Build, and assign a recipe resource in Level004Config.WaveSource; (b) for visual waves, enable `addons/wave_editor` under Project Settings → Plugins, click the new **Wave Editor** main tab, choose **New .tres** in Level004's folder, author waves/batches/enemies, Save, then assign that new `WaveSetResource` file to Level004Config.WaveSource. You can duplicate `Level003Waves.tres` as a starting template. Give WaveSetId a unique descriptive ID (e.g. level004). No WaveCatalog switch registration is required. An empty ID and empty WaveSource disables waves for an unfinished map.
 4. Create a MissionDefinition resource saved as Level004Mission.tres. Set Number=4, Title, Description and MapScenePath=Level004.tscn. Leave LegacyLauncher empty. Keep Enabled off while the draft is unfinished.
@@ -23,4 +23,5 @@ The three existing launchers remain F6 shortcuts. An optional new shortcut can i
 
 The common `WORLD/DefaultWorldConfig.tres` remains the default for existing maps (100×80 cells, 64px each). For a larger map, create a dedicated `WorldMasterConfig` resource in its level folder and set `LevelConfig.WorldConfig` to it. The existing `WorldMapLoader` supplies that resource to the same `World/Grid` before `_Ready`/navigation setup. This **does not** change other missions, TileSet cell size, or duplicate world services.
 
-For a paint-ready larger-map example, open `LEVELS/Level011/`. Its blank 160×120 map reuses `LevelTemplate.tscn`, and its resource-based wave is editable in the Wave Editor. The previously proposed shared `BaseLevelMap.tscn` refactor is not yet on this branch; this example does not depend on it.
+For a paint-ready larger-map example, open `LEVELS/Level011/`. Its blank 160×120 map reuses `LevelTemplate.tscn`, and its resource-based wave is editable in the Wave Editor. Level011 was added independently while LM1 was in progress and remains unchanged as a standalone map. LM1 migrates the five earlier production maps plus LevelTemplate; new maps should use the inherited workflow above. The unregistered `TESTS/Levels/LM1AuthoringProbe.tscn` demonstrates local paint and objects under inherited containers.
+

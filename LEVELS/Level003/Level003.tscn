@@ -1,44 +1,31 @@
 [gd_scene format=4 uid="uid://ovshlvskui7m"]
 
-[ext_resource type="Texture2D" uid="uid://dtgxtqxxwsmoc" path="res://WORLD/BACKGROUNDS/Stars/level001_space.svg" id="1_p5ed7"]
 [ext_resource type="TileSet" uid="uid://bwnwc1jg7xakk" path="res://WORLD/TERRAIN/TileSets/DecorationTerrain.tres" id="2_decorations"]
 [ext_resource type="TileSet" uid="uid://bxlqc3wy16uoh" path="res://WORLD/TERRAIN/TileSets/ImpassableTerrain.tres" id="2_impassable"]
 [ext_resource type="TileSet" uid="uid://cx81pmlj50tpq" path="res://WORLD/TERRAIN/TileSets/InteractiveTerrain.tres" id="2_interactive"]
 [ext_resource type="TileSet" uid="uid://dbryu0fnchy4x" path="res://WORLD/TERRAIN/TileSets/PassableTerrain.tres" id="2_passable"]
-[ext_resource type="Script" uid="uid://cxu0tg3s3btvh" path="res://LEVELS/WorldLevel.cs" id="3_root"]
 [ext_resource type="Resource" path="res://LEVELS/Level003/Level003Config.tres" id="4_config"]
 [ext_resource type="PackedScene" uid="uid://pgmykoicpips" path="res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn" id="5_portal"]
 [ext_resource type="PackedScene" path="res://WORLD/OBJECTIVES/Citadel/Citadel.tscn" id="6_citadel"]
-[ext_resource type="Script" uid="uid://ceof7q2uqyh1q" path="res://DEBUG/Navigation/CheckpointDesignOverlay.cs" id="checkpoint_overlay"]
-[ext_resource type="PackedScene" path="res://DEBUG/LevelTools/LevelDebugTools.tscn" id="debug_tools"]
-[ext_resource type="Script" uid="uid://8mefrcgtbhru" path="res://WORLD/VISUALS/LevelAtmosphereController.cs" id="ve1_controller"]
-[ext_resource type="Resource" path="res://WORLD/VISUALS/Presets/CalmSpace.tres" id="ve1_preset"]
 
-[node name="Level003" type="Node2D" unique_id=864740696]
-script = ExtResource("3_root")
+[ext_resource type="PackedScene" path="res://LEVELS/Shared/BaseLevelMap.tscn" id="lm1_base"]
+
+[node name="Level003" unique_id=864740696 instance=ExtResource("lm1_base")]
 Settings = ExtResource("4_config")
 
-[node name="SpaceBackground" type="Node2D" parent="." unique_id=1825087959]
-z_index = -20
+[node name="SpaceBackground" parent="." unique_id=1825087959 index="0"]
 
-[node name="Nebulae" type="Node2D" parent="SpaceBackground" unique_id=87135791]
+[node name="Nebulae" parent="SpaceBackground" unique_id=87135791 index="0"]
 
-[node name="Stars" type="Node2D" parent="SpaceBackground" unique_id=2028579996]
+[node name="Stars" parent="SpaceBackground" unique_id=2028579996 index="1"]
 
-[node name="Space" type="Sprite2D" parent="SpaceBackground/Stars" unique_id=1191861450]
-position = Vector2(93, 7)
-scale = Vector2(4, 4)
-texture = ExtResource("1_p5ed7")
-centered = false
+[node name="Space" parent="SpaceBackground/Stars" unique_id=1191861450 index="0"]
 
-[node name="Planets" type="Node2D" parent="SpaceBackground" unique_id=1684856347]
+[node name="Planets" parent="SpaceBackground" unique_id=1684856347 index="2"]
 
-[node name="VisualAtmosphere" type="Node2D" parent="SpaceBackground" unique_id=535803022]
-visible = false
-script = ExtResource("ve1_controller")
-Config = ExtResource("ve1_preset")
+[node name="VisualAtmosphere" parent="SpaceBackground" unique_id=535803022 index="3"]
 
-[node name="Terrain" type="Node2D" parent="." unique_id=833107286]
+[node name="Terrain" parent="." unique_id=833107286 index="1"]
 
 [node name="Passable" type="TileMapLayer" parent="Terrain" unique_id=1382848671]
 tile_map_data = PackedByteArray("AAA+AC4AAQADAAAAAAA+ACwAAQADAAAAAAA+ACoAAQADAAAAAAA+ACgAAQADAAAAAAA9ADAAAQACAAAAAAA9AC8AAQACAAAAAAA+AC8AAQACAAAAAAA/AC8AAQACAAAAAABAAC8AAQACAAAAAABBAC8AAQACAAAAAAA9AC0AAQACAAAAAAA+AC0AAQACAAAAAAA/AC0AAQACAAAAAABAAC0AAQACAAAAAABBAC0AAQACAAAAAAA9ACsAAQACAAAAAAA+ACsAAQACAAAAAAA/ACsAAQACAAAAAABAACsAAQACAAAAAABBACsAAQACAAAAAAA9ACkAAQACAAAAAAA+ACkAAQACAAAAAAA/ACkAAQACAAAAAABAACkAAQACAAAAAABBACkAAQACAAAAAABBACcAAQACAAAAAABBACYAAQACAAAAAABBACUAAQACAAAAAABAACUAAQACAAAAAABAACYAAQACAAAAAABAACcAAQACAAAAAAA/ACcAAQACAAAAAAA+ACcAAQACAAAAAAA9ACcAAQACAAAAAAA9ACYAAQACAAAAAAA+ACYAAQACAAAAAAA/ACYAAQACAAAAAAA/ACUAAQACAAAAAAA+ACUAAQACAAAAAAA9ACUAAQACAAAAAABCADEAAgAAAAAAAABDADEAAgAAAAAAAABEADEAAgAAAAAAAABFADEAAgAAAAAAAABGADEAAgAAAAAAAABGADAAAgAAAAAAAABHADAAAgAAAAAAAABGAC4AAgAAAAAAAABGAC0AAgAAAAAAAABGACwAAgAAAAAAAABGACsAAgAAAAAAAABGACoAAgAAAAAAAABGACkAAgAAAAAAAABHAC4AAgAAAAAAAABHAC0AAgAAAAAAAABHACwAAgAAAAAAAABHACsAAgAAAAAAAABHACoAAgAAAAAAAABHACkAAgAAAAAAAAA+ADEAAgAAAAAAAAA9ADEAAgAAAAAAAAA8ADEAAgAAAAAAAAA+ADIAAgAAAAAAAAA9ADIAAgAAAAAAAAA8ADIAAgAAAAAAAAA7ADIAAgAAAAAAAAA6ADIAAgAAAAAAAAA7ADEAAgAAAAAAAAA7ADAAAgAAAAAAAAA7AC8AAgAAAAAAAAA6ADEAAgAAAAAAAAA6ADAAAgAAAAAAAAA6AC8AAgAAAAAAAAA7ACsAAgAAAAAAAAA7ACoAAgAAAAAAAAA7ACkAAgAAAAAAAAA7ACgAAgAAAAAAAAA7ACcAAgAAAAAAAAA6ACsAAgAAAAAAAAA6ACoAAgAAAAAAAAA6ACkAAgAAAAAAAAA6ACgAAgAAAAAAAAA6ACcAAgAAAAAAAAA5ADIAAgAAAAAAAAA5ADEAAgAAAAAAAAA5ADAAAgAAAAAAAAA5AC8AAgAAAAAAAAA5AC4AAgAAAAAAAAA5AC0AAgAAAAAAAAA5ACwAAgAAAAAAAAA5ACsAAgAAAAAAAAA5ACoAAgAAAAAAAAA5ACkAAgAAAAAAAAA5ACgAAgAAAAAAAAA5ACcAAgAAAAAAAAA5ACYAAgAAAAAAAAA7ACYAAgAAAAAAAAA7ACUAAgAAAAAAAAA7ACQAAgAAAAAAAAA7ACMAAgAAAAAAAAA8ACMAAgAAAAAAAAA9ACMAAgAAAAAAAAA+ACMAAgAAAAAAAAA6ACYAAgAAAAAAAAA6ACUAAgAAAAAAAAA6ACQAAgAAAAAAAAA6ACMAAgAAAAAAAAA5ACUAAgAAAAAAAAA5ACQAAgAAAAAAAAA5ACMAAgAAAAAAAABBACMAAgAAAAAAAABCACMAAgAAAAAAAABDACMAAgAAAAAAAABEACMAAgAAAAAAAABFACMAAgAAAAAAAABGACMAAgAAAAAAAABGACQAAgAAAAAAAABGACUAAgAAAAAAAABGACYAAgAAAAAAAABGACcAAgAAAAAAAABGACgAAgAAAAAAAABHACgAAgAAAAAAAABHACcAAgAAAAAAAABHACYAAgAAAAAAAABHACUAAgAAAAAAAABHACQAAgAAAAAAAABHACMAAgAAAAAAAABHACIAAgAAAAAAAABGACIAAgAAAAAAAABFACIAAgAAAAAAAABEACIAAgAAAAAAAABDACIAAgAAAAAAAABCACIAAgAAAAAAAABBACIAAgAAAAAAAABAACIAAgAAAAAAAAA/ACIAAgAAAAAAAAA+ACIAAgAAAAAAAAA9ACIAAgAAAAAAAAA8ACIAAgAAAAAAAAA7ACIAAgAAAAAAAAA6ACIAAgAAAAAAAAA5ACIAAgAAAAAAAAA4ACUAAgAAAAAAAAA4ACYAAgAAAAAAAAA4ACcAAgAAAAAAAAA4ACgAAgAAAAAAAAA4ACkAAgAAAAAAAAA4ACoAAgAAAAAAAAA7ACEAAgAAAAAAAAA8ACEAAgAAAAAAAAA9ACEAAgAAAAAAAAA+ACEAAgAAAAAAAAA/ACEAAgAAAAAAAABAACEAAgAAAAAAAABBACEAAgAAAAAAAABIACUAAgAAAAAAAABIACYAAgAAAAAAAABIACcAAgAAAAAAAABIACgAAgAAAAAAAABIACkAAgAAAAAAAABIACoAAgAAAAAAAABFADIAAgAAAAAAAABEADIAAgAAAAAAAABDADIAAgAAAAAAAAA/ADMAAgAAAAAAAABAADMAAgAAAAAAAABBADMAAgAAAAAAAABCADMAAgAAAAAAAABDADMAAgAAAAAAAABEADMAAgAAAAAAAABFADMAAgAAAAAAAABCADIAAgAAAAAAAABGADIAAgAAAAAAAABHADEAAgAAAAAAAABIADAAAgAAAAAAAABIAC8AAgAAAAAAAABIAC4AAgAAAAAAAABIAC0AAgAAAAAAAAA4AC8AAgAAAAAAAAA4ADAAAgAAAAAAAAA4ADEAAgAAAAAAAAA4ADMAAgAAAAAAAAA5ADMAAgAAAAAAAAA6ADMAAgAAAAAAAAA6ADQAAgAAAAAAAAA7ADQAAgAAAAAAAAA8ADQAAgAAAAAAAAA9ADQAAgAAAAAAAAA+ADMAAgAAAAAAAAA7ADMAAgAAAAAAAAA8ADMAAgAAAAAAAAA9ADMAAgAAAAAAAAA/ADQAAgAAAAAAAABAADQAAgAAAAAAAABBADQAAgAAAAAAAABCADQAAgAAAAAAAAA3ACcAAgAAAAAAAABEACEAAgAAAAAAAABFACEAAgAAAAAAAAA9ACAAAgAAAAAAAAA+ACAAAgAAAAAAAAA/ACAAAgAAAAAAAABJACYAAgAAAAAAAABJACcAAgAAAAAAAABJACgAAgAAAAAAAAA4ACwAAgAAAAAAAAA4AC0AAgAAAAAAAAA4ACsAAgAAAAAAAAA4AC4AAgAAAAAAAAA3ACsAAgAAAAAAAAA3ACwAAgAAAAAAAAA3AC0AAgAAAAAAAAA4ADIAAgAAAAAAAAA3ADEAAgAAAAAAAAA3ADIAAgAAAAAAAAA=")
@@ -55,21 +42,19 @@ tile_set = ExtResource("2_interactive")
 [node name="Decorations" type="TileMapLayer" parent="Terrain" unique_id=1034975239]
 tile_set = ExtResource("2_decorations")
 
-[node name="Checkpoints" type="Node" parent="." unique_id=1040747550]
+[node name="Checkpoints" parent="." unique_id=1040747550 index="2"]
 
-[node name="Portals" type="Node2D" parent="." unique_id=219222935]
+[node name="Portals" parent="." unique_id=219222935 index="3"]
 
 [node name="EnemyPortal1" parent="Portals" unique_id=1721559982 instance=ExtResource("5_portal")]
 position = Vector2(3936, 3424)
 
-[node name="Objectives" type="Node2D" parent="." unique_id=1539156350]
+[node name="Objectives" parent="." unique_id=1539156350 index="4"]
 
 [node name="Citadel" parent="Objectives" unique_id=1303919540 instance=ExtResource("6_citadel")]
 position = Vector2(3936, 2400)
 
-[node name="Debug" parent="." unique_id=1467647758 instance=ExtResource("debug_tools")]
+[node name="Debug" parent="." unique_id=1467647758 index="5"]
 
-[node name="CheckpointOverlay" type="Node2D" parent="Debug" unique_id=2072394971]
-z_index = 4090
-z_as_relative = false
-script = ExtResource("checkpoint_overlay")
+[node name="CheckpointOverlay" parent="Debug" unique_id=2072394971 index="0"]
+

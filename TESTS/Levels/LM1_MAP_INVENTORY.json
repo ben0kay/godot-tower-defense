@@ -1,0 +1,553 @@
+{
+  "status": "Before/after scene-text inventory matched; gameplay/editor QA remains pending",
+  "maps": {
+    "LEVELS/Level001/Level001.tscn": {
+      "scene_uid": "uid://dy7onq4sx05eu",
+      "nodes": {
+        ".": {
+          "script": "Resource(res://LEVELS/WorldLevel.cs)",
+          "Settings": "Resource(res://LEVELS/Level001/Level001Config.tres)",
+          "original_header": "name=\"Level001\" type=\"Node2D\" unique_id=864740696"
+        },
+        "SpaceBackground": {
+          "z_index": "-20",
+          "original_header": "name=\"SpaceBackground\" type=\"Node2D\" parent=\".\" unique_id=1825087959"
+        },
+        "SpaceBackground/Nebulae": {
+          "original_header": "name=\"Nebulae\" type=\"Node2D\" parent=\"SpaceBackground\" unique_id=87135791"
+        },
+        "SpaceBackground/Stars": {
+          "original_header": "name=\"Stars\" type=\"Node2D\" parent=\"SpaceBackground\" unique_id=2028579996"
+        },
+        "SpaceBackground/Stars/Space": {
+          "position": "Vector2(-4, 10)",
+          "scale": "Vector2(4, 4)",
+          "texture": "Resource(res://WORLD/BACKGROUNDS/Stars/level001_space.svg)",
+          "centered": "false",
+          "original_header": "name=\"Space\" type=\"Sprite2D\" parent=\"SpaceBackground/Stars\" unique_id=1191861450"
+        },
+        "SpaceBackground/Planets": {
+          "original_header": "name=\"Planets\" type=\"Node2D\" parent=\"SpaceBackground\" unique_id=1684856347"
+        },
+        "SpaceBackground/VisualAtmosphere": {
+          "script": "Resource(res://WORLD/VISUALS/LevelAtmosphereController.cs)",
+          "Config": "Resource(res://WORLD/VISUALS/Presets/CalmSpace.tres)",
+          "original_header": "name=\"VisualAtmosphere\" type=\"Node2D\" parent=\"SpaceBackground\""
+        },
+        "Terrain": {
+          "original_header": "name=\"Terrain\" type=\"Node2D\" parent=\".\" unique_id=833107286"
+        },
+        "Terrain/Passable": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/PassableTerrain.tres)",
+          "tile_map_data_sha256": "9506a769734c606185a46a5279a0693656b89a4ac68216538b80bf6183d604a9",
+          "tile_map_data_chars": 743,
+          "original_header": "name=\"Passable\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=1382848671"
+        },
+        "Terrain/Impassable": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/ImpassableTerrain.tres)",
+          "tile_map_data_sha256": "52be51d7eebda202665c1100d72a5522f89799d065cde7a81d982f641fd2b533",
+          "tile_map_data_chars": 743,
+          "original_header": "name=\"Impassable\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=1176658847"
+        },
+        "Terrain/Interactive": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/InteractiveTerrain.tres)",
+          "original_header": "name=\"Interactive\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=756526575"
+        },
+        "Terrain/Decorations": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/DecorationTerrain.tres)",
+          "original_header": "name=\"Decorations\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=1034975239"
+        },
+        "Portals": {
+          "original_header": "name=\"Portals\" type=\"Node2D\" parent=\".\" unique_id=219222935"
+        },
+        "Portals/EnemyPortal": {
+          "position": "Vector2(2592, 2528)",
+          "original_header": "name=\"EnemyPortal\" parent=\"Portals\" unique_id=345948730 instance=ExtResource(\"5_portal\")",
+          "instance_scene": "res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn"
+        },
+        "Objectives": {
+          "original_header": "name=\"Objectives\" type=\"Node2D\" parent=\".\" unique_id=1539156350"
+        },
+        "Objectives/Citadel": {
+          "position": "Vector2(3872, 2528)",
+          "original_header": "name=\"Citadel\" parent=\"Objectives\" unique_id=535378229 instance=ExtResource(\"6_citadel\")",
+          "instance_scene": "res://WORLD/OBJECTIVES/Citadel/Citadel.tscn"
+        },
+        "Debug": {
+          "script": "Resource(res://DEBUG/LevelTools/LevelDebugController.cs)",
+          "original_header": "name=\"Debug\" type=\"Node\" parent=\".\" unique_id=1405070056"
+        },
+        "Debug/CheckpointOverlay": {
+          "z_index": "4090",
+          "z_as_relative": "false",
+          "script": "Resource(res://DEBUG/Navigation/CheckpointDesignOverlay.cs)",
+          "original_header": "name=\"CheckpointOverlay\" type=\"Node2D\" parent=\"Debug\" unique_id=1950778630"
+        }
+      }
+    },
+    "LEVELS/Level002/Level002.tscn": {
+      "scene_uid": "uid://dgjaduoinixnf",
+      "nodes": {
+        ".": {
+          "script": "Resource(res://LEVELS/WorldLevel.cs)",
+          "Settings": "Resource(res://LEVELS/Level002/Level002Config.tres)",
+          "original_header": "name=\"Level002\" type=\"Node2D\" unique_id=864740696"
+        },
+        "SpaceBackground": {
+          "z_index": "-20",
+          "original_header": "name=\"SpaceBackground\" type=\"Node2D\" parent=\".\" unique_id=1825087959"
+        },
+        "SpaceBackground/Nebulae": {
+          "original_header": "name=\"Nebulae\" type=\"Node2D\" parent=\"SpaceBackground\" unique_id=87135791"
+        },
+        "SpaceBackground/Stars": {
+          "original_header": "name=\"Stars\" type=\"Node2D\" parent=\"SpaceBackground\" unique_id=2028579996"
+        },
+        "SpaceBackground/Stars/Space": {
+          "position": "Vector2(93, 7)",
+          "scale": "Vector2(4, 4)",
+          "texture": "Resource(res://WORLD/BACKGROUNDS/Stars/level001_space.svg)",
+          "centered": "false",
+          "original_header": "name=\"Space\" type=\"Sprite2D\" parent=\"SpaceBackground/Stars\" unique_id=1191861450"
+        },
+        "SpaceBackground/Planets": {
+          "original_header": "name=\"Planets\" type=\"Node2D\" parent=\"SpaceBackground\" unique_id=1684856347"
+        },
+        "Terrain": {
+          "original_header": "name=\"Terrain\" type=\"Node2D\" parent=\".\" unique_id=833107286"
+        },
+        "Terrain/Passable": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/PassableTerrain.tres)",
+          "tile_map_data_sha256": "a43491edde076cf559ee79c8d1b2e6fc643b49ae168557dd114d1d821ed2b8ef",
+          "tile_map_data_chars": 1975,
+          "original_header": "name=\"Passable\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=1382848671"
+        },
+        "Terrain/Impassable": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/ImpassableTerrain.tres)",
+          "tile_map_data_sha256": "9df370ad2462af6a82cce84e95a44bc087e7281cd4e51e5206e448f3fdc37a56",
+          "tile_map_data_chars": 1431,
+          "original_header": "name=\"Impassable\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=1176658847"
+        },
+        "Terrain/Interactive": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/InteractiveTerrain.tres)",
+          "original_header": "name=\"Interactive\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=421031592"
+        },
+        "Terrain/Decorations": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/DecorationTerrain.tres)",
+          "original_header": "name=\"Decorations\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=1034975239"
+        },
+        "Checkpoints": {
+          "original_header": "name=\"Checkpoints\" type=\"Node\" parent=\".\" unique_id=1040747550"
+        },
+        "Portals": {
+          "original_header": "name=\"Portals\" type=\"Node2D\" parent=\".\" unique_id=219222935"
+        },
+        "Portals/EnemyPortal1": {
+          "position": "Vector2(3168, 2592)",
+          "original_header": "name=\"EnemyPortal1\" parent=\"Portals\" unique_id=1721559982 instance=ExtResource(\"5_portal\")",
+          "instance_scene": "res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn"
+        },
+        "Portals/EnemyPortal2": {
+          "position": "Vector2(3936, 1824)",
+          "original_header": "name=\"EnemyPortal2\" parent=\"Portals\" unique_id=1710410001 instance=ExtResource(\"5_portal\")",
+          "instance_scene": "res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn"
+        },
+        "Objectives": {
+          "original_header": "name=\"Objectives\" type=\"Node2D\" parent=\".\" unique_id=1539156350"
+        },
+        "Objectives/Citadel": {
+          "position": "Vector2(3872, 2528)",
+          "original_header": "name=\"Citadel\" parent=\"Objectives\" unique_id=1303919540 instance=ExtResource(\"6_citadel\")",
+          "instance_scene": "res://WORLD/OBJECTIVES/Citadel/Citadel.tscn"
+        },
+        "Debug": {
+          "original_header": "name=\"Debug\" parent=\".\" unique_id=1467647758 instance=ExtResource(\"debug_tools\")",
+          "instance_scene": "res://DEBUG/LevelTools/LevelDebugTools.tscn"
+        },
+        "Debug/CheckpointOverlay": {
+          "z_index": "4090",
+          "z_as_relative": "false",
+          "script": "Resource(res://DEBUG/Navigation/CheckpointDesignOverlay.cs)",
+          "original_header": "name=\"CheckpointOverlay\" type=\"Node2D\" parent=\"Debug\" unique_id=2072394971"
+        }
+      }
+    },
+    "LEVELS/Level003/Level003.tscn": {
+      "scene_uid": "uid://ovshlvskui7m",
+      "nodes": {
+        ".": {
+          "script": "Resource(res://LEVELS/WorldLevel.cs)",
+          "Settings": "Resource(res://LEVELS/Level003/Level003Config.tres)",
+          "original_header": "name=\"Level003\" type=\"Node2D\" unique_id=864740696"
+        },
+        "SpaceBackground": {
+          "z_index": "-20",
+          "original_header": "name=\"SpaceBackground\" type=\"Node2D\" parent=\".\" unique_id=1825087959"
+        },
+        "SpaceBackground/Nebulae": {
+          "original_header": "name=\"Nebulae\" type=\"Node2D\" parent=\"SpaceBackground\" unique_id=87135791"
+        },
+        "SpaceBackground/Stars": {
+          "original_header": "name=\"Stars\" type=\"Node2D\" parent=\"SpaceBackground\" unique_id=2028579996"
+        },
+        "SpaceBackground/Stars/Space": {
+          "position": "Vector2(93, 7)",
+          "scale": "Vector2(4, 4)",
+          "texture": "Resource(res://WORLD/BACKGROUNDS/Stars/level001_space.svg)",
+          "centered": "false",
+          "original_header": "name=\"Space\" type=\"Sprite2D\" parent=\"SpaceBackground/Stars\" unique_id=1191861450"
+        },
+        "SpaceBackground/Planets": {
+          "original_header": "name=\"Planets\" type=\"Node2D\" parent=\"SpaceBackground\" unique_id=1684856347"
+        },
+        "SpaceBackground/VisualAtmosphere": {
+          "visible": "false",
+          "script": "Resource(res://WORLD/VISUALS/LevelAtmosphereController.cs)",
+          "Config": "Resource(res://WORLD/VISUALS/Presets/CalmSpace.tres)",
+          "original_header": "name=\"VisualAtmosphere\" type=\"Node2D\" parent=\"SpaceBackground\" unique_id=535803022"
+        },
+        "Terrain": {
+          "original_header": "name=\"Terrain\" type=\"Node2D\" parent=\".\" unique_id=833107286"
+        },
+        "Terrain/Passable": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/PassableTerrain.tres)",
+          "tile_map_data_sha256": "8cb2c822c97d42a8ebbdb480b98c417599045ceb1309e28bf71018dd17cc9271",
+          "tile_map_data_chars": 3463,
+          "original_header": "name=\"Passable\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=1382848671"
+        },
+        "Terrain/Impassable": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/ImpassableTerrain.tres)",
+          "tile_map_data_sha256": "ec6086bf402cf22bb3d5c73c735bf1c1d725c6b3829dca3edb574ecb7e68c361",
+          "tile_map_data_chars": 1191,
+          "original_header": "name=\"Impassable\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=1176658847"
+        },
+        "Terrain/Interactive": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/InteractiveTerrain.tres)",
+          "tile_map_data_sha256": "c94696da12106cadb25c55b56bceeed4fcb8effdfa06aba97d38db18316fb518",
+          "tile_map_data_chars": 551,
+          "original_header": "name=\"Interactive\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=421031592"
+        },
+        "Terrain/Decorations": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/DecorationTerrain.tres)",
+          "original_header": "name=\"Decorations\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=1034975239"
+        },
+        "Checkpoints": {
+          "original_header": "name=\"Checkpoints\" type=\"Node\" parent=\".\" unique_id=1040747550"
+        },
+        "Portals": {
+          "original_header": "name=\"Portals\" type=\"Node2D\" parent=\".\" unique_id=219222935"
+        },
+        "Portals/EnemyPortal1": {
+          "position": "Vector2(3936, 3424)",
+          "original_header": "name=\"EnemyPortal1\" parent=\"Portals\" unique_id=1721559982 instance=ExtResource(\"5_portal\")",
+          "instance_scene": "res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn"
+        },
+        "Objectives": {
+          "original_header": "name=\"Objectives\" type=\"Node2D\" parent=\".\" unique_id=1539156350"
+        },
+        "Objectives/Citadel": {
+          "position": "Vector2(3936, 2400)",
+          "original_header": "name=\"Citadel\" parent=\"Objectives\" unique_id=1303919540 instance=ExtResource(\"6_citadel\")",
+          "instance_scene": "res://WORLD/OBJECTIVES/Citadel/Citadel.tscn"
+        },
+        "Debug": {
+          "original_header": "name=\"Debug\" parent=\".\" unique_id=1467647758 instance=ExtResource(\"debug_tools\")",
+          "instance_scene": "res://DEBUG/LevelTools/LevelDebugTools.tscn"
+        },
+        "Debug/CheckpointOverlay": {
+          "z_index": "4090",
+          "z_as_relative": "false",
+          "script": "Resource(res://DEBUG/Navigation/CheckpointDesignOverlay.cs)",
+          "original_header": "name=\"CheckpointOverlay\" type=\"Node2D\" parent=\"Debug\" unique_id=2072394971"
+        }
+      }
+    },
+    "LEVELS/Level020/Level020.tscn": {
+      "scene_uid": "uid://dgjaduoinixnf",
+      "nodes": {
+        ".": {
+          "script": "Resource(res://LEVELS/WorldLevel.cs)",
+          "Settings": "Resource(res://LEVELS/Level020/Level020Config.tres)",
+          "original_header": "name=\"Level020\" type=\"Node2D\" unique_id=1426546349"
+        },
+        "Checkpoints": {
+          "original_header": "name=\"Checkpoints\" type=\"Node\" parent=\".\" unique_id=1625000831"
+        },
+        "SpaceBackground": {
+          "z_index": "-20",
+          "original_header": "name=\"SpaceBackground\" type=\"Node2D\" parent=\".\" unique_id=512607865"
+        },
+        "SpaceBackground/Nebulae": {
+          "original_header": "name=\"Nebulae\" type=\"Node2D\" parent=\"SpaceBackground\" unique_id=1823869249"
+        },
+        "SpaceBackground/Stars": {
+          "original_header": "name=\"Stars\" type=\"Node2D\" parent=\"SpaceBackground\" unique_id=1323883628"
+        },
+        "SpaceBackground/Stars/Space": {
+          "position": "Vector2(1, 1)",
+          "scale": "Vector2(4, 4)",
+          "texture": "Resource(res://WORLD/BACKGROUNDS/Stars/level001_space.svg)",
+          "centered": "false",
+          "original_header": "name=\"Space\" type=\"Sprite2D\" parent=\"SpaceBackground/Stars\" unique_id=697722500"
+        },
+        "SpaceBackground/Planets": {
+          "original_header": "name=\"Planets\" type=\"Node2D\" parent=\"SpaceBackground\" unique_id=2101939022"
+        },
+        "Terrain": {
+          "original_header": "name=\"Terrain\" type=\"Node2D\" parent=\".\" unique_id=1589209871"
+        },
+        "Terrain/Passable": {
+          "position": "Vector2(0, 3)",
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/PassableTerrain.tres)",
+          "tile_map_data_sha256": "338927376bcbbb171daecb615f758e6ef68df56538aee05a7ac147b5b13cf511",
+          "tile_map_data_chars": 1703,
+          "original_header": "name=\"Passable\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=1130090969"
+        },
+        "Terrain/Impassable": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/ImpassableTerrain.tres)",
+          "tile_map_data_sha256": "f21de2a9733efdd4e4f584f0d763326d1bc45ea984ed56402d3bd158bac3197c",
+          "tile_map_data_chars": 1751,
+          "original_header": "name=\"Impassable\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=544774292"
+        },
+        "Terrain/Interactive": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/InteractiveTerrain.tres)",
+          "original_header": "name=\"Interactive\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=1340039546"
+        },
+        "Terrain/Decorations": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/DecorationTerrain.tres)",
+          "original_header": "name=\"Decorations\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=425050064"
+        },
+        "Portals": {
+          "original_header": "name=\"Portals\" type=\"Node2D\" parent=\".\" unique_id=392524588"
+        },
+        "Portals/EnemyPortal01": {
+          "position": "Vector2(3936, 2595)",
+          "original_header": "name=\"EnemyPortal01\" parent=\"Portals\" unique_id=1274959124 instance=ExtResource(\"8_portal\")",
+          "instance_scene": "res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn"
+        },
+        "Portals/EnemyPortal02": {
+          "position": "Vector2(3168, 1827)",
+          "SizeMultiplier": "1.15",
+          "original_header": "name=\"EnemyPortal02\" parent=\"Portals\" unique_id=791619454 instance=ExtResource(\"8_portal\")",
+          "instance_scene": "res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn"
+        },
+        "Portals/EnemyPortal03": {
+          "position": "Vector2(2400, 2595)",
+          "SizeMultiplier": "0.9",
+          "original_header": "name=\"EnemyPortal03\" parent=\"Portals\" unique_id=1070409360 instance=ExtResource(\"8_portal\")",
+          "instance_scene": "res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn"
+        },
+        "Portals/EnemyPortal04": {
+          "position": "Vector2(3168, 3363)",
+          "SizeMultiplier": "1.1",
+          "original_header": "name=\"EnemyPortal04\" parent=\"Portals\" unique_id=2120615218 instance=ExtResource(\"8_portal\")",
+          "instance_scene": "res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn"
+        },
+        "Objectives": {
+          "original_header": "name=\"Objectives\" type=\"Node2D\" parent=\".\" unique_id=343975502"
+        },
+        "Objectives/Citadel": {
+          "position": "Vector2(3104, 2531)",
+          "original_header": "name=\"Citadel\" parent=\"Objectives\" unique_id=97552924 instance=ExtResource(\"9_citadel\")",
+          "instance_scene": "res://WORLD/OBJECTIVES/Citadel/Citadel.tscn"
+        },
+        "Debug": {
+          "script": "Resource(res://DEBUG/LevelTools/LevelDebugController.cs)",
+          "original_header": "name=\"Debug\" type=\"Node\" parent=\".\" unique_id=1262761477"
+        },
+        "Debug/CheckpointOverlay": {
+          "z_index": "4090",
+          "z_as_relative": "false",
+          "script": "Resource(res://DEBUG/Navigation/CheckpointDesignOverlay.cs)",
+          "original_header": "name=\"CheckpointOverlay\" type=\"Node2D\" parent=\"Debug\" unique_id=593809922"
+        }
+      }
+    },
+    "LEVELS/Level100/Level100.tscn": {
+      "scene_uid": "uid://bis7n86qk4wva",
+      "nodes": {
+        ".": {
+          "script": "Resource(res://LEVELS/WorldLevel.cs)",
+          "Settings": "Resource(res://LEVELS/Level100/Level100Config.tres)",
+          "original_header": "name=\"Level100\" type=\"Node2D\" unique_id=864740696"
+        },
+        "SpaceBackground": {
+          "z_index": "-20",
+          "original_header": "name=\"SpaceBackground\" type=\"Node2D\" parent=\".\" unique_id=1825087959"
+        },
+        "SpaceBackground/Nebulae": {
+          "original_header": "name=\"Nebulae\" type=\"Node2D\" parent=\"SpaceBackground\" unique_id=87135791"
+        },
+        "SpaceBackground/Stars": {
+          "original_header": "name=\"Stars\" type=\"Node2D\" parent=\"SpaceBackground\" unique_id=2028579996"
+        },
+        "SpaceBackground/Stars/Space": {
+          "position": "Vector2(93, 7)",
+          "scale": "Vector2(4, 4)",
+          "texture": "Resource(res://WORLD/BACKGROUNDS/Stars/level001_space.svg)",
+          "centered": "false",
+          "original_header": "name=\"Space\" type=\"Sprite2D\" parent=\"SpaceBackground/Stars\" unique_id=1191861450"
+        },
+        "SpaceBackground/Planets": {
+          "original_header": "name=\"Planets\" type=\"Node2D\" parent=\"SpaceBackground\" unique_id=1684856347"
+        },
+        "Terrain": {
+          "original_header": "name=\"Terrain\" type=\"Node2D\" parent=\".\" unique_id=833107286"
+        },
+        "Terrain/Passable": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/PassableTerrain.tres)",
+          "tile_map_data_sha256": "cc60c68905388d1bd7f87d6f9a4c6454f0568190282636a621cee7db0c015c85",
+          "tile_map_data_chars": 3191,
+          "original_header": "name=\"Passable\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=1382848671"
+        },
+        "Terrain/Impassable": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/ImpassableTerrain.tres)",
+          "tile_map_data_sha256": "f98653a63c8a0f2b8bebe811f0e96dcf07a7a0472439385c03ae852a1942316b",
+          "tile_map_data_chars": 2599,
+          "original_header": "name=\"Impassable\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=1176658847"
+        },
+        "Terrain/Interactive": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/InteractiveTerrain.tres)",
+          "original_header": "name=\"Interactive\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=421031592"
+        },
+        "Terrain/Decorations": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/DecorationTerrain.tres)",
+          "original_header": "name=\"Decorations\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=1034975239"
+        },
+        "Checkpoints": {
+          "original_header": "name=\"Checkpoints\" type=\"Node\" parent=\".\" unique_id=1040747550"
+        },
+        "Portals": {
+          "original_header": "name=\"Portals\" type=\"Node2D\" parent=\".\" unique_id=219222935"
+        },
+        "Portals/EnemyPortal1": {
+          "position": "Vector2(2592, 1184)",
+          "original_header": "name=\"EnemyPortal1\" parent=\"Portals\" unique_id=1721559982 instance=ExtResource(\"5_portal\")",
+          "instance_scene": "res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn"
+        },
+        "Portals/EnemyPortal2": {
+          "position": "Vector2(2336, 1824)",
+          "original_header": "name=\"EnemyPortal2\" parent=\"Portals\" unique_id=813932701 instance=ExtResource(\"5_portal\")",
+          "instance_scene": "res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn"
+        },
+        "Portals/EnemyPortal3": {
+          "position": "Vector2(2144, 2464)",
+          "original_header": "name=\"EnemyPortal3\" parent=\"Portals\" unique_id=1920601252 instance=ExtResource(\"5_portal\")",
+          "instance_scene": "res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn"
+        },
+        "Portals/EnemyPortal4": {
+          "position": "Vector2(2272, 3168)",
+          "original_header": "name=\"EnemyPortal4\" parent=\"Portals\" unique_id=1322626727 instance=ExtResource(\"5_portal\")",
+          "instance_scene": "res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn"
+        },
+        "Portals/EnemyPortal5": {
+          "position": "Vector2(2592, 3616)",
+          "original_header": "name=\"EnemyPortal5\" parent=\"Portals\" unique_id=1674483016 instance=ExtResource(\"5_portal\")",
+          "instance_scene": "res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn"
+        },
+        "Objectives": {
+          "original_header": "name=\"Objectives\" type=\"Node2D\" parent=\".\" unique_id=1539156350"
+        },
+        "Objectives/Citadel": {
+          "position": "Vector2(4256, 2400)",
+          "original_header": "name=\"Citadel\" parent=\"Objectives\" unique_id=1303919540 instance=ExtResource(\"6_citadel\")",
+          "instance_scene": "res://WORLD/OBJECTIVES/Citadel/Citadel.tscn"
+        },
+        "Debug": {
+          "original_header": "name=\"Debug\" parent=\".\" unique_id=1467647758 instance=ExtResource(\"debug_tools\")",
+          "instance_scene": "res://DEBUG/LevelTools/LevelDebugTools.tscn"
+        },
+        "Debug/CheckpointOverlay": {
+          "z_index": "4090",
+          "z_as_relative": "false",
+          "script": "Resource(res://DEBUG/Navigation/CheckpointDesignOverlay.cs)",
+          "original_header": "name=\"CheckpointOverlay\" type=\"Node2D\" parent=\"Debug\" unique_id=2072394971"
+        }
+      }
+    },
+    "LEVELS/LevelTemplate.tscn": {
+      "scene_uid": "uid://db0jtncj58lv8",
+      "nodes": {
+        ".": {
+          "script": "Resource(res://LEVELS/WorldLevel.cs)",
+          "Settings": "Resource(res://LEVELS/DefaultLevelConfig.tres)",
+          "original_header": "name=\"LevelTemplate\" type=\"Node2D\" unique_id=864740696"
+        },
+        "SpaceBackground": {
+          "z_index": "-20",
+          "original_header": "name=\"SpaceBackground\" type=\"Node2D\" parent=\".\" unique_id=1825087959"
+        },
+        "SpaceBackground/Nebulae": {
+          "original_header": "name=\"Nebulae\" type=\"Node2D\" parent=\"SpaceBackground\" unique_id=87135791"
+        },
+        "SpaceBackground/Stars": {
+          "original_header": "name=\"Stars\" type=\"Node2D\" parent=\"SpaceBackground\" unique_id=2028579996"
+        },
+        "SpaceBackground/Stars/Space": {
+          "position": "Vector2(93, 7)",
+          "scale": "Vector2(4, 4)",
+          "texture": "Resource(res://WORLD/BACKGROUNDS/Stars/level001_space.svg)",
+          "centered": "false",
+          "original_header": "name=\"Space\" type=\"Sprite2D\" parent=\"SpaceBackground/Stars\" unique_id=1191861450"
+        },
+        "SpaceBackground/Planets": {
+          "original_header": "name=\"Planets\" type=\"Node2D\" parent=\"SpaceBackground\" unique_id=1684856347"
+        },
+        "SpaceBackground/VisualAtmosphere": {
+          "visible": "false",
+          "script": "Resource(res://WORLD/VISUALS/LevelAtmosphereController.cs)",
+          "Config": "Resource(res://WORLD/VISUALS/Presets/CalmSpace.tres)",
+          "original_header": "name=\"VisualAtmosphere\" type=\"Node2D\" parent=\"SpaceBackground\""
+        },
+        "Terrain": {
+          "original_header": "name=\"Terrain\" type=\"Node2D\" parent=\".\" unique_id=833107286"
+        },
+        "Terrain/Passable": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/PassableTerrain.tres)",
+          "original_header": "name=\"Passable\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=1382848671"
+        },
+        "Terrain/Impassable": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/ImpassableTerrain.tres)",
+          "original_header": "name=\"Impassable\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=1176658847"
+        },
+        "Terrain/Interactive": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/InteractiveTerrain.tres)",
+          "original_header": "name=\"Interactive\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=421031592"
+        },
+        "Terrain/Decorations": {
+          "tile_set": "Resource(res://WORLD/TERRAIN/TileSets/DecorationTerrain.tres)",
+          "original_header": "name=\"Decorations\" type=\"TileMapLayer\" parent=\"Terrain\" unique_id=1034975239"
+        },
+        "Checkpoints": {
+          "original_header": "name=\"Checkpoints\" type=\"Node\" parent=\".\" unique_id=1040747550"
+        },
+        "Portals": {
+          "original_header": "name=\"Portals\" type=\"Node2D\" parent=\".\" unique_id=219222935"
+        },
+        "Portals/EnemyPortal1": {
+          "position": "Vector2(3424, 2592)",
+          "original_header": "name=\"EnemyPortal1\" parent=\"Portals\" unique_id=1721559982 instance=ExtResource(\"5_portal\")",
+          "instance_scene": "res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn"
+        },
+        "Objectives": {
+          "original_header": "name=\"Objectives\" type=\"Node2D\" parent=\".\" unique_id=1539156350"
+        },
+        "Objectives/Citadel": {
+          "position": "Vector2(3872, 2528)",
+          "original_header": "name=\"Citadel\" parent=\"Objectives\" unique_id=1303919540 instance=ExtResource(\"6_citadel\")",
+          "instance_scene": "res://WORLD/OBJECTIVES/Citadel/Citadel.tscn"
+        },
+        "Debug": {
+          "original_header": "name=\"Debug\" parent=\".\" unique_id=1467647758 instance=ExtResource(\"debug_tools\")",
+          "instance_scene": "res://DEBUG/LevelTools/LevelDebugTools.tscn"
+        },
+        "Debug/CheckpointOverlay": {
+          "z_index": "4090",
+          "z_as_relative": "false",
+          "script": "Resource(res://DEBUG/Navigation/CheckpointDesignOverlay.cs)",
+          "original_header": "name=\"CheckpointOverlay\" type=\"Node2D\" parent=\"Debug\" unique_id=2072394971"
+        }
+      }
+    }
+  }
+}
