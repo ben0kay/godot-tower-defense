@@ -4,7 +4,8 @@
 [ext_resource type="Script" uid="uid://ba4ugryh3wdf6" path="res://AUDIO/AudioDefinition.cs" id="1_qhxs2"]
 [ext_resource type="Resource" path="res://AUDIO/VoiceAssistant/Cues/Profiles/WelcomeCommander.tres" id="2_welcome"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/Sounds/BattleFire.tres" id="3_battle_fire"]
+[ext_resource type="Resource" path="res://TOWERS/Offensive/MachineGunTower/Sounds/MachineGunFire.tres" id="4_machine_gun_fire"]
 
 [resource]
 script = ExtResource("1_catalog")
-Sounds = Array[ExtResource("1_qhxs2")]([ExtResource("2_welcome"), ExtResource("3_battle_fire")])
+Sounds = Array[ExtResource("1_qhxs2")]([ExtResource("2_welcome"), ExtResource("3_battle_fire"), ExtResource("4_machine_gun_fire")])

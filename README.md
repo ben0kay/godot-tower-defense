@@ -1,3 +1,9 @@
+## Machine Gun Tower one-shot firing clip — 2026-11-05
+
+**Source Implemented / Awaiting Owner Validation.** Imported the owner's short machine-gun hit as `TOWERS/Offensive/MachineGunTower/Sounds/MachineGunFire.mp3`, trimmed/faded to remove near-silence, and registered `tower_machine_gun_fire`. The existing shared projectile turret emits a separate positional audio request for **each paid bullet**, not a loop or one sound per target/volley; zero per-ID cooldown preserves 14.4–15.36 bullets/s, subject to existing global polyphony/culling budgets. Other tower audio and damage/ammunition/heat remain unchanged. See [Machine Gun audio notes](TOWERS/Offensive/MachineGunTower/Sounds/README.md). Godot audio QA pending.
+
+---
+
 ## PW4-B — cached distance-limited recharge — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** Existing power manager now owns one coalesced multi-source conductive BFS; valid Citadel/generator footprints anchor delivery. Shared Inspector curve: 4 full cells, 12 soft falloff cells, 10% reachable-route floor. Recharge ceiling = nominal refill × efficiency; no route means zero. Capacity/drain/attack funding/source output and stored charge are unchanged; no new consumers, priority scheduling or relays. Cached consumer APIs expose distance/efficiency/ceiling; final derived cache is rebuilt before checkpoint unpause without new saved fields. Performance: reused arrays, no per-tower pathfinding/frame flood fill, no distance rebuild for positive output or curve-only edits. Narrow fixture updated; source/resource review only (environment unavailable), no build/runtime/benchmark claim. [Power guide](TOWERS/Economy/Power/Shared/README.md).

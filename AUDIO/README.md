@@ -1,3 +1,9 @@
+## Machine Gun Tower per-shot sound — 2026-11-05
+
+The uploaded `snd_tower_001_fire(1).wav` now drives `tower_machine_gun_fire` on every successfully emitted Machine Gun bullet through shared `ProjectileTurretBase` and `AudioManager.PlayFrom`. Feature-owned files: `TOWERS/Offensive/MachineGunTower/Sounds/MachineGunFire.mp3` and `MachineGunFire.tres`; registered in `DefaultAudioCatalog.tres`. The one-hit original is shortened to remove its nearly silent tail, gently faded and encoded as a lightweight mono MP3; it **does not loop**. Default per-ID cooldown is zero (no artificial skipping at 14–15 bullets/s), with positional culling, bounded polyphony and global 24-world-one-shot budget. See [Machine Gun Sounds](../TOWERS/Offensive/MachineGunTower/Sounds/README.md). Godot mix/overlap acceptance pending.
+
+---
+
 ## Battle Tower firing clip refined — 2026-11-05
 
 The owner confirmed the Battle Tower sound triggers, but the first electronic cannon tone sounded comical. Its authored `TOWERS/Offensive/BattleTower/Sounds/BattleFire.wav` has been replaced **at the same path** with a short, dry acoustic-style gunshot (sharp crack, low punch, subtle mechanical tail). The existing catalog ID, `PlayFrom` hook, positional sound, 24-world one-shot budget, and sound-definition tuning are unchanged. Godot playback and mix acceptance of the replacement are pending.

@@ -7,6 +7,8 @@ public partial class ProjectileTurretConfig : TowerConfig, ITowerTargetingPolicy
     [ExportGroup("Firing")]
     [Export] public BarrelFireMode FiringMode { get; set; } = BarrelFireMode.Single;
     [Export] public ShotDeliveryMode DeliveryMode { get; set; } = ShotDeliveryMode.PhysicalProjectile;
+    [ExportGroup("Audio")]
+    [Export] public string FireSoundId { get; set; } = ""; // Optional per-shot SFX; blank for all existing turret types.
     [ExportGroup("Weapon Visuals")]
     [Export] public bool ShieldRicochet { get; set; }
     [ExportGroup("Hull Hit Feedback")]

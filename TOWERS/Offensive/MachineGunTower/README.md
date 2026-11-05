@@ -1,3 +1,9 @@
+## One-shot machine-gun firing audio — 2026-11-05
+
+**Source Implemented / Awaiting Owner Validation.** Each successful, funded bullet requests `tower_machine_gun_fire` through the shared `AudioManager.PlayFrom` API; it is not a looping sound. The sound follows the existing A/B barrel sequence and the full 14.4 / 14.88 / 15.36 total bullets/s rates. `DefaultMachineGunTowerConfig.tres → FireSoundId` enables the cue (clear to silence). The audio clip, definition, and mix policy live in [Sounds/README.md](Sounds/README.md). Shared pooling, per-owner handling, distance/offscreen culling and budgets apply. Projectile behavior, aiming, heat, ammo, construction, and tower prices are unchanged. Godot playback/mix QA pending.
+
+---
+
 ## Purchased-level artwork: Level 2 / Level 3 — 2026-11-02
 
 Machine Gun now uses **the same shared purchased-level artwork presentation as Battle Tower**, with dedicated L2/L3 64×64 split base and dual-barrel gun SVGs and distinct **35% / 70%** upgrade assembly composites. Level 1's existing art and initial foundation/frame/assembly construction are preserved.

@@ -6,6 +6,7 @@
 [resource]
 script = ExtResource("1")
 HeatEnabled = true
+FireSoundId = "tower_machine_gun_fire"
 
 ProjectileVisual = ExtResource("pv_tracer")
 MuzzleFlash = ExtResource("pv_flash")

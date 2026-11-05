@@ -22,6 +22,7 @@ public abstract partial class ProjectileTurretBase : TowerBase
     private Sprite2D _sprite, _baseSprite, _constructionSprite;
     private TowerRecoilController _recoil;
     private EnemyRegistry _registry;
+    private AudioManager _audio;
     private HullHitSparkController _hullSparks;
     private Enemy _target;
     private float _searchTimer, _shotTimer;
@@ -89,6 +90,7 @@ public abstract partial class ProjectileTurretBase : TowerBase
         _registry = GetNodeOrNull<EnemyRegistry>("../../EnemySystems/Registry");
         _hullSparks = GetNodeOrNull<HullHitSparkController>("../../Effects/HullHitSparks");
         _projectiles = GetNodeOrNull<Node2D>("../../Projectiles");
+        _audio = AudioManager.Find(this); // Shared pooled playback, cached once per tower.
         _searchTimer = (GetInstanceId() % 97) / 97f * (FinalStats?.TargetSearchInterval ?? .15f);
         SetOperationalPhysicsProcess(_registry != null && _projectiles != null);
     }
@@ -144,13 +146,18 @@ public abstract partial class ProjectileTurretBase : TowerBase
             {
                 // No projectile node or travel loop: retain the same muzzle flash and funded firing sequence.
                 _visuals.FlashAt(muzzle, Config.MuzzleFlash);
-                continue;
             }
-            BasicProjectile bullet = new();
-            bullet.Initialize(_target, FinalStats.ProjectileSpeed, hit, CreateEffect(FinalStats), Config.ProjectileVisual, FinalStats.Handling, Config.ShieldRicochet,
-                Config.HullHitSparkCount);
-            _projectiles.AddChild(bullet);
-            WeaponVisuals.Present(bullet, muzzle, Config, _visuals);
+            else
+            {
+                BasicProjectile bullet = new();
+                bullet.Initialize(_target, FinalStats.ProjectileSpeed, hit, CreateEffect(FinalStats), Config.ProjectileVisual, FinalStats.Handling, Config.ShieldRicochet,
+                    Config.HullHitSparkCount);
+                _projectiles.AddChild(bullet);
+                WeaponVisuals.Present(bullet, muzzle, Config, _visuals);
+            }
+            // Each funded, emitted bullet requests one independent one-shot (never a continuous loop).
+            if (!string.IsNullOrWhiteSpace(Config.FireSoundId))
+                _audio?.PlayFrom(Config.FireSoundId, this);
         }
         _recoil?.Kick(); // All funded volley origins are captured before the assembly moves.
         _barrels.Commit(mode);

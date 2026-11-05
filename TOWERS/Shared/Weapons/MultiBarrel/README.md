@@ -1,3 +1,9 @@
+## Optional shot audio — 2026-11-05
+
+`ProjectileTurretConfig.FireSoundId` is an optional Inspector string (blank by default). The existing `ProjectileTurretBase` now caches the shared audio manager once and requests `PlayFrom(id, tower)` **after each successful funded bullet** (physical or instant delivery). It never plays sounds for rejected/empty/unfunded attacks, never loops audio, and never adds a per-tower sound player or process loop. Machine Gun opts in via its own config; other projectile turrets remain silent until explicitly configured. Mixer limits and culling can still reject requests without affecting gameplay.
+
+---
+
 ## HI1 — reusable per-weapon hull spark opt-in (2026-11-04)
 
 The shared `ProjectileTurretConfig.HullHitSparkCount` defaults to **0**, with explicit **2** for Machine Gun and **6** for Sniper in their authored `.tres` resources. Battle exposes its equivalent with default **4**. Physical rounds capture the count at launch; Sniper's current `InstantTarget` path passes the same setting to its direct damage bridge. All feed one fixed-capacity cosmetic effect under `FEEDBACK/HullHitSparks` without introducing projectile nodes or GPU emitters. See the [effect guide](../../../../FEEDBACK/HullHitSparks/README.md). Visual/FPS acceptance pending.

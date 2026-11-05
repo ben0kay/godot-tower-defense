@@ -1,0 +1,8 @@
+# Machine Gun Tower — per-bullet firing sound
+
+- `MachineGunFire.mp3` is the owner's uploaded `snd_tower_001_fire(1).wav` (originally 1.0s / 48 kHz / stereo PCM). To avoid holding pooled players through a nearly silent 0.5s tail on a 14–15 shots/s gun, this game-ready copy is mixed to mono, keeps its initial impact, gently fades from 0.35–0.42s, and is encoded at 48 kHz / 112 kbps. No loop is enabled. The original WAV is not committed separately.
+- `MachineGunFire.tres` contains stable ID `tower_machine_gun_fire`, category WorldSfx, **OneShot**, priority 35, **0s cooldown**, 18 concurrent instances for this ID, positional audio, 550px distance and offscreen culling. Volume starts at -8 dB to leave headroom for rapid layering; edit its Inspector value to taste.
+- `DefaultMachineGunTowerConfig.tres.FireSoundId` selects the sound. Every funded bullet in the shared `ProjectileTurretBase` issues `AudioManager.PlayFrom(id, this)`; alternating muzzle behavior and ammo expenditure are untouched. Blank the sound ID to disable it without stopping gameplay.
+- The shared `GameAudio` manager pools audio players and enforces its global maximum of **24** simultaneous world one-shots. This is a safety cap for many towers: in dense fights some requests may be culled, but the tower never reduces rate, damage or ammo due to audio availability. No dedicated sound players, loop emitters, per-shot resource loading, or audio process loops.
+
+**Owner Godot check:** pull `dev`, import the MP3, build C#, start a level, fire a single Machine Gun and several simultaneously; confirm rapid individual hits, pauses between bursts, camera pan/zoom culling and a comfortable mix with Battle Tower. Source-only review; no engine/audio-device FPS claims.
