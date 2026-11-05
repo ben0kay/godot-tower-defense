@@ -1,5 +1,7 @@
 # Heavy Gunner Drone — implemented (HG1)
 
+**Weapon refinement — 2026-11-05:** The Heavy Gunner's own minigun now fires **5 Kinetic damage** at **2.5 shots/s**, with **650px/s** bullet travel and a larger **14.6×2.9px** red tapered streak (roughly 33% longer/wider than its previous 11×2.2). This changes only the heavy gun weapon and tracer resources. Its 260 HP, 52px/s movement, 275px range, hull/gun artwork, 2.8s bullet lifetime and existing muzzle flash remain unchanged. The starter Gunner's weapon, visuals and balance remain untouched.
+
 **New independent enemy** `heavy_gunner_drone_mk1`, display name **Heavy Gunner Drone**, Class **Standard**, Rank **Veteran**, Role **Fighter**. “Heavy” describes its tougher armour and stronger weapon; its 62×42 hull falls in the Standard physical-size range. A tankier, slower, more dangerous armed cousin to the lightweight Gunner Drone. The starter ship (`gunner_drone_mk1`) and its art, damage, firing cadence, bullet visuals and health are **unchanged**.
 
 | Setting | Starter Gunner | Heavy Gunner |
@@ -15,11 +17,11 @@
 | Kill reward | 8 Credits | **14 Credits** |
 | Death explosion multiplier | 1.35 | **1.65** |
 | Gun range | 260 px | **275 px** |
-| Shots/sec | 6 | **3.5** |
-| Shot damage | 2 Kinetic | **4 Kinetic** |
-| Bullet speed | 1200 px/s | **850 px/s** |
+| Shots/sec | 6 | **2.5** |
+| Shot damage | 2 Kinetic | **5 Kinetic** |
+| Bullet speed | 1200 px/s | **650 px/s** |
 | Bullet lifetime | 2.5s | **2.8s** |
-| Red tracer dimensions | 9×1.5 | **11×2.2** |
+| Red tracer dimensions | 9×1.5 | **14.6×2.9** |
 
 ## Implementation
 

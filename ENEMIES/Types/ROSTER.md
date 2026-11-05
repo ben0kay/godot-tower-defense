@@ -20,7 +20,7 @@
 | Elite Assault Ship | Standard | Elite | Fighter | `elite_mk1` | `Types/Enemy006/` | 80×60 |
 | Cruiser | Superheavy | Elite | Fighter | `cruiser_mk1` | `Types/Cruiser/` | 168×96 |
 
-**Heavy Gunner addition — 2026-11-05:** Introduced as Heavy/Veteran/Fighter; now **Standard/Veteran/Fighter** under physical-size rules (62×42 hull). Its “Heavy” name describes armour/firepower, not its Class. The independent 260 HP, 52px/s, 24px clearance, 18×50 cannon, 850px/s red 11×2.2 tracer, 4 damage and 3.5 shots/s are unchanged. Both gunner variants remain available in F2; no waves changed.
+**Heavy Gunner addition — 2026-11-05:** Introduced as Heavy/Veteran/Fighter; now **Standard/Veteran/Fighter** under physical-size rules (62×42 hull). Its “Heavy” name describes armour/firepower, not its Class. The independent 260 HP, 52px/s, 24px clearance, 18×50 cannon, original 850px/s red 11×2.2 tracer, 4 damage and 3.5 shots/s were the first weapon presets. A later heavy-only pass changed them to **650px/s**, **14.6×2.9**, **5 damage**, and **2.5 shots/s**, without changing classification, hull or movement. Both gunner variants remain available in F2; no waves changed.
 
 **Gunner starter resize/refinement — 2026-11-05:** Gunner's art is now **48×30** (originally 64×48), minigun **12×44** (originally 24×40), hull health 135 (was 180) and movement radius 18 (was 22). Its Class was initially retained as Standard after the art revision; this subsequent physical-size regrouping changes it to **Light**, while Common Rank, Fighter Role and gameplay values remain unchanged. Bullet presentation and stable EnemyId are unchanged.
 

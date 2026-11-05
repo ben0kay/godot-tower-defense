@@ -1,6 +1,12 @@
+## Heavy Gunner slower, heavier red ammunition — 2026-11-05
+
+The Heavy Gunner's dedicated minigun now fires a roughly **33% longer/wider red tapered projectile** (14.6×2.9px, previously 11×2.2), travelling at **650px/s** (was 850). Its firing rate is **2.5/s** (was 3.5/s) with **5 Kinetic damage** per bullet (was 4). The starter Gunner and its bullet style are unchanged, as are the Heavy Gunner's hull, movement speed, 260 HP, 275px range, muzzle flash and 2.8s bullet lifetime. Focused test expectations updated; Godot visual verification pending. [Heavy Gunner notes](ENEMIES/Types/HeavyGunnerDrone/README.md).
+
+---
+
 ## Heavy Gunner Drone — new armed enemy (2026-11-05)
 
-Added `heavy_gunner_drone_mk1` as a separate **Heavy/Veteran/Fighter** enemy with a 62×42 armoured SVG hull, independent 18×50 long-barrel cannon and 260 HP at 52px/s. Dedicated weapon config uses 4-damage Kinetic shots at 3.5/s, slower 850px/s travel, 275px range and larger **red 11×2.2 tapered tracers**. The original lightweight starter Gunner and its bullets remain completely unchanged. The new enemy is appended to the 15-entry default catalog (available in F2/Wave Editor); no authored waves were changed. Focused catalog/weapon checks and roster docs updated. **Source checks only; Godot owner validation pending.** [Heavy Gunner details](ENEMIES/Types/HeavyGunnerDrone/README.md).
+Added `heavy_gunner_drone_mk1` as a separate **Standard/Veteran/Fighter** enemy (the current size-based classification) with a 62×42 armoured SVG hull, independent 18×50 long-barrel cannon and 260 HP at 52px/s. Dedicated weapon config uses 4-damage Kinetic shots at 3.5/s, slower 850px/s travel, 275px range and larger **red 11×2.2 tapered tracers**. The original lightweight starter Gunner and its bullets remain completely unchanged. The new enemy is appended to the 15-entry default catalog (available in F2/Wave Editor); no authored waves were changed. Focused catalog/weapon checks and roster docs updated. **Source checks only; Godot owner validation pending.** [Heavy Gunner details](ENEMIES/Types/HeavyGunnerDrone/README.md).
 
 ---
 

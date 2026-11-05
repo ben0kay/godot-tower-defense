@@ -1,3 +1,9 @@
+## Heavy Gunner ammunition refinement — 2026-11-05
+
+Updated the existing GunnerDroneChecks expectations for its independent Heavy Gunner minigun: **650px/s** shot speed, **2.5 shots/s**, **5 Kinetic damage**, and the **14.6×2.9px** tapered red projectile snapshot, while retaining the starter Gunner checks, real muzzle origin and normal world bullet system. Source checks only; Godot runtime and visual acceptance pending.
+
+---
+
 ## Heavy Gunner Drone new variant checks — 2026-11-05
 
 The existing `GunnerDroneChecks.tscn` now validates both the untouched starter and the new Heavy Gunner: 15-entry catalog; two opt-in armed enemies; no automatic wave inclusion; 62×42 hull and 18×50 up-facing gun; separate `Muzzle=(0,-21)`; 260 HP/52 speed/24 radius; 3.5 shots/s, 850 bullet speed and 4 damage; 11×2.2 enlarged red snapshot; live world-owned muzzle-origin projectile and real tower damage. `FleetExpansionChecks` covers heavy metadata, portal spawning, ordinary hull damage, single arrival damage and kill reward.

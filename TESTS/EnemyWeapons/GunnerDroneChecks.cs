@@ -158,14 +158,14 @@ public partial class GunnerDroneChecks : Node
             && gun.GetNode<Node2D>("TurretPivot").Position == new Vector2(-2, 0)
             && muzzle.Position == new Vector2(0, -21),
             "62x42 armoured hull and 18x50 independent gun match the real barrel-tip marker");
-        Require(config.RangePixels == 275 && config.ShotsPerSecond == 3.5f
-            && config.BulletSpeedPixels == 850 && config.DamagePerBullet == 4
+        Require(config.RangePixels == 275 && config.ShotsPerSecond == 2.5f
+            && config.BulletSpeedPixels == 650 && config.DamagePerBullet == 5
             && config.RotationSpeedDegrees == 180 && config.BulletLifetimeSeconds == 2.8
             && !config.UseBursts && config.ProjectileVisual != null
-            && config.ProjectileVisual.Tapered && config.ProjectileVisual.LengthPixels == 11
-            && Mathf.IsEqualApprox(config.ProjectileVisual.CoreThicknessPixels, 2.2f)
+            && config.ProjectileVisual.Tapered && Mathf.IsEqualApprox(config.ProjectileVisual.LengthPixels, 14.6f)
+            && Mathf.IsEqualApprox(config.ProjectileVisual.CoreThicknessPixels, 2.9f)
             && config.ProjectileVisual.BodyColor.R > config.ProjectileVisual.BodyColor.G,
-            "Heavy Gunner has an independent 4-damage, 850px/s, broad red 11x2.2 shot preset");
+            "Heavy Gunner has independent 5-damage, 650px/s, broad red 14.6x2.9 shot presets");
         preview.Free();
 
         Enemy ship = f.Spawns.SpawnWave("heavy_gunner_drone_mk1", new RandomNumberGenerator { Seed = 42 });
@@ -182,9 +182,9 @@ public partial class GunnerDroneChecks : Node
         var shot = bullets.Snapshot(0);
         Require(shot.Position.IsEqualApprox(muzzle.GlobalPosition)
             && shot.Direction.IsEqualApprox(-muzzle.GlobalTransform.Y.Normalized())
-            && Mathf.IsEqualApprox(shot.Speed, 850f)
-            && shot.Visual.Tapered && shot.Visual.Length == 11
-            && Mathf.IsEqualApprox(shot.Visual.Width, 2.2f)
+            && Mathf.IsEqualApprox(shot.Speed, 650f)
+            && shot.Visual.Tapered && Mathf.IsEqualApprox(shot.Visual.Length, 14.6f)
+            && Mathf.IsEqualApprox(shot.Visual.Width, 2.9f)
             && shot.Visual.Body.R > shot.Visual.Body.G,
             "Heavy world-owned bullet starts at its muzzle, flies slower and keeps an enlarged red tracer");
         bullets.Advance(.15);
