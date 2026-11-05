@@ -81,6 +81,12 @@ public partial class EnemySpawnMenuChecks : Node
             EnemyDefinition definition = f.Spawns.Catalog.DefinitionFor(id);
             Require(definition != null && choice.GetItemText(index) == definition.DisplayName,
                 "Every selectable entry resolves to its registered ship");
+            // The Bulwark's 64×48 physical hull belongs to Standard, not the default Tiny class.
+            // The F2 dropdown and preview must reflect its single authored definition, not a separate list.
+            if (id == "medium_mk1")
+                Require(definition.Class == EnemyClass.Standard &&
+                    choice.GetItemTooltip(index).Contains("Class: Standard", StringComparison.Ordinal),
+                    "Bulwark Drone must resolve as Standard from its registered EnemyDefinition");
             Require((int)definition.Class >= previousClass, "F2 enemy classes sorted Tiny through Titan");
             if ((int)definition.Class != previousClass)
                 Require(index > 0 && choice.GetPopup().IsItemSeparator(index - 1) &&

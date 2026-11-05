@@ -1,3 +1,9 @@
+## Class metadata fix — 2026-11-05
+
+The actual `Enemy004.tres` now explicitly serializes **Standard (Class = 2), Common (Rank = 0), Fighter (Role = 0)**. Previously these properties were absent, making the 64×48 Bulwark appear under F2's Tiny heading because the shared `EnemyDefinition` defaults to Tiny. F2 already groups current catalog classes automatically; no debug-only correction or artwork-based runtime override was needed. This class metadata is descriptive and does not change hull HP, navigation size, movement, waves or combat. See [roster](../ROSTER.md).
+
+---
+
 ## Flat dark/red Bulwark artwork refresh — 2026-10-26
 
 The existing `Artwork/enemy004.svg` is now a **flat charcoal/black, red-accented** counterpart to Enemy001 and Enemy002. Its unique **64×48px broad tusked assault** silhouette remains medium/heavy rather than copying the small dart shapes: two reinforced outboard nacelles, sharp cleaving forward tusks, a bulky central hull, dark inset plates, twin rear drive ports and a narrow red core slit. No gradients, filters, runtime lights or glowing shader layers; the original SVG viewBox and right (+X) nose are preserved. The existing scene, `medium_mk1` ID, movement, hit radius, shields, combat and rewards are untouched. Earlier amber reactor/metallic-gradient artwork descriptions below are historical. Verify the sprite's appearance at normal gameplay zoom in Godot.

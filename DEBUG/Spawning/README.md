@@ -1,3 +1,9 @@
+## Bulwark classification correction — 2026-11-05
+
+Fixed `medium_mk1` (Bulwark Drone) missing its serialized `Class` value. Without the explicit `Class = 2` assignment in `ENEMIES/Types/Enemy004/Enemy004.tres`, Godot uses `EnemyDefinition.Class`'s `Tiny` default; F2 was faithfully displaying and grouping that wrong value. The 64×48px Bulwark is now authored as **Standard / Common / Fighter**, matching the source roster. **F2 remains catalog-driven**, reading the current `EnemyDefinition` from `EnemyCatalog` at menu initialization; no duplicated runtime class list or automatic art-size classifier was added. After pulling, restart/reload the game level to rebuild the F2 picker. A focused F2 check asserts the classification and tooltip. Godot runtime verification pending.
+
+---
+
 ## F2 Class-grouped enemy list — 2026-11-04 (source implemented)
 
 The F2 enemy picker now sorts ship definitions by **Class (Tiny → Titan)**, then alphabetically by `DisplayName`, and adds **non-selectable class headings** for occupied classes. Names remain short in the dropdown; Rank/Role/EnemyId and actual-size sprite still appear in the right-side preview and tooltip. The menu index has a matched scene/definition slot for every row including each heading (null marker), so hovering a heading does nothing and clicking or attempting to spawn a heading is rejected; no erroneous sprite or enemy is spawned. Each type's stable `EnemyId` resolves to its original registered scene. Batch behaviour, spawn cap, portals, shields, stealth and enemy stats are unchanged. `TESTS/Debug/EnemySpawnMenuChecks.cs` now checks class ordering, header mapping and preview/spawn correspondence without assuming menu index equals catalogue index. Godot.NET interactive verification pending.

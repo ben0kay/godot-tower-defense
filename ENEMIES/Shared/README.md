@@ -1,6 +1,6 @@
 ## Independent enemy classifications — 2026-11-04
 
-All 14 enemy definitions now explicitly author **Class, Rank and Role** under **Classification**. These replace Fleet Family as descriptive metadata only: stats, sprite size, speed, weapons/abilities, wave IDs and Mk progression are independent. Wave Editor sorts by Class with separate selected metadata; F2 retains catalog/scene/preview indices and displays full details. See [the canonical roster](../Types/ROSTER.md) for assignments, enum extension rules, source migration, external custom resource guidance and the existing checkpoint content-hash caveat. Source implemented; owner Godot validation pending.
+Registered enemies use **Class, Rank and Role** under **Classification**. Some older resources intentionally omit default-zero values; ensure nondefault classes are serialized. A missing Bulwark `Class` assignment was corrected in `Enemy004.tres` on 2026-11-05. These replace Fleet Family as descriptive metadata only: stats, sprite size, speed, weapons/abilities, wave IDs and Mk progression are independent. Wave Editor sorts by Class with separate selected metadata; F2 retains catalog/scene/preview indices and displays full details. See [the canonical roster](../Types/ROSTER.md) for assignments, enum extension rules, source migration, external custom resource guidance and the existing checkpoint content-hash caveat. Source implemented; owner Godot validation pending.
 
 ---
 
