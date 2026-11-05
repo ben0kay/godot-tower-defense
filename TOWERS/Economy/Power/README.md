@@ -1,3 +1,13 @@
+## PW4-C revised direction — nearest towers first during shortages (2026-11-05)
+
+**OWNER DECISION / PLANNED.** The existing PW4-A energy buffers and PW4-B distance-based charging remain intact. PW4-C will replace the provisional shared proportional shortage allocation with **distance-first allocation**: consumers physically closer by **shortest conducting-terrain path** to a living Citadel/generator receive their desired refill before farther consumers. If island production runs short, farther towers receive **partial refill or none at all**, and use their own stored battery until depleted. When production is sufficient, all reachable towers receive their PW4-B distance-capped rates and can eventually fill to 100%.
+
+**Do not make the stored 0–100 PowerPriority the primary allocator.** It is already a dormant save field, but the owner only *may later* add a mild Inspector preference bias (limited equivalent-distance shift, not unrestricted override) to slightly favour a specific tower during shortages. This is **not authorized in PW4-C**, and a nonfunctional slider should not be added in PW4-D. For same actual distance and insufficient energy, split the remaining refill proportionally within that equal-distance group. No consumer gets extra recharge beyond its distance ceiling, and credits never exceed the finite shared supply.
+
+**Authoritative Codex requirements:** [PW4-C allocation decision](IMPLEMENTATION_PLAN.md#pw4-c-allocation-decision--distance-first-not-priority-first-2026-11-05). Older statements below about priority-first allocation are superseded; PW4-C/remaining PW4-D/PW5 are not yet implemented.
+
+---
+
 ## PW4-B — conductive-distance recharge — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** The existing PowerGridManager now caps recharge by cached shortest **four-neighbour conductive distance** to a positive-output Citadel/generator footprint. Source footprints seed all valid cells at distance zero; a consumer receives at its nearest valid footprint cell. Both footprints must lie wholly on one island. Vacuum/Lava/diagonal gaps, unassigned footprints and zero-output sources cannot invent a route. Stored energy, capacity, spending and owned NoPower hysteresis are unchanged.
@@ -78,7 +88,7 @@ All three generator types use one common implementation and documented home unde
 - [Fusion Reactor](FusionReactor/README.md): very large, expensive endgame output.
 - [Power Relay](../../Utility/PowerRelay/README.md): manual inter-island link.
 - [Consumer capability](../../Shared/Power/README.md): optional baseline IdlePowerDraw/ActivePowerDraw in non-level tower type config, with research changing effective draw later.
-- **Power Priority:** each placed electricity consumer has an Inspector slider 0–100 (default 50). When output is insufficient, give full power to higher-priority buildings before lower ones (with stable tie ordering and brief anti-flicker protection). Production may stop to preserve defensive towers.
+- **Scarce-power allocation:** PW4-C will favour shortest conductive distance to an active source, then share any partial same-distance group proportionally; farther towers may get no refill. Optional future 0–100 per-tower priority is limited to a small bias if requested, not the main rule. The Inspector slider is not implemented.
 
 ## Implementation constraints
 Keep one authoritative manager; cache terrain-region IDs and a small relay graph, refresh connectivity only on actual terrain/link changes, and update generation/demand from building/state events or budgeted processing. Do not scan every tile, node or tower on every frame. No compulsory wires, batteries, power losses, fuel-delivery network or complexity beyond this first design.
