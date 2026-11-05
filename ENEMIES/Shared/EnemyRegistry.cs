@@ -8,6 +8,10 @@ public partial class EnemyRegistry : Node
     [ExportGroup("Spatial Queries")]
     [Export(PropertyHint.Range, "16,512,16")] public float SpatialCellSize { get; set; } = 128;
     private EnemySpatialIndex _spatial;
+    public WorldGrid TerrainGrid { get; private set; }
+    // =========================================================
+    // Cache the owning world once; isolated registry fixtures may deliberately have no terrain.
+    public override void _Ready() => TerrainGrid = GetNodeOrNull<WorldGrid>("../../Grid");
     public float ProjectileRadiusPadding { get; private set; }
     private EnemySpatialIndex Spatial => _spatial ??= new(SpatialCellSize);
     private readonly Stack<List<EnemySpatialIndex.Neighbor>> _queryBuffers = new();
@@ -73,7 +77,7 @@ public partial class EnemyRegistry : Node
 
     // =========================================================
     // World unload releases index history, membership and reusable query storage together.
-    public override void _ExitTree() { _living.Clear(); _members.Clear(); _queryBuffers.Clear(); _spatial = null; ProjectileRadiusPadding = 0; EnemyUnregistered = null; EnemyRegistered = null; EnemyPositionChanged = null; AttributedKill = null; }
+    public override void _ExitTree() { TerrainGrid = null; _living.Clear(); _members.Clear(); _queryBuffers.Clear(); _spatial = null; ProjectileRadiusPadding = 0; EnemyUnregistered = null; EnemyRegistered = null; EnemyPositionChanged = null; AttributedKill = null; }
 
     // =========================================================
     // Emit kill-only notifications after an enemy leaves the living registry.
@@ -86,3 +90,4 @@ public partial class EnemyRegistry : Node
         EnemyKilled?.Invoke(enemy);
     }
 }
+

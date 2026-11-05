@@ -7,6 +7,7 @@ public partial class MountainTerrainVisual : Node2D
     [Export] public MountainVisualConfig Config { get; set; }
     private WorldGrid _grid;
     private ArrayMesh _mesh, _shadow;
+    private ShaderMaterial _rockMaterial;
     private readonly HashSet<Vector2I> _cells = new();
     private readonly List<Vector2I> _ordered = new();
     private static readonly Vector2I[] Ring =
@@ -56,6 +57,7 @@ public partial class MountainTerrainVisual : Node2D
         var vertices = new List<Vector3>(_ordered.Count * 24);
         var shadows = new List<Vector3>(_ordered.Count * 24);
         var colors = new List<Color>(_ordered.Count * 24);
+        var uvs = new List<Vector2>(_ordered.Count * 24);
         foreach (Vector2I cell in _ordered)
         {
             Vector2I key = cell * 2 + Vector2I.One;
@@ -77,10 +79,14 @@ public partial class MountainTerrainVisual : Node2D
                     Vector2 shade = ToLocal(_grid.ToGlobal(basePoint + new Vector2(point.Z * 0.45f, point.Z * 0.25f)));
                     vertices.Add(new(raised.X, raised.Y, 0));
                     shadows.Add(new(shade.X, shade.Y, 0)); colors.Add(color);
+                    uvs.Add(basePoint / _grid.Config.CellSize);
                 }
             }
         }
-        _mesh = BuildMesh(vertices, colors);
+        _rockMaterial = new ShaderMaterial { Shader = GD.Load<Shader>("res://WORLD/TERRAIN/Mountains/MountainRock.gdshader") };
+        _rockMaterial.SetShaderParameter("detail_strength", Mathf.Clamp(Config.RockDetailStrength, 0, 0.35f));
+        Material = _rockMaterial;
+        _mesh = BuildMesh(vertices, colors, uvs);
         _shadow = BuildMesh(shadows, null);
         QueueRedraw();
     }
@@ -119,10 +125,11 @@ public partial class MountainTerrainVisual : Node2D
 
     // =========================================================
     // Two surfaces per world, independent of mountain count; native meshes retain draw data.
-    private static ArrayMesh BuildMesh(List<Vector3> vertices, List<Color> colors)
+    private static ArrayMesh BuildMesh(List<Vector3> vertices, List<Color> colors, List<Vector2> uvs = null)
     {
         var arrays = new Godot.Collections.Array(); arrays.Resize((int)Mesh.ArrayType.Max);
         arrays[(int)Mesh.ArrayType.Vertex] = vertices.ToArray();
+        if (uvs != null) arrays[(int)Mesh.ArrayType.TexUV] = uvs.ToArray();
         if (colors != null) arrays[(int)Mesh.ArrayType.Color] = colors.ToArray();
         var mesh = new ArrayMesh(); mesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, arrays);
         return mesh;
@@ -141,6 +148,7 @@ public partial class MountainTerrainVisual : Node2D
     private void ClearMeshes()
     {
         _mesh?.Dispose(); _shadow?.Dispose(); _mesh = null; _shadow = null;
+        Material = null; _rockMaterial?.Dispose(); _rockMaterial = null;
     }
     public override void _ExitTree()
     {
@@ -148,3 +156,4 @@ public partial class MountainTerrainVisual : Node2D
         ClearMeshes(); _grid = null;
     }
 }
+

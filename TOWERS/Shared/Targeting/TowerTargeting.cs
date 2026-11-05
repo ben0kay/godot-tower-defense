@@ -19,7 +19,7 @@ public static class TowerTargeting
         if (!Enum.IsDefined(preference)) throw new ArgumentOutOfRangeException(nameof(preference));
         if (!Enum.IsDefined(priority)) throw new ArgumentOutOfRangeException(nameof(priority));
         if (!float.IsFinite(range) || range < 0) throw new ArgumentOutOfRangeException(nameof(range));
-        TargetVisitor visitor = new() { Position = position, RangeSquared = range * range, Mode = priority,
+        TargetVisitor visitor = new() { Grid = registry.TerrainGrid, Position = position, RangeSquared = range * range, Mode = priority,
             Score = Largest(priority) ? float.NegativeInfinity : float.PositiveInfinity, Order = ulong.MaxValue, RequiredEffect = requiredEffect, PreferredGroup = preference, DetectsStealth = detectsStealth };
         // Preserve the old float-distance inclusive boundary; narrow scoring still uses its exact comparison.
         float queryRange = float.IsFinite(MathF.BitIncrement(range)) ? MathF.BitIncrement(range) : range;
@@ -33,6 +33,7 @@ public static class TowerTargeting
 
     private struct TargetVisitor : EnemySpatialIndex.INeighborVisitor
     {
+        public WorldGrid Grid;
         public Vector2 Position;
         public float RangeSquared, Score;
         public Priority Mode;
@@ -59,7 +60,11 @@ public static class TowerTargeting
             // Preferences rank eligible groups first; ordinary mode scoring/ties apply within each group.
             if (Best == null || (preferred && !BestPreferred) || (preferred == BestPreferred &&
                 ((Largest(Mode) ? candidate > Score : candidate < Score) || (candidate == Score && nearby.Order < Order))))
-            { Score = candidate; Best = nearby.Enemy; Order = nearby.Order; BestPreferred = preferred; }
+            {
+                // Only contenders pay for a line traversal; no allocations, raycast objects or full-map scans.
+                if (GodotObject.IsInstanceValid(Grid) && !Grid.HasTowerLineOfSight(Position, nearby.Position)) return;
+                Score = candidate; Best = nearby.Enemy; Order = nearby.Order; BestPreferred = preferred;
+            }
         }
     }
 
@@ -75,6 +80,9 @@ public static class TowerTargeting
     // Cached targets are checked cheaply between staggered searches.
     public static bool Valid(Enemy enemy, Vector2 position, float range, bool detectsStealth = false) =>
         TowerDetection.CanDetect(enemy, detectsStealth)
-        && position.DistanceSquaredTo(enemy.GlobalPosition) <= range * range;
+        && position.DistanceSquaredTo(enemy.GlobalPosition) <= range * range
+        && (!GodotObject.IsInstanceValid(enemy.Registry?.TerrainGrid)
+            || enemy.Registry.TerrainGrid.HasTowerLineOfSight(position, enemy.GlobalPosition));
     #endregion
 }
+

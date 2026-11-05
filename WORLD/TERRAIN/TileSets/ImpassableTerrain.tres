@@ -36,6 +36,7 @@ texture_region_size = Vector2i(64, 64)
 2:0/0/custom_data_1 = true
 2:0/0/custom_data_2 = true
 2:0/0/custom_data_3 = true
+2:0/0/custom_data_4 = true
 
 [resource]
 tile_size = Vector2i(64, 64)
@@ -47,7 +48,10 @@ custom_data_layer_2/name = "conducts_power"
 custom_data_layer_2/type = 1
 custom_data_layer_3/name = "mountain_visual"
 custom_data_layer_3/type = 1
+custom_data_layer_4/name = "blocks_tower_sight"
+custom_data_layer_4/type = 1
 sources/0 = SubResource("Atlas")
 sources/1 = SubResource("NewMetalWalls")
 sources/2 = SubResource("MarsRock")
+
 

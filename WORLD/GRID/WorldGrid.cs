@@ -42,7 +42,7 @@ public partial class WorldGrid : Node2D
     #region Terrain and Occupancy
     private readonly List<Vector2I> _approaches = new();
     private int _objectiveStamp;
-    private bool[] _buildable, _terrainBlocked, _occupied, _reserved, _painted, _conductsPower;
+    private bool[] _buildable, _terrainBlocked, _occupied, _reserved, _painted, _conductsPower, _towerSightBlocked;
     public int PowerTerrainRevision { get; private set; }
     internal ReadOnlySpan<bool> PowerConductivity => _conductsPower;
     public int NavigationRevision { get; private set; }
@@ -61,7 +61,7 @@ public partial class WorldGrid : Node2D
         int count = Config.WidthCells * Config.HeightCells;
         _buildable = new bool[count]; _terrainBlocked = new bool[count];
         _occupied = new bool[count]; _reserved = new bool[count]; _painted = new bool[count];
-        _conductsPower = new bool[count];
+        _conductsPower = new bool[count]; _towerSightBlocked = new bool[count];
         RebuildTerrain();
     }
 
@@ -71,7 +71,7 @@ public partial class WorldGrid : Node2D
     {
         bool[] previous = (bool[])_terrainBlocked.Clone();
         bool[] previousPower = (bool[])_conductsPower.Clone();
-        Array.Clear(_buildable); Array.Clear(_terrainBlocked); Array.Clear(_reserved); Array.Clear(_painted); Array.Clear(_conductsPower);
+        Array.Clear(_buildable); Array.Clear(_terrainBlocked); Array.Clear(_reserved); Array.Clear(_painted); Array.Clear(_conductsPower); Array.Clear(_towerSightBlocked); TowerSightBlockerCount = 0;
         ValidateTileSet(Level.Decorations, false);
         ReadLayer(Level.Passable, false);
         if (Level.Interactive != null) ReadLayer(Level.Interactive, null);
@@ -108,6 +108,9 @@ public partial class WorldGrid : Node2D
         int powerLayer = layer.TileSet.GetCustomDataLayerByName("conducts_power");
         if (powerLayer >= 0 && layer.TileSet.GetCustomDataLayerType(powerLayer) != Variant.Type.Bool)
             throw new InvalidOperationException($"{layer.GetPath()}: conducts_power metadata must be Boolean.");
+        int sightLayer = layer.TileSet.GetCustomDataLayerByName("blocks_tower_sight");
+        if (sightLayer >= 0 && layer.TileSet.GetCustomDataLayerType(sightLayer) != Variant.Type.Bool)
+            throw new InvalidOperationException($"{layer.GetPath()}: blocks_tower_sight metadata must be Boolean.");
         int mismatches = 0, overlaps = 0, invalidTiles = 0;
         foreach (Vector2I painted in layer.GetUsedCells())
         {
@@ -118,6 +121,9 @@ public partial class WorldGrid : Node2D
             int index = Index(cell);
             if (_painted[index] && expectedBlocked != null) overlaps++;
             _painted[index] = true;
+            bool sightBlocked = sightLayer >= 0 && tile.GetCustomData("blocks_tower_sight").AsBool();
+            if (_towerSightBlocked[index] != sightBlocked) TowerSightBlockerCount += sightBlocked ? 1 : -1;
+            _towerSightBlocked[index] = sightBlocked;
             // Legacy/custom palettes without this optional field treat painted gameplay terrain as land.
             // Reservations/occupancy never overwrite this independent terrain fact.
             _conductsPower[index] = powerLayer < 0 || tile.GetCustomData("conducts_power").AsBool();
@@ -294,3 +300,4 @@ public partial class WorldGrid : Node2D
     }
     #endregion
 }
+

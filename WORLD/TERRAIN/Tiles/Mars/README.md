@@ -1,6 +1,6 @@
 ## Mountain visual first pass — 2026-11-05
 
-Mars atlas now has a third 64px cell: **(2,0), source 2 in Impassable**. Paint it to generate connected raised mountain facets on battlefield load. Prototype, original tiles and existing maps are preserved. Movement/building are blocked; tower sight blocking is future work. [Configuration and preview instructions](../../Mountains/README.md). Historical two-cell descriptions below refer to the original rollout.
+Mars atlas now has a third 64px cell: **(2,0), source 2 in Impassable**. Paint it to generate connected raised mountain facets on battlefield load. Prototype, original tiles and existing maps are preserved. Movement/building and aimed tower sight are blocked. Peaks now have subtly increased height and static mineral/strata detail. [Configuration and preview instructions](../../Mountains/README.md). Historical two-cell descriptions below refer to the original rollout.
 
 ---
 
@@ -40,4 +40,5 @@ These are two initial hand-authored tiles, not automatic terrain transitions or 
 ## Edge styling (planned, not enabled)
 
 The optional profile resources `../../Edges/Profiles/MarsDustEdge.tres` and `MarsRockEdge.tres` declare visual materials for later organic transitions. `../../Edges/DefaultTerrainEdgeConfig.tres` stays disabled and no scene uses the renderer yet. The known dust/rock SVG overflow and visible tiling bands are **not fixed by the scaffold**: see [Edges/IMPLEMENTATION_PLAN.md](../../Edges/IMPLEMENTATION_PLAN.md), E1 then E2. Gameplay flags and existing painted coordinates remain authoritative.
+
 

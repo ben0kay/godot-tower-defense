@@ -1,3 +1,9 @@
+## Mountain sight blocking — 2026-11-05
+
+Shared acquisition and cached-lock checks now honor explicit WorldGrid `blocks_tower_sight` metadata. Only mountain marker (Mars source 2, cell 2,0) initially opts in. Candidate scoring/priority/stealth/status enums and spatial broadphase remain unchanged. Only a potentially winning candidate pays for allocation-free segment traversal; cached locks recheck moving targets every existing weapon tick. No-blocker maps return immediately. This affects all aimed hostile tower paths; already-emitted projectiles, splash, untargeted Shockwave, repair/support and enemy weapons are unchanged. [Terrain rules and limitations](../../../WORLD/TERRAIN/Mountains/README.md). Optional `TESTS/Terrain/MountainSightChecks.tscn` is authored but not run here.
+
+---
+
 ## RT0 — friendly-tower selection (2026-11-05)
 
 **Source Implemented / Awaiting Owner Validation.** `TargetDomain` is optional vocabulary (`HostileEnemy = 0`, `FriendlyTower = 1`), not a replacement for existing typed backends or enums. `TowerTargeting`, `ITowerTargetingPolicy`, hostile targeting, stealth/shield preferences and all six serialized enemy priorities are unchanged.
@@ -68,3 +74,4 @@ Stasis passes RequiredEffect=Freeze to the existing eligibility hook. Already-fr
 ## MC2 cross-Citadel journeys
 
 The selector itself is unchanged. Enemy.RemainingJourneyDistance now reflects its fixed assigned Citadel, including destination-keyed checkpoint tails. First/Last remain global physical remaining-distance comparisons, not preferred-objective selection; shield preference and Slow/Freeze eligibility still precede ordinary mode scoring. Retired destination estimates cannot win First/Last.
+

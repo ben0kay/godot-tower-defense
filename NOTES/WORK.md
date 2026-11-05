@@ -1,3 +1,9 @@
+## Mountain refinement and tower sight — 2026-11-05
+
+**Source Implemented / Awaiting Owner Validation.** Increased default peak height from 1.1 to 1.22 cells and added configurable static mineral/strata shading on existing meshes. New independent blocks_tower_sight TileData opts only Mars mountain (source 2, cell 2,0) into cached WorldGrid obstruction. Shared hostile acquisition checks potential winners; cached locks recheck sight on existing weapon ticks, including Laser shutdown. Allocation-free supercover traversal, no-blocker fast path, no scene searches per candidate, no extra processing loop or per-cell nodes. Occupancy, other terrain, target priority enums, existing projectiles/splash/untargeted effects and save format are unchanged. Narrow optional MountainSightChecks fixture authored, not run. Source/resource checks only; Godot/.NET/shader/gameplay review pending. See [mountain guide](../WORLD/TERRAIN/Mountains/README.md).
+
+---
+
 ## Mountain terrain visual first pass — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** Mars atlas expands to 192×64, preserving dust/rock coordinates and adding mountain marker (2,0) to Impassable source 2. Existing navigation/placement flags block movement/building. World-scoped metadata-driven renderer generates shared-vertex faceted ridges and shadows once on load/explicit terrain rebuild, with stable seed and configurable height/colors. No per-cell nodes, processing loops or occupancy invalidation. Prototype atlas and painted maps remain unchanged. Tower line-of-sight and depth-aware object sorting remain future work. Paint a 3×2 block and launch through Campaign/Main to preview. Source/resource review only; Godot/.NET and visual validation pending. See [mountain guide](../WORLD/TERRAIN/Mountains/README.md).
