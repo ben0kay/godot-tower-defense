@@ -1,3 +1,11 @@
+## Revised PW4/PW5 plan — distance charging and internal reserves (2026-11-04)
+
+**Planning only; PW1–PW3 implementation remains unchanged.** Towers will hold individual **energy buffers**, recharged by their shared island supply at a rate diminished by **four-neighbour conductive distance** to active generators/Citadels. Faraway towers may still eventually charge completely while idle; in combat they can drain faster than distant recharge. Current buffer remains after source death, with NoPower only after depletion/low threshold. Finite shared producer output and 0–100 refill priorities prevent energy creation. The selected Inspector bar will show **stored charge / capacity**, with recharge, drain, efficiency and priority, styled like Heat and Ammo.
+
+PW4 is broken into **PW4-A buffer/use**, **PW4-B cached distance efficiency**, **PW4-C actual source-budget allocation/priorities**, **PW4-D Inspector UI**. Later **PW5 relays** boost nearby recharge distribution without generating energy, and retain optional manual cross-island pairs. **[IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) is authoritative**; earlier comments below about universal island efficiency, no batteries, immediate outage or relays without distribution effects are superseded, not current requirements.
+
+---
+
 ## PW3 Industrial Generator — 2026-11-04
 
 Industrial is now an Economy build choice using shared generator code: **250 provisional power / 300 Credits / 5 seconds / 1200 HP / 2×2 cells**. It registers only after construction and while it can operate, and withdraws output on disable/death/removal. Existing construction, selection and checkpoint systems are reused. See [Industrial guide](IndustrialGenerator/README.md). Source/resource checks only; Godot validation pending. **Next PW4:** consumers, priority/shortages and the selected-tower power bar matching heat/ammo. Existing older not-implemented notes below describe prior phases.
