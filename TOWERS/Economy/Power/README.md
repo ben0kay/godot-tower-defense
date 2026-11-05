@@ -1,3 +1,9 @@
+## PW4-C updated direction — distance-first shortage allocation (2026-11-05)
+
+**Planning only.** Under finite island power, towers with shorter conducting-terrain paths to Citadel/generator sources receive their requested capacitor refill **before farther towers**. PW4-B already slows recharge with distance; PW4-C will additionally allow distant towers to get **zero actual refill** in a shortage while nearer capacitors take available output. As nearby batteries fill, power reaches farther structures. Stored energy is never wiped by lack of incoming power. The existing 0–100 PowerPriority saved value stays unused; a possible **later** slider can add a small bounded bias rather than override distance. PW4-D should show actual recharge separately from its distance-limited maximum. [The updated PW4-C plan](IMPLEMENTATION_PLAN.md) supersedes older priority-first notes below.
+
+---
+
 ## PW4-B — conductive-distance recharge — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** The existing PowerGridManager now caps recharge by cached shortest **four-neighbour conductive distance** to a positive-output Citadel/generator footprint. Source footprints seed all valid cells at distance zero; a consumer receives at its nearest valid footprint cell. Both footprints must lie wholly on one island. Vacuum/Lava/diagonal gaps, unassigned footprints and zero-output sources cannot invent a route. Stored energy, capacity, spending and owned NoPower hysteresis are unchanged.

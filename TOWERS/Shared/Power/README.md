@@ -1,3 +1,11 @@
+## PW4-C decision — proximity governs scarce electricity (2026-11-05)
+
+**PW4-C planned / not yet implemented.** A capacitor's maximum refill is already reduced by PW4-B conductive distance. When aggregate demand exceeds actual producer output, PW4-C will allocate the finite supply **nearer first**, using the shared cached conductive-path distance and a stable tie-break. A reachable distant tower may get zero while nearer eligible batteries charge; once nearby buffers fill, remaining power reaches farther towers. Any already-stored energy remains usable and NoPower still depends on depletion/recovery, not instantaneous allocation. Keep PW4-C inside the existing shared manager, not new per-tower processing.
+
+The saved `PowerPriority` value (default 50) remains **inactive**. A future player slider may provide only a **small bounded preference** if later approved, not a hard override. PW4-D should show *actual received* versus *potential distance-capped recharge* without pretending a priority slider already changes supply. [Authoritative design](../../Economy/Power/IMPLEMENTATION_PLAN.md). Earlier priority-first / slider requirements below are historical.
+
+---
+
 ## PW4-B consumer delivery update — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** Capacitor consumers expose cached `ConductiveDistanceCells`, `DeliveryEfficiency` and `RechargeCeilingPerSecond`. PrepareRefill now uses nominal recharge × distance efficiency × eligible elapsed time, capped by capacity headroom and the existing finite shared island allocation. Distance never reduces capacity or attack damage/cadence, increases drain, or erases stored energy. NoPower continues to derive only from energy sufficiency/restart hysteresis, so outage/isolation does not immediately disable a charged tower.
