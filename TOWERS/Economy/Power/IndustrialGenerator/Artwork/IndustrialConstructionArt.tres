@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="TowerConstructionArt" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="art"]
+[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="stage"]
+[ext_resource type="Texture2D" path="res://TOWERS/Economy/Power/IndustrialGenerator/Artwork/stage0_foundation.svg" id="s0"]
+[ext_resource type="Texture2D" path="res://TOWERS/Economy/Power/IndustrialGenerator/Artwork/stage1_frame.svg" id="s1"]
+[ext_resource type="Texture2D" path="res://TOWERS/Economy/Power/IndustrialGenerator/Artwork/stage2_assembly.svg" id="s2"]
+
+[sub_resource type="Resource" id="Foundation"]
+script = ExtResource("stage")
+Texture = ExtResource("s0")
+
+[sub_resource type="Resource" id="Frame"]
+script = ExtResource("stage")
+Progress = 0.35
+Texture = ExtResource("s1")
+
+[sub_resource type="Resource" id="Assembly"]
+script = ExtResource("stage")
+Progress = 0.7
+Texture = ExtResource("s2")
+
+[resource]
+script = ExtResource("art")
+BuildStages = Array[ExtResource("stage")]([SubResource("Foundation"), SubResource("Frame"), SubResource("Assembly")])

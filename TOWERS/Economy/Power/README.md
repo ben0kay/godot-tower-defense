@@ -1,3 +1,9 @@
+## PW3 Industrial Generator — 2026-11-04
+
+Industrial is now an Economy build choice using shared generator code: **250 provisional power / 300 Credits / 5 seconds / 1200 HP / 2×2 cells**. It registers only after construction and while it can operate, and withdraws output on disable/death/removal. Existing construction, selection and checkpoint systems are reused. See [Industrial guide](IndustrialGenerator/README.md). Source/resource checks only; Godot validation pending. **Next PW4:** consumers, priority/shortages and the selected-tower power bar matching heat/ammo. Existing older not-implemented notes below describe prior phases.
+
+---
+
 ## PW2 accounting and Citadel generation — 2026-11-04
 
 Citadel baseline output is now source implemented (**100 provisional power**, editable in `WORLD/OBJECTIVES/Citadel/DefaultCitadelPower.tres`). Shared per-island accounting tracks supply, requested demand, margin and unassigned registrations; F4 displays these totals. It is event-driven and adds no frame/physics callback. No tower draw, outages, generators or relays yet. See [current shared implementation](Shared/README.md) and [updated phases](IMPLEMENTATION_PLAN.md). Owner build/runtime review pending; PW3 Industrial Generator is next.

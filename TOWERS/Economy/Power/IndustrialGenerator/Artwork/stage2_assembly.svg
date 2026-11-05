@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="112" height="112" viewBox="0 0 112 112">
+<defs><linearGradient id="metal" x2="0" y2="1"><stop stop-color="#6e8794"/><stop offset="1" stop-color="#263d4b"/></linearGradient><linearGradient id="copper" x2="0" y2="1"><stop stop-color="#ffca79"/><stop offset="1" stop-color="#a95128"/></linearGradient></defs>
+<path d="M15 5H97L107 15V97L97 107H15L5 97V15Z" fill="#0a1720" stroke="#b0c6cc" stroke-width="2"/>
+<path d="M17 10H95L102 17V95L95 102H17L10 95V17Z" fill="#243c48" stroke="#4e6978" stroke-width="2"/>
+<path d="M16 16H96V96H16Z" fill="#182b36" stroke="#66818c"/>
+<circle cx="13" cy="13" r="3" fill="#9db0b6" stroke="#091720"/><path d="M11 13h4" stroke="#30424b"/>
+<circle cx="13" cy="99" r="3" fill="#9db0b6" stroke="#091720"/><path d="M11 99h4" stroke="#30424b"/>
+<circle cx="99" cy="13" r="3" fill="#9db0b6" stroke="#091720"/><path d="M97 13h4" stroke="#30424b"/>
+<circle cx="99" cy="99" r="3" fill="#9db0b6" stroke="#091720"/><path d="M97 99h4" stroke="#30424b"/>
+<path d="M30 17H82L91 28V84L82 95H30L21 84V28Z" fill="url(#metal)" stroke="#b3c9cf" stroke-width="2"/>
+<path d="M36 23H76L83 33V79L76 89H36L29 79V33Z" fill="#0c202b" stroke="#5f889b" stroke-width="2"/>
+<path d="M36 17V30M76 17V30M36 82V95M76 82V95" stroke="#d8a15c" stroke-width="5"/>
+<rect x="13" y="32" width="12" height="48" rx="2" fill="#101f2a" stroke="#91a9b6"/>
+<path d="M15 37h8" stroke="#5e9bad" stroke-width="3"/>
+<path d="M15 44h8" stroke="#5e9bad" stroke-width="3"/>
+<path d="M15 51h8" stroke="#5e9bad" stroke-width="3"/>
+<path d="M15 58h8" stroke="#5e9bad" stroke-width="3"/>
+<path d="M15 65h8" stroke="#5e9bad" stroke-width="3"/>
+<path d="M15 72h8" stroke="#5e9bad" stroke-width="3"/>
+<rect x="87" y="32" width="12" height="48" rx="2" fill="#101f2a" stroke="#91a9b6"/>
+<path d="M89 37h8" stroke="#5e9bad" stroke-width="3"/>
+<path d="M89 44h8" stroke="#5e9bad" stroke-width="3"/>
+<path d="M89 51h8" stroke="#5e9bad" stroke-width="3"/>
+<path d="M89 58h8" stroke="#5e9bad" stroke-width="3"/>
+<path d="M89 65h8" stroke="#5e9bad" stroke-width="3"/>
+<path d="M89 72h8" stroke="#5e9bad" stroke-width="3"/>
+<circle cx="56" cy="56" r="20" fill="#283b44" stroke="#aa8157" stroke-width="3"/><path d="M8 23H104M8 89H104M23 8V104M89 8V104" stroke="#d9a951" stroke-width="2" fill="none"/>
+<path d="M8 23L23 8M89 8L104 23M8 89L23 104M89 104L104 89" stroke="#8398a4" stroke-width="2"/>
+</svg>

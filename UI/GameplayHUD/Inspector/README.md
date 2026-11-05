@@ -1,3 +1,9 @@
+## Planned power bar — PW4 (2026-11-04)
+
+Add the selected tower's power bar alongside the current **heat and ammunition** displays when power consumers are implemented. Use supplied/current-required power plus explicit powered/shortage text and colours, with a nearby per-instance Power Priority 0–100 control. Full/empty allocation is intentional for the initial all-or-nothing supply policy; zero demand gets a neutral no-draw state and nonconsumers hide the bar. Reuse the selected-only event/coalesced refresh pattern. No new polling, stat resolution or power allocation belongs in Inspector code. PW3 generator selection currently reports generation/island through existing runtime details; the consumer bar remains unimplemented. See [consumer notes](../../../TOWERS/Shared/Power/README.md).
+
+---
+
 ## Compact bottom-docked tray and Inspector — 2026-10-19 (code change; runtime verification pending)
 
 The bottom HUD panels now share the **true bottom edge of the gameplay viewport** (0 px exterior bottom offset; side margins remain). Their Inspector-configurable nominal sizes are **224 px build tray** (previously 260) and **252 px Inspector** (previously 330), with unchanged Inspector **560 px** width and unchanged tray/Inspector horizontal division. This trims empty space and exposes more terrain. The Inspector is still a non-scrolling `PanelContainer`: **its natural content minimum may expand it upward for unusually dense upgrade/rank/heat/construction text**, rather than clipping buttons. The left build tray remains an independent fixed-height scroll browser aligned to the same bottom edge.

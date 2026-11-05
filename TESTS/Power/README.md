@@ -1,3 +1,11 @@
+## PW3 generator checks — 2026-11-04
+
+`PowerGeneratorChecks.tscn` is an optional small fixture using production placement/work/checkpoint seams. It covers the 300-Credit purchase, unfinished zero output, completion to 250, center-based 2×2 membership, removal, shared EMP/recovery, private config output, lethal damage and unfinished/completed restore without repurchase/duplicate generation. It does not write profile saves or run stress simulations. **Authored but not executed here**: Godot/.NET is unavailable. Only focused source/resource checks were performed; no broad suite or benchmark.
+
+Owner: rebuild C#, place Industrial from Economy, inspect 0/35/70% artwork/work, and watch F4 local supply increase only on completion. A normal grounded 100-power Citadel plus one complete Industrial on the same island totals 350; an isolated Industrial supplies only its own island. Inspect selected runtime generation text. Check a fresh Save/Load/Continue with unfinished and completed generators. The selected consumer power bar is PW4 work and is not expected yet.
+
+---
+
 ## PW2 additions — 2026-11-04
 
 Focused source checks were extended for stable-ID producer updates without duplicates, requested demand, per-island split/remapping, unassigned supply, idempotent removals and invalid amounts. CitadelPowerConfig emits one Changed signal per actual output change. No fixture/build/runtime tests were executed here (Godot/.NET unavailable), and no benchmark or broad regression run was attempted.

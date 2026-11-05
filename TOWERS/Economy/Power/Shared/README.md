@@ -1,3 +1,11 @@
+## PW3 — buildable Industrial Generator (2026-11-04)
+
+**Source implemented / owner Godot validation pending.** `PowerGenerator.cs` / `PowerGeneratorConfig.cs` provide one passive producer implementation for generator definitions. Industrial is registered in the Economy catalog with 250 provisional output, 300 Credits, 5s work, 1200 HP and a 2×2 footprint. No paid upgrades or fuel. Source lifetime follows work, shared disabling, hull/config/spatial and terrain events; no generator processing callback. Existing tower SaveId/work/health/disable restoration reconstructs output without a schema addition. See [Industrial guide](../IndustrialGenerator/README.md).
+
+The selected generator shows current/configured generation and island in existing runtime details. The selected-tower **power bar beside heat/ammo, supplied/required text and Power Priority slider** remain PW4 work with real consumers. No consumption or shortage enforcement was enabled by PW3. The earlier PW2-only statements below are historical and superseded for generator availability.
+
+---
+
 ## PW2 — Citadel starter power and island accounting (2026-11-04)
 
 **Source Implemented / Awaiting Owner Validation.** Each initialized living Citadel now registers a producer on its conducting island. `WORLD/OBJECTIVES/Citadel/DefaultCitadelPower.tres → Output` defaults to **100 provisional power**; the shared Battlefield's CitadelSession exports the resource under **Citadel Starter Power**. This is a capacity/rate budget, not a battery that accumulates over time. Output remains available between waves and is removed on death or objective removal. Multiple Citadels use distinct stable objective IDs.

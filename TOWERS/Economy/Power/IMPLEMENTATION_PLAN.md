@@ -1,3 +1,9 @@
+## PW3 implementation update — 2026-11-04
+
+Industrial Generator is now registered as an Economy placeable, backed by shared PowerGenerator/PowerGeneratorConfig, static finished/0/35/70% construction SVGs and existing work/disable/save seams. Provisional authored values: 250 output, 300 Credits, 5 seconds, 1200 HP, 2×2. No consumer gating, fuel or paid upgrades. Runtime details show current output/island. The requested selected-tower **power bar styled like heat/ammo** is part of PW4: supplied/required power, full/empty allocation state, normal/shortage colours, neutral zero-demand handling and a nearby 0–100 priority slider, refreshed on events only. Source implemented; owner Godot build/play review pending.
+
+---
+
 ## PW2 implementation update — 2026-11-04
 
 `PowerGridManager.Accounting.cs` adds shared registration and cached per-island totals. `CitadelSession.Power.cs` owns source lifetime/config subscriptions after health initialization; `CitadelPowerConfig`/`DefaultCitadelPower.tres` supply a configurable provisional Output=100. F4 reads global diagnostic sums and local totals. Sources persist as derived registrations, not a saved energy balance. No frame callbacks or power gating. See [shared guide](Shared/README.md) for exact API, lifecycle and validation limits. The PW0 audit below remains design context; PW1-only statements describe that original phase, not a reason to reimplement it.
@@ -105,7 +111,7 @@ future relay changes rebuild only network unions, not terrain islands. Never sca
 | **PW0** | This audit, terrain/membership decisions, folder ownership and staged contracts | Complete; remaining balancing/UI decisions above are explicitly deferred. |
 | **PW1** | `Shared/PowerIslandMap.cs`, `PowerGridManager.cs`, WorldGrid conductivity, appended palette metadata, shared scene attachment and F4 diagnostics | Source implemented; check separated/diagonal land, bridges, erasure, Foundation/Lava/wall precedence, unchanged rebuilds, occupancy and level teardown. No generation or shutdown. |
 | **PW2** | Shared producer/demand accounting + configurable Citadel baseline registration | Source implemented / owner validation pending. DefaultCitadelPower.tres Output=100 provisional; event-driven source lifetime, per-island cached totals and F4 accounting. No actual consumers/outages yet. Check multiple Citadels, isolation, death/removal and a new Save/Load. |
-| **PW3** | Shared generator/config in `Shared/`, Industrial scene/config/art in its type folder | Planned. Add one catalog build choice; verify work lifecycle, destruction and save restoration without free stock/power registration duplicates. |
+| **PW3** | Shared generator/config in `Shared/`, Industrial scene/config/art in its type folder | Source implemented / owner validation pending. `industrial_generator` in Economy, provisional 250 output / 300 Credits / 5s / 1200 HP / 2×2, assembly stages, work/disable/lifetime registration and existing checkpoint reconstruction. |
 | **PW4** | Consumer capability in `TOWERS/Shared/Power/`, selected Inspector, shared NoPower gate | Planned. Approve demand transitions/balance first; test priorities, deterministic ties, anti-flicker, EMP/heat overlap, production and save/load. |
 | **PW5** | `TOWERS/Utility/PowerRelay/`, manual peer selection, small network graph | Planned. One peer per relay initially; joins/splits/alternate links, invalid targets, removal and durable peer IDs. Range/UI choices remain open. |
 | **PW6** | Solar/Fusion variants, shared status feedback and tuning | Planned. Distinct IDs/configs, one producer implementation; readable capacity/shortage feedback and measured desktop cost. |

@@ -1,3 +1,9 @@
+## Selected-tower power bar requirement — PW4 (2026-11-04)
+
+The owner requests a **power bar in the selected-tower Inspector**, visually consistent with existing heat and ammo bars. Show supplied versus current required power, readable `POWER 20 / 20` / `NO POWER 0 / 20` text, normal versus shortage colours, and a nearby Power Priority slider (0–100, default 50). Initial allocation is full on/off, so the consumer bar is full/empty; zero requirement needs a neutral no-draw state rather than dividing by zero. Hide it for buildings without the consumer capability. Update only on selection/power/activity changes, not an extra frame loop. Producer output is distinct from consumption; PW3 generators already describe generation in their runtime details. Implement this with PW4 consumers/allocation, not in the generator-only phase.
+
+---
+
 ## PW0 audit / PW1 boundary — 2026-11-04
 
 Terrain island detection is source implemented in [Economy Power](../../Economy/Power/IMPLEMENTATION_PLAN.md). Consumer code here remains planned for PW4. Reuse the existing TowerDisableReason.NoPower and owned ApplyDisable/RemoveDisable handles; do not create a second disable mechanism. Demand activity, generator accounting and consumer registration are later work; all current towers remain operational. Save priorities as durable input and rebuild derived NoPower allocation before resume. Full phase contracts and outstanding demand decisions are in the power plan.

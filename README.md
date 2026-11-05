@@ -1,3 +1,9 @@
+## Power PW3 — buildable Industrial Generator — 2026-11-04
+
+Economy now offers Industrial Generator: provisional **250 power, 300 Credits, 5s construction, 1200 HP, 2×2**. Shared generator code uses existing construction/art, disable, selection and checkpoint lifecycle without a frame-processing loop. No consumers/outages yet. The selected-tower power bar matching heat/ammo is recorded for PW4. See [Industrial guide](TOWERS/Economy/Power/IndustrialGenerator/README.md). Source checks only; owner Godot validation pending.
+
+---
+
 ## Power PW2 — Citadel starter generation and accounting — 2026-11-04
 
 Citadels now contribute configurable starter power (100 provisional) to their own islands. Shared event-driven accounting and F4 show supply/requested demand without disabling towers; no consumers or generators are added yet. Edit `WORLD/OBJECTIVES/Citadel/DefaultCitadelPower.tres`. See [power details](TOWERS/Economy/Power/Shared/README.md). Source/resource review only; Godot/.NET build/runtime validation pending.

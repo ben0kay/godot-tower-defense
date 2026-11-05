@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PowerGeneratorConfig" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://TOWERS/Economy/Power/Shared/PowerGeneratorConfig.cs" id="1"]
+[ext_resource type="Resource" path="res://TOWERS/Economy/Power/IndustrialGenerator/Artwork/IndustrialConstructionArt.tres" id="construction"]
+
+[resource]
+script = ExtResource("1")
+DisplayName = "Industrial Generator"
+Description = "Reliable additional island power once construction is complete and the generator is operational."
+Output = 250.0
+ConstructionCredits = 300
+ConstructionSeconds = 5.0
+MaxHealth = 1200.0
+ConstructionArt = ExtResource("construction")
