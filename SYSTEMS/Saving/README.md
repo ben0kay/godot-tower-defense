@@ -66,3 +66,7 @@ known durable tower/Citadel identities; an unknown sustained source rejects savi
 - `CampaignStore.cs`: atomic storage; `CampaignSession.cs`: capture, compatibility and scene preparation.
 - Feature-local `*.Saving.cs` plus narrow owner methods keep restoration with existing gameplay owners.
 - [Implementation plan/audit](IMPLEMENTATION_PLAN.md); [focused checks/local smoke steps](../../TESTS/Saving/README.md).
+
+## PW4-A capacitor checkpoints — 2026-11-05
+
+Optional `TowerSaveData.Power` stores energy, 0–100 priority, recovery latch/minimum and prepaid active remainder. Authored capacity/rates, island labels and refill allocations are not saved. Capture settles the shared power interval; restore reconstructs the owned NoPower handle before unpause, preserving unrelated disables (including external NoPower). Missing old power data restores empty; it never reapplies a configured free initial fill. The new field is optional only for reading pre-capacitor v2 data; fields within a present power snapshot remain required and validated. The existing content fingerprint can still reject earlier checkpoints; no compatibility bypass or envelope bump. Godot .NET save/load validation remains for owner.

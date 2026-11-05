@@ -3,6 +3,7 @@ using Godot;
 
 public partial class BattleTower : TowerBase
 {
+    public override bool SupportsPowerCapacitor => true;
     public const string GunSpritePath = "TurretPivot/RecoilRoot/Sprite";
     public const string MuzzlePath = "TurretPivot/RecoilRoot/Muzzles/MuzzleA";
     public const string ConstructionSpritePath = "TurretPivot/ConstructionSprite";
@@ -99,7 +100,7 @@ public partial class BattleTower : TowerBase
         bool aligned = TurretAiming.Track(_turret, _target.GlobalPosition, FinalStats.RotationSpeedDegrees,
             FinalStats.AimToleranceDegrees, Config.RotateWhileTracking, delta);
         if (!aligned || _shotTimer > 0f || FinalStats.ShotsPerSecond <= 0f) return;
-        if (Ammunition?.TryFire() == false) return;
+        if (!TryFundProjectileAttack(1.0 / FinalStats.ShotsPerSecond)) return;
         BasicProjectile bullet = new();
         bullet.Initialize(_target, FinalStats.ProjectileSpeed,
             new DamageInfo(FinalStats.DamagePerShot, DamageType.Kinetic, shieldPenetration: FinalStats.ShieldPenetration, source: DamageSource), visual: Config.ProjectileVisual, handling: FinalStats.Handling, shieldRicochet: Config.ShieldRicochet,
@@ -109,7 +110,7 @@ public partial class BattleTower : TowerBase
         if (!string.IsNullOrWhiteSpace(Config.FireSoundId)) _audio?.PlayFrom(Config.FireSoundId, this);
         _recoil.Kick(); // Snapshot the real barrel-tip launch and flash before starting visual motion.
         _shotTimer = Mathf.Max(0, 1f / FinalStats.ShotsPerSecond + _shotTimer);
-        RecordAttackHeat();
+        RecordAttackHeat(); CompletePowerAttack();
     }
     #endregion
 

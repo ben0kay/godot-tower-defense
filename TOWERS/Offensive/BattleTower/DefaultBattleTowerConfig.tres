@@ -6,8 +6,11 @@
 [ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/Visuals/BattleTracerStyle.tres" id="pv_tracer"]
 [ext_resource type="Resource" uid="uid://bkiqcbyqtnexc" path="res://TOWERS/Offensive/BattleTower/Visuals/BattleRecoilStyle.tres" id="recoil"]
 
+[ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/BattlePower.tres" id="power"]
+
 [resource]
 script = ExtResource("1")
+Power = ExtResource("power")
 HeatEnabled = true
 FireSoundId = "tower_battle_fire"
 HullHitSparkCount = 4

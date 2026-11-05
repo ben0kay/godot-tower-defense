@@ -7,11 +7,12 @@ public partial class TowerConditions
 {
     // =========================================================
     // Unknown sustained sources cannot be silently dropped. Timed detached sources retain a distinct durable key.
-    internal List<DisableSaveData> CaptureCheckpoint(Func<ulong, string> sourceKey)
+    internal List<DisableSaveData> CaptureCheckpoint(Func<ulong, string> sourceKey, TowerDisableHandle omitted = default)
     {
         var saved = new List<DisableSaveData>();
         foreach (var entry in _entries)
         {
+            if (omitted.TowerId == _owner.GetInstanceId() && omitted.Token == entry.Token) continue;
             string key = entry.Source == 0 ? "" : sourceKey(entry.Source);
             if (key == null && !entry.Remaining.HasValue) throw new InvalidOperationException("A sustained disable source cannot be saved.");
             saved.Add(new(entry.Reason, entry.Remaining, key ?? "detached:" + entry.Source));

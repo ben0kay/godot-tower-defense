@@ -48,6 +48,11 @@ public static class SaveValidation
             if (tower.Tier < 1 || !float.IsFinite(tower.Health) || tower.Health <= 0 || (tower.Priority.HasValue && !Enum.IsDefined(tower.Priority.Value)) ||
                 !Enum.IsDefined(tower.Work.Phase) || Math.Abs((long)tower.X) > 1000000 || Math.Abs((long)tower.Y) > 1000000)
                 throw new InvalidDataException("Invalid tower checkpoint.");
+            if (tower.Power is PowerSaveData power)
+            {
+                Number(power.Energy); Number(power.RestartEnergy); Number(power.ActiveSecondsRemaining);
+                if (power.Priority < 0 || power.Priority > 100) throw new InvalidDataException("Invalid saved power priority.");
+            }
             Number(tower.XP); Number(tower.Heat); Number(tower.Work.ElapsedSeconds); Number(tower.Work.TotalSeconds);
             if (tower.Work.ElapsedSeconds > tower.Work.TotalSeconds ||
                 (tower.Work.Phase != TowerWorkPhase.Operational && tower.Work.ElapsedSeconds >= tower.Work.TotalSeconds) ||

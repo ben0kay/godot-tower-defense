@@ -1,35 +1,26 @@
-## PW4 revised consumer contract — capacitor + distance-based refill (2026-11-04)
+# Tower capacitors — PW4-A
 
-**PLANNED, NOT IMPLEMENTED.** The owner replaced immediate full/on-off power allocation with a **per-tower rechargeable energy buffer**. See the [authoritative PW4-A–D plan](../../Economy/Power/IMPLEMENTATION_PLAN.md). Each opted-in building will have Inspector-editable **Capacity**, **CurrentEnergy**, **RechargeRatePerSecond**, **IdleDrawPerSecond**, **ActiveDrawPerSecond** and per-instance **PowerPriority**. Stored charge can gradually reach 100% even far from a generator, provided positive net idle charging; distance limits **recharge rate only**, not storage capacity or the tower's weapon damage. Combat expenditure can outrun weak refill, eventually causing NoPower until some energy recharges. Generator death does not erase stored charge.
+**Source Implemented / Awaiting Owner Validation · 2026-11-05.** Optional `TowerConfig.Power` is a private per-instance copy of `TowerPowerConfig`. Only Battle Tower currently supports funded attacks and its default config opts in through `BattlePower.tres`: capacity **100**, recharge **10 energy/s**, idle **0**, active **12 energy/s**, initial fill **0**, restart **15%**. Other tower types remain unchanged; attaching a profile to an unadapted weapon fails definition preflight rather than allowing unpaid attacks.
 
-Use existing TowerDisableReason.NoPower with one owned handle and a configurable restart threshold; preserve EMP/heat. Refill is limited by BOTH a cached four-neighbour conductive-path distance efficiency and the same finite island generation budget; priority applies to **allocation of refill**, not instant grid on/off states. Per-instance battery charge and priority need durable checkpoint save/load; derived distribution/NoPower must be reconstructed. Non-power towers should stay unaffected.
+## Ownership and spending
 
-**Inspector PW4-D:** primary Heat/Ammo-like bar is **Stored Energy / Capacity** (e.g. ENERGY 64/100), with current recharge, drain, distance efficiency, NoPower/charging state and 0–100 priority nearby. This supersedes the earlier PW4 "full/empty supplied/required" bar below, which is **historical**. No consumer/buffer/priority code is live as of PW3. Do not modify implementation based only on this guide; follow approved subpass requests.
+- `TowerPowerConfig.cs`: Inspector-editable non-level capacity/rates, initial fill and restart fraction. Capacity must be positive; omit the optional profile for a non-power tower. Zero idle and active draw never applies NoPower.
+- `PowerCapacitor.cs`: plain energy arithmetic; current energy is runtime state, never shared authored data. Config/tier/rank changes preserve absolute energy and clamp only to capacity; initial fill applies once.
+- `TowerPowerConsumer.cs`: event subscriptions, cached island/state, priority (0–100, initially 50), owned NoPower handle and save seam. No per-tower node or processing callback.
+- `TowerBase.Power.cs`: optional capability and reusable funded-projectile seam. Battle prepays active draw × nominal shot interval before launch. Ammo rejection rolls that reservation back. It publishes depletion after launch so target cleanup cannot invalidate the paid projectile.
 
----
+Active draw is the **total** active rate, not idle plus active: each successful shot prepays one firing interval and suppresses idle expenditure for that interval. Outside paid attack time, only an operational tower incurs idle draw. Seeking, cooldown, ammo failure and a wave-active flag never create active spending. Unfinished/upgrading towers neither recharge nor spend; work clocks are untouched and stored charge is preserved. Built EMP/heat/NoPower-disabled towers may recharge and incur no idle draw. Emitted attacks remain independent.
 
-## Selected-tower power bar requirement — PW4 (2026-11-04)
+Insufficient attack energy or an empty energy-using buffer applies one existing `TowerDisableReason.NoPower` handle. Restart requires max(capacity × restart fraction, last refused attack cost); refill continues while disabled. Only that handle is removed, preserving EMP/heat/other NoPower owners. Zero active draw still permits free attacks if otherwise operational; zero capacity is invalid. A shot costing more than capacity cannot fire until its authored settings change.
 
-The owner requests a **power bar in the selected-tower Inspector**, visually consistent with existing heat and ammo bars. Show supplied versus current required power, readable `POWER 20 / 20` / `NO POWER 0 / 20` text, normal versus shortage colours, and a nearby Power Priority slider (0–100, default 50). Initial allocation is full on/off, so the consumer bar is full/empty; zero requirement needs a neutral no-draw state rather than dividing by zero. Hide it for buildings without the consumer capability. Update only on selection/power/activity changes, not an extra frame loop. Producer output is distinct from consumption; PW3 generators already describe generation in their runtime details. Implement this with PW4 consumers/allocation, not in the generator-only phase.
+## Shared refill and saves
 
----
+The existing [PowerGridManager](../../Economy/Power/Shared/README.md) runs a modest shared time-integrated service (default 0.25s) only while work is needed. Valid same-island towers use full efficiency in A; stored energy remains usable after source death/isolation. The provisional proportional allocator limits total credited refill to island production × elapsed game time and each consumer's recharge ceiling/headroom. No island storage, distance lookup, relay or priority scheduling yet. F4's older requested-demand totals remain diagnostics for that API; they are not capacitor delivery or authoritative brownout state.
 
-## PW0 audit / PW1 boundary — 2026-11-04
+Checkpoint state includes energy, priority, restart latch/minimum and unexpired paid active time. Authored capacity/rates remain in resources. Only power's exact owned NoPower handle is omitted; external NoPower conditions still persist. Restore derives the owned handle while the battlefield is paused. Missing optional power data restores empty; strict content-fingerprint compatibility remains unchanged and can reject pre-change checkpoints. Never edit an old JSON fingerprint to bypass it.
 
-Terrain island detection is source implemented in [Economy Power](../../Economy/Power/IMPLEMENTATION_PLAN.md). Consumer code here remains planned for PW4. Reuse the existing TowerDisableReason.NoPower and owned ApplyDisable/RemoveDisable handles; do not create a second disable mechanism. Demand activity, generator accounting and consumer registration are later work; all current towers remain operational. Save priorities as durable input and rebuild derived NoPower allocation before resume. Full phase contracts and outstanding demand decisions are in the power plan.
+## Remaining phases
 
----
+**PW4-B:** conductive-distance refill ceiling. **PW4-C:** deterministic priority allocation replacing A's provisional sharing. **PW4-D:** selected Heat/Ammo-style **Stored Energy / Capacity** bar, live rates/efficiency and priority control. A adds only compact energy text to the existing runtime label. **PW5:** relays. See the [authoritative plan](../../Economy/Power/IMPLEMENTATION_PLAN.md).
 
-# Per-building power use — FUTURE / NOT IMPLEMENTED
-
-## Purpose
-Optional **consumer-side** power capability for any placed tower/building. [Economy Power](../../Economy/Power/README.md) owns generation, connected terrain islands and priority allocation; an individual tower does not scan power sources or calculate its own grid.
-
-## Parameters
-- Fixed **IdlePowerDraw** and **ActivePowerDraw** baseline values in each type's non-level config (not its *Levels.cs rows). Buying Level 2/3 does not automatically increase electricity draw; future permanent research may change **effective** consumption without mutating base settings.
-- Per placed instance: is-powered status, current operating mode and **PowerPriority** slider from 0 (lowest) to 100 (highest), starting at 50 in the existing tower Inspector. Priority is a player preference, not purchased level/rank/research.
-- During shortages the shared network supplies higher-priority buildings first (initially full on/off operation, deterministic tie-breakers and anti-flicker logic). Define idle/firing behaviour and restoration with tests. Buildings with no power capability remain valid.
-
-Keep power operational state separate from immutable cached combat stats and from the session Credits wallet; avoid required per-tower power nodes/ticks. Until a dedicated power pass, existing towers stay operational as they do now.
-
-**Not implemented. Validate power interruption, priority, upgrades, Inspector/saves and many-tower performance later.**
+Validation: focused source/resource/diff review only; no .NET toolchain is available. No runtime or performance acceptance is claimed. Owner: rebuild in Godot .NET, let a completed Battle Tower charge, sustain fire to depletion/restart, remove its source and check stored-energy use, then check a new between-wave Save/Load and existing heat/EMP gates.

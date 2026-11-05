@@ -1,3 +1,13 @@
+## PW4-A — tower capacitors (2026-11-05)
+
+**Source Implemented / Awaiting Owner Validation.** Battle Tower alone now opts into a local capacitor: **100 energy capacity, 10/s recharge, 0/s idle, 12/s active, empty initial fill, 15% restart**. Real shots prepay energy and ammunition before launch; no global wave-active drain. Charge survives source loss, timed work pauses power use/recharge, and built EMP/heat/NoPower-disabled towers may recharge. Save/load preserves charge, priority and hysteresis and derives only power's owned NoPower handle. Existing wave composition, combat stats, prices, generation rates and other tower types are unchanged.
+
+The existing manager owns a shared 0.25s game-time service, dormant when no useful refill/idle drain remains. A provisional full-efficiency proportional refill is capped by island production × elapsed time; no unlimited refill or global energy bank. Source/topology changes settle the preceding interval before updating their caches. Reused consumer snapshots and sparse island requests avoid per-frame tower/map scans. **PW4-B distance, PW4-C priority scheduling, PW4-D Inspector bar and PW5 relays remain planned.** Priority is stored (default 50) but has no allocation effect yet. Existing requested-demand diagnostics are not capacitor delivered energy.
+
+See [consumer implementation](../../../Shared/Power/README.md) and [power plan](../IMPLEMENTATION_PLAN.md). Source/resource review only; .NET build/runtime remains for owner. Earlier dated phase notes below are historical.
+
+---
+
 ## PW3 — buildable Industrial Generator (2026-11-04)
 
 **Source implemented / owner Godot validation pending.** `PowerGenerator.cs` / `PowerGeneratorConfig.cs` provide one passive producer implementation for generator definitions. Industrial is registered in the Economy catalog with 250 provisional output, 300 Credits, 5s work, 1200 HP and a 2×2 footprint. No paid upgrades or fuel. Source lifetime follows work, shared disabling, hull/config/spatial and terrain events; no generator processing callback. Existing tower SaveId/work/health/disable restoration reconstructs output without a schema addition. See [Industrial guide](../IndustrialGenerator/README.md).

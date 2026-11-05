@@ -14,18 +14,19 @@ public abstract partial class TowerBase
     // Capture source inputs, real stock and fractional clocks; never serialize calculated final stats.
     internal TowerSaveData CaptureCheckpoint(Func<ulong, string> sourceKey)
     {
+        PowerSaveData? power = CapturePowerCheckpoint();
         var inventory = this is AmmoBuilding building ? building.Inventory : Ammunition?.Inventory;
         return new()
         {
             Id = SaveId, TypeId = TowerTypeId, X = GridCell.X, Y = GridCell.Y, Tier = UpgradeLevel,
             XP = RankProgress.TotalXp, Health = Health, Priority = TargetPriority, Work = CaptureWorkState(), Held = AwaitingConstructionDrone,
-            Heat = CurrentHeat, Overheated = IsOverheated, Disables = _conditions?.CaptureCheckpoint(sourceKey) ?? new(),
+            Heat = CurrentHeat, Overheated = IsOverheated, Disables = _conditions?.CaptureCheckpoint(sourceKey, Power?.NoPowerHandle ?? default) ?? new(),
             Ammo = inventory?.Amount, Consumed = Ammunition?.ConsumedRounds ?? 0, Discarded = Ammunition?.DiscardedRounds ?? 0,
             BeamCredit = Ammunition?.SavedBeamCredit ?? 0,
             StoredCredits = (this as CreditProducerTower)?.Buffer?.Current,
             CreditSeconds = (this as CreditProducerTower)?.SavedCreditSeconds ?? 0,
             AmmoSeconds = (this as AmmunitionFactory)?.Production.ProgressSeconds ?? 0,
-            Produced = (this as AmmunitionFactory)?.ProducedRounds ?? 0, WeaponCooldown = CaptureWeaponCooldown()
+            Produced = (this as AmmunitionFactory)?.ProducedRounds ?? 0, WeaponCooldown = CaptureWeaponCooldown(), Power = power
         };
     }
 
@@ -72,6 +73,7 @@ public abstract partial class TowerBase
         else if (data.StoredCredits.HasValue) throw new InvalidDataException("Unexpected producer balance.");
         if (this is AmmunitionFactory factory) factory.RestoreProduction(data.AmmoSeconds, data.Produced);
         if (data.Heat != 0 || data.Disables.Count > 0) Conditions().RestoreCheckpoint(data.Heat, data.Overheated, data.Disables, sourceId);
+        RestorePowerCheckpoint(data.Power);
         RestoreWeaponCooldown(data.WeaponCooldown); NotifyRuntimeChanged();
     }
 }

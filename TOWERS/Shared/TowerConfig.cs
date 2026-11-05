@@ -4,6 +4,10 @@ using Godot;
 [GlobalClass]
 public partial class TowerConfig : Resource
 {
+    private TowerPowerConfig _power;
+    [ExportGroup("Electricity (optional)")]
+    [Export] public TowerPowerConfig Power { get => _power; set { if (_power == value) return; _power = value; EmitChanged(); } }
+
     [ExportGroup("Detection")]
     [Export] public bool CanDetectStealth { get; set; } = false;
 
@@ -64,6 +68,7 @@ public partial class TowerConfig : Resource
         // Keep presentation profiles and textures shared; mutable combat rows/recipes still get private copies below.
         TowerConfig copy = (TowerConfig)Duplicate(false);
         copy.ConstructionArt = ConstructionArt;
+        copy.Power = Power == null ? null : (TowerPowerConfig)Power.Duplicate(true);
         copy._passiveCosts = TowerLevel.CopyCosts(_passiveCosts);
         copy.Levels = new();
         foreach (TowerLevel level in Levels) copy.Levels.Add(level?.CreateInstanceCopy());

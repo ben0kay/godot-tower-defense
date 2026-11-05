@@ -29,7 +29,12 @@ public abstract partial class TowerBase : Node2D
     // =========================================================
     // Aimed weapons request one fresh acquisition on their next normal physics tick.
     protected virtual void OnTargetPriorityChanged() { }
-    public virtual string DescribeRuntime() => Ammunition?.Describe() ?? "";
+    public virtual string DescribeRuntime()
+    {
+        string ammo = Ammunition?.Describe() ?? "";
+        if (Power == null) return ammo;
+        return ammo + (ammo.Length > 0 ? " · " : "") + $"Energy: {Power.Capacitor.Energy:0.#} / {Power.Capacitor.Settings.Capacity:0.#}";
+    }
     internal void NotifyRuntimeChanged() => RuntimeChanged?.Invoke();
     public event Action ExperienceChanged;
     public TowerRankProgress RankProgress { get; } = new();
@@ -59,7 +64,7 @@ public abstract partial class TowerBase : Node2D
     // Apply a private source copy before Ready; definition remains shared authored metadata.
     public void InitializeDefinition(TowerDefinition definition, TowerMasterConfig rules = null, TowerResearchBonuses research = default)
     {
-        if (definition == null || !AcceptsConfig(definition.DefaultConfig))
+        if (definition == null || !AcceptsConfig(definition.DefaultConfig) || (definition.DefaultConfig.Power != null && !SupportsPowerCapacitor))
             throw new InvalidOperationException("Tower/config mismatch.");
         Definition = definition; _experienceRules = rules; _research = research;
         ApplyConfig(definition.DefaultConfig.CreateInstanceCopy());
@@ -86,7 +91,7 @@ public abstract partial class TowerBase : Node2D
     // Publish once after committed changes; wallet/controller retain payment ownership.
     internal void NotifyStatsChanged()
     {
-        SynchronizeHealth(); SynchronizeAmmunition(); SynchronizeConditions(); StatsChanged?.Invoke();
+        SynchronizeHealth(); SynchronizeAmmunition(); SynchronizeConditions(); SynchronizePower(); StatsChanged?.Invoke();
     }
 
     // =========================================================
@@ -300,6 +305,6 @@ public abstract partial class TowerBase : Node2D
         ConstructionWorkManager manager = _construction; _construction = null; _constructionDroneOwner = null;
         if (GodotObject.IsInstanceValid(manager)) manager.Unregister(this);
     }
-    public override void _ExitTree() { Ready -= InitializeDurability; _conditions?.Clear(); _conditions = null; CancelConstruction(); }
+    public override void _ExitTree() { Power?.Dispose(); Power = null; Ready -= InitializeDurability; _conditions?.Clear(); _conditions = null; CancelConstruction(); }
     #endregion
 }

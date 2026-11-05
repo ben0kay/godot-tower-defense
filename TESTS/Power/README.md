@@ -1,3 +1,17 @@
+## PW4-A focused owner check — 2026-11-05
+
+Source/resource/diff review only; no .NET build, runtime suite or performance run here. No tool installation. Rebuild C# in Godot .NET, then briefly check:
+
+1. Complete a Battle Tower on a supplied island: energy starts empty, charges at up to 10/s and resumes at 15/100. Other tower types have no capacitor/gate.
+2. Sustained actual shots spend 12 × firing interval each; seeking/cooldown/no ammo never spend active energy. Energy can deplete/recover; no projectile/ammo is emitted/spent on an unfunded shot. NoPower must not cancel the last successfully paid launch.
+3. Disconnect/remove the source: stored energy stays usable, refill stops. An isolated island cannot borrow another island's generation. Combined delivered refill remains bounded by available generation; priorities have no effect until C.
+4. Heat/EMP retain their independent handles; charging can recover power while these remain disabled. Construction/upgrades keep their old clocks, preserve charge and neither charge nor drain until complete.
+5. Make a new between-wave Save/Load with partial charge, also with recovering power and heat/EMP. Compare charge, ammo and work; no free initial fill or stale/duplicated NoPower. Current compatibility fingerprint can reject earlier saves.
+
+The runtime label shows energy quantity. The heat/ammo-style energy bar is deliberately PW4-D. No new per-tower processing/node, distance calculation, priority sorting or relay code belongs to A. Existing PW1 fixtures with **no consumers** should still see a dormant manager. Earlier checks below describe their named historical phases.
+
+---
+
 ## PW3 generator checks — 2026-11-04
 
 `PowerGeneratorChecks.tscn` is an optional small fixture using production placement/work/checkpoint seams. It covers the 300-Credit purchase, unfinished zero output, completion to 250, center-based 2×2 membership, removal, shared EMP/recovery, private config output, lethal damage and unfinished/completed restore without repurchase/duplicate generation. It does not write profile saves or run stress simulations. **Authored but not executed here**: Godot/.NET is unavailable. Only focused source/resource checks were performed; no broad suite or benchmark.

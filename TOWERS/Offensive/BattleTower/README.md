@@ -1,3 +1,9 @@
+## PW4-A capacitor baseline — 2026-11-05
+
+Default config opts into `BattlePower.tres`: capacity 100, recharge 10 energy/s, idle 0, total active 12 energy/s, initial fill 0, restart 15%. Each real shot prepays active rate × firing interval, with rollback on ammo failure; depletion publishes after launch. Finished towers charge only from their own island's live supply, retain charge on source loss and save exact charge/recovery. No damage/cadence/heat/ammo/price changes. Other weapons remain non-power. [Shared consumer guide](../../Shared/Power/README.md). Distance, priority scheduling and the Inspector bar remain B/C/D; source only, owner build/play pending.
+
+---
+
 ## TA1 acoustic firing sound revision — 2026-11-05
 
 The original Battle Tower gunshot was audible but sounded comical due to its falling synthetic energy pitch. Replaced `Sounds/BattleFire.wav` **in place** with a drier, percussive, acoustic-style gunshot: broadband crack, compact low-frequency body and faint metallic tail (0.29 s, 44.1 kHz, mono 16-bit PCM). The sound ID `tower_battle_fire`, per-tower firing hook, volume, priority, cooldown, distance/visibility culling and pool limits are preserved. See [Sounds](Sounds/README.md). In-game tonal acceptance remains for the owner.

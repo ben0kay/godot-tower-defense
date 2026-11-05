@@ -1,3 +1,13 @@
+## PW4-A — tower capacitors (2026-11-05)
+
+**Source Implemented / Awaiting Owner Validation.** Battle Tower alone now opts into a local capacitor: **100 energy capacity, 10/s recharge, 0/s idle, 12/s active, empty initial fill, 15% restart**. Real shots prepay energy and ammunition before launch; no global wave-active drain. Charge survives source loss, timed work pauses power use/recharge, and built EMP/heat/NoPower-disabled towers may recharge. Save/load preserves charge, priority and hysteresis and derives only power's owned NoPower handle. Existing wave composition, combat stats, prices, generation rates and other tower types are unchanged.
+
+The existing manager owns a shared 0.25s game-time service, dormant when no useful refill/idle drain remains. A provisional full-efficiency proportional refill is capped by island production × elapsed time; no unlimited refill or global energy bank. Source/topology changes settle the preceding interval before updating their caches. Reused consumer snapshots and sparse island requests avoid per-frame tower/map scans. **PW4-B distance, PW4-C priority scheduling, PW4-D Inspector bar and PW5 relays remain planned.** Priority is stored (default 50) but has no allocation effect yet. Existing requested-demand diagnostics are not capacitor delivered energy.
+
+See [consumer implementation](../../Shared/Power/README.md) and [power plan](IMPLEMENTATION_PLAN.md). Source/resource review only; .NET build/runtime remains for owner. Earlier dated phase notes below are historical.
+
+---
+
 ## Revised PW4/PW5 plan — distance charging and internal reserves (2026-11-04)
 
 **Planning only; PW1–PW3 implementation remains unchanged.** Towers will hold individual **energy buffers**, recharged by their shared island supply at a rate diminished by **four-neighbour conductive distance** to active generators/Citadels. Faraway towers may still eventually charge completely while idle; in combat they can drain faster than distant recharge. Current buffer remains after source death, with NoPower only after depletion/low threshold. Finite shared producer output and 0–100 refill priorities prevent energy creation. The selected Inspector bar will show **stored charge / capacity**, with recharge, drain, efficiency and priority, styled like Heat and Ammo.

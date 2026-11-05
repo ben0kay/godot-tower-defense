@@ -1,3 +1,9 @@
+## Power PW4-A update — 2026-11-05
+
+**Source Implemented / Awaiting Owner Validation.** Battle-only optional capacitor and paid-shot energy use; finite provisional full-efficiency recharge in the existing manager; owned hysteretic NoPower; checkpoint charge/priority/recovery. Defaults 100 capacity, 10/s refill, 0/s idle, 12/s active, empty initial, 15% restart. No other consumers or combat/source balance changes. **Next PW4-B distance**, then C priority allocation and D selected energy bar; relays remain PW5. Lightweight source review only; Godot .NET build/play remains for owner. [Details](../TOWERS/Shared/Power/README.md). Earlier dated updates below are historical.
+
+---
+
 ## Power PW4 revised roadmap — 2026-11-04 (planning, no implementation)
 
 The owner revised PW4 from instant full/on-off grid allocation to **per-building rechargeable internal buffers with conductive-distance-dependent charging**. A tower far from a source can slowly reach full stored energy while idle, then drain faster than it recharges while firing. Live generation is shared and limited per connected island; priorities govern available refill, and NoPower applies only when the stored reserve is exhausted/low. Relays in PW5 will reinforce charging near themselves **without generating electricity**, while retaining future cross-island links. PW4-D Inspector should show the **stored-energy bar**, charge/drain/efficiency and priority beside Heat/Ammo. Follow [revised PW4-A–D and PW5 plan](../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md) rather than earlier full/empty planned bar or immediate blackout language. **PW0–PW3 remain unchanged; PW4/PW5 not implemented.**

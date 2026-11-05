@@ -42,9 +42,10 @@ public partial class PowerGridManager
         {
             if (entry.Producer != producer) throw new ArgumentException("A power ID cannot change between producer and consumer.");
             if (entry.Anchor == anchor && entry.Size == size && entry.Amount == amount && entry.Region == region) return;
+            if (producer) FlushCapacitors();
             Adjust(entry, -1);
         }
-        else { entry = new Endpoint { Producer = producer }; _endpoints.Add(id, entry); }
+        else { if (producer) FlushCapacitors(); entry = new Endpoint { Producer = producer }; _endpoints.Add(id, entry); }
         entry.Anchor = anchor; entry.Size = size; entry.Amount = amount; entry.Region = region;
         Adjust(entry, 1); PublishAccounting();
     }
@@ -53,7 +54,9 @@ public partial class PowerGridManager
     // Removing a dead/unloaded caller is idempotent, including teardown where the manager's dictionary is already empty.
     public void RemoveEndpoint(string id)
     {
-        if (id == null || !_endpoints.Remove(id, out Endpoint entry)) return;
+        if (id == null || !_endpoints.TryGetValue(id, out Endpoint entry)) return;
+        if (entry.Producer) FlushCapacitors();
+        _endpoints.Remove(id);
         Adjust(entry, -1); PublishAccounting();
     }
 
@@ -99,7 +102,7 @@ public partial class PowerGridManager
 
     // =========================================================
     // Listeners see a completed change; identical values never emit another accounting event.
-    private void PublishAccounting() { AccountingRevision++; AccountingChanged?.Invoke(); }
+    private void PublishAccounting() { AccountingRevision++; AccountingChanged?.Invoke(); WakeCapacitors(); }
 
     // =========================================================
     // No durable state or Node references live in accounting; future saves restore inputs through their owning features.

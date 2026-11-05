@@ -30,6 +30,7 @@ public partial class TowerDefinition : Resource
         if (string.IsNullOrWhiteSpace(TowerId) || TowerId != TowerId.Trim()) throw new InvalidOperationException("Tower ID must be nonblank and trimmed.");
         if (!Enum.IsDefined(Category) || !ValidFootprint(Footprint)) throw new InvalidOperationException("Footprint must have positive dimensions, each at most 1024 cells, and a valid category.");
         if (Scene == null || DefaultConfig == null) throw new InvalidOperationException("Tower scene/config is missing: " + TowerId);
+        DefaultConfig.Power?.Settings();
         TowerUpgradeController.Validate(DefaultConfig.Levels); TowerConfig.ValidateWorkSeconds(DefaultConfig.BuildSeconds);
         if (DefaultConfig.ConstructionCosts == null) throw new InvalidOperationException("Construction recipe is missing: " + TowerId);
         foreach (ResourceCost cost in DefaultConfig.ConstructionCosts)
@@ -38,7 +39,7 @@ public partial class TowerDefinition : Resource
         Node root = Scene.Instantiate();
         try
         {
-            if (root is not TowerBase tower || !tower.AcceptsConfig(DefaultConfig) || !tower.ValidateScene())
+            if (root is not TowerBase tower || !tower.AcceptsConfig(DefaultConfig) || !tower.ValidateScene() || (DefaultConfig.Power != null && !tower.SupportsPowerCapacitor))
                 throw new InvalidOperationException("Scene does not support its declared tower config: " + TowerId);
         }
         finally { root.Free(); }

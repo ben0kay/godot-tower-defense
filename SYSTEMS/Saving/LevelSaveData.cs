@@ -36,6 +36,7 @@ public sealed record RunSaveData(int Killed, int Breached, int Placed, int Const
 }
 public sealed record CitadelSaveData(string Id, int Health, int Credits, double ProductionSeconds, bool CriticalLatched);
 public sealed record DisableSaveData(TowerDisableReason Reason, double? Remaining, string Source);
+public readonly record struct PowerSaveData(double Energy, int Priority, bool RecoveryRequired, double RestartEnergy, double ActiveSecondsRemaining);
 public sealed record TowerSaveData
 {
     public string Id { get; init; } = "";
@@ -60,6 +61,7 @@ public sealed record TowerSaveData
     public double AmmoSeconds { get; init; }
     public long Produced { get; init; }
     public double WeaponCooldown { get; init; }
+    public PowerSaveData? Power { get; init; }
 }
 public sealed record DeliverySaveData(string Source, string Destination, int Cargo, int Reserved, bool Returning, SavePoint Position, float Speed);
 public sealed record LogisticsSaveData
