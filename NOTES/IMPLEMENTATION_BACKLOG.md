@@ -1,3 +1,9 @@
+## Power PW4-C allocation revision — 2026-11-05 (planning only)
+
+**Decision:** When output is scarce, towers **closer by existing PW4-B conductive-source distance** receive recharge before faraway towers; equal-distance towers proportionally share any limited remainder, and distant ones may receive zero. This is **not priority-first**. The already-saved 0–100 `PowerPriority` must remain inactive; a future Inspector slider may introduce only a *minor bounded bias* if separately requested. PW4-D should focus on actual delivered recharge/drain, source distance, efficiency, buffer and shortage indication, without an inert priority slider. PW4-A/B remain implemented; **PW4-C is not yet implemented**. See [authoritative plan](../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md).
+
+---
+
 ## PW4-B — cached distance-limited recharge — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** Existing power manager now owns one coalesced multi-source conductive BFS; valid Citadel/generator footprints anchor delivery. Shared Inspector curve: 4 full cells, 12 soft falloff cells, 10% reachable-route floor. Recharge ceiling = nominal refill × efficiency; no route means zero. Capacity/drain/attack funding/source output and stored charge are unchanged; no new consumers, priority scheduling or relays. Cached consumer APIs expose distance/efficiency/ceiling; final derived cache is rebuilt before checkpoint unpause without new saved fields. Performance: reused arrays, no per-tower pathfinding/frame flood fill, no distance rebuild for positive output or curve-only edits. Narrow fixture updated; source/resource review only (environment unavailable), no build/runtime/benchmark claim. [Power guide](../TOWERS/Economy/Power/Shared/README.md).
