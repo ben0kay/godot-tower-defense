@@ -1,25 +1,36 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="20" height="40" viewBox="0 0 20 40">
-<!-- Up-facing independent minigun. Slimmer 20x40 image centre (10,20) and real muzzle tip (10,2) retain Marker2D(0,-18). -->
+<svg xmlns="http://www.w3.org/2000/svg" width="12" height="44" viewBox="0 0 12 44">
+<!-- Starter gun: 12px narrow, 44px long. Centre (6,22); exact muzzle (6,4) = Marker2D(0,-18). -->
 <defs>
- <linearGradient id="armour" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d1e1e7"/><stop offset=".32" stop-color="#819ba8"/><stop offset=".67" stop-color="#486575"/><stop offset="1" stop-color="#223742"/></linearGradient>
- <linearGradient id="barrels" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#101d29"/><stop offset=".45" stop-color="#a0c3ce"/><stop offset=".75" stop-color="#334956"/><stop offset="1" stop-color="#142632"/></linearGradient>
+  <linearGradient id="casing" x1="0" y1="0" x2="1" y2="1">
+    <stop stop-color="#b4cad0"/><stop offset=".35" stop-color="#75929d"/>
+    <stop offset=".75" stop-color="#365363"/><stop offset="1" stop-color="#172d3a"/>
+  </linearGradient>
+  <linearGradient id="tube" x1="0" y1="0" x2="1" y2="0">
+    <stop stop-color="#172938"/><stop offset=".36" stop-color="#728f9b"/>
+    <stop offset=".57" stop-color="#b5d0d6"/><stop offset="1" stop-color="#1a3442"/>
+  </linearGradient>
 </defs>
-<g transform="translate(0.4 0) scale(0.8 1)" stroke-linejoin="round" stroke-linecap="round">
- <!-- Thin contrasting silhouette leaves the whole rotating mount readable against dark hull. -->
- <path d="M4 17L5 7L8 3H16L19 7L20 17L22 21L21 30L17 34H7L3 30L2 21Z" fill="#101923" stroke="#bed8e2" stroke-width="1.1"/>
- <!-- Three long barrel rails; single physical muzzle remains at the central front tip. -->
- <path d="M6 18V5L8 2H10V18Z M10.5 19V3H13.5V19Z M14 18V2H16L18 5V18Z" fill="url(#barrels)" stroke="#0a1822" stroke-width=".75"/>
- <path d="M8 6V16 M12 5V17 M16 6V16" stroke="#d3edf1" stroke-width=".85" opacity=".85"/>
- <path d="M5 6H19V10H5Z" fill="#344855" stroke="#d9a196" stroke-width="1"/>
- <path d="M5 15H19V19H5Z" fill="#91b4c0" stroke="#1b2e3a" stroke-width=".8"/>
- <!-- Strong angular rotating gun shield. -->
- <path d="M4 20L8 17H16L20 20L21 27L16 32H8L3 27Z" fill="url(#armour)" stroke="#deedf0" stroke-width="1.15"/>
- <path d="M5 21L10 19H14L19 21L17 26H7Z" fill="#283e4b" stroke="#90a8b3" stroke-width=".75"/>
- <path d="M4 23L7 26L7 29L4 27Z M20 23L17 26L17 29L20 27Z" fill="#bd7770"/>
- <circle cx="12" cy="24" r="5.1" fill="#122734" stroke="#b8d0da" stroke-width="1.2"/>
- <circle cx="12" cy="24" r="2.6" fill="#ea866c" stroke="#702c2b" stroke-width=".7"/>
- <circle cx="12" cy="24" r="1" fill="#ffe2bd"/>
- <path d="M8 31H16L17 35H7Z" fill="#526e7b" stroke="#b7d0dc" stroke-width=".9"/>
- <path d="M9 35H15" stroke="#f39b75" stroke-width="1.5"/>
+<g stroke-linecap="round" stroke-linejoin="round">
+  <!-- One long narrow central barrel. Tip stays aligned with existing projectile muzzle. -->
+  <path d="M4.3 26V7.1L5.1 4H6.9L7.7 7.1V26Z" fill="url(#tube)"
+        stroke="#101f2a" stroke-width=".8"/>
+  <path d="M5.35 7V22.8" stroke="#d4e6e8" stroke-width=".75" opacity=".84"/>
+  <path d="M6.75 7V22.8" stroke="#233d4b" stroke-width=".7"/>
+  <path d="M4.3 4H7.7V6H4.3Z" fill="#263c47" stroke="#bdd3d6" stroke-width=".7"/>
+  <!-- Light barrel clamps and tiny side heat rails; no wide rotating gun shield. -->
+  <path d="M2.9 14.5H9.1V17H2.9Z" fill="#536e79" stroke="#9cb3ba" stroke-width=".7"/>
+  <path d="M2.7 23H9.3V25.8H2.7Z" fill="#8ca9b2" stroke="#192f3b" stroke-width=".8"/>
+  <path d="M3.2 19V23M8.8 19V23" fill="none" stroke="#668e99" stroke-width=".9"/>
+  <!-- Narrow breech and small circular motor housing over the existing turret socket. -->
+  <path d="M3.1 25.2H8.9L10 28V36L8 39H4L2 36V28Z"
+        fill="url(#casing)" stroke="#c3d7db" stroke-width=".95"/>
+  <path d="M3.7 27.5H8.3L8.8 32.5H3.2Z" fill="#263e49" stroke="#72909c" stroke-width=".65"/>
+  <path d="M2.5 30.5L3.5 32.5V35L2.5 34Z M9.5 30.5L8.5 32.5V35L9.5 34Z"
+        fill="#a56560"/>
+  <circle cx="6" cy="33.2" r="3.1" fill="#132936" stroke="#a9c4ca" stroke-width=".85"/>
+  <circle cx="6" cy="33.2" r="1.65" fill="#de876f" stroke="#793d37" stroke-width=".65"/>
+  <circle cx="6" cy="33.2" r=".55" fill="#ffe5be"/>
+  <path d="M4.5 39H7.5L8 41H4Z" fill="#4f6c78" stroke="#9ebbc5" stroke-width=".75"/>
+  <path d="M5 40.8H7" stroke="#ed9676" stroke-width=".9"/>
 </g>
 </svg>

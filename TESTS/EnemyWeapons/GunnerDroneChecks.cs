@@ -48,13 +48,13 @@ public partial class GunnerDroneChecks : Node
             && definition.RadiusPixels == 18 && definition.KillRewardCredits == 8 && definition.MaxShield == 0,
             "Gunner has independent editable playtest balance");
         Enemy preview = catalog.Find("gunner_drone_mk1").Instantiate<Enemy>();
-        Require(preview.GetNode<Sprite2D>("Sprite").Texture.GetSize() == new Vector2(52, 38),
-            "Compact starter Gunner hull is 52x38, smaller than the 64x48 Bulwark");
+        Require(preview.GetNode<Sprite2D>("Sprite").Texture.GetSize() == new Vector2(48, 30),
+            "Lightweight starter Gunner hull is 48x30, smaller than the 64x48 Bulwark");
         var gun = preview.GetNode<EnemyMinigun>(WeaponPath);
         Require(gun.GetNode<Sprite2D>("TurretPivot/GunSprite").Texture != preview.GetNode<Sprite2D>("Sprite").Texture
-            && gun.GetNode<Sprite2D>("TurretPivot/GunSprite").Texture.GetSize() == new Vector2(20, 40)
+            && gun.GetNode<Sprite2D>("TurretPivot/GunSprite").Texture.GetSize() == new Vector2(12, 44)
             && gun.GetNode<Marker2D>("TurretPivot/GunSprite/Muzzle").Position == new Vector2(0, -18),
-            "Slimmer separate 20x40 gun keeps the original physical barrel-tip muzzle");
+            "Long-barrel 12x44 gun retains the physical muzzle marker at its new canvas tip");
         preview.Free();
     }
     // =========================================================

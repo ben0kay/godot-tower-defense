@@ -1,7 +1,15 @@
 # Gunner Drone artwork
 
-**Starter gunner redesign — 2026-11-04.** The compact right-facing hull is now **52×38** (formerly 64×48), with shorter swept stabilizers and a slimmer needle-shaped central body. The independent up-facing minigun is now **20×40** (formerly 24×40), scaled **20% narrower only**; its length and muzzle tip registration stay unchanged. The gun still points toward the muzzle at local `(0,-18)`, with the hull socket at `(-2,0)`.
+## Starter gunner — second silhouette refinement (2026-11-05)
 
-The native SVG width/height now describe the smaller real ship in F2 preview and drive the shared thruster's automatic size-responsive appearance. The two original artwork filenames, scene node hierarchy, `uid://` import IDs and gun/turret marker positions are retained. No scale transforms are added to the scene, and all minigun projectile textures, flash/tracer geometry, damage/cadence, targeting and bullet physics remain unchanged.
+The entry-level Gunner has been redrawn as a visibly **smaller, slimmer 48×30 hull** (previously 52×38). A narrow main fuselage and short swept stabilizers make it look like a lightweight starter ship rather than an armoured medium gunship. It retains the +X nose, centered SVG, dark steel colour scheme, orange engine accent and local gun socket at **(-2, 0)**.
 
-In `GunnerDrone.tres`, health drops **180 → 135 HP** (25%) and navigation radius **22 → 18 px** to suit the smaller footprint. No changes to projectile visuals or movement speed. Source-only checks; visual Godot review pending.
+The separate minigun has been **redrawn from scratch**, not merely scaled narrower: **12×44 px** instead of 20×40. A single long exposed barrel (from SVG y=4 to y=26) and compact breech/motor housing distinguish it from larger turret weapons. The gun remains up-facing in its own SVG and initially faces +X using the existing pivot rotation.
+
+**Critical muzzle registration:** SVG centre is `(6,22)`, barrel tip is `(6,4)`, and the existing scene Marker2D remains `(0,-18)`. Firing still originates at the physical barrel tip. No scene transform, weapon script, bullet/tracer sprite, muzzle flash, targeting, recoil, movement, damage or other combat settings were changed.
+
+Original filenames, import metadata UIDs and scene hierarchy are retained, so Godot reloads the art without asset migration. The hull's smaller native size also influences the existing shared auto-size thruster visual. Existing **135 HP**, **18px movement radius**, **75px/s speed** and Standard/Common/Fighter classification are intentionally unchanged. Source/reference checks only; normal zoom acceptance pending.
+
+## Earlier compact pass (2026-11-04)
+
+The first revision reduced the original 64×48 / 24×40 visuals to 52×38 / 20×40 and reduced health from 180 to 135 (25%) with the radius from 22 to 18. The present refinement changes **artwork only**, keeping that earlier balance.

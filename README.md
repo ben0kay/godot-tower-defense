@@ -1,3 +1,9 @@
+## Lightweight Gunner Drone — second visual refinement (2026-11-05)
+
+The starter Gunner's hull SVG is now **48×30** (down from 52×38), with a slimmer small-fighter silhouette; its separate gun SVG is now **12×44** (down from 20px wide and up from 40px long), using a long visible barrel and compact breech. The gun muzzle is still physically at the existing local marker **(0,-18)**, without any scene or weapon changes. **135 HP**, 18px navigation radius, projectile visuals and all firing/movement settings remain unchanged. [Gunner artwork notes](ENEMIES/Types/GunnerDrone/Artwork/README.md). Source checks only; owner visual validation pending.
+
+---
+
 ## Machine Gun Tower one-shot firing clip — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** Imported the owner's short machine-gun hit as `TOWERS/Offensive/MachineGunTower/Sounds/MachineGunFire.mp3`, trimmed/faded to remove near-silence, and registered `tower_machine_gun_fire`. The existing shared projectile turret emits a separate positional audio request for **each paid bullet**, not a loop or one sound per target/volley; zero per-ID cooldown preserves 14.4–15.36 bullets/s, subject to existing global polyphony/culling budgets. Other tower audio and damage/ammunition/heat remain unchanged. See [Machine Gun audio notes](TOWERS/Offensive/MachineGunTower/Sounds/README.md). Godot audio QA pending.

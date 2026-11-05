@@ -1,3 +1,11 @@
+## Starter Gunner art refinement — 2026-11-05
+
+The Gunner Drone's native hull is now **48×30** (formerly 52×38), with a slender body and short swept fins. Its independent gun is **12×44** (formerly 20×40), with an obvious longer exposed barrel and much less bulky rotating housing. **Muzzle stays at `(0,-18)`**, exactly the barrel tip on the new image; the turret still mounts at hull-local `(-2,0)`. These are SVG-only changes: the scene, bullets/tracers, muzzle flashes, 6/s cadence, 2 kinetic damage, HP, radius, speed, targeting and existing weapon code are untouched.
+
+The entry gunner remains **135 HP, 18px movement radius, 75px/s speed**, with Standard/Common/Fighter metadata. No other ships were changed. F2 artwork preview should show the new 48×30 hull at native size and visibly thinner long-barrel gun. [Artwork specification](Artwork/README.md). Source checks only; normal-zoom playtest pending.
+
+---
+
 ## Compact starter Gunner Drone — 2026-11-04
 
 This armed starter drone has a new **52×38** compact, narrower gunship silhouette (previously 64×48). Its separate minigun is now **20×40** (previously 24×40): the artwork is 20% slimmer horizontally with the original full barrel length and the same local `Muzzle=(0,-18)`. The mounting socket remains at `TurretPivot=(-2,0)` to keep muzzle alignment and aiming unchanged. Native import dimensions and the shared rear thruster naturally follow the new hull size.
@@ -17,7 +25,7 @@ Stable ID gunner_drone_mk1; Class Standard, Rank Common, Role Fighter (metadata 
 
 ## Size and artwork
 
-The original EG3 medium reference was Enemy004 at 64×48 and radius22. The current starter gunner was later reduced to **52×38 with radius18**; its minigun was narrowed to **20×40**, centre(10,20), tip(10,2), so Marker2D remains (0,-18). TurretPivot is(-2,0) on the hull's circular socket and initially points right. No hull rotation is performed by the weapon.
+The original EG3 medium reference was Enemy004 at 64×48 and radius22. The first starter gunner resize produced **52×38 with radius18** and a **20×40** gun. The latest SVG-only refinement produces **48×30** and a **12×44** gun, image centre(6,22), tip(6,4), while Marker2D remains (0,-18). TurretPivot is(-2,0) on the hull's circular socket and initially points right. No hull rotation is performed by the weapon.
 
 Scene path: Sprite/Weapons/Minigun/TurretPivot/GunSprite/Muzzle. Weapons and Minigun are Node2D so transforms follow the hull. Being under Sprite also inherits stealth alpha without polling. DefenseBar, hull/status/shields, routes, checkpoint/Citadel assignment and arrivals retain GenericEnemy ownership. Existing gun Freeze gating remains in the shared mount.
 
