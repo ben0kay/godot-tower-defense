@@ -1,10 +1,18 @@
+## PW4-C scarcity policy clarified — geographic priority, not player priority (2026-11-05)
+
+**PLANNED, NOT IMPLEMENTED.** PW4-B already limits how fast each tower *can* recharge by conductive source distance. PW4-C will additionally ration **scarce shared output to nearer consumers first**, at their existing distance-capped request rates. Equal-distance consumers share a short remainder proportionally; farther consumers can receive **zero**. Full batteries request nothing; low/depleted batteries continue to request while NoPower disables attacking; stored energy is never erased by source loss. No changes to PW4-A/B, active/idle draw, recharge capacity or weapon behaviour are approved here.
+
+`TowerPowerConsumer.PowerPriority` currently stores 0–100 (default 50), but that field **must remain inactive** in PW4-C. A future owner-approved per-tower Inspector slider may give a **small bounded bias** to rationing order, without negating actual geographic distance or increasing the real PW4-B recharge ceiling. PW4-D's upcoming Inspector should show actual delivered recharge, depletion, distance and efficiency first; do not expose an inert or priority-first slider. See [authoritative PW4-C design](../../Economy/Power/IMPLEMENTATION_PLAN.md).
+
+---
+
 ## PW4-B consumer delivery update — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** Capacitor consumers expose cached `ConductiveDistanceCells`, `DeliveryEfficiency` and `RechargeCeilingPerSecond`. PrepareRefill now uses nominal recharge × distance efficiency × eligible elapsed time, capped by capacity headroom and the existing finite shared island allocation. Distance never reduces capacity or attack damage/cadence, increases drain, or erases stored energy. NoPower continues to derive only from energy sufficiency/restart hysteresis, so outage/isolation does not immediately disable a charged tower.
 
 The shared world config defaults to full efficiency through 4 cells, soft half-efficiency 12 cells beyond that, 10% floor **only for reachable routes**. No source/invalid footprint means zero. Consumers cache footprint distance at delivery revision/placement boundaries; power-only topology queries do not invoke navigation. Constructor/attack notifications do not force the shared dirty field to rebuild during source batches. The modest existing service refreshes cached delivery; public explicit delivery queries can warm a pending shared field once. Source/curve changes flush old elapsed state first. Initial/load state does not receive free energy.
 
-No new saved delivery fields or opted-in tower types; Battle remains the baseline. Restore warms source-derived mappings before unpause. Priority scheduling remains PW4-C, rate/efficiency/priority Inspector controls remain later D, relays remain PW5. The compact Energy bar is preserved. See [shared implementation](../../Economy/Power/Shared/README.md). Source checks only; owner Godot build/runtime validation pending. Earlier dated notes below are historical and superseded for full-efficiency-only delivery.
+No new saved delivery fields or opted-in tower types; Battle remains the baseline. Restore warms source-derived mappings before unpause. **Distance-first** scarce-power scheduling remains PW4-C; rate/efficiency/actual-delivery Inspector feedback remains in D, while an optional minor priority-bias slider is deferred. Relays remain PW5. The compact Energy bar is preserved. See [shared implementation](../../Economy/Power/Shared/README.md). Source checks only; owner Godot build/runtime validation pending. Earlier dated notes below are historical and superseded for full-efficiency-only delivery.
 
 ---
 
@@ -39,6 +47,6 @@ This delivers only the **charge meter** requested ahead of full PW4-D; recharge/
 
 ## Remaining phases
 
-**PW4-B:** conductive-distance refill ceiling. **PW4-C:** deterministic priority allocation replacing A's provisional sharing. **PW4-D:** extend the now-live selected Stored Energy / Capacity bar with live rates/efficiency and priority control. A adds only compact energy text to the existing runtime label. **PW5:** relays. See the [authoritative plan](../../Economy/Power/IMPLEMENTATION_PLAN.md).
+**PW4-B:** conductive-distance refill ceiling. **PW4-C:** deterministic **nearer-distance-first** allocation replacing A's provisional proportional sharing; priorities stay dormant. **PW4-D:** extend the now-live selected Stored Energy / Capacity bar with actual delivered recharge, drain, distance/efficiency and shortage state; a minor player priority control is optional later. A adds only compact energy text to the existing runtime label. **PW5:** relays. See the [authoritative plan](../../Economy/Power/IMPLEMENTATION_PLAN.md).
 
 Validation: focused source/resource/diff review only; no .NET toolchain is available. No runtime or performance acceptance is claimed. Owner: rebuild in Godot .NET, let a completed Battle Tower charge, sustain fire to depletion/restart, remove its source and check stored-energy use, then check a new between-wave Save/Load and existing heat/EMP gates.
