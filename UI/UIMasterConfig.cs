@@ -28,6 +28,11 @@ public partial class UIMasterConfig : Resource
     [Export] public Color HealthHealthyColor { get; set; } = new Color("#69cddc");
     [Export] public Color HealthWarningColor { get; set; } = new Color("#efbc62");
     [Export] public Color HealthCriticalColor { get; set; } = new Color("#ed6666");
+
+    [ExportGroup("Energy Meter")]
+    [Export] public Color EnergyFullColor { get; set; } = new Color("#69e4a3");
+    [Export] public Color EnergyMidColor { get; set; } = new Color("#efbc62");
+    [Export] public Color EnergyLowColor { get; set; } = new Color("#ed6666");
     [Export(PropertyHint.Range, "0,1,0.05")] public float HealthWarningThreshold { get; set; } = 0.5f;
     [Export(PropertyHint.Range, "0,1,0.05")] public float HealthCriticalThreshold { get; set; } = 0.25f;
 

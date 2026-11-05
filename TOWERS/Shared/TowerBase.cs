@@ -29,12 +29,8 @@ public abstract partial class TowerBase : Node2D
     // =========================================================
     // Aimed weapons request one fresh acquisition on their next normal physics tick.
     protected virtual void OnTargetPriorityChanged() { }
-    public virtual string DescribeRuntime()
-    {
-        string ammo = Ammunition?.Describe() ?? "";
-        if (Power == null) return ammo;
-        return ammo + (ammo.Length > 0 ? " · " : "") + $"Energy: {Power.Capacitor.Energy:0.#} / {Power.Capacitor.Settings.Capacity:0.#}";
-    }
+    // Stored capacitor charge has its own Inspector meter; retain only contextual runtime status here.
+    public virtual string DescribeRuntime() => Ammunition?.Describe() ?? "";
     internal void NotifyRuntimeChanged() => RuntimeChanged?.Invoke();
     public event Action ExperienceChanged;
     public TowerRankProgress RankProgress { get; } = new();

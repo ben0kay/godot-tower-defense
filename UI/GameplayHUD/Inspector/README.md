@@ -1,4 +1,14 @@
-## Planned power bar — PW4 (2026-11-04)
+## Stored Energy meter + compact rank (2026-11-05)
+
+**Source implemented; Godot visual acceptance pending.** Placed power-capable towers now show a **separate ENERGY: stored / capacity** text and slim 6px `EnergyBar` beneath Heat, consistent with HP and Ammo. The fill blends **red when depleted → yellow at 50% → green when full**; colours are Inspector-editable via `UI/DefaultUIConfig.tres` (`EnergyLowColor`, `EnergyMidColor`, `EnergyFullColor`). The meter reads `TowerBase.Power.Capacitor.Energy` and `Settings.Capacity` directly, follows existing selected-only `RuntimeChanged` updates, and hides for generator/passive/other towers without a capacitor or during build previews. The former inline `Ammo ready · Energy ...` runtime footer now shows just contextual ammo status because the bar owns energy quantities.
+
+The redundant `RankBonuses` percentage line is **removed entirely**, releasing vertical space without hiding Combat Rank or its XP bar/next-rank text. All earned rank modifiers still participate in `TowerFinalStats`; the left-side CURRENT/NEXT/GAIN table already uses those resolved stats. This does **not** change XP, rank bonuses, upgrades, energy balance or consumption.
+
+**Scope boundary:** This is a small early Inspector display enhancement, *not* full PW4-D: recharge/drain/efficiency details and Power Priority editing stay planned until later phases. No extra tower/HUD `_Process`, new power service, or scene polling. Inspect new Battle Energy bar at full/mid/low/zero charge, non-powered Laser selection, XP rank-up, and bottom-docked layout at the normal game zoom.
+
+---
+
+## Earlier PW4 Inspector plan (2026-11-04; partly superseded by compact Energy bar)
 
 Add the selected tower's power bar alongside the current **heat and ammunition** displays when power consumers are implemented. Use supplied/current-required power plus explicit powered/shortage text and colours, with a nearby per-instance Power Priority 0–100 control. Full/empty allocation is intentional for the initial all-or-nothing supply policy; zero demand gets a neutral no-draw state and nonconsumers hide the bar. Reuse the selected-only event/coalesced refresh pattern. No new polling, stat resolution or power allocation belongs in Inspector code. PW3 generator selection currently reports generation/island through existing runtime details; the consumer bar remains unimplemented. See [consumer notes](../../../TOWERS/Shared/Power/README.md).
 

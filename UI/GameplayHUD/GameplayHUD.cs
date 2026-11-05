@@ -51,14 +51,16 @@ public partial class GameplayHUD : Control
     private CreditGainIndicator _creditGain;
     private ProgressBar _healthBar, _experienceBar, _towerHealthBar, _towerAmmoBar;
     private Label _towerHealthText, _towerAmmoText;
-    private VBoxContainer _defenseMeters;
+    private VBoxContainer _defenseMeters, _powerMeters;
     private VBoxContainer _rankSection, _workSection, _conditionSection;
     private Label _heatText, _disableReasons;
     private ProgressBar _heatBar;
-    private StyleBoxFlat _heatFill;
+    private StyleBoxFlat _heatFill, _energyFill;
+    private Label _energyText;
+    private ProgressBar _energyBar;
     private ProgressBar _workBar;
     private Label _workStatus, _workTime;
-    private Label _rankLabel, _experienceText, _rankBonuses;
+    private Label _rankLabel, _experienceText;
     private CitadelHudRow _citadelRow;
     private CitadelSession _creditSession;
     private CitadelDestination _singleDestination;
@@ -127,6 +129,8 @@ public partial class GameplayHUD : Control
         _defenseMeters = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/Columns/Side/DefenseMeters");
         _towerHealthText = _defenseMeters.GetNode<Label>("HealthText"); _towerHealthBar = _defenseMeters.GetNode<ProgressBar>("HealthBar");
         _towerAmmoText = _defenseMeters.GetNode<Label>("AmmoText"); _towerAmmoBar = _defenseMeters.GetNode<ProgressBar>("AmmoBar");
+        _powerMeters = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/Columns/Side/PowerMeters");
+        _energyText = _powerMeters.GetNode<Label>("EnergyText"); _energyBar = _powerMeters.GetNode<ProgressBar>("EnergyBar");
         _collectCredits = UIButtonFactory.Create("COLLECT CREDITS", () =>
         {
             if (GodotObject.IsInstanceValid(_creditProducer)) { _creditProducer.TryCollect(); SetDefenseDetails(_creditProducer); }
@@ -135,7 +139,6 @@ public partial class GameplayHUD : Control
         _rankSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/Columns/Side/RankSection");
         _rankLabel = _rankSection.GetNode<Label>("Rank");
         _experienceText = _rankSection.GetNode<Label>("ExperienceText");
-        _rankBonuses = _rankSection.GetNode<Label>("RankBonuses");
         _experienceBar = _rankSection.GetNode<ProgressBar>("ExperienceBar");
 
         _startWave = GetNode<Button>("TopBar/Status/StartWave");
@@ -320,7 +323,7 @@ public partial class GameplayHUD : Control
         bool preview = category.EndsWith("Build Preview", StringComparison.Ordinal) || category == "Placement rejected";
         _buildPreview = preview;
         SetRuntimeDetails(""); SetWorkDetails(null); SetConditionDetails(null); SetUpgradeComparison(null, null); SetUpgradeDetails("", "", false);
-        _targetSection.Hide(); _rankSection.Hide(); _defenseMeters.Hide();
+        _targetSection.Hide(); _rankSection.Hide(); _defenseMeters.Hide(); _powerMeters.Hide();
         _towerName.Text = name; _towerName.TooltipText = category + "\n" + notes + "\n" + stats;
         _towerCategory.Text = "";
         _towerStats.Text = stats; _towerNotes.Text = notes;
@@ -387,7 +390,8 @@ public partial class GameplayHUD : Control
     public void SetDefenseDetails(TowerBase tower)
     {
         _creditProducer = tower is CreditProducerTower producer && producer.UsesManualCollection ? producer : null;
-        if (!GodotObject.IsInstanceValid(tower) || _buildPreview) { _creditProducer = null; _collectCredits.Hide(); _defenseMeters.Hide(); SetRuntimeDetails(""); return; }
+        if (!GodotObject.IsInstanceValid(tower) || _buildPreview)
+        { _creditProducer = null; _collectCredits.Hide(); _defenseMeters.Hide(); _powerMeters.Hide(); SetRuntimeDetails(""); return; }
         _collectCredits.Visible = _creditProducer != null;
         if (_creditProducer != null)
         {
@@ -404,6 +408,21 @@ public partial class GameplayHUD : Control
         {
             _towerAmmoText.Text = $"Ammo: {stock.Amount:N0} / {stock.Capacity:N0}";
             _towerAmmoBar.MaxValue = Mathf.Max(1, stock.Capacity); _towerAmmoBar.Value = stock.Amount;
+        }
+        // Capacitor energy belongs to a dedicated visual meter, never the runtime text footer.
+        PowerCapacitor capacitor = tower.Power?.Capacitor;
+        _powerMeters.Visible = capacitor != null && capacitor.Settings.Capacity > 0;
+        if (_powerMeters.Visible)
+        {
+            double capacity = capacitor.Settings.Capacity;
+            double charge = Math.Clamp(capacitor.Energy, 0d, capacity);
+            double fraction = charge / capacity;
+            _energyText.Text = $"ENERGY: {charge:0.#} / {capacity:0.#}";
+            _energyBar.MaxValue = capacity;
+            _energyBar.Value = charge;
+            _energyFill.BgColor = fraction <= .5d
+                ? Config.EnergyLowColor.Lerp(Config.EnergyMidColor, (float)(fraction * 2))
+                : Config.EnergyMidColor.Lerp(Config.EnergyFullColor, (float)((fraction - .5d) * 2));
         }
         string status = tower.DescribeRuntime();
         int separator = status.LastIndexOf('\n');
@@ -491,7 +510,6 @@ public partial class GameplayHUD : Control
         _rankLabel.Text = $"Combat Rank: {current.Rank}";
         _towerName.Text = tower.AuthoredConfig.DisplayName + " · Lv " + tower.UpgradeLevel + " (" + current.Rank + ")";
         _experienceText.TooltipText = $"Total combat XP: {total:0.##}. Earned rank is independent of paid tower levels.";
-        _rankBonuses.Text = $"Damage +{current.DamageBonus * 100:0.##}% · Range +{current.RangeBonus * 100:0.##}% · HP +{current.HpBonus * 100:0.##}%";
         _experienceBar.MinValue = 0;
         _experienceBar.MaxValue = next.HasValue ? next.Value.TotalXp - current.TotalXp : 1;
         _experienceBar.Value = next.HasValue ? total - current.TotalXp : 1;
@@ -901,9 +919,13 @@ public partial class GameplayHUD : Control
         _heatBar.AddThemeStyleboxOverride("fill", _heatFill);
         _heatBar.AddThemeStyleboxOverride("background", new StyleBoxFlat { BgColor = Config.ButtonColor });
         _heatText.AddThemeColorOverride("font_color", Config.MutedTextColor);
+        _energyFill = new StyleBoxFlat { BgColor = Config.EnergyFullColor };
+        _energyBar.AddThemeStyleboxOverride("fill", _energyFill);
+        _energyBar.AddThemeStyleboxOverride("background", new StyleBoxFlat { BgColor = Config.ButtonColor });
+        _energyText.AddThemeColorOverride("font_color", Config.MutedTextColor);
         _disableReasons.AddThemeColorOverride("font_color", Config.HealthCriticalColor);
         _rankLabel.AddThemeColorOverride("font_color", Config.AccentColor);
-        Label[] muted = { _towerCategory, _towerStats, _towerNotes, _experienceText, _rankBonuses,
+        Label[] muted = { _towerCategory, _towerStats, _towerNotes, _experienceText,
             GetNode<Label>("BottomArea/TraySlot/TowerBar/Insets/Tray/Header/Hint") };
         foreach (Label label in muted) label.AddThemeColorOverride("font_color", Config.MutedTextColor);
 

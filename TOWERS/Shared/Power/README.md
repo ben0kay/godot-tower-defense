@@ -19,8 +19,16 @@ The existing [PowerGridManager](../../Economy/Power/Shared/README.md) runs a mod
 
 Checkpoint state includes energy, priority, restart latch/minimum and unexpired paid active time. Authored capacity/rates remain in resources. Only power's exact owned NoPower handle is omitted; external NoPower conditions still persist. Restore derives the owned handle while the battlefield is paused. Missing optional power data restores empty; strict content-fingerprint compatibility remains unchanged and can reject pre-change checkpoints. Never edit an old JSON fingerprint to bypass it.
 
+## Compact energy bar delivered (UI amendment, 2026-11-05)
+
+The existing selected-tower Inspector now displays capacitor **ENERGY current / capacity** with its own thin bar, styled red→yellow→green by charge ratio, independent of the Heat and Ammo meters. It is event-updated from `RuntimeChanged`; towers with no capacitor and build previews show no energy bar. Inline energy quantity was removed from the runtime-status footer to avoid duplication. The Combat Rank bonus-percentages line was removed to free the vertical space; its combat effects and rank XP remain unchanged. [Inspector notes](../../../UI/GameplayHUD/Inspector/README.md).
+
+This delivers only the **charge meter** requested ahead of full PW4-D; recharge/distance efficiency, drain details and Power Priority control remain **future phases**. The power service, save format, attack funding and capacity calculations are unchanged. Source check only; in-editor playback and layout QA pending.
+
+---
+
 ## Remaining phases
 
-**PW4-B:** conductive-distance refill ceiling. **PW4-C:** deterministic priority allocation replacing A's provisional sharing. **PW4-D:** selected Heat/Ammo-style **Stored Energy / Capacity** bar, live rates/efficiency and priority control. A adds only compact energy text to the existing runtime label. **PW5:** relays. See the [authoritative plan](../../Economy/Power/IMPLEMENTATION_PLAN.md).
+**PW4-B:** conductive-distance refill ceiling. **PW4-C:** deterministic priority allocation replacing A's provisional sharing. **PW4-D:** extend the now-live selected Stored Energy / Capacity bar with live rates/efficiency and priority control. A adds only compact energy text to the existing runtime label. **PW5:** relays. See the [authoritative plan](../../Economy/Power/IMPLEMENTATION_PLAN.md).
 
 Validation: focused source/resource/diff review only; no .NET toolchain is available. No runtime or performance acceptance is claimed. Owner: rebuild in Godot .NET, let a completed Battle Tower charge, sustain fire to depletion/restart, remove its source and check stored-energy use, then check a new between-wave Save/Load and existing heat/EMP gates.

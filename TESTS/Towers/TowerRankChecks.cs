@@ -221,9 +221,18 @@ public static class TowerRankChecks
             placement.Call("SelectTower", tower);
             var section = hud.GetNode<Control>("BottomArea/Inspector/Insets/Body/Columns/Side/RankSection");
             var label = section.GetNode<Label>("Rank"); var text = section.GetNode<Label>("ExperienceText");
-            var bar = section.GetNode<ProgressBar>("ExperienceBar"); var bonuses = section.GetNode<Label>("RankBonuses");
-            Require(section.Visible && label.Text == "Enhanced" && text.Text.Contains("0 / 4000 XP → Superior")
-                && bonuses.Text.Contains("Damage +4%") && bonuses.Text.Contains("Range +2%"), "Placed bottom-right Inspector shows named rank, segment XP and active bonuses");
+            var bar = section.GetNode<ProgressBar>("ExperienceBar");
+            var powerMeters = hud.GetNode<Control>("BottomArea/Inspector/Insets/Body/Columns/Side/PowerMeters");
+            var energyBar = powerMeters.GetNode<ProgressBar>("EnergyBar");
+            var energyText = powerMeters.GetNode<Label>("EnergyText");
+            Require(section.Visible && label.Text == "Combat Rank: Enhanced" && text.Text.Contains("0 / 4000 XP → Superior")
+                && section.GetNodeOrNull<Label>("RankBonuses") == null,
+                "Placed Inspector preserves XP/rank but omits redundant rank bonus percentages");
+            Require(tower.Power != null && powerMeters.Visible
+                && energyBar.MaxValue == tower.Power.Capacitor.Settings.Capacity
+                && Math.Abs(energyBar.Value - tower.Power.Capacitor.Energy) < .01
+                && energyText.Text.StartsWith("ENERGY: "),
+                "Opt-in powered Battle Tower shows actual charge and capacity in its meter");
             TowerFinalStats cached = tower.FinalStats; string upgrade = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeInfo").Text;
             TowerRankController.AwardExperience(tower, 1200);
             await main.ToSignal(main.GetTree(), SceneTree.SignalName.ProcessFrame);
@@ -232,7 +241,7 @@ public static class TowerRankChecks
                 && text.Text.Contains("1200 / 4000 XP → Superior"), "XP events update actual progress without pipeline polling/rebuilds");
             Require(hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeInfo").Text == upgrade, "XP updates preserve the existing upgrade panel");
             TowerRankController.AwardExperience(tower, 10800);
-            Require(label.Text == "Legendary" && text.Text.Contains("MAX RANK") && bar.Value == bar.MaxValue,
+            Require(label.Text == "Combat Rank: Legendary" && text.Text.Contains("MAX RANK") && bar.Value == bar.MaxValue,
                 "Multiple promotions update MAX RANK display and full progress bar automatically");
             Require(tower.UpgradeLevel == 3 && tower.FinalStats.DamagePerShot == 39 && tower.RankProgress.TotalXp == 15000,
                 "Level and earned rank stay independent at maximum");
@@ -242,9 +251,10 @@ public static class TowerRankChecks
             Require(panel.GetGlobalRect().Position.Y >= 0 && panel.GetGlobalRect().End.Y <= hud.Size.Y + 1,
                 "Rank section preserves onscreen Inspector layout");
             placement.Call("SelectTower", other);
-            Require(label.Text == "Standard" && text.Text.Contains("0 / 1000 XP → Veteran"), "Selecting another tower shows its independent XP");
+            Require(label.Text == "Combat Rank: Standard" && text.Text.Contains("0 / 1000 XP → Veteran") && !powerMeters.Visible,
+                "Selecting a power-free tower shows independent XP and hides capacitor meter");
             TowerRankController.AwardExperience(tower, 50);
-            Require(label.Text == "Standard", "Previously selected tower unsubscribes from Inspector updates");
+            Require(label.Text == "Combat Rank: Standard", "Previously selected tower unsubscribes from Inspector updates");
             hud.ClearInspection(); TowerRankController.AwardExperience(other, 1.5);
             placement.Call("SelectTower", other);
             Require(hud.IsInspectionVisible && text.Text.Contains("1.5 / 1000 XP → Veteran"),
