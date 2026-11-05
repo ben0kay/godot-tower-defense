@@ -1,3 +1,9 @@
+## 2026-11-05 — PW4-C distance-first shortage decision (docs only)
+
+Updated [PW4 implementation plan](../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md), Power overview, consumer notes and backlog. Under limited output, **nearest conductive-path towers charge first**, more distant towers can receive zero refill, and full batteries leave supply for others. Retains the PW4-A stored capacitor and PW4-B distance recharge ceiling; no energy created/erased. Existing saved PowerPriority stays inactive; future optional player slider may only mildly bias distance after separate approval. PW4-D will distinguish actual recharge from potential recharge. **PW4-C not implemented; docs only.**
+
+---
+
 ## Victory Results hold — 2026-11-05
 
 LevelSessionController now holds the frozen winning battlefield for **4 seconds** before showing Mission Results. Configure `LevelSession → VictoryResultsDelaySeconds` in the shared battlefield Inspector; 0 restores immediate presentation. Outcome arbitration, final counters and pause/input locks still latch immediately; defeat presentation is unchanged. One child Timer runs during the results-owned pause, and stop/unsubscribe on controller exit prevents a delayed popup after unloading. No idle processing loop or terrain work. Existing outcome/reward/navigation fixtures explicitly use 0 to retain their immediate-presentation assertions. Source review only; Godot build/play validation pending.
