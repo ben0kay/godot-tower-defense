@@ -1,3 +1,9 @@
+## TA1 acoustic firing sound revision — 2026-11-05
+
+The original Battle Tower gunshot was audible but sounded comical due to its falling synthetic energy pitch. Replaced `Sounds/BattleFire.wav` **in place** with a drier, percussive, acoustic-style gunshot: broadband crack, compact low-frequency body and faint metallic tail (0.29 s, 44.1 kHz, mono 16-bit PCM). The sound ID `tower_battle_fire`, per-tower firing hook, volume, priority, cooldown, distance/visibility culling and pool limits are preserved. See [Sounds](Sounds/README.md). In-game tonal acceptance remains for the owner.
+
+---
+
 ## TA1 — authored Battle Tower firing audio (2026-11-04)
 
 Battle Tower now fires a **real original 0.26s WAV** (metallic sci-fi cannon impulse with descending energy tail) whenever it successfully launches a paid projectile. The clip and Inspector-editable `AudioDefinition` live under [Sounds/](Sounds/README.md), not in the global audio folder. Its stable ID `tower_battle_fire` is registered in `AUDIO/DefaultAudioCatalog.tres`. `BattleTowerConfig.FireSoundId` defaults to that ID and may be cleared to silence an individual authored config. `BattleTower` caches the shared `AudioManager` on readiness, calls `PlayFrom` on successful firing, and lets the manager enforce positional attenuation, off-screen/range culling, priority 40, per-tower 0.12s cooldown, max 8 overlapping instances and the existing WorldSFX cap. **No sound player node, process loop or gameplay dependency added to individual towers.** Source/clip verified; Godot sound balance and FPS remain for local testing.

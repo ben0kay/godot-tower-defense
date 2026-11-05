@@ -1,6 +1,6 @@
 # Battle Tower — firing sound
 
-- `BattleFire.wav` is a **new original 0.26-second, 24 kHz, mono 16-bit PCM** sci-fi cannon report, consisting of a crisp mechanical attack, descending energy tone and fast low-frequency tail. It is committed as a real WAV asset, not generated during gameplay.
+- `BattleFire.wav` is an **original 0.29-second, 44.1 kHz, mono 16-bit PCM acoustic-style gunshot**. The earlier cartoonish descending electronic cannon tone was replaced with a much drier broadband crack, a short low-end thump, faint mechanical clicks and restrained early reflections. There is no pitched sci-fi sweep. It is a committed WAV asset, not generated during gameplay.
 - `BattleFire.tres` owns the stable `AudioDefinition` ID **`tower_battle_fire`**; the shared `AUDIO/DefaultAudioCatalog.tres` references it. The manager stays autoloaded as `GameAudio` and uses pooled `AudioStreamPlayer2D`.
 - `BattleTowerConfig.FireSoundId` controls the optional sound ID per tower/config (blank disables audio). `BattleTower._Ready` caches the existing AudioManager once; a **successfully funded and emitted shot** calls `PlayFrom(soundId, this)` so the per-owner cooldown, culling and category budgets remain authoritative.
 - Default priority **40**, owner-specific cooldown **0.12s**, maximum **8** concurrent instances of this sound ID, world audio budget **24** shared one-shots, **550px** max listener distance, and **off-screen culling enabled** for this definition. Pitch 1.0; mix **−4 dB**.
@@ -8,3 +8,5 @@
 - When adding other tower sounds, keep each clip and definition with its own tower type; register all definitions centrally in `AUDIO/DefaultAudioCatalog.tres`. AudioSystem handles distance/pan/budgets, not the tower.
 
 **Local validation pending:** pull `dev`, let Godot import the WAV, launch a battlefield with a firing Battle Tower; listen close and at >550px, move the camera left/right, try off-screen firing and many simultaneous towers. Test disabling the sound via the FireSoundId field (blank) or definition settings. No gameplay audio or FPS measurement was done remotely.
+
+**2026-11-05 revision:** Replaced the original electric-looking sound because the tower was audible but sounded too comical. WAV content-only replacement (same path and resource ID); no config, cooldown, priority, category budgets, distance culling, combat timing or sound-manager code changed. Audibility is confirmed by owner for the earlier clip; new mix/playfeel is still unverified in Godot.

@@ -1,3 +1,9 @@
+## Battle Tower firing clip refined — 2026-11-05
+
+The owner confirmed the Battle Tower sound triggers, but the first electronic cannon tone sounded comical. Its authored `TOWERS/Offensive/BattleTower/Sounds/BattleFire.wav` has been replaced **at the same path** with a short, dry acoustic-style gunshot (sharp crack, low punch, subtle mechanical tail). The existing catalog ID, `PlayFrom` hook, positional sound, 24-world one-shot budget, and sound-definition tuning are unchanged. Godot playback and mix acceptance of the replacement are pending.
+
+---
+
 ## Battle Tower gunshot audio — first tower shot hook (2026-11-04)
 
 A new original 0.26-second PCM WAV is stored in `TOWERS/Offensive/BattleTower/Sounds/BattleFire.wav`, with an adjacent `BattleFire.tres` audio definition registered in `DefaultAudioCatalog.tres` as `tower_battle_fire`. Battle Tower requests `AudioManager.PlayFrom` only **after an actual funded projectile launch**, using the placed tower as the owner for independent cooldown and positional origin. It inherits the existing 24-world-shot budget, pooled players, listener distance and screen culling; default 550px max distance, off-screen disabled, owner cooldown 0.12s, per-ID cap 8 and priority 40. Gameplay never depends on sound availability. See [Battle Sounds](../TOWERS/Offensive/BattleTower/Sounds/README.md). Godot import/playback and mixing QA pending.
