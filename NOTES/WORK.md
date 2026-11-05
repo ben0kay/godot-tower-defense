@@ -1,3 +1,9 @@
+## 2026-11-05 — PW4-C redesign: geographical first allocation (docs only)
+
+Updated [power implementation plan](../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md), related producer/consumer documentation and backlog. Owner clarified that **PW4-B distance controls the maximum charging rate AND PW4-C will give scarce energy to physically closer towers first**, so distant towers may get zero when producers are overloaded. Same-distance requests share proportional remainder; total energy remains supply-limited. The existing stored `PowerPriority` stays dormant; only a future, explicitly approved bounded Inspector weighting could slightly change allocation order. PW4-D prioritizes real delivered rate/distance/energy UI, not an inactive priority slider. **PW4-A/B unchanged; no gameplay or C#/scene edits.** Focused documentation review only.
+
+---
+
 ## PW4-B — cached distance-limited recharge — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** Existing power manager now owns one coalesced multi-source conductive BFS; valid Citadel/generator footprints anchor delivery. Shared Inspector curve: 4 full cells, 12 soft falloff cells, 10% reachable-route floor. Recharge ceiling = nominal refill × efficiency; no route means zero. Capacity/drain/attack funding/source output and stored charge are unchanged; no new consumers, priority scheduling or relays. Cached consumer APIs expose distance/efficiency/ceiling; final derived cache is rebuilt before checkpoint unpause without new saved fields. Performance: reused arrays, no per-tower pathfinding/frame flood fill, no distance rebuild for positive output or curve-only edits. Narrow fixture updated; source/resource review only (environment unavailable), no build/runtime/benchmark claim. [Power guide](../TOWERS/Economy/Power/Shared/README.md).
