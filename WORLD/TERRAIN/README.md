@@ -1,3 +1,9 @@
+## Mountain visual first pass — 2026-11-05
+
+Mars atlas now has a third 64px cell: **(2,0), source 2 in Impassable**. Paint it to generate connected raised mountain facets on battlefield load. Prototype, original tiles and existing maps are preserved. Movement/building are blocked; tower sight blocking is future work. [Configuration and preview instructions](Mountains/README.md). Historical two-cell descriptions below refer to the original rollout.
+
+---
+
 ## E1/E2 implementation — 2026-10-21
 
 E1 clips both64×64 SVG atlas cells independently, removes the dust's repeated gradient/sediment bands in favour of low-contrast seamless grain, and softens the rock's repeating black strokes. Source IDs, atlas coordinates, TileData flags and saved maps are unchanged.
@@ -35,3 +41,4 @@ WorldGrid caches Passable → Interactive → Impassable, then applies Portal/Ci
 One world-scoped InteractiveTileManager handles immediate-entry and periodic Lava damage for only active occupants, with actual swept-segment exposure and no per-tile nodes or full-world enemy scans. Adjacent Lava retains one timer, exit removes it, teleports only enter their destination. Inspector LavaTileConfig owns damage/interval/entry toggle/type. Artwork is vivid orange liquid with tiny sparse highlights. Paint Lava in Terrain/Interactive source1; it has not been arbitrarily added to the playable map. See Interactive/README.md for complete behavior and tests.
 
 Explicit WorldGrid.RebuildTerrain updates rules and reconciles hazards; hazard/build-permission-only changes do not unnecessarily rebuild A*. Blocking/goal changes retain navigation invalidation. Tower placement/removal retains incremental occupancy behavior. WorldTerrain.tres remains a legacy mixed palette; current scenes use the category palettes.
+

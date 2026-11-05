@@ -1,3 +1,9 @@
+## Mountain terrain visual first pass — 2026-11-05
+
+**Source Implemented / Awaiting Owner Validation.** Mars atlas expands to 192×64, preserving dust/rock coordinates and adding mountain marker (2,0) to Impassable source 2. Existing navigation/placement flags block movement/building. World-scoped metadata-driven renderer generates shared-vertex faceted ridges and shadows once on load/explicit terrain rebuild, with stable seed and configurable height/colors. No per-cell nodes, processing loops or occupancy invalidation. Prototype atlas and painted maps remain unchanged. Tower line-of-sight and depth-aware object sorting remain future work. Paint a 3×2 block and launch through Campaign/Main to preview. Source/resource review only; Godot/.NET and visual validation pending. See [mountain guide](../WORLD/TERRAIN/Mountains/README.md).
+
+---
+
 ## 2026-11-05 — PW4-C distance-first shortage decision (docs only)
 
 Updated [PW4 implementation plan](../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md), Power overview, consumer notes and backlog. Under limited output, **nearest conductive-path towers charge first**, more distant towers can receive zero refill, and full batteries leave supply for others. Retains the PW4-A stored capacitor and PW4-B distance recharge ceiling; no energy created/erased. Existing saved PowerPriority stays inactive; future optional player slider may only mildly bias distance after separate approval. PW4-D will distinguish actual recharge from potential recharge. **PW4-C not implemented; docs only.**
