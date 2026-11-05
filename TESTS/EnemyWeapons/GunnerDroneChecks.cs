@@ -1,4 +1,4 @@
-// EG3 integration: real inherited medium-size gunner, F2/catalog, split hull/gun, accepted-shot flashes and tower damage.
+// EG3 integration: compact starter Gunner, F2/catalog, split hull/gun, accepted-shot flashes and tower damage.
 using Godot;
 using System;
 using System.Linq;
@@ -22,7 +22,7 @@ public partial class GunnerDroneChecks : Node
                 Definitions(f); CatalogCycle(f); Firefight(f); StealthAndFreeze(f); Overflow(f);
             }
             await SubsystemBattlefield.DrainFreedFixtures(this);
-            GD.Print("PASS: EG3 Gunner Drone split artwork/medium size, parked catalog cycle, muzzle snapshots, accepted-shot flashes and tower HP loss");
+            GD.Print("PASS: EG3 Gunner Drone compact starter artwork, parked catalog cycle, muzzle snapshots, accepted-shot flashes and tower HP loss");
             GetTree().Quit();
         }
         catch (Exception error) { GetTree().Paused = false; GD.PushError(error.ToString()); GetTree().Quit(1); }
@@ -44,17 +44,17 @@ public partial class GunnerDroneChecks : Node
             Require(waves.SelectMany(w => w.Batches).SelectMany(b => b.Entries).All(e => e.EnemyId != "gunner_drone_mk1"),
                 "Current authored waves do not include the new armed ship");
         EnemyDefinition definition = catalog.DefinitionFor("gunner_drone_mk1");
-        Require(definition.Class == EnemyClass.Standard && definition.Rank == EnemyRank.Common && definition.Role == EnemyRole.Fighter && definition.MaxHealth == 180 && definition.MoveSpeed == 75
-            && definition.RadiusPixels == 22 && definition.KillRewardCredits == 8 && definition.MaxShield == 0,
+        Require(definition.Class == EnemyClass.Standard && definition.Rank == EnemyRank.Common && definition.Role == EnemyRole.Fighter && definition.MaxHealth == 135 && definition.MoveSpeed == 75
+            && definition.RadiusPixels == 18 && definition.KillRewardCredits == 8 && definition.MaxShield == 0,
             "Gunner has independent editable playtest balance");
         Enemy preview = catalog.Find("gunner_drone_mk1").Instantiate<Enemy>();
-        Texture2D medium = GD.Load<Texture2D>("res://ENEMIES/Types/Enemy004/Artwork/enemy004.svg");
-        Require(preview.GetNode<Sprite2D>("Sprite").Texture.GetSize() == medium.GetSize() && medium.GetSize() == new Vector2(64, 48),
-            "Hull matches actual medium Enemy004 size, not its shape");
+        Require(preview.GetNode<Sprite2D>("Sprite").Texture.GetSize() == new Vector2(52, 38),
+            "Compact starter Gunner hull is 52x38, smaller than the 64x48 Bulwark");
         var gun = preview.GetNode<EnemyMinigun>(WeaponPath);
         Require(gun.GetNode<Sprite2D>("TurretPivot/GunSprite").Texture != preview.GetNode<Sprite2D>("Sprite").Texture
+            && gun.GetNode<Sprite2D>("TurretPivot/GunSprite").Texture.GetSize() == new Vector2(20, 40)
             && gun.GetNode<Marker2D>("TurretPivot/GunSprite/Muzzle").Position == new Vector2(0, -18),
-            "Separate gun SVG has one real barrel-tip muzzle");
+            "Slimmer separate 20x40 gun keeps the original physical barrel-tip muzzle");
         preview.Free();
     }
     // =========================================================

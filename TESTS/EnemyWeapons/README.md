@@ -1,3 +1,9 @@
+## Compact starter Gunner regression expectations — 2026-11-04
+
+The existing GunnerDroneChecks definitions check has been updated for **52×38 hull art**, **20×40 thin gun art**, **135 HP**, and **18 px movement radius**. The authoritative `Muzzle=(0,-18)` still has the same world-shot position; no changes were made to gunner bullet requests, tracer/head/tail, muzzle flash, 6/s firing or hit damage. No test suite was executed for this cosmetic/stat edit, per the project's light-testing preference; run the focused Gunner test only if the owner requests validation. Existing older EG3 records below describe the original 64×48/180HP baseline at the time.
+
+---
+
 ## Gunner polish verification — 2026-10-20
 
 Executed with the local Godot4.7.2 .NET runtime and .NET8 SDK, using its local NuGet feed:

@@ -10,7 +10,7 @@
 | Racer Interceptor | Tiny | Veteran | Fighter | `racer_mk1` | `Types/Racer/` | 34×18 |
 | Bulwark Drone | Standard | Common | Fighter | `medium_mk1` | `Types/Enemy004/` | 64×48 |
 | Heavy Bulwark | Heavy | Veteran | Fighter | `heavy_bulwark_mk1` | `Types/HeavyBulwark/` | 88×64 |
-| Gunner Drone | Standard | Common | Fighter | `gunner_drone_mk1` | `Types/GunnerDrone/` | 64×48 |
+| Gunner Drone | Standard | Common | Fighter | `gunner_drone_mk1` | `Types/GunnerDrone/` | 52×38 |
 | Shield Emitter | Standard | Common | Support | `shield_emitter_mk1` | `Types/Enemy003/` | 40×32 |
 | Shield Frigate | Heavy | Veteran | Support | `shield_frigate_mk1` | `Types/ShieldFrigate/` | 72×48 |
 | Drone Transporter | Heavy | Common | Cargo | `transporter_mk1` | `Types/Transporter/` | 112×72 |
@@ -18,6 +18,8 @@
 | Heavy Warship | Superheavy | Veteran | Fighter | `big_mk1` | `Types/Enemy005/` | 112×120 |
 | Elite Assault Ship | Heavy | Elite | Fighter | `elite_mk1` | `Types/Enemy006/` | 80×60 |
 | Cruiser | Capital | Elite | Fighter | `cruiser_mk1` | `Types/Cruiser/` | 168×96 |
+
+**Gunner starter resize — 2026-11-04:** Gunner's art is now 52×38 (was 64×48), minigun 20×40, hull health 135 (was 180) and movement radius 18 (was 22). Its **Standard** Class and Common Rank are retained deliberately: classification is descriptive metadata, not an automatic physics/health scale. A class regrouping can be a separate decision. Bullet presentation and stable EnemyId are unchanged.
 
 ## Authoring contract
 

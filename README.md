@@ -1,3 +1,9 @@
+## Gunner Drone compact starter-ship revision — 2026-11-04
+
+The Gunner enemy now uses a compact **52×38** swept-fighter silhouette (formerly 64×48), a **20×40** minigun image narrowed 20% (formerly 24×40), and **135 max HP** (formerly 180, exactly 25% less). Movement/corridor radius was reduced 22→18 px to fit the smaller ship. Its separate rotating gun, barrel-tip muzzle marker, original projectile look/damage/cadence, 75px/s movement, catalog ID, loot and classification remain unchanged. Existing focused test expectations and enemy roster documentation were updated; no runtime tests run. See [Gunner details](ENEMIES/Types/GunnerDrone/README.md).
+
+---
+
 ## Power PW3 — buildable Industrial Generator — 2026-11-04
 
 Economy now offers Industrial Generator: provisional **250 power, 300 Credits, 5s construction, 1200 HP, 2×2**. Shared generator code uses existing construction/art, disable, selection and checkpoint lifecycle without a frame-processing loop. No consumers/outages yet. The selected-tower power bar matching heat/ammo is recorded for PW4. See [Industrial guide](TOWERS/Economy/Power/IndustrialGenerator/README.md). Source checks only; owner Godot validation pending.
