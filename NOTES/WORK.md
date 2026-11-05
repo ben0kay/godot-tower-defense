@@ -1,3 +1,9 @@
+## Level011 right-edge bounds fix — 2026-11-05
+
+Expanded only Level011WorldConfig WidthCells 160→192 (height120/cell64 unchanged). Current paint reaches X=175 and the Citadel sits past old X=10240px, so the camera correctly clamped short and grid ignored right-side content. New local bounds12288×7680 contain current layout with margin. Authored scene/objects, shared camera code, other missions and global defaults untouched. Updated Level011 notes. Minimal coordinate/config review only; restart/redeploy and inspect right-edge pan/placement in Godot. No runtime/benchmark claim.
+
+---
+
 ## Level011 shared map migration — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** Level011 now inherits BaseLevelMap with four local editable terrain layers. Focused before/after comparison preserved every original node property, scene header, terrain block, object position and resource reference. Independent 160×120 WorldConfig, LevelConfig, waves and mission registration are untouched. Updated Level011/shared authoring notes and added its migration inventory. Source comparison only; no repeated Godot probe, build or gameplay test. Owner: reopen Level011, paint local layers and deploy through Campaign. [Level011](../LEVELS/Level011/README.md).

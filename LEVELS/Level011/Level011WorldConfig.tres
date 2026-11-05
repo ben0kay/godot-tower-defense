@@ -4,6 +4,6 @@
 
 [resource]
 script = ExtResource("world")
-WidthCells = 160
+WidthCells = 192
 HeightCells = 120
 CellSize = 64
