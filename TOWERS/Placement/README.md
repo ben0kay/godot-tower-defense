@@ -1,3 +1,9 @@
+## Cached sight-aware selected range — 2026-11-05
+
+Placement now delegates selected range drawing to `FEEDBACK/Selection/TowerRangeOverlay`: cyan visible area, red obstructed area and matching arc segments for aimed hostile towers. Existing support/untargeted circles keep their normal color. Selection close/deselect/build previews/unload clear the cached presenter; only range/position/settings/terrain changes rebuild it, with no processing callback or per-frame sight scan. Tune colors/opacities in the existing TowerMasterConfig. [Rendering details](../../FEEDBACK/Selection/README.md). Source-only validation; Godot owner review pending.
+
+---
+
 ## Shared selected-tower overlay (2026-11-03)
 
 A single shared `FEEDBACK/Selection/TowerSelectionOverlay` follows this controller's existing `SelectTower` lifecycle. On selecting a placed tower, a stronger but translucent HUD tactical grid/tint appears, together with a world-space caption to the tower's right and a slightly oversized pulsing footprint bracket. Status uses the existing selected tower disable/work signals (aqua operational, red disabled/upgrading), with no new gameplay polling. Overlay clears when inspection closes, selection is removed, build previews start or the tower exits. The pre-existing selection range and lower-right Inspector are untouched. Settings and owner QA: [Selection feedback](../../FEEDBACK/Selection/README.md).
@@ -83,3 +89,4 @@ Preview checks only terrain/occupancy/affordability; full navigation validation 
 ## Startup and economy
 
 A null Catalog export loads `res://TOWERS/DefaultTowerCatalog.tres` with a warning; explicit catalogs remain unchanged, and a missing default reports its exact resource path. Factory/Depot reuse normal catalog, wallet and Inspector infrastructure. Factory production remains 100 rounds/2s with **1,000-round shipments**; Depot retains **10,000 storage**. Centered roots remain drone departure/return positions; transport/reservations/consumption and upgrade prices are unchanged. Selling UI and saving remain deferred.
+

@@ -16,6 +16,7 @@ public partial class RepairTowerChecks : Node
             {
                 SubsystemBattlefield.DetachSession(f.Main);
                 Check(f);
+                CheckStickyTarget(f);
             }
             await SubsystemBattlefield.DrainFreedFixtures(this);
             GD.Print("PASS: RT1 repair stats, friendly hull/beam, pause/disable/full/range/work and checkpoint inputs");
@@ -83,6 +84,31 @@ public partial class RepairTowerChecks : Node
             "Restore derives repair capability with no transient target/beam save fields");
         restored.Free(); target.Free();
     }
+    // =========================================================
+    // Both ships stay eligible while their relative health fractions cross; only completion releases the lock.
+    private void CheckStickyTarget(AmmoLoopFixture f)
+    {
+        Vector2 origin = new(2000, 2000);
+        RepairTower healer = f.Add<RepairTower>("repair", origin);
+        BattleTower first = f.Add<BattleTower>("battle", origin + Vector2.Up * 100,
+            config => { config.Power = null; config.MaxHealth = 100; });
+        BattleTower second = f.Add<BattleTower>("battle", origin + Vector2.Up * 150,
+            config => { config.Power = null; config.MaxHealth = 100; });
+        Hurt(first, 70); Hurt(second, 60);
+        healer._PhysicsProcess(.5);
+        Near(first.Health, 38, "Initial lowest-integrity target is selected");
+        healer._PhysicsProcess(.5); // First becomes healthier than second.
+        Near(first.Health, 46, "Repair remains on first while fractions cross");
+        Hurt(second, 20); // A newly more urgent target must not steal the active beam.
+        healer._PhysicsProcess(.5);
+        Near(first.Health, 54, "Current valid target survives periodic search deadlines");
+        Near(second.Health, 20, "Other damaged target waits");
+        first.RestoreHealth(100);
+        healer._PhysicsProcess(.5);
+        Near(second.Health, 28, "Completion releases the lock and selects the next damaged tower");
+        healer.Free(); first.Free(); second.Free();
+    }
     private static void Hurt(TowerBase tower, float amount) => tower.ApplyDamage(new DamageInfo(amount, DamageType.Kinetic, hullCoefficientOverride: 1));
     private static void Near(float a, float b, string message) => Require(Math.Abs(a - b) < .001, message);
 }
+

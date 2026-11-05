@@ -5,7 +5,7 @@
 ## Owners and behavior
 
 - `RepairTowerConfig.cs` / `RepairTowerLevels.cs`: normal private config copies and a complete absolute Level 1 row. Inspector exports tune repair rate/range/aim/search. Standard-only rank; no automatic support XP or purchased tiers.
-- `RepairTower.cs`: RT0 `FriendlyTowerTargeting`, one retained scratch list and a cached friendly lock. Lowest finite hull fraction wins, with registration-order ties. Queries use TowerRegistry's spatial index at the staggered interval; cached validation is O(1). No enemy/Citadel/shield/mobile-unit targeting, group lookup or scene-container scan.
+- `RepairTower.cs`: RT0 `FriendlyTowerTargeting`, one retained scratch list and a cached friendly lock. Lowest finite hull fraction wins, with registration-order ties. Queries use TowerRegistry's spatial index at the staggered interval **only while no valid target is locked**; cached validation is O(1). A valid target is retained until its hull is full or it becomes ineligible, even when another tower's integrity becomes lower. No enemy/Citadel/shield/mobile-unit targeting, group lookup or scene-container scan.
 - Repair occurs only when operational, unpaused, aligned and target-eligible. It applies `RestoreHealth` for min(delta, missing hull / rate); no negative damage, direct health writes, resurrection or overheal. Damaged EMP/heat/NoPower-disabled targets can receive repair; busy/destroyed/full/out-of-range targets cannot. The healer's own disable/work gates stop repair.
 - Current target health/work/spatial/death/exit events clear invalid locks and hide the beam immediately. Source disable/work/removal and registry exit stop processing and presentation. Inactive/zero-rate towers sleep; operational idle towers keep the small staggered acquisition clock. Scratch capacity is retained, and no query/result/delegate array is allocated per frame.
 - `Artwork/` owns new native 64×64 white/silver/aqua base, head and composite icon SVGs. The head rotates about the fixed root; `TurretPivot/Muzzle` is at the physical tip (0,-29). One initial foundation image uses the existing construction presenter/drone/work clock, then restores split layers. Extra 35/70% stages and paid-tier art remain RT3.
@@ -24,3 +24,8 @@ Existing placement, selection/range ring, health bar, construction and checkpoin
 [Authoritative plan](IMPLEMENTATION_PLAN.md) · [targeting](../../Shared/Targeting/README.md) · [focused owner check](../../../TESTS/Towers/RepairTower.md).
 
 Validation: lightweight source/resource review only. Execution environment unavailable; no .NET build, fixture or Godot visual/performance pass was run. Owner: pull dev, rebuild/import SVGs, build Support → Restoration Tower, damage a nearby tower, inspect muzzle/beam/repair, full/range/work/EMP/pause behavior and a fresh Save/Load. Optional F6 fixture is `TESTS/Towers/RepairTowerChecks.tscn`.
+
+
+## Sticky repair lock — 2026-11-05
+
+A passing search deadline no longer replaces an eligible lock. Health percentage crossings or new damage on other towers cannot cause beam ping-pong. Full health, target work/death/removal/out-of-range, or healer shutdown still clears the target through existing events; the next eligible search selects Lowest Integrity again. The search clock remains bounded at zero while repairing, so a completed long repair can acquire another target next normal tick. No extra query, timer, save field or operating cost. `RepairTowerChecks` includes two-target crossing/completion checks, authored but unrun here.

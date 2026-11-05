@@ -40,6 +40,7 @@ public partial class TowerPlacementController : Node2D
     private readonly Dictionary<TowerBase, Action> _placementExits = new();
     private TowerBase _selected;
     private TowerSelectionOverlay _selectionOverlay;
+    private TowerRangeOverlay _rangeOverlay;
     private int _displayedUpgradeLevel;
     private ulong _lastUpgradeFrame = ulong.MaxValue;
     #endregion
@@ -68,6 +69,8 @@ public partial class TowerPlacementController : Node2D
         _selectionOverlay = new TowerSelectionOverlay { Name = "SelectedTowerOverlay" };
         AddChild(_selectionOverlay);
         _selectionOverlay.Configure(_grid, _hud);
+        _rangeOverlay = new TowerRangeOverlay { Name = "SelectedTowerRange", ZIndex = 9 };
+        AddChild(_rangeOverlay); _rangeOverlay.Configure(_grid, Settings);
         Catalog.Rebuild();
         _hud.BindCatalog(Catalog);
         foreach (TowerDefinition definition in Catalog.Definitions)
@@ -415,6 +418,7 @@ public partial class TowerPlacementController : Node2D
         RefreshUpgradePreview();
         if (GodotObject.IsInstanceValid(_selected)) _selectionOverlay?.ShowTower(_selected);
         else _selectionOverlay?.Clear();
+        _rangeOverlay?.Present(_selected);
         QueueRedraw();
     }
 
@@ -466,6 +470,7 @@ public partial class TowerPlacementController : Node2D
     private void OnInspectionClosed()
     {
         _selectionOverlay?.Clear();
+        _rangeOverlay?.Clear();
         _browsingBuild = false;
         ObserveWork(null);
         if (GodotObject.IsInstanceValid(_selected))
@@ -623,10 +628,6 @@ public partial class TowerPlacementController : Node2D
     // Draw the full preview rectangle and optional selected weapon range; grid transforms stay authoritative.
     public override void _Draw()
     {
-        if (GodotObject.IsInstanceValid(_selected) && _selected.InspectionRange.HasValue && Settings.ShowSelectionRange)
-            DrawArc(ToLocal(_selected.GlobalPosition), _selected.InspectionRange.Value, 0f,
-                Mathf.Tau, 96, new Color(0.37f, 0.82f, 0.95f, 0.55f), 2f);
-
         if (!_previewVisible || !Settings.ShowPlacementPreview) return;
         float size = _grid.Config.CellSize;
         DrawSetTransformMatrix(GlobalTransform.AffineInverse() * _grid.GlobalTransform);
@@ -639,3 +640,4 @@ public partial class TowerPlacementController : Node2D
     }
     #endregion
 }
+

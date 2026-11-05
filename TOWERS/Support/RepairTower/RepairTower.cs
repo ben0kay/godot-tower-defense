@@ -87,8 +87,10 @@ public partial class RepairTower : TowerBase
     {
         if (!CanAttack || IsBusy || !double.IsFinite(delta) || delta <= 0) return;
         if (FinalStats?.Repair is not RepairStats repair || repair.HullPerSecond <= 0) { SetTarget(null); return; }
-        _searchRemaining -= delta;
-        if (_searchRemaining <= 0)
+        // Retain a valid lock until full or invalid; relative health changes must not cause ping-pong.
+        bool hasLock = ValidateLock();
+        _searchRemaining = System.Math.Max(0, _searchRemaining - delta);
+        if (!hasLock && _searchRemaining <= 0)
         {
             SetTarget(FriendlyTowerTargeting.Find(_registry, this, FinalStats.RangePixels, _scratch));
             _searchRemaining = FinalStats.TargetSearchInterval;
@@ -150,3 +152,4 @@ public partial class RepairTower : TowerBase
     }
     #endregion
 }
+
