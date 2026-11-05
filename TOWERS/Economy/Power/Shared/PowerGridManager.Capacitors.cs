@@ -1,4 +1,4 @@
-// PW4-A/B refill: cached local distance ceilings, bounded by island production; priority remains PW4-C.
+// Shared distance-first capacitor refill, bounded by island production and cached conductive delivery.
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -8,28 +8,36 @@ public partial class PowerGridManager
     [Export(PropertyHint.Range, "0.1,1,0.05")] public double CapacitorServiceSeconds { get; set; } = .25;
     private readonly HashSet<TowerPowerConsumer> _capacitors = new();
     private readonly List<TowerPowerConsumer> _capacitorStep = new();
-    private readonly Dictionary<int, double> _refillRequests = new();
+    private readonly Dictionary<int, double> _refillBudgets = new();
+    private readonly List<TowerPowerConsumer> _capacitorOrder = new();
+    private bool _capacitorOrderDirty = true;
+    private int _allocationDeliveryRevision = -1;
+    public int AllocationOrderRebuildCount { get; private set; }
     private double _serviceElapsed;
     private bool _servicingCapacitors;
     internal double CapacitorTime { get; private set; }
     // =========================================================
     // Registration/source/config/attack events wake one shared clock, never one process per tower.
-    internal void RegisterCapacitor(TowerPowerConsumer consumer) { _capacitors.Add(consumer); WakeCapacitors(); }
+    internal void RegisterCapacitor(TowerPowerConsumer consumer)
+    { if (_capacitors.Add(consumer)) InvalidateCapacitorOrder(); WakeCapacitors(); }
+    internal void InvalidateCapacitorOrder() => _capacitorOrderDirty = true;
     internal void UnregisterCapacitor(TowerPowerConsumer consumer)
     {
-        _capacitors.Remove(consumer);
+        if (_capacitors.Remove(consumer)) InvalidateCapacitorOrder();
+        if (!_servicingCapacitors) _capacitorOrder.Remove(consumer);
         if (_capacitors.Count == 0) _serviceElapsed = 0; // Discard unused production time; never bank it for a future consumer.
         WakeCapacitors();
     }
     internal void WakeCapacitors() { if (IsInsideTree()) SetPhysicsProcess(_capacitors.Count > 0); }
     public override void _PhysicsProcess(double delta)
     {
+        if (!double.IsFinite(delta) || delta <= 0 || GetTree().Paused) return;
         CapacitorTime += delta; _serviceElapsed += delta;
         double interval = double.IsFinite(CapacitorServiceSeconds) ? Math.Clamp(CapacitorServiceSeconds, .1, 1) : .25;
         if (_serviceElapsed >= interval) FlushCapacitors();
     }
     // =========================================================
-    // Integrate once, using cached supply and memberships. PW4-C replaces proportional sharing with priority.
+    // Integrate once, prepare requests, then allocate nearest-first from one finite budget per island.
     internal void FlushCapacitors()
     {
         if (_servicingCapacitors || _serviceElapsed <= 0) return;
@@ -38,25 +46,20 @@ public partial class PowerGridManager
         try
         {
             EnsureDelivery();
-            _refillRequests.Clear();
+            _refillBudgets.Clear();
             _capacitorStep.Clear(); _capacitorStep.AddRange(_capacitors);
             foreach (TowerPowerConsumer consumer in _capacitorStep)
-            {
-                if (!consumer.Live) continue;
-                consumer.PrepareRefill();
-                if (consumer.Region > 0)
-                {
-                    _refillRequests.TryGetValue(consumer.Region, out double requested);
-                    _refillRequests[consumer.Region] = requested + consumer.DesiredRefill;
-                }
-            }
-            foreach (TowerPowerConsumer consumer in _capacitorStep)
+                if (consumer.Live) consumer.PrepareRefill();
+            EnsureCapacitorOrder();
+            foreach (TowerPowerConsumer consumer in _capacitorOrder)
             {
                 if (!consumer.Live) continue;
                 int region = consumer.Region;
-                _refillRequests.TryGetValue(region, out double requested);
-                double fraction = requested > 0 ? Math.Min(1, TotalsForRegion(region).Supply * elapsed / requested) : 0;
-                consumer.CreditRefill(consumer.DesiredRefill * fraction);
+                if (!_refillBudgets.TryGetValue(region, out double remaining))
+                    remaining = Math.Max(0, TotalsForRegion(region).Supply * elapsed);
+                double granted = Math.Min(remaining, consumer.DesiredRefill);
+                double credited = consumer.CreditRefill(granted, elapsed);
+                _refillBudgets[region] = Math.Max(0, remaining - credited);
             }
             // Finish all credits before callbacks can change sources/topology or dispose another consumer.
             foreach (TowerPowerConsumer consumer in _capacitorStep) if (consumer.Live) consumer.Publish();
@@ -64,7 +67,32 @@ public partial class PowerGridManager
             foreach (TowerPowerConsumer consumer in _capacitors) if (consumer.NeedsService) { awake = true; break; }
             SetPhysicsProcess(awake);
         }
-        finally { _capacitorStep.Clear(); _servicingCapacitors = false; }
+        finally
+        {
+            _capacitorStep.Clear(); _servicingCapacitors = false;
+            // Callbacks may remove consumers after allocation; don't retain dead towers while asleep.
+            if (_capacitorOrderDirty) _capacitorOrder.Clear();
+        }
+    }
+    // =========================================================
+    // Dirty-only sorting uses cached fields, never delivery queries/BFS inside the comparer.
+    // Snapshot preparation has refreshed every live consumer before this cache is consumed.
+    private void EnsureCapacitorOrder()
+    {
+        if (!_capacitorOrderDirty && _allocationDeliveryRevision == _deliveryRevision) return;
+        _capacitorOrder.Clear(); _capacitorOrder.AddRange(_capacitorStep);
+        _capacitorOrder.Sort(CapacitorDistanceComparer.Instance);
+        _capacitorOrderDirty = false; _allocationDeliveryRevision = _deliveryRevision;
+        AllocationOrderRebuildCount++;
+    }
+    private sealed class CapacitorDistanceComparer : IComparer<TowerPowerConsumer>
+    {
+        internal static readonly CapacitorDistanceComparer Instance = new();
+        public int Compare(TowerPowerConsumer a, TowerPowerConsumer b)
+        {
+            int distance = a.CachedConductiveDistance.CompareTo(b.CachedConductiveDistance);
+            return distance != 0 ? distance : StringComparer.Ordinal.Compare(a.AllocationSaveId, b.AllocationSaveId);
+        }
     }
     // =========================================================
     // No source nodes, consumer callbacks or accumulated time survive a level unload.
@@ -73,6 +101,8 @@ public partial class PowerGridManager
         foreach (TowerPowerConsumer consumer in _capacitors) consumer.DetachGrid();
         _capacitors.Clear();
         if (!_servicingCapacitors) _capacitorStep.Clear();
-        _refillRequests.Clear(); _serviceElapsed = 0; SetPhysicsProcess(false);
+        _refillBudgets.Clear(); _capacitorOrder.Clear(); _capacitorOrderDirty = true;
+        _allocationDeliveryRevision = -1; _serviceElapsed = 0; SetPhysicsProcess(false);
     }
 }
+

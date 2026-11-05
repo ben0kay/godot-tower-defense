@@ -10,7 +10,7 @@ public sealed class TowerPowerConsumer : IDisposable
     private double _lastTime, _chargingSeconds;
     private bool _idleAllowed, _chargeAllowed, _publishing, _disposed;
     private int _priority = 50;
-    private double _publishedEnergy = double.NaN;
+    private double _publishedEnergy = double.NaN, _publishedRefillRate = double.NaN;
     private bool _publishedRecovery;
     private Vector2I _anchor;
     private int _deliveryRevision = -1, _distance = -1, _publishedDistance = int.MinValue;
@@ -22,6 +22,10 @@ public sealed class TowerPowerConsumer : IDisposable
     public TowerDisableHandle NoPowerHandle { get; private set; }
     public int Region { get; private set; }
     internal double DesiredRefill { get; private set; }
+    internal int CachedConductiveDistance => _distance;
+    internal string AllocationSaveId => _tower.SaveId;
+    // Latest completed service interval, distinct from the theoretical PW4-B recharge ceiling.
+    public double LastDeliveredRefillPerSecond { get; private set; }
     public int PowerPriority => _priority;
     // =========================================================
     // Replacing an authored profile preserves this instance's energy instead of recreating/filling it.
@@ -45,7 +49,7 @@ public sealed class TowerPowerConsumer : IDisposable
         ReadState(); Publish();
     }
     // =========================================================
-    // Priority is a durable input for PW4-C; PW4-A intentionally does not sort/allocate by priority.
+    // Durable compatibility metadata only; PW4-C allocates by distance, never this value.
     public void SetPriority(int value)
     {
         if (value < 0 || value > 100) throw new ArgumentOutOfRangeException(nameof(value));
@@ -71,6 +75,7 @@ public sealed class TowerPowerConsumer : IDisposable
     {
         _tower.RemoveDisable(NoPowerHandle); NoPowerHandle = default;
         Capacitor.Restore(data ?? new PowerSaveData(0, 50, false, 0, 0));
+        LastDeliveredRefillPerSecond = 0;
         _priority = data?.Priority ?? 50; _chargingSeconds = 0; _lastTime = _grid?.CapacitorTime ?? 0;
         ReadState(); Publish(); _grid?.WakeCapacitors();
     }
@@ -81,6 +86,9 @@ public sealed class TowerPowerConsumer : IDisposable
     private void StateChanged()
     {
         if (_disposed || _publishing) return;
+        // Work eligibility changes settle the prior interval before disabling/enabling requests.
+        // Ordinary hull/disable updates still settle only this consumer, not the entire island.
+        if (_chargeAllowed != (Live && !_tower.IsBusy)) _grid?.FlushCapacitors();
         Settle(); ReadState(); Publish(); _grid?.WakeCapacitors();
     }
     private void ConfigChanged()
@@ -90,7 +98,7 @@ public sealed class TowerPowerConsumer : IDisposable
     private void Moved(TowerBase tower) { _grid?.FlushCapacitors(); Remap(); _grid?.WakeCapacitors(); }
     private void Remap()
     {
-        _deliveryRevision = -1;
+        _deliveryRevision = -1; _grid?.InvalidateCapacitorOrder();
         if (_grid?.Grid == null) { Region = 0; _distance = -1; _efficiency = 0; return; }
         WorldGrid grid = _grid.Grid;
         Vector2 first = grid.ToLocal(_tower.GlobalPosition) - (Vector2)(_tower.Footprint - Vector2I.One) * (grid.Config.CellSize * .5f);
@@ -119,11 +127,20 @@ public sealed class TowerPowerConsumer : IDisposable
     internal void PrepareRefill()
     {
         RefreshDelivery(); Settle();
-        DesiredRefill = Live && Region > 0 ? Math.Min(Capacitor.Settings.Capacity - Capacitor.Energy,
-            RechargeCeilingPerSecond * _chargingSeconds) : 0;
+        DesiredRefill = Live && _chargeAllowed && Region > 0 && _distance >= 0
+            ? Math.Max(0, Math.Min(Capacitor.Settings.Capacity - Capacitor.Energy,
+                RechargeCeilingPerSecond * _chargingSeconds)) : 0;
         _chargingSeconds = 0;
     }
-    internal void CreditRefill(double amount) => Capacitor.Credit(amount);
+    // Return actual credit so unused headroom is immediately available to farther consumers.
+    internal double CreditRefill(double amount, double elapsed)
+    {
+        double before = Capacitor.Energy;
+        Capacitor.Credit(Math.Max(0, Math.Min(amount, Capacitor.Settings.Capacity - before)));
+        double credited = Math.Max(0, Capacitor.Energy - before);
+        LastDeliveredRefillPerSecond = elapsed > 0 ? credited / elapsed : 0;
+        return credited;
+    }
     internal bool NeedsService => Live && (_idleAllowed && Capacitor.Settings.Idle > 0 && Capacitor.Energy > 0
         || _chargeAllowed && RechargeCeilingPerSecond > 0 && Capacitor.Energy < Capacitor.Settings.Capacity
         && Region > 0 && _grid.TotalsForRegion(Region).Supply > 0);
@@ -142,10 +159,10 @@ public sealed class TowerPowerConsumer : IDisposable
             ReadState();
             // Do not warm/rebuild a dirty field from every constructor/attack notification during source batches.
             double ceiling = Capacitor.Settings.Recharge * _efficiency;
-            if (_publishedEnergy != Capacitor.Energy || _publishedRecovery != Capacitor.RecoveryRequired
+            if (_publishedEnergy != Capacitor.Energy || _publishedRefillRate != LastDeliveredRefillPerSecond || _publishedRecovery != Capacitor.RecoveryRequired
                 || _publishedEfficiency != _efficiency || _publishedCeiling != ceiling || _publishedDistance != _distance)
             {
-                _publishedEnergy = Capacitor.Energy; _publishedRecovery = Capacitor.RecoveryRequired;
+                _publishedEnergy = Capacitor.Energy; _publishedRefillRate = LastDeliveredRefillPerSecond; _publishedRecovery = Capacitor.RecoveryRequired;
                 _publishedEfficiency = _efficiency; _publishedCeiling = ceiling; _publishedDistance = _distance;
                 _tower.NotifyRuntimeChanged();
             }
@@ -157,7 +174,7 @@ public sealed class TowerPowerConsumer : IDisposable
     internal void DetachGrid()
     {
         if (_grid != null) _grid.NetworksChanged -= Remap;
-        _grid = null; Region = 0; _chargingSeconds = 0; _deliveryRevision = -1; _distance = -1; _efficiency = 0;
+        _grid = null; Region = 0; _chargingSeconds = 0; LastDeliveredRefillPerSecond = 0; _deliveryRevision = -1; _distance = -1; _efficiency = 0;
     }
     public void Dispose()
     {
@@ -168,3 +185,4 @@ public sealed class TowerPowerConsumer : IDisposable
         _tower.RemoveDisable(NoPowerHandle); NoPowerHandle = default;
     }
 }
+

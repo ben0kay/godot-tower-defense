@@ -96,6 +96,7 @@ public partial class PowerNetworkChecks : Node
             interactive.SetCell(bridge, 1, new(0, 0)); grid.RebuildTerrain();
             Require(power.IslandCount == 1 && grid.TerrainConductsPower(bridge), "Impassable wins over Interactive for conductivity too");
             CheckDelivery(power, grid, world, a, b);
+            PowerAllocationChecks.Run(power, grid, world, a, b);
             CheckAccounting(power, grid, impassable, interactive, bridge, a, b);
             Require(!power.IsProcessing() && !power.IsPhysicsProcessing(), "Topology/accounting manager has no idle/frame callbacks");
         }
@@ -196,3 +197,4 @@ public partial class PowerNetworkChecks : Node
     }
     private static void Require(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
 }
+
