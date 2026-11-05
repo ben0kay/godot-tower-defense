@@ -38,16 +38,23 @@ public partial class PowerGridManager
         if (string.IsNullOrWhiteSpace(id) || id != id.Trim() || !float.IsFinite(amount) || amount < 0 || size.X <= 0 || size.Y <= 0)
             throw new ArgumentException("Power registration needs a stable ID, positive footprint and finite nonnegative amount.");
         int region = RegionForFootprint(anchor, size);
+        bool anchorChanged;
         if (_endpoints.TryGetValue(id, out Endpoint entry))
         {
             if (entry.Producer != producer) throw new ArgumentException("A power ID cannot change between producer and consumer.");
             if (entry.Anchor == anchor && entry.Size == size && entry.Amount == amount && entry.Region == region) return;
+            anchorChanged = producer && ((entry.Amount > 0 && entry.Region > 0) != (amount > 0 && region > 0)
+                || (entry.Amount > 0 && entry.Region > 0 && (entry.Anchor != anchor || entry.Size != size || entry.Region != region)));
             if (producer) FlushCapacitors();
             Adjust(entry, -1);
         }
-        else { if (producer) FlushCapacitors(); entry = new Endpoint { Producer = producer }; _endpoints.Add(id, entry); }
+        else
+        {
+            anchorChanged = producer && amount > 0 && region > 0;
+            if (producer) FlushCapacitors(); entry = new Endpoint { Producer = producer }; _endpoints.Add(id, entry);
+        }
         entry.Anchor = anchor; entry.Size = size; entry.Amount = amount; entry.Region = region;
-        Adjust(entry, 1); PublishAccounting();
+        Adjust(entry, 1); if (anchorChanged) InvalidateDelivery(); PublishAccounting();
     }
 
     // =========================================================
@@ -57,7 +64,9 @@ public partial class PowerGridManager
         if (id == null || !_endpoints.TryGetValue(id, out Endpoint entry)) return;
         if (entry.Producer) FlushCapacitors();
         _endpoints.Remove(id);
-        Adjust(entry, -1); PublishAccounting();
+        Adjust(entry, -1);
+        if (entry.Producer && entry.Amount > 0 && entry.Region > 0) InvalidateDelivery();
+        PublishAccounting();
     }
 
     // =========================================================

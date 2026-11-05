@@ -1,3 +1,15 @@
+## PW4-B focused owner check — 2026-11-05
+
+**Updated fixture authored; not executed here.** Execution environment unavailable; source/resource review only. No SDK installation, large suite or benchmark. After rebuilding in Godot .NET, optionally run `PowerNetworkChecks.tscn` once.
+
+`PowerDistanceChecks.Run` checks a small conductive detour vs straight-line gap, zero-distance whole source footprints, duplicate/multiple anchors, invalid footprint, diagonal isolation, last-source clearing and curve/input bounds. The existing synthetic transformed-grid fixture adds two real Battle capacitors: local vs distance-limited refill, unchanged capacity/stored charge on outage, zero-output source exclusion, consumer relocation, closer-source recovery, batched rebuild count and no BFS for positive output/curve edits. Existing terrain/island/accounting assertions remain. No source maps, waves, shipped balance or profile files are edited by the fixtures.
+
+Owner: compare completed Battle Towers at near/far conductive distances; both can eventually reach full charge while idle with a viable supply. Test a winding route, disconnected island and generator disable/removal/replacement; charge stays usable but refill ceiling updates. Check terrain bridge/Lava changes, multi-cell generator placement and a new between-wave Save/Load. Inspect shared `DefaultPowerDelivery.tres` (4 full cells / 12 falloff / 0.10 floor) and retain current Battle capacity/draw. Public consumer distance/efficiency/ceiling are upper delivery limits; actual refill also shares the finite production budget. No priority scheduling or relay expected yet.
+
+Performance checks here are source-level design checks only: one lazy shared BFS with reused arrays, consumer revision caching, no per-tower search or per-frame map scan. DistanceRebuildCount and LastDistanceRebuildMilliseconds allow owner-side observation if desired; no FPS/timing improvement has been measured or claimed.
+
+---
+
 ## PW4-A focused owner check — 2026-11-05
 
 Source/resource/diff review only; no .NET build, runtime suite or performance run here. No tool installation. Rebuild C# in Godot .NET, then briefly check:

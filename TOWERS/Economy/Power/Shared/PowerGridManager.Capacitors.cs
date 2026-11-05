@@ -1,4 +1,4 @@
-// PW4-A provisional full-efficiency refill, bounded by existing island production; no stored grid bank.
+// PW4-A/B refill: cached local distance ceilings, bounded by island production; priority remains PW4-C.
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -15,7 +15,12 @@ public partial class PowerGridManager
     // =========================================================
     // Registration/source/config/attack events wake one shared clock, never one process per tower.
     internal void RegisterCapacitor(TowerPowerConsumer consumer) { _capacitors.Add(consumer); WakeCapacitors(); }
-    internal void UnregisterCapacitor(TowerPowerConsumer consumer) { _capacitors.Remove(consumer); WakeCapacitors(); }
+    internal void UnregisterCapacitor(TowerPowerConsumer consumer)
+    {
+        _capacitors.Remove(consumer);
+        if (_capacitors.Count == 0) _serviceElapsed = 0; // Discard unused production time; never bank it for a future consumer.
+        WakeCapacitors();
+    }
     internal void WakeCapacitors() { if (IsInsideTree()) SetPhysicsProcess(_capacitors.Count > 0); }
     public override void _PhysicsProcess(double delta)
     {
@@ -32,6 +37,7 @@ public partial class PowerGridManager
         double elapsed = _serviceElapsed; _serviceElapsed = 0;
         try
         {
+            EnsureDelivery();
             _refillRequests.Clear();
             _capacitorStep.Clear(); _capacitorStep.AddRange(_capacitors);
             foreach (TowerPowerConsumer consumer in _capacitorStep)

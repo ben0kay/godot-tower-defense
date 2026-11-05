@@ -12,6 +12,12 @@ public sealed class TowerPowerConsumer : IDisposable
     private int _priority = 50;
     private double _publishedEnergy = double.NaN;
     private bool _publishedRecovery;
+    private Vector2I _anchor;
+    private int _deliveryRevision = -1, _distance = -1, _publishedDistance = int.MinValue;
+    private double _efficiency, _publishedEfficiency = double.NaN, _publishedCeiling = double.NaN;
+    public int ConductiveDistanceCells { get { RefreshDelivery(); return _distance; } }
+    public double DeliveryEfficiency { get { RefreshDelivery(); return _efficiency; } }
+    public double RechargeCeilingPerSecond { get { RefreshDelivery(); return Capacitor.Settings.Recharge * _efficiency; } }
     public PowerCapacitor Capacitor { get; }
     public TowerDisableHandle NoPowerHandle { get; private set; }
     public int Region { get; private set; }
@@ -84,10 +90,22 @@ public sealed class TowerPowerConsumer : IDisposable
     private void Moved(TowerBase tower) { _grid?.FlushCapacitors(); Remap(); _grid?.WakeCapacitors(); }
     private void Remap()
     {
-        if (_grid?.Grid == null) { Region = 0; return; }
+        _deliveryRevision = -1;
+        if (_grid?.Grid == null) { Region = 0; _distance = -1; _efficiency = 0; return; }
         WorldGrid grid = _grid.Grid;
         Vector2 first = grid.ToLocal(_tower.GlobalPosition) - (Vector2)(_tower.Footprint - Vector2I.One) * (grid.Config.CellSize * .5f);
-        Region = _grid.RegionForFootprint(grid.WorldToCell(grid.ToGlobal(first)), _tower.Footprint);
+        _anchor = grid.WorldToCell(grid.ToGlobal(first));
+        Region = _grid.RegionForFootprint(_anchor, _tower.Footprint);
+    }
+    // =========================================================
+    // Cached per revision/placement: source batches rebuild the shared field once, not once per consumer/tick.
+    internal void RefreshDelivery()
+    {
+        if (!GodotObject.IsInstanceValid(_grid) || !_grid.IsInsideTree()) { _distance = -1; _efficiency = 0; return; }
+        int revision = _grid.DeliveryRevision;
+        if (_deliveryRevision == revision) return;
+        PowerDelivery delivery = Region > 0 ? _grid.DeliveryForFootprint(_anchor, _tower.Footprint) : new(-1, 0);
+        _distance = delivery.DistanceCells; _efficiency = delivery.Efficiency; _deliveryRevision = revision;
     }
     // =========================================================
     // Paused game time is owned by the manager; event boundaries retain old-state time exactly once.
@@ -100,14 +118,14 @@ public sealed class TowerPowerConsumer : IDisposable
     }
     internal void PrepareRefill()
     {
-        Settle();
+        RefreshDelivery(); Settle();
         DesiredRefill = Live && Region > 0 ? Math.Min(Capacitor.Settings.Capacity - Capacitor.Energy,
-            Capacitor.Settings.Recharge * _chargingSeconds) : 0;
+            RechargeCeilingPerSecond * _chargingSeconds) : 0;
         _chargingSeconds = 0;
     }
     internal void CreditRefill(double amount) => Capacitor.Credit(amount);
     internal bool NeedsService => Live && (_idleAllowed && Capacitor.Settings.Idle > 0 && Capacitor.Energy > 0
-        || _chargeAllowed && Capacitor.Settings.Recharge > 0 && Capacitor.Energy < Capacitor.Settings.Capacity
+        || _chargeAllowed && RechargeCeilingPerSecond > 0 && Capacitor.Energy < Capacitor.Settings.Capacity
         && Region > 0 && _grid.TotalsForRegion(Region).Supply > 0);
     // =========================================================
     // One owned NoPower handle; heat, EMP, upgrades and other NoPower sources remain independent.
@@ -122,9 +140,13 @@ public sealed class TowerPowerConsumer : IDisposable
             else if (!Capacitor.RecoveryRequired && NoPowerHandle.Token != 0)
             { TowerDisableHandle old = NoPowerHandle; NoPowerHandle = default; _tower.RemoveDisable(old); }
             ReadState();
-            if (_publishedEnergy != Capacitor.Energy || _publishedRecovery != Capacitor.RecoveryRequired)
+            // Do not warm/rebuild a dirty field from every constructor/attack notification during source batches.
+            double ceiling = Capacitor.Settings.Recharge * _efficiency;
+            if (_publishedEnergy != Capacitor.Energy || _publishedRecovery != Capacitor.RecoveryRequired
+                || _publishedEfficiency != _efficiency || _publishedCeiling != ceiling || _publishedDistance != _distance)
             {
                 _publishedEnergy = Capacitor.Energy; _publishedRecovery = Capacitor.RecoveryRequired;
+                _publishedEfficiency = _efficiency; _publishedCeiling = ceiling; _publishedDistance = _distance;
                 _tower.NotifyRuntimeChanged();
             }
         }
@@ -135,7 +157,7 @@ public sealed class TowerPowerConsumer : IDisposable
     internal void DetachGrid()
     {
         if (_grid != null) _grid.NetworksChanged -= Remap;
-        _grid = null; Region = 0; _chargingSeconds = 0;
+        _grid = null; Region = 0; _chargingSeconds = 0; _deliveryRevision = -1; _distance = -1; _efficiency = 0;
     }
     public void Dispose()
     {
