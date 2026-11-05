@@ -2,7 +2,7 @@
 using Godot;
 using System;
 
-public sealed class TowerPowerConsumer : IDisposable
+public sealed partial class TowerPowerConsumer : IDisposable
 {
     private readonly TowerBase _tower;
     private TowerPowerConfig _config;
@@ -64,6 +64,7 @@ public sealed class TowerPowerConsumer : IDisposable
         PowerSaveData before = Capacitor.Capture(_priority);
         if (!Capacitor.TryPayAttack(seconds)) { Publish(); return false; }
         if (ammo?.TryFire() == false) { Capacitor.Restore(before); return false; }
+        RecordEnergySpent(before.Energy - Capacitor.Energy);
         // Publication waits until the projectile exists: disabling clears Battle Tower's target.
         _grid?.WakeCapacitors(); return true;
     }
@@ -75,7 +76,7 @@ public sealed class TowerPowerConsumer : IDisposable
     {
         _tower.RemoveDisable(NoPowerHandle); NoPowerHandle = default;
         Capacitor.Restore(data ?? new PowerSaveData(0, 50, false, 0, 0));
-        LastDeliveredRefillPerSecond = 0;
+        LastDeliveredRefillPerSecond = 0; ResetInspectionSample();
         _priority = data?.Priority ?? 50; _chargingSeconds = 0; _lastTime = _grid?.CapacitorTime ?? 0;
         ReadState(); Publish(); _grid?.WakeCapacitors();
     }
@@ -98,7 +99,7 @@ public sealed class TowerPowerConsumer : IDisposable
     private void Moved(TowerBase tower) { _grid?.FlushCapacitors(); Remap(); _grid?.WakeCapacitors(); }
     private void Remap()
     {
-        _deliveryRevision = -1; _grid?.InvalidateCapacitorOrder();
+        _deliveryRevision = -1; _hasInspectionSample = false; _grid?.InvalidateCapacitorOrder();
         if (_grid?.Grid == null) { Region = 0; _distance = -1; _efficiency = 0; return; }
         WorldGrid grid = _grid.Grid;
         Vector2 first = grid.ToLocal(_tower.GlobalPosition) - (Vector2)(_tower.Footprint - Vector2I.One) * (grid.Config.CellSize * .5f);
@@ -113,6 +114,7 @@ public sealed class TowerPowerConsumer : IDisposable
         int revision = _grid.DeliveryRevision;
         if (_deliveryRevision == revision) return;
         PowerDelivery delivery = Region > 0 ? _grid.DeliveryForFootprint(_anchor, _tower.Footprint) : new(-1, 0);
+        _hasInspectionSample = false;
         _distance = delivery.DistanceCells; _efficiency = delivery.Efficiency; _deliveryRevision = revision;
     }
     // =========================================================
@@ -122,7 +124,9 @@ public sealed class TowerPowerConsumer : IDisposable
         double now = _grid?.CapacitorTime ?? _lastTime;
         double elapsed = Math.Max(0, now - _lastTime); _lastTime = now;
         if (_chargeAllowed) _chargingSeconds += elapsed;
+        double before = Capacitor.Energy;
         Capacitor.Advance(elapsed, _idleAllowed);
+        RecordEnergySpent(before - Capacitor.Energy);
     }
     internal void PrepareRefill()
     {
@@ -139,9 +143,11 @@ public sealed class TowerPowerConsumer : IDisposable
         Capacitor.Credit(Math.Max(0, Math.Min(amount, Capacitor.Settings.Capacity - before)));
         double credited = Math.Max(0, Capacitor.Energy - before);
         LastDeliveredRefillPerSecond = elapsed > 0 ? credited / elapsed : 0;
+        CompleteInspectionSample(credited, elapsed);
         return credited;
     }
-    internal bool NeedsService => Live && (_idleAllowed && Capacitor.Settings.Idle > 0 && Capacitor.Energy > 0
+    internal bool NeedsService => Live && (_energySpent > 0 || LastConsumedPerSecond > 0 || LastDeliveredRefillPerSecond > 0
+        || _idleAllowed && Capacitor.Settings.Idle > 0 && Capacitor.Energy > 0
         || _chargeAllowed && RechargeCeilingPerSecond > 0 && Capacitor.Energy < Capacitor.Settings.Capacity
         && Region > 0 && _grid.TotalsForRegion(Region).Supply > 0);
     // =========================================================
@@ -159,9 +165,11 @@ public sealed class TowerPowerConsumer : IDisposable
             ReadState();
             // Do not warm/rebuild a dirty field from every constructor/attack notification during source batches.
             double ceiling = Capacitor.Settings.Recharge * _efficiency;
-            if (_publishedEnergy != Capacitor.Energy || _publishedRefillRate != LastDeliveredRefillPerSecond || _publishedRecovery != Capacitor.RecoveryRequired
+            PowerDeliveryState state = InspectionState();
+            if (_publishedState != state || _publishedConsumed != LastConsumedPerSecond || _publishedEnergy != Capacitor.Energy || _publishedRefillRate != LastDeliveredRefillPerSecond || _publishedRecovery != Capacitor.RecoveryRequired
                 || _publishedEfficiency != _efficiency || _publishedCeiling != ceiling || _publishedDistance != _distance)
             {
+                _publishedState = state; _publishedConsumed = LastConsumedPerSecond;
                 _publishedEnergy = Capacitor.Energy; _publishedRefillRate = LastDeliveredRefillPerSecond; _publishedRecovery = Capacitor.RecoveryRequired;
                 _publishedEfficiency = _efficiency; _publishedCeiling = ceiling; _publishedDistance = _distance;
                 _tower.NotifyRuntimeChanged();
@@ -174,7 +182,7 @@ public sealed class TowerPowerConsumer : IDisposable
     internal void DetachGrid()
     {
         if (_grid != null) _grid.NetworksChanged -= Remap;
-        _grid = null; Region = 0; _chargingSeconds = 0; LastDeliveredRefillPerSecond = 0; _deliveryRevision = -1; _distance = -1; _efficiency = 0;
+        _grid = null; Region = 0; _chargingSeconds = 0; LastDeliveredRefillPerSecond = 0; ResetInspectionSample(); _deliveryRevision = -1; _distance = -1; _efficiency = 0;
     }
     public void Dispose()
     {
@@ -185,4 +193,5 @@ public sealed class TowerPowerConsumer : IDisposable
         _tower.RemoveDisable(NoPowerHandle); NoPowerHandle = default;
     }
 }
+
 

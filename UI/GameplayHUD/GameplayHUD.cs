@@ -56,7 +56,7 @@ public partial class GameplayHUD : Control
     private Label _heatText, _disableReasons;
     private ProgressBar _heatBar;
     private StyleBoxFlat _heatFill, _energyFill;
-    private Label _energyText;
+    private Label _energyText, _powerDetails;
     private ProgressBar _energyBar;
     private ProgressBar _workBar;
     private Label _workStatus, _workTime;
@@ -130,6 +130,7 @@ public partial class GameplayHUD : Control
         _towerHealthText = _defenseMeters.GetNode<Label>("HealthText"); _towerHealthBar = _defenseMeters.GetNode<ProgressBar>("HealthBar");
         _towerAmmoText = _defenseMeters.GetNode<Label>("AmmoText"); _towerAmmoBar = _defenseMeters.GetNode<ProgressBar>("AmmoBar");
         _powerMeters = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/Columns/Side/PowerMeters");
+        _powerDetails = GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Main/PowerDetails");
         _energyText = _powerMeters.GetNode<Label>("EnergyText"); _energyBar = _powerMeters.GetNode<ProgressBar>("EnergyBar");
         _collectCredits = UIButtonFactory.Create("COLLECT CREDITS", () =>
         {
@@ -323,7 +324,7 @@ public partial class GameplayHUD : Control
         bool preview = category.EndsWith("Build Preview", StringComparison.Ordinal) || category == "Placement rejected";
         _buildPreview = preview;
         SetRuntimeDetails(""); SetWorkDetails(null); SetConditionDetails(null); SetUpgradeComparison(null, null); SetUpgradeDetails("", "", false);
-        _targetSection.Hide(); _rankSection.Hide(); _defenseMeters.Hide(); _powerMeters.Hide();
+        _targetSection.Hide(); _rankSection.Hide(); _defenseMeters.Hide(); _powerMeters.Hide(); _powerDetails.Hide();
         _towerName.Text = name; _towerName.TooltipText = category + "\n" + notes + "\n" + stats;
         _towerCategory.Text = "";
         _towerStats.Text = stats; _towerNotes.Text = notes;
@@ -391,7 +392,7 @@ public partial class GameplayHUD : Control
     {
         _creditProducer = tower is CreditProducerTower producer && producer.UsesManualCollection ? producer : null;
         if (!GodotObject.IsInstanceValid(tower) || _buildPreview)
-        { _creditProducer = null; _collectCredits.Hide(); _defenseMeters.Hide(); _powerMeters.Hide(); SetRuntimeDetails(""); return; }
+        { _creditProducer = null; _collectCredits.Hide(); _defenseMeters.Hide(); _powerMeters.Hide(); _powerDetails.Hide(); SetRuntimeDetails(""); return; }
         _collectCredits.Visible = _creditProducer != null;
         if (_creditProducer != null)
         {
@@ -412,8 +413,14 @@ public partial class GameplayHUD : Control
         // Capacitor energy belongs to a dedicated visual meter, never the runtime text footer.
         PowerCapacitor capacitor = tower.Power?.Capacitor;
         _powerMeters.Visible = capacitor != null && capacitor.Settings.Capacity > 0;
+        _powerDetails.Visible = _powerMeters.Visible;
         if (_powerMeters.Visible)
         {
+            PowerInspectionSnapshot power = tower.Power.Inspect();
+            string details = PowerInspectionText.Details(power);
+            if (_powerDetails.Text != details) _powerDetails.Text = details;
+            _powerDetails.TooltipText = PowerInspectionText.Tooltip(power);
+            _powerMeters.TooltipText = _powerDetails.TooltipText;
             double capacity = capacitor.Settings.Capacity;
             double charge = Math.Clamp(capacitor.Energy, 0d, capacity);
             double fraction = charge / capacity;
@@ -950,4 +957,5 @@ public partial class GameplayHUD : Control
 
     #endregion
 }
+
 

@@ -1,3 +1,15 @@
+## PW4-D — selected power feedback — 2026-11-05
+
+**Source Implemented / Awaiting Owner Validation.** The existing right-column ENERGY current/capacity bar remains. A compact three-line **PowerDetails** label in the Inspector Main column shows **actual Refill +X/s**, **distance-limited Limit +Y/s**, **actual Use −Z/s**, conductive distance, efficiency and connection state. Tooltips explain measured versus potential rates, authored idle/total-active draw and the recovery threshold. Full, charging, awaiting refill, supply-limited, connected/starved, disconnected/no-live-source, recharge-disabled and work-paused are distinct. Recovery is shown separately; no incoming supply does not erase stored energy.
+
+`TowerPowerInspection.cs` owns a typed derived snapshot and service samples; `PowerInspectionText.cs` owns formatting. Successful funded attack payments and settled idle energy losses are counted once; rejected ammunition and config capacity clamps are not consumption. Rates use the existing shared game-time service (default 0.25s), not an instantaneous frame estimate. Full/work/disconnected states suppress stale incoming rates; one final zero sample after activity ends lets the existing shared service return to sleep. Restore/detach resets derived samples, with no save-schema change. Pause freezes both power and its displayed samples.
+
+UI uses the existing selected-only/coalesced RuntimeChanged path and hides for build previews/non-capacitor towers/closed inspection. No new UI or per-tower processing loop, source scan, stat-grid reconstruction or allocation change. PowerPriority remains inactive with no slider; PW5 relays and additional consumers are not implemented. Existing Inspector dimensions/fonts and targeting controls are preserved; the new Main label can wrap, so desktop geometry at small resolutions remains an owner check.
+
+Focused PowerAllocationChecks now covers typed starved/full/disconnected samples, actual-versus-ceiling formatting, paid consumption and zero-rate dormancy. Authored but not executed here. Source/scene checks only; Godot/.NET unavailable, no layout/runtime/benchmark claim. Owner: inspect a selected Battle Tower charging, firing, full, behind other near consumers under shortage, without a source, during work/pause, then switch/close/reselect and check a fresh Save/Load. Check Heat/Ammo/ENERGY and the new detail lines at normal and small window sizes.
+
+---
+
 ## PW4-C — distance-first scarce-supply allocation — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** The existing shared capacitor service now allocates finite island generation in ascending cached conductive-path distance, breaking ties by ordinal Tower SaveId. Every request is capped by eligible elapsed recharge at its PW4-B ceiling and remaining capacitor headroom. Unused energy goes immediately to later requests; zero supply/route/ineligible state delivers zero. Stored energy, shot spending and NoPower recovery remain independent. No priority slider or bias, new consumer, relay, balance change or save schema is introduced.
@@ -91,4 +103,5 @@ the old profiling rows retain their indices/behavior. That fixture was updated, 
 PW1 neither generates nor consumes electricity. Citadel baseline output is recorded for PW2.
 Topology labels are derived and are not saved. The existing content fingerprint may reject older
 checkpoints after this source/resource update; save validation itself is unchanged.
+
 

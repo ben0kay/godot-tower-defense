@@ -1,3 +1,9 @@
+## PW4-D — Inspector power feedback (2026-11-05) — SOURCE IMPLEMENTED / AWAITING OWNER VALIDATION
+
+Existing ENERGY bar now has compact actual refill / possible refill / actual consumption / distance / efficiency / state details in the selected Inspector. Typed service samples distinguish connected starvation from disconnection and clear stale rates without an extra per-tower/UI loop. Priority slider remains deferred. Existing allocation, attack funding, balance and save schema are preserved. Source/scene review only; owner Godot layout/runtime check pending. See [power plan](../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md).
+
+---
+
 ## PW4-C revised power allocation (2026-11-05) — SOURCE IMPLEMENTED / AWAITING OWNER VALIDATION
 
 Distance is the **primary allocator** under generator shortages, not the old descending 0–100 priority order. PW4-B sets each connected tower's recharge ceiling by conductive-path distance; PW4-C now additionally gives nearer capacitors **first access to finite island generation**. Far towers can receive zero actual energy until nearer buffers are full or output increases; stored reserves persist. Keep existing PowerPriority metadata dormant. A later optional Inspector slider may only mildly bias the distance preference, requiring separate approval. PW4-D should display real refill versus distance-limited ceiling. Follow [canonical PW4-C update](../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md). The shared allocator now implements this decision; final Inspector rate/status UI remains PW4-D.
@@ -246,4 +252,5 @@ This list describes **source delivery**, not universal desktop approval.
 For every job: **read root README + CodePreferences + the linked feature README**, verify current HEAD/code, keep scope narrow, make new work opt-in/configurable when sensible, avoid per-frame full-registry scans, run truthful focused tests where possible, update relevant notes and make **one commit per job**. Source-only verification is not an in-editor visual or GPU benchmark.
 
 **Audit scope:** no game assets/C#/.tres/.tscn modified or tested as part of this file's creation. The cleanup flags above are intentionally **not** automatic edits to those other documents.
+
 
