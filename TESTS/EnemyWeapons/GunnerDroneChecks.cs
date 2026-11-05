@@ -45,7 +45,7 @@ public partial class GunnerDroneChecks : Node
             Require(waves.SelectMany(w => w.Batches).SelectMany(b => b.Entries).All(e => e.EnemyId != "gunner_drone_mk1" && e.EnemyId != "heavy_gunner_drone_mk1"),
                 "Current authored waves do not include either armed gunner ship");
         EnemyDefinition definition = catalog.DefinitionFor("gunner_drone_mk1");
-        Require(definition.Class == EnemyClass.Standard && definition.Rank == EnemyRank.Common && definition.Role == EnemyRole.Fighter && definition.MaxHealth == 135 && definition.MoveSpeed == 75
+        Require(definition.Class == EnemyClass.Light && definition.Rank == EnemyRank.Common && definition.Role == EnemyRole.Fighter && definition.MaxHealth == 135 && definition.MoveSpeed == 75
             && definition.RadiusPixels == 18 && definition.KillRewardCredits == 8 && definition.MaxShield == 0,
             "Gunner has independent editable playtest balance");
         Enemy preview = catalog.Find("gunner_drone_mk1").Instantiate<Enemy>();
@@ -142,7 +142,7 @@ public partial class GunnerDroneChecks : Node
     {
         EnemyCatalog catalog = f.Spawns.Catalog;
         EnemyDefinition data = catalog.DefinitionFor("heavy_gunner_drone_mk1");
-        Require(data != null && data.Class == EnemyClass.Heavy && data.Rank == EnemyRank.Veteran
+        Require(data != null && data.Class == EnemyClass.Standard && data.Rank == EnemyRank.Veteran
             && data.Role == EnemyRole.Fighter && data.MaxHealth == 260 && data.MaxShield == 0
             && data.MoveSpeed == 52 && data.RadiusPixels == 24 && data.TurnSpeed == 4.4f
             && data.CitadelDamage == 4 && data.KillRewardCredits == 14,

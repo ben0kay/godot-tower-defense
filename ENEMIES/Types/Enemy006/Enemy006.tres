@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 EnemyId = "elite_mk1"
-Class = 3
+Class = 2
 Rank = 2
 Role = 0
 DisplayName = "Elite Assault Ship"

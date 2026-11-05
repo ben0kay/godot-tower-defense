@@ -75,13 +75,16 @@ public partial class FleetExpansionChecks : Node
         EnemyCatalog.ValidateDefinition(unusual);
         Require(unusual.MaxHealth == 60f && unusual.MoveSpeed == 100f && unusual.MaxShield == 0,
             "Changing class/rank/role never derives gameplay values"); unusual.Dispose();
+        EnemyDefinition carrier = f.Spawns.Catalog.DefinitionFor("transporter_mk1");
+        Require(carrier.Class == EnemyClass.Superheavy && carrier.Rank == EnemyRank.Common && carrier.Role == EnemyRole.Cargo,
+            "Drone Transporter is large Cargo, not automatically high combat rank");
         var cases = new[] {
             ("reinforced_drone_mk1", EnemyClass.Light, EnemyRank.Veteran, EnemyRole.Fighter, 110f, 100f, new Vector2(40, 30)),
             ("racer_mk1", EnemyClass.Tiny, EnemyRank.Veteran, EnemyRole.Fighter, 20f, 230f, new Vector2(34, 18)),
-            ("shield_frigate_mk1", EnemyClass.Heavy, EnemyRank.Veteran, EnemyRole.Support, 120f, 65f, new Vector2(72, 48)),
-            ("heavy_gunner_drone_mk1", EnemyClass.Heavy, EnemyRank.Veteran, EnemyRole.Fighter, 260f, 52f, new Vector2(62, 42)),
+            ("shield_frigate_mk1", EnemyClass.Standard, EnemyRank.Veteran, EnemyRole.Support, 120f, 65f, new Vector2(72, 48)),
+            ("heavy_gunner_drone_mk1", EnemyClass.Standard, EnemyRank.Veteran, EnemyRole.Fighter, 260f, 52f, new Vector2(62, 42)),
             ("heavy_bulwark_mk1", EnemyClass.Heavy, EnemyRank.Veteran, EnemyRole.Fighter, 500f, 50f, new Vector2(88, 64)),
-            ("cruiser_mk1", EnemyClass.Capital, EnemyRank.Elite, EnemyRole.Fighter, 3000f, 30f, new Vector2(168, 96)),
+            ("cruiser_mk1", EnemyClass.Superheavy, EnemyRank.Elite, EnemyRole.Fighter, 3000f, 30f, new Vector2(168, 96)),
             ("heavy_transporter_mk1", EnemyClass.Superheavy, EnemyRank.Veteran, EnemyRole.Cargo, 1400f, 35f, new Vector2(144, 100)) };
         var wallet = f.Main.GetNode<EconomyManager>("Economy");
         foreach (var (id, shipClass, rank, role, hull, speed, size) in cases)

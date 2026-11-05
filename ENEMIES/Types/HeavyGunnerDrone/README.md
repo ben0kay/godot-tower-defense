@@ -1,6 +1,6 @@
 # Heavy Gunner Drone — implemented (HG1)
 
-**New independent enemy** `heavy_gunner_drone_mk1`, display name **Heavy Gunner Drone**, Class **Heavy**, Rank **Veteran**, Role **Fighter**. A tankier, slower, more dangerous armed cousin to the lightweight Gunner Drone. The starter ship (`gunner_drone_mk1`) and its art, damage, firing cadence, bullet visuals and health are **unchanged**.
+**New independent enemy** `heavy_gunner_drone_mk1`, display name **Heavy Gunner Drone**, Class **Standard**, Rank **Veteran**, Role **Fighter**. “Heavy” describes its tougher armour and stronger weapon; its 62×42 hull falls in the Standard physical-size range. A tankier, slower, more dangerous armed cousin to the lightweight Gunner Drone. The starter ship (`gunner_drone_mk1`) and its art, damage, firing cadence, bullet visuals and health are **unchanged**.
 
 | Setting | Starter Gunner | Heavy Gunner |
 | --- | ---: | ---: |

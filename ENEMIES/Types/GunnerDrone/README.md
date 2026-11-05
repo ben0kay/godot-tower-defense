@@ -2,7 +2,7 @@
 
 The Gunner Drone's native hull is now **48×30** (formerly 52×38), with a slender body and short swept fins. Its independent gun is **12×44** (formerly 20×40), with an obvious longer exposed barrel and much less bulky rotating housing. **Muzzle stays at `(0,-18)`**, exactly the barrel tip on the new image; the turret still mounts at hull-local `(-2,0)`. These are SVG-only changes: the scene, bullets/tracers, muzzle flashes, 6/s cadence, 2 kinetic damage, HP, radius, speed, targeting and existing weapon code are untouched.
 
-The entry gunner remains **135 HP, 18px movement radius, 75px/s speed**, with Standard/Common/Fighter metadata. No other ships were changed. F2 artwork preview should show the new 48×30 hull at native size and visibly thinner long-barrel gun. [Artwork specification](Artwork/README.md). Source checks only; normal-zoom playtest pending.
+The entry gunner remains **135 HP, 18px movement radius, 75px/s speed**, with **Light/Common/Fighter** metadata after the physical-size class revision. No other ships were changed. F2 artwork preview should show the new 48×30 hull at native size and visibly thinner long-barrel gun. [Artwork specification](Artwork/README.md). Source checks only; normal-zoom playtest pending.
 
 ---
 
@@ -21,7 +21,7 @@ Continuous6/s firing is now default (UseBursts=false), with1s closest-target rec
 
 # Gunner Drone — EG3
 
-Stable ID gunner_drone_mk1; Class Standard, Rank Common, Role Fighter (metadata only). GenericEnemy inherited scene, optional enemy minigun, no unique enemy gameplay script. Appended to DefaultEnemyCatalog as entry14, so F2/F3 pick it up automatically. Current Level001/002/020 waves omit it.
+Stable ID gunner_drone_mk1; Class **Light**, Rank Common, Role Fighter (physical-size metadata only; was previously Standard). GenericEnemy inherited scene, optional enemy minigun, no unique enemy gameplay script. Appended to DefaultEnemyCatalog as entry14, so F2/F3 pick it up automatically. Current Level001/002/020 waves omit it.
 
 ## Size and artwork
 

@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("definition")
 EnemyId = "heavy_gunner_drone_mk1"
-Class = 3
+Class = 2
 Rank = 1
 Role = 0
 DisplayName = "Heavy Gunner Drone"

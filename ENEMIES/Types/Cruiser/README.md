@@ -6,7 +6,7 @@
 
 # Cruiser (`cruiser_mk1`)
 
-Class **Capital**, Rank **Elite**, Role **Fighter** (descriptive metadata only). Provisional balance: **3000 hull**, **400 optional shield capacity**, **30px/s**, **24px navigation radius**, **12 Citadel arrival damage**, **35 kill Credits**. Right-facing alien robotic SVG: **168×96px**.
+Class **Superheavy**, Rank **Elite**, Role **Fighter** (physical-size metadata only). The 168px longest hull dimension leaves **Capital** and **Titan** open for much larger future ships. Provisional balance: **3000 hull**, **400 optional shield capacity**, **30px/s**, **24px navigation radius**, **12 Citadel arrival damage**, **35 kill Credits**. Right-facing alien robotic SVG: **168×96px**.
 
 Edit `Cruiser.tres` in Godot Inspector for identity, independent Class/Rank/Role and balance. The inherited GenericEnemy scene supplies movement, defense bars, shared shield visual, damage, rewards and death feedback. Registered for F2/F3 and waves via `Enemy("cruiser_mk1")`. Existing missions are unchanged. Shields remain opt-in: use `Enemy("cruiser_mk1", shield: true)` to start at capacity; ordinary/F2 spawns remain unshielded. No passive regeneration.
 

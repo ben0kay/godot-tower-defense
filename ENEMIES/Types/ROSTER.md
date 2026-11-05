@@ -10,19 +10,37 @@
 | Racer Interceptor | Tiny | Veteran | Fighter | `racer_mk1` | `Types/Racer/` | 34×18 |
 | Bulwark Drone | Standard | Common | Fighter | `medium_mk1` | `Types/Enemy004/` | 64×48 |
 | Heavy Bulwark | Heavy | Veteran | Fighter | `heavy_bulwark_mk1` | `Types/HeavyBulwark/` | 88×64 |
-| Gunner Drone | Standard | Common | Fighter | `gunner_drone_mk1` | `Types/GunnerDrone/` | 48×30 |
-| Heavy Gunner Drone | Heavy | Veteran | Fighter | `heavy_gunner_drone_mk1` | `Types/HeavyGunnerDrone/` | 62×42 |
-| Shield Emitter | Standard | Common | Support | `shield_emitter_mk1` | `Types/Enemy003/` | 40×32 |
-| Shield Frigate | Heavy | Veteran | Support | `shield_frigate_mk1` | `Types/ShieldFrigate/` | 72×48 |
-| Drone Transporter | Heavy | Common | Cargo | `transporter_mk1` | `Types/Transporter/` | 112×72 |
+| Gunner Drone | Light | Common | Fighter | `gunner_drone_mk1` | `Types/GunnerDrone/` | 48×30 |
+| Heavy Gunner Drone | Standard | Veteran | Fighter | `heavy_gunner_drone_mk1` | `Types/HeavyGunnerDrone/` | 62×42 |
+| Shield Emitter | Light | Common | Support | `shield_emitter_mk1` | `Types/Enemy003/` | 40×32 |
+| Shield Frigate | Standard | Veteran | Support | `shield_frigate_mk1` | `Types/ShieldFrigate/` | 72×48 |
+| Drone Transporter | Superheavy | Common | Cargo | `transporter_mk1` | `Types/Transporter/` | 112×72 |
 | Heavy Transporter | Superheavy | Veteran | Cargo | `heavy_transporter_mk1` | `Types/HeavyTransporter/` | 144×100 |
 | Heavy Warship | Superheavy | Veteran | Fighter | `big_mk1` | `Types/Enemy005/` | 112×120 |
-| Elite Assault Ship | Heavy | Elite | Fighter | `elite_mk1` | `Types/Enemy006/` | 80×60 |
-| Cruiser | Capital | Elite | Fighter | `cruiser_mk1` | `Types/Cruiser/` | 168×96 |
+| Elite Assault Ship | Standard | Elite | Fighter | `elite_mk1` | `Types/Enemy006/` | 80×60 |
+| Cruiser | Superheavy | Elite | Fighter | `cruiser_mk1` | `Types/Cruiser/` | 168×96 |
 
-**Heavy Gunner addition — 2026-11-05:** The new Heavy/Veteran/Fighter gunner (62×42 hull, 18×50 cannon) uses its own 260 HP, 52px/s and 24px clearance; a separate 850px/s red 11×2.2 tracer at 4 damage and 3.5 shots/s. The starter Gunner is unchanged. Both are separately available to the catalog and F2; existing authored waves are unchanged.
+**Heavy Gunner addition — 2026-11-05:** Introduced as Heavy/Veteran/Fighter; now **Standard/Veteran/Fighter** under physical-size rules (62×42 hull). Its “Heavy” name describes armour/firepower, not its Class. The independent 260 HP, 52px/s, 24px clearance, 18×50 cannon, 850px/s red 11×2.2 tracer, 4 damage and 3.5 shots/s are unchanged. Both gunner variants remain available in F2; no waves changed.
 
-**Gunner starter resize/refinement — 2026-11-05:** Gunner's art is now **48×30** (originally 64×48), minigun **12×44** (originally 24×40), hull health 135 (was 180) and movement radius 18 (was 22). Its **Standard** Class and Common Rank are retained deliberately: classification is descriptive metadata, not an automatic physics/health scale. A class regrouping can be a separate decision. Bullet presentation and stable EnemyId are unchanged.
+**Gunner starter resize/refinement — 2026-11-05:** Gunner's art is now **48×30** (originally 64×48), minigun **12×44** (originally 24×40), hull health 135 (was 180) and movement radius 18 (was 22). Its Class was initially retained as Standard after the art revision; this subsequent physical-size regrouping changes it to **Light**, while Common Rank, Fighter Role and gameplay values remain unchanged. Bullet presentation and stable EnemyId are unchanged.
+
+## Physical-size class guidelines (2026-11-05)
+
+**Class now describes hull size, not combat strength or boss status.** Use the native hull SVG's **longest dimension** (larger of width and height), excluding separate rotating guns, exhaust, shields and visual effects, to choose a suggested Class:
+
+| Class | Suggested longest hull dimension | Physical presence |
+| --- | ---: | --- |
+| Tiny | ≤36 px | Scouts, tiny drones |
+| Light | 37–55 px | Light fighters and support drones |
+| Standard | 56–85 px | Regular fighters, medium assault hulls |
+| Heavy | 86–110 px | Heavy fighters, armoured hulls |
+| Superheavy | 111–255 px | Large cruisers, warships and transports |
+| Capital | 256–511 px | Future massive boss-scale hulls |
+| Titan | ≥512 px | Future enormous superstructures |
+
+These are **authoring guidelines**, not runtime-calculated classifications: set the Class explicitly in the enemy's `.tres`. Do not automatically resize art, navigation, HP or weapons to fit a category. At a borderline size, the designer may choose a neighbouring class deliberately. Capital and Titan are intentionally **unoccupied by the current 15-ship roster** to leave room for much larger enemies.
+
+**Rank describes overall threat/skill/encounter importance**, independent of size; **Role describes battlefield job**, independent of strength. For example, the 80×60 Elite Assault Ship is **Standard / Elite / Fighter**, whereas the larger 112×72 unarmed Drone Transporter is **Superheavy / Common / Cargo**. The Heavy Gunner's name refers to armament, not hull-size Class. The Drone Transporter's `Class` and `Role` were also explicitly authored here after being omitted from its resource (which previously loaded as default Tiny/Fighter).
 
 ## Authoring contract
 
@@ -32,7 +50,7 @@ Open a type's `.tres` → **Classification / Class, Rank, Role**. Each value is 
 - **Rank:** Common, Veteran, Elite, Champion, Miniboss, Boss — threat/importance, with no automatic scaling. A Tiny Boss and a Common Capital are both valid.
 - **Role:** Fighter, Cargo, Miner, Support — purpose only. Append future enum values without renumbering existing values. An anomaly can reuse any appropriate role and add unusual abilities through its scene; classification never grants or blocks capabilities.
 
-The suggested mapping was retained after checking actual SVG dimensions and scene transforms. These are relative authored classes, not pixel thresholds: the compact Shield Emitter remains Standard as the proposed relative presence label. No current Titan, Champion, Miniboss, Boss or Miner is required. Mk progression remains independent and unimplemented.
+The active class assignments now follow the size guidelines above; they remain independent of navigation radius, speed, armour, shields, abilities and stat balance. No current Capital, Titan, Champion, Miniboss, Boss or Miner is required. Mk progression remains independent and unimplemented.
 
 Keep **EnemyId** and **DisplayName** unchanged. IDs remain the only wave/save lookup keys. Folder, scene, resource, artwork paths and UIDs remain unchanged; new types should use readable PascalCase folders. Actual stats, movement, shields, weapons and abilities remain owned by existing definitions/scenes and reusable systems.
 
