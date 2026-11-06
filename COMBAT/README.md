@@ -1,8 +1,8 @@
-## Shared recoil and hostile splash roadmap — 2026-11-06
-
-**Plan only.** Existing Blaster/friendly AoE remains in `COMBAT/AreaDamage/`; future hostile splash should reuse `AreaDamage.AtDistance` and add a TowerRegistry recipient path, not recreate the falloff system. Generic gun recoil is visual-only and belongs under `FEEDBACK/Weapons/Recoil/`, with compatibility for the current tower recoil scripts. [CW1/CW2 Codex handoff](SHARED_WEAPON_CAPABILITIES_PLAN.md).
+## CW1 — shared recoil source implemented — 2026-11-06
+Motion/style now live under `FEEDBACK/Weapons/Recoil/`; existing tower classes, preset paths and behaviour remain compatible adapters. Gunner, Heavy Gunner and four Capital cannons have independent accepted-shot recoil. Only gun art moves; fixed physical muzzle/aim and bullet cadence remain unchanged. Source review only; owner validation pending. CW2 remains planned.
 
 ---
+
 
 # Shared combat
 

@@ -1,8 +1,10 @@
-[gd_resource type="Resource" script_class="EnemyMinigunConfig" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="EnemyMinigunConfig" load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://ENEMIES/Weapons/Minigun/EnemyMinigunConfig.cs" id="config"]
 [ext_resource type="Resource" path="res://ENEMIES/Types/HeavyGunnerDrone/Visuals/HeavyGunnerTracer.tres" id="tracer"]
 [ext_resource type="Resource" path="res://ENEMIES/Types/HeavyGunnerDrone/Visuals/HeavyGunnerMuzzleFlash.tres" id="flash"]
+
+[ext_resource type="Resource" path="res://ENEMIES/Types/HeavyGunnerDrone/Visuals/HeavyGunnerRecoil.tres" id="recoil"]
 
 [resource]
 script = ExtResource("config")
@@ -18,3 +20,4 @@ BulletLifetimeSeconds = 2.8
 UseBursts = false
 ProjectileVisual = ExtResource("tracer")
 MuzzleFlash = ExtResource("flash")
+Recoil = ExtResource("recoil")

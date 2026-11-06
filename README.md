@@ -1,8 +1,8 @@
-## Shared weapon recoil and future enemy splash — CW1/CW2 (planned 2026-11-06)
-
-**Codex plan only.** CW1 will extract the existing friendly-tower recoil motion into a backwards-compatible weapon-neutral visual controller, allowing Gunner/Heavy Gunner and all four Capital ship cannons to recoil on successful shots. CW2 later extends the **already shared** `COMBAT/AreaDamage` falloff to hostile explosive bullets against friendly building footprints, without rewriting Blaster Cannon or enemy bullet pooling. No code/asset/balance changes yet. [Implementation handoff](COMBAT/SHARED_WEAPON_CAPABILITIES_PLAN.md).
+## CW1 — shared recoil source implemented — 2026-11-06
+Motion/style now live under `FEEDBACK/Weapons/Recoil/`; existing tower classes, preset paths and behaviour remain compatible adapters. Gunner, Heavy Gunner and four Capital cannons have independent accepted-shot recoil. Only gun art moves; fixed physical muzzle/aim and bullet cadence remain unchanged. Source review only; owner validation pending. CW2 remains planned.
 
 ---
+
 
 ## SPAWN2.5 — portal spawn swell and violet smoke
 **Source Implemented / Awaiting Owner Validation.** Successful Open-portal spawns trigger a 12% soft artwork pulse and six large billowing violet puffs, alongside existing sparks and energy flash. Retained/cullable GPU emission and one coalesced cooldown keep dense traffic bounded. Opening stays 2.2s; waves/readiness/navigation unchanged. [Settings](WORLD/PORTALS/EnemyPortal/README.md).

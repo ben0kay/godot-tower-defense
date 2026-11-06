@@ -1,3 +1,6 @@
+## CW1 recoil — source implemented / owner validation pending
+The gun sprite now uses the shared visual recoil controller with its own preset under `Visuals/`. Physical muzzle markers are fixed siblings under `TurretPivot/Muzzle` at the original barrel-tip positions; gun art alone kicks after accepted shots. The Capital's four mounts retain independent state. No hull, aim, cadence or damage changes.
+
 ## Flat charcoal/scarlet gunner artwork — 2026-11-06
 
 **Artwork source updated; owner Godot visual acceptance pending.** `Artwork/gunner_drone.svg` and `Artwork/gunner_minigun.svg` now use the flat black/charcoal, near-black outline, muted scarlet panel and small orange-red drive/weapon detailing of Enemy001. The sharp 48×30 light gunner silhouette and the separate narrow 12×44 gun are preserved; all previous SVG gradients have been replaced by solid vector fills. Existing hull-local mount `(-2,0)`, gun muzzle `(0,-18)`, native dimensions, sprites/scene structure, stats, targeting, tracers and animation behavior are unchanged. This palette pass supersedes the earlier blue-grey art descriptions below.
@@ -33,7 +36,7 @@ Stable ID gunner_drone_mk1; Class **Light**, Rank Common, Role Fighter (physical
 
 The original EG3 medium reference was Enemy004 at 64×48 and radius22. The first starter gunner resize produced **52×38 with radius18** and a **20×40** gun. The latest SVG-only refinement produces **48×30** and a **12×44** gun, image centre(6,22), tip(6,4), while Marker2D remains (0,-18). TurretPivot is(-2,0) on the hull's circular socket and initially points right. No hull rotation is performed by the weapon.
 
-Scene path: Sprite/Weapons/Minigun/TurretPivot/GunSprite/Muzzle. Weapons and Minigun are Node2D so transforms follow the hull. Being under Sprite also inherits stealth alpha without polling. DefenseBar, hull/status/shields, routes, checkpoint/Citadel assignment and arrivals retain GenericEnemy ownership. Existing gun Freeze gating remains in the shared mount.
+Scene path: Sprite/Weapons/Minigun/TurretPivot/Muzzle. Weapons and Minigun are Node2D so transforms follow the hull. Being under Sprite also inherits stealth alpha without polling. DefenseBar, hull/status/shields, routes, checkpoint/Citadel assignment and arrivals retain GenericEnemy ownership. Existing gun Freeze gating remains in the shared mount.
 
 ## Editable playtest settings
 

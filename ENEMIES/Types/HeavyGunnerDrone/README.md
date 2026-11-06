@@ -1,3 +1,6 @@
+## CW1 recoil — source implemented / owner validation pending
+The gun sprite now uses the shared visual recoil controller with its own preset under `Visuals/`. Physical muzzle markers are fixed siblings under `TurretPivot/Muzzle` at the original barrel-tip positions; gun art alone kicks after accepted shots. The Capital's four mounts retain independent state. No hull, aim, cadence or damage changes.
+
 ## Flat black/red Heavy Gunner artwork — 2026-11-06
 
 The 62×42 hull `Artwork/heavy_gunner_drone.svg` and separate 18×50 `Artwork/heavy_gunner_cannon.svg` now use the modern charcoal/scarlet fleet style rather than blue-grey reflective gradients. The Heavy Gunner retains its armoured twin-stabilizer silhouette, centred gun mount `(-2,0)`, precise muzzle `(0,-21)` and heavier-barrel profile. Small red armour and heat-sink strips distinguish it from the starter gunner. No SVG gradients, filters or runtime effects. Weapon ballistics, health, shields, movement, enemy logic and weapon nodes are unchanged; source reviewed, owner Godot acceptance pending.

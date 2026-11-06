@@ -11,14 +11,25 @@ public partial class EnemyMinigun : EnemyWeaponMount
     private EnemyBulletSystem _bullets;
     private WeaponVisualRenderer _visuals;
     private MuzzleFlashSnapshot? _flash;
+    private WeaponRecoilController _recoil;
     public long ShotRequests { get; private set; }
     public event Action<EnemyShotRequest> ShotRequested;
     // =========================================================
     // Capture the specialized source once; untyped or invalid configs cannot start a minigun.
     protected override bool CaptureAdditionalSettings()
     {
+        if (GodotObject.IsInstanceValid(_recoil)) _recoil.Unbind();
         _bullets = null; _visual = null; _flash = null; _visuals = null;
         if (Config is not EnemyMinigunConfig minigun || !minigun.TryCaptureBurst(out _burstSeconds, out _restSeconds)) return false;
+        if (minigun.Recoil != null)
+        {
+            if (!GodotObject.IsInstanceValid(_recoil))
+            {
+                _recoil = new WeaponRecoilController { Name = "Recoil" };
+                AddChild(_recoil);
+            }
+            _recoil.Bind(GetNodeOrNull<Node2D>(PivotPath.ToString() + "/GunSprite"), minigun.Recoil);
+        }
         _useBursts = minigun.UseBursts;
         _lifetime = minigun.BulletLifetimeSeconds; _visual = minigun.ProjectileVisual?.Capture();
         _flash = minigun.MuzzleFlash?.Capture();
@@ -28,7 +39,7 @@ public partial class EnemyMinigun : EnemyWeaponMount
     }
     // =========================================================
     // Losing target/alignment, disable, reuse or removal starts the next engagement with fresh private timing.
-    protected override void ResetWeapon() { _burst = _rest = _cooldown = 0; }
+    protected override void ResetWeapon() { _burst = _rest = _cooldown = 0; if (GodotObject.IsInstanceValid(_recoil)) _recoil.Cancel(); }
     // =========================================================
     // One launch attempt at most per tick; overflow consumes its cadence opportunity and never queues catch-up fire.
     protected override void OnAimReady(double delta)
@@ -47,6 +58,7 @@ public partial class EnemyMinigun : EnemyWeaponMount
                 if (_bullets.TrySpawn(request))
                 {
                     if (_flash.HasValue && GodotObject.IsInstanceValid(_visuals)) _visuals.FlashAt(Muzzle, _flash.Value);
+                    if (GodotObject.IsInstanceValid(_recoil)) _recoil.Kick(); // Origin/direction and the flash were captured before the visual-only impulse.
                     ShotRequests++; ShotRequested?.Invoke(request);
                 }
                 _cooldown = Math.Max(0, 1.0 / Settings.ShotsPerSecond + _cooldown);
@@ -61,9 +73,9 @@ public partial class EnemyMinigun : EnemyWeaponMount
     // =========================================================
     // Stop only the gun's transient presentation; world-owned bullets must keep travelling.
     protected override void OnMountStopped()
-    { if (GodotObject.IsInstanceValid(_visuals)) _visuals.ClearFlashes(); }
+    { if (GodotObject.IsInstanceValid(_recoil)) _recoil.Cancel(); if (GodotObject.IsInstanceValid(_visuals)) _visuals.ClearFlashes(); }
     // =========================================================
     // A world-delivery subscriber must not survive this optional component's lifetime.
-    public override void _ExitTree() { ShotRequested = null; _bullets = null; base._ExitTree(); _visuals = null; _flash = null; }
+    public override void _ExitTree() { ShotRequested = null; _bullets = null; base._ExitTree(); if (GodotObject.IsInstanceValid(_recoil)) _recoil.Unbind(); _recoil = null; _visuals = null; _flash = null; }
     #endregion
 }

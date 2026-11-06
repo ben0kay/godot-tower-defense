@@ -1,3 +1,6 @@
+## CW1 — optional shared recoil
+Opted-in miniguns retain a shared `WeaponRecoilController` driven only after accepted `TrySpawn` and flash snapshots. Config.Recoil owns the preset; Gunner/Heavy/Capital presets use 0.8/1.5/2px. Their scenes explicitly use `MuzzlePath = TurretPivot/Muzzle` so only the sibling GunSprite recoils. Legacy unopted mounts keep their existing default muzzle path. No cadence, aiming or bullet changes; see [shared presentation](../../../FEEDBACK/Weapons/Recoil/README.md). Source implemented, owner validation pending.
+
 ## Continuous default fire — 2026-10-20
 
 DefaultEnemyMinigun now explicitly sets UseBursts=false:6 shots/s continuously while a valid target is aligned. BurstSeconds/RestSeconds remain available only through explicit UseBursts opt-in. Bounded fractional cooldown carry preserves cadence and never emits catch-up volleys. The default also sets LockedTargetSearchSeconds=1 and TargetSearchSeconds=0.2. Visuals/EnemyMinigunTracer.tres now opts into9px tapered energy streaks; bullets remain unguided Kinetic rounds. The previous burst/rest description below is retained as history. Build and focused enemy checks passed; desktop appearance still needs review.

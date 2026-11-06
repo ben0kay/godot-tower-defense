@@ -45,7 +45,7 @@ public partial class GunnerDroneChecks : Node
                 var config = (EnemyMinigunConfig)gun.Config;
                 Require(config.DamagePerBullet == 5 && config.ShotsPerSecond == 2.5 && config.BulletSpeedPixels == 650,
                     "All four weapons retain the Heavy Gunner-style tracer cadence");
-                Require(gun.GetNode<Marker2D>("TurretPivot/GunSprite/Muzzle").Position == new Vector2(0, -32),
+                Require(gun.GetNode<Marker2D>("TurretPivot/Muzzle").Position == new Vector2(0, -32),
                     "Capital shots originate at the authored gun tip");
             }
         }
@@ -77,7 +77,7 @@ public partial class GunnerDroneChecks : Node
         var gun = preview.GetNode<EnemyMinigun>(WeaponPath);
         Require(gun.GetNode<Sprite2D>("TurretPivot/GunSprite").Texture != preview.GetNode<Sprite2D>("Sprite").Texture
             && gun.GetNode<Sprite2D>("TurretPivot/GunSprite").Texture.GetSize() == new Vector2(12, 44)
-            && gun.GetNode<Marker2D>("TurretPivot/GunSprite/Muzzle").Position == new Vector2(0, -18),
+            && gun.GetNode<Marker2D>("TurretPivot/Muzzle").Position == new Vector2(0, -18),
             "Long-barrel 12x44 gun retains the physical muzzle marker at its new canvas tip");
         preview.Free();
     }
@@ -120,7 +120,7 @@ public partial class GunnerDroneChecks : Node
         Enemy ship = Spawn(f);
         var gun = ship.GetNode<EnemyMinigun>(WeaponPath);
         var pivot = gun.GetNode<Node2D>("TurretPivot");
-        var muzzle = gun.GetNode<Marker2D>("TurretPivot/GunSprite/Muzzle");
+        var muzzle = gun.GetNode<Marker2D>("TurretPivot/Muzzle");
         var renderer = gun.GetNode<WeaponVisualRenderer>("WeaponVisuals");
         var bullets = f.Main.GetNode<EnemyBulletSystem>("World/EnemyBullets");
         BattleTower tower = f.Add<BattleTower>("battle", new(2000, 2000));
@@ -138,6 +138,17 @@ public partial class GunnerDroneChecks : Node
             && renderer.ToGlobal(renderer.LastFlashPosition).IsEqualApprox(muzzle.GlobalPosition)
             && renderer.LastFlashStyle.Length == 5 && renderer.LastFlashStyle.Duration < .08f,
             "Dedicated small red tracer and tiny warm muzzle flash share the real launch origin");
+        var recoil = gun.GetNode<WeaponRecoilController>("Recoil");
+        var movingGun = gun.GetNode<Sprite2D>("TurretPivot/GunSprite");
+        Vector2 restGun = movingGun.Position, fixedMuzzle = muzzle.GlobalPosition;
+        Transform2D fixedPivot = pivot.Transform;
+        recoil.Advance(.02);
+        Require(recoil.Impulses == 1 && recoil.Active && movingGun.Position.Y > restGun.Y
+            && muzzle.GlobalPosition.IsEqualApprox(fixedMuzzle) && pivot.Transform == fixedPivot && ship.Transform == hull,
+            "Accepted recoil moves only gun art, never the physical muzzle, aiming pivot or ship");
+        recoil.Advance(1);
+        Require(!recoil.Active && !recoil.IsProcessing() && movingGun.Position == restGun,
+            "Shared recoil restores the exact pose and sleeps");
         long count = gun.ShotRequests; gun._PhysicsProcess(.001);
         Require(gun.ShotRequests == count && renderer.TotalFlashes == 1, "Cooldown opportunities do not flash");
         bullets.Advance(.1);
@@ -175,7 +186,7 @@ public partial class GunnerDroneChecks : Node
         var hull = preview.GetNode<Sprite2D>("Sprite");
         var gun = preview.GetNode<EnemyMinigun>(WeaponPath);
         var gunSprite = gun.GetNode<Sprite2D>("TurretPivot/GunSprite");
-        var muzzle = gun.GetNode<Marker2D>("TurretPivot/GunSprite/Muzzle");
+        var muzzle = gun.GetNode<Marker2D>("TurretPivot/Muzzle");
         EnemyMinigunConfig config = (EnemyMinigunConfig)gun.Config;
         Require(hull.Texture.GetSize() == new Vector2(62, 42) && gunSprite.Texture.GetSize() == new Vector2(18, 50)
             && gun.GetNode<Node2D>("TurretPivot").Position == new Vector2(-2, 0)
@@ -195,7 +206,7 @@ public partial class GunnerDroneChecks : Node
         Require(ship != null, "Heavy Gunner spawns through the shared enemy catalog and portal");
         Disable(ship); ship.GlobalPosition = new(2000, 2064); ship.Rotation = 0;
         gun = ship.GetNode<EnemyMinigun>(WeaponPath);
-        muzzle = gun.GetNode<Marker2D>("TurretPivot/GunSprite/Muzzle");
+        muzzle = gun.GetNode<Marker2D>("TurretPivot/Muzzle");
         var bullets = f.Main.GetNode<EnemyBulletSystem>("World/EnemyBullets");
         BattleTower tower = f.Add<BattleTower>("battle", new(2000, 2000));
         float hp = tower.Health;

@@ -1,6 +1,6 @@
 # Shared weapon capabilities — CW1 recoil / CW2 hostile splash
 
-**Status:** PLANNED / CODEX HANDOFF (2026-11-06). Work on `ben0kay/godot-tower-defense`, **`dev` only**. Implement CW1 first; CW2 is a **separate later task**. Read `NOTES/CodePreferences.md`, root README, `COMBAT/README.md`, the recoil/AoE docs and current source before editing; check `AGENTS.md` if present.
+**Status:** CW1 SOURCE IMPLEMENTED / AWAITING OWNER VALIDATION; CW2 PLANNED (2026-11-06). Work on `ben0kay/godot-tower-defense`, **`dev` only**. Implement CW1 first; CW2 is a **separate later task**. Read `NOTES/CodePreferences.md`, root README, `COMBAT/README.md`, the recoil/AoE docs and current source before editing; check `AGENTS.md` if present.
 
 ## Current reusable systems — do not duplicate
 
@@ -11,7 +11,7 @@
 
 **Ownership:** actual damage/target recipients in `COMBAT/`; visual-only recoil in `FEEDBACK/Weapons/Recoil/`; hostile aiming, firing rate and config remain in `ENEMIES/Weapons/`; hostile bullet movement remains in `ENEMIES/Projectiles/`.
 
-## CW1 — shared weapon recoil for friendlies and enemies (first Codex pass)
+## CW1 — shared weapon recoil for friendlies and enemies (source implemented)
 
 1. Extract the tower recoil **motion logic into a small weapon-neutral visual component/style**, with a backward-compatible wrapper/adapter retaining existing `TowerRecoilController`/`TowerRecoilStyle` classes and Godot paths. Do **not** mass-migrate tower scenes/presets, duplicate the motion, or change friendly tower behaviour.
 2. Move only the **gun's local visual assembly** backward (+Y for current up-facing art), never the ship hull, tower root, aiming pivot, projectiles or physical firing origin. Snapshot muzzle origin/direction and flash **before** kicking. One bounded accumulated kick/return per mount, exact pose reset, Inspector-editable enable/distance/timing/cap, zero processing at rest; no per-shot tween, timer or node allocation.
@@ -27,4 +27,4 @@
 
 ## Delivery
 
-Do not implement CW2 as part of CW1. Keep each phase to one focused commit on **`dev`**, then update this status, owning README(s) and backlog. Per owner preference, do only short source/resource inspection and at most one readily available build; leave visual and FPS gameplay acceptance to the owner. **This document implements neither mechanic.**
+Do not implement CW2 as part of CW1. Keep each phase to one focused commit on **`dev`**, then update this status, owning README(s) and backlog. Per owner preference, do only short source/resource inspection and at most one readily available build; leave visual and FPS gameplay acceptance to the owner. **CW1 is source implemented; CW2 remains unimplemented.**

@@ -4,7 +4,10 @@
 [ext_resource type="Resource" path="res://ENEMIES/Weapons/Minigun/Visuals/EnemyMinigunMuzzleFlash.tres" id="flash"]
 [ext_resource type="Resource" uid="uid://bk0af31thdhry" path="res://ENEMIES/Weapons/Minigun/Visuals/EnemyMinigunTracer.tres" id="tracer"]
 
+[ext_resource type="Resource" path="res://ENEMIES/Types/GunnerDrone/Visuals/GunnerRecoil.tres" id="recoil"]
+
 [resource]
 script = ExtResource("config")
 ProjectileVisual = ExtResource("tracer")
 MuzzleFlash = ExtResource("flash")
+Recoil = ExtResource("recoil")

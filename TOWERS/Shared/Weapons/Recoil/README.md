@@ -1,8 +1,8 @@
-## CW1 — planned weapon-neutral recoil extraction (2026-11-06)
-
-**Plan only.** Preserve the current TowerRecoilController/TowerRecoilStyle and all tower presets/scene-resource paths while extracting a shared visual-only recoil core that enemy Gunner/Heavy Gunner and Capital gun mounts can use. New shared presentation location: `FEEDBACK/Weapons/Recoil/`. No migration has been performed. [Codex handoff](../../../../COMBAT/SHARED_WEAPON_CAPABILITIES_PLAN.md).
+## CW1 — shared recoil source implemented — 2026-11-06
+Motion/style now live under `FEEDBACK/Weapons/Recoil/`; existing tower classes, preset paths and behaviour remain compatible adapters. Gunner, Heavy Gunner and four Capital cannons have independent accepted-shot recoil. Only gun art moves; fixed physical muzzle/aim and bullet cadence remain unchanged. Source review only; owner validation pending. CW2 remains planned.
 
 ---
+
 
 ## Projectile tower rollout — implemented in source (2026-10-20)
 

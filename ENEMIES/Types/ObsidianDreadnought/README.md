@@ -1,3 +1,6 @@
+## CW1 recoil — source implemented / owner validation pending
+The gun sprite now uses the shared visual recoil controller with its own preset under `Visuals/`. Physical muzzle markers are fixed siblings under `TurretPivot/Muzzle` at the original barrel-tip positions; gun art alone kicks after accepted shots. The Capital's four mounts retain independent state. No hull, aim, cadence or damage changes.
+
 ## Capital hull black-fleet polish — 2026-11-06
 
 `Artwork/obsidian_dreadnought.svg` (352×208) and the separate `Artwork/capital_cannon.svg` (24×72) now use **flat near-black/charcoal armour, dark structural borders and restrained scarlet/orange-red accents** like the rest of the fleet. The original broad four-socket dreadnought silhouette and all path geometry are preserved; metallic plate/spine/engine gradients and silver reflective details have been replaced with solid faction colours. No scene, import UID, viewport size, gun mount `(112,±62)`/`(-104,±62)`, gun muzzle `(0,-32)`, collision, HP, weapon, wave or gameplay changes. Owner visual review in F2 and Level011 wave 10 remains pending.
