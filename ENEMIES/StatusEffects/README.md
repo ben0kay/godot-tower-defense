@@ -1,3 +1,15 @@
+## CTX1 — Corruption and safe shared DoT ticking
+
+**Source Implemented / Awaiting Owner Validation.** Corruption joins Slow/Freeze using the same enemy-owned compact entries and lazy world clock. Each periodic entry stores its immutable total duration/DPS/source, double remaining duration and accrued time. Exactly one entry per identity; refresh uses new duration, maximum current/new DPS, latest source and preserved accrued time. No status application itself awards XP.
+
+TimedStatusScheduler now uses O(1) registration/swap-removal and a retained versioned step buffer over active timed enemies only. Death, removal of another enemy, world exit or reinitialization during damage callbacks cannot invalidate iteration, skip a survivor or advance a new generation using an old step. New registrations wait until the next scheduler step. No per-frame temporary collections, enemy-registry scan or per-enemy Timer/process. Empty clocks sleep.
+
+Normal damage ticks every1s; frame hitches aggregate whole due seconds, and expiration pays a final partial second. Enemy.ApplyDamage remains the sole damage/kill/XP path, with full shield bypass and explicit1:1 hull damage. Status state is committed before callbacks. Weak DamageSource permits continued damage after tower removal without XP for a dead/replacement owner. Pause stops elapsed time; Freeze/Slow do not. Slow/Freeze family policies are unchanged; Freeze expiration now refreshes movement/tint even while another timed effect remains.
+
+Successful Corruption applications use one short shared impact ring plus a composited purple tint; no infected-enemy particle system. Death/arrival/exit/reinitialize unregister and release all state. Between-wave saves still disallow live enemies and require no schema addition. Focused owner fixture: TESTS/Towers/CorruptorTowerChecks.tscn, authored but unrun (.NET unavailable). Historical DoT-unimplemented wording below is superseded.
+
+---
+
 ## Stasis ST1 — implemented 2026-10-18
 
 Green-themed Stasis is now a catalog-registered Offensive Energy projectile tower. It uses the existing shared muzzle/projectile, construction, physical ammo, hull HP, purchased-level, earned-rank, stat pipeline and Inspector paths. No Inspector layout changes. Targets must be unfrozen and Freeze-nonimmune; all six selected modes score only those eligible candidates. If none qualify, wait with no damage-only fallback. Cryo-slowed enemies remain eligible. Existing in-flight shots can refresh Freeze with maximum remaining/new duration, never additive duration.

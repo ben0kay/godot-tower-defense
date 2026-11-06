@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="MuzzleFlashStyle" load_steps=2 format=3]
+[ext_resource type="Script" path="res://TOWERS/Shared/Weapons/Visuals/MuzzleFlashStyle.cs" id="1"]
+[resource]
+script = ExtResource("1")
+Shape = 1
+DurationSeconds = 0.12
+LengthPixels = 18
+WidthPixels = 15
+CoreColor = Color(1, 0.75, 1, 1)
+OuterColor = Color(0.9, 0.15, 0.8, 0.65)

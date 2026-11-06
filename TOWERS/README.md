@@ -1,3 +1,9 @@
+## CTX1 — Corruptor Tower
+
+**Source Implemented / Awaiting Owner Validation.** New `corruptor` Offensive1×1 tower: L1 initial8 hull HP +3 hull HP/s over8s (32 potential),0.6shots/s, three paid tiers, five ranks, graphite/violet native SVG art and shared construction/power/ammo/heat/targeting/selling/checkpoints. Prefers unaffected Corruption-susceptible targets with affected fallback using one existing spatial visitor. Corruption is a reusable enemy-owned periodic status on the existing timed scheduler; hull damage/XP/kill attribution stays authoritative. [Config, balance and owner checks](Offensive/CorruptorTower/README.md).
+
+---
+
 ## TS1 — Health-based tower selling
 
 **Source Implemented / Awaiting Owner Validation.**

@@ -17,6 +17,7 @@ public static class TowerRanksStage
             DamagePerShot = (int)Math.Clamp(Math.Round(stats.DamagePerShot * damage), 0, int.MaxValue),
             RangePixels = Scale(stats.RangePixels, range),
             MaxHealth = Scale(stats.MaxHealth, 1 + (double)rank.HpBonus),
+            Corruption = stats.Corruption.HasValue ? stats.Corruption.Value with { DamagePerSecond = Scale(stats.Corruption.Value.DamagePerSecond, damage) } : null,
             Beam = stats.Beam.HasValue ? new BeamStats(Scale(stats.Beam.Value.DamagePerSecond, damage)) : null,
             Shockwave = stats.Shockwave.HasValue ? stats.Shockwave.Value with { DamagePerWave = Scale(stats.Shockwave.Value.DamagePerWave, damage) } : null
         };

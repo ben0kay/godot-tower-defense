@@ -1,3 +1,9 @@
+## CTX1 checkpoint boundary
+
+**Source Implemented / Awaiting Owner Validation.** Corruptor is a normal registered tower: identity, paid tier/rank, actual Credits invested, hull, work, ammo, heat, power and cooldown reuse existing capture/restore. No new JSON fields or version. Live enemies/projectiles already prohibit saving; Corruption runtime is cleared with those enemies, so no active effect/source serialization is added. Load re-resolves capabilities from the authored config without replaying shots/ticks/refunds. Existing fingerprints and strict compatibility remain unchanged.
+
+---
+
 ## SPAWN1 — between-wave portal availability
 
 **Source Implemented / Awaiting Owner Validation.** No new save fields or envelope version. WaveManager restores portal state from the actual Numbers of the first `CompletedWaves` definitions. START portals stay active; only already-completed activation waves are reapplied. The next wave's new portal stays hidden until Start. Restore does not replay spawns, pulse/burst feedback or materialization. Existing dependency fingerprints, strict validation and combat-save restrictions remain authoritative; changed authored scene/shader dependencies can still reject older checkpoints.

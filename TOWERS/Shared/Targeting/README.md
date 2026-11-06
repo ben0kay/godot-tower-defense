@@ -1,3 +1,9 @@
+## CTX1 optional affected-status fallback
+
+**Source Implemented / Awaiting Owner Validation.** `TowerTargeting.Find/Eligible` append an optional `affectedFallback=false` argument. With a required identity and opt-in, susceptible unaffected candidates outrank affected candidates before ordinary priority scoring/ties. One spatial visitor, normal detection/range/terrain sight, no second scan. ProjectileTurretBase exposes a protected opt-in hook; only Corruptor enables it. Cryo/Slow and Stasis/Freeze keep strict existing exclusion and no damage-only fallback.
+
+---
+
 ## Mountain sight blocking — 2026-11-05
 
 Shared acquisition and cached-lock checks now honor explicit WorldGrid `blocks_tower_sight` metadata. Only mountain marker (Mars source 2, cell 2,0) initially opts in. Candidate scoring/priority/stealth/status enums and spatial broadphase remain unchanged. Only a potentially winning candidate pays for allocation-free segment traversal; cached locks recheck moving targets every existing weapon tick. No-blocker maps return immediately. This affects all aimed hostile tower paths; already-emitted projectiles, splash, untargeted Shockwave, repair/support and enemy weapons are unchanged. [Terrain rules and limitations](../../../WORLD/TERRAIN/Mountains/README.md). Optional `TESTS/Terrain/MountainSightChecks.tscn` is authored but not run here.

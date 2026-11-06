@@ -9,6 +9,7 @@ public static class SafetyClampsStage
     {
         // Zero is the default for towers without a directional sensor.
         ScanConeDegrees = Mathf.Min(180f, FiniteMinimum(stats.ScanConeDegrees, 0)),
+        Corruption = DamageOverTimeStats.Sanitize(stats.Corruption),
         Repair = stats.Repair.HasValue ? new RepairStats(FiniteMinimum(stats.Repair.Value.HullPerSecond, 0)) : null,
         Handling = stats.Handling.HasValue ? ProjectileHandlingStats.Sanitize(stats.Handling.Value) : null,
         Freeze = stats.Freeze.HasValue ? new FreezeStats(FiniteMinimum(stats.Freeze.Value.DurationSeconds, 0)) : null,

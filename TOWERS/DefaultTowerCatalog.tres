@@ -24,6 +24,8 @@
 [ext_resource type="Resource" path="res://TOWERS/Economy/Power/SolarGenerator/SolarGeneratorDefinition.tres" id="solar_power"]
 [ext_resource type="Resource" path="res://TOWERS/Economy/Power/FusionReactor/FusionReactorDefinition.tres" id="fusion_power"]
 
+[ext_resource type="Resource" path="res://TOWERS/Offensive/CorruptorTower/CorruptorTowerDefinition.tres" id="corruptor"]
+
 [resource]
 script = ExtResource("1")
-Definitions = [ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10"), ExtResource("10_rocket"), ExtResource("stasis"), ExtResource("resource_income"), ExtResource("arg_income"), ExtResource("stealth_beacon"), ExtResource("industrial_power"), ExtResource("repair"), ExtResource("power_relay"), ExtResource("power_transmitter"), ExtResource("solar_power"), ExtResource("fusion_power")]
+Definitions = [ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10"), ExtResource("10_rocket"), ExtResource("stasis"), ExtResource("corruptor"), ExtResource("resource_income"), ExtResource("arg_income"), ExtResource("stealth_beacon"), ExtResource("industrial_power"), ExtResource("repair"), ExtResource("power_relay"), ExtResource("power_transmitter"), ExtResource("solar_power"), ExtResource("fusion_power")]

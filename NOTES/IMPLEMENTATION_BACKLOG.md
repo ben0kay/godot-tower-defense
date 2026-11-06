@@ -1,3 +1,9 @@
+## CTX1 — Corruptor and shared DoT — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Registered graphite/violet Corruptor with three paid tiers/five ranks and normal projectiles, construction stages, power/ammo/heat, selling and checkpoints. Shared Corruption status: hull-only1s ticks, stronger-DPS duration refresh, latest weak source attribution, safe active-only versioned scheduler and Slow/Freeze coexistence. Single-pass unaffected-first / affected fallback is Corruptor-only; Cryo stays strict. Inspector shows initial/periodic/total damage. Source/resource/SVG/diff checks + one art render only; .NET unavailable and focused fixture unrun. Owner: all six priorities, actual DoT/XP/kill flow, pause/lifecycle, art/UI, economy/heat and fresh save/load.
+
+---
+
 ## SPAWN1 startup repair and RT2 audit — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** Removed stale registrations for absent Level001 Portal2 and Level020 Portal05 (SPAWN1 had promoted previous warnings into startup SETUP ERROR). Normalized Restoration resource script-before-Power assignment; guarded post-heal/heat callback removal and bounded heat to delivered hull. Corrected power-aware repair fixtures and Level001 activation fixture setup. Source/resource/diff checks only; .NET unavailable. Owner: start Level001/020 waves; confirm funded Restoration repair, overheat/EMP recovery and heat/energy save/load. No tower costs, rates, heat timings or wave content changed.

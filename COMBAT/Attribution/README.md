@@ -1,3 +1,9 @@
+## CTX1 periodic attribution
+
+**Source Implemented / Awaiting Owner Validation.** Every Corruption tick supplies the active entry's DamageSource to normal Enemy.ApplyDamage. The real lethal tick sets KillingSource and awards existing finite damage XP + kill XP, while registry Credits/mission notifications fire once. Reapplication transfers later ticks to its latest source (while retaining stronger DPS). Other actual killing blows retain their own attribution. Weak source lifetime checks prevent sold/freed towers or later replacements receiving credit; source removal does not cancel remaining damage. Reinitialization explicitly resets KillingSource. No extra XP pool, wallet or kill counter.
+
+---
+
 # Lightweight damage attribution
 
 DamageSource is one weak owner token created lazily per TowerBase, not per hit. DamageInfo optionally carries that token; null remains the default for debug/manual/unattributed callers. Battle snapshots it in guided bullets, Laser supplies it on beam ticks, Blaster snapshots it in SplashProjectile, and ShockwaveEmitter retains it in its emitted payload. AreaDamage.AtDistance copies the token unchanged alongside damage type/overrides/penetration, so every splash/wave recipient credits the correct attacker.

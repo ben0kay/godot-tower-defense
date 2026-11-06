@@ -13,14 +13,14 @@ public static class TowerTargeting
     #region Spatial Acquisition
     // =========================================================
     // Search only living enemies in firing range; stale/failed paths cannot win First.
-    public static Enemy Find(EnemyRegistry registry, Vector2 position, float range, Priority priority, StatusEffectId? requiredEffect = null, Preference preference = Preference.None, bool detectsStealth = false)
+    public static Enemy Find(EnemyRegistry registry, Vector2 position, float range, Priority priority, StatusEffectId? requiredEffect = null, Preference preference = Preference.None, bool detectsStealth = false, bool affectedFallback = false)
     {
         using var pf2 = SubsystemProfiler.Measure(registry, ProfileCategory.Targeting);
         if (!Enum.IsDefined(preference)) throw new ArgumentOutOfRangeException(nameof(preference));
         if (!Enum.IsDefined(priority)) throw new ArgumentOutOfRangeException(nameof(priority));
         if (!float.IsFinite(range) || range < 0) throw new ArgumentOutOfRangeException(nameof(range));
         TargetVisitor visitor = new() { Grid = registry.TerrainGrid, Position = position, RangeSquared = range * range, Mode = priority,
-            Score = Largest(priority) ? float.NegativeInfinity : float.PositiveInfinity, Order = ulong.MaxValue, RequiredEffect = requiredEffect, PreferredGroup = preference, DetectsStealth = detectsStealth };
+            Score = Largest(priority) ? float.NegativeInfinity : float.PositiveInfinity, Order = ulong.MaxValue, RequiredEffect = requiredEffect, PreferredGroup = preference, DetectsStealth = detectsStealth, AffectedFallback = affectedFallback };
         // Preserve the old float-distance inclusive boundary; narrow scoring still uses its exact comparison.
         float queryRange = float.IsFinite(MathF.BitIncrement(range)) ? MathF.BitIncrement(range) : range;
         registry.VisitEnemiesInRadius(position, queryRange, ref visitor);
@@ -41,12 +41,12 @@ public static class TowerTargeting
         public Enemy Best;
         public StatusEffectId? RequiredEffect;
         public Preference PreferredGroup;
-        public bool BestPreferred, DetectsStealth;
+        public bool BestPreferred, DetectsStealth, AffectedFallback;
         // =========================================================
         // Strict finite best-score selection plus the original earlier-living-entry tie-break.
         public void Accept(EnemySpatialIndex.Neighbor nearby)
         {
-            if (!TowerDetection.CanDetect(nearby.Enemy, DetectsStealth) || !Eligible(nearby.Enemy, RequiredEffect)) return;
+            if (!TowerDetection.CanDetect(nearby.Enemy, DetectsStealth) || !Eligible(nearby.Enemy, RequiredEffect, AffectedFallback)) return;
             float distance = Position.DistanceSquaredTo(nearby.Position);
             if (distance > RangeSquared) return;
             float candidate = Mode switch
@@ -56,7 +56,8 @@ public static class TowerTargeting
                 _ => distance
             };
             if (!float.IsFinite(candidate)) return;
-            bool preferred = PreferredGroup == Preference.Shielded && nearby.Enemy.CurrentShield > 0;
+            bool preferred = AffectedFallback && RequiredEffect.HasValue ? !nearby.Enemy.HasStatus(RequiredEffect.Value)
+                : PreferredGroup == Preference.Shielded && nearby.Enemy.CurrentShield > 0;
             // Preferences rank eligible groups first; ordinary mode scoring/ties apply within each group.
             if (Best == null || (preferred && !BestPreferred) || (preferred == BestPreferred &&
                 ((Largest(Mode) ? candidate > Score : candidate < Score) || (candidate == Score && nearby.Order < Order))))
@@ -73,8 +74,8 @@ public static class TowerTargeting
     #region Eligibility
     // =========================================================
     // Eligibility is shared by spatial acquisition and cached-target checks; no damage-only fallback.
-    public static bool Eligible(Enemy enemy, StatusEffectId? effect) => !effect.HasValue
-        || (enemy.CanReceiveStatus(effect.Value) && !enemy.HasStatus(effect.Value));
+    public static bool Eligible(Enemy enemy, StatusEffectId? effect, bool affectedFallback = false) => !effect.HasValue
+        || (enemy.CanReceiveStatus(effect.Value) && (affectedFallback || !enemy.HasStatus(effect.Value)));
 
     // =========================================================
     // Cached targets are checked cheaply between staggered searches.

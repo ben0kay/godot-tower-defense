@@ -1,3 +1,9 @@
+## CTX1 Corruptor comparison
+
+**Source Implemented / Awaiting Owner Validation.** Typed Corruption snapshots add DoT (HP/s), Duration(s) and Total potential rows to the ordinary direct damage/range/rate comparison, including upgrade deltas and max-tier current values. No additional Inspector, polling, layout width or stat parsing. Other tower rows are unchanged. Owner should check this denser comparison with right-side rank/HP/ammo/heat/energy and existing UPGRADE/SELL buttons at normal viewport size.
+
+---
+
 ## TS1 — Health-based tower selling
 
 **Source Implemented / Awaiting Owner Validation.**

@@ -34,6 +34,12 @@ public static class TowerUpgradeComparison
         bool beam = current.Beam.HasValue && next.Beam.HasValue;
         bool wave = current.Shockwave.HasValue && next.Shockwave.HasValue;
         bool projectile = !beam && !wave;
+        if (current.Corruption is DamageOverTimeStats dot && next.Corruption is DamageOverTimeStats nextDot)
+        {
+            Add(rows, "DoT (HP/s)", dot.DamagePerSecond, nextDot.DamagePerSecond, 2);
+            Add(rows, "Duration (s)", dot.DurationSeconds, nextDot.DurationSeconds, 1);
+            Add(rows, "Total potential", current.DamagePerShot + dot.TotalDamage, next.DamagePerShot + nextDot.TotalDamage, 2);
+        }
         if (beam) Add(rows, "DPS", current.Beam.Value.DamagePerSecond, next.Beam.Value.DamagePerSecond, 2);
         else if (wave) Add(rows, "Wave Damage", current.Shockwave.Value.DamagePerWave, next.Shockwave.Value.DamagePerWave, 2);
         else if (projectile) Add(rows, "Damage", current.DamagePerShot, next.DamagePerShot, 0);

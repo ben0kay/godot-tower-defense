@@ -43,6 +43,7 @@ public partial class Enemy : Node2D
         }
         if (_statuses.HasTimed) { _statusClock ??= TimedStatusScheduler.For(_registry); _statusClock.Register(this); }
         RefreshStatusColor();
+        StatusEffectFeedback.Applied(this, effect.Id);
         _thruster?.SetEffectiveSpeed(EffectiveMoveSpeed);
         return true;
     }
@@ -58,15 +59,18 @@ public partial class Enemy : Node2D
     }
     // =========================================================
     // Expiry changes cached movement/presentation only, never routing or terrain clocks.
-    internal bool AdvanceStatuses(float seconds)
+    internal bool OwnsStatuses(EnemyStatusEffects statuses) => IsAlive && IsInsideTree() && !IsQueuedForDeletion() && _statuses == statuses;
+    internal bool AdvanceStatuses(double seconds)
     {
-        if (!IsAlive || IsQueuedForDeletion() || _statuses == null) return false;
-        bool active = _statuses.Advance(seconds);
-        if (!active)
-        {
-            RefreshStatusColor();
-            _thruster?.SetEffectiveSpeed(EffectiveMoveSpeed);
-        }
+        if (!IsAlive || !IsInsideTree() || IsQueuedForDeletion() || _statuses == null) return false;
+        if (GetTree().Paused) return _statuses.HasTimed;
+        EnemyStatusEffects holder = _statuses;
+        float movement = holder.MovementMultiplier;
+        bool frozen = HasStatus(StatusEffectId.Freeze), corrupted = HasStatus(StatusEffectId.Corruption);
+        bool active = holder.Advance(seconds, this);
+        if (!GodotObject.IsInstanceValid(this) || !OwnsStatuses(holder)) return false;
+        if (movement != holder.MovementMultiplier || frozen != HasStatus(StatusEffectId.Freeze) || corrupted != HasStatus(StatusEffectId.Corruption))
+        { RefreshStatusColor(); _thruster?.SetEffectiveSpeed(EffectiveMoveSpeed); }
         return active;
     }
     // =========================================================
@@ -76,6 +80,7 @@ public partial class Enemy : Node2D
         if (!GodotObject.IsInstanceValid(_statusSprite)) return;
         Color tint = HasStatus(StatusEffectId.Slow) ? new(.65f, .95f, 1f) : Colors.White;
         if (HasStatus(StatusEffectId.Freeze)) tint *= new Color(.4f, 1f, .45f);
+        if (HasStatus(StatusEffectId.Corruption)) tint *= new Color(1f, .65f, .95f);
         _statusSprite.SelfModulate = _originalStatusColor * tint;
     }
     #endregion
@@ -101,7 +106,7 @@ public partial class Enemy : Node2D
         if (GodotObject.IsInstanceValid(_registry) && _registry.Contains(this)) _registry.Unregister(this);
         AssignedCitadel = routeHandoff?.Destination ?? assignedCitadel ?? paths.Navigation.SingleDestination;
         ClearStatuses();
-        SpawnGeneration = generation; _registry = registry; Health = Mathf.Max(1f, Definition.MaxHealth); IsAlive = true;
+        KillingSource = null; SpawnGeneration = generation; _registry = registry; Health = Mathf.Max(1f, Definition.MaxHealth); IsAlive = true;
         CurrentShield = spawnWithShield && float.IsFinite(Definition.MaxShield)
             ? Mathf.Max(0f, Definition.MaxShield) : 0f;
         _initialDurability = (double)Health + CurrentShield;

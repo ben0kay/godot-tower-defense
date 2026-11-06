@@ -23,6 +23,7 @@ public static class PermanentResearchStage
         return stats with
         {
             DamagePerShot = (int)Math.Clamp(Math.Round(stats.DamagePerShot * multiplier), 0, int.MaxValue),
+            Corruption = stats.Corruption.HasValue ? stats.Corruption.Value with { DamagePerSecond = Scale(stats.Corruption.Value.DamagePerSecond, multiplier) } : null,
             Beam = stats.Beam.HasValue ? new BeamStats(Scale(stats.Beam.Value.DamagePerSecond, multiplier)) : null,
             Shockwave = stats.Shockwave.HasValue ? stats.Shockwave.Value with { DamagePerWave = Scale(stats.Shockwave.Value.DamagePerWave, multiplier) } : null
         };

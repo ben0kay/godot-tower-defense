@@ -15,6 +15,7 @@ public abstract partial class ProjectileTurretBase : TowerBase
     // =========================================================
     // Optional status weapons reuse the same bounded target search and launch-time projectile delivery.
     protected virtual StatusEffectId? RequiredEffect => null;
+    protected virtual bool AffectedStatusFallback => false;
     protected virtual StatusEffectPayload? CreateEffect(TowerFinalStats stats) => null;
     #region Config and Runtime
     private ProjectileTurretConfig _config;
@@ -111,11 +112,11 @@ public abstract partial class ProjectileTurretBase : TowerBase
         _shotTimer = Mathf.Max(-Mathf.Min((float)delta, .05f), _shotTimer - (float)delta);
         if (_searchTimer <= 0)
         {
-            _target = TowerTargeting.Find(_registry, GlobalPosition, Mathf.Max(0, FinalStats.RangePixels), Config.TargetPriority, RequiredEffect, detectsStealth: Config.CanDetectStealth);
+            _target = TowerTargeting.Find(_registry, GlobalPosition, Mathf.Max(0, FinalStats.RangePixels), Config.TargetPriority, RequiredEffect, detectsStealth: Config.CanDetectStealth, affectedFallback: AffectedStatusFallback);
             _searchTimer = Mathf.Max(.05f, FinalStats.TargetSearchInterval);
         }
         if (!TowerTargeting.Valid(_target, GlobalPosition, Mathf.Max(0, FinalStats.RangePixels), Config.CanDetectStealth)
-            || !TowerTargeting.Eligible(_target, RequiredEffect))
+            || !TowerTargeting.Eligible(_target, RequiredEffect, AffectedStatusFallback))
         { _visuals.SetAim(null, Vector2.Zero, 0, null, false); return; }
         bool aligned = TurretAiming.Track(_pivot, _target.GlobalPosition, FinalStats.RotationSpeedDegrees,
             FinalStats.AimToleranceDegrees, Config.RotateWhileTracking, delta);

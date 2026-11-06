@@ -24,6 +24,6 @@ public static class WeaponHitDelivery
             GodotObject.IsInstanceValid(sparks))
             sparks.Spawn(contact, incoming, hullHitSparkCount);
         if (effect.HasValue && GodotObject.IsInstanceValid(target) && target.IsAlive && !target.IsQueuedForDeletion())
-            target.ApplyStatus(effect.Value);
+            target.ApplyStatus(effect.Value.WithSource(hit.Source));
     }
 }

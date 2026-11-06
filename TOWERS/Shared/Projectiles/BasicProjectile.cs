@@ -98,7 +98,7 @@ public partial class BasicProjectile : Node2D
                 GodotObject.IsInstanceValid(hit) && hit.Health < hullBefore &&
                 GodotObject.IsInstanceValid(_hullSparks))
                 _hullSparks.Spawn(GlobalPosition, _travelDirection, _hullSparkCount);
-            if (_effect.HasValue && GodotObject.IsInstanceValid(hit) && hit.IsAlive && !hit.IsQueuedForDeletion()) hit.ApplyStatus(_effect.Value);
+            if (_effect.HasValue && GodotObject.IsInstanceValid(hit) && hit.IsAlive && !hit.IsQueuedForDeletion()) hit.ApplyStatus(_effect.Value.WithSource(_damage.Source));
             return;
         }
         GlobalPosition = end; _life -= seconds;
