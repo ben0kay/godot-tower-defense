@@ -50,12 +50,13 @@ public partial class CorruptorTowerChecks : Node
     private void CheckSnapshot(AmmoLoopFixture f, CorruptorTower source, TimedStatusScheduler clock)
     {
         Enemy target = Ship(f, new(2000, 1800));
+        CorruptorTowerConfig config = (CorruptorTowerConfig)source.Config;
         TowerFinalStats snapshot = source.FinalStats;
         BasicProjectile bullet = new();
         bullet.Initialize(target, snapshot.ProjectileSpeed, source.Config.CreateHit(snapshot, source.DamageSource),
             Dot(source.DamageSource, snapshot.Corruption.Value.DamagePerSecond, snapshot.Corruption.Value.DurationSeconds));
         f.Main.GetNode("World/Projectiles").AddChild(bullet); bullet.LaunchFrom(target.GlobalPosition + Vector2.Down * 80);
-        source.Config.Level1DamagePerSecond = 99; bullet._PhysicsProcess(.2);
+        config.Level1DamagePerSecond = 99; bullet._PhysicsProcess(.2);
         Near(target.Health, 92, "Immediate Energy hit bypasses shields for 8 hull HP"); Near(target.CurrentShield, 100, "Initial hit leaves shield intact");
         target.ApplyStatus(new(StatusEffectId.Slow, .33f)); target.ApplyStatus(new(StatusEffectId.Freeze, 0, 2));
         clock._PhysicsProcess(.5); Near(target.Health, 92, "No tick before one second");
@@ -69,7 +70,7 @@ public partial class CorruptorTowerChecks : Node
         clock._PhysicsProcess(20); Near(target.Health, 68, "Hitch pays all eight seconds exactly once and expires");
         Near(target.CurrentShield, 100, "Periodic ticks bypass shields");
         clock._PhysicsProcess(20); Near(target.Health, 68, "Expired effect cannot damage again");
-        source.Config.Level1DamagePerSecond = 3; target.Free();
+        config.Level1DamagePerSecond = 3; target.Free();
     }
     private static void CheckRefresh(AmmoLoopFixture f, CorruptorTower a, CorruptorTower b, TimedStatusScheduler clock)
     {
