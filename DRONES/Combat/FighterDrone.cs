@@ -54,7 +54,7 @@ public partial class FighterDrone : Node2D
             FighterDroneConfig.Safe(Config.FlightSpeed, 340, 32, 2000), 100,
             Config.Acceleration, Config.Deceleration);
         State = returning ? FighterDroneState.Returning : FighterDroneState.Launching;
-        _weapon?.Suspend();
+        _steering.ResetPass(); _weapon?.Suspend();
         Present(0, true);
     }
     internal bool Step(float dt)
@@ -86,7 +86,7 @@ public partial class FighterDrone : Node2D
         State = _target == null ? FighterDroneState.Holding :
             GlobalPosition.DistanceTo(_target.GlobalPosition) > engagement ? FighterDroneState.Intercepting : FighterDroneState.Manoeuvring;
         _steering.Step(this, _target, home, dt, clamp); Present(dt, true);
-        bool fired = _weapon?.Step(dt, _target) == true;
+        bool fired = _weapon?.Step(dt, _steering.OnAttackRun ? _target : null) == true;
         return before != State || fired;
     }
     private void Present(float dt, bool ignite) => _body?.Present(InTransit ? _motion.Heading : _steering.Heading,
@@ -110,7 +110,7 @@ public partial class FighterDrone : Node2D
         Health = data.Health; Ammo = data.Ammo; State = data.State; GlobalPosition = data.Position.Vector();
         _motion = data.Motion?.CopyFlight() ?? new DroneFlightMotion { Heading = data.Heading };
         _steering.Heading = data.Heading; _steering.Velocity = data.Velocity.Vector(); _steering.Phase = data.ManoeuvrePhase;
-        _target = null; _search = Slot * .08f;
+        _target = null; _steering.ResetPass(); _search = Slot * .08f;
         _weapon?.RestoreCooldown(data.WeaponCooldown);
         _body.Reset(); Present(0, false);
     }

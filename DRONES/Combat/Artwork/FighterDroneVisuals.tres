@@ -7,3 +7,5 @@ HaloTint = Color(0.1, 0.8, 1, 0.3)
 TrailColor = Color(0.2, 0.9, 1, 1)
 MaximumTrailLength = 48.0
 EngineScale = 1.15
+EngineLengthMultiplier = 3.2
+AccelerationFlare = 0.8

@@ -1,11 +1,10 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=7 format=3]
 [ext_resource type="Script" path="res://DRONES/Combat/FighterDrone.cs" id="fighter"]
 [ext_resource type="Resource" path="res://DRONES/Combat/DefaultFighterDroneConfig.tres" id="config"]
 [ext_resource type="Script" path="res://DRONES/Shared/DroneBody.cs" id="body"]
 [ext_resource type="Resource" path="res://DRONES/Combat/Artwork/FighterDroneVisuals.tres" id="visuals"]
 [ext_resource type="Texture2D" path="res://DRONES/Combat/Artwork/FighterDrone.svg" id="art"]
 [ext_resource type="Script" path="res://DRONES/Combat/FighterDroneWeapon.cs" id="gun"]
-[ext_resource type="Texture2D" path="res://DRONES/Combat/Artwork/FighterMinigun.svg" id="gun_art"]
 
 [node name="FighterDrone" type="Node2D"]
 z_index = 12
@@ -22,14 +21,11 @@ TrailStartPixels = 20.0
 texture = ExtResource("art")
 show_behind_parent = true
 
-[node name="GunPivot" type="Node2D" parent="Body"]
-position = Vector2(0, -2)
+[node name="LeftMuzzle" type="Marker2D" parent="Body/Sprite"]
+position = Vector2(-10, -20)
 
-[node name="GunSprite" type="Sprite2D" parent="Body/GunPivot"]
-texture = ExtResource("gun_art")
-
-[node name="Muzzle" type="Marker2D" parent="Body/GunPivot"]
-position = Vector2(0, -14)
+[node name="RightMuzzle" type="Marker2D" parent="Body/Sprite"]
+position = Vector2(10, -20)
 
 [node name="Weapon" type="Node" parent="."]
 script = ExtResource("gun")

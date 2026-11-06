@@ -1,4 +1,4 @@
-// FD4 fighter's independently aimed blue gun: shared physical friendly projectiles, one cooldown and finite real ammo.
+// Fixed twin hull guns alternate accepted rounds; only forward firing passes spend real ammo.
 using Godot;
 using System;
 
@@ -6,8 +6,8 @@ public partial class FighterDroneWeapon : Node
 {
     private FighterDrone _fighter;
     private WorldGrid _grid;
-    private Node2D _projectiles, _pivot;
-    private Marker2D _muzzle;
+    private Node2D _projectiles, _hull;
+    private Marker2D _leftMuzzle, _rightMuzzle;
     private WeaponVisualRenderer _visuals;
     private DamageSource _source;
     private double _cooldown;
@@ -18,9 +18,10 @@ public partial class FighterDroneWeapon : Node
     {
         SetProcess(false); SetPhysicsProcess(false);
         _fighter = GetParent<FighterDrone>();
-        _pivot = GetNode<Node2D>("../Body/GunPivot");
-        _muzzle = GetNode<Marker2D>("../Body/GunPivot/Muzzle");
-        _visuals = WeaponVisuals.Attach(_pivot);
+        _hull = GetNode<Node2D>("../Body/Sprite");
+        _leftMuzzle = GetNode<Marker2D>("../Body/Sprite/LeftMuzzle");
+        _rightMuzzle = GetNode<Marker2D>("../Body/Sprite/RightMuzzle");
+        _visuals = WeaponVisuals.Attach(_hull);
         _source = new DamageSource(_fighter);
     }
 
@@ -28,7 +29,7 @@ public partial class FighterDroneWeapon : Node
     { _fighter = fighter; _grid = grid; _projectiles = projectiles; }
 
     // =========================================================
-    // Continue steering the gun regardless of cooldown; only an aligned, unobstructed shot spends ammo.
+    // No turret tracking: a small forward cone allows modest aim correction after the hull lines up.
     internal bool Step(float dt, Enemy target)
     {
         if (!float.IsFinite(dt) || dt <= 0 || !GodotObject.IsInstanceValid(_fighter) ||
@@ -44,18 +45,22 @@ public partial class FighterDroneWeapon : Node
 
         FighterDroneConfig config = _fighter.Config;
         float range = FighterDroneConfig.Safe(config.WeaponRangePixels, 275, 16, 1600);
-        Vector2 delta = target.GlobalPosition - _muzzle.GlobalPosition;
+        Marker2D muzzle = ((_fighter.AmmoCapacity - _fighter.Ammo) & 1) == 0 ? _leftMuzzle : _rightMuzzle;
+        Vector2 delta = target.GlobalPosition - muzzle.GlobalPosition;
         if (!delta.IsFinite() || delta.LengthSquared() > range * range) return false;
-        bool aligned = TurretAiming.Track(_pivot, target.GlobalPosition,
-            FighterDroneConfig.Safe(config.GunTurnDegreesPerSecond, 540, 0, 1440),
-            FighterDroneConfig.Safe(config.AimToleranceDegrees, 10, 0, 45), true, dt);
-        if (!aligned || _fighter.Ammo <= 0 || _cooldown > 0 ||
-            !_grid.HasWeaponLineOfSight(_muzzle.GlobalPosition, target.GlobalPosition)) return false;
-
-        Vector2 direction = -_muzzle.GlobalTransform.Y.Normalized();
         float speed = FighterDroneConfig.Safe(config.BulletSpeed, 1200, 40, 3000);
+        Vector2 aimPoint = target.GlobalPosition + Vector2.FromAngle(target.Rotation) * target.EffectiveMoveSpeed *
+            Mathf.Min(delta.Length() / speed, FighterDroneConfig.Safe(config.InterceptLeadSeconds, .8f, 0, 3));
+        Vector2 direction = (aimPoint - muzzle.GlobalPosition).Normalized();
+        Vector2 forward = -_hull.GlobalTransform.Y.Normalized();
+        float tolerance = Mathf.DegToRad(FighterDroneConfig.Safe(config.AimToleranceDegrees, 8, 0, 45));
+        bool aligned = forward.Dot(direction) >= Mathf.Cos(tolerance);
+        if (!aligned || _fighter.Ammo <= 0 || _cooldown > 0 || !TowerDetection.CanDetect(target) ||
+            !_grid.HasWeaponLineOfSight(muzzle.GlobalPosition, target.GlobalPosition) ||
+            !_grid.HasWeaponLineOfSight(muzzle.GlobalPosition, aimPoint)) return false;
+
         float damage = FighterDroneConfig.Safe(config.DamagePerShot, 4, 0, 1000);
-        float rate = FighterDroneConfig.Safe(config.ShotsPerSecond, 5, .1f, 30);
+        float rate = FighterDroneConfig.Safe(config.ShotsPerSecond, 9, .1f, 30);
         if (!direction.IsFinite() || direction.LengthSquared() < .5f || damage <= 0 || rate <= 0) return false;
 
         // =========================================================
@@ -64,8 +69,8 @@ public partial class FighterDroneWeapon : Node
         bullet.Initialize(target, speed, new DamageInfo(damage, DamageType.Kinetic, source: _source),
             visual: config.ProjectileVisual);
         _projectiles.AddChild(bullet);
-        bullet.LaunchFrom(_muzzle.GlobalPosition, direction);
-        _visuals?.FlashAt(_muzzle, config.MuzzleFlash);
+        bullet.LaunchFrom(muzzle.GlobalPosition, direction);
+        _visuals?.FlashAt(muzzle, config.MuzzleFlash);
         _fighter.RecordFiredRound();
         _cooldown = Math.Max(0, 1.0 / rate + _cooldown);
         return true;
@@ -80,7 +85,7 @@ public partial class FighterDroneWeapon : Node
     public override void _ExitTree()
     {
         _visuals?.ClearFlashes();
-        _fighter = null; _grid = null; _projectiles = null; _pivot = null; _muzzle = null;
+        _fighter = null; _grid = null; _projectiles = null; _hull = null; _leftMuzzle = null; _rightMuzzle = null;
         _visuals = null; _source = null;
     }
 }

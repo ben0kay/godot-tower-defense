@@ -1,3 +1,6 @@
+## Fixed twin-gun fighter jets — 2026-11-06
+Replaced rotating minigun with one integrated twin-barrel SVG and fixed left/right muzzle markers. Alternate accepted rounds using ammo parity; total rate 5→9/s, 8° hull-forward cone with lead/LOS. Fighter movement stages a run, crosses/extends beyond the enemy and alternates return lobes; no firing while turning back. Config exposes run-up/exit/loop settings. Fighter-only preset extends shared exhaust 3.2× with acceleration flare; other presets keep defaults. Targeting, ammo/damage/credit rules, launch/recall and snapshot schema retained; attack leg reacquired on restore. No FD3/FD5. Lightweight source/resource review and SVG render; .NET unavailable, owner flight/firing/visual checks pending.
+
 ## Organic portal feedback + lingering wave smoke — 2026-11-06
 Varied cosmetic pulse strength/time, spark count/orientation and burst spacing via isolated RNG. Replaced spawn-reset smoke with one bounded continuous emitter per Open portal during active waves: 18 live puffs, 110px, 5s, slow drift/growth/swirl. Wave start/clear/outcome signals own emission; completion drains smoke, culling/pause/restore/unload stay bounded. Preset settings exposed; no spawn timing, opening duration or gameplay RNG changes. Source review; .NET unavailable, owner visual/FPS acceptance pending.
 

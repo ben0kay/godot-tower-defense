@@ -11,6 +11,8 @@ public partial class DroneVisualConfig : Resource
     [Export(PropertyHint.Range, "0,3,.05")] public float Intensity { get; set; } = 1;
     [Export(PropertyHint.Range, ".2,3,.05")] public float EngineScale { get; set; } = 1;
     [Export(PropertyHint.Range, "1,4,.1")] public float IgnitionScale { get; set; } = 2.2f;
+    [Export(PropertyHint.Range, "1,5,.1")] public float EngineLengthMultiplier { get; set; } = 1;
+    [Export(PropertyHint.Range, "0,2,.1")] public float AccelerationFlare { get; set; }
     [ExportGroup("Ion Contrail")]
     [Export] public bool TrailEnabled { get; set; } = true;
     [Export] public Color TrailColor { get; set; } = new(.25f, .85f, 1, 1);

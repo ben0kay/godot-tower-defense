@@ -8,7 +8,7 @@ public partial class DroneBody : Node2D
     private Sprite2D _sprite;
     private readonly Vector2[] _history = new Vector2[32];
     private int _count, _leg = -1;
-    private float _heading, _ratio, _ignition, _glow;
+    private float _heading, _ratio, _ignition, _glow, _lastSpeed, _accelerationGlow;
     private bool? _cargo;
     public override void _Ready() { _sprite = GetNode<Sprite2D>("Sprite"); SetProcess(false); SetPhysicsProcess(false); }
     // =========================================================
@@ -24,6 +24,10 @@ public partial class DroneBody : Node2D
         if (!flying) _ignition = 0;
         _ignition = Mathf.Max(0, _ignition - dt);
         _ratio = flying && maximumSpeed > 0 ? Mathf.Clamp(velocity.Length() / maximumSpeed, 0, 1) : 0;
+        float speed = flying ? velocity.Length() : 0;
+        float accelerating = dt > 0 && speed > _lastSpeed ? Mathf.Clamp((speed - _lastSpeed) / dt / 1000, 0, 1) : 0;
+        _accelerationGlow = Mathf.Lerp(_accelerationGlow, accelerating, 1 - Mathf.Exp(-10 * Mathf.Max(0, dt)));
+        _lastSpeed = speed;
         _glow = flying ? Mathf.Lerp(.12f, 1, _ratio) : .08f;
         if (!flying || !Config.TrailEnabled || Config.TrailAlpha <= 0 || Config.MaximumTrailLength <= 0 || _ratio < .02f) _count = 0;
         else
@@ -38,7 +42,7 @@ public partial class DroneBody : Node2D
         }
         QueueRedraw();
     }
-    public void Reset() { if (_count > 0 || _glow > 0 || _cargo.HasValue) QueueRedraw(); _count = 0; _leg = -1; _ignition = _glow = 0; _cargo = null; }
+    public void Reset() { if (_count > 0 || _glow > 0 || _cargo.HasValue) QueueRedraw(); _count = 0; _leg = -1; _ignition = _glow = _lastSpeed = _accelerationGlow = 0; _cargo = null; }
     // =========================================================
     // Bounded segments fade outward. Engines/cargo rotate with the sprite, never the construction beam.
     public override void _Draw()
@@ -73,8 +77,13 @@ public partial class DroneBody : Node2D
             {
                 Vector2 offset = EngineOffset.IsFinite() ? EngineOffset : new(9, 6);
                 Vector2 engine = new(i == 0 ? -offset.X : offset.X, offset.Y);
+                float extension = Safe(c.EngineLengthMultiplier, 1, 1, 5) *
+                    (1 + _accelerationGlow * Safe(c.AccelerationFlare, 0, 0, 2));
+                float plume = (1.5f + 3 * _ratio + 3 * flare) * scale * extension;
                 DrawCircle(engine + Vector2.Down * scale, 2.4f * scale, halo);
-                DrawLine(engine, engine + Vector2.Down * (1.5f + 3 * _ratio + 3 * flare) * scale, core, 1.5f * scale, true);
+                if (extension > 1.01f)
+                    DrawLine(engine, engine + Vector2.Down * plume, halo, 3.5f * scale, true);
+                DrawLine(engine, engine + Vector2.Down * plume, core, 1.5f * scale, true);
                 DrawCircle(engine, .8f * scale, core);
             }
         }

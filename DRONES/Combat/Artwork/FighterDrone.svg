@@ -18,4 +18,11 @@
 <path d="M18 42H22" stroke="#a1ffff" stroke-width="1.5"/>
 <path d="M14 15 15 28M26 15 25 28" stroke="#8fc7cc" stroke-width=".6" opacity=".65"/>
 <path d="M19 34H21V38H19Z" fill="#d1f7fa"/>
+<!-- Fixed twin forward cannons, integrated into the hull and wing roots. -->
+<path d="M7 13H13V27H7ZM27 13H33V27H27Z" fill="#0c1b26" stroke="#6795a3" stroke-width=".8"/>
+<path d="M8 6H12V20H8ZM28 6H32V20H28Z" fill="#162d3a" stroke="#a4d4db" stroke-width=".7"/>
+<path d="M9 7H11V18H9ZM29 7H31V18H29Z" fill="#497482"/>
+<path d="M8 6H12M28 6H32" stroke="#bcf9ff" stroke-width="1.6"/>
+<path d="M7 20H13M27 20H33" stroke="#36cee8" stroke-width="1.5"/>
+<path d="M6 32 12 30M28 30 34 32" stroke="#a5dce5" stroke-width=".9"/>
 </svg>
