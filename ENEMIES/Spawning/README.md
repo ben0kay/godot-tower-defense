@@ -1,3 +1,9 @@
+## SPAWN2.5 — new visual-only Codex pass before SPAWN3
+
+**Approved plan / not implemented (2026-11-06).** Successful wave/F2 portal spawns should animate a soft 12% expand/recover pulse and release large puffy shader-driven violet clouds while keeping the existing outward spark burst. No impact on actual spawned ships, source selection or readiness. `WORLD/PORTALS/EnemyPortal/` owns visuals; `SpawnManager` already calls `PlaySpawnFeedback` on success. SPAWN2 (2.2s opening) remains independent; SPAWN3 map-edge mixing and SPAWN4 concurrent batches remain later. [Full handoff](IMPLEMENTATION_PLAN.md#phase-spawn25--per-spawn-portal-expansion--violet-dimensional-smoke-codex-handoff-approved-plan--not-implemented).
+
+---
+
 ## SPAWN2 — shared portal materialization — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** Every registered START portal now forms on fresh deployment; Wave N portals use the same Dormant → Forming → Open presentation on their accepted authored wave. No Level011 map or wave data changed. A 2.2s pausable tween drives a localized violet spiral shader, growing segmented ring, art/label reveal, inward GPU curls and concentrated ignition/ripple. No fullscreen effects, audio assets or idle CPU animation loop were added. Existing 120°/s rotation and 48-particle outward per-spawn rim bursts remain the Open-state presentation.

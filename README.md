@@ -1,3 +1,9 @@
+## SPAWN2.5 — per-enemy portal puff and expansion — planned 2026-11-06
+
+**Approved Codex visual-effects handoff, not implemented.** Ahead of SPAWN3 (mixed portal/edge spawning), each successful spawn from an Open portal should briefly enlarge the portal (~12%) and emit several big translucent violet, shader-billowing smoke puffs alongside its existing outward sparks. Event-driven and visually coalesced for crowded waves; no change to SPAWN2's 2.2s opening, portal activation, wave scheduling or spawn success. [SPAWN2.5 plan](ENEMIES/Spawning/IMPLEMENTATION_PLAN.md#phase-spawn25--per-spawn-portal-expansion--violet-dimensional-smoke-codex-handoff-approved-plan--not-implemented).
+
+---
+
 ## FD1-A — Drone Station built as a 2×3 Utility building (2026-11-06)
 
 **Source implemented / awaiting owner Godot validation.** A new buildable [Drone Station](DRONES/Combat/Station/README.md) is registered in the shared catalog under Utility, using a true **2 cells wide × 3 cells tall** footprint and 128×192 native SVG hangar art with two illustrated docking bays and cyan launch rails. The construction site passes through 0/35/70% purpose-made SVG stages before the completed art, using existing building/drone work mechanics. Provisional Inspector config is **600 Credits, 8s construction, 1,800 HP**. Normal selection, durability, selling and between-wave base tower saving are inherited; no fighter launches, slots, ammo, repair service or combat logic are active. **Codex next: FD1-B**, adding first fighter/docking to this existing station without replacing the artwork or registration. [Fighter roadmap](DRONES/Combat/FIGHTER_DRONES_IMPLEMENTATION_PLAN.md). Source-only validation pending editor acceptance.

@@ -12,7 +12,7 @@ Tune `WORLD/PORTALS/EnemyPortal/Visuals/DefaultPortalMaterializationStyle.tres`:
 
 # Enemy Spawn Sources and Dynamic Portals — implementation plan
 
-**Status: SPAWN0 / SPAWN1 Source Implemented / Awaiting Owner Validation (2026-11-06). SPAWN2 is Source Implemented / Awaiting Owner Validation; SPAWN3–5 remain PLANNED. The original cinematic specification is retained below.**
+**Status: SPAWN0 / SPAWN1 Source Implemented / Awaiting Owner Validation (2026-11-06). SPAWN2 is Source Implemented / Awaiting Owner Validation; SPAWN2.5 (per-spawn pulse + smoke) and SPAWN3–5 remain PLANNED. The original cinematic specification is retained below.**
 
 SPAWN0 source identity/baseline contract is documented in README.md; an isolated owner-run fixture covers all edges and legacy Both preference. SPAWN1 now implements START/Wave N visibility/eligibility, route reservation, authoring errors and exact-number checkpoint restoration. Existing Level011 scenes/waves are unchanged. The separately requested slow rotation and bounded purple per-spawn particles are included; **they are not the SPAWN2 cinematic opening**. Existing START portals are visible instantly until SPAWN2 is implemented. C# fixtures are authored but unrun (.NET unavailable); gameplay/visual acceptance is pending.
 
@@ -136,6 +136,47 @@ Focused acceptance (minimal test code + owner editor visual review):
 
 **Delivery note:** This is a design/implementation handoff, not permission to mark SPAWN2 complete until its source and visuals actually exist and owner visual acceptance occurs.
 
+## Phase SPAWN2.5 — per-spawn portal expansion + violet dimensional smoke (Codex handoff, APPROVED PLAN / NOT IMPLEMENTED)
+
+**Order:** Implement **after SPAWN2** (already source implemented, opening duration restored to 2.2s) and **before SPAWN3**, the next planned spawning phase. SPAWN3 adds portal/map-edge mixing; SPAWN4 later adds concurrent attack groups. SPAWN2.5 is **cosmetic only**: a successful enemy emerging from an already-Open portal should make the portal swell gently and exhale several large smoky purple puffs, alongside its existing outward particle burst. This is **not** a replay of SPAWN2's one-time dimensional materialization and must not alter spawn readiness, success, timing, waves, AI, navigation, the map or saves.
+
+### Starting point (read before editing)
+
+- Read `NOTES/CodePreferences.md`, root README, `WORLD/PORTALS/EnemyPortal/README.md`, and this spawning plan on `dev`; check `AGENTS.md` if present.
+- `SpawnManager.cs` already calls `chosenPortal?.PlaySpawnFeedback()` **after successful creation** for both wave spawns and F2 portal spawns. Failed spawn attempts/edge spawns must never trigger this.
+- `EnemyPortal.Presentation.cs` already owns `PlaySpawnFeedback`, a one-per-750ms maximum reusable **48-particle violet rim burst**, on-screen check, offscreen shutdown, and the existing `EnergyFieldVisual.PlaySpawnPulse()` brightness pulse. `EnemyPortal.Materialization.cs` owns the separate Dormant/Forming/Open animation, readiness and its opening-only inward/ignition particles.
+- `EnemyPortal.tscn` holds the rotating `Visuals/PortalArt`, `EnergyField`, `SpawnParticles`, `OnScreen`, and `Materialization`. `SizeMultiplier` scales `Visuals` while `SpawnExit` stays independent. Do **not** duplicate the callback, add a new spawn service, or route regular spawn visual requests through `BeginMaterialization()`.
+
+### A. Expand and recover the open portal on a successful spawn
+
+- Add a brief **soft, outward breathing pulse** to the already-open portal: roughly **1.0 → 1.12 → 1.0** of its resting presentation size over **0.7–0.9 seconds** by default, with an eased expansion followed by slower settling. Subtle glow/rim expansion can accompany it. Keep the existing idle rotation, energy brightness pulse and lilac rim spark burst.
+- Pulse only **portal artwork/its appropriate visual child or a dedicated centred pulse layer**; never scale the portal root, `Visuals` container, `SpawnExit`, footprint, route checkpoint, labels, spawning offsets or enemy sprite. A scaled overlay must have a correct centred pivot. Respect existing `SizeMultiplier` and avoid accumulating scaling or interfering with SPAWN2's opening pose.
+- Keep a **single bounded per-portal active pulse**, triggered by successful spawns, coalescing or gracefully extending repeated events rather than restarting every rapid spawn indefinitely. Always return exactly to the stored resting pose. Pause, offscreen transition, scene exit, fresh opening, and restore must cancel/reset cosmetic motion without changing availability.
+- Provisional exported controls: enable toggle, expansion fraction (~0.12), pulse duration (~0.8s), brightness strength. Use the feature's existing resource/export pattern, not project-wide hardcoded magic values.
+
+### B. Large billowing purple dimensional clouds (2D shader + bounded GPU puffs)
+
+- Add one reusable `GPUParticles2D`-style emitter (or comparable single bounded, pooled 2D effect) under portal visuals, fired from the **same accepted-spawn event**. Default about **4–6 large puffs per eligible burst**, each roughly **24–60px diameter at native portal scale**, drifting outward from the rim/exit with small tangential swirl. Expand and disperse for approximately **0.9–1.4 seconds**, then dissolve fully; never linger as fog across the map.
+- Use a **lightweight shared CanvasItem shader** or small noise-based puff texture/shader combination with soft feathered alpha, low-frequency irregular edges and subtle animated internal billows, so it reads as **puffy smoky vapour**, not identical plain circles. Colour: layered dark violet/plum with lavender/magenta illuminated edges, consistent with the current portal art; semi-transparent enough that emerging ships stay legible. Some puffs may bloom behind the ship, with lighter wisps around its sides.
+- Distinguish visual layers: existing 48 particles remain small fast outward flecks; new clouds are **larger, slower, diffuse and rolling**. Keep the ordinary energy pulse. Do not use actual volumetric 3D fog or screen-space/postprocess blur. Prefer at most ~2–3 cheap procedural noise octaves or a preauthored noise texture; no expensive screen reads, dynamic lights, per-puff nodes, physics collision or per-frame CPU-driven cloud geometry.
+- Expose smoke enable, puff count, size/spread, lifespan, outward speed, opacity and tint via a **portal-owned preset resource** (for example `Visuals/PortalSpawnFeedbackStyle.cs` + `DefaultPortalSpawnFeedbackStyle.tres`) or equivalent existing Inspector-authoring convention. New shader/preset belong in `WORLD/PORTALS/EnemyPortal/Visuals/`. Default look should be attractive at normal gameplay zoom without flooding the map.
+- Native cloud emission must honour `SizeMultiplier`, respect camera/on-screen culling and stop on screen exit. Existing SPAWN2 materialization visuals are unaffected.
+
+### C. Shared event lifecycle, GPU bounds and gameplay invariants
+
+- Integrate under the **existing** `PlaySpawnFeedback` only. Use one visual cooldown/coalescing rule (retain at least the existing 750ms limiter for costly bursts) so dense Level011 traffic cannot cause unlimited puffs or independent tweens. If burst budget is unavailable/offscreen, skip cosmetic smoke but **never suppress an enemy spawn**. Energy brightness may retain its existing lighter per-spawn behaviour.
+- If Godot pause does not freeze a GPU shader/particle effect automatically, explicitly manage time/particle speed where practical so new effects freeze and resume without restart. Ensure each live pulse uses a bound/paused tween (or equivalent) and resets on unload/restart; no animation should leak into a checkpoint restore, disappear/reappear corruptly, or continue while portal is Dormant/Forming.
+- Aim for stable **60 FPS on the user's GTX 1080** as an optimization target, *not* an unmeasured guarantee. All effects are local, short-lived, retained per portal, culled when hidden and dormant when not triggered. No new CPU `_Process` loop, per-ship attachment, scene-wide enemy scan, multiplayer replication, source graph rebuild or gameplay timer.
+- Keep SPAWN2's original **2.2s portal opening**, 120°/s ongoing artwork rotation, existing 48 flecks, SPAWN1 activation/checkpoint readiness, Level011's Portal4 wave-six appearance, and every existing mission and wave resource unchanged.
+
+### D. Codex delivery and minimal owner acceptance
+
+Implement this as a **single focused SPAWN2.5 commit on `dev`**, with code/art/preset changes in `WORLD/PORTALS/EnemyPortal/` and short updated README/backlog status. Do not advance SPAWN3–5, do not change gameplay rules or adjust opening duration. Lightweight source/resource checks only; if readily practical, one basic build or shader parse, no broad testing.
+
+Owner checks in Godot: watch an Open portal when one ship emerges, then a quick stream of ships; confirm obvious gentle expansion and large smoky lavender clouds **in addition to** the existing 48 sparks, without hiding the spawned ship. Check all portals including late-appearing Level011 Portal4, portal scaling, F2, pause/resume, offscreen pan, rapid waves, fresh retry and between-wave restore. Check no growth accumulation, duplicate opening animation, stuck glow, runaway smoke or FPS spikes. Mark **Source Implemented / Awaiting Owner Validation** only after source delivery, not now.
+
+---
+
 ## Phase SPAWN3 — map-edge and mixed source policy (medium)
 
 **Baseline exists:** `LevelConfig.SpawnMode = MapEdges` + `AllowedEdges = Top|Bottom|Left|Right` allows spawning at all **reachable** boundary-cell candidates on a single-Citadel map. Current `Both` = **PortalPreferred** with edge fallback, not simultaneous.
@@ -170,9 +211,10 @@ Current sequential `WaveManager` has **one** `_batchIndex`, `_entryIndex` and `_
 
 1. **SPAWN0/1 already source implemented**: START/Wave N activation, source reservation and eligibility now exist; retain them.
 2. **Validate implemented SPAWN2 in Godot**: spectacular *shared* startup and Wave N dimensional portal warp-in, a pausable one-shot transition and spawn-readiness gating; not just a future-only fade.
-3. SPAWN3 when missions need actual **portal + edge mixing / weighted sectors**, beyond today's basic all-edges checkbox.
-4. SPAWN4 when Level011 or later maps should present independently paced three-lane attacks.
-5. SPAWN5 only after playtesting the earlier patterns.
+3. **SPAWN2.5 first:** per-spawn portal expansion and dimensional smoke, using the existing successful-spawn feedback callback; visual-only, after opening and before source-policy work.
+4. SPAWN3 when missions need actual **portal + edge mixing / weighted sectors**, beyond today's basic all-edges checkbox.
+5. SPAWN4 when Level011 or later maps should present independently paced three-lane attacks.
+6. SPAWN5 only after playtesting the earlier patterns.
 
 Performance: reuse the existing cached source grid and RNG; no per-ship A* start, polling hidden portals each frame, per-edge Marker2D, per-bullet nodes, or fully rebuilding navigation on reveal. Maintain explicit authoring errors and `MaxWaveSpawnAttemptsPerFrame`/`MaxActiveEnemies` guardrails. Avoid changing wave recipes, visuals, map points and mission outcomes without separate authorization.
 

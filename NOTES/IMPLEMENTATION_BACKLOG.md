@@ -1,3 +1,9 @@
+## SPAWN2.5 — Portal spawn expansion + dimensional smoke — 2026-11-06
+
+**APPROVED PLAN / NOT IMPLEMENTED; Codex before SPAWN3.** Add an event-driven, soft expanding/settling pulse to an Open portal on successful enemy spawn, plus ~4–6 large rolling purple/lavender shader-driven smoke puffs, alongside existing 48 sparks and energy flash. Reuse `PlaySpawnFeedback()`; keep emissions budgeted, offscreen-cullable, pause/unload-safe and independent of SPAWN2's restored 2.2s opening. Do not change wave/portal mechanics or implement SPAWN3/4. [Codex-ready detail](../ENEMIES/Spawning/IMPLEMENTATION_PLAN.md#phase-spawn25--per-spawn-portal-expansion--violet-dimensional-smoke-codex-handoff-approved-plan--not-implemented).
+
+---
+
 ## FD1-A — buildable 2×3 Drone Station (2026-11-06)
 
 **SOURCE IMPLEMENTED / AWAITING OWNER VALIDATION.** New `DRONES/Combat/Station/` contains passive `DroneStation` TowerBase type, Inspector config (600 Credits / 8s / 1,800 HP), category Utility registration (`drone_station`), precise `Footprint=Vector2i(2,3)`, original 128×192 twin-bay hangar art, and 0/35/70% staged SVG construction via shared work/drone visuals. Generic placement, select/health/damage/disabled/sell/between-wave tower checkpoint are inherited; no fighter instances, station inventory, combat, docking or patrol yet. **Codex next is FD1-B** (one actual fighter, station ownership and launch/return) and subsequently FD2–FD6. No construction/courier service changes. No Godot runtime acceptance yet. [Station](../DRONES/Combat/Station/README.md) · [Fighter plan](../DRONES/Combat/FIGHTER_DRONES_IMPLEMENTATION_PLAN.md).

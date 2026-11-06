@@ -1,3 +1,9 @@
+## SPAWN2.5 — per-spawn expanding portal + puffy violet smoke — 2026-11-06
+
+**APPROVED PLAN / NOT IMPLEMENTED; Codex next in spawning visuals, before SPAWN3.** Every **successful** spawn from an **Open** portal should gently expand its visible circular rim/art (~12% over ~0.8s, then settle) while emitting **4–6 large, soft, slowly billowing purple/lavender dimensional-smoke puffs** (~0.9–1.4s), in addition to the existing 48 fast outward sparks and energy-brightness pulse. Use the current `EnemyPortal.PlaySpawnFeedback()` callback, one local coalesced pulse and retained/cullable GPU emitter with a cheap noise/feather shader. Keep portal root/SpawnExit/labels and gameplay state fixed; preserve original 2.2s SPAWN2 materialization and `SizeMultiplier`. No new spawn timer, source service, per-ship effect or wave edits. [Approved Codex scope](../../../ENEMIES/Spawning/IMPLEMENTATION_PLAN.md#phase-spawn25--per-spawn-portal-expansion--violet-dimensional-smoke-codex-handoff-approved-plan--not-implemented).
+
+---
+
 ## Restored slower portal opening — 2026-11-06
 
 Restored the shared materialization animation to its original 2.2 seconds, including authored preset and code defaults/fallback. Level011 Wave 6 still leads with its existing Portal4 ship, so it launches on readiness without waiting for a later shuffled request. Drone motion and widget changes remain. Focused source review only; owner visual acceptance pending.
