@@ -1,3 +1,9 @@
+## Content-sized mission narration — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** `UI/Narration/NarrationDisplay` now sizes its shared cyan card to the full wrapped text instead of clipping briefings at 136px. The existing PanelHeight becomes a minimum. RichTextLabel fit-content and reveal-after-shaping reserve the full text before typing; minimum-size/viewport events reflow and shrink replacements without idle polling. Applies to every mission briefing and wave transmission. Voice hold, timing, authored text and input remain unchanged. Updated narrator/briefing docs and config comment. Source/scene sanity review only; .NET unavailable. Owner: inspect all Level001 paragraphs, resize, then replace with short narration. Extremely short viewports can still be smaller than long authored messages.
+
+---
+
 ## Shared weapon terrain vision — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** Mountains now block enemy weapon acquisition, aiming and firing as well as friendly tower targeting. `WorldGrid.HasWeaponLineOfSight(from, to)` is the neutral shared API, using the existing allocation-free cached terrain traversal. `HasTowerLineOfSight` remains a compatibility wrapper; the existing `blocks_tower_sight` tile metadata, blocker count/cache, corner rules and no-blocker fast path are preserved. Friendly target queries and the selected red/visible range overlay call the neutral API; no second visibility cache, terrain scan, physics ray system or global fog system.

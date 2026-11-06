@@ -22,6 +22,7 @@ public partial class NarrationConfig : Resource
     [Export(PropertyHint.Range, "220,700,10,suffix:px")]
     public float PanelWidth { get; set; } = 390f;
     [Export(PropertyHint.Range, "80,260,2,suffix:px")]
+    // Minimum card height; wrapped message content may grow the card beyond this.
     public float PanelHeight { get; set; } = 136f;
     [Export(PropertyHint.Range, "0,80,1,suffix:px")]
     public float RightMargin { get; set; } = 18f;
