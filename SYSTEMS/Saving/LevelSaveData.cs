@@ -65,6 +65,7 @@ public sealed record TowerSaveData
     public double WeaponCooldown { get; init; }
     public PowerSaveData? Power { get; init; }
     public string PowerPeerId { get; init; } = "";
+    public FighterStationSaveData Fighters { get; init; }
 }
 public sealed record DeliverySaveData(string Source, string Destination, int Cargo, int Reserved, bool Returning, SavePoint Position, float Speed)
 { public DroneFlightMotion Motion { get; init; } }

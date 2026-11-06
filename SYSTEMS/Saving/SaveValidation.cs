@@ -48,8 +48,16 @@ public static class SaveValidation
         foreach (var citadel in data.Citadels)
         { if (citadel.Health < 1 || citadel.Credits < 0) throw new InvalidDataException("Invalid Citadel checkpoint."); Number(citadel.ProductionSeconds); }
         var towerIds = data.Towers.Select(t => t.Id).ToHashSet(StringComparer.Ordinal);
+        var fighterIds = new HashSet<string>();
         foreach (var tower in data.Towers)
         {
+            if (tower.Fighters != null)
+            {
+                if (tower.TypeId != "drone_station") throw new InvalidDataException("Unexpected fighter roster.");
+                FighterDroneManager.ValidateSnapshot(tower.Fighters);
+                foreach (var fighter in tower.Fighters.Fighters)
+                    if (!fighterIds.Add(fighter.Id)) throw new InvalidDataException("Duplicate fighter owner.");
+            }
             CampaignStore.ValidateId(tower.Id); Text(tower.TypeId);
             if (tower.Tier < 1 || !float.IsFinite(tower.Health) || tower.Health <= 0 || (tower.Priority.HasValue && !Enum.IsDefined(tower.Priority.Value)) ||
                 !Enum.IsDefined(tower.Work.Phase) || Math.Abs((long)tower.X) > 1000000 || Math.Abs((long)tower.Y) > 1000000)

@@ -23,6 +23,7 @@ public partial class GameplayHUD : Control
     [Signal] public delegate void TowerSellRequestedEventHandler();
     [Signal] public delegate void TowerSellConfirmedEventHandler();
     private Button _sellButton;
+    private FighterStationPanel _fighterStationPanel;
     private ConfirmationDialog _sellConfirmation;
     [Signal] public delegate void TargetPriorityRequestedEventHandler(int priority);
     #endregion
@@ -142,6 +143,9 @@ public partial class GameplayHUD : Control
         }, UIButtonStyle.Compact, 24, Config);
         _collectCredits.Name = "CollectCredits"; _collectCredits.Hide(); _defenseMeters.AddChild(_collectCredits);
         SetupPowerLinkActions();
+        _fighterStationPanel = new FighterStationPanel { Name = "FighterStationPanel", ThemeConfig = Config };
+        GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/Columns/Side").AddChild(_fighterStationPanel);
+        InspectionClosed += () => _fighterStationPanel.Bind(null);
         _rankSection = GetNode<VBoxContainer>("BottomArea/Inspector/Insets/Body/Columns/Side/RankSection");
         _rankLabel = _rankSection.GetNode<Label>("Rank");
         _experienceText = _rankSection.GetNode<Label>("ExperienceText");
@@ -336,7 +340,7 @@ public partial class GameplayHUD : Control
     public void ShowTowerDetails(string name, string category, string stats, string notes = "", bool newSelection = false)
     {
         bool preview = category.EndsWith("Build Preview", StringComparison.Ordinal) || category == "Placement rejected";
-        _buildPreview = preview; SetPowerLinkActions(null); SetSellDetails(false, false, 0, "");
+        _buildPreview = preview; _fighterStationPanel?.Bind(null); SetPowerLinkActions(null); SetSellDetails(false, false, 0, "");
         SetRuntimeDetails(""); SetWorkDetails(null); SetConditionDetails(null); SetUpgradeComparison(null, null); SetUpgradeDetails("", "", false);
         _targetSection.Hide(); _rankSection.Hide(); _defenseMeters.Hide(); _powerMeters.Hide(); _powerDetails.Hide();
         _towerName.Text = name; _towerName.TooltipText = category + "\n" + notes + "\n" + stats;
@@ -405,6 +409,7 @@ public partial class GameplayHUD : Control
     public void SetDefenseDetails(TowerBase tower)
     {
         SetPowerLinkActions(tower);
+        _fighterStationPanel?.Bind(!_buildPreview ? tower as DroneStation : null);
         _creditProducer = tower is CreditProducerTower producer && producer.UsesManualCollection ? producer : null;
         if (!GodotObject.IsInstanceValid(tower) || _buildPreview)
         { _creditProducer = null; _collectCredits.Hide(); _defenseMeters.Hide(); _powerMeters.Hide(); _powerDetails.Hide(); SetRuntimeDetails(""); return; }

@@ -3,6 +3,8 @@ using Godot;
 public partial class DroneBody : Node2D
 {
     [Export] public DroneVisualConfig Config { get; set; }
+    [Export] public Vector2 EngineOffset { get; set; } = new(9, 6);
+    [Export(PropertyHint.Range, "0,64,1")] public float TrailStartPixels { get; set; } = 8;
     private Sprite2D _sprite;
     private readonly Vector2[] _history = new Vector2[32];
     private int _count, _leg = -1;
@@ -44,7 +46,8 @@ public partial class DroneBody : Node2D
         var c = Config; if (c == null) return;
         float response = Mathf.Pow(_ratio, Safe(c.SpeedResponse, 1, .25f, 3));
         float min = Safe(c.MinimumTrailLength, 15, 0, 64), max = Mathf.Max(min, Safe(c.MaximumTrailLength, 35, 0, 64));
-        float tail = response * Mathf.Lerp(min, max, response), length = 8 + tail, covered = 0;
+        float start = Safe(TrailStartPixels, 8, 0, 64);
+        float tail = response * Mathf.Lerp(min, max, response), length = start + tail, covered = 0;
         Transform2D local = GlobalTransform.AffineInverse();
         if (c.TrailEnabled && c.TrailAlpha > 0 && tail > .1f)
             for (int i = 0; i + 1 < _count && covered < length; i++)
@@ -52,10 +55,10 @@ public partial class DroneBody : Node2D
                 Vector2 a = _history[i], b = _history[i + 1]; float segment = a.DistanceTo(b);
                 if (segment < .001f) continue;
                 float used = Mathf.Min(segment, length - covered); b = a.Lerp(b, used / segment);
-                if (covered + used <= 8) { covered += used; continue; }
-                if (covered < 8) a = a.Lerp(b, (8 - covered) / used);
+                if (covered + used <= start) { covered += used; continue; }
+                if (covered < start) a = a.Lerp(b, (start - covered) / used);
                 Color color = c.TrailColor;
-                color.A *= Safe(c.TrailAlpha, .32f, 0, 1) * Mathf.Clamp(1 - (Mathf.Max(8, covered) + used * .5f - 8) / tail, 0, 1);
+                color.A *= Safe(c.TrailAlpha, .32f, 0, 1) * Mathf.Clamp(1 - (Mathf.Max(start, covered) + used * .5f - start) / tail, 0, 1);
                 DrawLine(local * a, local * b, color, Safe(c.TrailWidth, 1.25f, .5f, 2), true); covered += used;
             }
         DrawSetTransform(Vector2.Zero, _heading + Mathf.Pi / 2);
@@ -68,7 +71,8 @@ public partial class DroneBody : Node2D
             Color halo = c.HaloTint, core = c.CoreTint; halo.A *= intensity; core.A *= intensity;
             for (int i = 0; i < 2; i++)
             {
-                Vector2 engine = new(i == 0 ? -9 : 9, 6);
+                Vector2 offset = EngineOffset.IsFinite() ? EngineOffset : new(9, 6);
+                Vector2 engine = new(i == 0 ? -offset.X : offset.X, offset.Y);
                 DrawCircle(engine + Vector2.Down * scale, 2.4f * scale, halo);
                 DrawLine(engine, engine + Vector2.Down * (1.5f + 3 * _ratio + 3 * flare) * scale, core, 1.5f * scale, true);
                 DrawCircle(engine, .8f * scale, core);

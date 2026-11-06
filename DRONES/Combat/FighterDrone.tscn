@@ -1,0 +1,20 @@
+[gd_scene load_steps=6 format=3]
+[ext_resource type="Script" path="res://DRONES/Combat/FighterDrone.cs" id="fighter"]
+[ext_resource type="Resource" path="res://DRONES/Combat/DefaultFighterDroneConfig.tres" id="config"]
+[ext_resource type="Script" path="res://DRONES/Shared/DroneBody.cs" id="body"]
+[ext_resource type="Resource" path="res://DRONES/Combat/Artwork/FighterDroneVisuals.tres" id="visuals"]
+[ext_resource type="Texture2D" path="res://DRONES/Combat/Artwork/FighterDrone.svg" id="art"]
+[node name="FighterDrone" type="Node2D"]
+z_index = 12
+script = ExtResource("fighter")
+Config = ExtResource("config")
+[node name="Body" type="Node2D" parent="."]
+script = ExtResource("body")
+Config = ExtResource("visuals")
+EngineOffset = Vector2(11, 16)
+TrailStartPixels = 20.0
+[node name="Sprite" type="Sprite2D" parent="Body"]
+texture = ExtResource("art")
+show_behind_parent = true
+[node name="Muzzle" type="Marker2D" parent="Body/Sprite"]
+position = Vector2(0, -24)

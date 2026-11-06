@@ -1,8 +1,14 @@
+## FD1-B status — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Station-owned paid fighters, launch/hold/recall/dock, elongated shared-style art and minimal checkpoint state are delivered. See [current usage](README.md). FD2–FD6 remain future work; no combat or resupply is active.
+
+---
+
 ## FD1-A — Drone Station building and artwork (2026-11-06)
 
 **SOURCE IMPLEMENTED / AWAITING OWNER VALIDATION.** The placeable, selectable and standard constructible **Drone Station** exists now under [`DRONES/Combat/Station/`](Station/README.md). Its native artwork and three build stages are **128×192**, matching **2 cells wide (X) by 3 cells long (Y)**. It is registered under Utility in `TOWERS/DefaultTowerCatalog.tres` as `drone_station`. Inspector-editable provisional config: **600 Credits**, **8s** build and **1,800 HP**. It inherits the shared 2×3 building placement, durability, construction drones, selling and checkpoint behaviour but is **non-operational as a fighter facility** until Codex integrates real drones. No custom station tick, slot inventory, supply or fighter state was introduced.
 
-**Codex must begin with FD1-B**, not repeat FD1-A. Keep the station's current scene/config/definition/artwork and append the first fighter + launch/dock/ownership logic, then FD2–FD6 as previously planned. The illustrated two landing bays are only art; future `Marker2D` anchors at local (-25,+1) and (+26,+1) are suggestions, not implemented. No gameplay/level wave edits or fighter activity claimed. A focused catalog-check addition is authored but not run. Full in-editor visual/footprint acceptance pending.
+**FD1-B is now source implemented (owner validation pending); FD2 is next only when requested.** Do not repeat FD1-A/FD1-B. Keep the station's current scene/config/definition/artwork and append the first fighter + launch/dock/ownership logic, then FD2–FD6 as previously planned. The illustrated two landing bays are only art; future `Marker2D` anchors at local (-25,+1) and (+26,+1) are suggestions, not implemented. No gameplay/level wave edits or fighter activity claimed. A focused catalog-check addition is authored but not run. Full in-editor visual/footprint acceptance pending.
 
 ---
 

@@ -26,7 +26,8 @@ public abstract partial class TowerBase
             StoredCredits = (this as CreditProducerTower)?.Buffer?.Current,
             CreditSeconds = (this as CreditProducerTower)?.SavedCreditSeconds ?? 0,
             AmmoSeconds = (this as AmmunitionFactory)?.Production.ProgressSeconds ?? 0,
-            Produced = (this as AmmunitionFactory)?.ProducedRounds ?? 0, WeaponCooldown = CaptureWeaponCooldown(), Power = power, PowerPeerId = (this as PowerTransmitter)?.PeerSaveId ?? ""
+            Produced = (this as AmmunitionFactory)?.ProducedRounds ?? 0, WeaponCooldown = CaptureWeaponCooldown(), Power = power, PowerPeerId = (this as PowerTransmitter)?.PeerSaveId ?? "",
+            Fighters = (this as DroneStation)?.CaptureFighters()
         };
     }
 
@@ -76,6 +77,8 @@ public abstract partial class TowerBase
         if (this is AmmunitionFactory factory) factory.RestoreProduction(data.AmmoSeconds, data.Produced);
         if (data.Heat != 0 || data.Disables.Count > 0) Conditions().RestoreCheckpoint(data.Heat, data.Overheated, data.Disables, sourceId);
         RestorePowerCheckpoint(data.Power);
+        if (this is DroneStation station) station.RestoreFighters(data.Fighters);
+        else if (data.Fighters != null) throw new InvalidDataException("Unexpected fighter roster on a non-station.");
         RestoreWeaponCooldown(data.WeaponCooldown); NotifyRuntimeChanged();
     }
 }

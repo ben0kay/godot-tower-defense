@@ -1,6 +1,9 @@
-[gd_resource type="Resource" script_class="DroneStationConfig" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="DroneStationConfig" load_steps=5 format=3]
 [ext_resource type="Script" path="res://DRONES/Combat/Station/DroneStationConfig.cs" id="station_config"]
 [ext_resource type="Resource" path="res://DRONES/Combat/Station/Artwork/DroneStationConstructionArt.tres" id="construction"]
+
+[ext_resource type="Resource" path="res://DRONES/Combat/DefaultFighterDroneConfig.tres" id="fighter_config"]
+[ext_resource type="PackedScene" path="res://DRONES/Combat/FighterDrone.tscn" id="fighter_scene"]
 
 [resource]
 script = ExtResource("station_config")
@@ -8,3 +11,7 @@ ConstructionCredits = 600
 ConstructionSeconds = 8.0
 MaxHealth = 1800.0
 ConstructionArt = ExtResource("construction")
+FighterCapacity = 2
+FighterCredits = 250
+FighterConfig = ExtResource("fighter_config")
+FighterScene = ExtResource("fighter_scene")

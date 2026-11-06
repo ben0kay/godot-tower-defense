@@ -15,3 +15,13 @@ texture = ExtResource("hull")
 [node name="ConstructionVisuals" type="Node" parent="."]
 script = ExtResource("construction")
 SpritePath = NodePath("../Sprite")
+
+[node name="DockPoints" type="Node2D" parent="."]
+[node name="Dock0" type="Marker2D" parent="DockPoints"]
+position = Vector2(-25, 1)
+[node name="Dock1" type="Marker2D" parent="DockPoints"]
+position = Vector2(26, 1)
+[node name="Dock2" type="Marker2D" parent="DockPoints"]
+position = Vector2(-25, 45)
+[node name="Dock3" type="Marker2D" parent="DockPoints"]
+position = Vector2(26, 45)

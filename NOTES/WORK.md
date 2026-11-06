@@ -1,3 +1,9 @@
+## FD1-B — station-owned fighter foundation — 2026-11-06
+
+Added paid fighter slots and station Inspector BUY/LAUNCH/RECALL, fixed-rate bounded flights and persistent ID/HP/ammo/slot/flight snapshots. New longer 40×52 fighter SVG keeps the current cyan/steel drone style; shared body accepts engine/trail offsets with existing defaults preserved. Two slots / 250 Credits / 300 HP / 200 ammo initially; no free refills or replacements, combat/autopilot/patrol/service remain FD2+. Station sale removes owned fighters; disabling recalls them. Main paths: DRONES/Combat/, shared DroneBody, selected HUD and TowerBase save seam. Source/reference review and native SVG render only; .NET unavailable; owner to check purchase, launch/recall, pause, disable/sale and fresh save/load.
+
+---
+
 ## Obsidian Dreadnought flat black fleet art — 2026-11-06
 
 Recoloured existing 352×208 CAPITAL hull SVG and four shared-instance 24×72 cannon SVGs to flat near-black/charcoal plates with restrained scarlet/orange-red mechanical accents. Preserved full hull silhouette, original SVG dimensions/viewBoxes and four weapon mount positions, barrel-tip alignment, enemy stats, movement, targeting, payloads and waves. Removed metallic vector gradients/highlight colours; source-level SVG checks only, owner F2/Level011 visual acceptance pending. Files: `ENEMIES/Types/ObsidianDreadnought/Artwork/`.

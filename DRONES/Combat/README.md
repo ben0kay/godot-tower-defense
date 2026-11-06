@@ -1,3 +1,9 @@
+## FD1-B — paid fighters, launch and docking — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Complete a Drone Station, select it, then use BUY (250 Credits), the fighter-slot selector, LAUNCH and RECALL. Defaults: two slots, 300 HP / 200 ammo per fighter. Launch holds at a nearby map-bounded point; recall returns to that fighter's own dock. Landing never refills HP/ammo. Disabled stations recall deployed fighters; sale/destruction removes their owned roster without free replacement. Longer 40×52 cyan/steel fighter SVG extends the current builder/courier design, reusing shared fixed-rate flight and configurable engine/trail anchors. Minimal station-owned snapshots preserve IDs, slots, HP/ammo, pose and active flight without replaying purchases. No combat, autopilot, patrol or resupply yet (FD2 onwards). Source/reference review and native Godot SVG render passed; .NET unavailable, gameplay acceptance pending.
+
+---
+
 ## FD1-A — station base building added (2026-11-06)
 
 **SOURCE IMPLEMENTED / OWNER VALIDATION PENDING.** [Drone Station](Station/README.md) is now a **2×3** centered (128×192) placeable Utility building with dedicated SVG, three construction stages, provisional **600 Credits / 8s / 1,800 HP** and normal TowerBase build, HP, selection, sell and save hooks. The hangar's two illustrated landing bays are *not* physical fighters or functional docks yet. All player-owned fighters, autopilot, two-point patrol, combat, health/ammo service and anti-air remain planned. Codex should proceed with **FD1-B (one fighter + docking/ownership)** and reuse the delivered station rather than build a second one. [Implementation roadmap](FIGHTER_DRONES_IMPLEMENTATION_PLAN.md).
