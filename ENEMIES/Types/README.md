@@ -1,3 +1,9 @@
+## Heavy Warship and cargo fleet dark/red re-polish — 2026-11-05
+
+Updated `Enemy005/Artwork/enemy005.svg` (112×120), `Transporter/Artwork/transporter.svg` (112×72), and `HeavyTransporter/Artwork/heavy_transporter_mk1.svg` (**160×112**, previously 144×100). Flat charcoal/scarlet graphics retain distinct four-lance warship and ribbed industrial carrier silhouettes. The heavy carrier's size increase is visual only; no changes to gameplay, scene IDs, navigation, releases or waves. See [ART_DIRECTION.md](ART_DIRECTION.md). Owner Godot visual validation pending.
+
+---
+
 ## Create a new enemy — AI guide
 
 **[NEW_ENEMY_TEMPLATE.md](NEW_ENEMY_TEMPLATE.md)** is the preferred starting point for every new ship design or Mk variant. It includes the current **Class / Rank / Role** enum choices, a copyable AI design brief (visuals, size, stats, abilities, progression), and the safe implementation workflow for inherited enemy scenes, catalogue registration, wave isolation, performance and documentation. [ROSTER.md](ROSTER.md) remains the live inventory of existing classifications.
@@ -31,7 +37,7 @@ Six new inherited enemy types bring the catalog to **13**. Each has independent 
 
 **Shields:** capacity remains opt-in for every type. Author `Enemy("shield_frigate_mk1", shield: true)` for the intended shield-heavy threat; plain/F2 spawns are unshielded. No passive regeneration or new shield mechanic. Heavy Transporter uses two existing DeathSpawn components: six Standard Drones plus four Swift Interceptors, staggered by independent 0.16s jobs under the shared per-frame queue budget. Both reserve wave ownership before parent removal and inherit destination/checkpoints. No payload on arrival/unload and no living launches. Configs are local to its folder; shared Transporter defaults are unchanged.
 
-**Large hulls:** Cruiser art 168×96; Heavy Transporter 144×100; both retain 24px navigation radius. Art extends beyond clearance, as with Big mk.1. Hull-shaped routing/large-footprint clearance and tight-corridor appearance remain future work. No immunity or weapon behavior is implied by Class/Rank/Role.
+**Large hulls:** Cruiser art 168×96; Heavy Transporter now 160×112 (previously 144×100), both retaining 24px navigation radius. Art extends beyond clearance, as with Big mk.1. Hull-shaped routing/large-footprint clearance and tight-corridor appearance remain future work. No immunity or weapon behavior is implied by Class/Rank/Role.
 
 **Follow-up planning:** balance and schedule appearances in mission waves; add Mk.2+ as deliberate per-type definitions/art; design boss abilities separately. Class/Rank/Role metadata is implemented; Mk progression, automatic scaling and boss abilities remain deferred. Existing future plans below remain intact. Verification is recorded in `TESTS/Enemies/FleetExpansion.md`.
 

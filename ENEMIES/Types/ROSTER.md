@@ -15,10 +15,12 @@
 | Shield Emitter | Light | Common | Support | `shield_emitter_mk1` | `Types/Enemy003/` | 40×32 |
 | Shield Frigate | Standard | Veteran | Support | `shield_frigate_mk1` | `Types/ShieldFrigate/` | 72×48 |
 | Drone Transporter | Superheavy | Common | Cargo | `transporter_mk1` | `Types/Transporter/` | 112×72 |
-| Heavy Transporter | Superheavy | Veteran | Cargo | `heavy_transporter_mk1` | `Types/HeavyTransporter/` | 144×100 |
+| Heavy Transporter | Superheavy | Veteran | Cargo | `heavy_transporter_mk1` | `Types/HeavyTransporter/` | 160×112 |
 | Heavy Warship | Superheavy | Veteran | Fighter | `big_mk1` | `Types/Enemy005/` | 112×120 |
 | Elite Assault Ship | Standard | Elite | Fighter | `elite_mk1` | `Types/Enemy006/` | 80×60 |
 | Cruiser | Superheavy | Elite | Fighter | `cruiser_mk1` | `Types/Cruiser/` | 168×96 |
+
+**Heavy Transporter artwork-only enlargement — 2026-11-05:** Native sprite 160×112 (was 144×100); original viewBox, Superheavy/Veteran/Cargo classification, 24px clearance, stats and cargo payload are unchanged.
 
 **Heavy Gunner addition — 2026-11-05:** Introduced as Heavy/Veteran/Fighter; now **Standard/Veteran/Fighter** under physical-size rules (62×42 hull). Its “Heavy” name describes armour/firepower, not its Class. The independent 260 HP, 52px/s, 24px clearance, 18×50 cannon, original 850px/s red 11×2.2 tracer, 4 damage and 3.5 shots/s were the first weapon presets. A later heavy-only pass changed them to **650px/s**, **14.6×2.9**, **5 damage**, and **2.5 shots/s**, without changing classification, hull or movement. Both gunner variants remain available in F2; no waves changed.
 

@@ -1,3 +1,9 @@
+## Dark/red Heavy Warship artwork repolish — 2026-11-05
+
+`Artwork/enemy005.svg` now matches the flat charcoal/black/scarlet fleet style, retaining four independent lance wings, reinforced spine, compact red sensor and two aft drive ports. Native size **112×120**, original `0 0 112 120` viewBox, right-facing orientation and gameplay remain unchanged. No gradients, filters, reflective shading or glow. Source implemented; owner Godot native-zoom review pending.
+
+---
+
 ## Current artwork — alien robotic pass (2026-10-18)
 
 **Four-lance capital warship**, right-facing, native **112×120px**. Tall independent lance wings/nacelles, armored center spine, blue reactor and recessed surface machinery. Artwork only: stable identity, scenes, gameplay/ability settings and navigation clearance are unchanged. Earlier art/color descriptions below are historical. See `../ART_DIRECTION.md` for fleet-wide conventions and the review sheet.

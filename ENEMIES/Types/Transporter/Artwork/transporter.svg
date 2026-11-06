@@ -1,25 +1,26 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="112" height="72" viewBox="-56 -36 112 72">
-<!-- Right-facing alien robotic hull; baked vector lighting only. Keep native canvas and forward axis. -->
-<defs>
-  <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#53626e"/><stop offset=".25" stop-color="#263440"/><stop offset=".56" stop-color="#111a23"/><stop offset="1" stop-color="#070c12"/></linearGradient>
-  <linearGradient id="plate" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#78858d"/><stop offset=".17" stop-color="#3b4b57"/><stop offset=".6" stop-color="#19242e"/><stop offset="1" stop-color="#0d151d"/></linearGradient>
-  <linearGradient id="core" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ff3026"/><stop offset=".5" stop-color="#ffc4a5"/><stop offset="1" stop-color="#ff3026"/></linearGradient>
-</defs>
-<g transform="translate(-56 -36) scale(1.12 0.72)" stroke-linejoin="round" stroke-linecap="round">
-<!-- Bulbous armored carrier: rounded cargo vaults, swept fins and inset red launch spine -->
-<path d="M8 6 33 11 53 24 34 30 16 25Z M8 94 33 89 53 76 34 70 16 75Z M66 7 84 17 91 31 78 28Z M66 93 84 83 91 69 78 72Z" fill="url(#hull)" stroke="#7c858b" stroke-width="1.3"/>
-<path d="M13 10 32 16 43 24 27 22Z M13 90 32 84 43 76 27 78Z M72 13 82 21 85 27Z M72 87 82 79 85 73Z" fill="#5d3033"/>
-<path d="M8 38C10 17 35 12 56 16S86 31 91 42L98 50 91 58C86 69 77 80 56 84S10 83 8 62L3 50Z" fill="url(#hull)" stroke="#889198" stroke-width="1.3"/>
-<path d="M13 37C22 20 43 17 57 22S78 32 81 39L63 38 39 32Z M13 63C22 80 43 83 57 78S78 68 81 61L63 62 39 68Z" fill="url(#plate)"/>
-<path d="M26 23Q20 30 20 39 M40 19Q32 28 32 36 M57 22Q48 29 48 36 M26 77Q20 70 20 61 M40 81Q32 72 32 64 M57 78Q48 71 48 64" fill="none" stroke="#090f15" stroke-width="1.5"/>
-<path d="M14 42Q44 31 71 42L91 46 96 50 91 54 71 58Q44 69 14 58L9 50Z" fill="#070e15" stroke="#53626e" stroke-width="1"/>
-<path d="M17 46 47 40 65 43 73 50 65 57 47 60 17 54 13 50Z" fill="#ef251d" opacity=".45"/>
-<path d="M23 48 48 44 63 46 68 50 63 54 48 56 23 52Z" fill="url(#core)"/>
-<path d="M28 45V55 M39 43V57 M50 44V56 M60 45V55" stroke="#202731" stroke-width="2.5"/>
-<path d="M74 42 88 47V53L74 58 80 50Z" fill="url(#plate)"/>
-<path d="M9 43 5 45V55L9 57 M12 45V55" fill="none" stroke="#ff572f" stroke-width="2"/>
-<path d="M25 27Q43 20 57 26 M25 73Q43 80 57 74" fill="none" stroke="#92a0a5" stroke-width=".8" opacity=".7"/>
-<path d="M80 34 86 40 M80 66 86 60" stroke="#ff3c26" stroke-width="1.5"/>
-
-</g>
+  <!-- Right-facing Drone Transporter, broad armour-clad cargo body and gated launch spine. -->
+  <g transform="translate(-56 -36)" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M8 22 25 6 45 11 59 21 44 27 26 28Z" fill="#111920" stroke="#05080c" stroke-width="2.5"/>
+    <path d="M8 50 25 66 45 61 59 51 44 45 26 44Z" fill="#111920" stroke="#05080c" stroke-width="2.5"/>
+    <path d="M18 20 27 12 43 16 50 22 40 25 25 24Z M18 52 27 60 43 56 50 50 40 47 25 48Z" fill="#30363c"/>
+    <path d="M26 15 35 18 40 21 30 20Z M26 57 35 54 40 51 30 52Z" fill="#ad2729"/>
+    <path d="M8 28 Q18 13 44 12 L63 14 83 22 99 28 108 36 99 44 83 50 63 58 44 60 Q18 59 8 44 L4 36Z" fill="#111920" stroke="#05080c" stroke-width="2.9"/>
+    <path d="M13 27 Q27 17 45 18 L60 20 76 26 84 30 58 29 37 32 16 35Z" fill="#30363c" stroke="#05080c" stroke-width="1.4"/>
+    <path d="M13 45 Q27 55 45 54 L60 52 76 46 84 42 58 43 37 40 16 37Z" fill="#30363c" stroke="#05080c" stroke-width="1.4"/>
+    <path d="M24 20 31 20 35 29 27 32 21 29Z M39 18 47 19 49 29 41 30 35 28Z M54 19 62 21 64 30 55 30 50 27Z" fill="#1e252c" stroke="#05080c" stroke-width="1.5"/>
+    <path d="M24 52 31 52 35 43 27 40 21 43Z M39 54 47 53 49 43 41 42 35 44Z M54 53 62 51 64 42 55 42 50 45Z" fill="#1e252c" stroke="#05080c" stroke-width="1.5"/>
+    <path d="M27 23 32 23 34 27 29 28Z M42 22 47 23 47 27 43 27Z M27 49 32 49 34 45 29 44Z M42 50 47 49 47 45 43 45Z" fill="#ad2729"/>
+    <path d="M13 31 36 27 64 28 88 31 105 36 88 41 64 44 36 45 13 41 8 36Z" fill="#1e252c" stroke="#05080c" stroke-width="2.5"/>
+    <path d="M18 32 42 30 70 32 91 36 70 40 42 42 18 40 14 36Z" fill="#090f15" stroke="#05080c" stroke-width="1.5"/>
+    <path d="M26 34 48 33 68 34 84 36 68 38 48 39 26 38 22 36Z" fill="#ad2729"/>
+    <path d="M34 35.5 56 35 70 36 56 37 34 36.5Z" fill="#ff6039"/>
+    <path d="M29 31 32 31 33 41 29 41Z M43 30 47 31 47 41 43 42Z M59 31 63 31 63 41 59 41Z M75 32 79 33 79 39 75 40Z" fill="#30363c" stroke="#05080c" stroke-width="0.9"/>
+    <path d="M84 28 99 30 109 36 99 42 84 44 93 36Z" fill="#101820" stroke="#05080c" stroke-width="1.8"/>
+    <path d="M93 32 105 36 93 40 97 36Z" fill="#ad2729"/>
+    <path d="M7 28 19 27 24 32 18 36 7 35 2 32Z M7 37 18 36 24 40 19 45 7 44 2 40Z" fill="#090f15" stroke="#05080c" stroke-width="1.9"/>
+    <path d="M5 30 14 30 18 32 14 34 5 34Z M5 39 14 39 18 40 14 42 5 42Z" fill="#ad2729"/>
+    <path d="M4 31 11 31 13 32 11 33 4 33Z M4 39.5 11 39.5 13 40.5 11 41.5 4 41.5Z" fill="#ff6039"/>
+    <path d="M70 25 84 28 88 31 75 28Z M70 47 84 44 88 41 75 44Z" fill="#ad2729"/>
+  </g>
 </svg>

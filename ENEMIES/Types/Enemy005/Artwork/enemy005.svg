@@ -1,31 +1,34 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="112" height="120" viewBox="0 0 112 120">
-<!-- Right-facing alien robotic hull; baked vector lighting only. Keep native canvas and forward axis. -->
-<defs>
-  <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#53626e"/><stop offset=".25" stop-color="#263440"/><stop offset=".56" stop-color="#111a23"/><stop offset="1" stop-color="#070c12"/></linearGradient>
-  <linearGradient id="plate" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#78858d"/><stop offset=".17" stop-color="#3b4b57"/><stop offset=".6" stop-color="#19242e"/><stop offset="1" stop-color="#0d151d"/></linearGradient>
-  <linearGradient id="core" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#2aaff7"/><stop offset=".5" stop-color="#c7f5ff"/><stop offset="1" stop-color="#2aaff7"/></linearGradient>
-</defs>
-<g transform="translate(0 0) scale(1.12 1.2)" stroke-linejoin="round" stroke-linecap="round">
-<!-- Capital warship: four independent lance wings, tall dorsal/ventral nacelles -->
-<path d="M8 3 23 7 36 28 68 14 89 15 72 37 42 43 17 29Z M8 97 23 93 36 72 68 86 89 85 72 63 42 57 17 71Z" fill="url(#hull)" stroke="#74828c" stroke-width="1"/>
-<path d="M15 4 25 10 28 30 20 36 14 24Z M15 96 25 90 28 70 20 64 14 76Z" fill="url(#plate)" stroke="#9aa3a6" stroke-width=".8"/>
-<path d="M39 30 68 19 83 18 66 32 44 39Z M39 70 68 81 83 82 66 68 44 61Z" fill="url(#plate)"/>
-<path d="M30 28 46 30 39 34 33 33Z M30 72 46 70 39 66 33 67Z" fill="#fd3b20"/>
-<path d="M7 37 30 32 51 35 57 43 57 57 51 65 30 68 7 63 12 50Z" fill="#0a121b" stroke="#6f7c86" stroke-width="1.1"/>
-<path d="M16 36Q51 29 71 39L96 50 71 61Q51 71 16 64L9 56V44Z" fill="url(#plate)" stroke="#88949a" stroke-width="1"/>
-<path d="M25 40 57 36 77 43 88 50 77 57 57 64 25 60 17 50Z" fill="#0a141e" stroke="#435766" stroke-width="1"/>
-<path d="M33 40 53 38 48 45 27 48Z M33 60 53 62 48 55 27 52Z" fill="#435663"/>
-<path d="M52 42 69 42 80 50 69 58 52 58 47 50Z" fill="#1580bb" opacity=".55"/>
-<path d="M56 45 68 45 75 50 68 55 56 55 52 50Z" fill="url(#core)"/>
-<path d="M59 45V55 M65 44V56" stroke="#183043" stroke-width="1.8"/>
-<path d="M8 43V57 M12 45V55" stroke="#ff6335" stroke-width="2.8"/>
-<path d="M21 13 26 25 M21 87 26 75 M49 27 64 22 M49 73 64 78" stroke="#c0c6c7" opacity=".5" stroke-width=".7"/>
-<path d="M31 37 35 40 M31 63 35 60 M74 44 80 47 M74 56 80 53" stroke="#fc4926" stroke-width="1.5"/>
-<path d="M22 44V56 M27 42V58 M32 40V44 M32 56V60" stroke="#090f15" stroke-width="1.3"/>
-
-<path d="M18 19 22 22 23 29 M18 81 22 78 23 71 M42 31 46 28 55 25 M42 69 46 72 55 75" fill="none" stroke="#131f2a" stroke-width="1.5"/>
-<path d="M38 41 44 40 M38 44 44 43 M38 59 44 60 M38 56 44 57" stroke="#788998" stroke-width=".65"/>
-<circle cx="23" cy="48" r="2.1" fill="#080d14" stroke="#83919c" stroke-width=".7"/>
-<circle cx="23" cy="48" r=".65" fill="#db5432"/>
-</g>
+  <!-- Right-facing four-lance Heavy Warship, flat dark/red fleet styling. -->
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <path d="M8 16 20 3 32 8 47 30 76 14 103 11 89 31 67 43 39 45 20 32Z" fill="#111920" stroke="#05080c" stroke-width="2.6"/>
+    <path d="M8 104 20 117 32 112 47 90 76 106 103 109 89 89 67 77 39 75 20 88Z" fill="#111920" stroke="#05080c" stroke-width="2.6"/>
+    <path d="M12 37 32 29 53 35 77 28 103 24 89 44 62 52 36 49 16 47Z" fill="#101820" stroke="#05080c" stroke-width="2.4"/>
+    <path d="M12 83 32 91 53 85 77 92 103 96 89 76 62 68 36 71 16 73Z" fill="#101820" stroke="#05080c" stroke-width="2.4"/>
+    <path d="M18 16 23 10 33 15 47 35 67 25 87 19 80 28 57 39 36 39Z" fill="#30363c" stroke="#05080c" stroke-width="1.6"/>
+    <path d="M18 104 23 110 33 105 47 85 67 95 87 101 80 92 57 81 36 81Z" fill="#30363c" stroke="#05080c" stroke-width="1.6"/>
+    <path d="M20 37 35 33 54 40 83 32 92 31 82 43 59 48 35 45Z" fill="#293139" stroke="#05080c" stroke-width="1.6"/>
+    <path d="M20 83 35 87 54 80 83 88 92 89 82 77 59 72 35 75Z" fill="#293139" stroke="#05080c" stroke-width="1.6"/>
+    <path d="M25 14 32 20 36 29 30 23Z M45 36 54 34 59 36 49 39Z M25 106 32 100 36 91 30 97Z M45 84 54 86 59 84 49 81Z" fill="#ad2729"/>
+    <path d="M29 17 33 23 34 25 31 21Z M29 103 33 97 34 95 31 99Z" fill="#ff6039"/>
+    <path d="M38 19 43 28 48 33 42 32Z M38 101 43 92 48 87 42 88Z" fill="#0b141c"/>
+    <path d="M68 30 83 27 78 35 67 40Z M68 90 83 93 78 85 67 80Z" fill="#ad2729"/>
+    <path d="M11 43 30 39 48 45 58 53 58 67 48 75 30 81 11 77 19 60Z" fill="#090f15" stroke="#05080c" stroke-width="2.6"/>
+    <path d="M15 50 35 42 58 44 79 51 107 60 79 69 58 76 35 78 15 70 21 60Z" fill="#1e252c" stroke="#05080c" stroke-width="3"/>
+    <path d="M24 49 41 45 61 47 72 53 59 57 37 56Z" fill="#30363c" stroke="#05080c" stroke-width="1.6"/>
+    <path d="M24 71 41 75 61 73 72 67 59 63 37 64Z" fill="#30363c" stroke="#05080c" stroke-width="1.6"/>
+    <path d="M29 49 33 47 39 53 32 54Z M43 47 49 47 55 54 47 53Z M29 71 33 73 39 67 32 66Z M43 73 49 73 55 66 47 67Z" fill="#101820"/>
+    <path d="M51 51 68 50 85 55 94 60 85 65 68 70 51 69 61 60Z" fill="#101820" stroke="#05080c" stroke-width="2"/>
+    <path d="M58 54 73 54 83 60 73 66 58 66 66 60Z" fill="#293139" stroke="#05080c" stroke-width="1.1"/>
+    <path d="M64 57 77 57 84 60 77 63 64 63 69 60Z" fill="#070d13"/>
+    <path d="M77 51 95 49 107 57 98 56 87 56Z M77 69 95 71 107 63 98 64 87 64Z" fill="#111920" stroke="#05080c" stroke-width="1.8"/>
+    <path d="M82 56 99 57 109 60 99 63 82 64 88 60Z" fill="#070d13"/>
+    <path d="M85 58 100 59 106 60 100 61 85 62 91 60Z" fill="#ad2729"/>
+    <path d="M93 59.5 101 60 93 60.5 90 60Z" fill="#ff6039"/>
+    <path d="M8 49 22 47 28 53 22 58 8 58 3 53Z M8 62 22 62 28 67 22 73 8 71 3 67Z" fill="#090f15" stroke="#05080c" stroke-width="2"/>
+    <path d="M6 51 16 50 20 53 16 56 6 56Z M6 64 16 64 20 67 16 70 6 69Z" fill="#ad2729"/>
+    <path d="M5 52 13 52 15 53 13 54 5 54Z M5 66 13 66 15 67 13 68 5 68Z" fill="#ff6039"/>
+    <path d="M30 55 43 53 48 56 35 58Z M30 65 43 67 48 64 35 62Z" fill="#ad2729"/>
+    <path d="M33 55 40 54 42 55 35 57Z M33 65 40 66 42 65 35 63Z" fill="#e74931"/>
+  </g>
 </svg>

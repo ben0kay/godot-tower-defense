@@ -1,3 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="144" height="100" viewBox="0 0 160 100">
-<defs><linearGradient id="plate" x1="0" y1="0" x2="0.2" y2="1"><stop stop-color="#566476"/><stop offset=".45" stop-color="#293240"/><stop offset="1" stop-color="#10151f"/></linearGradient></defs>
-<path d="M12 50C12 13 45 7 88 12L125 23 150 40 156 50 150 60 125 77 88 88C45 93 12 87 12 50Z" fill="url(#plate)" stroke="#8b98aa" stroke-width="1.5" stroke-linejoin="round"/><path d="M26 18L57 5 107 12 129 27 92 23 52 28Z" fill="url(#plate)" stroke="#8b98aa" stroke-width="1.5" stroke-linejoin="round"/><path d="M26 82L57 95 107 88 129 73 92 77 52 72Z" fill="url(#plate)" stroke="#8b98aa" stroke-width="1.5" stroke-linejoin="round"/><path d="M34 39L121 33 143 50 121 67 34 61Z" fill="url(#plate)" stroke="#8b98aa" stroke-width="1.5" stroke-linejoin="round"/><path d="M39 26Q27 50 39 74" fill="none" stroke="#0a0c13" stroke-width="5"/><path d="M41 28Q31 50 41 72" fill="none" stroke="#637183" stroke-width="2"/><path d="M55 26Q43 50 55 74" fill="none" stroke="#0a0c13" stroke-width="5"/><path d="M57 28Q47 50 57 72" fill="none" stroke="#637183" stroke-width="2"/><path d="M71 26Q59 50 71 74" fill="none" stroke="#0a0c13" stroke-width="5"/><path d="M73 28Q63 50 73 72" fill="none" stroke="#637183" stroke-width="2"/><path d="M87 26Q75 50 87 74" fill="none" stroke="#0a0c13" stroke-width="5"/><path d="M89 28Q79 50 89 72" fill="none" stroke="#637183" stroke-width="2"/><path d="M103 26Q91 50 103 74" fill="none" stroke="#0a0c13" stroke-width="5"/><path d="M105 28Q95 50 105 72" fill="none" stroke="#637183" stroke-width="2"/><path d="M20 42v16M27 43v14" stroke="#e4494a" stroke-width="3"/><path d="M74 47L116 47 128 50 116 53 74 53Z" fill="#ff614b" stroke="#191c2b" stroke-width="2"/><path d="M48 36L70 34M48 64L70 66M112 33l12 4M112 67l12 -4" fill="none" stroke="#abb4c1" stroke-width="1.5"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="112" viewBox="0 0 160 100">
+  <!-- Right-facing Heavy Transporter; artwork enlarged only from 144x100, original viewBox. -->
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <path d="M7 27 24 9 58 3 98 7 124 16 150 18 142 34 115 39 79 36 43 40 18 36Z" fill="#111920" stroke="#05080c" stroke-width="3"/>
+    <path d="M7 73 24 91 58 97 98 93 124 84 150 82 142 66 115 61 79 64 43 60 18 64Z" fill="#111920" stroke="#05080c" stroke-width="3"/>
+    <path d="M18 24 30 14 62 10 97 14 121 22 141 23 136 31 110 34 79 31 47 33Z" fill="#30363c" stroke="#05080c" stroke-width="1.8"/>
+    <path d="M18 76 30 86 62 90 97 86 121 78 141 77 136 69 110 66 79 69 47 67Z" fill="#30363c" stroke="#05080c" stroke-width="1.8"/>
+    <path d="M103 30 128 27 153 21 151 34 136 42 113 43Z M103 70 128 73 153 79 151 66 136 58 113 57Z" fill="#101820" stroke="#05080c" stroke-width="2.6"/>
+    <path d="M120 30 146 24 145 32 130 39 116 39Z M120 70 146 76 145 68 130 61 116 61Z" fill="#30363c"/>
+    <path d="M31 17 45 15 53 28 37 29Z M57 12 72 13 79 28 63 26Z M84 15 99 18 104 30 88 28Z M31 83 45 85 53 72 37 71Z M57 88 72 87 79 72 63 74Z M84 85 99 82 104 70 88 72Z" fill="#111920" stroke="#05080c" stroke-width="1.4"/>
+    <path d="M34 19 45 18 49 23 36 24Z M60 15 71 16 74 21 62 20Z M89 19 99 21 101 25 91 24Z M34 81 45 82 49 77 36 76Z M60 85 71 84 74 79 62 80Z M89 81 99 79 101 75 91 76Z" fill="#ad2729"/>
+    <path d="M12 43 Q15 19 43 18 L84 19 115 26 142 36 156 50 142 64 115 74 84 81 43 82 Q15 81 12 57 L5 50Z" fill="#111920" stroke="#05080c" stroke-width="3.4"/>
+    <path d="M17 40 Q27 27 46 26 L82 28 111 33 129 39 103 40 78 42 43 44Z" fill="#30363c" stroke="#05080c" stroke-width="1.9"/>
+    <path d="M17 60 Q27 73 46 74 L82 72 111 67 129 61 103 60 78 58 43 56Z" fill="#30363c" stroke="#05080c" stroke-width="1.9"/>
+    <path d="M14 40 37 34 78 34 111 38 141 43 153 50 141 57 111 62 78 66 37 66 14 60 8 50Z" fill="#1e252c" stroke="#05080c" stroke-width="3"/>
+    <path d="M27 34 37 32 43 41 35 45 25 40Z M48 33 59 33 64 41 55 45 45 41Z M69 34 81 34 85 42 76 45 66 42Z M91 36 102 38 105 44 96 45 88 42Z M113 40 123 42 127 46 117 46 110 44Z" fill="#30363c" stroke="#05080c" stroke-width="1.6"/>
+    <path d="M27 66 37 68 43 59 35 55 25 60Z M48 67 59 67 64 59 55 55 45 59Z M69 66 81 66 85 58 76 55 66 58Z M91 64 102 62 105 56 96 55 88 58Z M113 60 123 58 127 54 117 54 110 56Z" fill="#30363c" stroke="#05080c" stroke-width="1.6"/>
+    <path d="M42 38 46 37 48 43 44 46Z M63 38 67 38 68 44 65 46Z M85 39 89 40 90 45 87 46Z M105 42 109 43 111 47 107 46Z M42 62 46 63 48 57 44 54Z M63 62 67 62 68 56 65 54Z M85 61 89 60 90 55 87 54Z M105 58 109 57 111 53 107 54Z" fill="#090f15"/>
+    <path d="M23 45 52 42 87 43 120 46 143 50 120 54 87 57 52 58 23 55 17 50Z" fill="#070d13" stroke="#05080c" stroke-width="1.8"/>
+    <path d="M29 48 53 47 88 47 118 49 135 50 118 51 88 53 53 53 29 52Z" fill="#ad2729"/>
+    <path d="M42 49 71 49 92 50 71 51 42 51Z" fill="#ff6039"/>
+    <path d="M41 44 46 44 46 56 41 56Z M61 43 66 43 66 57 61 57Z M82 44 87 44 87 56 82 56Z M103 45 108 46 108 54 103 55Z" fill="#293139" stroke="#05080c" stroke-width="1.2"/>
+    <path d="M127 38 145 38 157 47 147 47 136 44Z M127 62 145 62 157 53 147 53 136 56Z" fill="#101820" stroke="#05080c" stroke-width="2"/>
+    <path d="M137 45 155 50 137 55 144 50Z" fill="#0b141c"/>
+    <path d="M142 48 154 50 142 52 147 50Z" fill="#ad2729"/>
+    <path d="M9 33 25 32 30 39 24 45 9 44 3 39Z M8 44 25 43 31 50 25 57 8 56 2 50Z M9 56 24 55 30 61 25 68 9 67 3 61Z" fill="#090f15" stroke="#05080c" stroke-width="2.3"/>
+    <path d="M6 36 17 35 22 39 17 42 6 42Z M5 47 17 47 22 50 17 53 5 53Z M6 58 17 58 22 61 17 64 6 64Z" fill="#ad2729"/>
+    <path d="M4 38 12 38 15 39 12 40 4 40Z M4 49 12 49 15 50 12 51 4 51Z M4 60 12 60 15 61 12 62 4 62Z" fill="#ff6039"/>
+    <path d="M32 29 43 29 48 34 37 34Z M53 25 64 26 67 30 56 29Z M32 71 43 71 48 66 37 66Z M53 75 64 74 67 70 56 71Z" fill="#ad2729"/>
+  </g>
+</svg>

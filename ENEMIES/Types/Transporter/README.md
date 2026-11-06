@@ -1,3 +1,9 @@
+## Dark/red Drone Transporter artwork repolish — 2026-11-05
+
+`Artwork/transporter.svg` now uses the same flat charcoal/scarlet faction palette, but keeps a distinctive **112×72** bulbous cargo body, segmented holding cells and recessed mechanically gated central launch slot. The centred `-56 -36 112 72` viewBox and +X orientation remain unchanged. No gradients, glow or reflective shading. Stats, 24px clearance, six-drone DeathSpawn, scene and waves are untouched. Owner Godot visual acceptance pending.
+
+---
+
 ## Current artwork — alien robotic pass (2026-10-18)
 
 **Bulbous armored carrier**, right-facing, native **112×72px**. Full rounded cargo hull, segmented curved armor, swept fins and a long recessed red launch spine, inspired by the supplied ballooned-carrier reference. Artwork only: stable identity, scenes, gameplay/ability settings and navigation clearance are unchanged. Earlier art/color descriptions below are historical. See `../ART_DIRECTION.md` for fleet-wide conventions and the review sheet.
