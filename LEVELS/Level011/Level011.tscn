@@ -4,7 +4,7 @@
 [ext_resource type="TileSet" uid="uid://bxlqc3wy16uoh" path="res://WORLD/TERRAIN/TileSets/ImpassableTerrain.tres" id="2_impassable"]
 [ext_resource type="TileSet" uid="uid://cx81pmlj50tpq" path="res://WORLD/TERRAIN/TileSets/InteractiveTerrain.tres" id="2_interactive"]
 [ext_resource type="TileSet" uid="uid://dbryu0fnchy4x" path="res://WORLD/TERRAIN/TileSets/PassableTerrain.tres" id="2_passable"]
-[ext_resource type="Resource" path="res://LEVELS/Level011/Level011Config.tres" id="4_config"]
+[ext_resource type="Resource" uid="uid://cbalt0e1vi3j4" path="res://LEVELS/Level011/Level011Config.tres" id="4_config"]
 [ext_resource type="PackedScene" uid="uid://pgmykoicpips" path="res://WORLD/PORTALS/EnemyPortal/EnemyPortal.tscn" id="5_portal"]
 [ext_resource type="PackedScene" path="res://WORLD/OBJECTIVES/Citadel/Citadel.tscn" id="6_citadel"]
 [ext_resource type="PackedScene" path="res://WORLD/ROUTING/RouteCheckpoint/RouteCheckpoint.tscn" id="7_5hvd8"]
@@ -85,6 +85,11 @@ CheckpointPath = NodePath("../../Checkpoints/RouteCheckpoint2a")
 
 [node name="EnemyPortal3" parent="Portals" index="2" unique_id=462482160 instance=ExtResource("5_portal")]
 position = Vector2(1440, 4832)
+CheckpointPath = NodePath("../../Checkpoints/RouteCheckpoint3a")
+
+[node name="EnemyPortal4" parent="Portals" index="3" unique_id=771680454 instance=ExtResource("5_portal")]
+position = Vector2(7136, 3552)
+AppearAtWave = 6
 CheckpointPath = NodePath("../../Checkpoints/RouteCheckpoint3a")
 
 [node name="Citadel" parent="Objectives" index="0" unique_id=1303919540 instance=ExtResource("6_citadel")]

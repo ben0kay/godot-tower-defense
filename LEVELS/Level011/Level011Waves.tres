@@ -7,7 +7,6 @@
 
 [sub_resource type="Resource" id="W1B1E1"]
 script = ExtResource("enemy")
-EnemyId = "basic_mk1"
 Weight = 12.0
 Portal = "Portals/EnemyPortal1"
 
@@ -21,12 +20,11 @@ Portal = "Portals/EnemyPortal1"
 script = ExtResource("batch")
 Count = 18
 Interval = 0.65
-After = 2.00
+After = 2.0
 Enemies = Array[ExtResource("enemy")]([SubResource("W1B1E1"), SubResource("W1B1E2")])
 
 [sub_resource type="Resource" id="W1B2E1"]
 script = ExtResource("enemy")
-EnemyId = "basic_mk1"
 Weight = 12.0
 Portal = "Portals/EnemyPortal2"
 
@@ -39,13 +37,12 @@ Portal = "Portals/EnemyPortal2"
 [sub_resource type="Resource" id="W1B2"]
 script = ExtResource("batch")
 Count = 18
-Interval = 0.60
-After = 2.00
+Interval = 0.6
+After = 2.0
 Enemies = Array[ExtResource("enemy")]([SubResource("W1B2E1"), SubResource("W1B2E2")])
 
 [sub_resource type="Resource" id="W1B3E1"]
 script = ExtResource("enemy")
-EnemyId = "basic_mk1"
 Weight = 12.0
 Portal = "Portals/EnemyPortal3"
 
@@ -59,19 +56,16 @@ Portal = "Portals/EnemyPortal3"
 script = ExtResource("batch")
 Count = 18
 Interval = 0.55
-After = 0.00
 Enemies = Array[ExtResource("enemy")]([SubResource("W1B3E1"), SubResource("W1B3E2")])
 
 [sub_resource type="Resource" id="W1"]
 script = ExtResource("wave")
-Number = 1
+Batches = Array[ExtResource("batch")]([SubResource("W1B1"), SubResource("W1B2"), SubResource("W1B3")])
 BannerTitle = "Three-Lane Contact"
 BannerDescription = "Light drone formations probe all three approaches."
-Batches = Array[ExtResource("batch")]([SubResource("W1B1"), SubResource("W1B2"), SubResource("W1B3")])
 
 [sub_resource type="Resource" id="W2B1E1"]
 script = ExtResource("enemy")
-EnemyId = "basic_mk1"
 Weight = 12.0
 Portal = "Portals/EnemyPortal1"
 
@@ -91,12 +85,11 @@ Portal = "Portals/EnemyPortal1"
 script = ExtResource("batch")
 Count = 24
 Interval = 0.55
-After = 1.50
+After = 1.5
 Enemies = Array[ExtResource("enemy")]([SubResource("W2B1E1"), SubResource("W2B1E2"), SubResource("W2B1E3")])
 
 [sub_resource type="Resource" id="W2B2E1"]
 script = ExtResource("enemy")
-EnemyId = "basic_mk1"
 Weight = 12.0
 Portal = "Portals/EnemyPortal2"
 
@@ -116,7 +109,7 @@ Portal = "Portals/EnemyPortal2"
 script = ExtResource("batch")
 Count = 30
 Interval = 0.55
-After = 1.50
+After = 1.5
 Enemies = Array[ExtResource("enemy")]([SubResource("W2B2E1"), SubResource("W2B2E2"), SubResource("W2B2E3")])
 
 [sub_resource type="Resource" id="W2B3E1"]
@@ -140,20 +133,18 @@ Portal = "Portals/EnemyPortal3"
 [sub_resource type="Resource" id="W2B3"]
 script = ExtResource("batch")
 Count = 30
-Interval = 0.50
-After = 0.00
+Interval = 0.5
 Enemies = Array[ExtResource("enemy")]([SubResource("W2B3E1"), SubResource("W2B3E2"), SubResource("W2B3E3")])
 
 [sub_resource type="Resource" id="W2"]
 script = ExtResource("wave")
 Number = 2
+Batches = Array[ExtResource("batch")]([SubResource("W2B1"), SubResource("W2B2"), SubResource("W2B3")])
 BannerTitle = "Interceptor Wings"
 BannerDescription = "Fast skirmishers, armed drones and shield support attack three lanes."
-Batches = Array[ExtResource("batch")]([SubResource("W2B1"), SubResource("W2B2"), SubResource("W2B3")])
 
 [sub_resource type="Resource" id="W3B1E1"]
 script = ExtResource("enemy")
-EnemyId = "basic_mk1"
 Weight = 10.0
 Portal = "Portals/EnemyPortal1"
 
@@ -179,7 +170,7 @@ Portal = "Portals/EnemyPortal1"
 script = ExtResource("batch")
 Count = 30
 Interval = 0.48
-After = 1.50
+After = 1.5
 Enemies = Array[ExtResource("enemy")]([SubResource("W3B1E1"), SubResource("W3B1E2"), SubResource("W3B1E3"), SubResource("W3B1E4")])
 
 [sub_resource type="Resource" id="W3B2E1"]
@@ -204,7 +195,7 @@ Portal = "Portals/EnemyPortal3"
 script = ExtResource("batch")
 Count = 30
 Interval = 0.45
-After = 1.50
+After = 1.5
 Enemies = Array[ExtResource("enemy")]([SubResource("W3B2E1"), SubResource("W3B2E2"), SubResource("W3B2E3")])
 
 [sub_resource type="Resource" id="W3B3E1"]
@@ -236,7 +227,7 @@ Shield = true
 script = ExtResource("batch")
 Count = 30
 Interval = 0.55
-After = 1.00
+After = 1.0
 Enemies = Array[ExtResource("enemy")]([SubResource("W3B3E1"), SubResource("W3B3E2"), SubResource("W3B3E3"), SubResource("W3B3E4")])
 
 [sub_resource type="Resource" id="W3B4E1"]
@@ -261,15 +252,14 @@ Portal = "Portals/EnemyPortal3"
 script = ExtResource("batch")
 Count = 30
 Interval = 0.48
-After = 0.00
 Enemies = Array[ExtResource("enemy")]([SubResource("W3B4E1"), SubResource("W3B4E2"), SubResource("W3B4E3")])
 
 [sub_resource type="Resource" id="W3"]
 script = ExtResource("wave")
 Number = 3
+Batches = Array[ExtResource("batch")]([SubResource("W3B1"), SubResource("W3B2"), SubResource("W3B3"), SubResource("W3B4")])
 BannerTitle = "Crossfire Formation"
 BannerDescription = "Bulwarks and veteran gunships support rapid flanking attacks."
-Batches = Array[ExtResource("batch")]([SubResource("W3B1"), SubResource("W3B2"), SubResource("W3B3"), SubResource("W3B4")])
 
 [sub_resource type="Resource" id="W4B1E1"]
 script = ExtResource("enemy")
@@ -300,7 +290,7 @@ Shield = true
 script = ExtResource("batch")
 Count = 36
 Interval = 0.48
-After = 1.50
+After = 1.5
 Enemies = Array[ExtResource("enemy")]([SubResource("W4B1E1"), SubResource("W4B1E2"), SubResource("W4B1E3"), SubResource("W4B1E4")])
 
 [sub_resource type="Resource" id="W4B2E1"]
@@ -331,7 +321,7 @@ Portal = "Portals/EnemyPortal2"
 script = ExtResource("batch")
 Count = 36
 Interval = 0.45
-After = 1.50
+After = 1.5
 Enemies = Array[ExtResource("enemy")]([SubResource("W4B2E1"), SubResource("W4B2E2"), SubResource("W4B2E3"), SubResource("W4B2E4")])
 
 [sub_resource type="Resource" id="W4B3E1"]
@@ -362,7 +352,7 @@ Portal = "Portals/EnemyPortal3"
 script = ExtResource("batch")
 Count = 36
 Interval = 0.42
-After = 2.00
+After = 2.0
 Enemies = Array[ExtResource("enemy")]([SubResource("W4B3E1"), SubResource("W4B3E2"), SubResource("W4B3E3"), SubResource("W4B3E4")])
 
 [sub_resource type="Resource" id="W4B4E1"]
@@ -406,16 +396,15 @@ Portal = "Portals/EnemyPortal3"
 script = ExtResource("batch")
 Count = 54
 Interval = 0.55
-After = 0.00
 Enemies = Array[ExtResource("enemy")]([SubResource("W4B4E1"), SubResource("W4B4E2"), SubResource("W4B4E3"), SubResource("W4B4E4"), SubResource("W4B4E5"), SubResource("W4B4E6")])
 
 [sub_resource type="Resource" id="W4"]
 script = ExtResource("wave")
 Number = 4
+Batches = Array[ExtResource("batch")]([SubResource("W4B1"), SubResource("W4B2"), SubResource("W4B3"), SubResource("W4B4")])
 Alert = 1
 BannerTitle = "Armoured Breakthrough"
 BannerDescription = "Veteran escorts screen elite assault ships and the first drone carriers."
-Batches = Array[ExtResource("batch")]([SubResource("W4B1"), SubResource("W4B2"), SubResource("W4B3"), SubResource("W4B4")])
 
 [sub_resource type="Resource" id="W5B1E1"]
 script = ExtResource("enemy")
@@ -446,7 +435,7 @@ Shield = true
 script = ExtResource("batch")
 Count = 45
 Interval = 0.45
-After = 1.50
+After = 1.5
 Enemies = Array[ExtResource("enemy")]([SubResource("W5B1E1"), SubResource("W5B1E2"), SubResource("W5B1E3"), SubResource("W5B1E4")])
 
 [sub_resource type="Resource" id="W5B2E1"]
@@ -477,7 +466,7 @@ Portal = "Portals/EnemyPortal3"
 script = ExtResource("batch")
 Count = 45
 Interval = 0.38
-After = 1.50
+After = 1.5
 Enemies = Array[ExtResource("enemy")]([SubResource("W5B2E1"), SubResource("W5B2E2"), SubResource("W5B2E3"), SubResource("W5B2E4")])
 
 [sub_resource type="Resource" id="W5B3E1"]
@@ -508,7 +497,7 @@ Portal = "Portals/EnemyPortal2"
 script = ExtResource("batch")
 Count = 45
 Interval = 0.42
-After = 2.00
+After = 2.0
 Enemies = Array[ExtResource("enemy")]([SubResource("W5B3E1"), SubResource("W5B3E2"), SubResource("W5B3E3"), SubResource("W5B3E4")])
 
 [sub_resource type="Resource" id="W5B4E1"]
@@ -558,7 +547,7 @@ Portal = "Portals/EnemyPortal3"
 script = ExtResource("batch")
 Count = 45
 Interval = 0.65
-After = 2.50
+After = 2.5
 Enemies = Array[ExtResource("enemy")]([SubResource("W5B4E1"), SubResource("W5B4E2"), SubResource("W5B4E3"), SubResource("W5B4E4"), SubResource("W5B4E5"), SubResource("W5B4E6"), SubResource("W5B4E7")])
 
 [sub_resource type="Resource" id="W5B5E1"]
@@ -602,16 +591,15 @@ Portal = "Portals/EnemyPortal3"
 script = ExtResource("batch")
 Count = 24
 Interval = 0.45
-After = 0.00
 Enemies = Array[ExtResource("enemy")]([SubResource("W5B5E1"), SubResource("W5B5E2"), SubResource("W5B5E3"), SubResource("W5B5E4"), SubResource("W5B5E5"), SubResource("W5B5E6")])
 
 [sub_resource type="Resource" id="W5"]
 script = ExtResource("wave")
 Number = 5
+Batches = Array[ExtResource("batch")]([SubResource("W5B1"), SubResource("W5B2"), SubResource("W5B3"), SubResource("W5B4"), SubResource("W5B5")])
 Alert = 1
 BannerTitle = "Fleet Spearhead"
 BannerDescription = "A mass assault culminates in cruisers, warships and heavy transports."
-Batches = Array[ExtResource("batch")]([SubResource("W5B1"), SubResource("W5B2"), SubResource("W5B3"), SubResource("W5B4"), SubResource("W5B5")])
 
 [sub_resource type="Resource" id="W6B1E1"]
 script = ExtResource("enemy")
@@ -647,8 +635,8 @@ Portal = "Portals/EnemyPortal1"
 [sub_resource type="Resource" id="W6B1"]
 script = ExtResource("batch")
 Count = 54
-Interval = 0.50
-After = 2.00
+Interval = 0.5
+After = 2.0
 Enemies = Array[ExtResource("enemy")]([SubResource("W6B1E1"), SubResource("W6B1E2"), SubResource("W6B1E3"), SubResource("W6B1E4"), SubResource("W6B1E5")])
 
 [sub_resource type="Resource" id="W6B2E1"]
@@ -686,7 +674,7 @@ Shield = true
 script = ExtResource("batch")
 Count = 54
 Interval = 0.46
-After = 2.00
+After = 2.0
 Enemies = Array[ExtResource("enemy")]([SubResource("W6B2E1"), SubResource("W6B2E2"), SubResource("W6B2E3"), SubResource("W6B2E4"), SubResource("W6B2E5")])
 
 [sub_resource type="Resource" id="W6B3E1"]
@@ -724,7 +712,7 @@ Shield = true
 script = ExtResource("batch")
 Count = 54
 Interval = 0.42
-After = 2.00
+After = 2.0
 Enemies = Array[ExtResource("enemy")]([SubResource("W6B3E1"), SubResource("W6B3E2"), SubResource("W6B3E3"), SubResource("W6B3E4"), SubResource("W6B3E5")])
 
 [sub_resource type="Resource" id="W6B4E1"]
@@ -781,16 +769,15 @@ Shield = true
 script = ExtResource("batch")
 Count = 54
 Interval = 0.64
-After = 0.00
 Enemies = Array[ExtResource("enemy")]([SubResource("W6B4E1"), SubResource("W6B4E2"), SubResource("W6B4E3"), SubResource("W6B4E4"), SubResource("W6B4E5"), SubResource("W6B4E6"), SubResource("W6B4E7"), SubResource("W6B4E8")])
 
 [sub_resource type="Resource" id="W6"]
 script = ExtResource("wave")
 Number = 6
+Batches = Array[ExtResource("batch")]([SubResource("W6B1"), SubResource("W6B2"), SubResource("W6B3"), SubResource("W6B4")])
 Alert = 1
 BannerTitle = "Heavy Fleet Escalation"
 BannerDescription = "Heavy gunners, elites and shield frigates replace the earlier drone skirmishes."
-Batches = Array[ExtResource("batch")]([SubResource("W6B1"), SubResource("W6B2"), SubResource("W6B3"), SubResource("W6B4")])
 
 [sub_resource type="Resource" id="W7B1E1"]
 script = ExtResource("enemy")
@@ -826,8 +813,8 @@ Portal = "Portals/EnemyPortal1"
 [sub_resource type="Resource" id="W7B1"]
 script = ExtResource("batch")
 Count = 54
-Interval = 0.50
-After = 1.80
+Interval = 0.5
+After = 1.8
 Enemies = Array[ExtResource("enemy")]([SubResource("W7B1E1"), SubResource("W7B1E2"), SubResource("W7B1E3"), SubResource("W7B1E4"), SubResource("W7B1E5")])
 
 [sub_resource type="Resource" id="W7B2E1"]
@@ -870,7 +857,7 @@ Portal = "Portals/EnemyPortal2"
 script = ExtResource("batch")
 Count = 54
 Interval = 0.65
-After = 2.00
+After = 2.0
 Enemies = Array[ExtResource("enemy")]([SubResource("W7B2E1"), SubResource("W7B2E2"), SubResource("W7B2E3"), SubResource("W7B2E4"), SubResource("W7B2E5"), SubResource("W7B2E6")])
 
 [sub_resource type="Resource" id="W7B3E1"]
@@ -908,7 +895,7 @@ Portal = "Portals/EnemyPortal3"
 script = ExtResource("batch")
 Count = 60
 Interval = 0.43
-After = 2.00
+After = 2.0
 Enemies = Array[ExtResource("enemy")]([SubResource("W7B3E1"), SubResource("W7B3E2"), SubResource("W7B3E3"), SubResource("W7B3E4"), SubResource("W7B3E5")])
 
 [sub_resource type="Resource" id="W7B4E1"]
@@ -959,16 +946,15 @@ Shield = true
 script = ExtResource("batch")
 Count = 60
 Interval = 0.68
-After = 0.00
 Enemies = Array[ExtResource("enemy")]([SubResource("W7B4E1"), SubResource("W7B4E2"), SubResource("W7B4E3"), SubResource("W7B4E4"), SubResource("W7B4E5"), SubResource("W7B4E6"), SubResource("W7B4E7")])
 
 [sub_resource type="Resource" id="W7"]
 script = ExtResource("wave")
 Number = 7
+Batches = Array[ExtResource("batch")]([SubResource("W7B1"), SubResource("W7B2"), SubResource("W7B3"), SubResource("W7B4")])
 Alert = 1
 BannerTitle = "Carrier Strike"
 BannerDescription = "Drone carriers and heavy transports enter behind elite escorts on three lanes."
-Batches = Array[ExtResource("batch")]([SubResource("W7B1"), SubResource("W7B2"), SubResource("W7B3"), SubResource("W7B4")])
 
 [sub_resource type="Resource" id="W8B1E1"]
 script = ExtResource("enemy")
@@ -1006,7 +992,7 @@ Portal = "Portals/EnemyPortal2"
 script = ExtResource("batch")
 Count = 48
 Interval = 0.62
-After = 2.00
+After = 2.0
 Enemies = Array[ExtResource("enemy")]([SubResource("W8B1E1"), SubResource("W8B1E2"), SubResource("W8B1E3"), SubResource("W8B1E4"), SubResource("W8B1E5")])
 
 [sub_resource type="Resource" id="W8B2E1"]
@@ -1049,8 +1035,8 @@ Portal = "Portals/EnemyPortal1"
 [sub_resource type="Resource" id="W8B2"]
 script = ExtResource("batch")
 Count = 48
-Interval = 0.60
-After = 2.00
+Interval = 0.6
+After = 2.0
 Enemies = Array[ExtResource("enemy")]([SubResource("W8B2E1"), SubResource("W8B2E2"), SubResource("W8B2E3"), SubResource("W8B2E4"), SubResource("W8B2E5"), SubResource("W8B2E6")])
 
 [sub_resource type="Resource" id="W8B3E1"]
@@ -1088,7 +1074,7 @@ Portal = "Portals/EnemyPortal3"
 script = ExtResource("batch")
 Count = 48
 Interval = 0.44
-After = 1.50
+After = 1.5
 Enemies = Array[ExtResource("enemy")]([SubResource("W8B3E1"), SubResource("W8B3E2"), SubResource("W8B3E3"), SubResource("W8B3E4"), SubResource("W8B3E5")])
 
 [sub_resource type="Resource" id="W8B4E1"]
@@ -1133,7 +1119,7 @@ Shield = true
 script = ExtResource("batch")
 Count = 48
 Interval = 0.68
-After = 2.00
+After = 2.0
 Enemies = Array[ExtResource("enemy")]([SubResource("W8B4E1"), SubResource("W8B4E2"), SubResource("W8B4E3"), SubResource("W8B4E4"), SubResource("W8B4E5"), SubResource("W8B4E6")])
 
 [sub_resource type="Resource" id="W8B5E1"]
@@ -1170,17 +1156,16 @@ Portal = "Portals/EnemyPortal1"
 [sub_resource type="Resource" id="W8B5"]
 script = ExtResource("batch")
 Count = 48
-Interval = 0.50
-After = 0.00
+Interval = 0.5
 Enemies = Array[ExtResource("enemy")]([SubResource("W8B5E1"), SubResource("W8B5E2"), SubResource("W8B5E3"), SubResource("W8B5E4"), SubResource("W8B5E5")])
 
 [sub_resource type="Resource" id="W8"]
 script = ExtResource("wave")
 Number = 8
+Batches = Array[ExtResource("batch")]([SubResource("W8B1"), SubResource("W8B2"), SubResource("W8B3"), SubResource("W8B4"), SubResource("W8B5")])
 Alert = 1
 BannerTitle = "Shielded Armada"
 BannerDescription = "Shield screens protect cruisers, heavy warships and elite assault groups."
-Batches = Array[ExtResource("batch")]([SubResource("W8B1"), SubResource("W8B2"), SubResource("W8B3"), SubResource("W8B4"), SubResource("W8B5")])
 
 [sub_resource type="Resource" id="W9B1E1"]
 script = ExtResource("enemy")
@@ -1224,7 +1209,7 @@ Portal = "Portals/EnemyPortal1"
 script = ExtResource("batch")
 Count = 48
 Interval = 0.62
-After = 2.00
+After = 2.0
 Enemies = Array[ExtResource("enemy")]([SubResource("W9B1E1"), SubResource("W9B1E2"), SubResource("W9B1E3"), SubResource("W9B1E4"), SubResource("W9B1E5"), SubResource("W9B1E6")])
 
 [sub_resource type="Resource" id="W9B2E1"]
@@ -1268,7 +1253,7 @@ Shield = true
 script = ExtResource("batch")
 Count = 48
 Interval = 0.66
-After = 1.50
+After = 1.5
 Enemies = Array[ExtResource("enemy")]([SubResource("W9B2E1"), SubResource("W9B2E2"), SubResource("W9B2E3"), SubResource("W9B2E4"), SubResource("W9B2E5"), SubResource("W9B2E6")])
 
 [sub_resource type="Resource" id="W9B3E1"]
@@ -1313,7 +1298,7 @@ Portal = "Portals/EnemyPortal2"
 script = ExtResource("batch")
 Count = 54
 Interval = 0.64
-After = 2.00
+After = 2.0
 Enemies = Array[ExtResource("enemy")]([SubResource("W9B3E1"), SubResource("W9B3E2"), SubResource("W9B3E3"), SubResource("W9B3E4"), SubResource("W9B3E5"), SubResource("W9B3E6")])
 
 [sub_resource type="Resource" id="W9B4E1"]
@@ -1350,8 +1335,8 @@ Portal = "Portals/EnemyPortal3"
 [sub_resource type="Resource" id="W9B4"]
 script = ExtResource("batch")
 Count = 54
-Interval = 0.50
-After = 2.00
+Interval = 0.5
+After = 2.0
 Enemies = Array[ExtResource("enemy")]([SubResource("W9B4E1"), SubResource("W9B4E2"), SubResource("W9B4E3"), SubResource("W9B4E4"), SubResource("W9B4E5")])
 
 [sub_resource type="Resource" id="W9B5E1"]
@@ -1402,16 +1387,15 @@ Portal = "Portals/EnemyPortal3"
 script = ExtResource("batch")
 Count = 48
 Interval = 0.68
-After = 0.00
 Enemies = Array[ExtResource("enemy")]([SubResource("W9B5E1"), SubResource("W9B5E2"), SubResource("W9B5E3"), SubResource("W9B5E4"), SubResource("W9B5E5"), SubResource("W9B5E6"), SubResource("W9B5E7")])
 
 [sub_resource type="Resource" id="W9"]
 script = ExtResource("wave")
 Number = 9
+Batches = Array[ExtResource("batch")]([SubResource("W9B1"), SubResource("W9B2"), SubResource("W9B3"), SubResource("W9B4"), SubResource("W9B5")])
 Alert = 1
 BannerTitle = "Siege Vanguard"
 BannerDescription = "An armoured siege fleet probes the fortress before the final command ship."
-Batches = Array[ExtResource("batch")]([SubResource("W9B1"), SubResource("W9B2"), SubResource("W9B3"), SubResource("W9B4"), SubResource("W9B5")])
 
 [sub_resource type="Resource" id="W10B1E1"]
 script = ExtResource("enemy")
@@ -1422,8 +1406,8 @@ Portal = "Portals/EnemyPortal2"
 [sub_resource type="Resource" id="W10B1"]
 script = ExtResource("batch")
 Count = 1
-Interval = 0.00
-After = 7.00
+Interval = 0.0
+After = 7.0
 Enemies = Array[ExtResource("enemy")]([SubResource("W10B1E1")])
 
 [sub_resource type="Resource" id="W10B2E1"]
@@ -1454,8 +1438,8 @@ Portal = "Portals/EnemyPortal2"
 [sub_resource type="Resource" id="W10B2"]
 script = ExtResource("batch")
 Count = 36
-Interval = 0.70
-After = 2.00
+Interval = 0.7
+After = 2.0
 Enemies = Array[ExtResource("enemy")]([SubResource("W10B2E1"), SubResource("W10B2E2"), SubResource("W10B2E3"), SubResource("W10B2E4")])
 
 [sub_resource type="Resource" id="W10B3E1"]
@@ -1498,8 +1482,8 @@ Shield = true
 [sub_resource type="Resource" id="W10B3"]
 script = ExtResource("batch")
 Count = 60
-Interval = 0.60
-After = 2.00
+Interval = 0.6
+After = 2.0
 Enemies = Array[ExtResource("enemy")]([SubResource("W10B3E1"), SubResource("W10B3E2"), SubResource("W10B3E3"), SubResource("W10B3E4"), SubResource("W10B3E5"), SubResource("W10B3E6")])
 
 [sub_resource type="Resource" id="W10B4E1"]
@@ -1537,7 +1521,7 @@ Portal = "Portals/EnemyPortal3"
 script = ExtResource("batch")
 Count = 60
 Interval = 0.46
-After = 1.50
+After = 1.5
 Enemies = Array[ExtResource("enemy")]([SubResource("W10B4E1"), SubResource("W10B4E2"), SubResource("W10B4E3"), SubResource("W10B4E4"), SubResource("W10B4E5")])
 
 [sub_resource type="Resource" id="W10B5E1"]
@@ -1581,7 +1565,7 @@ Portal = "Portals/EnemyPortal2"
 script = ExtResource("batch")
 Count = 60
 Interval = 0.74
-After = 2.00
+After = 2.0
 Enemies = Array[ExtResource("enemy")]([SubResource("W10B5E1"), SubResource("W10B5E2"), SubResource("W10B5E3"), SubResource("W10B5E4"), SubResource("W10B5E5"), SubResource("W10B5E6")])
 
 [sub_resource type="Resource" id="W10B6E1"]
@@ -1625,16 +1609,15 @@ Portal = "Portals/EnemyPortal2"
 script = ExtResource("batch")
 Count = 48
 Interval = 0.52
-After = 0.00
 Enemies = Array[ExtResource("enemy")]([SubResource("W10B6E1"), SubResource("W10B6E2"), SubResource("W10B6E3"), SubResource("W10B6E4"), SubResource("W10B6E5"), SubResource("W10B6E6")])
 
 [sub_resource type="Resource" id="W10"]
 script = ExtResource("wave")
 Number = 10
+Batches = Array[ExtResource("batch")]([SubResource("W10B1"), SubResource("W10B2"), SubResource("W10B3"), SubResource("W10B4"), SubResource("W10B5"), SubResource("W10B6")])
 Alert = 1
 BannerTitle = "Obsidian Dreadnought"
 BannerDescription = "Capital-class dreadnought leads a sustained three-lane assault with shield escorts and heavy warships."
-Batches = Array[ExtResource("batch")]([SubResource("W10B1"), SubResource("W10B2"), SubResource("W10B3"), SubResource("W10B4"), SubResource("W10B5"), SubResource("W10B6")])
 
 [resource]
 script = ExtResource("set")
