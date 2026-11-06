@@ -19,6 +19,12 @@ public partial class ConstructionSiteVisualConfig : Resource
     [Export] public Color TelemetryBackground { get; set; } = new(.02f, .06f, .1f, .75f);
     [Export] public Vector2 TelemetryOffset { get; set; } = new(8, -14);
     [Export(PropertyHint.Range, "88,220,1")] public float TelemetryWidth { get; set; } = 132;
+    [ExportGroup("Circular Site Progress")]
+    [Export(PropertyHint.Range, "26,56,1")] public float TelemetryRingRadius { get; set; } = 40;
+    [Export(PropertyHint.Range, "0,180,1")] public float TelemetryOuterDegreesPerSecond { get; set; } = 30;
+    [Export(PropertyHint.Range, "0,180,1")] public float TelemetryMiddleDegreesPerSecond { get; set; } = 48;
+    [Export(PropertyHint.Range, "0,180,1")] public float TelemetryInnerDegreesPerSecond { get; set; } = 72;
+    [Export(PropertyHint.Range, "20,400,10")] public float TelemetryCountUpPerSecond { get; set; } = 160;
     [Export(PropertyHint.Range, ".8,1.2,.05")] public float CompletionReadoutSeconds { get; set; } = 1;
     [Export(PropertyHint.Range, "1,64,1")] public int MaxCompletionReadouts { get; set; } = 32;
     [ExportGroup("Site Acquisition")]

@@ -1,3 +1,11 @@
+## Circular construction telemetry polish — 2026-11-06
+
+**Source Implemented / Awaiting Owner Visual Validation.** The previous rectangular site readout is replaced only for **CONSTRUCTING / UPGRADING** by a compact cyan circular vector meter outside the footprint. The actual paid work percentage counts up in the centre; one pale outer curved arc and its 20 tiny ion dots move **anti-clockwise**, while two inner curves rotate **clockwise**. A small caption identifies the active job. The ring has only a subtle round tint; no black rectangle. **DRONE INBOUND, SITE LOCKED and SYSTEM ONLINE** remain short unboxed text, with the existing completion fade.
+
+This reuses the active-only shared `ConstructionSiteHologram` canvas, 24Hz redraw, eight bounded non-overlap lanes, pause behaviour, completion cap and original work/restore sources. No new site nodes, timers, shader, particle emitters or save fields. The original rectangular footprint hologram remains unchanged. Adjust ring radius, the three rotation speeds and count-up speed through `DefaultConstructionSiteVisualConfig.tres`. Owner Godot visual acceptance pending: inspect both build/upgrade, queued/locked/completed states, nearby towers, pause, checkpoint restore and cancellation.
+
+---
+
 ## DRONE2 site telemetry and acquisition
 
 **Source Implemented / Awaiting Owner Validation.** The same capped ConstructionSiteHologram canvas now draws one tiny panel outside the full footprint: DRONE INBOUND while held; SITE LOCKED during acquisition/deployment; real CONSTRUCTING/UPGRADING N% after release; SYSTEM ONLINE for1s only on successful WorkCompleted. No-builder work uses the authoritative work phase/progress immediately. No GUI scene, timer or process per site/drone. Existing work events cache strings, with the bounded redraw cadence recovering live visual toggles. Completion readouts cap32 (hard64), clear on removal/unload and are not restored/replayed. One new paid job replaces that tower's earlier completion panel.

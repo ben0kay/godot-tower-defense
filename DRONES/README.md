@@ -1,3 +1,9 @@
+## DRONE2 — circular fabrication telemetry (2026-11-06)
+
+**Source Implemented / Awaiting Owner Visual Validation.** During actual CONSTRUCTING/UPGRADING, the old dark rectangular floating readout becomes a circular cyan progress display with three independently turning arcs and drifting dots. Inbound, locked and online statuses use bare text without a panel. No drone movement, ammo delivery, construction work timing or gameplay logic changes. [Details](../TOWERS/Shared/Construction/Visuals/README.md).
+
+---
+
 # DRONES — shared flight and presentation, separate job owners
 
 ## DRONE2

@@ -117,7 +117,7 @@ public partial class ConstructionSiteHologram : Node2D
             {
                 UpdateReadout(site); // Cached strings also recover when visual toggles change while a site is held.
                 bool acquired = locked >= 0 || (GodotObject.IsInstanceValid(_builders) && _builders.PhaseFor(tower) == ConstructionDronePhase.Deploying);
-                DrawTelemetry(bounds, acquired ? "SITE LOCKED" : site.Text, 1, c);
+                DrawTelemetry(bounds, site, acquired, 1, c);
             }
         }
         DrawCompletions(visible, c);
