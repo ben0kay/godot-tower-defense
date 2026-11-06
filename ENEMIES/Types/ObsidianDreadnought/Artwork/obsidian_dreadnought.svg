@@ -1,66 +1,61 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="352" height="208" viewBox="0 0 352 208">
-<!-- Right-facing Capital hull. Weapon sockets: (288,42), (288,166), (72,42), (72,166). -->
-<defs>
-<linearGradient id="hull" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#46515d"/><stop offset=".18" stop-color="#252e39"/><stop offset=".52" stop-color="#0e141e"/><stop offset=".84" stop-color="#090e16"/><stop offset="1" stop-color="#03070c"/></linearGradient>
-<linearGradient id="plate" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#69737b"/><stop offset=".15" stop-color="#38424d"/><stop offset=".6" stop-color="#17212d"/><stop offset="1" stop-color="#0c121b"/></linearGradient>
-<linearGradient id="spine" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#141b25"/><stop offset=".55" stop-color="#343b44"/><stop offset="1" stop-color="#080e16"/></linearGradient>
-<linearGradient id="red" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ff9b94"/><stop offset=".35" stop-color="#f13b45"/><stop offset="1" stop-color="#6c111d"/></linearGradient>
-</defs>
+<!-- Obsidian Dreadnought: right-facing 352x208 Capital hull, flat charcoal/black armour with restrained scarlet faction markings. -->
+<!-- Preserve exact weapon sockets: (288,42), (288,166), (72,42), (72,166). No gradients, reflective lighting or runtime effects. -->
 <g stroke-linejoin="round" stroke-linecap="round">
-<!-- Broad aft armour and split forward shoulder outriggers around a spear-like command hull. -->
+<!-- Broad near-black aft armour and split forward shoulder outriggers around a spear-like command hull. -->
 <path d="M8 76 L20 57 24 24 100 4 134 20 246 16 316 29 305 64 347 96 350 104 347 112 305 144 316 179 246 192 134 188 100 204 24 184 20 151 8 132Z" fill="#03070c" stroke="#05080d" stroke-width="5"/>
-<path d="M12 76 L24 58 28 27 100 8 133 24 246 20 312 32 301 65 343 99 346 104 343 109 301 143 312 176 246 188 133 184 100 200 28 181 24 150 12 132Z" fill="url(#hull)" stroke="#6a747c" stroke-width="1.4"/>
-<path d="M30 30 L99 13 123 28 118 67 35 75 25 60Z M30 178 L99 195 123 180 118 141 35 133 25 148Z" fill="url(#plate)" stroke="#1b2631" stroke-width="2"/>
-<path d="M131 29 L240 26 303 37 292 65 232 78 129 68Z M131 179 L240 182 303 171 292 143 232 130 129 140Z" fill="url(#plate)" stroke="#121a25" stroke-width="2"/>
-<path d="M138 35 L235 33 271 40 M138 173 L235 175 271 168" fill="none" stroke="#78818a" stroke-width=".9"/>
-<path d="M32 35 L98 19 109 28 M32 173 L98 189 109 180" fill="none" stroke="#879098" stroke-width="1"/>
+<path d="M12 76 L24 58 28 27 100 8 133 24 246 20 312 32 301 65 343 99 346 104 343 109 301 143 312 176 246 188 133 184 100 200 28 181 24 150 12 132Z" fill="#111920" stroke="#30363c" stroke-width="1.4"/>
+<path d="M30 30 L99 13 123 28 118 67 35 75 25 60Z M30 178 L99 195 123 180 118 141 35 133 25 148Z" fill="#1e252c" stroke="#05080c" stroke-width="2"/>
+<path d="M131 29 L240 26 303 37 292 65 232 78 129 68Z M131 179 L240 182 303 171 292 143 232 130 129 140Z" fill="#1e252c" stroke="#080d13" stroke-width="2"/>
+<path d="M138 35 L235 33 271 40 M138 173 L235 175 271 168" fill="none" stroke="#30363c" stroke-width=".9"/>
+<path d="M32 35 L98 19 109 28 M32 173 L98 189 109 180" fill="none" stroke="#30363c" stroke-width="1"/>
 <!-- Restrained crimson channels separate outer armour from the inner machinery. -->
 <path d="M33 72 L111 63 131 73 233 82 296 68 M33 136 L111 145 131 135 233 126 296 140" fill="none" stroke="#05090f" stroke-width="8"/>
-<path d="M35 72 L111 64 131 74 232 83 295 69 M35 136 L111 144 131 134 232 125 295 139" fill="none" stroke="#b32132" stroke-width="2.5"/>
-<path d="M136 75 L220 82 M136 133 L220 126" stroke="#fb5a60" stroke-width=".8"/>
+<path d="M35 72 L111 64 131 74 232 83 295 69 M35 136 L111 144 131 134 232 125 295 139" fill="none" stroke="#ad2729" stroke-width="2.5"/>
+<path d="M136 75 L220 82 M136 133 L220 126" stroke="#e4442f" stroke-width=".8"/>
 <!-- Central keel, command citadel and armoured needle bow. -->
-<path d="M28 88 L85 75 137 80 196 70 264 83 303 82 343 104 303 126 264 125 196 138 137 128 85 133 28 120 19 104Z" fill="url(#spine)" stroke="#56616d" stroke-width="1.3"/>
-<path d="M32 94 L86 84 134 91 195 82 255 91 297 91 327 104 297 117 255 117 195 126 134 117 86 124 32 114 26 104Z" fill="#0a111b" stroke="#273443" stroke-width="1.5"/>
-<path d="M90 94 L142 96 173 88 224 94 240 104 224 114 173 120 142 112 90 114Z" fill="url(#plate)" stroke="#111a25" stroke-width="1.5"/>
-<path d="M149 98 L177 93 212 98 220 104 212 110 177 115 149 110Z" fill="#080e17" stroke="#606c77" stroke-width=".8"/>
-<path d="M161 100 L179 97 207 101 211 104 207 107 179 111 161 108Z" fill="url(#red)"/>
-<path d="M174 101 H201 M174 107 H201" stroke="#ffbab0" stroke-width=".7"/>
-<path d="M250 98 H296 L316 104 296 110 H250" fill="none" stroke="#a42130" stroke-width="2"/>
-<path d="M269 103 H304" stroke="#ff6265" stroke-width="1"/>
+<path d="M28 88 L85 75 137 80 196 70 264 83 303 82 343 104 303 126 264 125 196 138 137 128 85 133 28 120 19 104Z" fill="#0f171e" stroke="#05080c" stroke-width="1.3"/>
+<path d="M32 94 L86 84 134 91 195 82 255 91 297 91 327 104 297 117 255 117 195 126 134 117 86 124 32 114 26 104Z" fill="#0a1016" stroke="#101820" stroke-width="1.5"/>
+<path d="M90 94 L142 96 173 88 224 94 240 104 224 114 173 120 142 112 90 114Z" fill="#1e252c" stroke="#111a25" stroke-width="1.5"/>
+<path d="M149 98 L177 93 212 98 220 104 212 110 177 115 149 110Z" fill="#080e17" stroke="#30363c" stroke-width=".8"/>
+<path d="M161 100 L179 97 207 101 211 104 207 107 179 111 161 108Z" fill="#ad2729"/>
+<path d="M174 101 H201 M174 107 H201" stroke="#ff6039" stroke-width=".7"/>
+<path d="M250 98 H296 L316 104 296 110 H250" fill="none" stroke="#ad2729" stroke-width="2"/>
+<path d="M269 103 H304" stroke="#ff6039" stroke-width="1"/>
 <!-- Recessed engine banks and grilles; optional shared exhaust is attached by GenericEnemy. -->
-<path d="M15 82 H30 V126 H15Z" fill="#03060b" stroke="#48535d" stroke-width="1"/>
-<path d="M18 86 H25 V96 H18Z M18 100 H25 V108 H18Z M18 112 H25 V122 H18Z" fill="url(#red)"/>
-<path d="M39 92 H77 V116 H39Z" fill="#050a11" stroke="#364452" stroke-width="1"/>
-<path d="M43 96 V112" stroke="#65707a" stroke-width="1.6"/>
-<path d="M48 96 V112" stroke="#65707a" stroke-width="1.6"/>
-<path d="M53 96 V112" stroke="#65707a" stroke-width="1.6"/>
-<path d="M58 96 V112" stroke="#65707a" stroke-width="1.6"/>
-<path d="M63 96 V112" stroke="#65707a" stroke-width="1.6"/>
-<path d="M68 96 V112" stroke="#65707a" stroke-width="1.6"/>
-<path d="M73 96 V112" stroke="#65707a" stroke-width="1.6"/>
-<circle cx="288" cy="42" r="17" fill="#070c13" stroke="#73808b" stroke-width="1.2"/><circle cx="288" cy="42" r="13" fill="#202b36" stroke="#a82a39" stroke-width="1.4"/><path d="M268 42 H271 M305 42 H308" stroke="#f3555b" stroke-width="1.5"/>
-<circle cx="288" cy="166" r="17" fill="#070c13" stroke="#73808b" stroke-width="1.2"/><circle cx="288" cy="166" r="13" fill="#202b36" stroke="#a82a39" stroke-width="1.4"/><path d="M268 166 H271 M305 166 H308" stroke="#f3555b" stroke-width="1.5"/>
-<circle cx="72" cy="42" r="17" fill="#070c13" stroke="#73808b" stroke-width="1.2"/><circle cx="72" cy="42" r="13" fill="#202b36" stroke="#a82a39" stroke-width="1.4"/><path d="M52 42 H55 M89 42 H92" stroke="#f3555b" stroke-width="1.5"/>
-<circle cx="72" cy="166" r="17" fill="#070c13" stroke="#73808b" stroke-width="1.2"/><circle cx="72" cy="166" r="13" fill="#202b36" stroke="#a82a39" stroke-width="1.4"/><path d="M52 166 H55 M89 166 H92" stroke="#f3555b" stroke-width="1.5"/>
-<path d="M144 40 L148 58 M144 168 L148 150" stroke="#080e17" stroke-width="3"/><path d="M145 40 L149 58 M145 168 L149 150" stroke="#4f5c69" stroke-width=".7"/>
-<path d="M162 40 L166 58 M162 168 L166 150" stroke="#080e17" stroke-width="3"/><path d="M163 40 L167 58 M163 168 L167 150" stroke="#4f5c69" stroke-width=".7"/>
-<path d="M180 40 L184 58 M180 168 L184 150" stroke="#080e17" stroke-width="3"/><path d="M181 40 L185 58 M181 168 L185 150" stroke="#4f5c69" stroke-width=".7"/>
-<path d="M198 40 L202 58 M198 168 L202 150" stroke="#080e17" stroke-width="3"/><path d="M199 40 L203 58 M199 168 L203 150" stroke="#4f5c69" stroke-width=".7"/>
-<path d="M216 40 L220 58 M216 168 L220 150" stroke="#080e17" stroke-width="3"/><path d="M217 40 L221 58 M217 168 L221 150" stroke="#4f5c69" stroke-width=".7"/>
-<rect x="33" y="37" width="2" height="2" rx=".4" fill="#a7afb5"/>
-<rect x="95" y="23" width="2" height="2" rx=".4" fill="#a7afb5"/>
-<rect x="137" y="29" width="2" height="2" rx=".4" fill="#a7afb5"/>
-<rect x="241" y="25" width="2" height="2" rx=".4" fill="#a7afb5"/>
-<rect x="303" y="35" width="2" height="2" rx=".4" fill="#a7afb5"/>
-<rect x="33" y="169" width="2" height="2" rx=".4" fill="#a7afb5"/>
-<rect x="95" y="183" width="2" height="2" rx=".4" fill="#a7afb5"/>
-<rect x="137" y="177" width="2" height="2" rx=".4" fill="#a7afb5"/>
-<rect x="241" y="181" width="2" height="2" rx=".4" fill="#a7afb5"/>
-<rect x="303" y="171" width="2" height="2" rx=".4" fill="#a7afb5"/>
-<rect x="99" y="85" width="2" height="2" rx=".4" fill="#a7afb5"/>
-<rect x="99" y="121" width="2" height="2" rx=".4" fill="#a7afb5"/>
-<rect x="263" y="87" width="2" height="2" rx=".4" fill="#a7afb5"/>
-<rect x="263" y="119" width="2" height="2" rx=".4" fill="#a7afb5"/>
-<path d="M49 26 L61 23 M49 182 L61 185 M255 24 L271 27 M255 184 L271 181" stroke="#f4434c" stroke-width="2"/>
-<path d="M330 100 L340 104 330 108" fill="none" stroke="#b8c2c8" stroke-width=".9"/>
+<path d="M15 82 H30 V126 H15Z" fill="#03060b" stroke="#30363c" stroke-width="1"/>
+<path d="M18 86 H25 V96 H18Z M18 100 H25 V108 H18Z M18 112 H25 V122 H18Z" fill="#ad2729"/>
+<path d="M39 92 H77 V116 H39Z" fill="#050a11" stroke="#1e252c" stroke-width="1"/>
+<path d="M43 96 V112" stroke="#293139" stroke-width="1.6"/>
+<path d="M48 96 V112" stroke="#293139" stroke-width="1.6"/>
+<path d="M53 96 V112" stroke="#293139" stroke-width="1.6"/>
+<path d="M58 96 V112" stroke="#293139" stroke-width="1.6"/>
+<path d="M63 96 V112" stroke="#293139" stroke-width="1.6"/>
+<path d="M68 96 V112" stroke="#293139" stroke-width="1.6"/>
+<path d="M73 96 V112" stroke="#293139" stroke-width="1.6"/>
+<circle cx="288" cy="42" r="17" fill="#070c13" stroke="#05080c" stroke-width="1.2"/><circle cx="288" cy="42" r="13" fill="#101820" stroke="#ad2729" stroke-width="1.4"/><path d="M268 42 H271 M305 42 H308" stroke="#e4442f" stroke-width="1.5"/>
+<circle cx="288" cy="166" r="17" fill="#070c13" stroke="#05080c" stroke-width="1.2"/><circle cx="288" cy="166" r="13" fill="#101820" stroke="#ad2729" stroke-width="1.4"/><path d="M268 166 H271 M305 166 H308" stroke="#e4442f" stroke-width="1.5"/>
+<circle cx="72" cy="42" r="17" fill="#070c13" stroke="#05080c" stroke-width="1.2"/><circle cx="72" cy="42" r="13" fill="#101820" stroke="#ad2729" stroke-width="1.4"/><path d="M52 42 H55 M89 42 H92" stroke="#e4442f" stroke-width="1.5"/>
+<circle cx="72" cy="166" r="17" fill="#070c13" stroke="#05080c" stroke-width="1.2"/><circle cx="72" cy="166" r="13" fill="#101820" stroke="#ad2729" stroke-width="1.4"/><path d="M52 166 H55 M89 166 H92" stroke="#e4442f" stroke-width="1.5"/>
+<path d="M144 40 L148 58 M144 168 L148 150" stroke="#080e17" stroke-width="3"/><path d="M145 40 L149 58 M145 168 L149 150" stroke="#293139" stroke-width=".7"/>
+<path d="M162 40 L166 58 M162 168 L166 150" stroke="#080e17" stroke-width="3"/><path d="M163 40 L167 58 M163 168 L167 150" stroke="#293139" stroke-width=".7"/>
+<path d="M180 40 L184 58 M180 168 L184 150" stroke="#080e17" stroke-width="3"/><path d="M181 40 L185 58 M181 168 L185 150" stroke="#293139" stroke-width=".7"/>
+<path d="M198 40 L202 58 M198 168 L202 150" stroke="#080e17" stroke-width="3"/><path d="M199 40 L203 58 M199 168 L203 150" stroke="#293139" stroke-width=".7"/>
+<path d="M216 40 L220 58 M216 168 L220 150" stroke="#080e17" stroke-width="3"/><path d="M217 40 L221 58 M217 168 L221 150" stroke="#293139" stroke-width=".7"/>
+<rect x="33" y="37" width="2" height="2" rx=".4" fill="#30363c"/>
+<rect x="95" y="23" width="2" height="2" rx=".4" fill="#30363c"/>
+<rect x="137" y="29" width="2" height="2" rx=".4" fill="#30363c"/>
+<rect x="241" y="25" width="2" height="2" rx=".4" fill="#30363c"/>
+<rect x="303" y="35" width="2" height="2" rx=".4" fill="#30363c"/>
+<rect x="33" y="169" width="2" height="2" rx=".4" fill="#30363c"/>
+<rect x="95" y="183" width="2" height="2" rx=".4" fill="#30363c"/>
+<rect x="137" y="177" width="2" height="2" rx=".4" fill="#30363c"/>
+<rect x="241" y="181" width="2" height="2" rx=".4" fill="#30363c"/>
+<rect x="303" y="171" width="2" height="2" rx=".4" fill="#30363c"/>
+<rect x="99" y="85" width="2" height="2" rx=".4" fill="#30363c"/>
+<rect x="99" y="121" width="2" height="2" rx=".4" fill="#30363c"/>
+<rect x="263" y="87" width="2" height="2" rx=".4" fill="#30363c"/>
+<rect x="263" y="119" width="2" height="2" rx=".4" fill="#30363c"/>
+<path d="M49 26 L61 23 M49 182 L61 185 M255 24 L271 27 M255 184 L271 181" stroke="#ad2729" stroke-width="2"/>
+<path d="M330 100 L340 104 330 108" fill="none" stroke="#30363c" stroke-width=".9"/>
 </g></svg>

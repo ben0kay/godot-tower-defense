@@ -1,3 +1,9 @@
+## Obsidian Dreadnought flat black fleet art — 2026-11-06
+
+Recoloured existing 352×208 CAPITAL hull SVG and four shared-instance 24×72 cannon SVGs to flat near-black/charcoal plates with restrained scarlet/orange-red mechanical accents. Preserved full hull silhouette, original SVG dimensions/viewBoxes and four weapon mount positions, barrel-tip alignment, enemy stats, movement, targeting, payloads and waves. Removed metallic vector gradients/highlight colours; source-level SVG checks only, owner F2/Level011 visual acceptance pending. Files: `ENEMIES/Types/ObsidianDreadnought/Artwork/`.
+
+---
+
 ## Automatic wave progression and live victory hold — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** Wave 1 remains manual; subsequent waves auto-start 30 seconds after the previous wave fully clears, with per-wave overrides in the Wave Editor and an upper-right AUTO START countdown beside the still-available NEXT WAVE button. Pause/checkpoint Continue retain the countdown. Early start, outcomes, reset and unload cancel it safely. Victory keeps the map/drones/effects alive during the existing 4-second delay, while the official stat snapshot stays fixed; the map pauses when Results opens. Defeat remains immediate. Source/lifecycle and authored-fixture review only; .NET unavailable, owner visual/gameplay acceptance pending. See LEVELS/Waves/README.md and LEVELS/Session/README.md.

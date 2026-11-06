@@ -1,11 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="72" viewBox="0 0 24 72">
-<!-- Up-facing independently rotating cannon. Exact barrel tip (12,4) = local muzzle (0,-32). -->
-<defs><linearGradient id="metal" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#080c12"/><stop offset=".35" stop-color="#48505a"/><stop offset=".55" stop-color="#1d242e"/><stop offset="1" stop-color="#090c11"/></linearGradient></defs>
-<path d="M7 4 H17 V29 L21 35 V48 L17 55 H7 L3 48 V35 L7 29Z" fill="#04060a" stroke="#59616c" stroke-width="1"/>
-<path d="M9 5 H15 V31 H9Z" fill="url(#metal)"/><path d="M7 4 H17 V9 H7Z" fill="#10161c" stroke="#a1a8af" stroke-width=".8"/>
-<path d="M8 5 H16" stroke="#ff3a3f" stroke-width="1.8"/><path d="M9 12 V28" stroke="#f12e36" stroke-width="1"/>
-<circle cx="12" cy="36" r="10" fill="url(#metal)" stroke="#58616b" stroke-width="1"/><circle cx="12" cy="36" r="6" fill="#070b12" stroke="#9f222b" stroke-width="1.2"/>
-<path d="M10 31 H14 V42 H10Z" fill="#9d202b"/><path d="M10 31 H14 V34 H10Z" fill="#ff6869"/>
-<path d="M6 45 H18 L16 52 H8Z" fill="#1b222b" stroke="#414b56" stroke-width=".8"/>
-<path d="M7 46 V49 M17 46 V49" stroke="#f63f49" stroke-width="1.2"/><path d="M6 35 V39 M18 35 V39" stroke="#a4abb0" stroke-width=".7"/>
+<!-- Black/charcoal flat-fleet cannon, independently rotating and up-facing. Exact tip (12,4) = muzzle local (0,-32). -->
+<path d="M7 4 H17 V29 L21 35 V48 L17 55 H7 L3 48 V35 L7 29Z" fill="#04060a" stroke="#05080c" stroke-width="1"/>
+<path d="M9 5 H15 V31 H9Z" fill="#1e252c"/><path d="M7 4 H17 V9 H7Z" fill="#111920" stroke="#30363c" stroke-width=".8"/>
+<path d="M8 5 H16" stroke="#ad2729" stroke-width="1.8"/><path d="M9 12 V28" stroke="#ad2729" stroke-width="1"/>
+<circle cx="12" cy="36" r="10" fill="#1e252c" stroke="#05080c" stroke-width="1"/><circle cx="12" cy="36" r="6" fill="#070b12" stroke="#ad2729" stroke-width="1.2"/>
+<path d="M10 31 H14 V42 H10Z" fill="#ad2729"/><path d="M10 31 H14 V34 H10Z" fill="#ff6039"/>
+<path d="M6 45 H18 L16 52 H8Z" fill="#1e252c" stroke="#30363c" stroke-width=".8"/>
+<path d="M7 46 V49 M17 46 V49" stroke="#ad2729" stroke-width="1.2"/><path d="M6 35 V39 M18 35 V39" stroke="#30363c" stroke-width=".7"/>
 </svg>
