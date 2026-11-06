@@ -1,3 +1,9 @@
+## FIGHTER — future persistent combat/fighter squad (new roadmap, 2026-11-06)
+
+**PLANNED / NOT IMPLEMENTED.** [The fighter-drone implementation plan](Combat/FIGHTER_DRONES_IMPLEMENTATION_PLAN.md) defines a new placeable **Drone Station** and multiple persistent friendly fighter drones. Initial modes: **Auto-pilot** (intercept the enemy with shortest remaining journey to an assigned Citadel, attack while orbiting/figure-eight/kiting) and **Auto-patrol** (select a fighter and click two map waypoints for a repeating figure-eight, firing opportunistically). Finite HP/ammo, return-to-home service, real station resupply and future enemy anti-air are included. Phases FD0–FD6 keep fighter behaviour, controller, station, weapons, input and feature-local saving under `DRONES/Combat/`; reuse `DRONES/Shared/` and integration with existing combat, catalog, enemy targeting and ammo logistics **without moving or merging current construction/courier job managers**. The older one-off corridor-strike player ability remains a separate long-term idea, not a substitute for persistent fighters.
+
+---
+
 ## Fixed acceleration and braking — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** Builder and ammunition flight now integrates fixed acceleration/deceleration rates (800px/s² each by default) around the owner's configured cruising speed. Long trips add constant-speed cruise; very short trips lower peak speed without changing rates. Organic cubic routes and heading remain; one 64-segment distance table per leg plus bounded local refinement maps physical distance onto the curve instead of easing over the whole journey. No per-frame arrays, routefinding or extra Nodes/timers. Tune FlightAcceleration/FlightDeceleration on the builder config or courier scene.
@@ -35,7 +41,7 @@ New flat optional flight-profile checkpoint properties preserve timing; restored
 - [Shared](Shared/README.md): plain flight state, shared body scene and cosmetic configuration.
 - [Transport](Transport/README.md): active CargoDrone adapter for Factory→Depot and Depot→Tower, then return. AmmunitionLogistics owns stock, reservations, slots and callbacks.
 - [Construction](../TOWERS/ConstructionDrones/README.md): ConstructionDroneManager retains FIFO, Citadel assignment, pooled visuals, site orbit, acquisition/deployment holds and return.
-- [Combat](Combat/README.md): future player-ability concept; no combat drone system is introduced.
+- [Combat](Combat/README.md): **new persistent fighter-drone/Drone Station roadmap** (FD0–FD6; no gameplay yet), with an older one-off player ability retained only as a separate future idea.
 
 Both roles ignite two tiny rear cyan-white engines at outbound/return departure, soften propulsion while braking, and draw a thin fading trail from bounded recent actual positions. Builder hover has only a tiny glow and no trail. Hidden/parked entries reset their effects and have no processing. The existing movement updates drive presentation; no extra effect timers, particle nodes or flight scheduler.
 

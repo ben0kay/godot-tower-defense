@@ -1,3 +1,9 @@
+## Future Fighter Drone reuse — boundary (2026-11-06)
+
+**Planning only.** Persistent fighter drones will live in `DRONES/Combat/` with their own HP/ammo/station/AI. They may reuse this folder's `DroneBody` and finite-leg `DroneFlightMotion` for thrusters, interpolation and station travel where appropriate. Combat pursuit and figure-eight patrol steering are **not** cargo/construction legs; keep them in `DRONES/Combat/FighterDroneMovement` (future). No shared business dispatcher, inventory, target scan or per-frame flight job should be introduced here merely because fighters are planned. [Fighter plan](../Combat/FIGHTER_DRONES_IMPLEMENTATION_PLAN.md).
+
+---
+
 ## Fixed acceleration and braking — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** Builder and ammunition flight now integrates fixed acceleration/deceleration rates (800px/s² each by default) around the owner's configured cruising speed. Long trips add constant-speed cruise; very short trips lower peak speed without changing rates. Organic cubic routes and heading remain; one 64-segment distance table per leg plus bounded local refinement maps physical distance onto the curve instead of easing over the whole journey. No per-frame arrays, routefinding or extra Nodes/timers. Tune FlightAcceleration/FlightDeceleration on the builder config or courier scene.
