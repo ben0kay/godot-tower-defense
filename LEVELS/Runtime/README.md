@@ -1,6 +1,6 @@
-## Optional mission Intel Report — 2026-11-06
+## Mission intel — now the existing top-right typewriter (2026-11-06)
 
-**Source implemented; Godot visual confirmation pending.** `LevelConfig.MissionBriefing` is an optional `MissionBriefingDefinition` resource (Enabled, Title, Speaker, multiline Message/Objectives). A single shared `UI/MissionBriefing/MissionBriefingDisplay.tscn` in `Battlefield.tscn` presents it once per **fresh mission load**, automatically after battlefield initialization and **before START WAVE**. It uses the shared menu style, blocks map clicks and shortcuts and temporarily pauses until CONTINUE/Escape closes it. Dismissal **does not start a wave**; `WaveManager` remains the only wave authority. Blank/disabled resources and checkpoint restoration bypass the briefing entirely. The sample `Level001/Level001Briefing.tres` is enabled; other maps stay unchanged. See [UI briefings](../../UI/MissionBriefing/README.md). No narration/NP1/NP2 wave message, spawn logic, or save data was changed.
+**Source implemented; runtime verification pending.** Fresh level load can show a short optional per-level `LevelConfig.MissionBriefing.Message` in the **existing `NarrationDisplay`**, typed under the top-right wave controls by the shared `WavePresentationController`. It uses the same speaker/font/animation as wave transmissions, **does not pause/block input**, and never starts a wave. Wave 1 replaces/clears the intro as usual. Restored checkpoints skip it. The previous centred/modal `UI/MissionBriefing` panel was removed. Level001 is opted in; all other levels remain optional. `VoiceCueId` is reserved for later female assistant voice recordings, not played yet. See [mission intel](../Briefing/README.md).
 
 ---
 

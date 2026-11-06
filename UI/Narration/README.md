@@ -1,3 +1,9 @@
+## Mission-load briefings reuse this narrator — 2026-11-06
+
+**Source implemented; runtime verification pending.** `LevelConfig.MissionBriefing` opt-in now calls this same top-right `NarrationDisplay.ShowMessage(Message, Speaker)` **once after fresh level initialization**, before any wave starts. It is the identical NP2 typewriter, not a modal. Gameplay remains responsive (camera, build tray, tower selection, START WAVE). The same wave presenter replaces or clears the intro on an accepted wave start; no additional narrator/pause/audio code exists. The retired centred `UI/MissionBriefing` popup was removed. `VoiceCueId` is future metadata only; female AI voice playback is not yet implemented. See [briefing owner](../../LEVELS/Briefing/README.md).
+
+---
+
 # Narration — shared tactical transmissions (NP2)
 
 **Implemented in source 2026-10-20. Godot runtime/build/desktop visual verification pending.** This is the reusable *visual-only* tactical narrator displayed under the top-right Wave/Start controls; it is not an audio system.

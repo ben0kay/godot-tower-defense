@@ -10,7 +10,6 @@
 [ext_resource type="Resource" path="res://ECONOMY/Resources/Credits.tres" id="12_credits"]
 [ext_resource type="Script" uid="uid://b7d701nts0r0a" path="res://LEVELS/Waves/WaveManager.cs" id="13_waves"]
 [ext_resource type="Script" path="res://LEVELS/Waves/Presentation/WavePresentationController.cs" id="wave_presenter"]
-[ext_resource type="PackedScene" path="res://UI/MissionBriefing/MissionBriefingDisplay.tscn" id="mission_briefing"]
 [ext_resource type="Script" uid="uid://ddmuqepgay0t2" path="res://WORLD/OBJECTIVES/Citadel/CitadelSession.cs" id="14_citadel"]
 
 [ext_resource type="PackedScene" path="res://UI/Menus/Pause/PauseMenu.tscn" id="15_pause"]
@@ -60,8 +59,6 @@ script = ExtResource("wave_presenter")
 [node name="LevelSession" type="Node" parent="."]
 process_mode = 3
 script = ExtResource("17_session")
-
-[node name="MissionBriefing" parent="." instance=ExtResource("mission_briefing")]
 
 [node name="PerformanceOverlay" type="CanvasLayer" parent="."]
 script = ExtResource("perf_overlay")

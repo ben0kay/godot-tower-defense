@@ -1,3 +1,9 @@
+## Per-level mission intel — shared upper-right typewriter (2026-11-06)
+
+**Source implemented / owner visual acceptance pending.** Level001 now presents optional Command Intelligence text when a fresh mission finishes loading using the **same top-right typewriter narrator** as wave transmissions. No centred popup, gameplay pause or input blocking. START WAVE remains manual and replaces/clears the intro when accepted. Other levels opt in through `LevelConfig.MissionBriefing`; checkpoint Continue skips it. Voice cue metadata is reserved for a future female AI narrator but no voice plays yet. [Mission briefing details](LEVELS/Briefing/README.md).
+
+---
+
 ## Level011 — Ten-wave fleet campaign (2026-11-06)
 
 **Source Implemented / Awaiting Owner Validation.** Level011 now authors all ten waves in its editable `Level011Waves.tres`: waves 6–9 steadily raise Heavy/Superheavy, shield, carrier and gunship pressure; wave 10 opens with one Obsidian Dreadnought from the middle portal, followed by 264 staged support ships from all three lanes. Waves 1–5 and the map/portals remain unchanged. 1,825 ships are scheduled before possible carrier releases; owner Godot balance/FPS validation pending. [Wave details](LEVELS/Level011/README.md).

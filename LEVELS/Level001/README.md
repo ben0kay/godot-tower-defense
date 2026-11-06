@@ -1,6 +1,6 @@
-## Mission Intel Report — 2026-11-06
+## Introductory tactical transmission — 2026-11-06
 
-**Source implemented; in-editor visual check pending.** `Level001Config.tres` now references `Level001Briefing.tres`. Running **F5/Level001 fresh** shows an optional, readable, centred **MISSION INTELLIGENCE** report before any wave starts. The first draft describes defending the Citadel, standard hostile drones, later scouts, and three-wave survival; its title, sender, message and objective lines are Inspector-editable. CONTINUE (or Escape) dismisses the briefing **without** starting Wave 1. It does not reappear when continuing a saved checkpoint. Other levels receive no new briefing until a resource is assigned in their own LevelConfig. Reuse the shared [briefing documentation](../../UI/MissionBriefing/README.md).
+**Source implemented; owner visual verification pending.** On fresh Level001 load (F5), the compact **top-right narrator** starts typing a short `COMMAND INTELLIGENCE` message automatically while the battlefield stays live and usable at WAVE 00. There is no popup, close button or pause. The first draft mentions Standard Drones, protecting the Citadel for three waves and later Scouts. The text lives in `Level001Briefing.tres` under `Message`/`Speaker`; its old Title/Objectives remain authored for future layouts but aren't shown separately. A `VoiceCueId` has been reserved for later AI voice playback, not activated. When the player presses START WAVE, the normal wave alert and optional wave narration take over. Continue skips the intro; fresh retries show it again. Details: [mission intel](../Briefing/README.md).
 
 ---
 
