@@ -97,12 +97,18 @@ public partial class SpawnManager
         foreach (var node in _portalObjects)
             if (node is EnemyPortal portal && portal.ActivateForWave(number))
             { changed = true; if (portal.MaterializationStyle.WarningEnabled) warnings++; }
+        SetPortalWaveSmoke(true);
         if (changed) RefreshPortalEligibility();
         if (warnings > 0) PortalOpeningWarning?.Invoke(warnings);
     }
 
     // =========================================================
     // Between-wave restore replays availability only, using actual completed authored numbers; no VFX/spawns.
+    internal void SetPortalWaveSmoke(bool active)
+    {
+        foreach (var node in _portalObjects)
+            if (node is EnemyPortal portal && GodotObject.IsInstanceValid(portal)) portal.SetWaveSmoke(active);
+    }
     internal void RestorePortalActivation(WaveDefinition[] waves, int completed)
     {
         foreach (var node in _portalObjects)

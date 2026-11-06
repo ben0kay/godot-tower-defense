@@ -1,3 +1,10 @@
+## Organic pulse and lingering wave smoke — 2026-11-06
+Source implemented; owner visual acceptance pending. Pulse strength/duration, spark count/angle and feedback spacing now vary using a private cosmetic RNG (`Irregularity`, default 40%), independent of wave RNG. Small pulses can occur closer together; a busy pulse finishes rather than continually restarting.
+
+Open portals slowly emit large, spreading violet clouds throughout active waves, independent of per-ship bursts. Defaults: 18 live puffs maximum per portal, 110px initial size with variation, 5s life, 18px/s outward drift and gentle swirl. Clouds grow and billow with independent shader offsets. Wave completion stops new smoke and lets existing clouds dissolve; pause freezes it, screen exit hides/resets it, screen re-entry resumes only during a wave, and restore never restarts wave smoke. Tune the existing spawn-feedback preset. Opening timing/gameplay are unchanged. Source/lifecycle review only; .NET unavailable.
+
+---
+
 ## SPAWN2.5 — source implemented / awaiting owner validation
 Successful Open-portal spawns now trigger a soft 12% artwork swell over 0.8s and six large billowing violet GPU puffs, alongside existing sparks/energy feedback. Tune `Visuals/DefaultPortalSpawnFeedbackStyle.tres`: pulse enable/size/duration/brightness, smoke enable/count/size/spread/lifetime/outward speed/swirl/opacity/tint. Only the centred artwork scales; labels, exit, footprint and `SizeMultiplier` remain independent.
 

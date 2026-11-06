@@ -138,10 +138,12 @@ public partial class EnemyPortal
         if (_openingArt != null) { _openingArt.Modulate = Colors.White; _openingArt.Scale = Vector2.One; }
         if (_openingLabel != null) _openingLabel.Modulate = Colors.White;
         if (_energy != null) _energy.Visible = _energy.Style?.Enabled == true;
+        RefreshWaveSmoke();
         if (notify) SpawnReady?.Invoke(this);
     }
     internal void RestoreActivation(bool active)
     {
+        _waveSmoke = false;
         CancelMaterialization(); IsSpawnActive = active;
         OpeningState = active ? PortalState.Open : PortalState.Dormant;
         GetNode<Node2D>("Visuals").Visible = active;
@@ -167,6 +169,6 @@ public partial class EnemyPortal
     public override void _ExitTree()
     {
         CancelMaterialization(); StopSpawnFeedback();
-        if (GodotObject.IsInstanceValid(_onScreen)) _onScreen.ScreenExited -= StopSpawnFeedback;
+        if (GodotObject.IsInstanceValid(_onScreen)) { _onScreen.ScreenExited -= StopSpawnFeedback; _onScreen.ScreenEntered -= RefreshWaveSmoke; }
     }
 }

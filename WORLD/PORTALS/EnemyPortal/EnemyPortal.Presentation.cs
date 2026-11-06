@@ -45,22 +45,25 @@ public partial class EnemyPortal
             _spawnParticles.ProcessMaterial = burst;
         }
         SetupSpawnFeedback();
-        if (_onScreen != null) _onScreen.ScreenExited += StopSpawnFeedback;
+        if (_onScreen != null) { _onScreen.ScreenExited += StopSpawnFeedback; _onScreen.ScreenEntered += RefreshWaveSmoke; }
     }
 
     // =========================================================
-    // One 48-particle emitter per portal; dense waves coalesce to at most one burst per 750ms.
+    // Irregular cosmetic bursts reuse one emitter; gameplay randomness and timing remain independent.
     public void PlaySpawnFeedback()
     {
         if (!IsInsideTree() || !IsSpawnReady || !IsVisibleInTree() || GetTree().Paused || _onScreen?.IsOnScreen() != true) return;
         _energy?.PlaySpawnPulse();
         ulong now = Time.GetTicksMsec();
         if (now < _nextBurstMs) return;
-        // Keep one cadence for all costly responses; let the retained smoke population finish before reuse.
-        float lifetime = SpawnFeedbackStyle.SmokeEnabled ? FeedbackValue(SpawnFeedbackStyle.LifetimeSeconds, 1.2f, .9f, 1.4f) : .75f;
-        _nextBurstMs = now + (ulong)Mathf.Max(750, lifetime * 1000);
-        PlayArtworkPulse(); PlaySmoke();
-        if (SpawnParticlesEnabled && _spawnParticles != null) _spawnParticles.Restart();
+        _nextBurstMs = now + (ulong)(650 * FeedbackVariation());
+        PlayArtworkPulse();
+        if (SpawnParticlesEnabled && _spawnParticles != null)
+        {
+            _spawnParticles.Amount = Mathf.Clamp((int)(40 * FeedbackVariation()), 20, 60);
+            _spawnParticles.Rotation = _feedbackRandom.RandfRange(-Mathf.Pi, Mathf.Pi);
+            _spawnParticles.Restart();
+        }
     }
     private void StopSpawnFeedback()
     {

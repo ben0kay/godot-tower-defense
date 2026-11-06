@@ -226,6 +226,7 @@ public partial class WaveManager : Node
     private void CompleteIfClear()
     {
         if (State != WaveState.WaitingForClear || PlannedRemaining != 0 || _owned.Count != 0 || PendingDeathSpawns != 0) return;
+        _spawns.SetPortalWaveSmoke(false);
         int completedNumber = CurrentWave; CompletedWaves++;
         State = _waveIndex + 1 < _waves.Length ? WaveState.Completed : WaveState.AllWavesComplete;
         _nextWaveCountdown = !_outcomeStopped && State == WaveState.Completed ? NextWaveDelay() : -1;
@@ -246,6 +247,7 @@ public partial class WaveManager : Node
     // Outcome ownership retires both auto-start and spawn scheduling while the map finishes its visual hold.
     internal void StopForOutcome()
     {
+        if (GodotObject.IsInstanceValid(_spawns)) _spawns.SetPortalWaveSmoke(false);
         _outcomeStopped = true; _nextWaveCountdown = -1; _waitingForPortal = false;
         SetPhysicsProcess(false); Publish();
     }
@@ -254,6 +256,7 @@ public partial class WaveManager : Node
     // Unsubscribe without killing ships; loading a new Main scene owns physical cleanup.
     private void ReleaseOwnership()
     {
+        if (GodotObject.IsInstanceValid(_spawns)) _spawns.SetPortalWaveSmoke(false);
         _waitingForPortal = false; _nextWaveCountdown = -1;
         foreach (Enemy ship in _owned) ship.Removed -= OnEnemyRemoved;
         _owned.Clear(); _ownershipEpoch++; PendingDeathSpawns = 0;
@@ -265,6 +268,7 @@ public partial class WaveManager : Node
     // Invalid setup is visible and cannot silently run another level's wave set.
     private void SetError(string message)
     {
+        if (GodotObject.IsInstanceValid(_spawns)) _spawns.SetPortalWaveSmoke(false);
         _nextWaveCountdown = -1;
         State = WaveState.PausedError; StatusMessage = message; SetPhysicsProcess(false);
         GD.PushWarning("Wave setup: " + message); Publish();
