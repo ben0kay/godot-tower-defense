@@ -6,7 +6,8 @@
 [ext_resource type="Resource" path="res://TOWERS/Offensive/BattleTower/Sounds/BattleFire.tres" id="3_battle_fire"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/MachineGunTower/Sounds/MachineGunFire.tres" id="4_machine_gun_fire"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/CryoTower/Sounds/CryoFire.tres" id="5_cryo_fire"]
+[ext_resource type="Resource" path="res://TOWERS/Offensive/StasisTower/Sounds/StasisFire.tres" id="6_stasis_fire"]
 
 [resource]
 script = ExtResource("1_catalog")
-Sounds = Array[ExtResource("1_qhxs2")]([ExtResource("2_welcome"), ExtResource("3_battle_fire"), ExtResource("4_machine_gun_fire"), ExtResource("5_cryo_fire")])
+Sounds = Array[ExtResource("1_qhxs2")]([ExtResource("2_welcome"), ExtResource("3_battle_fire"), ExtResource("4_machine_gun_fire"), ExtResource("5_cryo_fire"), ExtResource("6_stasis_fire")])

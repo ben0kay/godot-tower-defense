@@ -9,6 +9,7 @@
 [resource]
 Power = ExtResource("power")
 script = ExtResource("1")
+FireSoundId = "tower_stasis_fire"
 ConstructionArt = ExtResource("construction")
 
 ProjectileVisual = ExtResource("pv_tracer")
