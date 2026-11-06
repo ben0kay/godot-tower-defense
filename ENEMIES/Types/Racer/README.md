@@ -1,3 +1,9 @@
+## Flat dark/red fleet artwork repolish — 2026-11-05
+
+`Artwork/racer_mk1.svg` now depicts a **34×18 extremely slender three-fork interceptor** in Enemy002's flat charcoal/near-black/scarlet palette. Longer swept wing spars, open negative space around the central spine, a razor-like forward stinger, small red identification slashes and a compact red/orange tail drive emphasize speed without copying Enemy002's silhouette. The original `0 0 160 100` viewBox, right (+X) orientation and texture path are intact. The old metallic gradient and cyan sensor are gone. No gameplay, navigation, scene, config, wave or import changes; owner in-game native-zoom review remains pending.
+
+---
+
 # Racer (`racer_mk1`)
 
 Class **Tiny**, Rank **Veteran**, Role **Fighter** (descriptive metadata only). Provisional balance: **20 hull**, **0 optional shield capacity**, **230px/s**, **7px navigation radius**, **1 Citadel arrival damage**, **3 kill Credits**. Right-facing alien robotic SVG: **34×18px**.

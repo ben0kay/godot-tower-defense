@@ -1,3 +1,9 @@
+## Flat dark/red fleet artwork repolish — 2026-11-05
+
+The existing `Artwork/heavy_bulwark_mk1.svg` has been redrawn as a **88×64 heavy siege derivative of Enemy004's tusked Bulwark**. Massive segmented side nacelles, detached forward cleaving tusks, deep dark structural channels, thick central armour, recessed split engines and restrained scarlet/orange machinery establish the same flat charcoal faction design at larger scale. It retains the original `0 0 160 100` viewBox, right (+X) nose, SVG path and native canvas. No gradients, baked highlights, glow or filters. Hull/navigation footprint, enemy data, shields, combat, rewards, scenes and waves remain unchanged; owner visual acceptance at normal gameplay zoom is pending.
+
+---
+
 # Heavy Bulwark (`heavy_bulwark_mk1`)
 
 Class **Heavy**, Rank **Veteran**, Role **Fighter** (descriptive metadata only). Provisional balance: **500 hull**, **0 optional shield capacity**, **50px/s**, **24px navigation radius**, **4 Citadel arrival damage**, **12 kill Credits**. Right-facing alien robotic SVG: **88×64px**.

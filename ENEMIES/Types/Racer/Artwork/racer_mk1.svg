@@ -1,3 +1,34 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="34" height="18" viewBox="0 0 160 100">
-<defs><linearGradient id="plate" x1="0" y1="0" x2="0.2" y2="1"><stop stop-color="#566476"/><stop offset=".45" stop-color="#293240"/><stop offset="1" stop-color="#10151f"/></linearGradient></defs>
-<path d="M8 5L65 28 150 50 65 72 8 95 34 65 83 50 34 35Z" fill="url(#plate)" stroke="#8b98aa" stroke-width="1.5" stroke-linejoin="round"/><path d="M32 39L103 41 157 50 103 59 32 61 48 50Z" fill="url(#plate)" stroke="#8b98aa" stroke-width="1.5" stroke-linejoin="round"/><path d="M20 42v16M27 43v14" stroke="#e4494a" stroke-width="3"/><path d="M74 47L116 47 128 50 116 53 74 53Z" fill="#4df2ff" stroke="#191c2b" stroke-width="2"/><path d="M48 36L70 34M48 64L70 66M112 33l12 4M112 67l12 -4" fill="none" stroke="#abb4c1" stroke-width="1.5"/></svg>
+  <!-- Racer Interceptor: elongated +X open-fork racing dart, a leaner cousin of Enemy002. -->
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <!-- Long, widely swept featherweight outriggers with empty air between wings and spine. -->
+    <path d="M5 4 37 15 72 28 104 38 90 41 64 36 30 29 12 19Z" fill="#111920" stroke="#05080c" stroke-width="3"/>
+    <path d="M5 96 37 85 72 72 104 62 90 59 64 64 30 71 12 81Z" fill="#111920" stroke="#05080c" stroke-width="3"/>
+    <path d="M13 13 39 20 70 32 86 37 65 33 32 25Z M13 87 39 80 70 68 86 63 65 67 32 75Z" fill="#30363c"/>
+    <path d="M20 17 39 23 61 31 42 26Z M20 83 39 77 61 69 42 74Z" fill="#ad2729"/>
+    <path d="M20 18 37 23 39 24 24 20Z M20 82 37 77 39 76 24 80Z" fill="#ff6039"/>
+    <!-- Upper and lower tail forks keep the characteristic three-prong empty gaps. -->
+    <path d="M5 35 30 33 52 41 46 46 20 44 2 40Z" fill="#151d25" stroke="#05080c" stroke-width="2.8"/>
+    <path d="M5 65 30 67 52 59 46 54 20 56 2 60Z" fill="#151d25" stroke="#05080c" stroke-width="2.8"/>
+    <path d="M10 37 29 36 43 41 28 42Z M10 63 29 64 43 59 28 58Z" fill="#30363c"/>
+    <!-- Very slim reinforced racing spine with long uninterrupted forward stinger. -->
+    <path d="M21 45 45 38 72 40 104 44 157 50 104 56 72 60 45 62 21 55 29 50Z" fill="#1e252c" stroke="#05080c" stroke-width="3.1"/>
+    <path d="M66 40 98 38 145 47 109 46 90 45Z M66 60 98 62 145 53 109 54 90 55Z" fill="#111920" stroke="#05080c" stroke-width="1.8"/>
+    <path d="M76 42 111 44 142 48 104 46Z M76 58 111 56 142 52 104 54Z" fill="#30363c"/>
+    <path d="M111 46 157 50 111 54 123 50Z" fill="#080d12"/>
+    <!-- Minimal flat armour and thin faction markings: tiny silhouette must remain legible. -->
+    <path d="M38 44 63 41 83 45 61 47 36 47Z M38 56 63 59 83 55 61 53 36 53Z" fill="#30363c" stroke="#0a1017" stroke-width="1.2"/>
+    <path d="M62 46 85 46 97 50 85 54 62 54 73 50Z" fill="#0b131a"/>
+    <path d="M66 48 85 48 91 50 85 52 66 52 75 50Z" fill="#283038"/>
+    <path d="M39 44 52 43 57 45 45 46Z M39 56 52 57 57 55 45 54Z" fill="#ad2729"/>
+    <path d="M58 43 66 44 72 46 64 45Z M58 57 66 56 72 54 64 55Z" fill="#e74a32"/>
+    <!-- Needle-like red nose sensor, not the old cyan reactor. -->
+    <path d="M99 47 120 48 139 50 120 52 99 53 109 50Z" fill="#ad2729" stroke="#05080c" stroke-width="1.2"/>
+    <path d="M110 49 128 50 110 51 105 50Z" fill="#ff6039"/>
+    <!-- One tiny center propulsion cassette, with dark split root supports. -->
+    <path d="M2 45 24 44 35 50 24 56 2 55 0 50Z" fill="#090f15" stroke="#04070a" stroke-width="2.4"/>
+    <path d="M8 47 22 46 27 50 22 54 8 53Z" fill="#30363c"/>
+    <path d="M3 48 15 48 18 50 15 52 3 52Z" fill="#ad2729"/>
+    <path d="M3 49 11 49 13 50 11 51 3 51Z" fill="#ff6039"/>
+  </g>
+</svg>

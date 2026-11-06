@@ -1,3 +1,44 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="88" height="64" viewBox="0 0 160 100">
-<defs><linearGradient id="plate" x1="0" y1="0" x2="0.2" y2="1"><stop stop-color="#566476"/><stop offset=".45" stop-color="#293240"/><stop offset="1" stop-color="#10151f"/></linearGradient></defs>
-<path d="M12 20L39 6 101 10 123 29 150 34 134 46 134 54 150 66 123 71 101 90 39 94 12 80 26 60 26 40Z" fill="url(#plate)" stroke="#8b98aa" stroke-width="1.5" stroke-linejoin="round"/><path d="M32 13L88 18 112 35 40 32Z" fill="url(#plate)" stroke="#8b98aa" stroke-width="1.5" stroke-linejoin="round"/><path d="M32 87L88 82 112 65 40 68Z" fill="url(#plate)" stroke="#8b98aa" stroke-width="1.5" stroke-linejoin="round"/><path d="M40 37L108 32 134 50 108 68 40 63Z" fill="url(#plate)" stroke="#8b98aa" stroke-width="1.5" stroke-linejoin="round"/><path d="M111 20L151 12 138 34 117 39ZM111 80L151 88 138 66 117 61Z" fill="url(#plate)" stroke="#98a2ab" stroke-width="2"/><path d="M20 42v16M27 43v14" stroke="#e4494a" stroke-width="3"/><path d="M74 47L116 47 128 50 116 53 74 53Z" fill="#ffc45c" stroke="#191c2b" stroke-width="2"/><path d="M48 36L70 34M48 64L70 66M112 33l12 4M112 67l12 -4" fill="none" stroke="#abb4c1" stroke-width="1.5"/></svg>
+  <!-- Heavy Bulwark: massive +X twin-nacelle siege hull sharing Enemy004's charcoal/scarlet armour language. -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <!-- Oversized upper/lower weapons-grade nacelles and split front cleaving tusks. -->
+    <path d="M7 22 25 6 58 5 89 13 118 18 151 15 142 33 116 40 88 36 57 37 28 37 11 32Z" fill="#111920" stroke="#05080c" stroke-width="3.3"/>
+    <path d="M7 78 25 94 58 95 89 87 118 82 151 85 142 67 116 60 88 64 57 63 28 63 11 68Z" fill="#111920" stroke="#05080c" stroke-width="3.3"/>
+    <path d="M16 22 30 12 59 11 88 18 116 23 138 20 132 29 107 34 74 31 42 31Z" fill="#30363c" stroke="#0a1118" stroke-width="1.8"/>
+    <path d="M16 78 30 88 59 89 88 82 116 77 138 80 132 71 107 66 74 69 42 69Z" fill="#30363c" stroke="#0a1118" stroke-width="1.8"/>
+    <!-- Forward tusks remain detached from the central hull by hard black channels. -->
+    <path d="M94 32 120 30 154 13 147 32 128 42 106 43Z" fill="#0d161e" stroke="#05080c" stroke-width="2.5"/>
+    <path d="M94 68 120 70 154 87 147 68 128 58 106 57Z" fill="#0d161e" stroke="#05080c" stroke-width="2.5"/>
+    <path d="M116 31 146 18 143 30 126 38 111 39Z M116 69 146 82 143 70 126 62 111 61Z" fill="#30363c"/>
+    <path d="M130 26 148 18 145 29 135 35Z M130 74 148 82 145 71 135 65Z" fill="#111920"/>
+    <!-- Layered segment armour, wide enough to read at native 88x64. -->
+    <path d="M29 15 46 15 53 28 36 27Z M54 14 73 16 78 29 58 27Z M80 19 98 23 104 33 84 29Z" fill="#111920" stroke="#090e14" stroke-width="1.5"/>
+    <path d="M29 85 46 85 53 72 36 73Z M54 86 73 84 78 71 58 73Z M80 81 98 77 104 67 84 71Z" fill="#111920" stroke="#090e14" stroke-width="1.5"/>
+    <path d="M30 16 47 18 48 22 33 21Z M57 17 72 20 73 23 58 21Z M85 23 97 27 99 29 86 26Z" fill="#ad2729"/>
+    <path d="M30 84 47 82 48 78 33 79Z M57 83 72 80 73 77 58 79Z M85 77 97 73 99 71 86 74Z" fill="#ad2729"/>
+    <path d="M35 18 43 19 43 20 36 19Z M35 82 43 81 43 80 36 81Z" fill="#ff6039"/>
+    <!-- Reinforced outer shoulder joints; four heavy structural channels. -->
+    <path d="M21 32 47 30 66 37 47 42 24 40Z M21 68 47 70 66 63 47 58 24 60Z" fill="#0a1118" stroke="#05080c" stroke-width="2.6"/>
+    <path d="M28 34 44 34 55 38 41 39Z M28 66 44 66 55 62 41 61Z" fill="#30363c"/>
+    <!-- Thick, blunt main fuselage: not a stretched interceptor. -->
+    <path d="M12 43 31 32 60 30 89 35 116 39 158 50 116 61 89 65 60 70 31 68 12 57 22 50Z" fill="#1e252c" stroke="#05080c" stroke-width="3.8"/>
+    <path d="M23 40 42 35 65 35 78 42 62 47 36 46Z M23 60 42 65 65 65 78 58 62 53 36 54Z" fill="#30363c" stroke="#090f16" stroke-width="2"/>
+    <path d="M35 39 43 37 48 42 41 44Z M51 37 60 37 65 43 55 43Z M35 61 43 63 48 58 41 56Z M51 63 60 63 65 57 55 57Z" fill="#101820"/>
+    <path d="M62 40 94 40 117 46 133 50 117 54 94 60 62 60 75 50Z" fill="#101820" stroke="#05080c" stroke-width="2.4"/>
+    <path d="M71 44 94 43 113 48 123 50 113 52 94 57 71 56 82 50Z" fill="#293139" stroke="#0b1219" stroke-width="1.4"/>
+    <path d="M81 46 92 45 101 50 92 55 81 54 88 50Z" fill="#0a1118"/>
+    <!-- Massive twin prow cheeks around compact recessed scarlet siege-core slit. -->
+    <path d="M106 41 133 37 156 46 141 46 128 44 116 46Z M106 59 133 63 156 54 141 54 128 56 116 54Z" fill="#111920" stroke="#05080c" stroke-width="2"/>
+    <path d="M112 45 136 45 153 50 136 55 112 55 124 50Z" fill="#060c12"/>
+    <path d="M116 48 137 47 149 50 137 53 116 52 126 50Z" fill="#ad2729"/>
+    <path d="M127 49 141 50 127 51 122 50Z" fill="#ff6039"/>
+    <!-- Paired recessed aft drive stacks, each with small solid red/orange exhaust. -->
+    <path d="M9 34 27 34 36 40 28 46 9 46 3 40Z M9 54 28 54 36 60 27 66 9 66 3 60Z" fill="#090f15" stroke="#04070a" stroke-width="2.8"/>
+    <path d="M7 37 19 37 24 40 19 43 7 43Z M7 57 19 57 24 60 19 63 7 63Z" fill="#ad2729"/>
+    <path d="M5 39 14 39 16 40 14 41 5 41Z M5 59 14 59 16 60 14 61 5 61Z" fill="#ff6039"/>
+    <!-- Reinforced scarlet command/identification blocks on central shoulders. -->
+    <path d="M31 39 44 36 53 41 40 43Z M31 61 44 64 53 59 40 57Z" fill="#ad2729"/>
+    <path d="M35 39 43 38 46 40 38 41Z M35 61 43 62 46 60 38 59Z" fill="#e74a32"/>
+    <path d="M94 42 108 44 113 47 99 45Z M94 58 108 56 113 53 99 55Z" fill="#ad2729"/>
+  </g>
+</svg>

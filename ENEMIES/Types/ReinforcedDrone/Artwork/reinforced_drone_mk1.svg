@@ -1,3 +1,39 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="40" height="30" viewBox="0 0 160 100">
-<defs><linearGradient id="plate" x1="0" y1="0" x2="0.2" y2="1"><stop stop-color="#566476"/><stop offset=".45" stop-color="#293240"/><stop offset="1" stop-color="#10151f"/></linearGradient></defs>
-<path d="M18 23L52 9 110 24 150 50 110 76 52 91 18 77 38 59 38 41Z" fill="url(#plate)" stroke="#8b98aa" stroke-width="1.5" stroke-linejoin="round"/><path d="M22 19L67 24 89 39 42 36Z" fill="url(#plate)" stroke="#8b98aa" stroke-width="1.5" stroke-linejoin="round"/><path d="M22 81L67 76 89 61 42 64Z" fill="url(#plate)" stroke="#8b98aa" stroke-width="1.5" stroke-linejoin="round"/><path d="M52 38L111 36 137 50 111 64 52 62Z" fill="url(#plate)" stroke="#8b98aa" stroke-width="1.5" stroke-linejoin="round"/><path d="M20 42v16M27 43v14" stroke="#e4494a" stroke-width="3"/><path d="M74 47L116 47 128 50 116 53 74 53Z" fill="#ff884a" stroke="#191c2b" stroke-width="2"/><path d="M48 36L70 34M48 64L70 66M112 33l12 4M112 67l12 -4" fill="none" stroke="#abb4c1" stroke-width="1.5"/></svg>
+  <!-- Reinforced Drone: plated +X fork-fighter related to Enemy001, in flat charcoal/scarlet fleet colours. -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <!-- Broad upper/lower stabilizers: heavier than Enemy001, with open inboard channels. -->
+    <path d="M7 22 31 7 63 17 91 30 87 39 59 37 27 34 13 39Z" fill="#111920" stroke="#05080c" stroke-width="3.2"/>
+    <path d="M7 78 31 93 63 83 91 70 87 61 59 63 27 66 13 61Z" fill="#111920" stroke="#05080c" stroke-width="3.2"/>
+    <path d="M18 22 35 15 62 23 79 31 65 31 35 27Z M18 78 35 85 62 77 79 69 65 69 35 73Z" fill="#30363c" stroke="#0a1017" stroke-width="1.6"/>
+    <path d="M21 24 42 21 56 27 39 27Z M21 76 42 79 56 73 39 73Z" fill="#ad2729"/>
+    <path d="M30 23 43 25 40 26 27 24Z M30 77 43 75 40 74 27 76Z" fill="#ff6039"/>
+    <!-- Exposed inner struts and reinforced fork roots, separated from the main centre body. -->
+    <path d="M10 36 33 33 53 39 44 46 20 45 3 39Z" fill="#151d25" stroke="#05080c" stroke-width="3"/>
+    <path d="M10 64 33 67 53 61 44 54 20 55 3 61Z" fill="#151d25" stroke="#05080c" stroke-width="3"/>
+    <path d="M15 38 31 36 43 41 30 43Z M15 62 31 64 43 59 30 57Z" fill="#30363c"/>
+    <path d="M30 31 52 33 66 38 46 39Z M30 69 52 67 66 62 46 61Z" fill="#060b10"/>
+    <!-- Twin heavy forward mandibles, broader and blunter than the light drone. -->
+    <path d="M76 35 108 26 143 33 153 40 125 42 99 44 82 42Z" fill="#101820" stroke="#05080c" stroke-width="3"/>
+    <path d="M76 65 108 74 143 67 153 60 125 58 99 56 82 58Z" fill="#101820" stroke="#05080c" stroke-width="3"/>
+    <path d="M99 35 128 33 147 39 119 39Z M99 65 128 67 147 61 119 61Z" fill="#30363c"/>
+    <!-- Thick trapezoidal core with separate bolted-on, dark-edged upper/lower armour slabs. -->
+    <path d="M17 43 42 32 74 33 103 39 153 50 103 61 74 67 42 68 17 57 26 50Z" fill="#1e252c" stroke="#05080c" stroke-width="3.7"/>
+    <path d="M32 40 52 35 80 37 95 44 73 46 47 46Z" fill="#30363c" stroke="#0a1017" stroke-width="2"/>
+    <path d="M32 60 52 65 80 63 95 56 73 54 47 54Z" fill="#30363c" stroke="#0a1017" stroke-width="2"/>
+    <path d="M48 38 57 38 62 43 52 44Z M66 37 75 38 81 44 70 43Z M48 62 57 62 62 57 52 56Z M66 63 75 62 81 56 70 57Z" fill="#101820"/>
+    <path d="M56 45 87 42 111 50 87 58 56 55 68 50Z" fill="#0c141b" stroke="#05080c" stroke-width="2"/>
+    <path d="M65 46 87 45 104 50 87 55 65 54 75 50Z" fill="#283038"/>
+    <!-- Dense black nose inset and the fleet's restrained red strike slit. -->
+    <path d="M100 43 127 43 151 50 127 57 100 57 113 50Z" fill="#090f15" stroke="#05080c" stroke-width="1.8"/>
+    <path d="M104 47 127 46 143 50 127 54 104 53 116 50Z" fill="#ad2729"/>
+    <path d="M115 49 132 50 115 51 111 50Z" fill="#ff6039"/>
+    <!-- Two recessed drive sockets, small exhausts: no bloom or gradient. -->
+    <path d="M8 39 27 39 35 44 27 49 8 49 3 44Z" fill="#080e14" stroke="#04070a" stroke-width="2.4"/>
+    <path d="M8 51 27 51 35 56 27 61 8 61 3 56Z" fill="#080e14" stroke="#04070a" stroke-width="2.4"/>
+    <path d="M7 42 18 42 23 44 18 46 7 46Z M7 54 18 54 23 56 18 58 7 58Z" fill="#ad2729"/>
+    <path d="M5 43 13 43 15 44 13 45 5 45Z M5 55 13 55 15 56 13 57 5 57Z" fill="#ff6039"/>
+    <!-- Paired red armour identification slashes, readable at 40x30. -->
+    <path d="M36 41 48 39 55 42 44 44Z M36 59 48 61 55 58 44 56Z M80 39 91 41 97 44 86 42Z M80 61 91 59 97 56 86 58Z" fill="#ad2729"/>
+    <path d="M39 41 47 40 49 41 42 43Z M39 59 47 60 49 59 42 57Z" fill="#e74a32"/>
+  </g>
+</svg>
