@@ -8,6 +8,10 @@ public partial class MissionDefinition : Resource
     #region Authoring
     [Export(PropertyHint.Range, "1,999,1")] public int Number { get; set; } = 1;
     [Export] public string Title { get; set; } = "New mission";
+    [ExportGroup("Campaign Card")]
+    [Export] public Texture2D CardPreview { get; set; }
+    [ExportGroup("Mission")]
+
     [Export(PropertyHint.MultilineText)] public string Description { get; set; } = "";
     [Export(PropertyHint.File, "*.tscn")] public string MapScenePath { get; set; } = "";
     public PackedScene MapScene => GD.Load<PackedScene>(MapScenePath);

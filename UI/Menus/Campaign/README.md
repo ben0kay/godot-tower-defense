@@ -1,3 +1,9 @@
+## Mission card glow and future artwork — 2026-11-06
+
+**Source implemented / awaiting owner visual validation.** The mission cards no longer show `SECTOR ### // OPERATIONS`. Hover or keyboard-focused cards use a strong cyan halo through the optional shared `UIButtonFactory.ApplySelectionGlow`, while the mission-grid scroll area reserves space for its shadow. Each `MissionDefinition` now has an optional Inspector `CardPreview` texture. Once imported, assign an image to an individual mission `.tres`: it appears cropped, blue-tinted and faded behind the card heading. No image is required and no placeholder artwork has been added. Navigation/saves/progression remain unchanged.
+
+---
+
 ## Full-window Campaign dashboard — 2026-11-06
 
 **Source implemented / awaiting owner visual and gameplay validation.** The Campaign hub now fills the game window with a header, a scrollable **three-column mission grid in the left two-thirds**, and a **fixed right third** with Continue, Research, current-profile commander/progression and Back to Main Menu anchored at the bottom. The grid uses the existing enabled `PlayableLevelCatalog` in numeric order, and its cards launch existing missions using `MenuNavigation.Open`; Level 1/2/3 occupy the first row. No fabricated Level 4–10, lock state, completion stars, thumbnail images or new save fields were introduced. Continue still uses `CampaignSession.ReadCurrent/LoadCurrent`, and the legacy `LevelSelectionMenu` remains available for compatibility although Campaign no longer navigates through it. Added focused UI geometry and direct-click coverage in the existing menu flow fixture; no engine test run here.

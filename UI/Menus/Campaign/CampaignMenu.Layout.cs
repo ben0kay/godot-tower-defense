@@ -59,11 +59,17 @@ public partial class CampaignMenu
             SizeFlagsVertical = SizeFlags.ExpandFill, HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled,
             VerticalScrollMode = ScrollContainer.ScrollMode.Auto, FollowFocus = true };
         left.AddChild(scroll);
+        // Inset the grid so cyan shadow halos are visible rather than clipped at scroll edges.
+        MarginContainer missionInsets = new() { Name = "MissionCardInsets",
+            SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        foreach (string edge in new[] { "left", "right", "top", "bottom" })
+            missionInsets.AddThemeConstantOverride("margin_" + edge, 18);
+        scroll.AddChild(missionInsets);
         GridContainer grid = new() { Name = "MissionGrid", Columns = 3,
             SizeFlagsHorizontal = SizeFlags.ExpandFill };
-        grid.AddThemeConstantOverride("h_separation", 12);
-        grid.AddThemeConstantOverride("v_separation", 12);
-        scroll.AddChild(grid);
+        grid.AddThemeConstantOverride("h_separation", 18);
+        grid.AddThemeConstantOverride("v_separation", 18);
+        missionInsets.AddChild(grid);
 
         firstMission = null;
         try

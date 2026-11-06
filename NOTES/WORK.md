@@ -1,3 +1,9 @@
+## Campaign mission card glow and optional artwork — 2026-11-06
+
+Removed the generic `SECTOR ### // OPERATIONS` strip from all campaign cards. Added opt-in, static cyan hover/focus/pressed glow through `UIButtonFactory.ApplySelectionGlow` (2–3px borders, bounded StyleBoxFlat shadow; no CPU animation), with grid insets to prevent halo clipping. `MissionDefinition.CardPreview` is a **nullable Inspector-editable Texture2D**: later assign a per-level screenshot/artwork on each `LEVELS/Level###/Level###Mission.tres` in Godot and the campaign card automatically shows it cropped and subtly faded behind its title. No images were fabricated or imported; empty previews remain text-only. Existing mission launch, progress and Continue/Research routes unchanged. Source/resource inspection only, Godot visual testing remains with owner.
+
+---
+
 ## Campaign full-window mission dashboard — 2026-11-06
 
 Replaced Campaign's compact centered MenuLayout with a full-window 2:1 split: left scrollable 3-column catalog-backed mission cards (Level 1/2/3 first row), right fixed Continue/Research, real commander + progression, Back at bottom. Cards directly launch existing MissionDefinition.LaunchPath via MenuNavigation. Continue uses the same selected-profile checkpoint/disabled reason; Research and Main navigation are unchanged. Existing Levels scene retained as legacy compatibility, no fake mission thumbnail/completion/unlock state. Files: `UI/Menus/Campaign/CampaignMenu.cs`, `CampaignMenu.Layout.cs`, `Levels/CampaignMissionCard.cs`, existing UI flow check. Source review only; Godot visual/layout/keyboard/gameplay checks at 1920×1080, 1366×768 and 960×540 remain for owner.
