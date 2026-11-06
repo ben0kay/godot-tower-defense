@@ -1,3 +1,9 @@
+## Restored slower portal opening — 2026-11-06
+
+Restored the shared materialization animation to its original 2.2 seconds, including authored preset and code defaults/fallback. Level011 Wave 6 still leads with its existing Portal4 ship, so it launches on readiness without waiting for a later shuffled request. Drone motion and widget changes remain. Focused source review only; owner visual acceptance pending.
+
+---
+
 ## Faster opening and immediate Level011 Wave 6 debut — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** Default shared materialization duration is halved from 2.2s to 1.1s; opening particle lifetimes scale down to drain before completion. Enemy delivery still waits for the genuine Open/readiness event, then resumes on the scheduler's next tick without a separate post-opening timer. Checkpoint/no-replay and pause semantics remain.

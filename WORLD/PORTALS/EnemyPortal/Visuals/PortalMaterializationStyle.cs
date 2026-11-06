@@ -6,7 +6,7 @@ public partial class PortalMaterializationStyle : Resource
     [ExportGroup("Opening")]
     [Export] public bool Enabled { get; set; } = true;
     [Export] public bool ReducedMotion { get; set; }
-    [Export(PropertyHint.Range, ".2,6,.1")] public float DurationSeconds { get; set; } = 1.1f;
+    [Export(PropertyHint.Range, ".2,6,.1")] public float DurationSeconds { get; set; } = 2.2f;
     [Export(PropertyHint.Range, "0,.2,.01")] public float StartStaggerSeconds { get; set; }
     [Export] public bool WarningEnabled { get; set; } = true;
     [ExportGroup("Appearance")]

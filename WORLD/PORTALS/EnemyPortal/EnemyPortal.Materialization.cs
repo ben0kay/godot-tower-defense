@@ -78,7 +78,7 @@ public partial class EnemyPortal
         _vortexMaterial?.SetShaderParameter("ring_radius", PortalMaterializationStyle.Safe(style.RingRadius, 46, 30, 70));
         _vortexMaterial?.SetShaderParameter("flash_strength", PortalMaterializationStyle.Safe(style.FlashStrength, 1, 0, 2));
         _vortexMaterial?.SetShaderParameter("reduced_motion", !style.Enabled || style.ReducedMotion);
-        float duration = PortalMaterializationStyle.Safe(style.DurationSeconds, 1.1f, .2f, 6);
+        float duration = PortalMaterializationStyle.Safe(style.DurationSeconds, 2.2f, .2f, 6);
         // Let opening particles drain before readiness even when the effect duration is shortened.
         if (_inward != null) _inward.Lifetime = Mathf.Min(.8f, duration * .38f);
         if (_ignition != null) _ignition.Lifetime = Mathf.Min(.42f, duration * .22f);
