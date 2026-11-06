@@ -1,3 +1,9 @@
+## DRONE2 — Unified construction/ammunition drone model and VFX (planned, 2026-11-06)
+
+**Approved Codex plan; not implemented.** [DRONE2_UNIFIED_DRONES_IMPLEMENTATION_PLAN.md](DRONE2_UNIFIED_DRONES_IMPLEMENTATION_PLAN.md) specifies replacing the old ammo courier visuals/straight flight with the construction-drone artwork and curved/eased movement, shared cyan twin thrusters and speed-sensitive contrails, plus one floating construction telemetry readout per site and a brief `SITE LOCKED` arrival effect. Construction and ammunition managers **remain separate**; ammo quantities/reservations and construction work holds stay authoritative. The historical implemented notes below describe the present pre-DRONE2 behavior.
+
+---
+
 ## Separate construction builder role — 2026-10-21
 
 Citadel builders live under TOWERS/ConstructionDrones because they coordinate paid tower construction. They own separate pooled artwork/beam and a central airborne dispatcher; Transport couriers and ammunition reservations/delivery remain unchanged. No shared drone health/combat/navigation framework is introduced. See ../TOWERS/ConstructionDrones/README.md.
