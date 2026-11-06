@@ -7,7 +7,7 @@
 Guideline: **Capital 256–511px, Colossal 512–1023px, Titan 1024px+**, by the native hull sprite's longest side. No existing enemy currently opts into Colossal and no default wave or catalog entries were added. The Godot C# enum declaration places Colossal before Titan visually, but assigns Colossal the appended numeric value `7` to avoid reinterpretation of historic `Titan = 6`.
 
 
-**Updated 2026-11-05.** Canonical metadata for the 15 entries in `ENEMIES/DefaultEnemyCatalog.tres`. Asset numbering, catalog order and stable IDs do not determine campaign order or difficulty. **Source Implemented / Awaiting Owner Validation.**
+**Updated 2026-11-05.** Canonical metadata for the 16 entries in `ENEMIES/DefaultEnemyCatalog.tres`. Asset numbering, catalog order and stable IDs do not determine campaign order or difficulty. **Source Implemented / Awaiting Owner Validation.**
 
 | Enemy | Class | Rank | Role | Stable EnemyId | Current scene folder | Hull artwork px |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -26,6 +26,7 @@ Guideline: **Capital 256–511px, Colossal 512–1023px, Titan 1024px+**, by the
 | Heavy Warship | Superheavy | Veteran | Fighter | `big_mk1` | `Types/Enemy005/` | 112×120 |
 | Elite Assault Ship | Standard | Elite | Fighter | `elite_mk1` | `Types/Enemy006/` | 80×60 |
 | Cruiser | Superheavy | Elite | Fighter | `cruiser_mk1` | `Types/Cruiser/` | 168×96 |
+| Obsidian Dreadnought | Capital | Champion | Fighter | `obsidian_dreadnought_mk1` | `Types/ObsidianDreadnought/` | 352×208 |
 
 **Heavy Transporter artwork-only enlargement — 2026-11-05:** Native sprite 160×112 (was 144×100); original viewBox, Superheavy/Veteran/Cargo classification, 24px clearance, stats and cargo payload are unchanged.
 
@@ -48,7 +49,7 @@ Guideline: **Capital 256–511px, Colossal 512–1023px, Titan 1024px+**, by the
 | Colossal | 512–1023 px | Monumental carriers, mobile fortresses and oversized support ships |
 | Titan | ≥1024 px | Ultimate ship-sized superstructures and map-dominating flagships |
 
-These are **authoring guidelines**, not runtime-calculated classifications: set the Class explicitly in the enemy's `.tres`. Do not automatically resize art, navigation, HP or weapons to fit a category. At a borderline size, the designer may choose a neighbouring class deliberately. Capital, Colossal and Titan are intentionally **unoccupied by the current 15-ship roster** to leave room for much larger enemies.
+These are **authoring guidelines**, not runtime-calculated classifications: set the Class explicitly in the enemy's `.tres`. Do not automatically resize art, navigation, HP or weapons to fit a category. At a borderline size, the designer may choose a neighbouring class deliberately. Capital now contains the 352×208 Obsidian Dreadnought; Colossal and Titan remain unoccupied for future larger hulls.
 
 **Rank describes overall threat/skill/encounter importance**, independent of size; **Role describes battlefield job**, independent of strength. For example, the 80×60 Elite Assault Ship is **Standard / Elite / Fighter**, whereas the larger 112×72 unarmed Drone Transporter is **Superheavy / Common / Cargo**. The Heavy Gunner's name refers to armament, not hull-size Class. The Drone Transporter's `Class` and `Role` were also explicitly authored here after being omitted from its resource (which previously loaded as default Tiny/Fighter).
 

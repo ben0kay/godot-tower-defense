@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" format=3]
+[ext_resource type="Script" path="res://ENEMIES/Shared/EnemyDefinition.cs" id="definition"]
+[resource]
+script = ExtResource("definition")
+EnemyId = "obsidian_dreadnought_mk1"
+DisplayName = "Obsidian Dreadnought"
+Class = 5
+Rank = 3
+Role = 0
+MaxHealth = 4500.0
+MaxShield = 0.0
+MoveSpeed = 22.0
+RadiusPixels = 24.0
+TurnSpeed = 1.5
+CitadelDamage = 20
+KillRewardCredits = 100
+DeathExplosionMultiplier = 2.5

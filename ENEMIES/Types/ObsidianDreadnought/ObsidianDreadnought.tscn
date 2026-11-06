@@ -1,0 +1,65 @@
+[gd_scene format=3]
+[ext_resource type="PackedScene" path="res://ENEMIES/Shared/GenericEnemy.tscn" id="base"]
+[ext_resource type="Resource" path="res://ENEMIES/Types/ObsidianDreadnought/ObsidianDreadnought.tres" id="definition"]
+[ext_resource type="Texture2D" path="res://ENEMIES/Types/ObsidianDreadnought/Artwork/obsidian_dreadnought.svg" id="hull"]
+[ext_resource type="Texture2D" path="res://ENEMIES/Types/ObsidianDreadnought/Artwork/capital_cannon.svg" id="gun"]
+[ext_resource type="Script" path="res://ENEMIES/Weapons/Minigun/EnemyMinigun.cs" id="weapon"]
+[ext_resource type="Resource" path="res://ENEMIES/Types/ObsidianDreadnought/CapitalCannon.tres" id="config"]
+[ext_resource type="Script" path="res://TOWERS/Shared/Weapons/Visuals/WeaponVisualRenderer.cs" id="visuals"]
+[node name="ObsidianDreadnought" instance=ExtResource("base")]
+Definition = ExtResource("definition")
+[node name="Sprite" parent="." index="0"]
+texture = ExtResource("hull")
+[node name="Weapons" type="Node2D" parent="Sprite"]
+
+[node name="FrontLeft" type="Node2D" parent="Sprite/Weapons"]
+position = Vector2(112, -62)
+script = ExtResource("weapon")
+Config = ExtResource("config")
+[node name="TurretPivot" type="Node2D" parent="Sprite/Weapons/FrontLeft"]
+rotation = 1.5707964
+[node name="GunSprite" type="Sprite2D" parent="Sprite/Weapons/FrontLeft/TurretPivot"]
+texture = ExtResource("gun")
+[node name="Muzzle" type="Marker2D" parent="Sprite/Weapons/FrontLeft/TurretPivot/GunSprite"]
+position = Vector2(0, -32)
+[node name="WeaponVisuals" type="Node2D" parent="Sprite/Weapons/FrontLeft"]
+script = ExtResource("visuals")
+
+[node name="FrontRight" type="Node2D" parent="Sprite/Weapons"]
+position = Vector2(112, 62)
+script = ExtResource("weapon")
+Config = ExtResource("config")
+[node name="TurretPivot" type="Node2D" parent="Sprite/Weapons/FrontRight"]
+rotation = 1.5707964
+[node name="GunSprite" type="Sprite2D" parent="Sprite/Weapons/FrontRight/TurretPivot"]
+texture = ExtResource("gun")
+[node name="Muzzle" type="Marker2D" parent="Sprite/Weapons/FrontRight/TurretPivot/GunSprite"]
+position = Vector2(0, -32)
+[node name="WeaponVisuals" type="Node2D" parent="Sprite/Weapons/FrontRight"]
+script = ExtResource("visuals")
+
+[node name="RearLeft" type="Node2D" parent="Sprite/Weapons"]
+position = Vector2(-104, -62)
+script = ExtResource("weapon")
+Config = ExtResource("config")
+[node name="TurretPivot" type="Node2D" parent="Sprite/Weapons/RearLeft"]
+rotation = 1.5707964
+[node name="GunSprite" type="Sprite2D" parent="Sprite/Weapons/RearLeft/TurretPivot"]
+texture = ExtResource("gun")
+[node name="Muzzle" type="Marker2D" parent="Sprite/Weapons/RearLeft/TurretPivot/GunSprite"]
+position = Vector2(0, -32)
+[node name="WeaponVisuals" type="Node2D" parent="Sprite/Weapons/RearLeft"]
+script = ExtResource("visuals")
+
+[node name="RearRight" type="Node2D" parent="Sprite/Weapons"]
+position = Vector2(-104, 62)
+script = ExtResource("weapon")
+Config = ExtResource("config")
+[node name="TurretPivot" type="Node2D" parent="Sprite/Weapons/RearRight"]
+rotation = 1.5707964
+[node name="GunSprite" type="Sprite2D" parent="Sprite/Weapons/RearRight/TurretPivot"]
+texture = ExtResource("gun")
+[node name="Muzzle" type="Marker2D" parent="Sprite/Weapons/RearRight/TurretPivot/GunSprite"]
+position = Vector2(0, -32)
+[node name="WeaponVisuals" type="Node2D" parent="Sprite/Weapons/RearRight"]
+script = ExtResource("visuals")

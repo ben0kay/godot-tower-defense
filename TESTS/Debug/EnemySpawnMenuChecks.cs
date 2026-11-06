@@ -66,7 +66,7 @@ public partial class EnemySpawnMenuChecks : Node
     {
         OptionButton choice = (OptionButton)menu.FindChild("Enemy", true, false);
         int before = f.Spawns.Registry.Living.Count, shipsSeen = 0, headersSeen = 0;
-        int previousClass = -1;
+        int previousClass = -1, previousRank = -1;
         Require((int)EnemyClass.Titan == 6 && (int)EnemyClass.Colossal == 7
             && EnemyNaming.ClassSortOrder(EnemyClass.Capital) < EnemyNaming.ClassSortOrder(EnemyClass.Colossal)
             && EnemyNaming.ClassSortOrder(EnemyClass.Colossal) < EnemyNaming.ClassSortOrder(EnemyClass.Titan),
@@ -83,7 +83,7 @@ public partial class EnemySpawnMenuChecks : Node
             }
             string id = choice.GetItemTooltip(index).Split('\n').Last();
             EnemyDefinition definition = f.Spawns.Catalog.DefinitionFor(id);
-            Require(definition != null && choice.GetItemText(index) == definition.DisplayName,
+            Require(definition != null && choice.GetItemText(index) == definition.DisplayName + " — " + EnemyNaming.Rank(definition.Rank),
                 "Every selectable entry resolves to its registered ship");
             // The Bulwark's 64×48 physical hull belongs to Standard, not the default Tiny class.
             // The F2 dropdown and preview must reflect its single authored definition, not a separate list.
@@ -96,7 +96,9 @@ public partial class EnemySpawnMenuChecks : Node
                 Require(index > 0 && choice.GetPopup().IsItemSeparator(index - 1) &&
                     choice.GetItemText(index - 1) == EnemyNaming.Class(definition.Class).ToUpperInvariant(),
                     "Each class begins with a nonselectable named heading");
-            previousClass = EnemyNaming.ClassSortOrder(definition.Class);
+            if (EnemyNaming.ClassSortOrder(definition.Class) == previousClass)
+                Require((int)definition.Rank >= previousRank, "Lower ranks appear first within each class");
+            previousRank = (int)definition.Rank; previousClass = EnemyNaming.ClassSortOrder(definition.Class);
             occupiedClasses.Add(definition.Class);
             shipsSeen++;
             choice.Select(index); choice.EmitSignal(OptionButton.SignalName.ItemSelected, index);
@@ -117,6 +119,8 @@ public partial class EnemySpawnMenuChecks : Node
                         "F2 tooltip retains class/rank/role metadata");
                     if (enemy.Definition.EnemyId == "gunner_drone_mk1")
                         Require(menu.SpritePreview.SpriteCount == 2, "Separate gun artwork included");
+                    if (enemy.Definition.EnemyId == "obsidian_dreadnought_mk1")
+                        Require(menu.SpritePreview.SpriteCount == 5, "Capital preview includes hull and all four independent guns");
                 }
             }
             finally { source.Free(); }

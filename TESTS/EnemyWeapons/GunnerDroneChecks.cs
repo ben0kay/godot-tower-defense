@@ -19,7 +19,7 @@ public partial class GunnerDroneChecks : Node
             {
                 SubsystemBattlefield.DetachSession(f.Main);
                 await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-                Definitions(f); CatalogCycle(f); Firefight(f); HeavyVariant(f); StealthAndFreeze(f); Overflow(f);
+                Definitions(f); CapitalDefinition(f.Spawns.Catalog); CatalogCycle(f); Firefight(f); HeavyVariant(f); StealthAndFreeze(f); Overflow(f);
             }
             await SubsystemBattlefield.DrainFreedFixtures(this);
             GD.Print("PASS: EG3 Gunner Drone starter/heavy gunship art and projectiles, catalog cycle, muzzle snapshots, accepted-shot flashes and tower HP loss");
@@ -28,17 +28,40 @@ public partial class GunnerDroneChecks : Node
         catch (Exception error) { GetTree().Paused = false; GD.PushError(error.ToString()); GetTree().Quit(1); }
     }
     // =========================================================
-    // The catalog has two opt-in gunships; all other ships remain unarmed and authored waves omit both.
+    // The catalog retains two Gunner variants plus the four-gun Capital; ordinary ships remain unarmed.
+    private static void CapitalDefinition(EnemyCatalog catalog)
+    {
+        var definition = catalog.DefinitionFor("obsidian_dreadnought_mk1");
+        Require(definition.Class == EnemyClass.Capital && definition.Rank == EnemyRank.Champion
+            && definition.MoveSpeed == 22 && definition.MaxHealth == 4500, "Independent Capital playtest profile");
+        Enemy ship = catalog.Find(definition.EnemyId).Instantiate<Enemy>();
+        try
+        {
+            Require(ship.GetNode<Sprite2D>("Sprite").Texture.GetSize() == new Vector2(352, 208), "Native Capital hull size");
+            var guns = ship.GetNode<Node>("Sprite/Weapons").GetChildren().OfType<EnemyMinigun>().ToArray();
+            Require(guns.Length == 4 && guns.Select(g => g.Position).Distinct().Count() == 4, "Four distinct front/rear-side mounts");
+            foreach (var gun in guns)
+            {
+                var config = (EnemyMinigunConfig)gun.Config;
+                Require(config.DamagePerBullet == 5 && config.ShotsPerSecond == 2.5 && config.BulletSpeedPixels == 650,
+                    "All four weapons retain the Heavy Gunner-style tracer cadence");
+                Require(gun.GetNode<Marker2D>("TurretPivot/GunSprite/Muzzle").Position == new Vector2(0, -32),
+                    "Capital shots originate at the authored gun tip");
+            }
+        }
+        finally { ship.Free(); }
+    }
+    // =========================================================
     private static void Definitions(AmmoLoopFixture f)
     {
         var catalog = f.Spawns.Catalog; catalog.Rebuild();
         var map = catalog.ToSceneMap();
-        Require(map.Count == 15 && catalog.Find("gunner_drone_mk1") != null && catalog.Find("heavy_gunner_drone_mk1") != null,
-            "All 15 catalog entries include distinct starter and heavy gunner IDs");
+        Require(map.Count == 16 && catalog.Find("gunner_drone_mk1") != null && catalog.Find("heavy_gunner_drone_mk1") != null,
+            "All 16 catalog entries retain distinct starter and heavy gunner IDs");
         foreach (var pair in map)
         {
             Node ship = pair.Value.Instantiate();
-            Require(HasWeapon(ship) == (pair.Key == "gunner_drone_mk1" || pair.Key == "heavy_gunner_drone_mk1"), "Weapon is opt-in only on the new ship: " + pair.Key);
+            Require(HasWeapon(ship) == (pair.Key == "gunner_drone_mk1" || pair.Key == "heavy_gunner_drone_mk1" || pair.Key == "obsidian_dreadnought_mk1"), "Weapon is opt-in only on the new ship: " + pair.Key);
             ship.Free();
         }
         foreach (var waves in new[] { Level001Waves.Create(), Level002Waves.Create(), Level020Waves.Create() })

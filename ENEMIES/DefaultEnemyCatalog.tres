@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemyCatalog" load_steps=17 format=3]
+[gd_resource type="Resource" script_class="EnemyCatalog" format=3]
 [ext_resource type="Script" path="res://ENEMIES/Shared/EnemyCatalog.cs" id="1"]
 [ext_resource type="PackedScene" path="res://ENEMIES/Types/Enemy001/Enemy001.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://ENEMIES/Types/Enemy002/Enemy002.tscn" id="3"]
@@ -17,6 +17,8 @@
 [ext_resource type="PackedScene" path="res://ENEMIES/Types/GunnerDrone/GunnerDrone.tscn" id="15"]
 [ext_resource type="PackedScene" path="res://ENEMIES/Types/HeavyGunnerDrone/HeavyGunnerDrone.tscn" id="16"]
 
+[ext_resource type="PackedScene" path="res://ENEMIES/Types/ObsidianDreadnought/ObsidianDreadnought.tscn" id="capital"]
+
 [resource]
 script = ExtResource("1")
-Scenes = Array[PackedScene]([ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10"), ExtResource("11"), ExtResource("12"), ExtResource("13"), ExtResource("14"), ExtResource("15"), ExtResource("16")])
+Scenes = Array[PackedScene]([ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10"), ExtResource("11"), ExtResource("12"), ExtResource("13"), ExtResource("14"), ExtResource("15"), ExtResource("16"), ExtResource("capital")])

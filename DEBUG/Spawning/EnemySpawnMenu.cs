@@ -7,6 +7,9 @@ public partial class EnemySpawnMenu : CanvasLayer
 {
     #region State
     [Export(PropertyHint.Range, "1,64,1")] public int MaxSpawnsPerTick { get; set; } = 16;
+    [ExportGroup("Enemy Picker Layout")]
+    [Export(PropertyHint.Range, "420,800,20")] public int PickerMinimumWidth { get; set; } = 560;
+    [Export(PropertyHint.Range, "200,900,20")] public int PickerMaximumHeight { get; set; } = 620;
     public bool IsOpen => _panel?.Visible == true;
     public bool IsSpawning => _batches.Count > 0;
     public int ActiveBatchCount => _batches.Count;
@@ -53,16 +56,17 @@ public partial class EnemySpawnMenu : CanvasLayer
         AddChild(root); root.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
         CenterContainer center = new() { MouseFilter = Control.MouseFilterEnum.Ignore };
         root.AddChild(center); center.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
-        _panel = new() { Name = "Panel", CustomMinimumSize = new(860, 0), MouseFilter = Control.MouseFilterEnum.Stop };
+        _panel = new() { Name = "Panel", CustomMinimumSize = new(1000, 0), MouseFilter = Control.MouseFilterEnum.Stop };
         center.AddChild(_panel);
         UIMasterConfig theme = GD.Load<UIMasterConfig>("res://UI/DefaultUIConfig.tres");
         _panel.AddThemeStyleboxOverride("panel", UIButtonFactory.Box(theme.PanelColor, theme.AccentColor));
         HBoxContainer columns = new(); columns.AddThemeConstantOverride("separation", 24); _panel.AddChild(columns);
-        VBoxContainer box = new() { CustomMinimumSize = new(420, 0), SizeFlagsHorizontal = Control.SizeFlags.ExpandFill }; columns.AddChild(box);
+        VBoxContainer box = new() { CustomMinimumSize = new(Mathf.Clamp(PickerMinimumWidth, 420, 800), 0), SizeFlagsHorizontal = Control.SizeFlags.ExpandFill }; columns.AddChild(box);
         box.AddChild(UIButtonFactory.Label("ENEMY SPAWNER · F2", 20));
         box.AddChild(UIButtonFactory.Label("Random valid portal per ship", 14));
-        _enemy = new() { Name = "Enemy", SizeFlagsHorizontal = Control.SizeFlags.ExpandFill }; box.AddChild(_enemy);
-        // Group by physical class, smallest to largest; keep every menu index aligned with its scene/definition.
+        _enemy = new() { Name = "Enemy", CustomMinimumSize = new(0, 40), SizeFlagsHorizontal = Control.SizeFlags.ExpandFill }; box.AddChild(_enemy);
+        _enemy.AddThemeFontSizeOverride("font_size", 17);
+        // Group by class, then ascending rank, then name/ID; header placeholders keep scene mapping intact.
         // Non-selectable class headers occupy indices too, so they receive null placeholders.
         List<(PackedScene Scene, EnemyDefinition Definition)> choices = new();
         foreach (var pair in spawns.Catalog.ToSceneMap())
@@ -70,8 +74,11 @@ public partial class EnemySpawnMenu : CanvasLayer
         choices.Sort((a, b) =>
         {
             int byClass = EnemyNaming.ClassSortOrder(a.Definition.Class).CompareTo(EnemyNaming.ClassSortOrder(b.Definition.Class));
-            return byClass != 0 ? byClass :
-                string.Compare(a.Definition.DisplayName, b.Definition.DisplayName, StringComparison.OrdinalIgnoreCase);
+            if (byClass != 0) return byClass;
+            int byRank = a.Definition.Rank.CompareTo(b.Definition.Rank);
+            if (byRank != 0) return byRank;
+            int byName = string.Compare(a.Definition.DisplayName, b.Definition.DisplayName, StringComparison.OrdinalIgnoreCase);
+            return byName != 0 ? byName : string.Compare(a.Definition.EnemyId, b.Definition.EnemyId, StringComparison.Ordinal);
         });
         EnemyClass? lastClass = null;
         foreach (var choice in choices)
@@ -83,7 +90,7 @@ public partial class EnemySpawnMenu : CanvasLayer
                 lastClass = choice.Definition.Class;
             }
             _scenes.Add(choice.Scene); _definitions.Add(choice.Definition);
-            _enemy.AddItem(choice.Definition.DisplayName);
+            _enemy.AddItem(choice.Definition.DisplayName + " — " + EnemyNaming.Rank(choice.Definition.Rank));
             _enemy.SetItemTooltip(_enemy.ItemCount - 1,
                 EnemyNaming.ClassificationLabel(choice.Definition) + "\n" + choice.Definition.EnemyId);
         }
@@ -120,7 +127,14 @@ public partial class EnemySpawnMenu : CanvasLayer
     }
     // =========================================================
     // Keep mouse hover and arrow-key highlight updates contained to the visible dropdown.
-    private void OnEnemyPopupOpened() => SetProcess(true);
+    private void OnEnemyPopupOpened()
+    {
+        // Keep the wider native popup bounded to the viewport; it scrolls when the future fleet grows.
+        _enemyPopup.MinSize = new Vector2I(Mathf.CeilToInt(_enemy.Size.X), 0);
+        int available = Math.Max(160, (int)GetViewport().GetVisibleRect().Size.Y - 80);
+        _enemyPopup.MaxSize = new Vector2I(0, Math.Min(Math.Clamp(PickerMaximumHeight, 200, 900), available));
+        SetProcess(true);
+    }
     // =========================================================
     // Escape/outside dismissal restores the committed spawn selection's artwork.
     private void OnEnemyPopupClosed() { SetProcess(false); RefreshPreview(_enemy.Selected); }
