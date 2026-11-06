@@ -213,7 +213,7 @@ public partial class ConstructionDroneManager : Node2D
     public override void _PhysicsProcess(double delta)
     {
         if (_shutdown || _ticking || !IsInsideTree() || GetTree().Paused || !double.IsFinite(delta) || delta <= 0) return;
-        if (GodotObject.IsInstanceValid(_session) && _session.State != LevelSessionState.Playing) return;
+        if (GodotObject.IsInstanceValid(_session) && _session.State != LevelSessionState.Playing && !_session.IsAwaitingResults) return;
         using var pf2 = SubsystemProfiler.Measure(this, ProfileCategory.Towers);
         _ticking = true;
         try

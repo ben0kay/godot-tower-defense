@@ -35,6 +35,11 @@ public static class WaveCatalog
     public static Dictionary<string, PackedScene> LoadScenes() => EnemyCatalog.Default.ToSceneMap();
 
     // =========================================================
+    // Exact -1 means inherit; every other authored delay must be a finite nonnegative number of seconds.
+    internal static bool ValidNextWaveDelay(double value) =>
+        double.IsFinite(value) && (value == -1 || (value >= 0 && value <= 86400));
+
+    // =========================================================
     // Validate the full set before any wave runs, reporting exact wave/batch context.
     public static void Validate(WaveDefinition[] waves, IReadOnlyDictionary<string, PackedScene> scenes)
     {
@@ -42,8 +47,8 @@ public static class WaveCatalog
         HashSet<int> numbers = new();
         foreach (WaveDefinition wave in waves)
         {
-            if (wave == null || wave.Number <= 0 || !numbers.Add(wave.Number) || wave.Batches.IsDefaultOrEmpty)
-                throw new ArgumentException("Wave numbers must be unique/positive, with at least one batch.");
+            if (wave == null || wave.Number <= 0 || !numbers.Add(wave.Number) || wave.Batches.IsDefaultOrEmpty || !ValidNextWaveDelay(wave.NextWaveDelaySeconds))
+                throw new ArgumentException("Wave numbers must be unique/positive, with batches and a valid next-wave delay (-1 or 0–86400 seconds).");
             long count = 0;
             foreach (WaveBatch batch in wave.Batches)
             {

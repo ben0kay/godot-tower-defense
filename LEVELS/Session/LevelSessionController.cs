@@ -33,7 +33,8 @@ public partial class LevelSessionController : Node
     private readonly Dictionary<Enemy, Action> _waveEnemies = new();
     private int _killed, _breached;
     private string _levelName, _scenePath;
-    private bool _victoryQueued, _navigating;
+    private bool _victoryQueued, _navigating, _resultsPresented;
+    public bool IsAwaitingResults => State == LevelSessionState.Victory && !_resultsPresented;
 
     #region Lifecycle and tallying
     // =========================================================
@@ -102,11 +103,11 @@ public partial class LevelSessionController : Node
             || _waves.State != WaveManager.WaveState.AllWavesComplete) return;
         if (_citadels.AnyIsDestroyed) { Defeat(); return; }
         State = LevelSessionState.Victory;
-        Capture(); Freeze(); DelayVictoryResults();
+        Capture(); Freeze(pauseWorld: false); DelayVictoryResults();
     }
 
     // =========================================================
-    // Hold the completed battlefield briefly; one owned timer runs through results-owned pause and dies on unload.
+    // Keep the completed map alive during the visual hold; freeze it only when the debrief opens.
     private void DelayVictoryResults()
     {
         double seconds = double.IsFinite(VictoryResultsDelaySeconds) ? Math.Max(0, VictoryResultsDelaySeconds) : 4;
@@ -134,18 +135,29 @@ public partial class LevelSessionController : Node
         TowersPlaced = RunStats.TowersPlaced, TowersConstructed = RunStats.TowersConstructed,
         UpgradesPurchased = RunStats.UpgradesPurchased, MissionSeconds = RunStats.MissionSeconds
     };
-    private void Freeze()
+    private void Freeze(bool pauseWorld = true)
     {
+        _waves.StopForOutcome();
         RunStats.Freeze();
         _hud.GetNodeOrNull<NarrationDisplay>("NarrationDisplay")?.Clear();
         _pause.LockForResults(); _hud.SetTowerBarOpen(false, true);
         _input.Bind(this, GameInput.BackAction, ConsumeBack, 200);
         _input.Bind(this, GameInput.BuildAction, () => true, 200);
-        GetTree().Paused = true;
+        if (!pauseWorld)
+        {
+            // Invisible input shield stops purchases/world clicks while the captured battlefield keeps animating.
+            var layer = new CanvasLayer { Name = "OutcomeInputShield", Layer = 90 };
+            AddChild(layer);
+            var shield = new Control { MouseFilter = Control.MouseFilterEnum.Stop, MouseForcePassScrollEvents = false };
+            layer.AddChild(shield); shield.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
+        }
+        GetTree().Paused = pauseWorld;
     }
-    private bool ConsumeBack() { if (!_results.DismissError()) _results.SkipReveal(); return true; }
+    private bool ConsumeBack() { if (_resultsPresented && !_results.DismissError()) _results.SkipReveal(); return true; }
     private void Present()
     {
+        if (_resultsPresented) return;
+        _resultsPresented = true; GetTree().Paused = true;
         NextScenePath = Snapshot.Outcome == LevelOutcome.Victory ? PlayableLevelCatalog.NextScene(_levelName) : null;
         TryAwardReward();
         _results.ShowResults(Snapshot, NextScenePath != null);

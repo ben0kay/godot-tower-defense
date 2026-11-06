@@ -1,3 +1,9 @@
+## Automatic wave progression and live victory hold — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Wave 1 remains manual; subsequent waves auto-start 30 seconds after the previous wave fully clears, with per-wave overrides in the Wave Editor and an upper-right AUTO START countdown beside the still-available NEXT WAVE button. Pause/checkpoint Continue retain the countdown. Early start, outcomes, reset and unload cancel it safely. Victory keeps the map/drones/effects alive during the existing 4-second delay, while the official stat snapshot stays fixed; the map pauses when Results opens. Defeat remains immediate. Source/lifecycle and authored-fixture review only; .NET unavailable, owner visual/gameplay acceptance pending. See LEVELS/Waves/README.md and LEVELS/Session/README.md.
+
+---
+
 ## Restored slower portal opening — 2026-11-06
 
 Restored the shared materialization animation to its original 2.2 seconds, including authored preset and code defaults/fallback. Level011 Wave 6 still leads with its existing Portal4 ship, so it launches on readiness without waiting for a later shuffled request. Drone motion and widget changes remain. Focused source review only; owner visual acceptance pending.

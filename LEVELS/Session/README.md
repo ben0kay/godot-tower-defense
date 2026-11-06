@@ -1,3 +1,11 @@
+## Live battlefield before Results — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Victory still captures and freezes the official outcome/stat snapshot immediately, but the map now keeps running during VictoryResultsDelaySeconds (default 4s). Drones, existing work, projectiles and effects can finish moving; builder dispatch explicitly permits this visual hold. An invisible mouse-input shield and existing result input bindings prevent new player transactions or Pause takeover, and WaveManager retires automatic/manual future starts. Results pauses the map only when its screen actually opens. Defeat retains its immediate pause/presentation path. Rewards still use the original captured snapshot and once-only ticket.
+
+The existing owned timer cancels on unload. Focused source/lifecycle review only; .NET unavailable; the new AutomaticWaveChecks owner fixture checks a live unpaused hold, immutable stats and the later pause when Results opens. Owner: win with returning/building drones and active effects, inspect the 4-second live map, then verify Results, Retry/Next/Menu and defeat.
+
+---
+
 ## Victory Results hold — 2026-11-05
 
 LevelSessionController now holds the frozen winning battlefield for **4 seconds** before showing Mission Results. Configure `LevelSession → VictoryResultsDelaySeconds` in the shared battlefield Inspector; 0 restores immediate presentation. Outcome arbitration, final counters and pause/input locks still latch immediately; defeat presentation is unchanged. One child Timer runs during the results-owned pause, and stop/unsubscribe on controller exit prevents a delayed popup after unloading. No idle processing loop or terrain work. Existing outcome/reward/navigation fixtures explicitly use 0 to retain their immediate-presentation assertions. Source review only; Godot build/play validation pending.

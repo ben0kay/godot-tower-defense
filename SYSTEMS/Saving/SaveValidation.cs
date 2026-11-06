@@ -25,6 +25,12 @@ public static class SaveValidation
     {
         Text(data.LevelId, 64); Text(data.ContentHash, 64);
         if (data.ContentHash.Length != 64 || data.CompletedWaves < 0) throw new InvalidDataException("Invalid mission checkpoint.");
+        if (data.NextWaveAutoStartSeconds.HasValue)
+        {
+            Number(data.NextWaveAutoStartSeconds.Value);
+            if (data.NextWaveAutoStartSeconds.Value > 86400 || data.CompletedWaves == 0)
+                throw new InvalidDataException("Invalid next-wave countdown.");
+        }
         List(data.Towers); List(data.Citadels, 64); List(data.Builders); List(data.Balances, 64);
         if (data.Citadels.Count == 0 || data.Research == null || data.Run == null || data.Logistics == null || data.RewardTicket == null)
             throw new InvalidDataException("Incomplete checkpoint.");

@@ -58,3 +58,12 @@ text = "START WAVE"
 clip_text = true
 disabled = true
 mouse_filter = 0
+
+[node name="AutoStart" type="Label" parent="Status"]
+visible = false
+layout_mode = 0
+text = "AUTO START · 00:30"
+horizontal_alignment = 2
+vertical_alignment = 1
+text_overrun_behavior = 3
+mouse_filter = 2

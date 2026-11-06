@@ -18,7 +18,7 @@ public partial class WaveSetResource : WaveSetSource
         if (Waves == null) throw new ArgumentException("Wave set has no Waves array.");
         foreach (WaveResource wave in Waves)
         {
-            if (wave == null || wave.Number < 1 || !seen.Add(wave.Number) || wave.Batches == null || wave.Batches.Count == 0)
+            if (wave == null || wave.Number < 1 || !seen.Add(wave.Number) || wave.Batches == null || wave.Batches.Count == 0 || !WaveCatalog.ValidNextWaveDelay(wave.NextWaveDelaySeconds))
                 throw new ArgumentException("Each wave needs a unique positive number and at least one batch.");
             var batches = new List<WaveBatch>();
             foreach (WaveBatchResource batch in wave.Batches)
@@ -42,10 +42,11 @@ public partial class WaveSetResource : WaveSetSource
             bool hasPresentation = wave.Alert != WaveAlertKind.Standard || !string.IsNullOrEmpty(wave.BannerTitle) ||
                 !string.IsNullOrEmpty(wave.BannerDescription) || !string.IsNullOrEmpty(wave.Speaker) ||
                 !string.IsNullOrEmpty(wave.NarrationText) || !string.IsNullOrEmpty(wave.VoiceCueId);
-            result.Add(hasPresentation
+            var definition = hasPresentation
                 ? Wave(wave.Number, Presentation(wave.Alert, wave.BannerTitle, wave.BannerDescription,
                     wave.Speaker, wave.NarrationText, wave.VoiceCueId), batches.ToArray())
-                : Wave(wave.Number, batches.ToArray()));
+                : Wave(wave.Number, batches.ToArray());
+            result.Add(definition with { NextWaveDelaySeconds = wave.NextWaveDelaySeconds });
         }
         return result.ToArray();
     }

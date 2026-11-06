@@ -58,7 +58,8 @@ public partial class NarrationDisplay : CanvasLayer
         float right = Mathf.Max(4, config.RightMargin);
         float width = Mathf.Min(Mathf.Max(220, config.PanelWidth), Mathf.Max(1, viewport.X - right * 2));
         float x = Mathf.Max(0, viewport.X - right - width);
-        float top = Mathf.Max(52, config.TopMargin);
+        float statusHeight = (GetParent() as GameplayHUD)?.Config?.TopBarHeight ?? 46;
+        float top = Mathf.Max(statusHeight + 38, config.TopMargin);
         if (GodotObject.IsInstanceValid(_alerts) && _alerts.Settings != null)
         {
             NotificationSettings settings = _alerts.Settings;

@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 public sealed record WaveEnemyEntry(string EnemyId, double Weight = 100, string Portal = "", bool SpawnWithShield = false, bool SpawnWithStealth = false);
 public sealed record WaveBatch(int Count, double Interval, double After, ImmutableArray<WaveEnemyEntry> Entries);
-public sealed record WaveDefinition(int Number, ImmutableArray<WaveBatch> Batches, WavePresentation Presentation = null);
+public sealed record WaveDefinition(int Number, ImmutableArray<WaveBatch> Batches, WavePresentation Presentation = null, double NextWaveDelaySeconds = -1);
 
 public static class WaveBuilder
 {

@@ -20,7 +20,7 @@ public partial class WaveEditorPanel : VBoxContainer
     private ItemList _waves, _batches, _enemies;
     private ScrollContainer _detailsScroll;
     private VBoxContainer _waveFields, _batchFields, _enemyFields, _presentationFields, _compositionPreview;
-    private SpinBox _waveNumber, _count, _interval, _after, _weight;
+    private SpinBox _waveDelay, _waveNumber, _count, _interval, _after, _weight;
     private OptionButton _alert, _enemyId;
     private LineEdit _bannerTitle, _bannerDescription, _speaker, _narration, _voiceCue, _portal;
     private EnemyCatalog _enemyCatalog;
@@ -82,6 +82,10 @@ public partial class WaveEditorPanel : VBoxContainer
         _waveFields = Pane("Selected wave", 0); details.AddChild(_waveFields);
         _waveNumber = Number(_waveFields, "Wave number", 1, 10000, 1, v => { Wave.Number = (int)v; RefreshComposition(); });
         _waveNumber.TooltipText = "Unique positive wave number. Waves play in the list order shown on the left; moving them does not renumber them.";
+
+        _waveDelay = Number(_waveFields, "Next wave delay (seconds; -1 = default)", -1, 86400, .5,
+            v => Wave.NextWaveDelaySeconds = v);
+        _waveDelay.TooltipText = "After this wave fully clears, auto-start the next wave after this many seconds. -1 uses the level default (30s). 0 starts on the next tick. The first wave remains manual; the final wave ignores this setting.";
 
         _batchFields = Pane("Selected batch", 0); details.AddChild(_batchFields);
         _count = Number(_batchFields, "Total enemies", 1, 100000, 1, v => { Batch.Count = (int)v; RefreshComposition(); });
@@ -558,7 +562,7 @@ public partial class WaveEditorPanel : VBoxContainer
             _enemyFields.Visible = Entry != null; _presentationFields.Visible = wave != null;
             if (wave != null)
             {
-                _waveNumber.Value = wave.Number; _alert.Select((int)wave.Alert);
+                _waveNumber.Value = wave.Number; _waveDelay.Value = wave.NextWaveDelaySeconds; _alert.Select((int)wave.Alert);
                 _bannerTitle.Text = wave.BannerTitle ?? ""; _bannerDescription.Text = wave.BannerDescription ?? "";
                 _speaker.Text = wave.Speaker ?? ""; _narration.Text = wave.NarrationText ?? "";
                 _voiceCue.Text = wave.VoiceCueId ?? "";

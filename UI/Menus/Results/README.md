@@ -1,3 +1,11 @@
+## Live battlefield before Results — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Victory still captures and freezes the official outcome/stat snapshot immediately, but the map now keeps running during VictoryResultsDelaySeconds (default 4s). Drones, existing work, projectiles and effects can finish moving; builder dispatch explicitly permits this visual hold. An invisible mouse-input shield and existing result input bindings prevent new player transactions or Pause takeover, and WaveManager retires automatic/manual future starts. Results pauses the map only when its screen actually opens. Defeat retains its immediate pause/presentation path. Rewards still use the original captured snapshot and once-only ticket.
+
+The existing owned timer cancels on unload. Focused source/lifecycle review only; .NET unavailable; the new AutomaticWaveChecks owner fixture checks a live unpaused hold, immutable stats and the later pause when Results opens. Owner: win with returning/building drones and active effects, inspect the 4-second live map, then verify Results, Retry/Next/Menu and defeat.
+
+---
+
 ## Victory palette — cooler cyan-aqua (2026-11-04)
 
 The shared mission-results victory screen now uses a cooler blue-cyan aqua (`#57d3ee`) instead of mint-green `#65e8cf` for its heading, row values/borders, action accents, XP track and soft frame glow. The victory frame/row fills lean slightly more navy and the passive vector background accents use `#4cbadf`. **Defeat's crimson/red palette is unchanged.** The layout, reveal animation, XP calculations, skip controls and session outcomes were not modified. Source review only; owner visual approval pending.

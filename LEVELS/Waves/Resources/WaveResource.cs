@@ -7,6 +7,9 @@ public partial class WaveResource : Resource
     [Export(PropertyHint.Range, "1,10000,1,or_greater")] public int Number { get; set; } = 1;
     [Export] public Godot.Collections.Array<WaveBatchResource> Batches { get; set; } = new();
 
+    // -1 inherits the level default (30 seconds); zero starts the next wave on the next scheduler tick.
+    [Export(PropertyHint.Range, "-1,86400,.5")] public double NextWaveDelaySeconds { get; set; } = -1;
+
     [ExportGroup("Presentation")]
     [Export] public WaveAlertKind Alert { get; set; } = WaveAlertKind.Standard;
     [Export] public string BannerTitle { get; set; } = "";
@@ -19,7 +22,7 @@ public partial class WaveResource : Resource
     // Copy both metadata and nested batches for independent wave duplication.
     public WaveResource Copy()
     {
-        var copy = new WaveResource { Number = Number, Alert = Alert, BannerTitle = BannerTitle,
+        var copy = new WaveResource { Number = Number, NextWaveDelaySeconds = NextWaveDelaySeconds, Alert = Alert, BannerTitle = BannerTitle,
             BannerDescription = BannerDescription, Speaker = Speaker, NarrationText = NarrationText, VoiceCueId = VoiceCueId };
         foreach (WaveBatchResource batch in Batches) copy.Batches.Add(batch?.Copy());
         return copy;

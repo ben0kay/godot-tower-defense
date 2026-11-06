@@ -55,6 +55,7 @@ public sealed class CampaignSession
         {
             LevelId = session.SavedLevelId, ContentHash = ContentHash(Mission(session.SavedLevelId)),
             CompletedWaves = waves.CompletedWaves, WaveRandomState = waves.SavedRandomState,
+            NextWaveAutoStartSeconds = waves.SavedAutoStartSeconds,
             Balances = _battle.GetNode<EconomyManager>("Economy").CaptureCheckpoint(), Research = citadels.Research.CaptureCheckpoint(),
             RewardTicket = session.SavedRewardTicket, Run = session.CaptureCheckpoint(), Citadels = citadels.CaptureCheckpoint(),
             Towers = towers.Select(t => t.CaptureCheckpoint(id => sources.GetValueOrDefault(id))).ToList(),
@@ -157,7 +158,7 @@ public sealed class CampaignSession
         _battle.GetNode<ConstructionDroneManager>("World/ConstructionDrones").RestoreCheckpoint(data.Builders, towers, data.BuilderRetry);
         _battle.GetNode<EconomyManager>("Economy").RestoreCheckpoint(data.Balances);
         session.RestoreCheckpoint(data, towers.Values);
-        _battle.GetNode<WaveManager>("Waves").RestoreCheckpoint(data.CompletedWaves, data.WaveRandomState);
+        _battle.GetNode<WaveManager>("Waves").RestoreCheckpoint(data.CompletedWaves, data.WaveRandomState, data.NextWaveAutoStartSeconds);
         _battle.GetNode<CameraController>("CameraRig").RestoreCamera(data.CameraPosition, data.CameraZoom);
         var power = _battle.GetNode<PowerGridManager>("World/PowerNetworks");
         power.RestoreTransmitterLinks(towers, data.Towers);

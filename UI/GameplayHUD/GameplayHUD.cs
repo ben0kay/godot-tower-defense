@@ -148,6 +148,7 @@ public partial class GameplayHUD : Control
         _experienceBar = _rankSection.GetNode<ProgressBar>("ExperienceBar");
 
         _startWave = GetNode<Button>("TopBar/Status/StartWave");
+        _autoStart = GetNode<Label>("TopBar/Status/AutoStart");
         _startWave.Pressed += () => EmitSignal(SignalName.WaveStartRequested);
         _healthBar = GetNode<ProgressBar>("TopBar/Status/Citadel/Bar");
         SetupSingleCitadelCredits();
@@ -927,6 +928,7 @@ public partial class GameplayHUD : Control
         _startWave.Position = new Vector2(width - margin - buttonWidth, height + 6);
         _startWave.Size = new Vector2(buttonWidth, 26);
         _startWave.AddThemeFontSizeOverride("font_size", Mathf.Max(10, fontSize - 2));
+        LayoutWaveCountdown(margin, height, fontSize);
         _healthBar.CustomMinimumSize = new Vector2(Mathf.Min(Config.CitadelBarWidth, centerWidth), Config.CitadelBarHeight);
     }
 

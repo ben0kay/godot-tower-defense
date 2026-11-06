@@ -1,4 +1,4 @@
-// One finite-wave scheduler with bounded spawning, manual progression and exact ownership.
+// One finite-wave scheduler with bounded spawning, manual first start and automatic progression and exact ownership.
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -17,7 +17,7 @@ public partial class WaveManager : Node
     public int EnemiesRemaining => PlannedRemaining + AliveCount + PendingDeathSpawns;
     private int _ownershipEpoch;
     private bool _acceptingSpawn;
-    public bool CanStart => (State == WaveState.Ready || State == WaveState.Completed) && _waveIndex + 1 < _waves.Length;
+    public bool CanStart => !_outcomeStopped && (State == WaveState.Ready || State == WaveState.Completed) && _waveIndex + 1 < _waves.Length;
     public string StatusMessage { get; private set; } = "";
     public event Action Changed;
     public event Action<WaveDefinition> WaveStarted;
@@ -31,13 +31,19 @@ public partial class WaveManager : Node
     private WaveEnemyEntry[] _sequence;
     private int _waveIndex = -1, _batchIndex, _entryIndex;
     private double _countdown;
-    private bool _startAttemptReserved, _waitingForPortal;
+    private bool _startAttemptReserved, _waitingForPortal, _outcomeStopped;
+    private double _nextWaveCountdown = -1;
+    private int _publishedAutoSeconds = -1;
+    public bool AutoStartPending => !_outcomeStopped && State == WaveState.Completed && _nextWaveCountdown >= 0;
+    public double? AutoStartSecondsRemaining => AutoStartPending ? _nextWaveCountdown : null;
+    internal double? SavedAutoStartSeconds => AutoStartSecondsRemaining;
 
     #region Lifecycle
     // =========================================================
     // Main places Waves after UI/services; no first wave starts merely from loading the level.
     public override void _Ready()
     {
+        ProcessMode = ProcessModeEnum.Pausable;
         _spawns = GetNode<SpawnManager>("../World/EnemySystems/Spawning");
         _hud = GetNode<GameplayHUD>("../UI/GameplayHUD");
         _spawns.WaveOwner = this; _spawns.WaveEnemyCreated += OnWaveCreating;
@@ -64,7 +70,7 @@ public partial class WaveManager : Node
     // Reset scheduler state; existing live ships become unowned and cannot delay the next set.
     public void Configure(WaveDefinition[] waves, IReadOnlyDictionary<string, PackedScene> scenes)
     {
-        ReleaseOwnership(); CompletedWaves = 0; _waveIndex = -1; PlannedRemaining = 0; _sequence = null; _countdown = 0; _startAttemptReserved = false;
+        ReleaseOwnership(); _outcomeStopped = false; CompletedWaves = 0; _waveIndex = -1; PlannedRemaining = 0; _sequence = null; _countdown = 0; _startAttemptReserved = false;
         _waves = Array.Empty<WaveDefinition>(); _scenes = null;
         try
         {
@@ -87,10 +93,11 @@ public partial class WaveManager : Node
     private void OnStartRequested() => StartWave();
 
     // =========================================================
-    // Accept one manual start, prepare its first batch and spawn its first ship immediately.
+    // Accept one manual/automatic start, prepare its first batch and attempt its first ship immediately.
     public bool StartWave()
     {
-        if (!CanStart) return false;
+        if (!CanStart || GetTree().Paused) return false;
+        _nextWaveCountdown = -1;
         _waveIndex++; _batchIndex = 0; _entryIndex = 0;
         PlannedRemaining = _waves[_waveIndex].Batches.Sum(b => b.Count);
         _sequence = WaveCatalog.Compose(_waves[_waveIndex].Batches[0], _random);
@@ -108,6 +115,14 @@ public partial class WaveManager : Node
     // The only scheduler tick; missed time never becomes an unbounded spawn catch-up burst.
     public override void _PhysicsProcess(double delta)
     {
+        if (_outcomeStopped || GetTree().Paused || !double.IsFinite(delta) || delta < 0) return;
+        if (AutoStartPending)
+        {
+            _nextWaveCountdown = Math.Max(0, _nextWaveCountdown - delta);
+            if (_nextWaveCountdown <= 0) { StartWave(); return; }
+            if ((int)Math.Ceiling(_nextWaveCountdown) != _publishedAutoSeconds) Publish();
+            return;
+        }
         int limit = Mathf.Max(1, _spawns.Paths.Config.MaxWaveSpawnAttemptsPerFrame);
         // Reserve the immediate button-start attempt against the first scheduler frame.
         if (_startAttemptReserved) { limit--; _startAttemptReserved = false; }
@@ -118,11 +133,12 @@ public partial class WaveManager : Node
     // Process at most the configured attempt count; retry the same selected entry on failure.
     private void Advance(double delta, int limit)
     {
-        if (State != WaveState.Spawning && State != WaveState.SpawnBlocked) return;
+        if (_outcomeStopped || (State != WaveState.Spawning && State != WaveState.SpawnBlocked)) return;
         _countdown = Math.Max(0, _countdown - Math.Max(0, delta));
         if (_countdown > 0.0000001) return;
         for (int attempt = 0; attempt < limit; attempt++)
         {
+            if (_outcomeStopped) return;
             WaveBatch batch = _waves[_waveIndex].Batches[_batchIndex];
             if (_entryIndex == _sequence.Length)
             {
@@ -206,20 +222,39 @@ public partial class WaveManager : Node
     }
 
     // =========================================================
-    // No alive-count shortcut can drop scheduled ships or auto-start a later wave.
+    // Only full authored resolution starts the between-wave countdown.
     private void CompleteIfClear()
     {
         if (State != WaveState.WaitingForClear || PlannedRemaining != 0 || _owned.Count != 0 || PendingDeathSpawns != 0) return;
         int completedNumber = CurrentWave; CompletedWaves++;
         State = _waveIndex + 1 < _waves.Length ? WaveState.Completed : WaveState.AllWavesComplete;
-        SetPhysicsProcess(false); Publish(); WaveCompleted?.Invoke(completedNumber);
+        _nextWaveCountdown = !_outcomeStopped && State == WaveState.Completed ? NextWaveDelay() : -1;
+        SetPhysicsProcess(AutoStartPending); Publish(); WaveCompleted?.Invoke(completedNumber);
+    }
+
+    // =========================================================
+    // Count from the actual end of this wave, rather than its last spawn or its banner.
+    private double NextWaveDelay()
+    {
+        double authored = _waves[_waveIndex].NextWaveDelaySeconds;
+        if (authored >= 0) return authored;
+        double fallback = _spawns.Paths.Navigation.Grid.Level.Settings.DefaultNextWaveDelaySeconds;
+        return double.IsFinite(fallback) ? Math.Clamp(fallback, 0, 86400) : 30;
+    }
+
+    // =========================================================
+    // Outcome ownership retires both auto-start and spawn scheduling while the map finishes its visual hold.
+    internal void StopForOutcome()
+    {
+        _outcomeStopped = true; _nextWaveCountdown = -1; _waitingForPortal = false;
+        SetPhysicsProcess(false); Publish();
     }
 
     // =========================================================
     // Unsubscribe without killing ships; loading a new Main scene owns physical cleanup.
     private void ReleaseOwnership()
     {
-        _waitingForPortal = false;
+        _waitingForPortal = false; _nextWaveCountdown = -1;
         foreach (Enemy ship in _owned) ship.Removed -= OnEnemyRemoved;
         _owned.Clear(); _ownershipEpoch++; PendingDeathSpawns = 0;
         if (GodotObject.IsInstanceValid(_spawns?.DeathReleases)) _spawns.DeathReleases.CancelWave(this);
@@ -230,6 +265,7 @@ public partial class WaveManager : Node
     // Invalid setup is visible and cannot silently run another level's wave set.
     private void SetError(string message)
     {
+        _nextWaveCountdown = -1;
         State = WaveState.PausedError; StatusMessage = message; SetPhysicsProcess(false);
         GD.PushWarning("Wave setup: " + message); Publish();
     }
@@ -247,6 +283,9 @@ public partial class WaveManager : Node
                 WaveState.PausedError => "SETUP ERROR", WaveState.Disabled => "NO WAVES",
                 _ => $"{EnemiesRemaining} LEFT"
             };
+            int autoSeconds = AutoStartPending ? (int)Math.Ceiling(_nextWaveCountdown) : -1;
+            _publishedAutoSeconds = autoSeconds;
+            _hud.SetWaveAutoStart(autoSeconds);
             _hud.SetWaveControls(CurrentWave, TotalWaves, button, CanStart,
                 $"{State}: {PlannedRemaining} scheduled, {AliveCount} alive, {PendingDeathSpawns} pending release. {StatusMessage}");
         }
@@ -257,15 +296,20 @@ public partial class WaveManager : Node
     // =========================================================
     // Explicit checkpoint input/output, with no purchase or reward replay.
     internal ulong SavedRandomState => _random.State;
-    internal void RestoreCheckpoint(int completed, ulong randomState)
+    internal void RestoreCheckpoint(int completed, ulong randomState, double? autoStartSeconds = null)
     {
         if (completed < 0 || completed >= _waves.Length || _owned.Count != 0) throw new System.IO.InvalidDataException("Invalid wave checkpoint.");
+        if (autoStartSeconds.HasValue && (!double.IsFinite(autoStartSeconds.Value) ||
+            autoStartSeconds.Value < 0 || autoStartSeconds.Value > 86400 || completed == 0))
+            throw new System.IO.InvalidDataException("Invalid saved next-wave countdown.");
+        _outcomeStopped = false;
         CompletedWaves = completed; _waveIndex = completed - 1; _random.State = randomState;
         State = completed == 0 ? WaveState.Ready : WaveState.Completed;
         _waitingForPortal = false;
         PlannedRemaining = PendingDeathSpawns = 0; _sequence = null; _countdown = 0;
         // CompletedWaves is an array count, not an authored wave Number (numbers may have gaps).
         _spawns.RestorePortalActivation(_waves, completed);
-        SetPhysicsProcess(false); Publish();
+        _nextWaveCountdown = completed > 0 ? autoStartSeconds ?? NextWaveDelay() : -1;
+        SetPhysicsProcess(AutoStartPending); Publish();
     }
 }

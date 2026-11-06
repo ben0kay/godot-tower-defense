@@ -1,3 +1,9 @@
+## Automatic wave progression and live victory hold — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Wave 1 remains manual; subsequent waves auto-start 30 seconds after the previous wave fully clears, with per-wave overrides in the Wave Editor and an upper-right AUTO START countdown beside the still-available NEXT WAVE button. Pause/checkpoint Continue retain the countdown. Early start, outcomes, reset and unload cancel it safely. Victory keeps the map/drones/effects alive during the existing 4-second delay, while the official stat snapshot stays fixed; the map pauses when Results opens. Defeat remains immediate. Source/lifecycle and authored-fixture review only; .NET unavailable, owner visual/gameplay acceptance pending. See LEVELS/Waves/README.md and LEVELS/Session/README.md.
+
+---
+
 ## FIGHTER — future fighter drones and Drone Station (2026-11-06)
 
 **Design documented; not implemented.** Planned player-owned **persistent fighter drones** with two modes: **Auto-pilot** hunts enemies closest to breaching their assigned Citadel, then fires while circling/weaving/kiting; **Auto-patrol** lets you select one drone and click two map positions for a looping figure-eight patrol that attacks nearby enemies. A new **Drone Station** homes multiple fighters with finite HP/ammo, return-to-dock resupply and repair; selected hostile anti-air ships may attack fighters in a separate future phase. This is a fighter-squad system, not a one-shot player ability and not a replacement for construction/ammo drones. Fighter gameplay ownership stays in `DRONES/Combat/`; reuse shared drone presentation, enemy registry/combat and existing ammo logistics. [Full FD0–FD6 Codex implementation plan](DRONES/Combat/FIGHTER_DRONES_IMPLEMENTATION_PLAN.md). No gameplay or level content changed.

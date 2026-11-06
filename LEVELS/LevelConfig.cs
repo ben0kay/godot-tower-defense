@@ -26,6 +26,7 @@ public partial class LevelConfig : Resource
     [Export] public MissionBriefingDefinition MissionBriefing { get; set; }
 
     [ExportGroup("Waves")]
+    [Export(PropertyHint.Range, "0,86400,1")] public double DefaultNextWaveDelaySeconds { get; set; } = 30;
     [Export] public WaveSetSource WaveSource { get; set; }
     [Export] public string WaveSetId { get; set; } = "";
 

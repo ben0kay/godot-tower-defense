@@ -9,6 +9,7 @@ public sealed record LevelSaveData
     public string ContentHash { get; init; } = "";
     public int CompletedWaves { get; init; }
     public ulong WaveRandomState { get; init; }
+    public double? NextWaveAutoStartSeconds { get; init; }
     public Dictionary<string, int> Balances { get; init; } = new();
     public ResearchSaveData Research { get; init; } = new();
     public MissionRewardTicket RewardTicket { get; init; }
