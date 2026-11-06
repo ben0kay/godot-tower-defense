@@ -21,6 +21,17 @@ These preferences guide both AI-assisted and manual development. **Keep the exis
 4. Prefer **one Git commit per authorized job**, not many small commits. Push authorized work by default unless the owner says not to; report the commit SHA and changed files. Never force-reset, force-push or overwrite unrelated changes.
 5. Follow the **minimal validation policy below**. Don't let testing or broad cleanup expand a small task.
 
+## Keep documentation and validation lightweight — reinforced 2026-11-06
+
+**Prioritize completing the requested implementation. Keep documentation and validation proportional and brief; do not turn them into a second substantial task.**
+
+- **Documentation default:** one short entry in `NOTES/WORK.md` covering what changed, key files/settings and anything still unverified. Update a feature README only when needed to explain changed usage or correct a directly relevant contradiction. Do not repeat the same long write-up across the root README, feature READMEs, backlog and plans.
+- Leave fuller documentation, expanded explanations and documentation polish to the owner or a later regular Chat pass, which can build on those initial implementation notes.
+- **Validation default:** brief diff/source review; at most one practical basic build when available. Do not routinely create new test fixtures, test scenes, simulation harnesses or broad regression updates. A small targeted check is appropriate only for a concrete risk that warrants it, or when explicitly requested.
+- The owner handles gameplay, visual, performance and extensive regression testing. Clearly state what was checked and what remains unverified; do not spend extra time trying to replace that owner testing.
+- Batch independent file reads, avoid redundant retrieval/checks and stop once the focused work is reviewable. Lightweight does not mean skipping necessary implementation, ignoring known defects or claiming unrun checks passed.
+- This section takes precedence over broader documentation/testing expectations elsewhere in repository notes. Explicit task-specific owner instructions still take priority.
+
 ## Validation and testing — IMPORTANT OWNER PREFERENCE
 
 **The owner handles extensive testing in the Godot editor. AI agents must not spend lots of time running tests or repeatedly validating work unless the owner explicitly requests it.**
@@ -46,7 +57,7 @@ The goal is **good, careful implementation with minimal AI validation overhead**
 
 ## Folder ownership, scenes and configuration
 
-- Keep **major feature folders** documented with a short `README.md` explaining their responsibility, key files, data flow, configurable settings and limitations. Read the existing docs before changes and update them when behaviour changes.
+- Keep **major feature folders** documented with a short `README.md` explaining their responsibility, key files, data flow, configurable settings and limitations. Read the relevant existing docs before changes; make only brief updates needed for changed usage, following the lightweight documentation policy above.
 - Prefer a **feature-level master config** for frequently tuned settings, using existing `.tres` resources and typed C# `Resource` definitions where appropriate. Reuse the project's current config layout rather than inventing a second master config or relocating working settings.
 - Keep systems contained and modular. Reusable plain `Node` helpers/container nodes are welcome to keep scenes tidy, but **container-only nodes do not need processing scripts**. Avoid unnecessary autoloads, central managers and deep scene-tree coupling.
 - Prefer explicit signals, interfaces, callbacks or well-defined services over cross-feature hard-coded `GetNode` paths. Compose reusable systems in levels/scenes instead of hiding everything in one enormous controller.
@@ -82,7 +93,7 @@ The goal is **good, careful implementation with minimal AI validation overhead**
 - Check relevant feature Markdown and `NOTES/IMPLEMENTATION_BACKLOG.md` / `NOTES/WORK.md` when the task touches planned phases. **Older notes may be superseded**: distinguish source-implemented behaviour from plans, outdated instructions and unverified claims.
 - For substantial changes, prefer a few independently reviewable phases with **scope, affected owners, expected behaviour, config knobs, performance considerations and owner acceptance checks**. Do not implement future phases without authorization.
 - Use clear status language: **Planned / In Progress / Source Implemented / Awaiting Owner Validation / Accepted**. A commit, successful build or headless test does not equal gameplay/visual acceptance.
-- Update the owning feature README and relevant backlog/status notes after implementing an authorized feature. Correct outdated contradictions when directly relevant, without turning a small job into a full documentation audit.
+- Record a concise implementation note in `NOTES/WORK.md`. Update the owning README or a plan/backlog status only when directly necessary; avoid duplicating lengthy summaries across files. The owner or a later regular Chat pass can expand these notes.
 - If there is a useful recurring fix or performance lesson, document it in the existing appropriate notes. Don't create elaborate new process files unnecessarily.
 - When reporting back, be concise: **what changed, config/paths to inspect, commit SHA, lightweight checks performed and any owner-side testing left**. Never imply Copilot, Codex, regular Chat or the owner ran checks they did not run.
 
