@@ -35,17 +35,13 @@ public partial class MenuTowerFlowChecks : Node
             Require(ProfileStore.Selected == fixture, "Boot's real profile action selects its memory-only fixture");
             ButtonFor(menu, "CAMPAIGN").EmitSignal(Button.SignalName.Pressed);
             CampaignMenu campaign = await Scene<CampaignMenu>();
-            Require(ButtonFor(campaign, "PLAY LEVEL 001") == null && ButtonFor(campaign, "RESEARCH") != null, "Hub separates Levels from Research");
+            Require(MissionCard(campaign, 1) != null && MissionCard(campaign, 2) != null
+                && MissionCard(campaign, 3) != null && MissionCard(campaign, 20) != null
+                && ButtonFor(campaign, "RESEARCH") != null && ButtonFor(campaign, "CONTINUE") != null,
+                "Full-width hub exposes the ordered mission cards and preserves Research/Continue");
+            Require(ProfileStore.Selected == fixture, "Campaign roster retains selected profile");
             await Geometry(campaign);
-            ButtonFor(campaign, "LEVELS").EmitSignal(Button.SignalName.Pressed);
-            LevelSelectionMenu levels = await Scene<LevelSelectionMenu>();
-            Require(ButtonFor(levels, "PLAY LEVEL 020") != null && ProfileStore.Selected == fixture, "Levels offers both existing missions for the same profile");
-            await Geometry(levels);
-            ButtonFor(levels, "BACK TO CAMPAIGN").EmitSignal(Button.SignalName.Pressed);
-            campaign = await Scene<CampaignMenu>();
-            ButtonFor(campaign, "LEVELS").EmitSignal(Button.SignalName.Pressed);
-            levels = await Scene<LevelSelectionMenu>();
-            ButtonFor(levels, "PLAY LEVEL 001").EmitSignal(Button.SignalName.Pressed);
+            MissionCard(campaign, 1).EmitSignal(Button.SignalName.Pressed);
             Node2D battlefield = await Scene<Node2D>();
             GameplayHUD hud = battlefield.GetNode<GameplayHUD>("UI/GameplayHUD");
             TowerPlacementController placement = battlefield.GetNode<TowerPlacementController>("TowerPlacement");
@@ -87,7 +83,7 @@ public partial class MenuTowerFlowChecks : Node
             hud.SetTowerBarOpen(false, true);
             Require(hud.IsInspectionVisible, "Closing the tray preserves placed-tower inspection");
             await SubsystemBattlefield.DrainFreedFixtures(this);
-            GD.Print("PASS: Boot → Main → Campaign → Levels/back → Level001, both mission choices, viewport geometry, catalog build and paid Battle upgrade (temporary saves only)");
+            GD.Print("PASS: Boot → Main → full-width Campaign grid → Level001, mission choices, viewport geometry, catalog build and paid Battle upgrade (temporary saves only)");
             GetTree().Quit(0);
         }
         catch (Exception error) { GD.PushError(error.ToString()); GetTree().Quit(1); }
@@ -100,21 +96,37 @@ public partial class MenuTowerFlowChecks : Node
     }
 
     // =========================================================
-    // Verify the actual hub/mission panels fit common viewports without changing shared menu layout.
-    private async Task Geometry(Control screen)
+    // =========================================================
+    // Check the actual 2:1 campaign split and scrolling/anchoring at common viewport sizes.
+    private async Task Geometry(CampaignMenu screen)
     {
-        var panel = screen.GetChild(1).GetChild(0).GetChild<PanelContainer>(0);
+        PanelContainer left = screen.FindChild("MissionPanel", true, false) as PanelContainer;
+        PanelContainer right = screen.FindChild("CommandPanel", true, false) as PanelContainer;
+        GridContainer grid = screen.FindChild("MissionGrid", true, false) as GridContainer;
+        ScrollContainer scroll = screen.FindChild("MissionScroll", true, false) as ScrollContainer;
+        Button back = ButtonFor(screen, "BACK TO MAIN MENU");
+        Require(left != null && right != null && grid?.Columns == 3 && scroll != null && back != null,
+            "Campaign has three-column scroll grid and fixed right controls");
         screen.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.TopLeft);
-        foreach (Vector2 size in new[] { new Vector2(1920,1080), new Vector2(1366,768), new Vector2(960,540) })
+        foreach (Vector2 size in new[] { new Vector2(1920, 1080), new Vector2(1366, 768), new Vector2(960, 540) })
         {
             screen.Size = size;
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-            Rect2 rect = panel.GetGlobalRect(), bounds = screen.GetGlobalRect();
-            Require(rect.Position.X >= bounds.Position.X - 1 && rect.Position.Y >= bounds.Position.Y - 1 &&
-                rect.End.X <= bounds.End.X + 1 && rect.End.Y <= bounds.End.Y + 1, "Campaign panel fits " + size);
+            Rect2 bounds = screen.GetGlobalRect(), l = left.GetGlobalRect(), r = right.GetGlobalRect();
+            Require(l.Position.X >= bounds.Position.X - 1 && l.Position.Y >= bounds.Position.Y - 1
+                && r.End.X <= bounds.End.X + 1 && r.End.Y <= bounds.End.Y + 1,
+                "Both full-screen campaign panels fit " + size);
+            Require(l.Size.X > r.Size.X * 1.35f && r.Position.X > l.End.X - 1
+                && back.GetGlobalRect().End.Y <= bounds.End.Y + 1,
+                "Scrollable mission panel takes most width and fixed Back stays visible at " + size);
         }
     }
+
+    // =========================================================
+    // New campaign cards launch directly using the existing mission metadata.
+    private static Button MissionCard(Node root, int level) =>
+        root.FindChild($"MissionLevel{level:000}", true, false) as Button;
 
     // =========================================================
     // Bound scene-transition waits so missing/redirected destinations fail rather than hang.

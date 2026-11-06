@@ -1,3 +1,9 @@
+## Campaign full-window mission dashboard — 2026-11-06
+
+Replaced Campaign's compact centered MenuLayout with a full-window 2:1 split: left scrollable 3-column catalog-backed mission cards (Level 1/2/3 first row), right fixed Continue/Research, real commander + progression, Back at bottom. Cards directly launch existing MissionDefinition.LaunchPath via MenuNavigation. Continue uses the same selected-profile checkpoint/disabled reason; Research and Main navigation are unchanged. Existing Levels scene retained as legacy compatibility, no fake mission thumbnail/completion/unlock state. Files: `UI/Menus/Campaign/CampaignMenu.cs`, `CampaignMenu.Layout.cs`, `Levels/CampaignMissionCard.cs`, existing UI flow check. Source review only; Godot visual/layout/keyboard/gameplay checks at 1920×1080, 1366×768 and 960×540 remain for owner.
+
+---
+
 ## Fighter drone targeting optimization — 2026-11-06
 
 Four fighter scripts now avoid per-frame weapon LOS (scheduled validation or real firing only, fresh shot geometry), skip acquisition/spatial queries for empty/ineligible caches, and request the shared ranker only from deployed combat-ready fighters after transit. Existing bounded cache also tracks detectable weapon candidates independently of valid Citadel journeys; its cadence detects later eligibility/stealth changes. Debug/unowned combat between waves preserved; movement, service, ammo/cooldown/save contracts unchanged. Short Combat README note added. Source/diff review only; .NET unavailable. Owner to check mountain LOS/lead, target death/stealth/reacquisition, empty and debug-only worlds, launch/recall and checkpoint continuation; no measured FPS claim.

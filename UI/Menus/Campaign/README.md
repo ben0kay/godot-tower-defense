@@ -1,3 +1,11 @@
+## Full-window Campaign dashboard — 2026-11-06
+
+**Source implemented / awaiting owner visual and gameplay validation.** The Campaign hub now fills the game window with a header, a scrollable **three-column mission grid in the left two-thirds**, and a **fixed right third** with Continue, Research, current-profile commander/progression and Back to Main Menu anchored at the bottom. The grid uses the existing enabled `PlayableLevelCatalog` in numeric order, and its cards launch existing missions using `MenuNavigation.Open`; Level 1/2/3 occupy the first row. No fabricated Level 4–10, lock state, completion stars, thumbnail images or new save fields were introduced. Continue still uses `CampaignSession.ReadCurrent/LoadCurrent`, and the legacy `LevelSelectionMenu` remains available for compatibility although Campaign no longer navigates through it. Added focused UI geometry and direct-click coverage in the existing menu flow fixture; no engine test run here.
+
+New view ownership: `CampaignMenu.Layout.cs` builds the full-size responsive grid/right pane; `Levels/CampaignMissionCard.cs` builds reusable text-forward cards. Card art/individual mission thumbnails and campaign completion/rating data are future optional polish, not represented as real progress.
+
+---
+
 ## Between-wave checkpoint integration — 2026-10-26
 
 S2/S3 now provide source-owned capture/restore seams for this feature through
