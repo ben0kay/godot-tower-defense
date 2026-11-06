@@ -1,4 +1,7 @@
 # DRONES — shared presentation and separate flight roles
+
+**Future ideas:** [Citadel repair drones, research-unlocked tower maintenance and more ambient base activity](ideas.md) — brainstorming only, no new drone mechanics implemented.
+
 [Combat](Combat/README.md) owns fighters, Auto-pilot, targeting and fighter saves (FD1-B/FD2 source implemented). The building and station UI live in [TOWERS/Utility/DroneStation](../TOWERS/Utility/DroneStation/README.md). Patrol, weapons and resupply remain planned. Builders and couriers retain their own dispatchers.
 
 ## Fixed acceleration and braking — 2026-11-06
