@@ -1,3 +1,9 @@
+## Planned Wave N activation and materialization — 2026-11-06
+
+The current placeable `EnemyPortal` scene has **no wave-activation setting**: registered portals are visible and spawn-eligible from deployment. An authored Inspector `AppearAtWave = 0` (START default, or positive Wave N) plus hidden, pre-reserved future locations, validation of checkpoint/Citadel reachability, one-time materialization VFX and future lifetime rules are **planned only** in [the spawning implementation plan](../../ENEMIES/Spawning/IMPLEMENTATION_PLAN.md). The portal remains visuals/position/entry authoring; `WaveManager` and `SpawnManager` still own timing and selection.
+
+---
+
 # PORTALS — Reusable Physical World Spawn Objects
 
 This folder owns **placeable Portal scenes**, *not* spawning mechanics. A Portal belongs to the map layout, can have future art/activation/VFX and provides a location where enemy ships may emerge.

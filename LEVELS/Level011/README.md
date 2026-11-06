@@ -1,3 +1,11 @@
+## Future multi-lane/portal activation work (2026-11-06 — planned only)
+
+Wave 1's 54 enemies arrive in three **ordered 18-enemy batches**: Portal1 (0.65s intervals, 2s `After`), Portal2 (0.60s, 2s `After`), Portal3 (0.55s). Each batch contains 12 Standards and 6 Scouts shuffled by seeded RNG; they are not random portal selections. The already shipped wave scheduler permits interleaving portals within one batch, but not independently timed parallel batches. See the [spawning/portal design plan](../../ENEMIES/Spawning/IMPLEMENTATION_PLAN.md) for future per-portal `AppearAtWave`, materialization/telegraph, all-side edge attacks, and concurrent lane pressure.
+
+**Wave 6 does not yet exist in Level011's playable wave set.** A future portal configured for Wave 6 would require authoring that wave before activation could occur. This is a documentation-only plan; no portals, lanes, spawn rules or waves are changed.
+
+---
+
 # Level011 — Three-Lane Fleet Defence
 
 ## Waves 1–5 (2026-11-05)

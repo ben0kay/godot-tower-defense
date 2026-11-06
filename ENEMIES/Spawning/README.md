@@ -1,3 +1,9 @@
+## Dynamic portals and source-policy roadmap — 2026-11-06 (PLAN ONLY)
+
+A dedicated [SPAWN0–SPAWN5 implementation plan](IMPLEMENTATION_PLAN.md) now covers authored **START / Wave N portal activation**, hidden reserved future portals, materialization feedback, all-four-side map-edge use, opt-in true mixed portal/edge selection, independent concurrent wave batches and optional bounded scripted reinforcements. **No new spawning mechanics are implemented by this note.** Existing ordered wave batches, `SpawnMode.MapEdges`, `Both` portal preference, F2 and route validation are unchanged.
+
+---
+
 # Enemy spawning
 
 `SpawnManager.cs` is a world service under World/EnemySystems/Spawning. Physical Portal scenes contain only visuals/SpawnExit; this service selects positions and creates requested scenes. Waves call SpawnWave(scene, random, optionalRequiredPortal), while level debug calls Spawn(scene, portalOnly: true).
