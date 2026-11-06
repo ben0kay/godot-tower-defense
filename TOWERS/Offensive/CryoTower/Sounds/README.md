@@ -1,0 +1,8 @@
+# Cryo Tower — laser firing sound
+
+- `CryoFire.wav` is a mono, 32 kHz, 16-bit PCM one-shot made from the owner's uploaded MP3 (48 kHz stereo, 4.63s). It retains the original laser attack and audible decay but trims the near-silent tail to **1.75 seconds** with a gentle ending fade. A small -3 dB headroom reduction was used when converting; no pitch shift or synthetic replacement. The original long MP3 is not committed.
+- `CryoFire.tres` registers `tower_cryo_fire` as positional **WorldSfx / OneShot**, priority 35, 0.1s per-owner debounce, 10 maximum same-clip instances, 550px maximum distance, offscreen culling, and -7 dB mixer level (in addition to the WAV's own gain).
+- `DefaultCryoTowerConfig.tres.FireSoundId` selects the sound. The already-existing shared `ProjectileTurretBase.FireVolley` calls `AudioManager.PlayFrom(id, this)` **only for successfully funded/projectile-emitting shots**. With no valid target, no ammo or power, or while construction/disable prevents shooting, no new firing sound is requested. One-shot audio availability never blocks damage or consumes more ammo.
+- Cryo's existing rate, muzzle location, projectile, permanent Slow, effects, sight checks, upgrades, shared pooled audio and other towers remain unchanged. Avoid per-shot `AudioStreamPlayer` creation or any new processing loop.
+
+**Owner check:** import/compile in Godot, place a Cryo Tower, let it fire several times and confirm each emitted shot plays once. Try multiple Cryos and camera zoom/pan to inspect the volume and existing culling/budget behavior. Source/WAV integrity review only; engine playback acceptance pending.
