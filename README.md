@@ -1,3 +1,9 @@
+## Power-capacitor resource-order fix — 2026-11-06
+
+**Source fixed; gameplay acceptance pending.** The Sniper and several other offensive towers had authored `Power` resources but did not show ENERGY or pay for shots. Eight `Default*Config.tres` resources placed `Power` before `script`; the working Battle/Corruptor resources had the correct `script`-first order. Reordered only the script/power assignment lines in Sniper, Machine Gun, Rocket, Laser, Cryo, Stasis, Shockwave and Blaster Cannon. Underlying shared power/payment/energy values and balance unchanged. Test **fresh** deployments after reimport, especially disconnected Sniper and Laser. [Power guide](TOWERS/Shared/Power/README.md).
+
+---
+
 ## SPAWN2 — shared portal materialization — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** Every registered START portal now forms on fresh deployment; Wave N portals use the same Dormant → Forming → Open presentation on their accepted authored wave. No Level011 map or wave data changed. A 2.2s pausable tween drives a localized violet spiral shader, growing segmented ring, art/label reveal, inward GPU curls and concentrated ignition/ripple. No fullscreen effects, audio assets or idle CPU animation loop were added. Existing 120°/s rotation and 48-particle outward per-spawn rim bursts remain the Open-state presentation.

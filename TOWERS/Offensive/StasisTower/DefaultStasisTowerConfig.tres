@@ -7,8 +7,8 @@
 [ext_resource type="Resource" path="res://TOWERS/Offensive/StasisTower/StasisTowerPower.tres" id="power"]
 
 [resource]
-Power = ExtResource("power")
 script = ExtResource("1")
+Power = ExtResource("power")
 FireSoundId = "tower_stasis_fire"
 ConstructionArt = ExtResource("construction")
 

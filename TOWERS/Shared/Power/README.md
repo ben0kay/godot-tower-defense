@@ -1,3 +1,15 @@
+## Power resource ordering hotfix — 2026-11-06
+
+**Source fixed; in-game confirmation pending.** User evidence showed Battle and Corruptor with live ENERGY meters, while Sniper, Blaster Cannon and Laser had no meter and a disconnected Sniper fired freely. The cause is the order of properties in eight authored `Default*Config.tres` resources: `Power = ExtResource("power")` was serialized **before** `script = ExtResource("1")`. The only two working offensive towers, Battle and Corruptor, had `script` first. Without a recognized `Power` on the loaded scripted resource, `TowerBase.SynchronizePower` constructs no `TowerPowerConsumer`, and the shared `TryFundProjectileAttack`/beam funding fallback treats the weapon as unpowered.
+
+**Correction:** moved `script` to the first property of `[resource]` in Sniper, Machine Gun, Rocket, Laser, Cryo, Stasis, Shockwave and Blaster Cannon default configs. `Power` references and numerical parameters were **not changed**; Battle, Corruptor and Restoration were already correctly ordered and are untouched. No shared power algorithm, combat code, save code or UI code changed.
+
+**Resource-authoring rule:** for scripted Godot `.tres` files, put `script = ExtResource(...)` first under `[resource]`, **before custom exported fields**, so Godot has the script while applying those fields. When reviewing future authored power rollouts, verify the runtime Inspector ENERGY meter appears rather than merely checking the text `Power =` in the source resource.
+
+**Light verification:** checked those eight `.tres` files all now put `script` before `Power`, have a matching power `ext_resource`, and retain their remaining properties byte-for-byte. No Godot runtime/build test claimed. Owner: pull `dev`, reimport/rebuild and deploy **fresh** Sniper, Blaster and Laser towers; verify ENERGY 0/capacity until connected, no free disconnected shots/beams, and normal recharge/combat when connected. Verify Machine Gun, Rocket, Cryo, Stasis, Shockwave too. Restart the map rather than using a pre-fix checkpoint.
+
+---
+
 ## Consumer drain verification — 2026-11-05
 
 Confirmed all nine offensive defaults and Repair reference their per-type Power resources and use the shared attack/work funding paths. Eight non-Battle offensive types plus Repair already have nonzero idle and active draw; no duplicate implementation or balance change was needed. Battle intentionally retains 0 idle / 12 active as the unchanged reference. Idle drains only while operational outside a paid active window; active replaces idle. Incoming recharge may keep stored energy full despite consumption. Inspect the existing selected **Use** and **Refill** rates, or remove supply to see depletion. Source checks only; owner gameplay validation pending.

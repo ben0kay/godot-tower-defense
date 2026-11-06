@@ -11,8 +11,8 @@
 [ext_resource type="Resource" path="res://TOWERS/Offensive/BlasterCannon/BlasterCannonPower.tres" id="power"]
 
 [resource]
-Power = ExtResource("power")
 script = ExtResource("1")
+Power = ExtResource("power")
 HeatEnabled = true
 ConstructionArt = ExtResource("construction")
 ImpactStyle = ExtResource("2")

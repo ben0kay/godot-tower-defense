@@ -6,8 +6,8 @@
 [ext_resource type="Resource" path="res://TOWERS/Offensive/MachineGunTower/MachineGunTowerPower.tres" id="power"]
 
 [resource]
-Power = ExtResource("power")
 script = ExtResource("1")
+Power = ExtResource("power")
 HeatEnabled = true
 FireSoundId = "tower_machine_gun_fire"
 
