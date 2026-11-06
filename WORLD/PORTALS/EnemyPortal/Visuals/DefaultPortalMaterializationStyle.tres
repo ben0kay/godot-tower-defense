@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="PortalMaterializationStyle" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="PortalMaterializationStyle" format=3 uid="uid://i28qbgxwv7n8"]
 
-[ext_resource type="Script" path="res://WORLD/PORTALS/EnemyPortal/Visuals/PortalMaterializationStyle.cs" id="1"]
+[ext_resource type="Script" uid="uid://c6wxk060aouqs" path="res://WORLD/PORTALS/EnemyPortal/Visuals/PortalMaterializationStyle.cs" id="1"]
+
 [resource]
 script = ExtResource("1")
 DurationSeconds = 2.2

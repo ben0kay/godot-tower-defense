@@ -78,19 +78,27 @@ position = Vector2(10754, 3753)
 [node name="EnemyPortal1" parent="Portals" index="0" unique_id=1721559982 instance=ExtResource("5_portal")]
 position = Vector2(1504, 2016)
 CheckpointPath = NodePath("../../Checkpoints/RouteCheckpoint1a")
+MaterializationStyle = null
+SpawnFeedbackStyle = null
 
 [node name="EnemyPortal2" parent="Portals" index="1" unique_id=619071293 instance=ExtResource("5_portal")]
 position = Vector2(1504, 3424)
 CheckpointPath = NodePath("../../Checkpoints/RouteCheckpoint2a")
+MaterializationStyle = null
+SpawnFeedbackStyle = null
 
 [node name="EnemyPortal3" parent="Portals" index="2" unique_id=462482160 instance=ExtResource("5_portal")]
 position = Vector2(1440, 4832)
 CheckpointPath = NodePath("../../Checkpoints/RouteCheckpoint3a")
+MaterializationStyle = null
+SpawnFeedbackStyle = null
 
 [node name="EnemyPortal4" parent="Portals" index="3" unique_id=771680454 instance=ExtResource("5_portal")]
 position = Vector2(7136, 3552)
 AppearAtWave = 6
-CheckpointPath = NodePath("../../Checkpoints/RouteCheckpoint3a")
+CheckpointPath = NodePath("../../Checkpoints/RouteCheckpoint2a2")
+MaterializationStyle = null
+SpawnFeedbackStyle = null
 
 [node name="Citadel" parent="Objectives" index="0" unique_id=1303919540 instance=ExtResource("6_citadel")]
 position = Vector2(10336, 3488)

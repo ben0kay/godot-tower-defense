@@ -1,28 +1,13 @@
-[gd_resource type="Resource" script_class="ConstructionSiteVisualConfig" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ConstructionSiteVisualConfig" format=3 uid="uid://bgcyufl6q3qoo"]
 
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/Visuals/ConstructionSiteVisualConfig.cs" id="1"]
+[ext_resource type="Script" uid="uid://bsln1l7ot5x2u" path="res://TOWERS/Shared/Construction/Visuals/ConstructionSiteVisualConfig.cs" id="1"]
 
 [resource]
 script = ExtResource("1")
-Enabled = true
-RefreshHz = 24.0
-MaxVisibleSites = 128
 TelemetryScale = 0.72
-TelemetryOffset = Vector2(-8, -4)
-TelemetryRevealDistance = 140.0
-TelemetryFadeInSeconds = 0.25
-TelemetryRingRadius = 40.0
-TelemetryOuterDegreesPerSecond = 30.0
-TelemetryMiddleDegreesPerSecond = 48.0
-TelemetryInnerDegreesPerSecond = 72.0
-TelemetryCountUpPerSecond = 160.0
-Tint = Color(0.25, 0.82, 1, 1)
 WaitingOpacity = 0.43
 BuildingOpacity = 0.68
 BlueprintOpacity = 0.13
-InsetPixels = 4.0
-CornerLength = 11.0
-RotationDegreesPerSecond = 18.0
 PerimeterCyclesPerSecond = 0.23
 PulseHz = 1.2
 PulseDepth = 0.14
