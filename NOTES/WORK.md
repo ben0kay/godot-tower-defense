@@ -1,3 +1,9 @@
+## Portal spin surge, bubbling spawn reaction and wider violet clouds — 2026-11-06
+
+In `WORLD/PORTALS/EnemyPortal/`, idle portal art spin rises from 120°/s to **180°/s** (Inspector `RotationDegreesPerSecond`); an accepted, cooldown-budgeted spawn burst integrates an additional ~210°/s decaying surge over ~0.7s, rebasing GPU rotation without phase jump or CPU idle loop. Spawn feedback now runs more frequently (~230–630ms irregular cooldown, down from ~390–910ms), with variable-density/scatter spark bursts and a short, randomly single- or double-peaked "volcanic bubble" expansion. Smoke continues in the two **existing** GPU emitters: normal puffs ~125px, ~5.5s, 26px/s outward; large faint puffs ~2.7×, ~9s, ~72% base drift speed (rather than 55%) with stronger swirl and capped 22/10 clouds. All visuals stay optional/local and do not affect portal readiness, wave count, routes, SpawnExit or saves; offscreen/paused cleanup remains. One shader/resource/source check only; Godot visual/FPS inspection remains with owner.
+
+---
+
 ## Citadel visual polish and world labels — 2026-11-06
 
 Removed the hardcoded CITADEL and PORTAL world labels from their shared scenes (and retired the portal's unused label animation hookup). Updated the existing 192×192 Citadel SVG to a more intricate dark-metal MK I fortress with layered plating, vents, cyan reactor housing and four **empty** future weapon hardpoints; retained the art resource path and rasterized-sprite architecture. No changes to footprint, placements, approach paths, health, credit UI, reactor shader, combat, portal spawning or saves. Source/scene sanity checked; owner to judge appearance and scene import in Godot.

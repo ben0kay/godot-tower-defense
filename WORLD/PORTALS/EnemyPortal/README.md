@@ -1,3 +1,9 @@
+## Faster spinning portals and volcanic spawn feedback — 2026-11-06
+
+**Source implemented / awaiting owner visual testing.** Default idle artwork spin is now **180°/s**, with an optional **+210°/s decaying surge** for ~0.7s after cooldown-accepted enemy spawn feedback. The angular phase is integrated in the shared GPU rotation shader and rebased on bursts, not updated every frame. In Inspector, tune `Rotation Degrees Per Second` and the new `Spawn Spin Surge` controls. Pulse feedback uses smaller irregular gaps, mixed single/double-bubble peak timing and erratically scattered sparks. Existing two bounded rolling GPU smoke layers grow larger, drift farther and swirl more; tune `Visuals/DefaultPortalSpawnFeedbackStyle.tres`. No new per-portal CPU loop or GPU emitter, and spawn readiness/route/Save rules stay unchanged. Level002's two stale `2°/s` instance overrides were removed so they inherit the faster base rate. `NOTES/WORK.md` records the defaults and owner checks. Older entries below are historical.
+
+---
+
 ## World-space name label removed — 2026-11-06
 
 Removed the decorative PORTAL caption from the shared scene and its unused formation-fade hookup. The portal artwork, swell, smoke, materialization, SpawnExit, readiness and wave behavior are unchanged. F3/debug route labels remain available separately.

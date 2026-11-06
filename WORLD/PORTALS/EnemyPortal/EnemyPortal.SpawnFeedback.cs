@@ -39,28 +39,46 @@ public partial class EnemyPortal
     }
 
     // =========================================================
-    // Busy pulses are coalesced, never restarted into indefinite growth.
+    // Each accepted event gets a short, asymmetrical bubble/double-bubble shape with independent peaks.
+    // One bounded active tween per portal; repeated spawns never accumulate scale or start extra processors.
     private void PlayArtworkPulse()
     {
         var style = SpawnFeedbackStyle;
         if (!style.PulseEnabled || MaterializationStyle?.ReducedMotion == true || _pulseArt == null ||
             (_spawnPulse != null && _spawnPulse.IsValid())) return;
         _restScale = _pulseArt.Scale; _restModulate = _pulseArt.Modulate;
-        float duration = FeedbackValue(style.PulseSeconds, .8f, .2f, 2) * FeedbackVariation();
-        float expansion = FeedbackValue(style.ExpansionFraction, .12f, 0, .3f) * FeedbackVariation();
-        float brightness = FeedbackValue(style.BrightnessStrength, .15f, 0, 1) * FeedbackVariation();
+        float duration = Mathf.Clamp(FeedbackValue(style.PulseSeconds, .56f, .2f, 2) * FeedbackVariation(), .30f, .76f);
+        float expansion = FeedbackValue(style.ExpansionFraction, .16f, 0, .3f) * FeedbackVariation();
+        float brightness = FeedbackValue(style.BrightnessStrength, .22f, 0, 1) * FeedbackVariation();
+        bool doubleBubble = _feedbackRandom.Randf() < .7f;
+        float secondaryPeak = _feedbackRandom.RandfRange(.4f, .82f);
+
         _spawnPulse = CreateTween().SetPauseMode(Tween.TweenPauseMode.Bound);
-        _spawnPulse.TweenMethod(Callable.From<float>(SetSpawnPulse), 0f, 1f, duration * .3f)
+        _spawnPulse.TweenMethod(Callable.From<float>(SetSpawnPulse), 0f, expansion, duration * (doubleBubble ? .24f : .32f))
             .SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.Out);
-        _spawnPulse.TweenMethod(Callable.From<float>(SetSpawnPulse), 1f, 0f, duration * .7f)
-            .SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.InOut);
-        _spawnPulse.TweenCallback(Callable.From(() => { SetSpawnPulse(0); _spawnPulse = null; }));
-        void SetSpawnPulse(float p)
+        if (doubleBubble)
         {
-            _pulseArt.Scale = _restScale * (1 + expansion * p);
-            _pulseArt.Modulate = new Color(_restModulate.R * (1 + brightness * p),
-                _restModulate.G * (1 + brightness * p), _restModulate.B * (1 + brightness * p), _restModulate.A);
+            _spawnPulse.TweenMethod(Callable.From<float>(SetSpawnPulse), expansion, expansion * .15f, duration * .24f)
+                .SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.InOut);
+            _spawnPulse.TweenMethod(Callable.From<float>(SetSpawnPulse), expansion * .15f, expansion * secondaryPeak, duration * .17f)
+                .SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.Out);
+            _spawnPulse.TweenMethod(Callable.From<float>(SetSpawnPulse), expansion * secondaryPeak, 0f, duration * .35f)
+                .SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.InOut);
         }
+        else _spawnPulse.TweenMethod(Callable.From<float>(SetSpawnPulse), expansion, 0f, duration * .68f)
+            .SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.Out);
+        _pulseBrightness = brightness;
+        _spawnPulse.TweenCallback(Callable.From(() => { SetSpawnPulse(0); _spawnPulse = null; }));
+    }
+    private float _pulseBrightness;
+
+    private void SetSpawnPulse(float scaleBonus)
+    {
+        if (_pulseArt == null) return;
+        _pulseArt.Scale = _restScale * (1 + scaleBonus);
+        float brightness = 1 + _pulseBrightness * Mathf.Clamp(scaleBonus * 6, 0, 1);
+        _pulseArt.Modulate = new Color(_restModulate.R * brightness, _restModulate.G * brightness,
+            _restModulate.B * brightness, _restModulate.A);
     }
 
     // =========================================================
@@ -70,14 +88,14 @@ public partial class EnemyPortal
         var style = SpawnFeedbackStyle;
         if (!style.SmokeEnabled || MaterializationStyle?.ReducedMotion == true || emitter == null || large && !style.LargeCloudsEnabled) return;
         emitter.Amount = large ? Mathf.Clamp(style.LargeCloudCount, 2, 12) : Mathf.Clamp(style.PuffCount, 4, 40);
-        emitter.Lifetime = large ? FeedbackValue(style.LargeCloudLifetime, 8, 4, 12) : FeedbackValue(style.LifetimeSeconds, 5, 2, 8);
+        emitter.Lifetime = large ? FeedbackValue(style.LargeCloudLifetime, 9, 4, 12) : FeedbackValue(style.LifetimeSeconds, 5.5f, 2, 8);
         if (emitter.ProcessMaterial is ParticleProcessMaterial particles)
         {
-            float size = FeedbackValue(style.PuffSize, 110, 48, 180) / 64 * (large ? FeedbackValue(style.LargeCloudSizeMultiplier, 2.2f, 1.5f, 4) : 1);
+            float size = FeedbackValue(style.PuffSize, 125, 48, 240) / 64 * (large ? FeedbackValue(style.LargeCloudSizeMultiplier, 2.7f, 1.5f, 4) : 1);
             particles.ScaleMin = size * (1 - FeedbackValue(style.PuffSizeSpread, .2f, 0, .5f)); particles.ScaleMax = size;
-            float speed = FeedbackValue(style.OutwardSpeed, 18, 4, 60) * (large ? .55f : 1);
+            float speed = FeedbackValue(style.OutwardSpeed, 26, 4, 80) * (large ? .72f : 1);
             particles.RadialVelocityMin = speed * .75f; particles.RadialVelocityMax = speed * 1.25f;
-            float swirl = FeedbackValue(style.SwirlAcceleration, 3, 0, 15) * (large ? .35f : 1);
+            float swirl = FeedbackValue(style.SwirlAcceleration, 6, 0, 20) * (large ? .55f : 1);
             particles.TangentialAccelMin = swirl * .5f; particles.TangentialAccelMax = swirl;
         }
         if (emitter.Material is ShaderMaterial shader)
@@ -85,7 +103,7 @@ public partial class EnemyPortal
             shader.SetShaderParameter("smoke_tint", large ? style.LargeCloudTint : style.Tint);
             shader.SetShaderParameter("opacity", large ? FeedbackValue(style.LargeCloudOpacity, .12f, 0, .3f) : FeedbackValue(style.Opacity, .38f, 0, 1));
         }
-        emitter.OneShot = false; emitter.Explosiveness = 0; emitter.Randomness = .8f;
+        emitter.OneShot = false; emitter.Explosiveness = 0; emitter.Randomness = .95f;
     }
     // =========================================================
     // Wave events and visibility wake one continuous, fixed-budget emitter; completion lets existing clouds dissolve.

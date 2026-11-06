@@ -29,13 +29,11 @@ tile_set = ExtResource("2_decorations")
 [node name="EnemyPortal1" parent="Portals" index="0" unique_id=1721559982 instance=ExtResource("5_portal")]
 position = Vector2(3040, 2592)
 MaterializationStyle = null
-RotationDegreesPerSecond = 2.0
 SpawnFeedbackStyle = null
 
 [node name="EnemyPortal2" parent="Portals" index="1" unique_id=1710410001 instance=ExtResource("5_portal")]
 position = Vector2(3936, 1696)
 MaterializationStyle = null
-RotationDegreesPerSecond = 2.0
 SpawnFeedbackStyle = null
 
 [node name="Citadel" parent="Objectives" index="0" unique_id=1303919540 instance=ExtResource("6_citadel")]
