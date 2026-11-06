@@ -1,5 +1,6 @@
 // Queued non-positional tactical voice cues; subtitles/gameplay alerts remain UI responsibilities.
 using Godot;
+using System;
 using System.Collections.Generic;
 
 public partial class VoiceAssistant : Node
@@ -10,6 +11,8 @@ public partial class VoiceAssistant : Node
     private int _currentPriority;
     private readonly List<AudioDefinition> _waiting = new();
     public string CurrentCueId => _currentId; // Read-only active cue for UI/test diagnostics.
+    public event Action<string> CueStarted; // Raised when a queued or immediate voice actually begins.
+    public event Action<string> CueEnded; // Raised on completion or interruption of that active voice.
     #endregion
 
     #region Lifecycle
@@ -65,6 +68,19 @@ public partial class VoiceAssistant : Node
     {
         if (!_audio.Play(sound.Id)) return false;
         _currentId = sound.Id; _currentPriority = sound.Priority;
+        CueStarted?.Invoke(sound.Id);
+        return true;
+    }
+
+    // =========================================================
+    // Explicit scene teardown can withdraw both a waiting cue and an active clip.
+    public bool Cancel(string cueId)
+    {
+        if (string.IsNullOrWhiteSpace(cueId)) return false;
+        bool removed = _waiting.RemoveAll(x => x.Id == cueId) > 0;
+        if (_currentId != cueId) return removed;
+        // AudioManager releases the slot and raises SoundFinished, which advances the queue.
+        if (!_audio.StopOneShot(cueId)) OnSoundFinished(cueId);
         return true;
     }
 
@@ -74,6 +90,9 @@ public partial class VoiceAssistant : Node
     {
         if (_currentId.Length == 0 || id != _currentId) return;
         _currentId = ""; _currentPriority = 0;
+        CueEnded?.Invoke(id);
+        // A CueEnded listener could have started a replacement; never overlap it.
+        if (_currentId.Length > 0) return;
         while (_waiting.Count > 0)
         {
             AudioDefinition next = _waiting[0];

@@ -17,3 +17,4 @@ Let's see what these towers can do, Commander. Good luck."
 Objectives = "• Protect the Citadel.
 • Build a defensive line along the approach.
 • Press START WAVE when you are ready."
+VoiceCueId = "voice_mission_level001_intro"

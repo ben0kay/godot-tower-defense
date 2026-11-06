@@ -1,3 +1,7 @@
+## Level001 voiced briefing — 2026-11-06
+
+The owner's `Level001Briefing.mp3` now plays automatically on **fresh Level001 load**, via `Level001BriefingVoice.tres` (non-positional Voice category) and the existing `VoiceAssistant` queue. `Level001Briefing.tres.VoiceCueId` selects it. The original top-right **typewriter** starts with audio, and text cannot fade until the recording ends plus the standard brief reading hold. A manually started wave does not prematurely clear a still-spoken intro. Gameplay stays active and checkpoint Continue skips the intro. Tune audio level in `Level001BriefingVoice.tres`; edit text in `Level001Briefing.tres`. Runtime audio/visual verification pending.---
+
 ## Introductory tactical transmission — 2026-11-06
 
 **Source implemented; owner visual verification pending.** On fresh Level001 load (F5), the compact **top-right narrator** starts typing a short `COMMAND INTELLIGENCE` message automatically while the battlefield stays live and usable at WAVE 00. There is no popup, close button or pause. The first draft mentions Standard Drones, protecting the Citadel for three waves and later Scouts. The text lives in `Level001Briefing.tres` under `Message`/`Speaker`; its old Title/Objectives remain authored for future layouts but aren't shown separately. A `VoiceCueId` has been reserved for later AI voice playback, not activated. When the player presses START WAVE, the normal wave alert and optional wave narration take over. Continue skips the intro; fresh retries show it again. Details: [mission intel](../Briefing/README.md).

@@ -1,3 +1,7 @@
+## Level001 introductory AI voice cue — 2026-11-06
+
+`LEVELS/Level001/Level001BriefingVoice.tres` now registers the owner's existing `Level001Briefing.mp3` as `voice_mission_level001_intro` in the shared AudioCatalog, Voice-category, non-positional, priority 65 (so it takes precedence over the profile welcome at priority 50). This audio remains in the mission's folder. `VoiceAssistant` now has `CueStarted` and `CueEnded` events, plus `Cancel` for mission teardown, allowing **actual clip-start/clip-end synchronization** without guessing durations. The UI typewriter remains in `UI/Narration` and gets a hold release after the clip completes. Other queued voice behaviour and world SFX remain shared and unchanged. Playback verification in Godot pending.---
+
 ## First real voice cue: profile greeting (2026-10-20; engine playback pending)
 
 The uploaded `AUDIO/VoiceAssistant/Welcome_Commander.mp3` is now registered in `AUDIO/DefaultAudioCatalog.tres` through [Cues/Profiles/WelcomeCommander.tres](Cues/Profiles/WelcomeCommander.tres), ID `voice_profile_welcome`. `UI/Menus/Boot/BootScreen.cs` requests it through the existing persistent `VoiceAssistant.Say()` queue **after successful selection of a saved profile or creation of a new profile**, just before Main Menu opens. The greeting is a non-positional `Voice` one-shot on `CompanionVoice` bus; mixer ducking, limits, and completion remain the shared system's responsibility. Missing sound never prevents profile selection. Godot import/playback has not been tested here.

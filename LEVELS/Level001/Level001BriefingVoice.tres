@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="AudioDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://AUDIO/AudioDefinition.cs" id="1"]
+[ext_resource type="AudioStream" path="res://LEVELS/Level001/Level001Briefing.mp3" id="2"]
+
+[resource]
+script = ExtResource("1")
+Id = "voice_mission_level001_intro"
+Stream = ExtResource("2")
+Mode = 0
+Category = 4
+Priority = 65
+CooldownSeconds = 0.0
+MaximumInstances = 1
+Positional = false
+VolumeDb = 0.0
+PitchScale = 1.0

@@ -14,6 +14,7 @@ public partial class NarrationDisplay : CanvasLayer
     private Phase _phase = Phase.Hidden;
     private float _elapsed, _typed;
     private int _totalCharacters;
+    private bool _waitForVoiceEnd;
     public bool IsActive => _phase != Phase.Hidden;
     public bool IsTyping => _phase == Phase.Typing;
     public int RevealedCharacters => _message?.VisibleCharacters ?? 0;
@@ -82,7 +83,7 @@ public partial class NarrationDisplay : CanvasLayer
     #region Typewriter
     // =========================================================
     // A new transmission replaces the previous one. Empty/disabled text removes the card immediately.
-    public void ShowMessage(string text, string speaker = "")
+    public void ShowMessage(string text, string speaker = "", bool waitForVoiceEnd = false)
     {
         if (Config?.Enabled != true || string.IsNullOrWhiteSpace(text)) { Clear(); return; }
         text = text.Trim();
@@ -91,6 +92,7 @@ public partial class NarrationDisplay : CanvasLayer
         _totalCharacters = _message.GetTotalCharacterCount();
         _message.VisibleCharacters = 0;
         _elapsed = 0; _typed = 0; _phase = Phase.FadingIn;
+        _waitForVoiceEnd = waitForVoiceEnd;
         _card.Modulate = new Color(1, 1, 1, 0);
         LayoutCard(); _card.Show(); SetProcess(true);
     }
@@ -106,10 +108,20 @@ public partial class NarrationDisplay : CanvasLayer
     }
 
     // =========================================================
+    // Voice-owned presentations stay visible until the voice system signals completion.
+    // Once released, apply the ordinary readable hold time, even if typing finished earlier.
+    public void ReleaseVoiceHold()
+    {
+        if (!_waitForVoiceEnd) return;
+        _waitForVoiceEnd = false;
+        if (_phase == Phase.Holding) _elapsed = 0;
+    }
+
+    // =========================================================
     // Clear on an un-narrated wave, on mission result, or when a replacement is dismissed.
     public void Clear()
     {
-        _phase = Phase.Hidden; _elapsed = 0; _typed = 0; _totalCharacters = 0;
+        _phase = Phase.Hidden; _elapsed = 0; _typed = 0; _totalCharacters = 0; _waitForVoiceEnd = false;
         if (GodotObject.IsInstanceValid(_card)) _card.Hide();
         SetProcess(false);
     }
@@ -133,6 +145,7 @@ public partial class NarrationDisplay : CanvasLayer
                 if (_message.VisibleCharacters >= _totalCharacters) { _elapsed = 0; _phase = Phase.Holding; }
                 break;
             case Phase.Holding:
+                if (_waitForVoiceEnd) { _elapsed = 0; break; }
                 if (_elapsed >= Mathf.Max(0f, Config.HoldSeconds)) { _elapsed = 0; _phase = Phase.FadingOut; }
                 break;
             case Phase.FadingOut:

@@ -1,3 +1,15 @@
+## Audible Level001 intel and voice-held subtitles — 2026-11-06
+
+**Source implemented; gameplay/audio-device acceptance pending.** Each mission briefing already has an optional Inspector `VoiceCueId`; Level001 now uses `voice_mission_level001_intro`, registered in `AUDIO/DefaultAudioCatalog.tres` by `LEVELS/Level001/Level001BriefingVoice.tres` and referencing the owner's newly pushed `Level001Briefing.mp3`. The authored spoken text in `Level001Briefing.tres` was retained exactly.
+
+- On fresh Level001 load the existing shared `WavePresentationController` requests the voice through `VoiceAssistant.Say`. `VoiceAssistant.CueStarted` begins the existing **top-right** typewriter (even if another voice caused the clip to queue); no popup, mouse capture, pause, manual wave start or extra audio player.
+- `NarrationDisplay.ShowMessage(..., waitForVoiceEnd: true)` prevents fade-out while the voice is queued/playing. After `CueEnded` from the real audio player, the existing readable hold/fade applies; text that is still typing can finish naturally. The display is still mouse-transparent and event-driven, without per-frame audio length polling.
+- Pressing START WAVE during a voiced intro does not erase the speaking AI's text. The normal wave banner still appears and waves spawn normally. If that wave has its own authored narration, its text replaces the intro **after** speech ends. With no wave dialogue, the briefing fades naturally after playback.
+- If a VoiceCueId is blank/unregistered/unplayable, narration remains text-only with its original timings. Checkpoint restores skip the intro and voice. Unloading a battlefield cancels a pending/active mission intro to avoid late speech in menus; the shared voice queue keeps its priority/interruption behaviour.
+- `Title` and `Objectives` remain metadata for a later optional mission objectives panel and are not yet displayed here.
+
+**Check in Godot:** fresh Level001 plays voice with its typewriter; the typed card remains visible until after the actual clip finishes; movement/placement/START WAVE work throughout; starting Wave 1 early retains subtitles without a second voice; pause and checkpoint Continue do not replay; speech ends on scene exit. Source-only sanity checks; no audio playback or performance testing claimed.---
+
 # Optional mission intel — pre-wave typewriter (2026-11-06)
 
 **Source implemented / owner Godot visual check pending.** Mission load intros reuse the **existing top-right `UI/Narration/NarrationDisplay`**, including its typewriter reveal, fade timings, compact cyan-bordered design, pause behaviour and auto-hide. There is **no centred popup, Continue button, input capture or automatic pause**. The player can move the camera, build and inspect towers, and press **START WAVE** while the message is being typed. When Wave 1 begins, the existing wave presenter replaces/clears the intro in the same card and issues the normal wave banner. This is not a spawn delay.
