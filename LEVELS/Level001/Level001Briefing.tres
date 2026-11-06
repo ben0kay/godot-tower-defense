@@ -7,9 +7,9 @@ script = ExtResource("1")
 Title = "DEFEND THE CITADEL"
 Message = "Commander, welcome to the field.
 
-Today's assignment is a little unconventional. We've recovered several hostile drones and successfully reprogrammed them for target practice.
+We've recovered several hostile drones and successfully reprogrammed them for target practice.
 
-Your objective is simple: deploy a few Battle Towers and put their combat capabilities to the test.
+Deploy a few Battle Towers and put their combat capabilities to the test.
 
 I'll be monitoring their performance and keeping an eye on you.
 
