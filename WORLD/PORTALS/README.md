@@ -1,3 +1,9 @@
+## SPAWN2 all-portals warp-in design (2026-11-06 — planned)
+
+The next planned visual pass is **not just a fade for future-wave portals**: *every* newly appearing portal (START portals together on fresh level load; Wave N portals on activation) should play the same ambitious **spiralling violet dimensional breach** with swirling particles, growing ring, short flash and transition to the established rotating idle look. Start-at-load is `AppearAtWave=0`; numeric Wave 1 remains wave-start activation. SPAWN1 activation is already source-implemented, so SPAWN2 must add a synchronized forming/ready gate to avoid spawning out of invisible openings. Reuse existing rotating shader and small spawn bursts; constrain opening VFX without sacrificing the art direction. [Full Codex handoff](../../ENEMIES/Spawning/IMPLEMENTATION_PLAN.md#phase-spawn2--shared-cinematic-dimensional-warp-in-for-all-portals-codex-implementation-specification). **Gameplay and visuals not implemented by these notes.**
+
+---
+
 ## SPAWN0 / SPAWN1 and portal feedback
 
 **Source Implemented / Awaiting Owner Validation.** `EnemyPortal.AppearAtWave=0` means START, positive values reveal at that authored wave Number. All future portals remain registered/reserved; SpawnManager and WaveManager own eligibility and ordering. The shared scene now includes 2°/s shader artwork rotation and a bounded purple GPUParticles2D spawn burst, configurable per portal. See [portal authoring/visuals](EnemyPortal/README.md) and [source contract](../../ENEMIES/Spawning/README.md). Historical no-setting/planned statements below are superseded for SPAWN0/1; SPAWN2–5 remain planned.

@@ -1,3 +1,9 @@
+## SPAWN2 expanded brief — shared ALL-PORTALS dimensional materialization (2026-11-06)
+
+**Plan only.** All START portals should form from a tiny dimensional singularity into a bright swirling violet warp as a level **freshly loads**. Portals configured `AppearAtWave=N` use the exact same one-shot event when their wave is accepted; numeric Wave 1 is not deployment, START=0 is. [Codex-ready SPAWN2 specification](IMPLEMENTATION_PLAN.md#phase-spawn2--shared-cinematic-dimensional-warp-in-for-all-portals-codex-implementation-specification) defines 4 visual phases (~2.2 s), spiralling inward GPU particles, ring/ripple/flash, shared state `Dormant->Forming->Open`, pausable progress, source readiness (no enemies from forming portals), restore/no-replay, warnings and particle performance caps. Existing SPAWN1 mechanics, rotation and per-spawn particles remain unchanged until implemented.
+
+---
+
 ## SPAWN1 startup registration follow-up — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** Level001's config still named a removed second portal, and Level020 named an absent fifth portal. Removed those stale entries to match each actual map; missing required source validation remains strict. The new activation fixture now checks real Level001 setup separately and uses Level002's two actual portals for its future-portal scenario. Maps, wave recipes, active source selection, schedules and portal coordinates are unchanged.
