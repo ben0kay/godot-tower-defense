@@ -1,5 +1,12 @@
 # Enemy roster — Class, Rank and Role
 
+## Colossal physical-size class — 2026-11-05
+
+**Source implemented / owner validation pending:** `EnemyClass.Colossal = 7` was added *between Capital and Titan in human-facing order*, retaining Titan's previously saved numeric ID `6`. The centralized `EnemyNaming.ClassSortOrder` is used by both F2 and the Wave Editor, so a future Colossal appears below Capital and above Titan without migration of existing `.tres` class numbers. This is author-assigned descriptive metadata only; not an automatic hull dimension classifier, change to collision, health, AI, targeting or wave difficulty.
+
+Guideline: **Capital 256–511px, Colossal 512–1023px, Titan 1024px+**, by the native hull sprite's longest side. No existing enemy currently opts into Colossal and no default wave or catalog entries were added. The Godot C# enum declaration places Colossal before Titan visually, but assigns Colossal the appended numeric value `7` to avoid reinterpretation of historic `Titan = 6`.
+
+
 **Updated 2026-11-05.** Canonical metadata for the 15 entries in `ENEMIES/DefaultEnemyCatalog.tres`. Asset numbering, catalog order and stable IDs do not determine campaign order or difficulty. **Source Implemented / Awaiting Owner Validation.**
 
 | Enemy | Class | Rank | Role | Stable EnemyId | Current scene folder | Hull artwork px |
@@ -37,10 +44,11 @@
 | Standard | 56–85 px | Regular fighters, medium assault hulls |
 | Heavy | 86–110 px | Heavy fighters, armoured hulls |
 | Superheavy | 111–255 px | Large cruisers, warships and transports |
-| Capital | 256–511 px | Future massive boss-scale hulls |
-| Titan | ≥512 px | Future enormous superstructures |
+| Capital | 256–511 px | Future massive warships and capital vessels |
+| Colossal | 512–1023 px | Monumental carriers, mobile fortresses and oversized support ships |
+| Titan | ≥1024 px | Ultimate ship-sized superstructures and map-dominating flagships |
 
-These are **authoring guidelines**, not runtime-calculated classifications: set the Class explicitly in the enemy's `.tres`. Do not automatically resize art, navigation, HP or weapons to fit a category. At a borderline size, the designer may choose a neighbouring class deliberately. Capital and Titan are intentionally **unoccupied by the current 15-ship roster** to leave room for much larger enemies.
+These are **authoring guidelines**, not runtime-calculated classifications: set the Class explicitly in the enemy's `.tres`. Do not automatically resize art, navigation, HP or weapons to fit a category. At a borderline size, the designer may choose a neighbouring class deliberately. Capital, Colossal and Titan are intentionally **unoccupied by the current 15-ship roster** to leave room for much larger enemies.
 
 **Rank describes overall threat/skill/encounter importance**, independent of size; **Role describes battlefield job**, independent of strength. For example, the 80×60 Elite Assault Ship is **Standard / Elite / Fighter**, whereas the larger 112×72 unarmed Drone Transporter is **Superheavy / Common / Cargo**. The Heavy Gunner's name refers to armament, not hull-size Class. The Drone Transporter's `Class` and `Role` were also explicitly authored here after being omitted from its resource (which previously loaded as default Tiny/Fighter).
 
@@ -48,11 +56,11 @@ These are **authoring guidelines**, not runtime-calculated classifications: set 
 
 Open a type's `.tres` → **Classification / Class, Rank, Role**. Each value is independent descriptive metadata:
 
-- **Class:** Tiny, Light, Standard, Heavy, Superheavy, Capital, Titan — physical scale and presence, with no forced sprite dimensions, collision radius, HP, speed or boss status.
+- **Class:** Tiny, Light, Standard, Heavy, Superheavy, Capital, Colossal, Titan — physical scale and presence, with no forced sprite dimensions, collision radius, HP, speed or boss status.
 - **Rank:** Common, Veteran, Elite, Champion, Miniboss, Boss — threat/importance, with no automatic scaling. A Tiny Boss and a Common Capital are both valid.
 - **Role:** Fighter, Cargo, Miner, Support — purpose only. Append future enum values without renumbering existing values. An anomaly can reuse any appropriate role and add unusual abilities through its scene; classification never grants or blocks capabilities.
 
-The active class assignments now follow the size guidelines above; they remain independent of navigation radius, speed, armour, shields, abilities and stat balance. No current Capital, Titan, Champion, Miniboss, Boss or Miner is required. Mk progression remains independent and unimplemented.
+The active class assignments now follow the size guidelines above; they remain independent of navigation radius, speed, armour, shields, abilities and stat balance. No current Capital, Colossal, Titan, Champion, Miniboss, Boss or Miner is required. Mk progression remains independent and unimplemented.
 
 Keep **EnemyId** and **DisplayName** unchanged. IDs remain the only wave/save lookup keys. Folder, scene, resource, artwork paths and UIDs remain unchanged; new types should use readable PascalCase folders. Actual stats, movement, shields, weapons and abilities remain owned by existing definitions/scenes and reusable systems.
 

@@ -69,7 +69,7 @@ public partial class EnemySpawnMenu : CanvasLayer
             choices.Add((pair.Value, spawns.Catalog.DefinitionFor(pair.Key)));
         choices.Sort((a, b) =>
         {
-            int byClass = a.Definition.Class.CompareTo(b.Definition.Class);
+            int byClass = EnemyNaming.ClassSortOrder(a.Definition.Class).CompareTo(EnemyNaming.ClassSortOrder(b.Definition.Class));
             return byClass != 0 ? byClass :
                 string.Compare(a.Definition.DisplayName, b.Definition.DisplayName, StringComparison.OrdinalIgnoreCase);
         });

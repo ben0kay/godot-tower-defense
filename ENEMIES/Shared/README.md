@@ -1,3 +1,9 @@
+## Colossal size classification — 2026-11-05
+
+Added `EnemyClass.Colossal = 7`, appearing between Capital and Titan in class-based editor/debug selection through `EnemyNaming.ClassSortOrder`. Titan retains serialized numeric value 6, and existing enemies remain unchanged. The human-authored hull-size guideline is Colossal 512–1023px and Titan 1024px+. No runtime size calculations, additional ships or new combat behavior are introduced. [Roster and classification guide](../Types/ROSTER.md).
+
+---
+
 ## Independent enemy classifications — 2026-11-04
 
 Registered enemies use **Class, Rank and Role** under **Classification**. Some older resources intentionally omit default-zero values; ensure nondefault classes are serialized. A missing Bulwark `Class` assignment was corrected in `Enemy004.tres` on 2026-11-05. These replace Fleet Family as descriptive metadata only: stats, sprite size, speed, weapons/abilities, wave IDs and Mk progression are independent. Wave Editor sorts by Class with separate selected metadata; F2 retains catalog/scene/preview indices and displays full details. See [the canonical roster](../Types/ROSTER.md) for assignments, enum extension rules, source migration, external custom resource guidance and the existing checkpoint content-hash caveat. Source implemented; owner Godot validation pending.

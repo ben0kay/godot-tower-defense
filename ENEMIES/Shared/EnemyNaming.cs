@@ -4,6 +4,15 @@ public static class EnemyNaming
     // =========================================================
     // Centralize readable labels independently of serialized enum numbers.
     public static string Class(EnemyClass value) => value.ToString();
+    // =========================================================
+    // Display order is independent of serialized enum numbers; Titan (6) must never be renumbered.
+    // All class-based pickers use this key so future Colossal ships appear before Titans.
+    public static int ClassSortOrder(EnemyClass value) => value switch
+    {
+        EnemyClass.Colossal => 6,
+        EnemyClass.Titan => 7,
+        _ => (int)value
+    };
     public static string Rank(EnemyRank value) => value.ToString();
     public static string Role(EnemyRole value) => value.ToString();
 

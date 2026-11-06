@@ -67,6 +67,10 @@ public partial class EnemySpawnMenuChecks : Node
         OptionButton choice = (OptionButton)menu.FindChild("Enemy", true, false);
         int before = f.Spawns.Registry.Living.Count, shipsSeen = 0, headersSeen = 0;
         int previousClass = -1;
+        Require((int)EnemyClass.Titan == 6 && (int)EnemyClass.Colossal == 7
+            && EnemyNaming.ClassSortOrder(EnemyClass.Capital) < EnemyNaming.ClassSortOrder(EnemyClass.Colossal)
+            && EnemyNaming.ClassSortOrder(EnemyClass.Colossal) < EnemyNaming.ClassSortOrder(EnemyClass.Titan),
+            "Colossal sorts between Capital and Titan without renumbering serialized classes");
         var occupiedClasses = new System.Collections.Generic.HashSet<EnemyClass>();
         for (int index = 0; index < choice.ItemCount; index++)
         {
@@ -87,12 +91,12 @@ public partial class EnemySpawnMenuChecks : Node
                 Require(definition.Class == EnemyClass.Standard &&
                     choice.GetItemTooltip(index).Contains("Class: Standard", StringComparison.Ordinal),
                     "Bulwark Drone must resolve as Standard from its registered EnemyDefinition");
-            Require((int)definition.Class >= previousClass, "F2 enemy classes sorted Tiny through Titan");
-            if ((int)definition.Class != previousClass)
+            Require(EnemyNaming.ClassSortOrder(definition.Class) >= previousClass, "F2 enemy classes sorted Tiny through Colossal to Titan");
+            if (EnemyNaming.ClassSortOrder(definition.Class) != previousClass)
                 Require(index > 0 && choice.GetPopup().IsItemSeparator(index - 1) &&
                     choice.GetItemText(index - 1) == EnemyNaming.Class(definition.Class).ToUpperInvariant(),
                     "Each class begins with a nonselectable named heading");
-            previousClass = (int)definition.Class;
+            previousClass = EnemyNaming.ClassSortOrder(definition.Class);
             occupiedClasses.Add(definition.Class);
             shipsSeen++;
             choice.Select(index); choice.EmitSignal(OptionButton.SignalName.ItemSelected, index);

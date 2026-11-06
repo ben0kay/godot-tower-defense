@@ -7,5 +7,7 @@ public enum EnemyClass
     Heavy = 3,
     Superheavy = 4,
     Capital = 5,
+    // New class is declared here for readability, but appended numerically to preserve saved Titan = 6.
+    Colossal = 7,
     Titan = 6
 }

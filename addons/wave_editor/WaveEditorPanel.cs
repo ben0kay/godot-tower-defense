@@ -232,7 +232,7 @@ public partial class WaveEditorPanel : VBoxContainer
                 EnemyDefinition definition = catalog.DefinitionFor(id);
                 return (Id: id, Name: definition?.DisplayName ?? id, Class: definition?.Class ?? EnemyClass.Tiny);
             })
-                .OrderBy(e => e.Class).ThenBy(e => e.Name, StringComparer.OrdinalIgnoreCase)
+                .OrderBy(e => EnemyNaming.ClassSortOrder(e.Class)).ThenBy(e => e.Name, StringComparer.OrdinalIgnoreCase)
                 .ThenBy(e => e.Id, StringComparer.Ordinal).ToList();
             _enemyCatalog = catalog; _enemyChoices = choices;
             Refresh(); Message("Enemy list refreshed: " + choices.Count + " registered types.");

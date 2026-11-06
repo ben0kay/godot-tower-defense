@@ -73,6 +73,12 @@ public partial class FleetExpansionChecks : Node
         EnemyCatalog.ValidateDefinition(unusual);
         unusual.Class = EnemyClass.Capital; unusual.Rank = EnemyRank.Common;
         EnemyCatalog.ValidateDefinition(unusual);
+        unusual.Class = EnemyClass.Colossal;
+        EnemyCatalog.ValidateDefinition(unusual);
+        Require((int)EnemyClass.Titan == 6 && (int)EnemyClass.Colossal == 7
+            && EnemyNaming.ClassSortOrder(EnemyClass.Capital) < EnemyNaming.ClassSortOrder(EnemyClass.Colossal)
+            && EnemyNaming.ClassSortOrder(EnemyClass.Colossal) < EnemyNaming.ClassSortOrder(EnemyClass.Titan),
+            "New Colossal sorts between Capital/Titan without changing saved Titan enum value");
         Require(unusual.MaxHealth == 60f && unusual.MoveSpeed == 100f && unusual.MaxShield == 0,
             "Changing class/rank/role never derives gameplay values"); unusual.Dispose();
         EnemyDefinition carrier = f.Spawns.Catalog.DefinitionFor("transporter_mk1");

@@ -1,3 +1,9 @@
+## Colossal class authoring — 2026-11-05
+
+Use `EnemyClass.Colossal` for future vessels with approximately 512–1023px longest native hull dimension. Titan begins at 1024px. Assign the class explicitly in the enemy definition; the game does not calculate it from image size. The C# enum preserves `Titan = 6` and appends `Colossal = 7`; F2 and Wave Editor apply shared `EnemyNaming.ClassSortOrder` to display Colossal before Titan.
+
+---
+
 # NEW ENEMY — AI authoring guide & design template
 
 **Purpose:** Use this file when asking Codex or another AI to create, modify or plan one enemy in `ben0kay/godot-tower-defense` (Godot 4 C#). This is an authoring guide and a **copyable brief**, not executable configuration or an instruction to create every possible feature.
@@ -10,7 +16,7 @@ These are **descriptive metadata**, not a rulebook or automatic stat multipliers
 
 | Field | Current values (in enum order) | Meaning |
 | --- | --- | --- |
-| **Class** | `Tiny`, `Light`, `Standard`, `Heavy`, `Superheavy`, `Capital`, `Titan` | Broad physical size / screen presence |
+| **Class** | `Tiny`, `Light`, `Standard`, `Heavy`, `Superheavy`, `Capital`, `Colossal`, `Titan` | Broad physical size / screen presence |
 | **Rank** | `Common`, `Veteran`, `Elite`, `Champion`, `Miniboss`, `Boss` | Threat or encounter importance |
 | **Role** | `Fighter`, `Cargo`, `Miner`, `Support` | Primary purpose or battlefield job |
 
@@ -20,7 +26,7 @@ These are **descriptive metadata**, not a rulebook or automatic stat multipliers
 - **Mk.1 / Mk.2 / Mk.3 is a separate concept**, not a fourth implemented classification. For example, Reinforced Drone can be treated creatively as a more advanced Standard Drone line without making Rank or Role dictate Mk progression. New Mk variants get their own stable definition/ID and deliberate assets/settings when approved.
 - **Future expansion:** if a genuinely new Class/Rank/Role is needed, discuss it with the owner and append to enums without renumbering existing serialized values. Avoid hardcoded switch-based gameplay restrictions.
 
-**Current examples (physical-size classes):** Standard Drone = Tiny / Common / Fighter (32×24px); Shield Emitter = Light / Common / Support (40×32px); Elite Assault Ship = Standard / Elite / Fighter (80×60px); Drone Transporter = Superheavy / Common / Cargo (112×72px); Heavy Transporter = Superheavy / Veteran / Cargo (144×100px); Cruiser = Superheavy / Elite / Fighter (168×96px). **Capital (256–511px longest hull dimension)** and **Titan (512px+)** are intentionally reserved for much bigger future ships. Select Class from the native hull SVG's longest dimension using the suggested size ranges in [ROSTER.md](ROSTER.md), not from health, speed, danger or names like “Heavy Gunner”. These are Inspector-authored guidelines, not an automatic runtime sizing system. The fleet has no Titan, Capital, Miniboss, Boss, Champion or Miner at the time of this update; that is intentional.
+**Current examples (physical-size classes):** Standard Drone = Tiny / Common / Fighter (32×24px); Shield Emitter = Light / Common / Support (40×32px); Elite Assault Ship = Standard / Elite / Fighter (80×60px); Drone Transporter = Superheavy / Common / Cargo (112×72px); Heavy Transporter = Superheavy / Veteran / Cargo (144×100px); Cruiser = Superheavy / Elite / Fighter (168×96px). **Capital (256–511px)**, **Colossal (512–1023px)** and **Titan (1024px+)** are intentionally reserved for much bigger future ships. Select Class from the native hull SVG's longest dimension using the suggested size ranges in [ROSTER.md](ROSTER.md), not from health, speed, danger or names like “Heavy Gunner”. These are Inspector-authored guidelines, not an automatic runtime sizing system. The fleet has no Titan, Colossal, Capital, Miniboss, Boss, Champion or Miner at the time of this update; that is intentional.
 
 ## 2. Copy/paste this brief when planning an enemy
 
@@ -33,7 +39,7 @@ Fill what you know; mark the rest **TBD / AI propose** rather than inventing a f
 | Proposed display name | **[name]** |
 | Stable enemy ID | **[unique snake_case ID; e.g. new_ship_mk1]** |
 | New design or variant of an existing ship? | **[new / Mk.2 of ... / specialized variant]** |
-| Class | **[Tiny / Light / Standard / Heavy / Superheavy / Capital / Titan]** |
+| Class | **[Tiny / Light / Standard / Heavy / Superheavy / Capital / Colossal / Titan]** |
 | Rank | **[Common / Veteran / Elite / Champion / Miniboss / Boss]** |
 | Role | **[Fighter / Cargo / Miner / Support]** |
 | Intended campaign introduction / purpose | **[level, encounter, counterplay; do not edit waves unless asked]** |
@@ -88,7 +94,7 @@ Fill what you know; mark the rest **TBD / AI propose** rather than inventing a f
 
 ## 4. Design principles to preserve
 
-- **Escalating scale is intentional:** the campaign may move from tiny ships to gigantic Capital/Titan hulls, with striking silhouettes, physically believable engine placement and dramatic death feedback. Don't assume big means slow; design for variety.
+- **Escalating scale is intentional:** the campaign may move from tiny ships to gigantic Capital/Colossal/Titan hulls, with striking silhouettes, physically believable engine placement and dramatic death feedback. Don't assume big means slow; design for variety.
 - **Special cases welcome:** fast capital ships, armed support vessels, bizarre anomaly ships, tiny bosses, escort spawners and unusual combinations should be possible through independent data and optional features.
 - **No auto-stat balancing from labels:** only explicit per-type stats and enabled mechanics control gameplay.
 - **Efficiency matters:** many small enemies can share cheap behavior; only units that need weapon mounts, shielding support, death spawning or elaborate effects should pay their cost. Avoid per-enemy idle polling and expensive one-off Draw/Process loops.

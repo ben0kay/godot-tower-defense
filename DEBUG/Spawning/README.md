@@ -1,3 +1,9 @@
+## Colossal class order — 2026-11-05
+
+F2's existing catalog-driven grouping now sorts via centralized `EnemyNaming.ClassSortOrder` instead of the numeric enum value. Newly authored Colossal-class ships will appear between Capital and Titan even though Colossal's appended enum value is 7 and Titan must stay 6 for serialization. Empty categories remain hidden; the current 15-ship picker is visually unchanged because neither category has a registered ship. Focused sorting tests updated; in-game confirmation pending.
+
+---
+
 ## Bulwark classification correction — 2026-11-05
 
 Fixed `medium_mk1` (Bulwark Drone) missing its serialized `Class` value. Without the explicit `Class = 2` assignment in `ENEMIES/Types/Enemy004/Enemy004.tres`, Godot uses `EnemyDefinition.Class`'s `Tiny` default; F2 was faithfully displaying and grouping that wrong value. The 64×48px Bulwark is now authored as **Standard / Common / Fighter**, matching the source roster. **F2 remains catalog-driven**, reading the current `EnemyDefinition` from `EnemyCatalog` at menu initialization; no duplicated runtime class list or automatic art-size classifier was added. After pulling, restart/reload the game level to rebuild the F2 picker. A focused F2 check asserts the classification and tooltip. Godot runtime verification pending.
