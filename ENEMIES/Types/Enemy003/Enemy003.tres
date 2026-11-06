@@ -3,13 +3,13 @@
 [resource]
 script = ExtResource("1")
 EnemyId = "shield_emitter_mk1"
-Class = 1
+Class = 2
 Rank = 0
 Role = 3
 DisplayName = "Shield Emitter"
-MaxHealth = 100.0
+MaxHealth = 200.0
 MaxShield = 80.0
-MoveSpeed = 70.0
-RadiusPixels = 16.0
+MoveSpeed = 60.0
+RadiusPixels = 22.0
 CitadelDamage = 2
 KillRewardCredits = 5

@@ -1,3 +1,11 @@
+## Shield Emitter upgraded to Standard class — 2026-11-06
+
+The existing `shield_emitter_mk1` is now **Standard / Common / Support** (was Light), with a uniformly enlarged **60×48px SVG** (was 40×32), **200 hull HP** (was 100), **60px/s** speed (was 70) and **22px navigation clearance** (was 16) to suit the larger hull. The original split-projector silhouette, charcoal/red fleet styling, violet reactor, 80 optional shield capacity and the 192px shield-restoration radius are unchanged. All other abilities, eligibility/limits, credits, waves and stable IDs remain intact; the F2 grouping updates automatically from the definition.
+
+Source-only validation; verify Godot SVG import, route clearance, and F2 preview/radius rendering in-game. Older stats and dimensions below are historical.
+
+---
+
 ## Faint violet shield restoration range — 2026-11-06
 
 The Shield Emitter now displays a thin, translucent violet perimeter at the exact **192px default `ShieldEmitterConfig.RadiusPixels`** (including a barely visible filled interior), moving with its ship in world space. The optional `ShieldRangeVisual` node draws behind the hull and follows live range edits; it hides when the emitter cannot actively pulse, on death or on removal. Rendering does not run an additional visual timer or physics tick. The ring shows **potential restoration reach**, not a guarantee that every nearby ship receives shielding; actual pulses still use MaxShield, eligibility and bounded recipient checks. This changes visuals only, not recipient shields, existing movement or combat. See [Shield Emitter component](../../Abilities/ShieldEmitter/README.md).

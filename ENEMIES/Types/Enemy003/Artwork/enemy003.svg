@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="40" height="32" viewBox="0 0 40 32">
-<!-- Shield Emitter: flat black/charcoal and scarlet fleet hull, restrained violet shield core. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="48" viewBox="0 0 40 32">
+<!-- Shield Emitter: 60x48 native Standard-class hull (1.5x original), black/charcoal with violet core. -->
 <g transform="translate(0 0) scale(0.4 0.32)" stroke-linejoin="round" stroke-linecap="round">
 <!-- Rounded reactor chassis with a split projection fork: support craft, not another arrow fighter -->
 <path d="M4 14 29 7 39 21 36 36 21 38Z M4 86 29 93 39 79 36 64 21 62Z" fill="#111920" stroke="#05080c" stroke-width="1.4"/>

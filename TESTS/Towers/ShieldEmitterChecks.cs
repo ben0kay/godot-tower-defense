@@ -11,6 +11,12 @@ public static class ShieldEmitterChecks
         Enemy ally = spawns.Spawn("basic_mk1", true), fast = spawns.Spawn("scout_mk1", true), outside = spawns.Spawn("basic_mk1", true);
         Enemy zero = spawns.Spawn("scout_mk1", true);
         Enemy[] ships = { first, second, ally, fast, outside, zero };
+        Require(first.Definition.Class == EnemyClass.Standard && first.Definition.Rank == EnemyRank.Common
+            && first.Definition.Role == EnemyRole.Support && first.Health == 200f
+            && first.Definition.MoveSpeed == 60f && first.Definition.RadiusPixels == 22f
+            && first.Definition.MaxShield == 80f
+            && first.GetNode<Sprite2D>("Sprite").GetRect().Size.IsEqualApprox(new Vector2(60, 48)),
+            "Shield Emitter has Standard size, 2x hull HP and reduced speed without changing shield capacity");
         foreach (Enemy ship in ships) ship.Movement.SetPhysicsProcess(false);
         Vector2 origin = ally.GlobalPosition;
         first.GlobalPosition = origin; second.GlobalPosition = origin + new Vector2(8, 0);

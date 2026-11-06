@@ -1,3 +1,9 @@
+## Standard-sized Shield Emitter art — 2026-11-06
+
+The existing shield emitter vector sprite now imports at **60×48px** (1.5× the old 40×32 canvas), retaining the exact source viewBox and all original artwork paths/colours. The increased canvas is the actual rendered sprite size, not an extra runtime Sprite2D scale, preserving shared thruster and health-bar autosizing. The shield-ring visual is a separate world-space Node2D and retains its actual configured 192px reach. The older 40×32 descriptions below are historical.
+
+---
+
 ## Enemy003 artwork naming — 2026-10-26
 
 The 40×32 right-facing shield-emitter support sprite is now `enemy003.svg`; its silhouette, colors, geometry, shield ability and gameplay remain unchanged. Previously it was called `shieldgenerator.svg` under the old support-enemy folder.

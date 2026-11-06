@@ -1,3 +1,9 @@
+## Shield Emitter balance and size pass — 2026-11-06
+
+Promoted `shield_emitter_mk1` **Light → Standard**; hull art **40×32 → 60×48** (1.5× uniform vector enlargement), hull **100 → 200 HP**, movement **70 → 60px/s**, navigation clearance **16 → 22px**. The emitter's shield capacity (80), shield restoration (20 per second in 192px radius), faint world-space radius, unique ID, Rank/Role, rewards, waves and shared systems are unchanged. F2 and Wave Editor use authored Class automatically. Updated `Enemy003.tres`, its SVG and relevant documentation, with one focused assertion in `ShieldEmitterChecks.cs`. Source-only check; owner to validate actual Godot art/ring alignment and corridor navigation.
+
+---
+
 ## FD5 plan update — real station-supplied fighter ammunition and service — 2026-11-06
 
 **Planning only; no FD5 gameplay code changed.** Expanded `DRONES/Combat/FIGHTER_DRONES_IMPLEMENTATION_PLAN.md` into FD5-A–E Codex handoff: Depot→Drone Station uses the existing courier/consumer logistics (requires a small endpoint generalization), station stock is finite and initially empty, fighters auto-return at configurable low ammo, timed 6s-full-load default consumes actual local ammo, paid gradual HP repair and one service bay are configurable, and a tiny bottom-up cyan bar appears by the docked fighter only when rearming. Defines manual-recall vs automatic relaunch, zero-stock waits, roster status, save/restore, accounting, lifecycle and low-overhead acceptance. FD1-B/FD2/FD4 remain source implemented; FD3/FD5 are not implemented; owner/ Codex gameplay work remains.

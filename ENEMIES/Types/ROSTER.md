@@ -19,7 +19,7 @@ Guideline: **Capital 256–511px, Colossal 512–1023px, Titan 1024px+**, by the
 | Heavy Bulwark | Heavy | Veteran | Fighter | `heavy_bulwark_mk1` | `Types/HeavyBulwark/` | 88×64 |
 | Gunner Drone | Light | Common | Fighter | `gunner_drone_mk1` | `Types/GunnerDrone/` | 48×30 |
 | Heavy Gunner Drone | Standard | Veteran | Fighter | `heavy_gunner_drone_mk1` | `Types/HeavyGunnerDrone/` | 62×42 |
-| Shield Emitter | Light | Common | Support | `shield_emitter_mk1` | `Types/Enemy003/` | 40×32 |
+| Shield Emitter | Standard | Common | Support | `shield_emitter_mk1` | `Types/Enemy003/` | 60×48 |
 | Shield Frigate | Standard | Veteran | Support | `shield_frigate_mk1` | `Types/ShieldFrigate/` | 72×48 |
 | Drone Transporter | Superheavy | Common | Cargo | `transporter_mk1` | `Types/Transporter/` | 112×72 |
 | Heavy Transporter | Superheavy | Veteran | Cargo | `heavy_transporter_mk1` | `Types/HeavyTransporter/` | 160×112 |
