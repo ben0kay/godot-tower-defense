@@ -1,3 +1,11 @@
+## SPAWN2 cinematic warp-in — revised Codex implementation handoff (2026-11-06)
+
+**PLANNED, not implemented.** [The complete SPAWN2 art/logic specification](../../../ENEMIES/Spawning/IMPLEMENTATION_PLAN.md#phase-spawn2--shared-cinematic-dimensional-warp-in-for-all-portals-codex-implementation-specification) now requires **every portal to animate in with the same impressive purple/lilac dimensional vortex, curved inward spiral particles, forming ring, bright ignition pulse and settling idle shader**. All `AppearAtWave=0` (START) portals **materialize together when a fresh level loads**, not simply appear fully formed; Wave N portals use the identical effect when their authored wave starts. `AppearAtWave=1` still means Wave 1 begins, so use 0 for loading-screen/start-of-level appearance. Restore from a between-wave checkpoint snaps already-open portals to Open without replaying the effect.
+
+Codex must preserve SPAWN1's registered source identity/route protection, differentiate `Dormant / Forming / Open` and gate enemy spawns until a portal finishes forming, while keeping pause and effect progress synchronized. Reuse existing rotating PortalArt, EnergyField and **ordinary** per-spawn 24-particle bursts. The cinematic materialization is a separate **one-shot** (proposal ~2.2 s) with bounded, cullable GPU particle swirls and locally rendered shader/ring effects; it must be striking on-screen while preserving 60 FPS as an optimization target. No implementation or Godot runtime visual acceptance has occurred yet.
+
+---
+
 ## START / Wave N activation and subtle spawn visuals
 
 **Source Implemented / Awaiting Owner Validation.**

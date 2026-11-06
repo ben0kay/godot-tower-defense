@@ -1,3 +1,9 @@
+## SPAWN2 planning update — all-portals dimensional warp-in (2026-11-06)
+
+The [SPAWN2 Codex handoff](ENEMIES/Spawning/IMPLEMENTATION_PLAN.md#phase-spawn2--shared-cinematic-dimensional-warp-in-for-all-portals-codex-implementation-specification) now specifies a **shared, cinematic violet swirly portal materialization** with inward curling GPU particles, growing ring, bright breach pulse and settling idle portal. **Every START (AppearAtWave=0) portal animates on fresh level deployment**, while portals due at Wave N play the same effect on their activation wave. Add a safe pausable Forming/Ready gate so no enemy can emerge from an unformed portal; between-wave checkpoint restore must not replay old appearances. Reuse existing SPAWN1 route reservations, idle rotation and short purple spawn bursts. **Documentation only: SPAWN2 not yet implemented.**
+
+---
+
 ## Per-level mission intel — shared upper-right typewriter (2026-11-06)
 
 **Source implemented / owner visual acceptance pending.** Level001 now presents optional Command Intelligence text when a fresh mission finishes loading using the **same top-right typewriter narrator** as wave transmissions. No centred popup, gameplay pause or input blocking. START WAVE remains manual and replaces/clears the intro when accepted. Other levels opt in through `LevelConfig.MissionBriefing`; checkpoint Continue skips it. Voice cue metadata is reserved for a future female AI narrator but no voice plays yet. [Mission briefing details](LEVELS/Briefing/README.md).
