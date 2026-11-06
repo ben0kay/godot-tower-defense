@@ -10,7 +10,7 @@ Motion/style now live under `FEEDBACK/Weapons/Recoil/`; existing tower classes, 
 ---
 
 ## FD1-B + FD2 — source implemented
-Paid station-owned fighters, launch/recall/checkpoints and budgeted Auto-pilot pursuit/manoeuvres are delivered; owner validation pending. Building/UI: [Drone Station](../TOWERS/Utility/DroneStation/README.md). Fighter AI: [DRONES/Combat](../DRONES/Combat/README.md). FD3 patrol UI, FD4 weapons and FD5 service remain planned.
+Paid station-owned fighters, launch/recall/checkpoints, Auto-pilot manoeuvres and **FD4 fixed twin-gun weapons** are source implemented (owner validation pending). **FD3 patrol, FD4.1 independent nearby weapon targeting and FD5 station resupply/service are planned, not yet implemented.** Codex handoffs for FD4.1 and FD5-A–E: [fighter plan](../DRONES/Combat/FIGHTER_DRONES_IMPLEMENTATION_PLAN.md). Building/UI: [Drone Station](../TOWERS/Utility/DroneStation/README.md). Fighter AI: [DRONES/Combat](../DRONES/Combat/README.md).
 
 ---
 

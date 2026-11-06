@@ -1,3 +1,9 @@
+## FD4.1 targeting + FD5 Codex handoff — 2026-11-06
+
+**Planning only, no gameplay implementation.** Added detailed FD4.1 to `DRONES/Combat/FIGHTER_DRONES_IMPLEMENTATION_PLAN.md`: keep Citadel-risk enemy as movement anchor, independently choose nearest actually shootable in-range/forward-arc/terrain-clear enemy for fixed twin guns, with separate short target hold, bounded shared spatial queries, shot-time LOS, pause/recall and checkpoint safety. Preserved the full FD5-A–E specification for real Depot→Station ammo deliveries, finite timed rearming/paid repair and small vertical per-fighter service telemetry. Recommended Codex order **FD4.1 then FD5**, with lightweight checks and separate status reporting. Corrected the outdated backlog note that called already-source-implemented FD4 weapons only planned.
+
+---
+
 ## Shield Emitter balance and size pass — 2026-11-06
 
 Promoted `shield_emitter_mk1` **Light → Standard**; hull art **40×32 → 60×48** (1.5× uniform vector enlargement), hull **100 → 200 HP**, movement **70 → 60px/s**, navigation clearance **16 → 22px**. The emitter's shield capacity (80), shield restoration (20 per second in 192px radius), faint world-space radius, unique ID, Rank/Role, rewards, waves and shared systems are unchanged. F2 and Wave Editor use authored Class automatically. Updated `Enemy003.tres`, its SVG and relevant documentation, with one focused assertion in `ShieldEmitterChecks.cs`. Source-only check; owner to validate actual Godot art/ring alignment and corridor navigation.
