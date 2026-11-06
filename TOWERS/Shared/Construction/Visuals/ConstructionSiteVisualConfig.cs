@@ -20,6 +20,7 @@ public partial class ConstructionSiteVisualConfig : Resource
     [Export] public Vector2 TelemetryOffset { get; set; } = new(8, -14);
     [Export(PropertyHint.Range, "88,220,1")] public float TelemetryWidth { get; set; } = 132;
     [ExportGroup("Circular Site Progress")]
+    [Export(PropertyHint.Range, ".4,1.5,.05")] public float TelemetryScale { get; set; } = .8f;
     [Export(PropertyHint.Range, "26,56,1")] public float TelemetryRingRadius { get; set; } = 40;
     [Export(PropertyHint.Range, "0,180,1")] public float TelemetryOuterDegreesPerSecond { get; set; } = 30;
     [Export(PropertyHint.Range, "0,180,1")] public float TelemetryMiddleDegreesPerSecond { get; set; } = 48;

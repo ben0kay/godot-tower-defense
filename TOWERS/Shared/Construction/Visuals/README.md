@@ -1,3 +1,9 @@
+## Percentage-only construction widget — 2026-11-06
+
+**Source Implemented / Awaiting Owner Visual Validation.** Removed DRONE INBOUND, SITE LOCKED, SYSTEM ONLINE and the job caption. The same animated circular percentage is shown while waiting/working and briefly counts up to 100% on successful completion before fading. The entire widget (arcs, dots and number) defaults to 80% scale via `TelemetryScale`, and anchors above/right of the building's upper-right footprint corner. Existing collision-avoidance lanes, shared bounded redraw, work progress, pause and save ownership remain. Acquisition footprint flashes remain visual-only and do not display status text. Source review only; .NET unavailable. Owner: check queue/acquire/build/upgrade/completion and crowded sites in Godot.
+
+---
+
 ## Circular construction telemetry polish — 2026-11-06
 
 **Source Implemented / Awaiting Owner Visual Validation.** The previous rectangular site readout is replaced only for **CONSTRUCTING / UPGRADING** by a compact cyan circular vector meter outside the footprint. The actual paid work percentage counts up in the centre; one pale outer curved arc and its 20 tiny ion dots move **anti-clockwise**, while two inner curves rotate **clockwise**. A small caption identifies the active job. The ring has only a subtle round tint; no black rectangle. **DRONE INBOUND, SITE LOCKED and SYSTEM ONLINE** remain short unboxed text, with the existing completion fade.

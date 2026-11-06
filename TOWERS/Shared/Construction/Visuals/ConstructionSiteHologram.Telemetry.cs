@@ -45,12 +45,12 @@ public partial class ConstructionSiteHologram
         site.Percent = percent; site.Waiting = waiting; site.Upgrading = upgrading;
         // New or restored work starts with its authoritative progress; future changes count upward.
         if (!site.DisplayInitialized) { site.DisplayInitialized = true; site.DisplayedPercent = percent; }
-        site.Text = waiting ? "DRONE INBOUND" : (upgrading ? "UPGRADING " : "CONSTRUCTING ") + percent + "%";
+        site.Text = percent + "%";
     }
     private void RetireTelemetry(TowerBase tower)
     {
         if (!_telemetry.TryGetValue(tower, out var site)) return;
-        // Unregister precedes WorkCompleted; only that successful event may create SYSTEM ONLINE.
+        // Unregister precedes WorkCompleted; only that successful event may show a completed 100% widget.
         if (!GodotObject.IsInstanceValid(tower) || tower.IsBusy || tower.IsDestroyed || tower.IsQueuedForDeletion()) RemoveTelemetry(site);
     }
     private void CompleteReadout(Readout site)
@@ -62,7 +62,8 @@ public partial class ConstructionSiteHologram
             || Config?.Enabled != true || !Config.TelemetryEnabled) { RemoveTelemetry(site); return; }
         int cap = Mathf.Clamp(Config.MaxCompletionReadouts, 1, 64);
         while (_completions.Count >= cap) RemoveTelemetry(_completions[0]);
-        site.Text = "SYSTEM ONLINE"; site.Age = 0;
+        site.Percent = 100; site.Waiting = false;
+        site.Text = "100%"; site.Age = 0;
         _completions.Add(site); RefreshProcessing();
     }
     private void AdvanceTelemetry(float dt)
@@ -71,7 +72,7 @@ public partial class ConstructionSiteHologram
         float rate = ConstructionDroneMasterConfig.Safe(Config.TelemetryCountUpPerSecond, 160, 20, 400);
         foreach (Readout site in _telemetry.Values)
         {
-            if (!site.DisplayInitialized || site.Waiting || site.Text == "SYSTEM ONLINE") continue;
+            if (!site.DisplayInitialized || site.Waiting) continue;
             site.DisplayedPercent = Mathf.MoveToward(site.DisplayedPercent, site.Percent, rate * dt);
         }
         float duration = ConstructionDroneMasterConfig.Safe(Config.CompletionReadoutSeconds, 1, .8f, 1.2f);
@@ -102,18 +103,18 @@ public partial class ConstructionSiteHologram
     private void ClearTelemetry()
     { foreach (var site in _telemetry.Values) Detach(site); _telemetry.Clear(); _completions.Clear(); }
     // =========================================================
-    // Draw either a circular construction percentage or bare, unboxed status text.
+    // Draw only the circular percentage, including a brief 100% completion fade.
     // Keep the old bounded eight-lane placement to prevent overlap on crowded sites.
     private void DrawTelemetry(Rect2 bounds, Readout site, bool acquiring, float opacity, ConstructionSiteVisualConfig c)
     {
         if (!c.TelemetryEnabled || site.Text == null || opacity <= 0) return;
-        bool progress = !acquiring && !site.Waiting && site.Text != "SYSTEM ONLINE";
+        float scale = ConstructionDroneMasterConfig.Safe(c.TelemetryScale, .8f, .4f, 1.5f);
         float radius = ConstructionDroneMasterConfig.Safe(c.TelemetryRingRadius, 40, 26, 56);
-        int fontSize = Mathf.Clamp(c.TelemetryFontSize, 8, 18);
-        float width = progress ? (radius + 9) * 2 : ConstructionDroneMasterConfig.Safe(c.TelemetryWidth, 132, 88, 220);
-        float height = progress ? (radius + 9) * 2 + 15 : fontSize + 10;
+        float diameter = (radius + 9) * 2;
+        float width = diameter * scale, height = diameter * scale;
         Vector2 offset = c.TelemetryOffset.IsFinite() ? c.TelemetryOffset : new(8, -14);
-        Rect2 panel = new(new Vector2(bounds.End.X, bounds.Position.Y) + offset, new(width, height));
+        // Place the complete widget above/right of the footprint corner, rather than alongside it.
+        Rect2 panel = new(new Vector2(bounds.End.X, bounds.Position.Y - height) + offset, new(width, height));
         Vector2 anchor = panel.Position;
         bool placed = false;
         for (int lane = 0; lane < 8 && !placed; lane++)
@@ -127,20 +128,9 @@ public partial class ConstructionSiteHologram
         if (!placed || _readoutCount >= _readoutBounds.Length) return;
         _readoutBounds[_readoutCount++] = panel;
         Font font = c.TelemetryFont ?? ThemeDB.FallbackFont;
-        if (progress) DrawCircularProgress(panel, radius, site, opacity, font, c);
-        else DrawBareStatus(panel, acquiring ? "SITE LOCKED" : site.Text, opacity, font, fontSize,
-            acquiring ? c.AcquisitionTint : c.TelemetryColor);
-    }
-
-    // =========================================================
-    // DRONE INBOUND, SITE LOCKED and SYSTEM ONLINE retain brief text, never a black rectangle.
-    private void DrawBareStatus(Rect2 panel, string label, float opacity, Font font, int fontSize, Color tint)
-    {
-        Vector2 pos = panel.Position + new Vector2(0, fontSize + 1);
-        Color shadow = new(.015f, .045f, .065f, opacity * .9f);
-        tint.A *= opacity;
-        DrawString(font, pos + Vector2.One, label, HorizontalAlignment.Left, panel.Size.X, fontSize, shadow);
-        DrawString(font, pos, label, HorizontalAlignment.Left, panel.Size.X, fontSize, tint);
+        DrawSetTransform(panel.Position, 0, Vector2.One * scale);
+        DrawCircularProgress(new Rect2(Vector2.Zero, new Vector2(diameter, diameter)), radius, site, opacity, font, c);
+        DrawSetTransform(Vector2.Zero, 0, Vector2.One);
     }
 
     // =========================================================
@@ -190,11 +180,6 @@ public partial class ConstructionSiteHologram
         DrawString(font, new Vector2(center.X - size.X * .5f, baseline), site.PercentLabel,
             HorizontalAlignment.Left, -1, numberSize, pale);
 
-        const int captionSize = 9;
-        string caption = site.Upgrading ? "UPGRADING" : "CONSTRUCTING";
-        float captionWidth = font.GetStringSize(caption, HorizontalAlignment.Left, -1, captionSize).X;
-        DrawString(font, new Vector2(center.X - captionWidth * .5f, panel.End.Y - 3), caption,
-            HorizontalAlignment.Left, -1, captionSize, new Color(.52f, .94f, 1f, opacity * .92f));
     }
     private void DrawCompletions(Rect2 visible, ConstructionSiteVisualConfig c)
     {

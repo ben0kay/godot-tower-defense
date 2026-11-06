@@ -1,3 +1,9 @@
+## Construction percentage widget and portal feedback polish — 2026-11-06
+
+**Source Implemented / Awaiting Owner Visual Validation.** Construction telemetry is percentage-only, uniformly 20% smaller, anchored upper-right of the footprint; successful completion counts to 100% then fades. Inbound/locked/online labels and job caption are removed. Portal spin defaults to 120 degrees/sec; 48 brighter/larger GPU sparks spawn from explicit 64-point rim geometry and travel radially outward. Existing event ownership, work/gameplay rules, shared bounded drawing, 750ms burst cap and culling remain. Source/resource sanity review only; .NET unavailable, owner visual/FPS checks pending. See [construction visuals](TOWERS/Shared/Construction/Visuals/README.md) and [portal feedback](WORLD/PORTALS/EnemyPortal/README.md).
+
+---
+
 ## Level001 companion voice synchronized with mission intel — 2026-11-06
 
 **Source implemented / owner audio acceptance pending.** The newly pushed `LEVELS/Level001/Level001Briefing.mp3` now registers as `voice_mission_level001_intro` and plays through the existing `VoiceAssistant` on a fresh Level001 load. The *same upper-right narrator* begins typing when voice playback starts and does not fade until after the clip ends (plus its usual reading hold). Camera movement/building/START WAVE remain available; early wave starts do not clear active voiced subtitles, and save-Continue skips replay. Voice is optional per mission through `MissionBriefingDefinition.VoiceCueId`. [Briefing documentation](LEVELS/Briefing/README.md).---

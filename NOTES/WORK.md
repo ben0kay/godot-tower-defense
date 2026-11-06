@@ -1,3 +1,9 @@
+## Construction percentage widget and portal feedback polish — 2026-11-06
+
+**Source Implemented / Awaiting Owner Visual Validation.** Construction telemetry is percentage-only, uniformly 20% smaller, anchored upper-right of the footprint; successful completion counts to 100% then fades. Inbound/locked/online labels and job caption are removed. Portal spin defaults to 120 degrees/sec; 48 brighter/larger GPU sparks spawn from explicit 64-point rim geometry and travel radially outward. Existing event ownership, work/gameplay rules, shared bounded drawing, 750ms burst cap and culling remain. Source/resource sanity review only; .NET unavailable, owner visual/FPS checks pending. See [construction visuals](../TOWERS/Shared/Construction/Visuals/README.md) and [portal feedback](../WORLD/PORTALS/EnemyPortal/README.md).
+
+---
+
 ## Content-sized mission narration — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** `UI/Narration/NarrationDisplay` now sizes its shared cyan card to the full wrapped text instead of clipping briefings at 136px. The existing PanelHeight becomes a minimum. RichTextLabel fit-content and reveal-after-shaping reserve the full text before typing; minimum-size/viewport events reflow and shrink replacements without idle polling. Applies to every mission briefing and wave transmission. Voice hold, timing, authored text and input remain unchanged. Updated narrator/briefing docs and config comment. Source/scene sanity review only; .NET unavailable. Owner: inspect all Level001 paragraphs, resize, then replace with short narration. Extremely short viewports can still be smaller than long authored messages.

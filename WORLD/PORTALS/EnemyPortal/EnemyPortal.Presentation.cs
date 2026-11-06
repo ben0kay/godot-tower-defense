@@ -4,15 +4,17 @@ using Godot;
 public partial class EnemyPortal
 {
     [ExportGroup("Portal Feedback")]
-    [Export(PropertyHint.Range, "0,10,0.1")] public float RotationDegreesPerSecond { get; set; } = 2f;
+    [Export(PropertyHint.Range, "0,360,1")] public float RotationDegreesPerSecond { get; set; } = 120f;
     [Export] public bool SpawnParticlesEnabled { get; set; } = true;
     private EnergyFieldVisual _energy;
     private GpuParticles2D _spawnParticles;
     private VisibleOnScreenNotifier2D _onScreen;
     private ulong _nextBurstMs;
+    private static ImageTexture _rimPoints;
+    private const int RimPointCount = 64;
 
     // =========================================================
-    // Copy only the tiny artwork material; particle resources remain shared immutable scene data.
+    // Copy per-portal materials; reuse one immutable 64-point rim texture across all portals.
     private void SetupPresentation()
     {
         _energy = GetNodeOrNull<EnergyFieldVisual>("Visuals/EnergyField");
@@ -22,13 +24,31 @@ public partial class EnemyPortal
         {
             var own = (ShaderMaterial)material.Duplicate(); art.Material = own;
             own.SetShaderParameter("radians_per_second", Mathf.DegToRad(float.IsFinite(RotationDegreesPerSecond)
-                ? Mathf.Clamp(RotationDegreesPerSecond, 0, 10) : 2f));
+                ? Mathf.Clamp(RotationDegreesPerSecond, 0, 360) : 120f));
+        }
+        if (_spawnParticles?.ProcessMaterial is ParticleProcessMaterial source)
+        {
+            // Shared immutable float positions, generated once: every particle starts on the visible rim.
+            if (_rimPoints == null)
+            {
+                using Image image = Image.CreateEmpty(RimPointCount, 1, false, Image.Format.Rgbaf);
+                for (int i = 0; i < RimPointCount; i++)
+                {
+                    Vector2 point = Vector2.FromAngle(Mathf.Tau * i / RimPointCount) * 46f;
+                    image.SetPixel(i, 0, new Color(point.X, point.Y, 0, 1));
+                }
+                _rimPoints = ImageTexture.CreateFromImage(image);
+            }
+            var burst = (ParticleProcessMaterial)source.Duplicate();
+            burst.EmissionPointTexture = _rimPoints;
+            burst.EmissionPointCount = RimPointCount;
+            _spawnParticles.ProcessMaterial = burst;
         }
         if (_onScreen != null) _onScreen.ScreenExited += StopSpawnFeedback;
     }
 
     // =========================================================
-    // One 24-particle emitter per portal; dense waves coalesce to at most one burst per 750ms.
+    // One 48-particle emitter per portal; dense waves coalesce to at most one burst per 750ms.
     public void PlaySpawnFeedback()
     {
         if (!IsInsideTree() || !IsSpawnActive || !IsVisibleInTree() || GetTree().Paused || _onScreen?.IsOnScreen() != true) return;
