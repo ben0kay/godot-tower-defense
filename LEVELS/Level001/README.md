@@ -1,3 +1,9 @@
+## Hotfix — Level001 briefing/audio missing (2026-11-06)
+
+**Fixed in source; owner retest pending.** `Level001Config.tres` had lost its `MissionBriefing = ExtResource("mission_briefing")` assignment. The load-time presenter reads the optional briefing **only** from `World/Level.Settings.MissionBriefing`, so a missing assignment quietly suppresses both typewritten text and `Level001Briefing.mp3`. Restored its resource reference using the authored `Level001Briefing.tres` UID; the latest briefing script, voice cue, audio catalog, and wave behavior remain unchanged. In Godot: inspect Level001Config → Mission Intro and verify the resource is assigned; run a **fresh** Level001 deployment (not checkpoint Continue) before START WAVE.
+
+---
+
 ## Level001 voiced briefing — 2026-11-06
 
 The owner's `Level001Briefing.mp3` now plays automatically on **fresh Level001 load**, via `Level001BriefingVoice.tres` (non-positional Voice category) and the existing `VoiceAssistant` queue. `Level001Briefing.tres.VoiceCueId` selects it. The original top-right **typewriter** starts with audio, and text cannot fade until the recording ends plus the standard brief reading hold. A manually started wave does not prematurely clear a still-spoken intro. Gameplay stays active and checkpoint Continue skips the intro. Tune audio level in `Level001BriefingVoice.tres`; edit text in `Level001Briefing.tres`. Runtime audio/visual verification pending.---

@@ -3,9 +3,12 @@
 [ext_resource type="Script" uid="uid://d3rj1iimghlhl" path="res://LEVELS/LevelConfig.cs" id="1"]
 [ext_resource type="Resource" uid="uid://cgao0momng87t" path="res://LEVELS/Level001/Level001Waves.tres" id="wave_source"]
 
+[ext_resource type="Resource" uid="uid://bx1m511lkusdy" path="res://LEVELS/Level001/Level001Briefing.tres" id="mission_briefing"]
+
 [resource]
 script = ExtResource("1")
 StartingCredits = 1000
 ActivePortals = Array[NodePath]([NodePath("Portals/EnemyPortal")])
+MissionBriefing = ExtResource("mission_briefing")
 WaveSource = ExtResource("wave_source")
 WaveSetId = "level001"
