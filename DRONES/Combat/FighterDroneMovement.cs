@@ -8,16 +8,18 @@ internal sealed class FighterDroneMovement
     private int _generation, _stage;
     private Vector2 _axis = Vector2.Up;
     private float _side = 1, _stageSeconds;
-    internal bool OnAttackRun => _passTarget != null && _stage == 1;
+    private Vector2 _steeringPoint, _acceleration;
+    private bool _steeringReady;
+    private float _angularVelocity;
 
     // =========================================================
     // Retained target-relative waypoints make complete passes instead of chasing an orbit point beside the ship.
     internal void Step(FighterDrone fighter, Enemy target, Vector2 home, float dt, System.Func<Vector2, Vector2> clamp)
     {
         var config = fighter.Config;
-        float speed = FighterDroneConfig.Safe(config.FlightSpeed, 340, 32, 2000);
-        float radius = FighterDroneConfig.Safe(config.OrbitRadius, 150, 24, 600);
-        float manoeuvreSpeed = FighterDroneConfig.Safe(config.ManoeuvreSpeed, 260, 24, 1000);
+        float speed = FighterDroneConfig.Safe(config.FlightSpeed, 300, 32, 2000);
+        float radius = FighterDroneConfig.Safe(config.OrbitRadius, 210, 24, 600);
+        float manoeuvreSpeed = FighterDroneConfig.Safe(config.ManoeuvreSpeed, 220, 24, 1000);
         Phase = Mathf.PosMod(Phase + dt * manoeuvreSpeed / radius, Mathf.Tau * 3);
         Vector2 destination; float cruise = speed;
         if (target == null)
@@ -62,27 +64,36 @@ internal sealed class FighterDroneMovement
                 destination = center + _axis * exit + lateral * radius * .35f;
             else if (_stage == 3)
             {
-                destination = center - _axis * runUp + lateral * radius;
+                destination = center - _axis * (runUp + radius) + lateral * radius;
                 cruise = manoeuvreSpeed;
             }
             else destination = staging;
         }
         destination = clamp(destination);
-        Vector2 offset = destination - fighter.GlobalPosition;
-        float braking = FighterDroneConfig.Safe(config.Deceleration, 1000, 32, 10000);
+        float response = FighterDroneConfig.Safe(config.SteeringResponseSeconds, .65f, .1f, 2);
+        if (!_steeringReady) { _steeringPoint = fighter.GlobalPosition + Vector2.FromAngle(Heading) * 100; _steeringReady = true; }
+        _steeringPoint = _steeringPoint.Lerp(destination, 1 - Mathf.Exp(-dt / response));
+        Vector2 offset = _steeringPoint - fighter.GlobalPosition;
+        float braking = FighterDroneConfig.Safe(config.Deceleration, 500, 32, 10000);
         // Maintain forward speed through the firing pass and pull-away; only guard/staging can slow on arrival.
         bool passing = target != null && (_stage == 1 || _stage == 2 || _stage == 3);
         float desiredSpeed = passing ? cruise : Mathf.Min(cruise, Mathf.Sqrt(2 * braking * offset.Length()));
         float desiredHeading = offset.LengthSquared() > .01f ? offset.Angle() : Heading;
-        float turn = Mathf.DegToRad(FighterDroneConfig.Safe(config.TurnDegreesPerSecond, 150, 30, 720)) * dt;
-        Heading = Mathf.Wrap(Heading + Mathf.Clamp(Mathf.AngleDifference(Heading, desiredHeading), -turn, turn), -Mathf.Pi, Mathf.Pi);
+        float maxTurn = Mathf.DegToRad(FighterDroneConfig.Safe(config.TurnDegreesPerSecond, 90, 30, 720));
+        float wantedTurn = Mathf.Clamp(Mathf.AngleDifference(Heading, desiredHeading) / response, -maxTurn, maxTurn);
+        _angularVelocity = Mathf.Lerp(_angularVelocity, wantedTurn, 1 - Mathf.Exp(-dt / (response * .5f)));
+        Heading = Mathf.Wrap(Heading + _angularVelocity * dt, -Mathf.Pi, Mathf.Pi);
         Vector2 desiredVelocity = Vector2.FromAngle(Heading) * desiredSpeed;
-        float rate = desiredSpeed < Velocity.Length() ? braking : FighterDroneConfig.Safe(config.Acceleration, 1000, 32, 10000);
-        Velocity = Velocity.MoveToward(desiredVelocity, rate * dt);
+        float speedResponse = FighterDroneConfig.Safe(config.AccelerationResponseSeconds, .6f, .1f, 2);
+        float rate = desiredSpeed < Velocity.Length() ? braking : FighterDroneConfig.Safe(config.Acceleration, 600, 32, 10000);
+        Vector2 wantedAcceleration = ((desiredVelocity - Velocity) / speedResponse).LimitLength(rate);
+        _acceleration = _acceleration.Lerp(wantedAcceleration, 1 - Mathf.Exp(-dt / (speedResponse * .4f)));
+        Velocity += _acceleration * dt;
+        if (Velocity.Length() > speed * 1.1f) Velocity = Velocity.LimitLength(speed * 1.1f);
         Vector2 position = fighter.GlobalPosition + Velocity * dt, bounded = clamp(position);
-        if (bounded != position) Velocity = (bounded - fighter.GlobalPosition) / dt;
+        if (bounded != position) { Velocity = (bounded - fighter.GlobalPosition) / dt; _acceleration = Vector2.Zero; }
         fighter.GlobalPosition = bounded;
     }
-    internal void ResetPass() { _passTarget = null; _stage = 0; _stageSeconds = 0; }
+    internal void ResetPass() { _passTarget = null; _stage = 0; _stageSeconds = 0; _steeringReady = false; _angularVelocity = 0; _acceleration = Vector2.Zero; }
     private void Advance(int stage) { _stage = stage; _stageSeconds = 0; }
 }

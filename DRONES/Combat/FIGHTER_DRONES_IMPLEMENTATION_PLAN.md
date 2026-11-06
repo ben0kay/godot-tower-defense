@@ -1,5 +1,5 @@
 ## FD4 fixed-gun fighter pass refactor — 2026-11-06
-**SOURCE IMPLEMENTED / AWAITING OWNER VALIDATION.** Single twin-barrel hull sprite, alternating muzzle rounds at 9 shots/s total, 8° hull-forward firing tolerance, complete attack passes with alternating return lobes, and longer speed/acceleration-responsive shared exhaust. Independent rotating gun removed. Shared physical Kinetic bullets, finite ammunition, LOS, attribution, targeting, recall and checkpoint ownership preserved. FD3/FD5 remain deferred. [Current usage/settings](README.md).
+**SOURCE IMPLEMENTED / AWAITING OWNER VALIDATION.** Single twin-barrel hull sprite, alternating muzzle rounds at 9 shots/s total, 180° full forward firing arc, smoothed attack passes with alternating return lobes and eased acceleration, and longer speed/acceleration-responsive shared exhaust. Independent rotating gun removed. Shared physical Kinetic bullets, finite ammunition, LOS, attribution, targeting, recall and checkpoint ownership preserved. FD3/FD5 remain deferred. [Current usage/settings](README.md).
 
 ---
 

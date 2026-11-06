@@ -1,3 +1,6 @@
+## Larger faint clouds and portal-relative particles — 2026-11-06
+Existing rolling smoke is retained. A second bounded layer adds eight larger, darker, faint clouds (2.2× size, 8s life, 12% opacity), with slower drift/swirl. Tune the new Large Faint Clouds group on the spawn-feedback preset. Both layers follow wave emission, pause, offscreen, reset and restore handling. All portal emitters simulate in local presentation space, so `SizeMultiplier` scales birth rim, puff/spark size, drift distance and bounds together without moving SpawnExit or changing spawn rules. Source/resource review only; owner visual/FPS acceptance pending.
+
 ## Organic pulse and lingering wave smoke — 2026-11-06
 Source implemented; owner visual acceptance pending. Pulse strength/duration, spark count/angle and feedback spacing now vary using a private cosmetic RNG (`Irregularity`, default 40%), independent of wave RNG. Small pulses can occur closer together; a busy pulse finishes rather than continually restarting.
 

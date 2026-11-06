@@ -43,6 +43,7 @@ public partial class EnemyPortal
             burst.EmissionPointTexture = _rimPoints;
             burst.EmissionPointCount = RimPointCount;
             _spawnParticles.ProcessMaterial = burst;
+            _spawnParticles.LocalCoords = true; // SizeMultiplier scales rim positions, spark size and outward drift together.
         }
         SetupSpawnFeedback();
         if (_onScreen != null) { _onScreen.ScreenExited += StopSpawnFeedback; _onScreen.ScreenEntered += RefreshWaveSmoke; }

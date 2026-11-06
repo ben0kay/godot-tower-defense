@@ -18,7 +18,7 @@ public partial class FighterDrone : Node2D
     private readonly FighterDroneMovement _steering = new();
     private Enemy _target;
     private int _targetGeneration;
-    private float _search;
+    private float _search, _retargetHold;
     internal void ClearTarget(FighterDroneTargeting targeting) { targeting?.Release(this); _target = null; }
     private DroneFlightMotion _motion = new() { Heading = -Mathf.Pi / 2 };
     private DroneBody _body;
@@ -73,10 +73,16 @@ public partial class FighterDrone : Node2D
     {
         if (!IsFlying || InTransit) return false;
         if (targeting == null || !targeting.Valid(_target) || _target.SpawnGeneration != _targetGeneration) ClearTarget(targeting);
-        _search -= dt;
+        _search -= dt; _retargetHold = Mathf.Max(0, _retargetHold - dt);
         if (_search <= 0)
         {
-            _target = targeting?.Acquire(this, _target);
+            if (_target == null || _retargetHold <= 0)
+            {
+                Enemy previous = _target;
+                _target = targeting?.Acquire(this, _target);
+                if (_target != previous)
+                    _retargetHold = FighterDroneConfig.Safe(Config.TargetHoldSeconds, 1.5f, 0, 5);
+            }
             _targetGeneration = _target?.SpawnGeneration ?? 0;
             _search = FighterDroneConfig.Safe(Config.TargetSearchSeconds, .3f, .1f, 2);
         }
@@ -86,7 +92,7 @@ public partial class FighterDrone : Node2D
         State = _target == null ? FighterDroneState.Holding :
             GlobalPosition.DistanceTo(_target.GlobalPosition) > engagement ? FighterDroneState.Intercepting : FighterDroneState.Manoeuvring;
         _steering.Step(this, _target, home, dt, clamp); Present(dt, true);
-        bool fired = _weapon?.Step(dt, _steering.OnAttackRun ? _target : null) == true;
+        bool fired = _weapon?.Step(dt, _target) == true;
         return before != State || fired;
     }
     private void Present(float dt, bool ignite) => _body?.Present(InTransit ? _motion.Heading : _steering.Heading,

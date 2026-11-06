@@ -18,5 +18,13 @@ public partial class PortalSpawnFeedbackStyle : Resource
     [Export(PropertyHint.Range, "4,60,1")] public float OutwardSpeed { get; set; } = 18;
     [Export(PropertyHint.Range, "0,15,1")] public float SwirlAcceleration { get; set; } = 3;
     [Export(PropertyHint.Range, "0,1,.05")] public float Opacity { get; set; } = .38f;
+    [ExportGroup("Large Faint Clouds")]
+    [Export] public bool LargeCloudsEnabled { get; set; } = true;
+    [Export(PropertyHint.Range, "2,12,1")] public int LargeCloudCount { get; set; } = 8;
+    [Export(PropertyHint.Range, "1.5,4,.1")] public float LargeCloudSizeMultiplier { get; set; } = 2.2f;
+    [Export(PropertyHint.Range, "4,12,.5")] public float LargeCloudLifetime { get; set; } = 8;
+    [Export(PropertyHint.Range, "0,.3,.01")] public float LargeCloudOpacity { get; set; } = .12f;
+    [Export] public Color LargeCloudTint { get; set; } = new(.26f, .10f, .38f, 1);
+    [ExportGroup("Smoke Colour")]
     [Export] public Color Tint { get; set; } = new(.52f, .22f, .76f, 1);
 }

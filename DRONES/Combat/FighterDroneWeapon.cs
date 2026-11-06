@@ -29,7 +29,7 @@ public partial class FighterDroneWeapon : Node
     { _fighter = fighter; _grid = grid; _projectiles = projectiles; }
 
     // =========================================================
-    // No turret tracking: a small forward cone allows modest aim correction after the hull lines up.
+    // No turret tracking: the full configurable firing arc permits tracking across the forward hemisphere.
     internal bool Step(float dt, Enemy target)
     {
         if (!float.IsFinite(dt) || dt <= 0 || !GodotObject.IsInstanceValid(_fighter) ||
@@ -53,7 +53,7 @@ public partial class FighterDroneWeapon : Node
             Mathf.Min(delta.Length() / speed, FighterDroneConfig.Safe(config.InterceptLeadSeconds, .8f, 0, 3));
         Vector2 direction = (aimPoint - muzzle.GlobalPosition).Normalized();
         Vector2 forward = -_hull.GlobalTransform.Y.Normalized();
-        float tolerance = Mathf.DegToRad(FighterDroneConfig.Safe(config.AimToleranceDegrees, 8, 0, 45));
+        float tolerance = Mathf.DegToRad(FighterDroneConfig.Safe(config.FiringArcDegrees, 180, 0, 360) * .5f);
         bool aligned = forward.Dot(direction) >= Mathf.Cos(tolerance);
         if (!aligned || _fighter.Ammo <= 0 || _cooldown > 0 || !TowerDetection.CanDetect(target) ||
             !_grid.HasWeaponLineOfSight(muzzle.GlobalPosition, target.GlobalPosition) ||
