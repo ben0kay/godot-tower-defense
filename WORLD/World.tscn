@@ -1,4 +1,4 @@
-[gd_scene load_steps=40 format=3]
+[gd_scene load_steps=41 format=3]
 
 [ext_resource type="Script" path="res://WORLD/GRID/WorldGrid.cs" id="1_script"]
 [ext_resource type="Resource" path="res://WORLD/DefaultWorldConfig.tres" id="2_config"]
@@ -53,6 +53,8 @@
 
 [ext_resource type="Script" path="res://WORLD/TERRAIN/Mountains/MountainTerrainVisual.cs" id="mountains"]
 [ext_resource type="Resource" path="res://WORLD/TERRAIN/Mountains/DefaultMountainVisual.tres" id="mountain_config"]
+
+[ext_resource type="Script" path="res://UI/Power/IslandInspection/IslandPowerInspection.cs" id="island_power_ui"]
 
 [node name="World" type="Node2D"]
 script = ExtResource("loader")
@@ -157,3 +159,6 @@ DroneScene = ExtResource("builder_scene")
 z_index = 6
 script = ExtResource("mountains")
 Config = ExtResource("mountain_config")
+
+[node name="IslandPowerInspection" type="Node2D" parent="."]
+script = ExtResource("island_power_ui")

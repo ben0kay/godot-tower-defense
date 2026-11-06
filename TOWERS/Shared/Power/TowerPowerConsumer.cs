@@ -18,6 +18,7 @@ public sealed partial class TowerPowerConsumer : IDisposable
     public int ConductiveDistanceCells { get { RefreshDelivery(); return _distance; } }
     public double DeliveryEfficiency { get { RefreshDelivery(); return _efficiency; } }
     public double RechargeCeilingPerSecond { get { RefreshDelivery(); return Capacitor.Settings.Recharge * _efficiency; } }
+    internal TowerBase InspectionOwner => _tower;
     public PowerCapacitor Capacitor { get; }
     public TowerDisableHandle NoPowerHandle { get; private set; }
     public int Region { get; private set; }
