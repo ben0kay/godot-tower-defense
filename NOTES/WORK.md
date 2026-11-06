@@ -1,3 +1,9 @@
+## FD5 plan update — real station-supplied fighter ammunition and service — 2026-11-06
+
+**Planning only; no FD5 gameplay code changed.** Expanded `DRONES/Combat/FIGHTER_DRONES_IMPLEMENTATION_PLAN.md` into FD5-A–E Codex handoff: Depot→Drone Station uses the existing courier/consumer logistics (requires a small endpoint generalization), station stock is finite and initially empty, fighters auto-return at configurable low ammo, timed 6s-full-load default consumes actual local ammo, paid gradual HP repair and one service bay are configurable, and a tiny bottom-up cyan bar appears by the docked fighter only when rearming. Defines manual-recall vs automatic relaunch, zero-stock waits, roster status, save/restore, accounting, lifecycle and low-overhead acceptance. FD1-B/FD2/FD4 remain source implemented; FD3/FD5 are not implemented; owner/ Codex gameplay work remains.
+
+---
+
 ## Capital cannon +33% weapon range — 2026-11-06
 
 Changed only `ENEMIES/Types/ObsidianDreadnought/CapitalCannon.tres`: `RangePixels` 275.0 → **365.75** (+33%). All four capital weapon mounts share that preset, so each gains range without a gun script, target logic, damage, rate of fire, bullet speed or other ship changes. Adjusted its directly relevant README balance line. Source-only review; Godot targeting acceptance pending.
