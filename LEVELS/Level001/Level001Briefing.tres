@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="MissionBriefingDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://LEVELS/Briefing/MissionBriefingDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+Enabled = true
+Title = "DEFEND THE CITADEL"
+Speaker = "COMMAND INTELLIGENCE"
+Message = "Commander, hostile Standard Drones are approaching the Citadel. Establish your defensive perimeter and position your first towers before initiating the assault.\n\nIntelligence suggests faster Scout ships may join the attack later. Your objective is to hold the Citadel through all three waves."
+Objectives = "• Protect the Citadel.\n• Build a defensive line along the approach.\n• Press START WAVE when you are ready."

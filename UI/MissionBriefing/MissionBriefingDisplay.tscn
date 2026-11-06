@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://UI/MissionBriefing/MissionBriefingDisplay.cs" id="1"]
+
+[node name="MissionBriefing" type="CanvasLayer"]
+process_mode = 3
+layer = 80
+script = ExtResource("1")

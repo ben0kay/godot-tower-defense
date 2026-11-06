@@ -1,4 +1,4 @@
-// Per-level spawn permissions and authored object references; no wave or spawn logic.
+// Per-level spawn permissions, optional load-time briefing and authored references; no wave logic.
 using Godot;
 
 [GlobalClass]
@@ -21,6 +21,9 @@ public partial class LevelConfig : Resource
     [Export] public SpawnSourceMode SpawnMode { get; set; } = SpawnSourceMode.Portals;
     [Export(PropertyHint.Flags, "Top,Bottom,Left,Right")] public MapEdge AllowedEdges { get; set; } = MapEdge.Left;
     [Export] public Godot.Collections.Array<NodePath> ActivePortals { get; set; } = new();
+
+    [ExportGroup("Mission Intro (optional)")]
+    [Export] public MissionBriefingDefinition MissionBriefing { get; set; }
 
     [ExportGroup("Waves")]
     [Export] public WaveSetSource WaveSource { get; set; }

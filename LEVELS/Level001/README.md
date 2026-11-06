@@ -1,3 +1,9 @@
+## Mission Intel Report — 2026-11-06
+
+**Source implemented; in-editor visual check pending.** `Level001Config.tres` now references `Level001Briefing.tres`. Running **F5/Level001 fresh** shows an optional, readable, centred **MISSION INTELLIGENCE** report before any wave starts. The first draft describes defending the Citadel, standard hostile drones, later scouts, and three-wave survival; its title, sender, message and objective lines are Inspector-editable. CONTINUE (or Escape) dismisses the briefing **without** starting Wave 1. It does not reappear when continuing a saved checkpoint. Other levels receive no new briefing until a resource is assigned in their own LevelConfig. Reuse the shared [briefing documentation](../../UI/MissionBriefing/README.md).
+
+---
+
 ## Wave setup repair — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** Removed stale `Portals/EnemyPortal2` from Level001Config.ActivePortals: the authored map contains only `Portals/EnemyPortal`. SPAWN1 correctly validates registrations but had promoted this pre-existing warning into a fatal SETUP ERROR. The remaining source, map, terrain and three wave recipes are unchanged. Reload Level001 and confirm START WAVE works. Strict validation remains enabled for missing/early required sources.

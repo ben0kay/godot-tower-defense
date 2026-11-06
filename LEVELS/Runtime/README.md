@@ -1,3 +1,9 @@
+## Optional mission Intel Report — 2026-11-06
+
+**Source implemented; Godot visual confirmation pending.** `LevelConfig.MissionBriefing` is an optional `MissionBriefingDefinition` resource (Enabled, Title, Speaker, multiline Message/Objectives). A single shared `UI/MissionBriefing/MissionBriefingDisplay.tscn` in `Battlefield.tscn` presents it once per **fresh mission load**, automatically after battlefield initialization and **before START WAVE**. It uses the shared menu style, blocks map clicks and shortcuts and temporarily pauses until CONTINUE/Escape closes it. Dismissal **does not start a wave**; `WaveManager` remains the only wave authority. Blank/disabled resources and checkpoint restoration bypass the briefing entirely. The sample `Level001/Level001Briefing.tres` is enabled; other maps stay unchanged. See [UI briefings](../../UI/MissionBriefing/README.md). No narration/NP1/NP2 wave message, spawn logic, or save data was changed.
+
+---
+
 ## LM1 map boundary (2026-11-05)
 
 Mission maps now inherit `LEVELS/Shared/BaseLevelMap.tscn` using local terrain layers. Runtime composition is unchanged: BattlefieldLauncher → WorldMapLoader → World/Level before Grid/navigation. No duplicate services, loader changes or new dimension settings. [Map authoring](../Shared/README.md).
