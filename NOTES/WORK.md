@@ -1,3 +1,9 @@
+## Backlog cleanup — outstanding-only live index — 2026-11-06
+
+Rebuilt `NOTES/IMPLEMENTATION_BACKLOG.md` against `dev` HEAD `e1a68dd77f`: removed duplicate completed-pass tables, dated implementation receipts and superseded “planned” claims. Left a current queue of genuinely unimplemented phases, optional feature-design decisions, a separately marked owner QA/performance list, unapproved idea IDs and Markdown-only accuracy debt. Reconciled recent FD4.1/FD5 and SPAWN3/SPAWN4 source delivery, complete Level011 Waves 1–10 and next-wave auto-start; older histories remain in this file and feature docs. Documentation only, no game build or Godot playtest.
+
+---
+
 ## SPAWN4 — parallel attack groups — 2026-11-06
 
 Source implemented / awaiting owner validation. Wave Schedule defaults to Sequential; Parallel uses per-batch StartOffsetSeconds from accepted wave start (After ignored). WaveManager.Parallel shares the existing attempt cap, RNG, exact compositions and ownership, with fair independent cooldowns/retries/readiness waits and no catch-up backlog. Wave Editor adds mode/start controls, timing bars and exact source-selector quotas/side weights; resource copy/build/validation retain settings. Existing mission recipes unchanged; SPAWN5 deferred. Brief authoring guide and plan status updated. Focused source/diff review only; .NET unavailable. Owner to check overlapping groups, blocked/forming sources, pause, zero intervals, wave completion/offspring, parallel→sequential transitions and editor save/duplicate. Existing content-hash rules still apply to older checkpoints after source updates.
