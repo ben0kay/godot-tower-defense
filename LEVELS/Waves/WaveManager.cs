@@ -65,7 +65,7 @@ public partial class WaveManager : Node
     {
         ReleaseOwnership(); CompletedWaves = 0; _waveIndex = -1; PlannedRemaining = 0; _sequence = null; _countdown = 0; _startAttemptReserved = false;
         _waves = Array.Empty<WaveDefinition>(); _scenes = null;
-        try { WaveCatalog.Validate(waves, scenes); }
+        try { WaveCatalog.Validate(waves, scenes); _spawns.ConfigurePortalActivation(waves); }
         catch (Exception exception) { SetError(exception.Message); return; }
         _waves = (WaveDefinition[])waves.Clone();
         _scenes = new Dictionary<string, PackedScene>(scenes);
@@ -87,6 +87,8 @@ public partial class WaveManager : Node
         PlannedRemaining = _waves[_waveIndex].Batches.Sum(b => b.Count);
         _sequence = WaveCatalog.Compose(_waves[_waveIndex].Batches[0], _random);
         _countdown = 0; StatusMessage = ""; State = WaveState.Spawning;
+        // Explicit ordering: reveal and refresh eligibility before observers or the immediate spawn.
+        _spawns.ActivatePortalsForWave(_waves[_waveIndex].Number);
         SetPhysicsProcess(true); _startAttemptReserved = true; Publish();
         // Emit exactly once for an accepted start, before the first immediate spawn attempt.
         WaveStarted?.Invoke(_waves[_waveIndex]);
@@ -238,6 +240,8 @@ public partial class WaveManager : Node
         CompletedWaves = completed; _waveIndex = completed - 1; _random.State = randomState;
         State = completed == 0 ? WaveState.Ready : WaveState.Completed;
         PlannedRemaining = PendingDeathSpawns = 0; _sequence = null; _countdown = 0;
+        // CompletedWaves is an array count, not an authored wave Number (numbers may have gaps).
+        _spawns.RestorePortalActivation(_waves, completed);
         SetPhysicsProcess(false); Publish();
     }
 }

@@ -21,6 +21,8 @@ public partial class SpawnManager : Node
     private int _sourceIndex, _cachedRevision = -1;
     private bool[] _reachable;
     private int _portalCount;
+    private bool[] _portalEligible = System.Array.Empty<bool>();
+    public int PortalEligibilityRevision { get; private set; }
     private readonly List<string> _portalPaths = new();
     private readonly List<Node2D> _portalObjects = new();
     private readonly List<Vector2> _entries = new();
@@ -119,6 +121,7 @@ public partial class SpawnManager : Node
                 GD.PushWarning("Portal SpawnExit is blocked or cannot reach the Citadel: " + _portalPaths[i]);
         if (nav.Goals.Count == 0)
             GD.PushWarning("No usable Citadel approach markers; enemies cannot find a destination.");
+        RefreshPortalEligibility();
         _cachedRevision = nav.Revision;
     }
 
@@ -150,7 +153,7 @@ public partial class SpawnManager : Node
             _ships.AddChild(ship); ship.GlobalPosition = position;
             EnemyPortal chosenPortal = portalOnly || source < _portalCount ? portals[source] as EnemyPortal : null;
             ship.Initialize(Registry, Paths, checkpoint: chosenPortal?.ResolveCheckpoint(), requiresCheckpoint: chosenPortal?.RequiresCheckpoint == true, assignedCitadel: source < _portalCount ? CitadelAssignments.For(portals[source]) : nav.SingleDestination); LastMessage = "Spawned " + ship.Definition.DisplayName;
-            chosenPortal?.GetNodeOrNull<EnergyFieldVisual>("Visuals/EnergyField")?.PlaySpawnPulse();
+            chosenPortal?.PlaySpawnFeedback();
             return ship;
         }
         ship.Free(); LastMessage = "No permitted reachable spawn exit; check tiles and Citadel approach points.";
@@ -207,7 +210,7 @@ public partial class SpawnManager : Node
         EnemyPortal chosenPortal = chosen < _portalCount ? _portalObjects[chosen] as EnemyPortal : null;
         if (waveOwned) WaveEnemyCreated?.Invoke(ship);
         ship.Initialize(Registry, Paths, spawnWithShield, chosenPortal?.ResolveCheckpoint(), chosenPortal?.RequiresCheckpoint == true, assignedCitadel: chosen < _portalCount ? CitadelAssignments.For(_portalObjects[chosen]) : nav.SingleDestination, spawnWithStealth: spawnWithStealth); LastMessage = "Wave spawned " + ship.Definition.DisplayName;
-        chosenPortal?.GetNodeOrNull<EnergyFieldVisual>("Visuals/EnergyField")?.PlaySpawnPulse();
+        chosenPortal?.PlaySpawnFeedback();
         return ship;
     }
 
@@ -270,7 +273,10 @@ public partial class SpawnManager : Node
 
     // =========================================================
     // Single-Citadel spawns retain the old cached connectivity path; multi uses cached source/radius validation.
-    private bool SourceUsable(int source, float radius) => _sourceReachable[source] &&
+    private bool SourceUsable(int source, float radius) =>
+        (source >= _portalCount || _portalEligible[source]) && _sourceReachable[source] &&
+        (source >= _portalCount || _portalObjects[source] is not EnemyPortal { RequiresCheckpoint: true }
+            || CitadelAssignments.CanSpawn(_portalObjects[source], _entries[source], radius)) &&
         (Paths.Navigation.Destinations.Count == 1 ? Paths.Navigation.SingleDestination.Available : source < _portalCount && CitadelAssignments.CanSpawn(_portalObjects[source], _entries[source], radius));
 
     // =========================================================
@@ -296,7 +302,7 @@ public partial class SpawnManager : Node
 
     #region Placement Validation
     // =========================================================
-    // Click-only route preservation: protect active ships and every currently usable source.
+    // Click-only route preservation: protect active ships and all registered usable routes, including dormant portals.
     public double LastPlacementValidationMilliseconds { get; private set; }
 
     // =========================================================

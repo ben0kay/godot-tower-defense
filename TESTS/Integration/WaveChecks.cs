@@ -188,8 +188,8 @@ public static class WaveChecks
 
         manager.Configure(new[] { Wave(1, Batch(1, 0, 0, Enemy("basic_mk1", portal: "Portals/NotRegistered"))) }, scenes);
         manager.StartWave();
-        Require(manager.State == WaveManager.WaveState.SpawnBlocked && manager.PlannedRemaining == 1 &&
-            manager.AliveCount == 0, "Unavailable required portal blocks without fallback or dropping a ship");
+        Require(manager.State == WaveManager.WaveState.PausedError && manager.StatusMessage.Contains("not a permitted registered source") &&
+            manager.AliveCount == 0, "Unknown required portal rejects authoring before a retry deadlock");
         manager.Configure(new[] { Wave(1, Batch(1, 0, 0, Enemy("basic_mk1", portal: "Portals/EnemyPortal2"))) }, scenes);
         manager.StartWave();
         Require(manager.AliveCount == 1 && spawns.Registry.Living[0].GlobalPosition.IsEqualApprox(sources[1]),

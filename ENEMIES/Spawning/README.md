@@ -1,3 +1,28 @@
+## SPAWN0 / SPAWN1 — authored portal activation
+
+**Source Implemented / Awaiting Owner Validation.**
+
+`EnemyPortal.AppearAtWave` defaults to **0 = START**; a positive value reveals at the accepted wave's authored `Number`, before WaveStarted observers and the first immediate spawn. Activation is idempotent and persists for later waves. Keep all portals in `LevelConfig.ActivePortals`: that list is registration, not the currently visible subset. Future portals hide only Visuals; existing footprints, source entries, fixed Citadel assignments and checkpoint obligations remain protected by placement validation.
+
+`SpawnManager.Activation.cs` validates registered identities/footprints, future exit/route safety and required-portal timing at wave setup. Unknown selectors and early requests become SETUP ERROR, instead of infinite retry. A genuinely blocked already-active required source still retries. Future portals need Portals/Both mode; edge-only configuration rejects them explicitly because its source cache cannot reserve their routes. An activation Number absent from the wave set warns and remains dormant. Defaults and Level011's authored maps/waves are unchanged.
+
+A separate eligibility array/revision excludes dormant portals from all debug/random/required delivery. Revealing rebuilds only those booleans; it never edits terrain, floods navigation, recaptures assignments or consumes RNG. Existing geometry/connectivity caches continue to include future portals. F3 labels dormant sources **PREVIEW ONLY · WAVE N**; simulation never activates them.
+
+### SPAWN0 source identity contract
+
+| Source | Stable identity | Eligibility / routing |
+| --- | --- | --- |
+| Portal | Level-root-relative registered NodePath | Registered independently from active visibility; fixed exit, authored activation and assigned Citadel/checkpoint chain |
+| Edge | Allowed side plus integer boundary cell | Existing reachable/clearance-safe cell centres; corners may belong to two sides; no sector/region IDs or weights authored yet |
+
+Source-array indices are session cache locations, never durable IDs. Existing exact portal requests use the path; a blank request uses legacy permitted selection. Both still prefers eligible portals; edges remain single-Citadel only. Future edge regions should extend side + cell-range identity without per-cell Nodes, per-ship A* or new spawning services.
+
+### Lightweight acceptance
+
+`TESTS/Integration/PortalActivationChecks.tscn` is an isolated owner-run fixture for sparse numbered waves (2/6/9), dormant F2/required exclusion, reserved footprint/route, activation ordering/idempotence, checkpoint restore seams, bad timing, all four edges and Both preference. The existing WaveChecks now expects unknown selectors to fail setup. Fixtures are authored **but unrun**: .NET is unavailable here. Level011 checkpoint paths were source-reviewed; gameplay, rendering and frame-time acceptance remain for owner.
+
+---
+
 ## Dynamic portals and source-policy roadmap — 2026-11-06 (PLAN ONLY)
 
 A dedicated [SPAWN0–SPAWN5 implementation plan](IMPLEMENTATION_PLAN.md) now covers authored **START / Wave N portal activation**, hidden reserved future portals, materialization feedback, all-four-side map-edge use, opt-in true mixed portal/edge selection, independent concurrent wave batches and optional bounded scripted reinforcements. **No new spawning mechanics are implemented by this note.** Existing ordered wave batches, `SpawnMode.MapEdges`, `Both` portal preference, F2 and route validation are unchanged.

@@ -1,6 +1,10 @@
 # Enemy Spawn Sources and Dynamic Portals — implementation plan
 
-**Status: PLANNED (2026-11-06), not gameplay implemented.** Audited the current `dev` implementation. This is a future work plan for Codex/normal implementation passes, **not permission to change Level011 waves, source settings, combat, saves or map layout now**. Work on `dev`, read `NOTES/CodePreferences.md`, root `README.md`, and the owning files before each pass.
+**Status: SPAWN0 / SPAWN1 Source Implemented / Awaiting Owner Validation (2026-11-06). SPAWN2–5 remain PLANNED.**
+
+SPAWN0 source identity/baseline contract is documented in README.md; an isolated owner-run fixture covers all edges and legacy Both preference. SPAWN1 now implements START/Wave N visibility/eligibility, route reservation, authoring errors and exact-number checkpoint restoration. Existing Level011 scenes/waves are unchanged. The separately requested slow rotation and bounded purple spawn particles are included; they do not implement SPAWN2 telegraph/materialization. C# fixtures are authored but unrun (.NET unavailable); gameplay/visual acceptance is pending.
+
+**Historical design below:** Audited the current `dev` implementation. This is a future work plan for Codex/normal implementation passes, **not permission to change Level011 waves, source settings, combat, saves or map layout now**. Work on `dev`, read `NOTES/CodePreferences.md`, root `README.md`, and the owning files before each pass.
 
 ## 0. Baseline — what already works (do not duplicate)
 

@@ -1,3 +1,17 @@
+## START / Wave N activation and subtle spawn visuals
+
+**Source Implemented / Awaiting Owner Validation.**
+
+Select a placed portal → **Wave Activation (0 = START) → Appear At Wave**. `0` preserves deployment visibility; `6` reveals on accepted authored Wave 6. Keep its path registered in the level ActivePortals list and use Portals/Both spawn mode. Required batches must not name it earlier. Missing future waves warn without auto-authoring a wave. Editor previews always show the portal; runtime hides only Visuals, preserving footprint/exit and fixed route protection.
+
+Under **Portal Feedback**, `RotationDegreesPerSecond` defaults to **2°/s** (180-second revolution); `0` disables it. A small vertex shader rotates the existing art only, keeping labels, marker, footprint and routes fixed. It shares the existing energy overlay's GPU TIME convention; cosmetic shader motion may continue during pause. No CPU animation callback is added.
+
+`SpawnParticlesEnabled` controls a reusable **24-particle**, **0.7-second** purple GPU burst on successful spawns. Radial velocity and tangential acceleration produce outward curling sparks in all directions. Burst cadence is capped at one per **750ms per portal**, with a 30Hz GPU simulation, tiny soft texture and no lights, collision, screen reads or persistent trail. No per-enemy emitter is created. Hidden/offscreen portals skip new feedback; screen exit stops emission. The existing energy pulse remains. Emitter amount/lifetime/motion/ramp are editable in EnemyPortal.tscn. GPU cost is bounded, not measured or guaranteed zero.
+
+Activation is instant gameplay availability; there is **no SPAWN2 materialization delay or tactical warning** in this pass. Owner: check visibility at START/Wave N and after loading, slow rotation, purple curls during dense traffic, pause/culling and normal portal size overrides.
+
+---
+
 ## VE2 visual energy — 2026-10-21
 
 The existing violet SVG stays as the base. An EnergyField ColorRect under Visuals shares WORLD/VISUALS/Shaders/EnergyField.gdshader and PortalEnergy.tres. Very slow purple swirl/rim are GPU shader motion. A successful wave/F2 portal spawn triggers the optional PlaySpawnPulse on that portal; only the overlay brightens briefly. Visuals child retains existing Scale multiplier and SpawnExit is unchanged. The overlay ignores mouse events and never changes collision/path/spawn logic. Desktop appearance is pending verification.

@@ -4,6 +4,11 @@ using Godot;
 [Tool]
 public partial class EnemyPortal : WorldObjectFootprint
 {
+    /// <summary>0: visible at deployment. Positive: reveal when this authored wave Number starts.</summary>
+    [ExportGroup("Wave Activation (0 = START)")]
+    [Export(PropertyHint.Range, "0,10000,1,or_greater")] public int AppearAtWave { get; set; }
+    public bool IsSpawnActive { get; private set; } = true;
+
     [ExportGroup("Route Checkpoint")]
     private NodePath _checkpointPath = new("");
     [Export] public NodePath CheckpointPath
@@ -15,8 +20,14 @@ public partial class EnemyPortal : WorldObjectFootprint
 
     // =========================================================
     // Broken authored links are visible in the editor instead of silently dropping a hard requirement.
-    public override string[] _GetConfigurationWarnings() => RequiresCheckpoint && ResolveCheckpoint() == null
-        ? new[] { "Required Route Checkpoint path is missing or does not reference a RouteCheckpoint node." } : System.Array.Empty<string>();
+    public override string[] _GetConfigurationWarnings()
+    {
+        var warnings = new System.Collections.Generic.List<string>();
+        if (AppearAtWave < 0) warnings.Add("Appear At Wave must be 0 (START) or a positive authored wave Number.");
+        if (RequiresCheckpoint && ResolveCheckpoint() == null)
+            warnings.Add("Required Route Checkpoint path is missing or does not reference a RouteCheckpoint node.");
+        return warnings.ToArray();
+    }
 
     private float _sizeMultiplier = 1f;
     [ExportGroup("Portal Size")]
@@ -32,7 +43,25 @@ public partial class EnemyPortal : WorldObjectFootprint
 
     // =========================================================
     // Apply authored overrides in the editor and game without any processing or navigation rebuild.
-    public override void _Ready() => UpdateVisualSize();
+    public override void _Ready()
+    {
+        SetProcess(false); SetPhysicsProcess(false); UpdateVisualSize(); SetupPresentation();
+        if (!Engine.IsEditorHint()) ResetActivation();
+    }
+
+    // =========================================================
+    // Hide presentation only: footprint/exit/checkpoint nodes remain registered and protected.
+    internal void ResetActivation()
+    {
+        IsSpawnActive = AppearAtWave == 0;
+        GetNode<Node2D>("Visuals").Visible = IsSpawnActive;
+        if (!IsSpawnActive) StopSpawnFeedback();
+    }
+    internal bool ActivateForWave(int number)
+    {
+        if (IsSpawnActive || AppearAtWave != number) return false;
+        IsSpawnActive = true; GetNode<Node2D>("Visuals").Show(); return true;
+    }
 
     // =========================================================
     // Scale only presentation; centered SpawnExit and logical grid footprint remain fixed.

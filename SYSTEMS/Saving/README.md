@@ -1,3 +1,9 @@
+## SPAWN1 — between-wave portal availability
+
+**Source Implemented / Awaiting Owner Validation.** No new save fields or envelope version. WaveManager restores portal state from the actual Numbers of the first `CompletedWaves` definitions. START portals stay active; only already-completed activation waves are reapplied. The next wave's new portal stays hidden until Start. Restore does not replay spawns, pulse/burst feedback or materialization. Existing dependency fingerprints, strict validation and combat-save restrictions remain authoritative; changed authored scene/shader dependencies can still reject older checkpoints.
+
+---
+
 ## TS1 — Health-based tower selling
 
 **Source Implemented / Awaiting Owner Validation.**

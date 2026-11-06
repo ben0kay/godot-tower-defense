@@ -135,7 +135,10 @@ public partial class RoutePreviewOverlay : Node2D
             {
                 Marker2D exit = level.GetNodeOrNull<Node2D>(path)?.GetNodeOrNull<Marker2D>("SpawnExit");
                 if (exit == null) continue;
-                _portals.AddItem(path.ToString()); _exits.Add(exit);
+                string label = path.ToString();
+                if (exit.GetParent() is EnemyPortal { IsSpawnActive: false } future)
+                    label += $" [PREVIEW ONLY · WAVE {future.AppearAtWave}]";
+                _portals.AddItem(label); _portals.SetItemMetadata(_portals.ItemCount - 1, path.ToString()); _exits.Add(exit);
             }
         if (_exits.Count > 0) _portals.AddItem("ALL PORTALS");
         _enemies.Clear(); _definitions.Clear();
@@ -164,7 +167,7 @@ public partial class RoutePreviewOverlay : Node2D
         {
             Marker2D exit = _exits[index];
             if (!GodotObject.IsInstanceValid(exit)) { Clear("Portal removed. Close/reopen F3 to refresh choices."); return; }
-            string pathName = _portals.GetItemText(index);
+            string pathName = _portals.GetItemMetadata(index).AsString();
             bool active = level.Settings.SpawnMode != LevelConfig.SpawnSourceMode.MapEdges && level.Settings.ActivePortals.Any(path =>
                 path.ToString() == pathName && level.GetNodeOrNull<Node2D>(path)?.GetNodeOrNull<Marker2D>("SpawnExit") == exit);
             if (!active) { Clear("Active portals changed. Close/reopen F3 to refresh choices."); return; }

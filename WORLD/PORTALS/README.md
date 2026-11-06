@@ -1,3 +1,9 @@
+## SPAWN0 / SPAWN1 and portal feedback
+
+**Source Implemented / Awaiting Owner Validation.** `EnemyPortal.AppearAtWave=0` means START, positive values reveal at that authored wave Number. All future portals remain registered/reserved; SpawnManager and WaveManager own eligibility and ordering. The shared scene now includes 2°/s shader artwork rotation and a bounded purple GPUParticles2D spawn burst, configurable per portal. See [portal authoring/visuals](EnemyPortal/README.md) and [source contract](../../ENEMIES/Spawning/README.md). Historical no-setting/planned statements below are superseded for SPAWN0/1; SPAWN2–5 remain planned.
+
+---
+
 ## Planned Wave N activation and materialization — 2026-11-06
 
 The current placeable `EnemyPortal` scene has **no wave-activation setting**: registered portals are visible and spawn-eligible from deployment. An authored Inspector `AppearAtWave = 0` (START default, or positive Wave N) plus hidden, pre-reserved future locations, validation of checkpoint/Citadel reachability, one-time materialization VFX and future lifetime rules are **planned only** in [the spawning implementation plan](../../ENEMIES/Spawning/IMPLEMENTATION_PLAN.md). The portal remains visuals/position/entry authoring; `WaveManager` and `SpawnManager` still own timing and selection.

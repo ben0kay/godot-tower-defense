@@ -1,3 +1,9 @@
+## SPAWN1 — portal reveal ordering
+
+**Source Implemented / Awaiting Owner Validation.** Configure validates required portal selectors and activation scheduling through SpawnManager. StartWave activates matching `EnemyPortal.AppearAtWave` Numbers before publishing the accepted wave or spawning its immediate first enemy. Missing/early selectors fail setup; blocked active routes retain retry behavior. Checkpoint restore passes the first CompletedWaves authored definitions to reconstruct availability (the field is a count, not a wave Number). RNG, ordered batches, ownership, intervals, manual starts and authored recipes are unchanged.
+
+---
+
 ## Level001 uses editable tutorial waves (2026-11-03)
 
 Level001 now loads **`Level001/Level001Waves.tres`** directly through its existing `LevelConfig.WaveSource`. The mission has three intro waves of **10, 14 and 20 enemies**, for 44 total. Waves 1–2 use only the unshielded Standard Drone; Wave 3 spawns ten Standards, then ten mixed Standard/Scout ships (5 of each), so fast Scouts first appear **halfway through the final wave**. No shield, stealth, Bulwark or other modifiers are used. Godot's Wave Editor opens the Level001 file for future banner and narrator text; all custom presentation fields are blank. The original `Level001Waves.cs` is a reference, not gameplay. Earlier Level001 shield-heavy 38/40/55 descriptions below are historical. [Level001](../Level001/README.md).
