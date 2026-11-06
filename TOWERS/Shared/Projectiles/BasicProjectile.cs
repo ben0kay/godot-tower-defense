@@ -21,6 +21,9 @@ public partial class BasicProjectile : Node2D
     private ProjectileHandlingStats _handling;
     private ProjectileVisualSnapshot? _visual;
     private Vector2 _travelDirection = Vector2.Up;
+    // Reusable per-projectile draw buffers; same taper geometry as enemy Gunner (no per-redraw arrays).
+    private readonly Vector2[] _streak = new Vector2[EnemyEnergyStreakGeometry.VertexCount];
+    private readonly Color[] _streakColors = new Color[EnemyEnergyStreakGeometry.VertexCount];
     public ProjectileVisualSnapshot? VisualSnapshot => _visual;
     public Vector2 TravelDirection => _travelDirection;
     public ProjectileHandlingStats Handling => _handling;
@@ -125,6 +128,13 @@ public partial class BasicProjectile : Node2D
             DrawTextureRect(style.Texture, new Rect2(-style.Length, -style.Width * .5f, style.Length, style.Width), false, style.Body);
             DrawSetTransform(Vector2.Zero);
         }
+        else if (style.Tapered)
+        {
+            // Shared Gunner streak shape, rotated with actual shot direction; only this projectile draws it.
+            if (style.Glow.A > 0) DrawTapered(style, 1, style.GlowWidth, style.Glow);
+            DrawTapered(style, 1, 1, style.Body);
+            DrawTapered(style, .85f, .55f, style.Core);
+        }
         else
         {
             DrawLine(tail, Vector2.Zero, style.Glow, style.Width * style.GlowWidth, true);
@@ -132,5 +142,11 @@ public partial class BasicProjectile : Node2D
             DrawLine(tail * .75f, Vector2.Zero, style.Core, style.Width, true);
         }
         if (style.BrightTip) DrawLine(-forward * style.Width * 1.5f, Vector2.Zero, style.Core, style.Width * 1.2f, true);
+    }
+
+    private void DrawTapered(ProjectileVisualSnapshot style, float lengthScale, float widthScale, Color color)
+    {
+        EnemyEnergyStreakGeometry.Fill(Vector2.Zero, Vector2.Right, style, lengthScale, widthScale, color, _streak, _streakColors);
+        DrawPolygon(_streak, _streakColors);
     }
 }

@@ -8,6 +8,7 @@ public partial class FighterDroneManager : Node
 {
     private DroneStation _station;
     private WorldGrid _grid;
+    private Node2D _projectiles;
     private FighterDroneTargeting _targeting;
     private Func<Vector2, Vector2> _clamp;
     private readonly FighterDrone[] _slots = new FighterDrone[4];
@@ -21,6 +22,7 @@ public partial class FighterDroneManager : Node
     internal void Bind(DroneStation station, WorldGrid grid)
     {
         _station = station; _grid = grid; _clamp = ClampToMap;
+        _projectiles = grid.GetNodeOrNull<Node2D>("../Projectiles");
         _targeting = FighterDroneTargeting.For(grid.GetNodeOrNull<EnemyRegistry>("../EnemySystems/Registry"));
     }
     public int FreeSlot()
@@ -39,7 +41,8 @@ public partial class FighterDroneManager : Node
                 body.GetNodeOrNull<Sprite2D>("Body/Sprite") == null) { node.Free(); return false; }
             fighter = body;
             fighter.Initialize(_station.Config.FighterConfig, slot, DockPoint(slot));
-            AddChild(fighter); Register(fighter); return true;
+            AddChild(fighter); fighter.BindWeapon(_grid, _projectiles);
+            Register(fighter); return true;
         }
         catch (Exception error)
         {
@@ -142,7 +145,8 @@ public partial class FighterDroneManager : Node
                 throw new InvalidDataException("Saved fighter endpoint changed.");
             var fighter = _station.Config.FighterScene.Instantiate<FighterDrone>();
             fighter.Initialize(_station.Config.FighterConfig, saved.Slot, position, saved.Id);
-            AddChild(fighter); Register(fighter); fighter.Restore(saved);
+            AddChild(fighter); fighter.BindWeapon(_grid, _projectiles);
+            Register(fighter); fighter.Restore(saved);
         }
         RefreshProcessing(); _station.NotifyRuntimeChanged();
     }
@@ -161,7 +165,8 @@ public partial class FighterDroneManager : Node
                 Mathf.Abs(f.Position.X) > 1e9f || Mathf.Abs(f.Position.Y) > 1e9f)
                 throw new InvalidDataException("Invalid saved fighter state.");
             if (!float.IsFinite(f.Velocity.X) || !float.IsFinite(f.Velocity.Y) || f.Velocity.Vector().LengthSquared() > 4000000 ||
-                !float.IsFinite(f.ManoeuvrePhase) || f.ManoeuvrePhase < 0 || f.ManoeuvrePhase > Mathf.Tau * 3 + .01f)
+                !float.IsFinite(f.ManoeuvrePhase) || f.ManoeuvrePhase < 0 || f.ManoeuvrePhase > Mathf.Tau * 3 + .01f ||
+                !double.IsFinite(f.WeaponCooldown) || f.WeaponCooldown < 0 || f.WeaponCooldown > 60)
                 throw new InvalidDataException("Invalid fighter steering state.");
             bool flying = f.State is FighterDroneState.Launching or FighterDroneState.Returning;
             if (flying != (f.Motion != null)) throw new InvalidDataException("Invalid fighter flight phase.");

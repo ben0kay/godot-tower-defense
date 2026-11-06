@@ -15,5 +15,6 @@ public sealed record FighterDroneSaveData
     public SavePoint Position { get; init; }
     public SavePoint Velocity { get; init; }
     public float ManoeuvrePhase { get; init; }
+    public double WeaponCooldown { get; init; } // Optional old checkpoint field; absent defaults to zero.
     public DroneFlightMotion Motion { get; init; }
 }

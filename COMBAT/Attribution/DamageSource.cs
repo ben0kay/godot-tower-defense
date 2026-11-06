@@ -1,14 +1,17 @@
-// One weak owner token per tower, carried by immutable hits; no tree searches or per-hit allocations.
+// Weak attack owner: towers retain XP; friendly fighters identify their shots without impersonating a tower.
 using Godot;
 using System;
 
 public sealed class DamageSource
 {
     private readonly WeakReference<TowerBase> _owner;
+    private readonly WeakReference<FighterDrone> _fighterOwner;
 
     // =========================================================
     // Projectiles/waves must not keep removed towers alive or transfer credit to a later replacement.
     public DamageSource(TowerBase owner) => _owner = new(owner);
+    // Fighter kills remain ordinary enemy kills/credit rewards. Fighter XP is a future explicit policy.
+    public DamageSource(FighterDrone owner) => _fighterOwner = new(owner);
 
     // =========================================================
     // A live source provides the session's shared Inspector rules; the enemy snapshots its XP budget once.
@@ -26,6 +29,16 @@ public sealed class DamageSource
 
     // =========================================================
     // Native lifetime, tree membership and deferred deletion all count; weak identity is never reassigned.
-    public bool TryGetTower(out TowerBase tower) => _owner.TryGetTarget(out tower)
-        && GodotObject.IsInstanceValid(tower) && tower.IsInsideTree() && !tower.IsQueuedForDeletion();
+    public bool TryGetTower(out TowerBase tower)
+    {
+        tower = null;
+        return _owner != null && _owner.TryGetTarget(out tower)
+            && GodotObject.IsInstanceValid(tower) && tower.IsInsideTree() && !tower.IsQueuedForDeletion();
+    }
+    public bool TryGetFighter(out FighterDrone fighter)
+    {
+        fighter = null;
+        return _fighterOwner != null && _fighterOwner.TryGetTarget(out fighter)
+            && GodotObject.IsInstanceValid(fighter) && fighter.IsInsideTree() && !fighter.IsQueuedForDeletion();
+    }
 }

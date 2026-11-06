@@ -1,3 +1,8 @@
+## FD4 status — 2026-11-06
+**SOURCE IMPLEMENTED / AWAITING OWNER VALIDATION.** Owner requested **FD4 before FD3** to visualize armed auto-pilot. Independent fighter mini-gun aims while the hull flies/kites, and fires real typed Kinetic friendly BasicProjectiles from a physical muzzle. Shared tapered Gunner streak is now used by opted-in friendly projectile drawing, with a separate **blue/cyan** style and flash. Ammo decreases only on fired rounds and never refills on docking; original enemy Gunner artwork/weapons untouched. Fighter attribution is weak and distinct from `TowerBase`, so generic kill Credits remain, but fighter shots do **not** earn tower/fighter XP without an approved policy. Shot cooldown is optional in existing fighter snapshots; old saves default to zero. Existing FD2 targeting, flight, landing and station placement remain; FD3 manual patrol and FD5 service are not implemented. Lightweight source review only, owner visual/functional validation pending. [Usage](README.md).
+
+---
+
 ## FD2 status — 2026-11-06
 **Source implemented / awaiting owner validation.** Budgeted shared threat ranking, independent intercept/figure-eight/orbit/kiting, home guard, recall and airborne snapshots are delivered. Station building/assets/UI now belong to `TOWERS/Utility/DroneStation/`; fighter systems remain here. FD3–FD5 are not implemented. [Usage and settings](README.md).
 
@@ -6,7 +11,7 @@
 # FIGHTER — Player-owned combat/fighter drones and Drone Station
 
 **Repository:** `ben0kay/godot-tower-defense` · **Branch:** `dev` only  
-**Status:** FD1-B and FD2 source implemented; remaining phases are design only. Preserve construction, ammunition, towers, enemy AI, mission waves and checkpoints.
+**Status:** FD1-B, FD2 and FD4 source implemented (owner validation pending); FD3, FD5 and later work are design only. Preserve construction, ammunition, towers, enemy AI, mission waves and checkpoints.
 
 ## 1. Vision and scope
 
@@ -78,7 +83,7 @@ Fighter scene/config, manager, movement, targeting, artwork and saving live in `
 | **FD1 — Drone Station + one fighter** | Place station with proper construction/ownership, one persistent fighter scene/manager and launch/return; unique identity, HP/ammo state, independent visual model, bounds and slot ownership. | Working station + fighter with return/dock; no weapons/autopilot yet. Allow configurable multi-slot capacity. |
 | **FD2 — Auto-pilot pursuit + aerial manoeuvres — SOURCE IMPLEMENTED** | Shared threat ranking by smallest remaining journey to Citadel; staggered target acquisition, smooth intercept, target-relative figure-eight/kiting, idle guard and target-loss recovery. | Several fighters can fly/track without full-list polling per drone. Weapons can initially be disabled for movement acceptance. |
 | **FD3 — Auto-patrol and selection UI** | Select fighter; choose mode; two map clicks for A/B; show figure-eight preview; defend route, leash, cancel/edit, repeat circuit; individual orders. | Working patrol movement and mode switching, independent per-drone A/B. No click interference with tower placement. |
-| **FD4 — Fighter weapons** | Real muzzle, turn/aim/LOS, projectile/shot system, finite ammo and cooldown; damage/shield attribution/XP policy; clean hit feedback. | Fighter shoots enemies in both modes, ammo decreases only on accepted shots; uses shared combat, no independent damage math or per-frame enemy enumeration. |
+| **FD4 — Fighter weapons — SOURCE IMPLEMENTED (Auto-pilot)** | Real independent muzzle/gun turn, terrain LOS, blue tapered Gunner-style shared physical shots, finite ammunition, cooldown and fighter attribution without XP. | Auto-pilot fires and consumes ammo; FD3 patrol is not implemented, so patrol firing is deferred until that mode exists. |
 | **FD5 — Station resupply and repair** | Ammo stock + proper existing logistical supply adapter, finite dock/service capacity/rates, health restoration policy, low-resource recalls, waiting/relaunch, interruption/cleanup. | Genuine ammo consumption and repair costs, no stock duplication, station loss safety. |
 | **FD6 — Persistence, tests, balance and later AA seam** | Integrate existing S0–S3 between-wave save/checkpoint; snapshot station/drone ownership, orders/A/B, HP/ammo, dock/service or flight state and true purchases. Test deployment/retry/load and battle performance. Document future AA target registry. | End-to-end owner-approved baseline; **anti-air itself is not implemented** unless separately requested. |
 

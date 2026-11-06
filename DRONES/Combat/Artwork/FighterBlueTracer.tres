@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ProjectileVisualStyle" load_steps=2 format=3]
+[ext_resource type="Script" path="res://TOWERS/Shared/Weapons/Visuals/ProjectileVisualStyle.cs" id="style"]
+[resource]
+script = ExtResource("style")
+LengthPixels = 18.0
+CoreThicknessPixels = 2.0
+GlowWidthMultiplier = 3.0
+CoreColor = Color(0.70, 0.91, 1, 1)
+BodyColor = Color(0.22, 0.60, 1, 1)
+GlowColor = Color(0.11, 0.39, 0.94, 0.19)
+BrightTip = false
+Tapered = true
+TailWidthFraction = 0.08
+TailOpacity = 0.08
+HeadWidthMultiplier = 1.25

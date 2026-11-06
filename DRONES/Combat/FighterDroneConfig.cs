@@ -16,6 +16,15 @@ public partial class FighterDroneConfig : Resource
     [Export(PropertyHint.Range, "24,600,1")] public float OrbitRadius { get; set; } = 100;
     [Export(PropertyHint.Range, "24,1000,1")] public float ManoeuvreSpeed { get; set; } = 170;
     [Export(PropertyHint.Range, "0,3,0.1")] public float InterceptLeadSeconds { get; set; } = .8f;
+    [ExportGroup("Fighter Weapon (FD4)")]
+    [Export(PropertyHint.Range, "16,1600,1")] public float WeaponRangePixels { get; set; } = 275;
+    [Export(PropertyHint.Range, "0,1000,0.5")] public float DamagePerShot { get; set; } = 4;
+    [Export(PropertyHint.Range, "0.1,30,0.1")] public float ShotsPerSecond { get; set; } = 5;
+    [Export(PropertyHint.Range, "40,3000,10")] public float BulletSpeed { get; set; } = 1200;
+    [Export(PropertyHint.Range, "0,1440,5")] public float GunTurnDegreesPerSecond { get; set; } = 540;
+    [Export(PropertyHint.Range, "0,45,1")] public float AimToleranceDegrees { get; set; } = 10;
+    [Export] public ProjectileVisualStyle ProjectileVisual { get; set; }
+    [Export] public MuzzleFlashStyle MuzzleFlash { get; set; }
     public static float Safe(float value, float fallback, float min, float max) =>
         float.IsFinite(value) ? Mathf.Clamp(value, min, max) : fallback;
 }

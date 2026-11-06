@@ -22,6 +22,10 @@ public partial class FighterDrone : Node2D
     internal void ClearTarget(FighterDroneTargeting targeting) { targeting?.Release(this); _target = null; }
     private DroneFlightMotion _motion = new() { Heading = -Mathf.Pi / 2 };
     private DroneBody _body;
+    private FighterDroneWeapon _weapon;
+    internal void BindWeapon(WorldGrid grid, Node2D projectiles) => _weapon?.Bind(this, grid, projectiles);
+    // Ammunition is spent only after a real friendly projectile successfully enters the world.
+    internal void RecordFiredRound() { if (Ammo > 0) Ammo--; }
     private Vector2 _initialPosition;
 
     internal void Initialize(FighterDroneConfig config, int slot, Vector2 position, string id = null)
@@ -33,7 +37,9 @@ public partial class FighterDrone : Node2D
     public override void _Ready()
     {
         SetProcess(false); SetPhysicsProcess(false);
-        _body = GetNode<DroneBody>("Body"); GlobalPosition = _initialPosition; Present(0, false);
+        _body = GetNode<DroneBody>("Body");
+        _weapon = GetNodeOrNull<FighterDroneWeapon>("Weapon");
+        GlobalPosition = _initialPosition; Present(0, false);
     }
 
     // =========================================================
@@ -48,6 +54,7 @@ public partial class FighterDrone : Node2D
             FighterDroneConfig.Safe(Config.FlightSpeed, 340, 32, 2000), 100,
             Config.Acceleration, Config.Deceleration);
         State = returning ? FighterDroneState.Returning : FighterDroneState.Launching;
+        _weapon?.Suspend();
         Present(0, true);
     }
     internal bool Step(float dt)
@@ -79,7 +86,8 @@ public partial class FighterDrone : Node2D
         State = _target == null ? FighterDroneState.Holding :
             GlobalPosition.DistanceTo(_target.GlobalPosition) > engagement ? FighterDroneState.Intercepting : FighterDroneState.Manoeuvring;
         _steering.Step(this, _target, home, dt, clamp); Present(dt, true);
-        return before != State;
+        bool fired = _weapon?.Step(dt, _target) == true;
+        return before != State || fired;
     }
     private void Present(float dt, bool ignite) => _body?.Present(InTransit ? _motion.Heading : _steering.Heading,
         InTransit ? _motion.Velocity.Vector() : IsFlying ? _steering.Velocity : Vector2.Zero,
@@ -93,7 +101,8 @@ public partial class FighterDrone : Node2D
         Id = SaveId, Slot = Slot, Health = Health, Ammo = Ammo, State = State,
         Position = SavePoint.From(GlobalPosition), Heading = InTransit ? _motion.Heading : _steering.Heading,
         Motion = InTransit ? _motion.CopyFlight() : null,
-        Velocity = SavePoint.From(_steering.Velocity), ManoeuvrePhase = _steering.Phase
+        Velocity = SavePoint.From(_steering.Velocity), ManoeuvrePhase = _steering.Phase,
+        WeaponCooldown = _weapon?.CaptureCooldown() ?? 0
     };
     internal void Restore(FighterDroneSaveData data)
     {
@@ -102,6 +111,7 @@ public partial class FighterDrone : Node2D
         _motion = data.Motion?.CopyFlight() ?? new DroneFlightMotion { Heading = data.Heading };
         _steering.Heading = data.Heading; _steering.Velocity = data.Velocity.Vector(); _steering.Phase = data.ManoeuvrePhase;
         _target = null; _search = Slot * .08f;
+        _weapon?.RestoreCooldown(data.WeaponCooldown);
         _body.Reset(); Present(0, false);
     }
 }
