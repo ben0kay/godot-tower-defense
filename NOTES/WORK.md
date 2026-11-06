@@ -1,3 +1,9 @@
+## Level002 briefing audio — 2026-11-06
+
+Renamed the owner-uploaded 289,295-byte Fish Audio MP3 to `LEVELS/Level002/Level002Briefing.mp3` by retaining the existing Git blob (no audio conversion). Added `Level002BriefingVoice.tres`, registered the voice in `AUDIO/DefaultAudioCatalog.tres`, and set `Level002Briefing.tres.VoiceCueId` to `voice_mission_level002_intro`. Reuses Level001's voice-held top-right typewriter; preserves briefing text, waves, gameplay and checkpoints. Source/resource review only; owner to confirm playback on fresh Level002 load after import.
+
+---
+
 ## Campaign mission card glow and optional artwork — 2026-11-06
 
 Removed the generic `SECTOR ### // OPERATIONS` strip from all campaign cards. Added opt-in, static cyan hover/focus/pressed glow through `UIButtonFactory.ApplySelectionGlow` (2–3px borders, bounded StyleBoxFlat shadow; no CPU animation), with grid insets to prevent halo clipping. `MissionDefinition.CardPreview` is a **nullable Inspector-editable Texture2D**: later assign a per-level screenshot/artwork on each `LEVELS/Level###/Level###Mission.tres` in Godot and the campaign card automatically shows it cropped and subtly faded behind its title. No images were fabricated or imported; empty previews remain text-only. Existing mission launch, progress and Continue/Research routes unchanged. Source/resource inspection only, Godot visual testing remains with owner.

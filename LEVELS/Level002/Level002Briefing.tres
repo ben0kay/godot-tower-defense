@@ -7,3 +7,4 @@ script = ExtResource("1")
 Title = "FOUNDATION PLATFORMS"
 Message = "Welcome back, Commander. I've unlocked something new for you: Foundation Platforms. These allow you to place towers on what would otherwise be enemy paths, forcing them into more favourable positions for our defenses. Use the terrain to your advantage. Let's see what you can come up with."
 Objectives = "• Place foundations to reshape enemy routes.\n• Build towers on foundation platforms.\n• Protect the Citadel."
+VoiceCueId = "voice_mission_level002_intro"
