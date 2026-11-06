@@ -1,3 +1,9 @@
+## Level002 foundation-platform briefing — 2026-11-06
+
+Added `LEVELS/Level002/Level002Briefing.tres` and assigned it through `Level002Config.tres.MissionBriefing`, following Level001's existing load-time top-right typewriter route. Short text explains foundations can carry towers and reroute enemies. Optional objective metadata is supplied; voice cue intentionally blank pending a future Fish Audio MP3. No wave, foundation tile, audio catalog, runtime code or level balance changes. Resource/config source checked; owner to verify a **fresh** Level002 load shows the message and that Continue skips it.
+
+---
+
 ## FD4.1 + FD5 — 2026-11-06
 Independent spatial nearest-shootable weapon selection keeps movement threat leases untouched; shared muzzle eligibility gates acquisition and real shots. Added real station inventory (empty/2000), narrow IAmmoDeliveryConsumer courier integration including demand/status/loss/save paths, fighter-owned AmmoInventory and persisted shot parity. Low-resource returns distinguish auto/manual/station-disable; one FIFO bay transfers real ammo over 6s/full reserve, independently repairs at 20HP/s with real 1C/10HP pricing and retained prepaid fraction. Waiting service sleeps; stock/wallet/enable events wake it. Tiny right-side real-transfer meter and selected roster status; additive per-slot progress/queue/order/fraction checkpoint fields, old missing fields remain empty/inactive. Restore order audited: inventories before courier jobs, wallet before unpause; no purchase/transfer/relaunch replay. No FD3/AA/flight-balance changes. Source/resource review only, .NET unavailable; owner to validate multi-station conservation, partial service, disable/sale, pause and checkpoint stages.
 

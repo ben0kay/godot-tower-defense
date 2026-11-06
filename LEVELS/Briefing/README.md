@@ -1,3 +1,9 @@
+## Level002 foundation-platform mission intro — 2026-11-06
+
+Fresh Level002 deployment now displays `Level002/Level002Briefing.tres` through the same top-right typewriter as Level001. The short briefing introduces raised foundations as buildable, enemy-blocking tiles that can redirect routes; the script lives in `Message`. `Level002Config.tres.MissionBriefing` opts in. No MP3 or audio-catalog cue exists yet: `VoiceCueId` stays blank and the intro is text-only until the owner's Fish Audio recording is added. Title/Objectives are reserved metadata, not separately displayed. Checkpoint Continue skips it; wave starts, paths, balance and Level001 are unchanged.
+
+---
+
 ## Audible Level001 intel and voice-held subtitles — 2026-11-06
 
 **Source implemented; gameplay/audio-device acceptance pending.** Each mission briefing already has an optional Inspector `VoiceCueId`; Level001 now uses `voice_mission_level001_intro`, registered in `AUDIO/DefaultAudioCatalog.tres` by `LEVELS/Level001/Level001BriefingVoice.tres` and referencing the owner's newly pushed `Level001Briefing.mp3`. The authored spoken text in `Level001Briefing.tres` was retained exactly.
