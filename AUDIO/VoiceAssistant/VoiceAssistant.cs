@@ -47,6 +47,11 @@ public partial class VoiceAssistant : Node
             string interrupted = _currentId;
             _currentId = ""; _currentPriority = 0;
             _audio.StopOneShot(interrupted);
+            // Explicit preemption clears CurrentCueId before SoundFinished; notify
+            // subtitle listeners directly so they never wait indefinitely.
+            CueEnded?.Invoke(interrupted);
+            // A listener may have started another voice. Respect the new owner.
+            if (_currentId.Length > 0) return Say(cueId);
             return Begin(sound);
         }
         int cap = Mathf.Max(0, _audio.Config.VoiceQueueLimit);
