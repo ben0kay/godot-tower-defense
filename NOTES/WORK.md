@@ -1,3 +1,6 @@
+## SPAWN2.5 — 2026-11-06
+Source implemented: Open-portal accepted spawns add a 12%/0.8s artwork pulse and retained six-puff violet smoke emitter with two-octave shader. Portal-owned preset controls size/spread/life/speed/swirl/opacity/tint/brightness. One coalesced cooldown (minimum 750ms), pause-aware particle phase, offscreen/opening/restore/unload reset; root/exit/labels, 2.2s materialization and all gameplay/waves unchanged. Source/resource review and native shader parse; .NET unavailable, owner visual/performance acceptance pending.
+
 ## FD2 + Drone Station migration — 2026-11-06
 Source implemented: station scripts/scene/config/definition/art/UI moved to `TOWERS/Utility/DroneStation/`, catalog/resource/docs updated, same `drone_station` ID, 2×3 footprint, paid roster and dock slots. Fighter code stays in `DRONES/Combat/`: shared budgeted remaining-journey targeting, independent pursuit/figure-eight/orbit/kiting and home guard, configurable fixed-rate steering, recall and airborne checkpoint motion. No FD3/FD4/FD5. Source/reference review only; .NET unavailable. Owner to check launch/multi-fighter retarget/recall, pause and checkpoint restore in Godot.
 

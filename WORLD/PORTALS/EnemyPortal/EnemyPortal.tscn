@@ -12,6 +12,36 @@
 [ext_resource type="Resource" path="res://WORLD/PORTALS/EnemyPortal/Visuals/DefaultPortalMaterializationStyle.tres" id="opening_style"]
 [ext_resource type="Shader" path="res://WORLD/PORTALS/EnemyPortal/Visuals/PortalMaterialization.gdshader" id="opening_shader"]
 
+[ext_resource type="Resource" path="res://WORLD/PORTALS/EnemyPortal/Visuals/DefaultPortalSpawnFeedbackStyle.tres" id="spawn_style"]
+[ext_resource type="Shader" path="res://WORLD/PORTALS/EnemyPortal/Visuals/PortalSmoke.gdshader" id="smoke_shader"]
+
+[sub_resource type="ShaderMaterial" id="smoke_material"]
+shader = ExtResource("smoke_shader")
+
+[sub_resource type="Gradient" id="smoke_white"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="smoke_texture"]
+gradient = SubResource("smoke_white")
+width = 64
+height = 64
+
+[sub_resource type="ParticleProcessMaterial" id="smoke_process"]
+particle_flag_disable_z = true
+emission_shape = 4
+emission_point_count = 64
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 0.0
+initial_velocity_max = 0.0
+radial_velocity_min = 25.5
+radial_velocity_max = 42.5
+tangential_accel_min = 9.0
+tangential_accel_max = 18.0
+scale_min = 0.55
+scale_max = 0.6875
+angle_min = -180.0
+angle_max = 180.0
+
 [sub_resource type="ShaderMaterial" id="rotation_material"]
 shader = ExtResource("rotation")
 
@@ -93,6 +123,7 @@ color_ramp = SubResource("spark_ramp")
 z_index = 3
 script = ExtResource("1")
 MaterializationStyle = ExtResource("opening_style")
+SpawnFeedbackStyle = ExtResource("spawn_style")
 
 [node name="Visuals" type="Node2D" parent="." unique_id=2094710352]
 
@@ -128,6 +159,22 @@ fixed_fps = 30
 visibility_rect = Rect2(-160, -160, 320, 320)
 process_material = SubResource("spark_process")
 texture = SubResource("spark_texture")
+
+[node name="SpawnSmoke" type="GPUParticles2D" parent="Visuals"]
+z_index = -1
+visible = false
+emitting = false
+amount = 6
+lifetime = 1.2
+one_shot = true
+explosiveness = 0.95
+randomness = 0.25
+local_coords = true
+fixed_fps = 30
+visibility_rect = Rect2(-280, -280, 560, 560)
+process_material = SubResource("smoke_process")
+material = SubResource("smoke_material")
+texture = SubResource("smoke_texture")
 
 [node name="OnScreen" type="VisibleOnScreenNotifier2D" parent="Visuals"]
 rect = Rect2(-160, -160, 320, 320)

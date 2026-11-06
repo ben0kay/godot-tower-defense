@@ -12,7 +12,7 @@ Tune `WORLD/PORTALS/EnemyPortal/Visuals/DefaultPortalMaterializationStyle.tres`:
 
 # Enemy Spawn Sources and Dynamic Portals — implementation plan
 
-**Status: SPAWN0 / SPAWN1 Source Implemented / Awaiting Owner Validation (2026-11-06). SPAWN2 is Source Implemented / Awaiting Owner Validation; SPAWN2.5 (per-spawn pulse + smoke) and SPAWN3–5 remain PLANNED. The original cinematic specification is retained below.**
+**Status: SPAWN0 / SPAWN1 Source Implemented / Awaiting Owner Validation (2026-11-06). SPAWN2 is Source Implemented / Awaiting Owner Validation; SPAWN2.5 is Source Implemented / Awaiting Owner Validation; SPAWN3–5 remain PLANNED. The original cinematic specification is retained below.**
 
 SPAWN0 source identity/baseline contract is documented in README.md; an isolated owner-run fixture covers all edges and legacy Both preference. SPAWN1 now implements START/Wave N visibility/eligibility, route reservation, authoring errors and exact-number checkpoint restoration. Existing Level011 scenes/waves are unchanged. The separately requested slow rotation and bounded purple per-spawn particles are included; **they are not the SPAWN2 cinematic opening**. Existing START portals are visible instantly until SPAWN2 is implemented. C# fixtures are authored but unrun (.NET unavailable); gameplay/visual acceptance is pending.
 
@@ -137,6 +137,8 @@ Focused acceptance (minimal test code + owner editor visual review):
 **Delivery note:** This is a design/implementation handoff, not permission to mark SPAWN2 complete until its source and visuals actually exist and owner visual acceptance occurs.
 
 ## Phase SPAWN2.5 — per-spawn portal expansion + violet dimensional smoke (Codex handoff, APPROVED PLAN / NOT IMPLEMENTED)
+
+**Status: Source Implemented / Awaiting Owner Validation (2026-11-06).** See the portal README for current settings. The specification below records the delivered scope.
 
 **Order:** Implement **after SPAWN2** (already source implemented, opening duration restored to 2.2s) and **before SPAWN3**, the next planned spawning phase. SPAWN3 adds portal/map-edge mixing; SPAWN4 later adds concurrent attack groups. SPAWN2.5 is **cosmetic only**: a successful enemy emerging from an already-Open portal should make the portal swell gently and exhale several large smoky purple puffs, alongside its existing outward particle burst. This is **not** a replay of SPAWN2's one-time dimensional materialization and must not alter spawn readiness, success, timing, waves, AI, navigation, the map or saves.
 

@@ -4,9 +4,8 @@
 
 ---
 
-## SPAWN2.5 — Portal spawn expansion + dimensional smoke — 2026-11-06
-
-**APPROVED PLAN / NOT IMPLEMENTED; Codex before SPAWN3.** Add an event-driven, soft expanding/settling pulse to an Open portal on successful enemy spawn, plus ~4–6 large rolling purple/lavender shader-driven smoke puffs, alongside existing 48 sparks and energy flash. Reuse `PlaySpawnFeedback()`; keep emissions budgeted, offscreen-cullable, pause/unload-safe and independent of SPAWN2's restored 2.2s opening. Do not change wave/portal mechanics or implement SPAWN3/4. [Codex-ready detail](../ENEMIES/Spawning/IMPLEMENTATION_PLAN.md#phase-spawn25--per-spawn-portal-expansion--violet-dimensional-smoke-codex-handoff-approved-plan--not-implemented).
+## SPAWN2.5 — portal spawn swell and violet smoke
+**Source Implemented / Awaiting Owner Validation.** Successful Open-portal spawns trigger a 12% soft artwork pulse and six large billowing violet puffs, alongside existing sparks and energy flash. Retained/cullable GPU emission and one coalesced cooldown keep dense traffic bounded. Opening stays 2.2s; waves/readiness/navigation unchanged. [Settings](../WORLD/PORTALS/EnemyPortal/README.md).
 
 ---
 

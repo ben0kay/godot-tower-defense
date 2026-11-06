@@ -1,6 +1,9 @@
-## SPAWN2.5 — per-spawn expanding portal + puffy violet smoke — 2026-11-06
+## SPAWN2.5 — source implemented / awaiting owner validation
+Successful Open-portal spawns now trigger a soft 12% artwork swell over 0.8s and six large billowing violet GPU puffs, alongside existing sparks/energy feedback. Tune `Visuals/DefaultPortalSpawnFeedbackStyle.tres`: pulse enable/size/duration/brightness, smoke enable/count/size/spread/lifetime/outward speed/swirl/opacity/tint. Only the centred artwork scales; labels, exit, footprint and `SizeMultiplier` remain independent.
 
-**APPROVED PLAN / NOT IMPLEMENTED; Codex next in spawning visuals, before SPAWN3.** Every **successful** spawn from an **Open** portal should gently expand its visible circular rim/art (~12% over ~0.8s, then settle) while emitting **4–6 large, soft, slowly billowing purple/lavender dimensional-smoke puffs** (~0.9–1.4s), in addition to the existing 48 fast outward sparks and energy-brightness pulse. Use the current `EnemyPortal.PlaySpawnFeedback()` callback, one local coalesced pulse and retained/cullable GPU emitter with a cheap noise/feather shader. Keep portal root/SpawnExit/labels and gameplay state fixed; preserve original 2.2s SPAWN2 materialization and `SizeMultiplier`. No new spawn timer, source service, per-ship effect or wave edits. [Approved Codex scope](../../../ENEMIES/Spawning/IMPLEMENTATION_PLAN.md#phase-spawn25--per-spawn-portal-expansion--violet-dimensional-smoke-codex-handoff-approved-plan--not-implemented).
+A single accepted-spawn cooldown (at least 750ms; default 1.2s to let smoke drain) coalesces rapid traffic. One retained eight-puff maximum emitter uses two noise octaves, no screen reads or CPU animation loop; particle age drives billows/dissolve and explicit pause speed freezes simulation. Offscreen/opening/restore/unload resets pulse and hides smoke. The 2.2s opening, 120°/s art rotation, readiness, waves, navigation and saves are unchanged.
+
+Source/resource review and native Godot shader parse only; .NET unavailable. Owner to inspect single/rapid spawns, scale, pause, offscreen return and checkpoint restore.
 
 ---
 

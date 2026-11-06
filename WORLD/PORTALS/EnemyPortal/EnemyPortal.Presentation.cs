@@ -44,6 +44,7 @@ public partial class EnemyPortal
             burst.EmissionPointCount = RimPointCount;
             _spawnParticles.ProcessMaterial = burst;
         }
+        SetupSpawnFeedback();
         if (_onScreen != null) _onScreen.ScreenExited += StopSpawnFeedback;
     }
 
@@ -54,13 +55,17 @@ public partial class EnemyPortal
         if (!IsInsideTree() || !IsSpawnReady || !IsVisibleInTree() || GetTree().Paused || _onScreen?.IsOnScreen() != true) return;
         _energy?.PlaySpawnPulse();
         ulong now = Time.GetTicksMsec();
-        if (!SpawnParticlesEnabled || _spawnParticles == null || now < _nextBurstMs) return;
-        _nextBurstMs = now + 750;
-        _spawnParticles.Restart();
+        if (now < _nextBurstMs) return;
+        // Keep one cadence for all costly responses; let the retained smoke population finish before reuse.
+        float lifetime = SpawnFeedbackStyle.SmokeEnabled ? FeedbackValue(SpawnFeedbackStyle.LifetimeSeconds, 1.2f, .9f, 1.4f) : .75f;
+        _nextBurstMs = now + (ulong)Mathf.Max(750, lifetime * 1000);
+        PlayArtworkPulse(); PlaySmoke();
+        if (SpawnParticlesEnabled && _spawnParticles != null) _spawnParticles.Restart();
     }
     private void StopSpawnFeedback()
     {
         if (_spawnParticles != null) _spawnParticles.Emitting = false;
+        ResetSpawnMotion();
         StopOpeningParticles();
     }
 }

@@ -65,7 +65,7 @@ public partial class EnemyPortal
     // Force the absent pose synchronously before any gameplay frame; stagger uses the same bound tween.
     internal void BeginMaterialization(float delay = 0)
     {
-        CancelMaterialization();
+        StopSpawnFeedback(); CancelMaterialization();
         IsSpawnActive = true; OpeningState = PortalState.Forming;
         GetNode<Node2D>("Visuals").Show();
         _opening?.Show();
