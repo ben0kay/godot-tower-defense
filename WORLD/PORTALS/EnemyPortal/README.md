@@ -1,3 +1,9 @@
+## World-space name label removed — 2026-11-06
+
+Removed the decorative PORTAL caption from the shared scene and its unused formation-fade hookup. The portal artwork, swell, smoke, materialization, SpawnExit, readiness and wave behavior are unchanged. F3/debug route labels remain available separately.
+
+---
+
 ## Larger faint clouds and portal-relative particles — 2026-11-06
 Existing rolling smoke is retained. A second bounded layer adds eight larger, darker, faint clouds (2.2× size, 8s life, 12% opacity), with slower drift/swirl. Tune the new Large Faint Clouds group on the spawn-feedback preset. Both layers follow wave emission, pause, offscreen, reset and restore handling. All portal emitters simulate in local presentation space, so `SizeMultiplier` scales birth rim, puff/spark size, drift distance and bounds together without moving SpawnExit or changing spawn rules. Source/resource review only; owner visual/FPS acceptance pending.
 

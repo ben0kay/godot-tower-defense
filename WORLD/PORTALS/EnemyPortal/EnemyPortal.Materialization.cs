@@ -14,7 +14,6 @@ public partial class EnemyPortal
     private Tween _openingTween;
     private Node2D _opening;
     private Sprite2D _openingArt;
-    private CanvasItem _openingLabel;
     private ColorRect _vortex;
     private ShaderMaterial _vortexMaterial;
     private GpuParticles2D _inward, _ignition;
@@ -29,7 +28,6 @@ public partial class EnemyPortal
         MaterializationStyle ??= GD.Load<PortalMaterializationStyle>("res://WORLD/PORTALS/EnemyPortal/Visuals/DefaultPortalMaterializationStyle.tres") ?? new();
         _opening = GetNodeOrNull<Node2D>("Visuals/Materialization");
         _openingArt = GetNodeOrNull<Sprite2D>("Visuals/PortalArt");
-        _openingLabel = GetNodeOrNull<CanvasItem>("Visuals/Label");
         _vortex = GetNodeOrNull<ColorRect>("Visuals/Materialization/Vortex");
         _inward = GetNodeOrNull<GpuParticles2D>("Visuals/Materialization/Inward");
         _ignition = GetNodeOrNull<GpuParticles2D>("Visuals/Materialization/Ignition");
@@ -118,7 +116,6 @@ public partial class EnemyPortal
             _openingArt.Modulate = new Color(1, 1, 1, reveal);
             _openingArt.Scale = Vector2.One * Mathf.Lerp(.12f, 1f, reveal);
         }
-        if (_openingLabel != null) _openingLabel.Modulate = new Color(1, 1, 1, Mathf.SmoothStep(0, 1, Mathf.Clamp((p - .82f) / .18f, 0, 1)));
         if (p >= .60f && _inward != null) _inward.Emitting = false;
         if (p >= .77f && !_ignited)
         {
@@ -136,7 +133,6 @@ public partial class EnemyPortal
         IsSpawnActive = true; OpeningState = PortalState.Open;
         GetNode<Node2D>("Visuals").Show();
         if (_openingArt != null) { _openingArt.Modulate = Colors.White; _openingArt.Scale = Vector2.One; }
-        if (_openingLabel != null) _openingLabel.Modulate = Colors.White;
         if (_energy != null) _energy.Visible = _energy.Style?.Enabled == true;
         RefreshWaveSmoke();
         if (notify) SpawnReady?.Invoke(this);
@@ -148,7 +144,6 @@ public partial class EnemyPortal
         OpeningState = active ? PortalState.Open : PortalState.Dormant;
         GetNode<Node2D>("Visuals").Visible = active;
         if (_openingArt != null) { _openingArt.Modulate = Colors.White; _openingArt.Scale = Vector2.One; }
-        if (_openingLabel != null) _openingLabel.Modulate = Colors.White;
         if (_energy != null) _energy.Visible = _energy.Style?.Enabled == true;
         StopSpawnFeedback();
     }

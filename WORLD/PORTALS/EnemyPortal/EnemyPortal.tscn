@@ -141,11 +141,6 @@ mouse_filter = 2
 script = ExtResource("ve2_visual")
 Style = ExtResource("ve2_style")
 
-[node name="Label" type="Label" parent="Visuals" unique_id=242257461]
-offset_left = -48.0
-offset_top = -80.0
-offset_right = 80.0
-text = "PORTAL"
 
 [node name="SpawnParticles" type="GPUParticles2D" parent="Visuals"]
 emitting = false

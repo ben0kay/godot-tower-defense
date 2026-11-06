@@ -1,3 +1,9 @@
+## Citadel MK I visual upgrade — 2026-11-06
+
+The shared `CitadelFortress.svg` has a more established top-down fortification: layered dark-steel armor, casemate walls, utility vents, reinforced reactor shroud, cyan technical lights and four **empty** corner hardpoints reserved visually for later turrets. This remains one static cached 192×192 sprite, centered at (64,64), so the authored 3×3 footprint, approach markers, ReactorEnergy shader, navigation, HP, power and clicking are unaffected. A future tier may replace the art or add weapons separately; no upgrade or gun behavior is introduced. The decorative world-space CITADEL label was removed (HUD and credit/health labels are unchanged). Owner to inspect scale and legibility in Godot.
+
+---
+
 ## Starter power implemented — PW2 (2026-11-04)
 
 `CitadelSession.Power.cs` registers each initialized, living/available Citadel with the shared world PowerGridManager. **`DefaultCitadelPower.tres → Output = 100`** is a provisional baseline independent of health, Credits and wave activity. The resource is assigned on `LEVELS/Runtime/Battlefield.tscn → CitadelSession → Citadel Starter Power / Power Config`; its scalar Output supports live change notifications. Source registration is event-driven, removed on death/tree exit and rebuilt normally on Save/Load/Continue without accumulating or duplicating energy. A Citadel needs its full WorldObjectFootprint on one conducting island; F4 reports unassigned sources if ground is missing. No extra processing node per objective.
@@ -33,7 +39,7 @@ A transparent, non-interactive ReactorEnergy ColorRect now overlays the SVG's ce
 
 ## Fortress artwork — 2026-10-20
 
-`Citadel.tscn` now uses a cached `Sprite2D` referencing `Visuals/CitadelFortress.svg` instead of the temporary Hull/Core polygons. The top-down armored 192px octagonal fortress is centered at local `(64,64)` to retain the existing 3×3 footprint alignment; its cyan reactor is decorative only. The `WorldObjectFootprint` root, 4 approach markers, health component, label, collision/navigation, clicking and multi-Citadel identity remain untouched. It has no runtime geometry generation or animation. Edit the SVG in this Citadel's `Visuals/` folder to swap it later.
+`Citadel.tscn` now uses a cached `Sprite2D` referencing `Visuals/CitadelFortress.svg` instead of the temporary Hull/Core polygons. The top-down armored 192px octagonal fortress is centered at local `(64,64)` to retain the existing 3×3 footprint alignment; its cyan reactor is decorative only. The `WorldObjectFootprint` root, 4 approach markers, health component, collision/navigation, clicking and multi-Citadel identity remain untouched. It has no runtime geometry generation or animation. Edit the SVG in this Citadel's `Visuals/` folder to swap it later.
 
 ---
 

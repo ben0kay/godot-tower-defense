@@ -1,3 +1,9 @@
+## Citadel visual polish and world labels — 2026-11-06
+
+Removed the hardcoded CITADEL and PORTAL world labels from their shared scenes (and retired the portal's unused label animation hookup). Updated the existing 192×192 Citadel SVG to a more intricate dark-metal MK I fortress with layered plating, vents, cyan reactor housing and four **empty** future weapon hardpoints; retained the art resource path and rasterized-sprite architecture. No changes to footprint, placements, approach paths, health, credit UI, reactor shader, combat, portal spawning or saves. Source/scene sanity checked; owner to judge appearance and scene import in Godot.
+
+---
+
 ## Level002 briefing audio — 2026-11-06
 
 Renamed the owner-uploaded 289,295-byte Fish Audio MP3 to `LEVELS/Level002/Level002Briefing.mp3` by retaining the existing Git blob (no audio conversion). Added `Level002BriefingVoice.tres`, registered the voice in `AUDIO/DefaultAudioCatalog.tres`, and set `Level002Briefing.tres.VoiceCueId` to `voice_mission_level002_intro`. Reuses Level001's voice-held top-right typewriter; preserves briefing text, waves, gameplay and checkpoints. Source/resource review only; owner to confirm playback on fresh Level002 load after import.

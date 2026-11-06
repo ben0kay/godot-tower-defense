@@ -31,12 +31,6 @@ mouse_filter = 2
 script = ExtResource("ve2_visual")
 Style = ExtResource("ve2_style")
 
-[node name="Label" type="Label" parent="."]
-offset_left = 24.0
-offset_top = -56.0
-offset_right = 156.0
-text = "CITADEL"
-mouse_filter = 2
 
 [node name="ApproachPoints" type="Node2D" parent="."]
 

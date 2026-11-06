@@ -1,23 +1,142 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+<!-- Citadel MK I, top-down: a single cached 192px sprite within the unchanged 3x3 world footprint.
+     Four clear corner hardpoints are decoration, not guns or physical mount markers. -->
 <defs>
-<linearGradient id="plate" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#899aad"/><stop offset=".48" stop-color="#334656"/><stop offset="1" stop-color="#172937"/></linearGradient>
-<radialGradient id="reactor"><stop stop-color="#e8ffff"/><stop offset=".3" stop-color="#8affec"/><stop offset=".72" stop-color="#16a6b0"/><stop offset="1" stop-color="#063944"/></radialGradient>
+  <linearGradient id="hull" x1="0" y1="0" x2="1" y2="1">
+    <stop stop-color="#738ea1"/><stop offset=".24" stop-color="#344b5c"/>
+    <stop offset=".62" stop-color="#1a3041"/><stop offset="1" stop-color="#415969"/>
+  </linearGradient>
+  <linearGradient id="facet" x1="0" y1="0" x2=".9" y2="1">
+    <stop stop-color="#566f80"/><stop offset=".44" stop-color="#253c4b"/>
+    <stop offset="1" stop-color="#102736"/>
+  </linearGradient>
+  <linearGradient id="edge" x1="0" y1="0" x2="0" y2="1">
+    <stop stop-color="#b6c6d0"/><stop offset=".35" stop-color="#537083"/>
+    <stop offset="1" stop-color="#243849"/>
+  </linearGradient>
+  <radialGradient id="core" cx=".46" cy=".42" r=".64">
+    <stop stop-color="#f2ffff"/><stop offset=".19" stop-color="#affff5"/>
+    <stop offset=".48" stop-color="#36d9db"/><stop offset=".78" stop-color="#096d85"/>
+    <stop offset="1" stop-color="#072733"/>
+  </radialGradient>
 </defs>
-<path d="M49 9H143L183 49V143L143 183H49L9 143V49Z" fill="#0d1a29" stroke="#101c2a" stroke-width="6"/>
-<path d="M51 17H141L175 51V141L141 175H51L17 141V51Z" fill="url(#plate)" stroke="#9aadc0" stroke-width="3"/>
-<path d="M59 31H133L161 59V133L133 161H59L31 133V59Z" fill="#192c3d" stroke="#5f8397" stroke-width="3"/>
-<path d="M60 18H132L137 41H55Z M60 174H132L137 151H55Z M18 60V132L41 137V55Z M174 60V132L151 137V55Z" fill="#3f5567" stroke="#b3c0ca" stroke-width="2"/>
-<path d="M50 50L67 67 M142 50L125 67 M50 142L67 125 M142 142L125 125" stroke="#8da5b7" stroke-width="8"/>
-<path d="M65 52H127L140 65V127L127 140H65L52 127V65Z" fill="#243b4a" stroke="#9baeb6" stroke-width="2"/>
-<path d="M96 43L116 60L132 78L132 114L114 132L78 132L60 114L60 78L78 60Z" fill="#0e222f" stroke="#2b8995" stroke-width="3"/>
-<circle cx="96" cy="96" r="34" fill="#0d2d37" stroke="#a4d8dc" stroke-width="4"/>
-<circle cx="96" cy="96" r="25" fill="url(#reactor)" stroke="#47b8c8" stroke-width="3"/>
-<path d="M96 66L102 86L122 96L102 103L96 124L88 103L68 96L88 88Z" fill="#c5fff6" opacity=".85"/>
-<circle cx="96" cy="96" r="9" fill="#edffff"/>
-<g fill="#122634" stroke="#9bb5c6" stroke-width="3">
-<rect x="38" y="38" width="24" height="24" rx="3"/><rect x="130" y="38" width="24" height="24" rx="3"/>
-<rect x="38" y="130" width="24" height="24" rx="3"/><rect x="130" y="130" width="24" height="24" rx="3"/>
+<!-- Deep recessed shadow and one continuous blast-resistant octagonal outer frame. -->
+<path d="M50 3H142L189 50V142L142 189H50L3 142V50Z" fill="#07121d" stroke="#06101b" stroke-width="3"/>
+<path d="M51 10H141L182 51V141L141 182H51L10 141V51Z" fill="url(#hull)" stroke="#a5b9c8" stroke-width="2.7"/>
+<path d="M54 17H138L175 54V138L138 175H54L17 138V54Z" fill="#0d1f2e" stroke="#152d3d" stroke-width="4"/>
+<path d="M56 21H136L171 56V136L136 171H56L21 136V56Z" fill="url(#facet)" stroke="#7894a5" stroke-width="1.8"/>
+<!-- Layered outer wall / radial plating; deliberate gaps distinguish individual armored sections. -->
+<path d="M54 16H138L147 30H45Z" fill="url(#edge)" stroke="#2b4556" stroke-width="1.5"/>
+<path d="M54 176H138L147 162H45Z" fill="#384e5e" stroke="#809aab" stroke-width="1.5"/>
+<path d="M16 54V138L30 147V45Z" fill="#3c5365" stroke="#9db0bb" stroke-width="1.5"/>
+<path d="M176 54V138L162 147V45Z" fill="#30495b" stroke="#849ba9" stroke-width="1.5"/>
+<path d="M21 51L51 21L65 34L34 65Z M171 51L141 21L127 34L158 65Z
+         M21 141L51 171L65 158L34 127Z M171 141L141 171L127 158L158 127Z"
+      fill="#142b3b" stroke="#65889a" stroke-width="1.6"/>
+<!-- Angular casemate shoulder armor. -->
+<path d="M58 35H134L148 49L134 64H58L44 49Z" fill="#223c4d" stroke="#6d8799" stroke-width="1.8"/>
+<path d="M58 157H134L148 143L134 128H58L44 143Z" fill="#1a3344" stroke="#6a8799" stroke-width="1.8"/>
+<path d="M35 58V134L49 148L64 134V58L49 44Z" fill="#274252" stroke="#758da0" stroke-width="1.8"/>
+<path d="M157 58V134L143 148L128 134V58L143 44Z" fill="#1c3546" stroke="#758da0" stroke-width="1.8"/>
+<!-- Symmetric diagonal power conduits, visible without crowding the central reactor. -->
+<path d="M59 59L75 75 M133 59L117 75 M59 133L75 117 M133 133L117 117"
+      stroke="#091c2b" stroke-width="9" stroke-linecap="round"/>
+<path d="M59 59L75 75 M133 59L117 75 M59 133L75 117 M133 133L117 117"
+      stroke="#5b7c8b" stroke-width="3" stroke-linecap="round"/>
+<path d="M62 62L71 71 M130 62L121 71 M62 130L71 121 M130 130L121 121"
+      stroke="#49beca" stroke-width="1.4"/>
+<!-- Utility air/heat exchangers along all four cardinal wall faces. -->
+<g transform="translate(96 25)"><rect x="-25" y="-6.5" width="50" height="13" rx="2" fill="#101e2b" stroke="#59758a" stroke-width="1.4"/><path d="M-23 -4H23" stroke="#385568" stroke-width="1.2"/><path d="M-19 -2v4" stroke="#0a1722" stroke-width="4" stroke-linecap="round"/><path d="M-19 -1v2" stroke="#8db0bf" stroke-width="1"/><path d="M-11 -2v4" stroke="#0a1722" stroke-width="4" stroke-linecap="round"/><path d="M-11 -1v2" stroke="#8db0bf" stroke-width="1"/><path d="M-3 -2v4" stroke="#0a1722" stroke-width="4" stroke-linecap="round"/><path d="M-3 -1v2" stroke="#8db0bf" stroke-width="1"/><path d="M5 -2v4" stroke="#0a1722" stroke-width="4" stroke-linecap="round"/><path d="M5 -1v2" stroke="#8db0bf" stroke-width="1"/><path d="M13 -2v4" stroke="#0a1722" stroke-width="4" stroke-linecap="round"/><path d="M13 -1v2" stroke="#8db0bf" stroke-width="1"/><path d="M-25 6.5H25" stroke="#66b9c3" opacity=".65" stroke-width="1.2"/></g>
+<g transform="translate(96 167)"><rect x="-25" y="-6.5" width="50" height="13" rx="2" fill="#101e2b" stroke="#59758a" stroke-width="1.4"/><path d="M-23 -4H23" stroke="#385568" stroke-width="1.2"/><path d="M-19 -2v4" stroke="#0a1722" stroke-width="4" stroke-linecap="round"/><path d="M-19 -1v2" stroke="#8db0bf" stroke-width="1"/><path d="M-11 -2v4" stroke="#0a1722" stroke-width="4" stroke-linecap="round"/><path d="M-11 -1v2" stroke="#8db0bf" stroke-width="1"/><path d="M-3 -2v4" stroke="#0a1722" stroke-width="4" stroke-linecap="round"/><path d="M-3 -1v2" stroke="#8db0bf" stroke-width="1"/><path d="M5 -2v4" stroke="#0a1722" stroke-width="4" stroke-linecap="round"/><path d="M5 -1v2" stroke="#8db0bf" stroke-width="1"/><path d="M13 -2v4" stroke="#0a1722" stroke-width="4" stroke-linecap="round"/><path d="M13 -1v2" stroke="#8db0bf" stroke-width="1"/><path d="M-25 6.5H25" stroke="#66b9c3" opacity=".65" stroke-width="1.2"/></g>
+<g transform="translate(25 96) rotate(-90)"><rect x="-25" y="-6.5" width="50" height="13" rx="2" fill="#101e2b" stroke="#59758a" stroke-width="1.4"/><path d="M-23 -4H23" stroke="#385568" stroke-width="1.2"/><path d="M-19 -2v4" stroke="#0a1722" stroke-width="4" stroke-linecap="round"/><path d="M-19 -1v2" stroke="#8db0bf" stroke-width="1"/><path d="M-11 -2v4" stroke="#0a1722" stroke-width="4" stroke-linecap="round"/><path d="M-11 -1v2" stroke="#8db0bf" stroke-width="1"/><path d="M-3 -2v4" stroke="#0a1722" stroke-width="4" stroke-linecap="round"/><path d="M-3 -1v2" stroke="#8db0bf" stroke-width="1"/><path d="M5 -2v4" stroke="#0a1722" stroke-width="4" stroke-linecap="round"/><path d="M5 -1v2" stroke="#8db0bf" stroke-width="1"/><path d="M13 -2v4" stroke="#0a1722" stroke-width="4" stroke-linecap="round"/><path d="M13 -1v2" stroke="#8db0bf" stroke-width="1"/><path d="M-25 6.5H25" stroke="#66b9c3" opacity=".65" stroke-width="1.2"/></g>
+<g transform="translate(167 96) rotate(90)"><rect x="-25" y="-6.5" width="50" height="13" rx="2" fill="#101e2b" stroke="#59758a" stroke-width="1.4"/><path d="M-23 -4H23" stroke="#385568" stroke-width="1.2"/><path d="M-19 -2v4" stroke="#0a1722" stroke-width="4" stroke-linecap="round"/><path d="M-19 -1v2" stroke="#8db0bf" stroke-width="1"/><path d="M-11 -2v4" stroke="#0a1722" stroke-width="4" stroke-linecap="round"/><path d="M-11 -1v2" stroke="#8db0bf" stroke-width="1"/><path d="M-3 -2v4" stroke="#0a1722" stroke-width="4" stroke-linecap="round"/><path d="M-3 -1v2" stroke="#8db0bf" stroke-width="1"/><path d="M5 -2v4" stroke="#0a1722" stroke-width="4" stroke-linecap="round"/><path d="M5 -1v2" stroke="#8db0bf" stroke-width="1"/><path d="M13 -2v4" stroke="#0a1722" stroke-width="4" stroke-linecap="round"/><path d="M13 -1v2" stroke="#8db0bf" stroke-width="1"/><path d="M-25 6.5H25" stroke="#66b9c3" opacity=".65" stroke-width="1.2"/></g>
+<!-- Inner command superstructure: nested octagons, fortified bracing, inset reactor containment. -->
+<path d="M78 46H114L146 78V114L114 146H78L46 114V78Z"
+      fill="#0b1926" stroke="#8199aa" stroke-width="3"/>
+<path d="M79 52H113L140 79V113L113 140H79L52 113V79Z"
+      fill="#1b3749" stroke="#315264" stroke-width="2.1"/>
+<path d="M80 57H112L135 80V112L112 135H80L57 112V80Z"
+      fill="#101f2e" stroke="#608193" stroke-width="1.5"/>
+<path d="M77 53H115 M77 139H115 M53 77V115 M139 77V115"
+      stroke="#85acb7" stroke-width="2.1" stroke-linecap="round"/>
+<path d="M78 59H114 M78 133H114 M59 78V114 M133 78V114"
+      stroke="#4ab0ba" stroke-width="1.5" opacity=".82"/>
+<!-- Four flush mount pads: reserved attachment zones for future weapons. No gun art included. -->
+<g transform="translate(43 43)">
+  <!-- Empty armored docking socket: later weapon tiers may mount a gun here. -->
+  <path d="M-18 -12L-12 -18H12L18 -12V12L12 18H-12L-18 12Z" fill="#091824" stroke="#93aabd" stroke-width="2"/>
+  <path d="M-16 -11L-11 -16H11L16 -11V11L11 16H-11L-16 11Z" fill="#344b5b" stroke="#142838" stroke-width="1.4"/>
+  <path d="M-13 -7L-7 -13H7L13 -7V7L7 13H-7L-13 7Z" fill="#0d202d" stroke="#5c7d91" stroke-width="1.6"/>
+  <circle r="9.5" fill="#070f1b" stroke="#88a8b9" stroke-width="1.8"/>
+  <circle r="5.5" fill="#173b48" stroke="#397e8e" stroke-width="1.4"/>
+  <circle r="2.4" fill="#3e9dab"/>
+  <path d="M-12 0H-8 M8 0H12 M0 -12V-8 M0 8V12" stroke="#74d8db" stroke-width="1.5" stroke-linecap="round"/>
+  <circle cx="-12.6" cy="-12.6" r="1.6" fill="#bdcad2"/><circle cx="12.6" cy="-12.6" r="1.6" fill="#bdcad2"/>
+  <circle cx="-12.6" cy="12.6" r="1.6" fill="#bdcad2"/><circle cx="12.6" cy="12.6" r="1.6" fill="#bdcad2"/>
 </g>
-<g fill="#71e2e4"><rect x="46" y="45" width="8" height="10"/><rect x="138" y="45" width="8" height="10"/><rect x="46" y="137" width="8" height="10"/><rect x="138" y="137" width="8" height="10"/></g>
-<path d="M80 22H112 M80 170H112 M22 80V112 M170 80V112" stroke="#61d9e2" stroke-width="4" stroke-linecap="round"/>
+<g transform="translate(149 43)">
+  <!-- Empty armored docking socket: later weapon tiers may mount a gun here. -->
+  <path d="M-18 -12L-12 -18H12L18 -12V12L12 18H-12L-18 12Z" fill="#091824" stroke="#93aabd" stroke-width="2"/>
+  <path d="M-16 -11L-11 -16H11L16 -11V11L11 16H-11L-16 11Z" fill="#344b5b" stroke="#142838" stroke-width="1.4"/>
+  <path d="M-13 -7L-7 -13H7L13 -7V7L7 13H-7L-13 7Z" fill="#0d202d" stroke="#5c7d91" stroke-width="1.6"/>
+  <circle r="9.5" fill="#070f1b" stroke="#88a8b9" stroke-width="1.8"/>
+  <circle r="5.5" fill="#173b48" stroke="#397e8e" stroke-width="1.4"/>
+  <circle r="2.4" fill="#3e9dab"/>
+  <path d="M-12 0H-8 M8 0H12 M0 -12V-8 M0 8V12" stroke="#74d8db" stroke-width="1.5" stroke-linecap="round"/>
+  <circle cx="-12.6" cy="-12.6" r="1.6" fill="#bdcad2"/><circle cx="12.6" cy="-12.6" r="1.6" fill="#bdcad2"/>
+  <circle cx="-12.6" cy="12.6" r="1.6" fill="#bdcad2"/><circle cx="12.6" cy="12.6" r="1.6" fill="#bdcad2"/>
+</g>
+<g transform="translate(43 149)">
+  <!-- Empty armored docking socket: later weapon tiers may mount a gun here. -->
+  <path d="M-18 -12L-12 -18H12L18 -12V12L12 18H-12L-18 12Z" fill="#091824" stroke="#93aabd" stroke-width="2"/>
+  <path d="M-16 -11L-11 -16H11L16 -11V11L11 16H-11L-16 11Z" fill="#344b5b" stroke="#142838" stroke-width="1.4"/>
+  <path d="M-13 -7L-7 -13H7L13 -7V7L7 13H-7L-13 7Z" fill="#0d202d" stroke="#5c7d91" stroke-width="1.6"/>
+  <circle r="9.5" fill="#070f1b" stroke="#88a8b9" stroke-width="1.8"/>
+  <circle r="5.5" fill="#173b48" stroke="#397e8e" stroke-width="1.4"/>
+  <circle r="2.4" fill="#3e9dab"/>
+  <path d="M-12 0H-8 M8 0H12 M0 -12V-8 M0 8V12" stroke="#74d8db" stroke-width="1.5" stroke-linecap="round"/>
+  <circle cx="-12.6" cy="-12.6" r="1.6" fill="#bdcad2"/><circle cx="12.6" cy="-12.6" r="1.6" fill="#bdcad2"/>
+  <circle cx="-12.6" cy="12.6" r="1.6" fill="#bdcad2"/><circle cx="12.6" cy="12.6" r="1.6" fill="#bdcad2"/>
+</g>
+<g transform="translate(149 149)">
+  <!-- Empty armored docking socket: later weapon tiers may mount a gun here. -->
+  <path d="M-18 -12L-12 -18H12L18 -12V12L12 18H-12L-18 12Z" fill="#091824" stroke="#93aabd" stroke-width="2"/>
+  <path d="M-16 -11L-11 -16H11L16 -11V11L11 16H-11L-16 11Z" fill="#344b5b" stroke="#142838" stroke-width="1.4"/>
+  <path d="M-13 -7L-7 -13H7L13 -7V7L7 13H-7L-13 7Z" fill="#0d202d" stroke="#5c7d91" stroke-width="1.6"/>
+  <circle r="9.5" fill="#070f1b" stroke="#88a8b9" stroke-width="1.8"/>
+  <circle r="5.5" fill="#173b48" stroke="#397e8e" stroke-width="1.4"/>
+  <circle r="2.4" fill="#3e9dab"/>
+  <path d="M-12 0H-8 M8 0H12 M0 -12V-8 M0 8V12" stroke="#74d8db" stroke-width="1.5" stroke-linecap="round"/>
+  <circle cx="-12.6" cy="-12.6" r="1.6" fill="#bdcad2"/><circle cx="12.6" cy="-12.6" r="1.6" fill="#bdcad2"/>
+  <circle cx="-12.6" cy="12.6" r="1.6" fill="#bdcad2"/><circle cx="12.6" cy="12.6" r="1.6" fill="#bdcad2"/>
+</g>
+<!-- Reinforced reactor housing with faceted power shroud and service lines. -->
+<path d="M96 60L122 70L132 96L122 122L96 132L70 122L60 96L70 70Z"
+      fill="#071923" stroke="#5c8795" stroke-width="3.2"/>
+<path d="M96 65L118 74L127 96L118 118L96 127L74 118L65 96L74 74Z"
+      fill="#0e303e" stroke="#7cb0bb" stroke-width="1.6"/>
+<path d="M96 64V74 M96 118V128 M64 96H74 M118 96H128
+         M74 74L81 81 M118 74L111 81 M74 118L81 111 M118 118L111 111"
+      stroke="#7cd9d9" stroke-width="2" stroke-linecap="round"/>
+<circle cx="96" cy="96" r="29" fill="#071b26" stroke="#9dbcc4" stroke-width="3.2"/>
+<circle cx="96" cy="96" r="24" fill="url(#core)" stroke="#2c9dab" stroke-width="2.6"/>
+<circle cx="96" cy="96" r="18" fill="none" stroke="#b8f4ed" stroke-width="1.5" opacity=".7"/>
+<path d="M96 75L102 89L117 96L102 102L96 117L90 102L75 96L90 90Z"
+      fill="#c5fff5" opacity=".83"/>
+<circle cx="96" cy="96" r="7" fill="#eeffff"/>
+<!-- Small recessed service pins and cyan edge navigation lights. -->
+<g fill="#aec4ce">
+  <circle cx="67" cy="52" r="1.7"/><circle cx="125" cy="52" r="1.7"/>
+  <circle cx="67" cy="140" r="1.7"/><circle cx="125" cy="140" r="1.7"/>
+  <circle cx="52" cy="67" r="1.7"/><circle cx="140" cy="67" r="1.7"/>
+  <circle cx="52" cy="125" r="1.7"/><circle cx="140" cy="125" r="1.7"/>
+</g>
+<g stroke="#67dbe3" stroke-width="2.7" stroke-linecap="round">
+  <path d="M70 13H84 M108 13H122 M70 179H84 M108 179H122"/>
+  <path d="M13 70V84 M13 108V122 M179 70V84 M179 108V122"/>
+</g>
+<g fill="#b5f5e9"><rect x="92" y="17" width="8" height="2.6" rx="1"/>
+<rect x="92" y="173" width="8" height="2.6" rx="1"/>
+<rect x="17" y="92" width="2.6" height="8" rx="1"/>
+<rect x="173" y="92" width="2.6" height="8" rx="1"/></g>
 </svg>
