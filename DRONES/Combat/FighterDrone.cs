@@ -9,9 +9,11 @@ public partial class FighterDrone : Node2D
     public string SaveId { get; private set; }
     public int Slot { get; private set; }
     public float Health { get; private set; }
-    public int Ammo { get; private set; }
+    public AmmoInventory Reserve { get; private set; }
+    public int Ammo => Reserve?.Amount ?? 0;
+    public long RoundsFired { get; private set; }
     public float MaxHealth => FighterDroneConfig.Safe(Config.MaxHealth, 300, 1, 10000);
-    public int AmmoCapacity => Mathf.Clamp(Config.AmmoCapacity, 1, 10000);
+    public int AmmoCapacity => Reserve?.Capacity ?? Mathf.Clamp(Config.AmmoCapacity, 1, 10000);
     public FighterDroneState State { get; private set; } = FighterDroneState.Docked;
     public bool IsFlying => State != FighterDroneState.Docked;
     private bool InTransit => State is FighterDroneState.Launching or FighterDroneState.Returning;
@@ -25,13 +27,15 @@ public partial class FighterDrone : Node2D
     private FighterDroneWeapon _weapon;
     internal void BindWeapon(WorldGrid grid, Node2D projectiles) => _weapon?.Bind(this, grid, projectiles);
     // Ammunition is spent only after a real friendly projectile successfully enters the world.
-    internal void RecordFiredRound() { if (Ammo > 0) Ammo--; }
+    internal void RecordFiredRound() { if (Reserve?.TryConsume(1) == true) RoundsFired++; }
+    internal void RepairHealth(float amount) { Health = Mathf.Min(MaxHealth, Health + Mathf.Max(0, amount)); }
     private Vector2 _initialPosition;
 
-    internal void Initialize(FighterDroneConfig config, int slot, Vector2 position, string id = null)
+    internal void Initialize(FighterDroneConfig config, int slot, Vector2 position, string id = null, bool purchased = true)
     {
         Config = config; Slot = slot; SaveId = id ?? Guid.NewGuid().ToString("N");
-        Health = MaxHealth; Ammo = AmmoCapacity; _initialPosition = position;
+        Health = MaxHealth; int capacity = Mathf.Clamp(config.AmmoCapacity, 1, 10000);
+        Reserve = new AmmoInventory(capacity, purchased ? capacity : 0); _initialPosition = position;
         _steering.Phase = slot * Mathf.Pi / 2; _search = slot * .08f;
     }
     public override void _Ready()
@@ -92,7 +96,7 @@ public partial class FighterDrone : Node2D
         State = _target == null ? FighterDroneState.Holding :
             GlobalPosition.DistanceTo(_target.GlobalPosition) > engagement ? FighterDroneState.Intercepting : FighterDroneState.Manoeuvring;
         _steering.Step(this, _target, home, dt, clamp); Present(dt, true);
-        bool fired = _weapon?.Step(dt, _target) == true;
+        bool fired = _weapon?.Step(dt) == true;
         return before != State || fired;
     }
     private void Present(float dt, bool ignite) => _body?.Present(InTransit ? _motion.Heading : _steering.Heading,
@@ -108,12 +112,12 @@ public partial class FighterDrone : Node2D
         Position = SavePoint.From(GlobalPosition), Heading = InTransit ? _motion.Heading : _steering.Heading,
         Motion = InTransit ? _motion.CopyFlight() : null,
         Velocity = SavePoint.From(_steering.Velocity), ManoeuvrePhase = _steering.Phase,
-        WeaponCooldown = _weapon?.CaptureCooldown() ?? 0
+        WeaponCooldown = _weapon?.CaptureCooldown() ?? 0, RoundsFired = RoundsFired
     };
     internal void Restore(FighterDroneSaveData data)
     {
         if (data.Health > MaxHealth || data.Ammo > AmmoCapacity) throw new System.IO.InvalidDataException("Fighter exceeds current capacity.");
-        Health = data.Health; Ammo = data.Ammo; State = data.State; GlobalPosition = data.Position.Vector();
+        Health = data.Health; Reserve.RestoreAmount(data.Ammo); RoundsFired = data.RoundsFired ?? (AmmoCapacity - data.Ammo); State = data.State; GlobalPosition = data.Position.Vector();
         _motion = data.Motion?.CopyFlight() ?? new DroneFlightMotion { Heading = data.Heading };
         _steering.Heading = data.Heading; _steering.Velocity = data.Velocity.Vector(); _steering.Phase = data.ManoeuvrePhase;
         _target = null; _steering.ResetPass(); _search = Slot * .08f;

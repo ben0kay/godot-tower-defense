@@ -15,6 +15,7 @@ public partial class AmmunitionLogistics : Node2D
     private readonly List<TowerBase> _pending = new();
     private readonly HashSet<TowerBase> _pendingSet = new();
     private readonly Dictionary<TowerBase, Action> _exitHooks = new(), _stockHooks = new();
+    private readonly Dictionary<TowerBase, AmmoInventory> _consumerStocks = new();
     private readonly Dictionary<TowerBase, int> _reserved = new(), _busy = new();
     private readonly Dictionary<TowerBase, AmmoDeliveryJob> _delivering = new();
     private readonly List<AmmoDeliveryJob> _jobs = new();
@@ -37,7 +38,21 @@ public partial class AmmunitionLogistics : Node2D
     public int BusySlots(AmmoBuilding source) => _busy.GetValueOrDefault(source);
     public int ReservedSpace(TowerBase destination) => _reserved.GetValueOrDefault(destination);
     private static bool Live(TowerBase node) => GodotObject.IsInstanceValid(node) && node.IsInsideTree() && !node.IsQueuedForDeletion() && node.IsOperational;
-    private static AmmoInventory Inventory(TowerBase owner) => owner is AmmoBuilding building ? building.Inventory : owner.Ammunition?.Inventory;
+    private static AmmoInventory Inventory(TowerBase owner) => owner is AmmoBuilding building ? building.Inventory : owner is IAmmoDeliveryConsumer consumer ? consumer.DeliveryInventory : owner.Ammunition?.Inventory;
+
+    private static bool ConsumerReady(TowerBase owner) => Live(owner) &&
+        (owner is not IAmmoDeliveryConsumer consumer || consumer.CanReceiveAmmo);
+    private static bool ConsumerEndpoint(TowerBase owner) => owner?.Ammunition != null || owner is IAmmoDeliveryConsumer;
+    private bool NeedsDelivery(TowerBase owner) => ConsumerReady(owner) && Inventory(owner) is AmmoInventory stock &&
+        (Config ??= GD.Load<AmmunitionMasterConfig>("res://TOWERS/Shared/Ammunition/DefaultAmmunitionConfig.tres")).NeedsResupply(stock.Amount, stock.Capacity);
+    private void ConsumerStatus(TowerBase owner, bool requested)
+    {
+        bool flight = _delivering.ContainsKey(owner);
+        if (owner is IAmmoDeliveryConsumer consumer) consumer.SetAmmoDeliveryStatus(requested, flight);
+        else owner.Ammunition?.SetDeliveryStatus(requested, flight);
+    }
+    public void RefreshConsumer(TowerBase owner) { RegisterConsumer(owner); if (_stockHooks.ContainsKey(owner)) UpdateRequest(owner); }
+    public void RemoveConsumer(TowerBase owner) { if (_exitHooks.ContainsKey(owner)) Unregister(owner); }
 
     // =========================================================
     // Register inventories once and retire both callbacks when an endpoint or this world leaves.
@@ -56,9 +71,9 @@ public partial class AmmunitionLogistics : Node2D
     }
     public void RegisterConsumer(TowerBase tower)
     {
-        if (_shutdown || !Live(tower) || tower.Ammunition == null || _stockHooks.ContainsKey(tower)) return;
+        if (_shutdown || !ConsumerReady(tower) || !ConsumerEndpoint(tower) || Inventory(tower) == null || _stockHooks.ContainsKey(tower)) return;
         Watch(tower); Action changed = () => UpdateRequest(tower);
-        _stockHooks.Add(tower, changed); tower.Ammunition.Inventory.Changed += changed;
+        _stockHooks.Add(tower, changed); _consumerStocks.Add(tower, Inventory(tower)); Inventory(tower).Changed += changed;
         UpdateRequest(tower);
     }
 
@@ -67,12 +82,11 @@ public partial class AmmunitionLogistics : Node2D
     private void RefreshRequests() { foreach (TowerBase tower in _stockHooks.Keys) UpdateRequest(tower); }
     private void UpdateRequest(TowerBase tower)
     {
-        if (_shutdown || !Live(tower)) return;
-        AmmoInventory stock = tower.Ammunition.Inventory;
-        bool low = (Config ?? GD.Load<AmmunitionMasterConfig>("res://TOWERS/Shared/Ammunition/DefaultAmmunitionConfig.tres")).NeedsResupply(stock.Amount, stock.Capacity);
+        if (_shutdown) return;
+        bool low = NeedsDelivery(tower);
         if (low && _pendingSet.Add(tower)) _pending.Add(tower);
         if (!low && _pendingSet.Remove(tower)) _pending.Remove(tower);
-        tower.Ammunition.SetDeliveryStatus(low, _delivering.ContainsKey(tower));
+        ConsumerStatus(tower, low);
     }
 
     // =========================================================
@@ -119,7 +133,7 @@ public partial class AmmunitionLogistics : Node2D
     }
     private void TryConsumer(TowerBase tower)
     {
-        if (!Live(tower) || _delivering.ContainsKey(tower)) return;
+        if (!ConsumerReady(tower) || _delivering.ContainsKey(tower)) return;
         UpdateRequest(tower);
         if (!_pendingSet.Contains(tower)) return;
         AmmunitionDepot best = null; float distance = float.PositiveInfinity;
@@ -136,7 +150,7 @@ public partial class AmmunitionLogistics : Node2D
     // Loading removes physical stock exactly once; cargo also serves as the source-stock reservation.
     private void Launch(AmmoBuilding source, TowerBase destination)
     {
-        if (!Live(source) || !Live(destination)) return;
+        if (!Live(source) || !Live(destination) || ConsumerEndpoint(destination) && !ConsumerReady(destination)) return;
         AmmoInventory target = Inventory(destination);
         int freeRoom = target.FreeSpace - ReservedSpace(destination);
         int amount;
@@ -154,11 +168,11 @@ public partial class AmmunitionLogistics : Node2D
         job.Reserved = amount;
         _reserved[destination] = ReservedSpace(destination) + amount;
         _busy[source] = BusySlots(source) + 1; _jobs.Add(job);
-        if (destination.Ammunition != null) _delivering.Add(destination, job);
+        if (ConsumerEndpoint(destination)) _delivering.Add(destination, job);
         drone.Initialize(source, destination, source.DroneSpeed, () => Arrive(job), () => Complete(job, false), () => Complete(job, true));
         AddChild(drone);
         source.NotifyRuntimeChanged(); destination.NotifyRuntimeChanged();
-        if (destination.Ammunition != null) UpdateRequest(destination);
+        if (ConsumerEndpoint(destination)) UpdateRequest(destination);
     }
 
     // =========================================================
@@ -167,7 +181,7 @@ public partial class AmmunitionLogistics : Node2D
     {
         if (job.Finished) return;
         ReleaseReservation(job);
-        if (Live(job.Destination) && ReferenceEquals(Inventory(job.Destination), job.DestinationInventory))
+        if (Live(job.Destination) && (!ConsumerEndpoint(job.Destination) || ConsumerReady(job.Destination)) && ReferenceEquals(Inventory(job.Destination), job.DestinationInventory))
         {
             int amount = Math.Min(job.Cargo.Amount, job.DestinationInventory.FreeSpace);
             if (amount > 0 && job.Cargo.TryTransferTo(job.DestinationInventory, amount)) DeliveredRounds += amount;
@@ -206,7 +220,7 @@ public partial class AmmunitionLogistics : Node2D
     private void Unregister(TowerBase owner)
     {
         if (_exitHooks.Remove(owner, out Action exit)) owner.TreeExiting -= exit;
-        if (_stockHooks.Remove(owner, out Action changed)) owner.Ammunition.Inventory.Changed -= changed;
+        if (_stockHooks.Remove(owner, out Action changed) && _consumerStocks.Remove(owner, out var watched)) watched.Changed -= changed;
         _pendingSet.Remove(owner); _pending.Remove(owner);
         if (owner is AmmunitionFactory factory) _factories.Remove(factory);
         if (owner is AmmunitionDepot depot) _depots.Remove(depot);

@@ -1,3 +1,6 @@
+## FD4.1 + FD5 — source implemented / owner validation pending
+Independent local weapon targeting; courier-fed station ammo, low-resource recall, FIFO timed rearm/paid repair, service meters/roster and additive checkpoint state. [Usage](../DRONES/Combat/README.md). FD3 patrol, broader FD6 balance and anti-air remain planned.
+
 ## CW1 — shared recoil source implemented — 2026-11-06
 Motion/style now live under `FEEDBACK/Weapons/Recoil/`; existing tower classes, preset paths and behaviour remain compatible adapters. Gunner, Heavy Gunner and four Capital cannons have independent accepted-shot recoil. Only gun art moves; fixed physical muzzle/aim and bullet cadence remain unchanged. Source review only; owner validation pending. CW2 remains planned.
 

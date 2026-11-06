@@ -26,6 +26,10 @@ public partial class FighterDroneConfig : Resource
     [Export(PropertyHint.Range, "0.1,30,0.1")] public float ShotsPerSecond { get; set; } = 9;
     [Export(PropertyHint.Range, "40,3000,10")] public float BulletSpeed { get; set; } = 1200;
     [Export(PropertyHint.Range, "0,360,1")] public float FiringArcDegrees { get; set; } = 180;
+    [Export(PropertyHint.Range, ".1,2,.05")] public float WeaponSearchSeconds { get; set; } = .2f;
+    [Export(PropertyHint.Range, "0,2,.05")] public float WeaponTargetHoldSeconds { get; set; } = .25f;
+    [Export(PropertyHint.Range, "0,.9,.05")] public float AutoReturnAmmoFraction { get; set; } = .25f;
+    [Export(PropertyHint.Range, "0,.9,.05")] public float AutoReturnHealthFraction { get; set; } = .35f;
     [Export] public ProjectileVisualStyle ProjectileVisual { get; set; }
     [Export] public MuzzleFlashStyle MuzzleFlash { get; set; }
     public static float Safe(float value, float fallback, float min, float max) =>

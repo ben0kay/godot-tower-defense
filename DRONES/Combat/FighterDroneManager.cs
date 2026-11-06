@@ -24,6 +24,7 @@ public partial class FighterDroneManager : Node
         _station = station; _grid = grid; _clamp = ClampToMap;
         _projectiles = grid.GetNodeOrNull<Node2D>("../Projectiles");
         _targeting = FighterDroneTargeting.For(grid.GetNodeOrNull<EnemyRegistry>("../EnemySystems/Registry"));
+        BindService();
     }
     public int FreeSlot()
     { for (int i = 0; i < Capacity; i++) if (_slots[i] == null) return i; return -1; }
@@ -55,10 +56,12 @@ public partial class FighterDroneManager : Node
         _slots[fighter.Slot] = fighter; Count++;
         Action exit = () => Removed(fighter);
         _exitHandlers.Add(fighter, exit); fighter.TreeExiting += exit;
+        RegisterService(fighter);
     }
     private void Removed(FighterDrone fighter)
     {
         fighter.ClearTarget(_targeting);
+        _service[fighter.Slot] = null; _meters[fighter.Slot] = null; _activeBays[fighter.Slot] = false;
         if (_exitHandlers.Remove(fighter, out var exit)) fighter.TreeExiting -= exit;
         if (_slots[fighter.Slot] == fighter) { _slots[fighter.Slot] = null; Count--; }
         if (!_shutdown && GodotObject.IsInstanceValid(_station) && !_station.IsQueuedForDeletion())
@@ -77,25 +80,37 @@ public partial class FighterDroneManager : Node
     }
     private Vector2 LaunchPoint(int slot) => ClampToMap(DockPoint(slot) + Vector2.Up *
         FighterDroneConfig.Safe(_station.Config.FighterConfig.LaunchDistance, 180, 64, 600));
-    internal bool Launch(int slot)
+    internal bool Launch(int slot, bool automatic = false)
     {
         FighterDrone fighter = At(slot);
-        if (fighter == null || fighter.State != FighterDroneState.Docked) return false;
+        if (fighter == null || fighter.State != FighterDroneState.Docked || fighter.Ammo <= 0 || !_station.CanOperate || _station.IsBusy) return false;
+        ResetVisit(slot);
+        _service[slot].ManualResourceOverride = !automatic &&
+            (fighter.Ammo <= fighter.AmmoCapacity * FighterDroneConfig.Safe(fighter.Config.AutoReturnAmmoFraction, .25f, 0, .9f) ||
+             fighter.Health <= fighter.MaxHealth * FighterDroneConfig.Safe(fighter.Config.AutoReturnHealthFraction, .35f, 0, .9f));
         fighter.BeginTransit(LaunchPoint(slot), false); RefreshProcessing(); _station.NotifyRuntimeChanged(); return true;
     }
-    internal bool Recall(int slot)
+    internal bool Recall(int slot, FighterReturnReason reason = FighterReturnReason.ManualRecall)
     {
-        FighterDrone fighter = At(slot);
-        if (fighter == null || fighter.State is FighterDroneState.Docked or FighterDroneState.Returning) return false;
-        fighter.ClearTarget(_targeting); fighter.BeginTransit(DockPoint(slot), true); RefreshProcessing(); _station.NotifyRuntimeChanged(); return true;
+        FighterDrone fighter = At(slot); if (fighter == null) return false;
+        var job = _service[slot];
+        if (fighter.State == FighterDroneState.Docked || fighter.State == FighterDroneState.Returning)
+        {
+            if (job.Reason == FighterReturnReason.None || job.Reason == reason) return false;
+            job.Reason = reason; job.ManualResourceOverride = false;
+            WakeService(); _station.NotifyRuntimeChanged(); return true;
+        }
+        ResetVisit(slot); _service[slot].Reason = reason;
+        fighter.ClearTarget(_targeting); fighter.BeginTransit(DockPoint(slot), true);
+        RefreshProcessing(); _station.NotifyRuntimeChanged(); return true;
     }
     internal void RecallAll()
-    { for (int i = 0; i < _slots.Length; i++) Recall(i); }
+    { for (int i = 0; i < _slots.Length; i++) Recall(i, FighterReturnReason.StationDisabled); }
     private void RefreshProcessing()
     {
         bool flying = false;
         for (int i = 0; i < _slots.Length; i++) flying |= _slots[i]?.IsFlying == true;
-        SetPhysicsProcess(flying && !_shutdown);
+        SetPhysicsProcess((flying || HasServiceWork()) && !_shutdown);
     }
 
     // =========================================================
@@ -105,27 +120,31 @@ public partial class FighterDroneManager : Node
         if (_shutdown || GetTree().Paused || !double.IsFinite(delta) || delta <= 0) return;
         if (!GodotObject.IsInstanceValid(_station) || _station.IsDestroyed || _station.IsQueuedForDeletion()) { SetPhysicsProcess(false); return; }
         float dt = (float)Math.Min(delta, .1);
-        _targeting?.Tick(dt);
         bool changed = false;
         for (int i = 0; i < _slots.Length; i++)
         {
             FighterDrone fighter = _slots[i]; if (fighter == null) continue;
-            if (!_station.CanOperate && fighter.IsFlying) Recall(i);
+            if (!_station.CanOperate && fighter.IsFlying) Recall(i, FighterReturnReason.StationDisabled);
+            else if (fighter.IsFlying && fighter.State != FighterDroneState.Returning && WantsAutoReturn(fighter))
+                Recall(i, FighterReturnReason.AutoService);
             if (fighter.IsFlying)
             {
-                changed |= fighter.Step(dt);
+                _targeting?.Tick(dt);
+                bool arrived = fighter.Step(dt); changed |= arrived;
+                if (arrived && fighter.State == FighterDroneState.Docked) BeginDockService(fighter);
                 changed |= fighter.StepAutoPilot(dt, _targeting, LaunchPoint(i), _clamp);
             }
         }
-        RefreshProcessing(); if (changed) _station.NotifyRuntimeChanged();
+        changed |= ServiceStep(dt);
+        RefreshProcessing(); if (changed) { RefreshMeters(); _station.NotifyRuntimeChanged(); }
     }
 
     // =========================================================
     // A tower snapshot owns its roster, so loading/selling can never leave a second orphaned copy in the world.
     internal FighterStationSaveData Capture()
     {
-        var result = new FighterStationSaveData();
-        foreach (var fighter in _slots) if (fighter != null) result.Fighters.Add(fighter.Capture());
+        var result = new FighterStationSaveData { ServiceElapsed = _serviceElapsed, ServiceSerial = _serviceSerial };
+        foreach (var fighter in _slots) if (fighter != null) result.Fighters.Add(fighter.Capture() with { Service = _service[fighter.Slot] with { } });
         return result;
     }
     internal void Restore(FighterStationSaveData data)
@@ -133,6 +152,7 @@ public partial class FighterDroneManager : Node
         if (Count != 0) throw new InvalidDataException("Fighter restore requires an empty station.");
         if (data == null) return; // Legacy stations contain no fighters; never mint free replacements.
         ValidateSnapshot(data);
+        _serviceElapsed = data.ServiceElapsed; _serviceSerial = data.ServiceSerial;
         foreach (var saved in data.Fighters)
         {
             if (saved.Slot >= Capacity || _station.IsBusy) throw new InvalidDataException("Saved fighter station is not ready or lacks its slot.");
@@ -144,16 +164,22 @@ public partial class FighterDroneManager : Node
             else if (saved.Motion != null && saved.Motion.End.Vector().DistanceSquaredTo(expected) > .01f)
                 throw new InvalidDataException("Saved fighter endpoint changed.");
             var fighter = _station.Config.FighterScene.Instantiate<FighterDrone>();
-            fighter.Initialize(_station.Config.FighterConfig, saved.Slot, position, saved.Id);
+            fighter.Initialize(_station.Config.FighterConfig, saved.Slot, position, saved.Id, purchased: false);
             AddChild(fighter); fighter.BindWeapon(_grid, _projectiles);
             Register(fighter); fighter.Restore(saved);
+            _service[saved.Slot] = saved.Service is null ? new() : saved.Service with { };
+            ValidateServiceCapacity(fighter, _service[saved.Slot]);
+            if (!_station.CanOperate && _service[saved.Slot].Reason == FighterReturnReason.AutoService)
+                throw new InvalidDataException("Disabled station cannot retain an automatic relaunch order.");
         }
-        RefreshProcessing(); _station.NotifyRuntimeChanged();
+        WakeService(); _station.NotifyRuntimeChanged();
     }
     internal static void ValidateSnapshot(FighterStationSaveData data)
     {
         if (data?.Fighters == null || data.Fighters.Count > 4) throw new InvalidDataException("Invalid fighter roster.");
-        var ids = new HashSet<string>(); var slots = new HashSet<int>();
+        if (!double.IsFinite(data.ServiceElapsed) || data.ServiceElapsed < 0 || data.ServiceElapsed >= .1 ||
+            data.ServiceSerial < 0 || data.ServiceSerial > 1000000000000) throw new InvalidDataException("Invalid station service clock.");
+        var ids = new HashSet<string>(); var slots = new HashSet<int>(); var serviceOrders = new HashSet<long>();
         foreach (var f in data.Fighters)
         {
             if (f == null || string.IsNullOrEmpty(f.Id)) throw new InvalidDataException("Missing fighter identity.");
@@ -168,6 +194,8 @@ public partial class FighterDroneManager : Node
                 !float.IsFinite(f.ManoeuvrePhase) || f.ManoeuvrePhase < 0 || f.ManoeuvrePhase > Mathf.Tau * 3 + .01f ||
                 !double.IsFinite(f.WeaponCooldown) || f.WeaponCooldown < 0 || f.WeaponCooldown > 60)
                 throw new InvalidDataException("Invalid fighter steering state.");
+            ValidateServiceSnapshot(f, data.ServiceSerial);
+            if (f.Service?.VisitStarted == true && !serviceOrders.Add(f.Service.QueueOrder)) throw new InvalidDataException("Duplicate service queue order.");
             bool flying = f.State is FighterDroneState.Launching or FighterDroneState.Returning;
             if (flying != (f.Motion != null)) throw new InvalidDataException("Invalid fighter flight phase.");
             f.Motion?.ValidateFlight();
@@ -175,7 +203,7 @@ public partial class FighterDroneManager : Node
     }
     public override void _ExitTree()
     {
-        _shutdown = true; SetPhysicsProcess(false);
+        _shutdown = true; SetPhysicsProcess(false); UnbindService();
         foreach (var pair in _exitHandlers) if (GodotObject.IsInstanceValid(pair.Key)) pair.Key.TreeExiting -= pair.Value;
         foreach (var fighter in _slots) if (GodotObject.IsInstanceValid(fighter)) fighter.ClearTarget(_targeting);
         _exitHandlers.Clear(); Array.Clear(_slots); Count = 0;

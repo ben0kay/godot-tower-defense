@@ -12,7 +12,7 @@ public partial class AmmunitionLogistics
     internal LogisticsSaveData CaptureCheckpoint() => new()
     {
         Jobs = _jobs.Select(j => new DeliverySaveData(j.Source.SaveId,
-            GodotObject.IsInstanceValid(j.Destination) && !j.Destination.IsQueuedForDeletion() ? j.Destination.SaveId : "",
+            Live(j.Destination) ? j.Destination.SaveId : "",
             j.Cargo.Amount, j.Reserved, j.Drone.Returning, SavePoint.From(j.Drone.GlobalPosition), j.Drone.Speed) { Motion = j.Drone.CaptureFlight() }).ToList(),
         Pending = _pending.Select(t => t.SaveId).ToList(), Factories = _factories.Select(t => t.SaveId).ToList(),
         Depots = _depots.Select(t => t.SaveId).ToList(), FactoryCursor = _factoryCursor, RequestCursor = _requestCursor,
@@ -51,7 +51,7 @@ public partial class AmmunitionLogistics
             if (destination != null)
             {
                 _reserved[destination] = ReservedSpace(destination) + saved.Reserved;
-                if (destination.Ammunition != null) _delivering.Add(destination, job);
+                if (ConsumerEndpoint(destination)) _delivering.Add(destination, job);
             }
             job.Drone.Initialize(source, destination, saved.Speed, () => Arrive(job), () => Complete(job, false), () => Complete(job, true));
             AddChild(job.Drone); job.Drone.SetLoaded(saved.Cargo > 0);
@@ -62,15 +62,15 @@ public partial class AmmunitionLogistics
         foreach (string id in data.Pending)
         {
             var tower = Find(id);
-            if (!_stockHooks.ContainsKey(tower) || !Config.NeedsResupply(tower.Ammunition.Inventory.Amount, tower.Ammunition.Inventory.Capacity))
+            if (!_stockHooks.ContainsKey(tower) || !NeedsDelivery(tower))
                 throw new InvalidDataException("Invalid saved resupply demand.");
             _pending.Add(tower); _pendingSet.Add(tower);
         }
         foreach (var tower in _stockHooks.Keys)
         {
-            bool low = Config.NeedsResupply(tower.Ammunition.Inventory.Amount, tower.Ammunition.Inventory.Capacity);
+            bool low = NeedsDelivery(tower);
             if (low != _pendingSet.Contains(tower)) throw new InvalidDataException("Incomplete saved demand list.");
-            tower.Ammunition.SetDeliveryStatus(low, _delivering.ContainsKey(tower));
+            ConsumerStatus(tower, low);
         }
         _factoryCursor = data.FactoryCursor; _requestCursor = data.RequestCursor; _factoryTurn = data.FactoryTurn;
         _elapsed = data.Elapsed; LostRounds = data.Lost; DeliveredRounds = data.Delivered;

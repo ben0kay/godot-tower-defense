@@ -1,3 +1,8 @@
+## FD4.1 + FD5 status — 2026-11-06
+**SOURCE IMPLEMENTED / AWAITING OWNER VALIDATION.** Independent spatial weapon targeting plus real courier-fed station stock, automatic resource returns, FIFO timed rearm, paid repair, tiny service meters/roster and additive checkpoint state are delivered. Existing balances/flight anchors preserved; FD3/anti-air remain separate. [Settings and owner checks](README.md). .NET unavailable; source/resource review only.
+
+---
+
 ## FD4 fixed-gun fighter pass refactor — 2026-11-06
 **SOURCE IMPLEMENTED / AWAITING OWNER VALIDATION.** Single twin-barrel hull sprite, alternating muzzle rounds at 9 shots/s total, 180° full forward firing arc, smoothed attack passes with alternating return lobes and eased acceleration, and longer speed/acceleration-responsive shared exhaust. Independent rotating gun removed. Shared physical Kinetic bullets, finite ammunition, LOS, attribution, targeting, recall and checkpoint ownership preserved. FD3/FD5 remain deferred. [Current usage/settings](README.md).
 
@@ -11,7 +16,7 @@
 # FIGHTER — Player-owned combat/fighter drones and Drone Station
 
 **Repository:** `ben0kay/godot-tower-defense` · **Branch:** `dev` only  
-**Status:** FD1-B, FD2 and FD4 source implemented (owner validation pending); FD3, FD4.1, FD5 and later work are design only. Preserve construction, ammunition, towers, enemy AI, mission waves and checkpoints.
+**Status:** FD1-B, FD2 and FD4 source implemented (owner validation pending); FD4.1/FD5 source implemented (owner validation pending); FD3 and later work are design only. Preserve construction, ammunition, towers, enemy AI, mission waves and checkpoints.
 
 ## 1. Vision and scope
 
@@ -92,7 +97,7 @@ Fighter scene/config, manager, movement, targeting, artwork and saving live in `
 
 ## FD4.1 — Approved Codex handoff: independent fighter weapon targeting (2026-11-06)
 
-**Status: APPROVED PLAN ONLY — FD4.1 NOT SOURCE IMPLEMENTED.** Implement this **before FD5** as a separate, focused source change, or keep both phases in one explicitly authorized Codex job with logically separate edits. FD4's existing movement/physical twin-gun mechanics remain source implemented. No FD3 patrol UI, new aircraft class, muzzle artwork or fighter resource economy is authorized here.
+**Status: FD4.1 SOURCE IMPLEMENTED / AWAITING OWNER VALIDATION.** Implement this **before FD5** as a separate, focused source change, or keep both phases in one explicitly authorized Codex job with logically separate edits. FD4's existing movement/physical twin-gun mechanics remain source implemented. No FD3 patrol UI, new aircraft class, muzzle artwork or fighter resource economy is authorized here.
 
 ### Problem and exact gameplay contract
 
@@ -128,7 +133,7 @@ Today `FighterDrone.StepAutoPilot()` acquires one `_target` using the shared `Fi
 
 ## FD5 — Approved Codex handoff: station ammunition supply, timed docking and fighter repair (2026-11-06)
 
-**Status: APPROVED PLAN ONLY — FD5 NOT SOURCE IMPLEMENTED.** Deliver all FD5-A–E as one focused implementation on `dev`; do not treat this update as live mechanics. FD1-B/FD2/FD4 remain source implemented, FD3 patrol remains separate/planned, and FD6 broader persistence/balance/anti-air is not authorized by this handoff. Preserve the existing S0–S3 checkpoints while adding the *minimum* FD5 save contract now, rather than deferring correctness to FD6.
+**Status: FD5 SOURCE IMPLEMENTED / AWAITING OWNER VALIDATION.** Deliver all FD5-A–E as one focused implementation on `dev`; do not treat this update as live mechanics. FD1-B/FD2/FD4 remain source implemented, FD3 patrol remains separate/planned, and FD6 broader persistence/balance/anti-air is not authorized by this handoff. Preserve the existing S0–S3 checkpoints while adding the *minimum* FD5 save contract now, rather than deferring correctness to FD6.
 
 ### Read and verify live owners before changing code
 

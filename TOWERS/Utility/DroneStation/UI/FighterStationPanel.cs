@@ -6,7 +6,7 @@ public partial class FighterStationPanel : VBoxContainer
     private DroneStation _station;
     private EconomyManager _wallet;
     private OptionButton _roster;
-    private Label _status, _error;
+    private Label _status, _error, _stock;
     private Button _buy, _launch, _recall;
     private int _slot;
     public override void _Ready()
@@ -16,6 +16,7 @@ public partial class FighterStationPanel : VBoxContainer
         _roster.AddThemeFontSizeOverride("font_size", 12);
         _roster.ItemSelected += index => { _slot = (int)index; Refresh(); };
         AddChild(_roster);
+        _stock = UIButtonFactory.Label("", 11, ThemeConfig); _stock.AutowrapMode = TextServer.AutowrapMode.WordSmart; AddChild(_stock);
         _status = UIButtonFactory.Label("", 11, ThemeConfig); AddChild(_status);
         _buy = UIButtonFactory.Create("BUY FIGHTER", Buy, UIButtonStyle.Compact, 24, ThemeConfig); AddChild(_buy);
         var actions = new HBoxContainer(); AddChild(actions);
@@ -23,8 +24,8 @@ public partial class FighterStationPanel : VBoxContainer
         _recall = UIButtonFactory.Create("RECALL", Recall, UIButtonStyle.Compact, 24, ThemeConfig);
         actions.AddChild(_launch); actions.AddChild(_recall);
         _error = UIButtonFactory.Label("", 10, ThemeConfig); _error.AutowrapMode = TextServer.AutowrapMode.WordSmart; AddChild(_error);
-        _launch.TooltipText = "Launch into Auto-pilot: intercept Citadel threats and manoeuvre nearby. Weapons are a later phase.";
-        _recall.TooltipText = "Return this fighter to its own reserved dock. Landing does not restore HP or ammo.";
+        _launch.TooltipText = "Launch into Auto-pilot: intercept Citadel threats and manoeuvre nearby. Fixed twin guns engage nearby valid targets. A partial manual launch is allowed when rounds remain.";
+        _recall.TooltipText = "Return this fighter to its own reserved dock. Dock service draws real station ammunition and paid repair; manual recall stays docked.";
         Hide();
     }
     public void Bind(DroneStation station)
@@ -47,15 +48,15 @@ public partial class FighterStationPanel : VBoxContainer
         for (int i = 0; i < capacity; i++)
         {
             var fighter = _station.Fighters?.At(i);
-            _roster.AddItem($"F{i + 1} · {fighter?.State.ToString().ToUpperInvariant() ?? "EMPTY"}", i);
+            _roster.AddItem($"F{i + 1} · {(fighter == null ? "EMPTY" : _station.Fighters.DescribeService(i))}", i);
         }
-        _roster.Select(_slot);
+        _roster.Select(_slot); _stock.Text = _station.DescribeAmmo();
         FighterDrone selected = _station.Fighters?.At(_slot);
         _status.Text = selected == null ? "Empty fighter slot" : $"HP {selected.Health:0}/{selected.MaxHealth:0} · AMMO {selected.Ammo}/{selected.AmmoCapacity}";
         _status.TooltipText = selected == null ? "" : "Fighter " + selected.SaveId;
         _buy.Text = $"BUY · {Mathf.Clamp(_station.Config.FighterCredits, 0, 1000000)} C"; _buy.Disabled = !_station.CanBuyFighter;
-        _launch.Disabled = !_station.CanAttack || _station.IsBusy || selected?.State != FighterDroneState.Docked;
-        _recall.Disabled = selected == null || selected.State is FighterDroneState.Docked or FighterDroneState.Returning || GetTree().Paused;
+        _launch.Disabled = !_station.CanAttack || _station.IsBusy || selected?.State != FighterDroneState.Docked || selected.Ammo <= 0;
+        _recall.Disabled = selected == null || selected.State == FighterDroneState.Docked || selected.State == FighterDroneState.Returning && !_station.Fighters.IsAutoReturning(_slot) || GetTree().Paused;
     }
     private void Buy()
     {

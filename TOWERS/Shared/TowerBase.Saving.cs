@@ -15,7 +15,7 @@ public abstract partial class TowerBase
     internal TowerSaveData CaptureCheckpoint(Func<ulong, string> sourceKey)
     {
         PowerSaveData? power = CapturePowerCheckpoint();
-        var inventory = this is AmmoBuilding building ? building.Inventory : Ammunition?.Inventory;
+        var inventory = this is AmmoBuilding building ? building.Inventory : this is IAmmoDeliveryConsumer consumer ? consumer.DeliveryInventory : Ammunition?.Inventory;
         return new()
         {
             Id = SaveId, TypeId = TowerTypeId, X = GridCell.X, Y = GridCell.Y, Tier = UpgradeLevel,
@@ -64,9 +64,10 @@ public abstract partial class TowerBase
     {
         if (data.Health > MaxHealth) throw new InvalidDataException("Saved tower health exceeds current capacity.");
         Health = data.Health; PublishHealthChanged();
-        var inventory = this is AmmoBuilding building ? building.Inventory : Ammunition?.Inventory;
-        if (data.Ammo.HasValue != (inventory != null)) throw new InvalidDataException("Saved ammunition capability differs.");
-        if (inventory != null) inventory.RestoreAmount(data.Ammo.Value);
+        var inventory = this is AmmoBuilding building ? building.Inventory : this is IAmmoDeliveryConsumer consumer ? consumer.DeliveryInventory : Ammunition?.Inventory;
+        int? savedAmmo = data.Ammo ?? (this is DroneStation ? 0 : (int?)null);
+        if (savedAmmo.HasValue != (inventory != null)) throw new InvalidDataException("Saved ammunition capability differs.");
+        if (inventory != null) inventory.RestoreAmount(savedAmmo.Value);
         Ammunition?.RestoreCounters(data.Consumed, data.Discarded, data.BeamCredit);
         if (this is CreditProducerTower producer)
         {

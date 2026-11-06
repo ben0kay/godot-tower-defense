@@ -1,3 +1,6 @@
+## FD5 station consumer adapter — 2026-11-06
+The same dispatcher now supports `IAmmoDeliveryConsumer` stock endpoints alongside weapon TowerAmmunition. Drone Station owns its finite inventory; it never becomes an AmmoBuilding source or creates couriers. Inventory/status access, watched-stock unsubscribe, in-flight consumer tracking and checkpoint restore use the common endpoint seam. Disabled stations stop requesting/receiving; interrupted cargo returns through existing callbacks. Ordinary tower flow, Factory→Depot full loads, thresholds, reservations, slots and scheduler budget are unchanged. Source implemented; owner acceptance pending.
+
 ## DRONE2 courier migration
 
 **Source Implemented / Awaiting Owner Validation.** Both existing routes now instantiate DRONES/Transport/CargoDrone.tscn, using builder artwork/shared organic flight and thruster/contrail presentation. CargoDrone only reports one-shot arrival/return/abort. All stock transfer,1000-round full Factory shipments, flexible Depot refills, reservations, source slots through return, surplus/loss and demand/cap rules remain here; business code is unchanged apart from type and save adaptation. ConstructionDroneManager remains separate with an independent cap.

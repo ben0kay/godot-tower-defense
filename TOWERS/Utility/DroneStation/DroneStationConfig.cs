@@ -11,6 +11,17 @@ public partial class DroneStationConfig : TowerConfig
     [Export] public FighterDroneConfig FighterConfig { get; set; }
     [Export] public PackedScene FighterScene { get; set; }
 
+    [ExportGroup("Station Service")]
+    [Export(PropertyHint.Range, "1,1000000,1")] public int StationAmmoCapacity { get; set; } = 2000;
+    [Export(PropertyHint.Range, ".5,120,.5")] public double FullFighterResupplySeconds { get; set; } = 6;
+    [Export(PropertyHint.Range, "1,4,1")] public int ServiceBayCount { get; set; } = 1;
+    [Export(PropertyHint.Range, "0,1000,1")] public float RepairHpPerSecond { get; set; } = 20;
+    [Export(PropertyHint.Range, "0,10000,1")] public int RepairCreditsPer10Hp { get; set; } = 1;
+    public bool ValidService => StationAmmoCapacity > 0 && StationAmmoCapacity <= 1000000 &&
+        double.IsFinite(FullFighterResupplySeconds) && FullFighterResupplySeconds >= .5 && FullFighterResupplySeconds <= 120 &&
+        ServiceBayCount >= 1 && ServiceBayCount <= 4 && float.IsFinite(RepairHpPerSecond) && RepairHpPerSecond >= 0 &&
+        RepairHpPerSecond <= 1000 && RepairCreditsPer10Hp >= 0 && RepairCreditsPer10Hp <= 10000;
+
     [ExportGroup("Construction")]
     [Export(PropertyHint.Range, "0,1000000,1,or_greater")]
     public int ConstructionCredits
