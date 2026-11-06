@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="DroneStationConfig" load_steps=5 format=3]
-[ext_resource type="Script" path="res://DRONES/Combat/Station/DroneStationConfig.cs" id="station_config"]
-[ext_resource type="Resource" path="res://DRONES/Combat/Station/Artwork/DroneStationConstructionArt.tres" id="construction"]
+[ext_resource type="Script" path="res://TOWERS/Utility/DroneStation/DroneStationConfig.cs" id="station_config"]
+[ext_resource type="Resource" path="res://TOWERS/Utility/DroneStation/Artwork/DroneStationConstructionArt.tres" id="construction"]
 
 [ext_resource type="Resource" path="res://DRONES/Combat/DefaultFighterDroneConfig.tres" id="fighter_config"]
 [ext_resource type="PackedScene" path="res://DRONES/Combat/FighterDrone.tscn" id="fighter_scene"]

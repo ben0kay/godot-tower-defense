@@ -19,6 +19,9 @@ public static class TowerCatalogChecks
         Require(droneStation != null && droneStation.Category == TowerDefinition.TowerCategory.Utility
             && droneStation.Footprint == new Vector2I(2, 3) && droneStation.TowerId == "drone_station",
             "Drone Station is registered as a buildable 2-wide x 3-long utility building");
+        Require(droneStation.Scene.ResourcePath == "res://TOWERS/Utility/DroneStation/DroneStation.tscn"
+            && droneStation.DefaultConfig.ResourcePath == "res://TOWERS/Utility/DroneStation/DefaultDroneStationConfig.tres",
+            "Drone Station building resources belong to TOWERS");
         Require(droneStation.DefaultConfig is DroneStationConfig stationConfig
             && stationConfig.ConstructionCredits == 600 && stationConfig.MaxHealth == 1800
             && stationConfig.BuildSeconds == 8 && stationConfig.Levels.Count == 0

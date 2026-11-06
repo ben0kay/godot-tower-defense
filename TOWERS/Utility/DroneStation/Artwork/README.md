@@ -10,4 +10,4 @@ All station artwork lives here, native **128×192** pixels, and must remain cent
 
 No SVG fonts, filters, external images, animation script or active GPU particles are needed. Keep all stages the same native size so placement ghost, bounds and hologram remain in one location. Colors follow existing friendly cyan drone/glow identity; they should not resemble the hostile fleet's red weapon lighting.
 
-**For Codex FD1-B:** illustrations are not actual service slots. Place future functional dock markers in the `DroneStation.tscn` scene at local `(-25,1)` and `(26,1)` after verifying with the native artwork; these markers must be separate from construction/placement and remain stable across save/restore. Do not treat drawn pad silhouettes as spawned fighters.
+Functional dock markers are authored in the station scene; the pad silhouettes remain flat artwork. Preserve marker positions for checkpoint compatibility.

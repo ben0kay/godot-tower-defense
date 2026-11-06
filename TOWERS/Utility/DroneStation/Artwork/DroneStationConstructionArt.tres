@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="TowerConstructionArt" load_steps=9 format=3]
 [ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="art"]
 [ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="stage"]
-[ext_resource type="Texture2D" path="res://DRONES/Combat/Station/Artwork/stage0_foundation.svg" id="s0"]
-[ext_resource type="Texture2D" path="res://DRONES/Combat/Station/Artwork/stage1_frame.svg" id="s1"]
-[ext_resource type="Texture2D" path="res://DRONES/Combat/Station/Artwork/stage2_assembly.svg" id="s2"]
+[ext_resource type="Texture2D" path="res://TOWERS/Utility/DroneStation/Artwork/stage0_foundation.svg" id="s0"]
+[ext_resource type="Texture2D" path="res://TOWERS/Utility/DroneStation/Artwork/stage1_frame.svg" id="s1"]
+[ext_resource type="Texture2D" path="res://TOWERS/Utility/DroneStation/Artwork/stage2_assembly.svg" id="s2"]
 
 [sub_resource type="Resource" id="Foundation"]
 script = ExtResource("stage")

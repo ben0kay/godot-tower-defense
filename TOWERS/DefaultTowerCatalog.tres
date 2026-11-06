@@ -25,7 +25,7 @@
 [ext_resource type="Resource" path="res://TOWERS/Economy/Power/FusionReactor/FusionReactorDefinition.tres" id="fusion_power"]
 
 [ext_resource type="Resource" path="res://TOWERS/Offensive/CorruptorTower/CorruptorTowerDefinition.tres" id="corruptor"]
-[ext_resource type="Resource" path="res://DRONES/Combat/Station/DroneStationDefinition.tres" id="drone_station"]
+[ext_resource type="Resource" path="res://TOWERS/Utility/DroneStation/DroneStationDefinition.tres" id="drone_station"]
 
 [resource]
 script = ExtResource("1")

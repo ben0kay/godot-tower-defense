@@ -1,4 +1,4 @@
-// Station-local slot ownership and active-only flight. No enemy scans, combat, service, or cargo/builder dispatch.
+// Station-local fighter ownership, launch/recall and active-only flight; world threat work is shared.
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -8,6 +8,8 @@ public partial class FighterDroneManager : Node
 {
     private DroneStation _station;
     private WorldGrid _grid;
+    private FighterDroneTargeting _targeting;
+    private Func<Vector2, Vector2> _clamp;
     private readonly FighterDrone[] _slots = new FighterDrone[4];
     private readonly Dictionary<FighterDrone, Action> _exitHandlers = new();
     private bool _shutdown;
@@ -16,7 +18,11 @@ public partial class FighterDroneManager : Node
     public FighterDrone At(int slot) => slot >= 0 && slot < _slots.Length ? _slots[slot] : null;
     public override void _Ready()
     { ProcessMode = ProcessModeEnum.Pausable; SetProcess(false); SetPhysicsProcess(false); }
-    internal void Bind(DroneStation station, WorldGrid grid) { _station = station; _grid = grid; }
+    internal void Bind(DroneStation station, WorldGrid grid)
+    {
+        _station = station; _grid = grid; _clamp = ClampToMap;
+        _targeting = FighterDroneTargeting.For(grid.GetNodeOrNull<EnemyRegistry>("../EnemySystems/Registry"));
+    }
     public int FreeSlot()
     { for (int i = 0; i < Capacity; i++) if (_slots[i] == null) return i; return -1; }
 
@@ -49,6 +55,7 @@ public partial class FighterDroneManager : Node
     }
     private void Removed(FighterDrone fighter)
     {
+        fighter.ClearTarget(_targeting);
         if (_exitHandlers.Remove(fighter, out var exit)) fighter.TreeExiting -= exit;
         if (_slots[fighter.Slot] == fighter) { _slots[fighter.Slot] = null; Count--; }
         if (!_shutdown && GodotObject.IsInstanceValid(_station) && !_station.IsQueuedForDeletion())
@@ -77,7 +84,7 @@ public partial class FighterDroneManager : Node
     {
         FighterDrone fighter = At(slot);
         if (fighter == null || fighter.State is FighterDroneState.Docked or FighterDroneState.Returning) return false;
-        fighter.BeginTransit(DockPoint(slot), true); RefreshProcessing(); _station.NotifyRuntimeChanged(); return true;
+        fighter.ClearTarget(_targeting); fighter.BeginTransit(DockPoint(slot), true); RefreshProcessing(); _station.NotifyRuntimeChanged(); return true;
     }
     internal void RecallAll()
     { for (int i = 0; i < _slots.Length; i++) Recall(i); }
@@ -89,17 +96,23 @@ public partial class FighterDroneManager : Node
     }
 
     // =========================================================
-    // One bounded loop only during actual transit; docked/holding fighters and their bodies do not tick.
+    // Deployed fighters steer each physics step; one shared budget ranks threats, docked fighters remain dormant.
     public override void _PhysicsProcess(double delta)
     {
         if (_shutdown || GetTree().Paused || !double.IsFinite(delta) || delta <= 0) return;
         if (!GodotObject.IsInstanceValid(_station) || _station.IsDestroyed || _station.IsQueuedForDeletion()) { SetPhysicsProcess(false); return; }
+        float dt = (float)Math.Min(delta, .1);
+        _targeting?.Tick(dt);
         bool changed = false;
         for (int i = 0; i < _slots.Length; i++)
         {
             FighterDrone fighter = _slots[i]; if (fighter == null) continue;
-            if (!_station.CanOperate && (fighter.State is FighterDroneState.Launching or FighterDroneState.Holding)) Recall(i);
-            if (fighter.IsFlying) changed |= fighter.Step((float)Math.Min(delta, 3600));
+            if (!_station.CanOperate && fighter.IsFlying) Recall(i);
+            if (fighter.IsFlying)
+            {
+                changed |= fighter.Step(dt);
+                changed |= fighter.StepAutoPilot(dt, _targeting, LaunchPoint(i), _clamp);
+            }
         }
         RefreshProcessing(); if (changed) _station.NotifyRuntimeChanged();
     }
@@ -123,9 +136,9 @@ public partial class FighterDroneManager : Node
             Vector2 position = saved.Position.Vector();
             if (ClampToMap(position).DistanceSquaredTo(position) > .01f) throw new InvalidDataException("Saved fighter is outside the map.");
             Vector2 expected = saved.State is FighterDroneState.Docked or FighterDroneState.Returning ? DockPoint(saved.Slot) : LaunchPoint(saved.Slot);
-            if (saved.State is FighterDroneState.Docked or FighterDroneState.Holding)
+            if (saved.State == FighterDroneState.Docked)
             { if (position.DistanceSquaredTo(expected) > .01f) throw new InvalidDataException("Saved fighter dock/hold position changed."); }
-            else if (saved.Motion.End.Vector().DistanceSquaredTo(expected) > .01f)
+            else if (saved.Motion != null && saved.Motion.End.Vector().DistanceSquaredTo(expected) > .01f)
                 throw new InvalidDataException("Saved fighter endpoint changed.");
             var fighter = _station.Config.FighterScene.Instantiate<FighterDrone>();
             fighter.Initialize(_station.Config.FighterConfig, saved.Slot, position, saved.Id);
@@ -147,6 +160,9 @@ public partial class FighterDroneManager : Node
                 !float.IsFinite(f.Position.X) || !float.IsFinite(f.Position.Y) ||
                 Mathf.Abs(f.Position.X) > 1e9f || Mathf.Abs(f.Position.Y) > 1e9f)
                 throw new InvalidDataException("Invalid saved fighter state.");
+            if (!float.IsFinite(f.Velocity.X) || !float.IsFinite(f.Velocity.Y) || f.Velocity.Vector().LengthSquared() > 4000000 ||
+                !float.IsFinite(f.ManoeuvrePhase) || f.ManoeuvrePhase < 0 || f.ManoeuvrePhase > Mathf.Tau * 3 + .01f)
+                throw new InvalidDataException("Invalid fighter steering state.");
             bool flying = f.State is FighterDroneState.Launching or FighterDroneState.Returning;
             if (flying != (f.Motion != null)) throw new InvalidDataException("Invalid fighter flight phase.");
             f.Motion?.ValidateFlight();
@@ -156,6 +172,7 @@ public partial class FighterDroneManager : Node
     {
         _shutdown = true; SetPhysicsProcess(false);
         foreach (var pair in _exitHandlers) if (GodotObject.IsInstanceValid(pair.Key)) pair.Key.TreeExiting -= pair.Value;
+        foreach (var fighter in _slots) if (GodotObject.IsInstanceValid(fighter)) fighter.ClearTarget(_targeting);
         _exitHandlers.Clear(); Array.Clear(_slots); Count = 0;
     }
 }

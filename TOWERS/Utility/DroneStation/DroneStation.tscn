@@ -1,8 +1,8 @@
 [gd_scene load_steps=5 format=3]
 
-[ext_resource type="Script" path="res://DRONES/Combat/Station/DroneStation.cs" id="station"]
-[ext_resource type="Resource" path="res://DRONES/Combat/Station/DefaultDroneStationConfig.tres" id="config"]
-[ext_resource type="Texture2D" path="res://DRONES/Combat/Station/Artwork/drone_station.svg" id="hull"]
+[ext_resource type="Script" path="res://TOWERS/Utility/DroneStation/DroneStation.cs" id="station"]
+[ext_resource type="Resource" path="res://TOWERS/Utility/DroneStation/DefaultDroneStationConfig.tres" id="config"]
+[ext_resource type="Texture2D" path="res://TOWERS/Utility/DroneStation/Artwork/drone_station.svg" id="hull"]
 [ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionVisuals.cs" id="construction"]
 
 [node name="DroneStation" type="Node2D"]

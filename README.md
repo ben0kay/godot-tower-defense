@@ -10,9 +10,8 @@
 
 ---
 
-## FD1-A — Drone Station built as a 2×3 Utility building (2026-11-06)
-
-**Source implemented / awaiting owner Godot validation.** A new buildable [Drone Station](DRONES/Combat/Station/README.md) is registered in the shared catalog under Utility, using a true **2 cells wide × 3 cells tall** footprint and 128×192 native SVG hangar art with two illustrated docking bays and cyan launch rails. The construction site passes through 0/35/70% purpose-made SVG stages before the completed art, using existing building/drone work mechanics. Provisional Inspector config is **600 Credits, 8s construction, 1,800 HP**. Normal selection, durability, selling and between-wave base tower saving are inherited; no fighter launches, slots, ammo, repair service or combat logic are active. **Codex next: FD1-B**, adding first fighter/docking to this existing station without replacing the artwork or registration. [Fighter roadmap](DRONES/Combat/FIGHTER_DRONES_IMPLEMENTATION_PLAN.md). Source-only validation pending editor acceptance.
+## FD1-B + FD2 — Drone Station and Auto-pilot
+**Source implemented / awaiting owner validation.** The [2×3 Utility Drone Station](TOWERS/Utility/DroneStation/README.md) owns paid fighters with launch/recall, persistent HP/ammo and checkpoints. Fighters intercept Citadel threats using shared budgeted remaining-journey ranking, weave/orbit/kite nearby and guard home between waves. [Settings and boundaries](DRONES/Combat/README.md). Patrol UI, weapons and service remain future work.
 
 ---
 
@@ -22,11 +21,7 @@
 
 ---
 
-## FIGHTER — future fighter drones and Drone Station (2026-11-06)
 
-**Design documented; not implemented.** Planned player-owned **persistent fighter drones** with two modes: **Auto-pilot** hunts enemies closest to breaching their assigned Citadel, then fires while circling/weaving/kiting; **Auto-patrol** lets you select one drone and click two map positions for a looping figure-eight patrol that attacks nearby enemies. A new **Drone Station** homes multiple fighters with finite HP/ammo, return-to-dock resupply and repair; selected hostile anti-air ships may attack fighters in a separate future phase. This is a fighter-squad system, not a one-shot player ability and not a replacement for construction/ammo drones. Fighter gameplay ownership stays in `DRONES/Combat/`; reuse shared drone presentation, enemy registry/combat and existing ammo logistics. [Full FD0–FD6 Codex implementation plan](DRONES/Combat/FIGHTER_DRONES_IMPLEMENTATION_PLAN.md). No gameplay or level content changed.
-
----
 
 ## Drone travel, site widget and portal pacing — 2026-11-06
 

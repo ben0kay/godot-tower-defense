@@ -23,7 +23,7 @@ public partial class FighterStationPanel : VBoxContainer
         _recall = UIButtonFactory.Create("RECALL", Recall, UIButtonStyle.Compact, 24, ThemeConfig);
         actions.AddChild(_launch); actions.AddChild(_recall);
         _error = UIButtonFactory.Label("", 10, ThemeConfig); _error.AutowrapMode = TextServer.AutowrapMode.WordSmart; AddChild(_error);
-        _launch.TooltipText = "Launch to the station's nearby holding point. Autopilot and weapons arrive in later phases.";
+        _launch.TooltipText = "Launch into Auto-pilot: intercept Citadel threats and manoeuvre nearby. Weapons are a later phase.";
         _recall.TooltipText = "Return this fighter to its own reserved dock. Landing does not restore HP or ammo.";
         Hide();
     }

@@ -1,8 +1,8 @@
-// Persistent friendly fighter body/state. Its station manager alone drives finite launch/return legs in FD1-B.
+// Persistent station-owned fighter; finite launch/dock legs and continuous autopilot share DroneBody presentation.
 using Godot;
 using System;
 
-public enum FighterDroneState { Docked, Launching, Holding, Returning }
+public enum FighterDroneState { Docked, Launching, Holding, Returning, Intercepting, Manoeuvring }
 public partial class FighterDrone : Node2D
 {
     [Export] public FighterDroneConfig Config { get; set; }
@@ -13,7 +13,13 @@ public partial class FighterDrone : Node2D
     public float MaxHealth => FighterDroneConfig.Safe(Config.MaxHealth, 300, 1, 10000);
     public int AmmoCapacity => Mathf.Clamp(Config.AmmoCapacity, 1, 10000);
     public FighterDroneState State { get; private set; } = FighterDroneState.Docked;
-    public bool IsFlying => State is FighterDroneState.Launching or FighterDroneState.Returning;
+    public bool IsFlying => State != FighterDroneState.Docked;
+    private bool InTransit => State is FighterDroneState.Launching or FighterDroneState.Returning;
+    private readonly FighterDroneMovement _steering = new();
+    private Enemy _target;
+    private int _targetGeneration;
+    private float _search;
+    internal void ClearTarget(FighterDroneTargeting targeting) { targeting?.Release(this); _target = null; }
     private DroneFlightMotion _motion = new() { Heading = -Mathf.Pi / 2 };
     private DroneBody _body;
     private Vector2 _initialPosition;
@@ -22,6 +28,7 @@ public partial class FighterDrone : Node2D
     {
         Config = config; Slot = slot; SaveId = id ?? Guid.NewGuid().ToString("N");
         Health = MaxHealth; Ammo = AmmoCapacity; _initialPosition = position;
+        _steering.Phase = slot * Mathf.Pi / 2; _search = slot * .08f;
     }
     public override void _Ready()
     {
@@ -34,7 +41,10 @@ public partial class FighterDrone : Node2D
     internal void BeginTransit(Vector2 destination, bool returning)
     {
         Vector2 direction = destination - GlobalPosition;
-        _motion.BeginFlight(GlobalPosition, destination, direction, direction,
+        Vector2 departure = InTransit ? _motion.Velocity.Vector() : _steering.Velocity;
+        if (departure.LengthSquared() < 1) departure = direction;
+        if (!InTransit) _motion.Heading = _steering.Heading;
+        _motion.BeginFlight(GlobalPosition, destination, departure, direction,
             FighterDroneConfig.Safe(Config.FlightSpeed, 340, 32, 2000), 100,
             Config.Acceleration, Config.Deceleration);
         State = returning ? FighterDroneState.Returning : FighterDroneState.Launching;
@@ -42,14 +52,38 @@ public partial class FighterDrone : Node2D
     }
     internal bool Step(float dt)
     {
-        if (!IsFlying) return false;
+        if (!InTransit) return false;
         Vector2 point = GlobalPosition;
         bool arrived = _motion.Fly(dt, ref point, Config.TurnDegreesPerSecond); GlobalPosition = point;
-        if (arrived) State = State == FighterDroneState.Returning ? FighterDroneState.Docked : FighterDroneState.Holding;
+        if (arrived)
+        {
+            State = State == FighterDroneState.Returning ? FighterDroneState.Docked : FighterDroneState.Holding;
+            _steering.Heading = _motion.Heading; _steering.Velocity = _motion.Velocity.Vector(); _search = Slot * .08f;
+        }
         Present(dt, true); return arrived;
     }
-    private void Present(float dt, bool ignite) => _body?.Present(_motion.Heading,
-        IsFlying ? _motion.Velocity.Vector() : Vector2.Zero, FighterDroneConfig.Safe(Config.FlightSpeed, 340, 32, 2000),
+    internal bool StepAutoPilot(float dt, FighterDroneTargeting targeting, Vector2 home, Func<Vector2, Vector2> clamp)
+    {
+        if (!IsFlying || InTransit) return false;
+        if (targeting == null || !targeting.Valid(_target) || _target.SpawnGeneration != _targetGeneration) ClearTarget(targeting);
+        _search -= dt;
+        if (_search <= 0)
+        {
+            _target = targeting?.Acquire(this, _target);
+            _targetGeneration = _target?.SpawnGeneration ?? 0;
+            _search = FighterDroneConfig.Safe(Config.TargetSearchSeconds, .3f, .1f, 2);
+        }
+        FighterDroneState before = State;
+        float engagement = FighterDroneConfig.Safe(Config.AttackDistance, 160, 32, 1200)
+            + FighterDroneConfig.Safe(Config.OrbitRadius, 100, 24, 600) * 1.8f;
+        State = _target == null ? FighterDroneState.Holding :
+            GlobalPosition.DistanceTo(_target.GlobalPosition) > engagement ? FighterDroneState.Intercepting : FighterDroneState.Manoeuvring;
+        _steering.Step(this, _target, home, dt, clamp); Present(dt, true);
+        return before != State;
+    }
+    private void Present(float dt, bool ignite) => _body?.Present(InTransit ? _motion.Heading : _steering.Heading,
+        InTransit ? _motion.Velocity.Vector() : IsFlying ? _steering.Velocity : Vector2.Zero,
+        FighterDroneConfig.Safe(Config.FlightSpeed, 340, 32, 2000),
         IsFlying, State == FighterDroneState.Returning ? 1 : 0, null, dt, ignite);
 
     // =========================================================
@@ -57,14 +91,17 @@ public partial class FighterDrone : Node2D
     internal FighterDroneSaveData Capture() => new()
     {
         Id = SaveId, Slot = Slot, Health = Health, Ammo = Ammo, State = State,
-        Position = SavePoint.From(GlobalPosition), Heading = _motion.Heading,
-        Motion = IsFlying ? _motion.CopyFlight() : null
+        Position = SavePoint.From(GlobalPosition), Heading = InTransit ? _motion.Heading : _steering.Heading,
+        Motion = InTransit ? _motion.CopyFlight() : null,
+        Velocity = SavePoint.From(_steering.Velocity), ManoeuvrePhase = _steering.Phase
     };
     internal void Restore(FighterDroneSaveData data)
     {
         if (data.Health > MaxHealth || data.Ammo > AmmoCapacity) throw new System.IO.InvalidDataException("Fighter exceeds current capacity.");
         Health = data.Health; Ammo = data.Ammo; State = data.State; GlobalPosition = data.Position.Vector();
         _motion = data.Motion?.CopyFlight() ?? new DroneFlightMotion { Heading = data.Heading };
+        _steering.Heading = data.Heading; _steering.Velocity = data.Velocity.Vector(); _steering.Phase = data.ManoeuvrePhase;
+        _target = null; _search = Slot * .08f;
         _body.Reset(); Present(0, false);
     }
 }

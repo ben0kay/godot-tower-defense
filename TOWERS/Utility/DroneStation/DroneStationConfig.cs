@@ -24,7 +24,7 @@ public partial class DroneStationConfig : TowerConfig
     public DroneStationConfig()
     {
         DisplayName = "Drone Station";
-        Description = "Armoured fighter hangar. Purchase fighters, launch to a nearby holding point and recall to dock. Combat, patrol and resupply are planned.";
+        Description = "Armoured fighter hangar. Purchase fighters, launch on Auto-pilot and recall to dock. Weapons, patrol and resupply are planned.";
         ConstructionCosts = new TowerLevel(1, 600, default).Costs;
         ConstructionSeconds = 8;
         MaxHealth = 1800;

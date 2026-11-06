@@ -1,21 +1,12 @@
-## FD1-B status — 2026-11-06
-
-**Source Implemented / Awaiting Owner Validation.** Station-owned paid fighters, launch/hold/recall/dock, elongated shared-style art and minimal checkpoint state are delivered. See [current usage](README.md). FD2–FD6 remain future work; no combat or resupply is active.
-
----
-
-## FD1-A — Drone Station building and artwork (2026-11-06)
-
-**SOURCE IMPLEMENTED / AWAITING OWNER VALIDATION.** The placeable, selectable and standard constructible **Drone Station** exists now under [`DRONES/Combat/Station/`](Station/README.md). Its native artwork and three build stages are **128×192**, matching **2 cells wide (X) by 3 cells long (Y)**. It is registered under Utility in `TOWERS/DefaultTowerCatalog.tres` as `drone_station`. Inspector-editable provisional config: **600 Credits**, **8s** build and **1,800 HP**. It inherits the shared 2×3 building placement, durability, construction drones, selling and checkpoint behaviour but is **non-operational as a fighter facility** until Codex integrates real drones. No custom station tick, slot inventory, supply or fighter state was introduced.
-
-**FD1-B is now source implemented (owner validation pending); FD2 is next only when requested.** Do not repeat FD1-A/FD1-B. Keep the station's current scene/config/definition/artwork and append the first fighter + launch/dock/ownership logic, then FD2–FD6 as previously planned. The illustrated two landing bays are only art; future `Marker2D` anchors at local (-25,+1) and (+26,+1) are suggestions, not implemented. No gameplay/level wave edits or fighter activity claimed. A focused catalog-check addition is authored but not run. Full in-editor visual/footprint acceptance pending.
+## FD2 status — 2026-11-06
+**Source implemented / awaiting owner validation.** Budgeted shared threat ranking, independent intercept/figure-eight/orbit/kiting, home guard, recall and airborne snapshots are delivered. Station building/assets/UI now belong to `TOWERS/Utility/DroneStation/`; fighter systems remain here. FD3–FD5 are not implemented. [Usage and settings](README.md).
 
 ---
 
 # FIGHTER — Player-owned combat/fighter drones and Drone Station
 
 **Repository:** `ben0kay/godot-tower-defense` · **Branch:** `dev` only  
-**Status:** **DESIGN / NOT IMPLEMENTED** (2026-11-06). Player-approved gameplay direction; **no gameplay authorization implied by this documentation change**. Implement in small named phases and preserve current construction, ammunition, towers, enemy AI, mission waves and checkpoint behaviour.
+**Status:** FD1-B and FD2 source implemented; remaining phases are design only. Preserve construction, ammunition, towers, enemy AI, mission waves and checkpoints.
 
 ## 1. Vision and scope
 
@@ -44,41 +35,9 @@ Core idea: a **persistent, manageable friendly air wing**, not a one-time projec
 
 Two player-facing modes are **Auto-pilot** and **Auto-patrol** only in the initial release. No manual WASD/mouse flight, independent defensive tower deployment or combat-drone ability cooldown is required.
 
-## 2. Repository ownership — keep fighter-drone feature in DRONES
+## 2. Repository ownership
+Fighter scene/config, manager, movement, targeting, artwork and saving live in `DRONES/Combat/`. The building, station config/definition/scene/artwork and station UI live in `TOWERS/Utility/DroneStation/`, using the standard `TowerBase` contract and stable `drone_station` ID. Shared generic flight/presentation stays in `DRONES/Shared/`.
 
-**Authoritative home:** `DRONES/Combat/`, with its own manager, fighter scene/config, movement, targeting, weapon adapter, station and UI/order-handling scripts. `DRONES/Shared/` continues to own **pure generic reusable drone body/flight presentation**. Existing live owners are deliberately elsewhere and must not be moved merely for folder neatness.
-
-Proposed structure (names can be adjusted after actual source inspection):
-
-```text
-DRONES/
-  README.md
-  Shared/
-    DroneFlightMotion.cs                # implemented generic cubic travel leg; extend narrowly if useful
-    DroneBody.cs / DroneBody.tscn        # implemented shared body + engines/trail
-    ...
-  Transport/                           # implemented ammo CargoDrone; unchanged business owner
-  Combat/
-    README.md
-    FIGHTER_DRONES_IMPLEMENTATION_PLAN.md   # THIS plan
-    FighterDrone.cs / FighterDrone.tscn
-    FighterDroneConfig.cs / DefaultFighterDroneConfig.tres
-    FighterDroneManager.cs
-    FighterDroneMovement.cs             # intercept, figure-eight, return/dock state
-    FighterDroneTargeting.cs            # shared threat priority and per-drone target leases
-    FighterDroneWeapon.cs               # friendly shot integration, no new damage resolver
-    FighterDroneOrders.cs               # selected-drone modes and two-click waypoint sequence
-    Artwork/                             # independent fighter hull/gun/trail visual assets
-    Station/
-      DroneStation.cs / DroneStation.tscn
-      DroneStationConfig.cs / DefaultDroneStationConfig.tres
-      DroneStationDefinition.tres
-      Artwork/
-    Saving/                              # fighter/station snapshots and validation, only when needed
-    UI/                                  # selection, mode controls, A/B waypoint preview
-```
-
-- `TOWERS/DefaultTowerCatalog.tres`, placement, construction, Inspector, power or ammunition integrations may **reference** the station's scene/config, but station-specific gameplay scripts/visuals/data should live under `DRONES/Combat/Station/`. It is a placeable building and must follow the existing `TowerBase`/`TowerDefinition` contract rather than creating a competing building-placement framework. Its `TowerCategory` can use the existing suitable category (likely Utility or Support) without inventing a new category solely for one station.
 - Reuse `DRONES/Shared/DroneFlightMotion` where it genuinely fits **finite outbound/return legs**, and `DroneBody` thruster/contrail conventions; a combat figure-eight/orbit is a **continuous steering manoeuvre**, not a finite cargo/constructor job. Do not overload `DroneFlightMotion` with combat-specific AI, weapons, health or station inventory. Fighters should look visually distinguishable from unarmed cyan cargo/builders (author a dedicated fighter sprite/gun/colour scheme).
 - `TOWERS/ConstructionDrones/` keeps construction manager, holds, site work and save handling; `TOWERS/Economy/Ammunition/Shared/Logistics/` keeps all Factory→Depot→Tower courier cargo, reservations, slots and inventory accounting; `DRONES/Transport/` remains a passive courier role. **Never merge their dispatchers or global concurrency caps with fighter combat.**
 - Use existing `ENEMIES/Shared/EnemyRegistry`/`EnemySpatialIndex`, `Enemy.RemainingJourneyDistance`, shared `TowerTargeting.Priority.First` semantics, `WorldGrid.HasWeaponLineOfSight`, `COMBAT/Damage` and existing friendly projectile/weapon presentation where compatible. Damage source attribution currently assumes a `TowerBase`; plan an **explicit safe drone attribution/XP policy**, rather than forging a dummy tower or extending shared code without tests.
@@ -117,7 +76,7 @@ DRONES/
 | --- | --- | --- |
 | **FD0 — Contracts and station design** | Confirm tower placement/catalog station requirements, existing ammo endpoint contracts, damage attribution, friendly bullet/LOS services, selection input and between-wave saving. | Small reference contracts and decision notes; no game code. |
 | **FD1 — Drone Station + one fighter** | Place station with proper construction/ownership, one persistent fighter scene/manager and launch/return; unique identity, HP/ammo state, independent visual model, bounds and slot ownership. | Working station + fighter with return/dock; no weapons/autopilot yet. Allow configurable multi-slot capacity. |
-| **FD2 — Auto-pilot pursuit + aerial manoeuvres** | Shared threat ranking by smallest remaining journey to Citadel; staggered target acquisition, smooth intercept, target-relative figure-eight/kiting, idle guard and target-loss recovery. | Several fighters can fly/track without full-list polling per drone. Weapons can initially be disabled for movement acceptance. |
+| **FD2 — Auto-pilot pursuit + aerial manoeuvres — SOURCE IMPLEMENTED** | Shared threat ranking by smallest remaining journey to Citadel; staggered target acquisition, smooth intercept, target-relative figure-eight/kiting, idle guard and target-loss recovery. | Several fighters can fly/track without full-list polling per drone. Weapons can initially be disabled for movement acceptance. |
 | **FD3 — Auto-patrol and selection UI** | Select fighter; choose mode; two map clicks for A/B; show figure-eight preview; defend route, leash, cancel/edit, repeat circuit; individual orders. | Working patrol movement and mode switching, independent per-drone A/B. No click interference with tower placement. |
 | **FD4 — Fighter weapons** | Real muzzle, turn/aim/LOS, projectile/shot system, finite ammo and cooldown; damage/shield attribution/XP policy; clean hit feedback. | Fighter shoots enemies in both modes, ammo decreases only on accepted shots; uses shared combat, no independent damage math or per-frame enemy enumeration. |
 | **FD5 — Station resupply and repair** | Ammo stock + proper existing logistical supply adapter, finite dock/service capacity/rates, health restoration policy, low-resource recalls, waiting/relaunch, interruption/cleanup. | Genuine ammo consumption and repair costs, no stock duplication, station loss safety. |
@@ -157,4 +116,4 @@ DRONES/
 
 The earlier `DRONES/Combat/README.md` described an **optional short-lived player combat ability** that flies a chosen corridor. That is **not** this new request. This plan is now the authoritative **persistent fighter squad / station / auto-pilot / auto-patrol** direction. Preserve the old one-off ability as a **separate future concept**, not the assumed first fighter implementation. Do not mix it into the logistics system or treat station-based drone fighters as consumable missiles.
 
-**Status remains planning only** until implementation is requested. After each implemented FD phase, update the owning docs/backlog with exact source status and owner validation, preserving independent role boundaries.
+**FD1-B and FD2 are source implemented; later phases remain planning only.** After each implemented FD phase, update the owning docs/backlog with exact source status and owner validation, preserving independent role boundaries.

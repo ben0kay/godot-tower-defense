@@ -13,5 +13,7 @@ public sealed record FighterDroneSaveData
     public FighterDroneState State { get; init; }
     public float Heading { get; init; }
     public SavePoint Position { get; init; }
+    public SavePoint Velocity { get; init; }
+    public float ManoeuvrePhase { get; init; }
     public DroneFlightMotion Motion { get; init; }
 }
