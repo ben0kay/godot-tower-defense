@@ -197,6 +197,10 @@ Owner checks in Godot: watch an Open portal when one ship emerges, then a quick 
 
 ## Phase SPAWN4 — parallel attack groups inside one wave (medium–high)
 
+**Source Implemented / Awaiting Owner Validation — 2026-11-06.** Opt-in wave `Schedule=Parallel` uses batch `StartOffsetSeconds` from wave start; `After` remains sequential-only. Independent cooldowns/readiness waits share one fair attempt budget, exact compositions and existing ownership. Wave Editor includes timing bars and source/quota summaries. Existing wave recipes unchanged; source review only (.NET unavailable). SPAWN5 remains deferred.
+
+Original handoff:
+
 Current sequential `WaveManager` has **one** `_batchIndex`, `_entryIndex` and `_countdown`. You can already interleave portals *within one mixed batch*, but not run **multiple separately timed batches concurrently**.
 
 - Preserve **Sequential (default)** scheduling for all current waves. Add opt-in `AttackGroup` or `BatchStartOffsetSeconds` to let e.g. Portal1 spawn 20 enemies at 0.5s **while** Portal3 spawns 10 at 0.9s, starting 3s later. Allow mixed compositions and a final simultaneous multi-side assault.

@@ -21,6 +21,9 @@ public partial class WaveEditorPanel : VBoxContainer
     private ScrollContainer _detailsScroll;
     private VBoxContainer _waveFields, _batchFields, _enemyFields, _presentationFields, _compositionPreview;
     private SpawnSourceEditor _waveSpawnSource, _batchSpawnSource, _entrySpawnSource;
+    private VBoxContainer _timeline;
+    private OptionButton _schedule;
+    private SpinBox _startOffset;
     private SpinBox _waveDelay, _waveNumber, _count, _interval, _after, _weight;
     private OptionButton _alert, _enemyId;
     private LineEdit _bannerTitle, _bannerDescription, _speaker, _narration, _voiceCue, _portal;
@@ -88,13 +91,27 @@ public partial class WaveEditorPanel : VBoxContainer
             v => Wave.NextWaveDelaySeconds = v);
         _waveDelay.TooltipText = "After this wave fully clears, auto-start the next wave after this many seconds. -1 uses the level default (30s). 0 starts on the next tick. The first wave remains manual; the final wave ignores this setting.";
 
+        _schedule = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        foreach (WaveScheduleMode mode in Enum.GetValues<WaveScheduleMode>()) _schedule.AddItem(mode.ToString());
+        Field(_waveFields, "Batch scheduling", _schedule);
+        _schedule.TooltipText = "Sequential preserves ordered batches and After delays. Parallel uses independent wave-relative start times; After is ignored.";
+        _schedule.ItemSelected += i =>
+        {
+            if (_refreshing || Wave == null) return;
+            Wave.Schedule = (WaveScheduleMode)i; Dirty(); Refresh();
+        };
+        _timeline = Pane("Wave timeline · estimated", 0); _waveFields.AddChild(_timeline);
+
         _batchFields = Pane("Selected batch", 0); details.AddChild(_batchFields);
         _count = Number(_batchFields, "Total enemies", 1, 100000, 1, v => { Batch.Count = (int)v; RefreshComposition(); });
         _count.TooltipText = "Total ships across all enemy entries in this batch; weights divide this count. Does not add ships per entry.";
         _interval = Number(_batchFields, "Seconds between spawns", 0, 3600, .01, v => { Batch.Interval = v; RefreshComposition(); });
         _interval.TooltipText = "Seconds between SUCCESSFUL spawns. The first ship starts immediately. Failed/blocked spawns retry and may extend this duration.";
-        _after = Number(_batchFields, "Delay after batch (seconds)", 0, 3600, .01, v => Batch.After = v);
+        _after = Number(_batchFields, "Delay after batch (seconds)", 0, 3600, .01, v => { Batch.After = v; RefreshComposition(); });
         _after.TooltipText = "Seconds after the last successful spawn before the next batch. Does not wait for enemies to die. Ignored for the final batch.";
+        _startOffset = Number(_batchFields, "Start after wave begins (seconds)", 0, 86400, .1,
+            v => { Batch.StartOffsetSeconds = v; RefreshComposition(); });
+        _startOffset.TooltipText = "Parallel only. Measured from the accepted wave start, including portal opening time. A late/blocked group waits independently; other groups keep running.";
         // Keep the composition summary immediately beneath count/timing so it is visible without scrolling.
         var preview = Pane("Live composition · exact counts", 0);
         _batchFields.AddChild(preview);
@@ -127,7 +144,7 @@ public partial class WaveEditorPanel : VBoxContainer
         _enemyFields.AddChild(_enemyClassification);
         _weight = Number(_enemyFields, "Weight", 0, 10000, .01, v => { Entry.Weight = v; RefreshComposition(); });
         _weight.TooltipText = "Relative share of this batch, not a ship count or an independent spawn chance. Example 75 and 25 with Count 20 means exactly 15 and 5, shuffled.";
-        _portal = Text(_enemyFields, "Required portal (blank = any)", v => Entry.Portal = v);
+        _portal = Text(_enemyFields, "Required portal (blank = any)", v => { Entry.Portal = v; RefreshComposition(); });
         _portal.TooltipText = "Optional level-root-relative portal path (e.g. Portals/EnemyPortal1). Blank lets the spawn system pick a valid source.";
         _shield = Check(_enemyFields, "Spawn with shield", v => { Entry.Shield = v; RefreshComposition(); });
         _shield.TooltipText = "Start these ships with their configured shield full; this does not add shields to an enemy whose MaxShield is zero.";
@@ -503,6 +520,7 @@ public partial class WaveEditorPanel : VBoxContainer
     // It rebuilds only when fields/selection change; no physics, random shuffles or background updates.
     private void RefreshComposition()
     {
+        RefreshTimeline();
         if (_compositionPreview == null) return;
         foreach (Node child in _compositionPreview.GetChildren())
         { _compositionPreview.RemoveChild(child); child.QueueFree(); }
@@ -577,17 +595,20 @@ public partial class WaveEditorPanel : VBoxContainer
             _enemyFields.Visible = Entry != null; _presentationFields.Visible = wave != null;
             if (wave != null)
             {
+                _schedule.Select((int)wave.Schedule);
                 _waveNumber.Value = wave.Number; _waveDelay.Value = wave.NextWaveDelaySeconds; _alert.Select((int)wave.Alert);
                 _bannerTitle.Text = wave.BannerTitle ?? ""; _bannerDescription.Text = wave.BannerDescription ?? "";
                 _speaker.Text = wave.Speaker ?? ""; _narration.Text = wave.NarrationText ?? "";
                 _voiceCue.Text = wave.VoiceCueId ?? "";
             }
-            if (batchSelected != null) { _count.Value = batchSelected.Count; _interval.Value = batchSelected.Interval; _after.Value = batchSelected.After; }
+            if (batchSelected != null) { _startOffset.Value = batchSelected.StartOffsetSeconds; _count.Value = batchSelected.Count; _interval.Value = batchSelected.Interval; _after.Value = batchSelected.After; }
             if (Entry != null)
             {
                 SelectEnemyId(Entry.EnemyId); _weight.Value = Entry.Weight; _portal.Text = Entry.Portal ?? "";
                 _shield.ButtonPressed = Entry.Shield; _stealth.ButtonPressed = Entry.Stealth;
             }
+            bool parallel = wave?.Schedule == WaveScheduleMode.Parallel;
+            _startOffset.Editable = parallel; _after.Editable = !parallel;
             _waveSpawnSource?.RefreshValues(); _batchSpawnSource?.RefreshValues(); _entrySpawnSource?.RefreshValues();
             RefreshComposition();
             _fileLabel.Text = _path + (_dirty ? "  * UNSAVED" : "");

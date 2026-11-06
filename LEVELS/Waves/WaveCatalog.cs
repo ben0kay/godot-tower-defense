@@ -40,6 +40,9 @@ public static class WaveCatalog
         double.IsFinite(value) && (value == -1 || (value >= 0 && value <= 86400));
 
     // =========================================================
+    internal static bool ValidStartOffset(double value) => double.IsFinite(value) && value >= 0 && value <= 86400;
+
+    // =========================================================
     // Validate the full set before any wave runs, reporting exact wave/batch context.
     public static void Validate(WaveDefinition[] waves, IReadOnlyDictionary<string, PackedScene> scenes)
     {
@@ -47,13 +50,13 @@ public static class WaveCatalog
         HashSet<int> numbers = new();
         foreach (WaveDefinition wave in waves)
         {
-            if (wave == null || wave.Number <= 0 || !numbers.Add(wave.Number) || wave.Batches.IsDefaultOrEmpty || !ValidNextWaveDelay(wave.NextWaveDelaySeconds))
-                throw new ArgumentException("Wave numbers must be unique/positive, with batches and a valid next-wave delay (-1 or 0–86400 seconds).");
+            if (wave == null || wave.Number <= 0 || !numbers.Add(wave.Number) || wave.Batches.IsDefaultOrEmpty || !ValidNextWaveDelay(wave.NextWaveDelaySeconds) || !Enum.IsDefined(wave.Schedule))
+                throw new ArgumentException("Wave numbers must be unique/positive, with batches, a valid schedule and a valid next-wave delay (-1 or 0–86400 seconds).");
             long count = 0;
             foreach (WaveBatch batch in wave.Batches)
             {
                 if (batch == null || batch.Count <= 0 || !double.IsFinite(batch.Interval) || batch.Interval < 0
-                    || !double.IsFinite(batch.After) || batch.After < 0 || batch.Entries.IsDefaultOrEmpty)
+                    || !double.IsFinite(batch.After) || batch.After < 0 || !ValidStartOffset(batch.StartOffsetSeconds) || batch.Entries.IsDefaultOrEmpty)
                     throw new ArgumentException($"Wave {wave.Number}: invalid count/timing/entries.");
                 count += batch.Count;
                 double weight = 0;

@@ -4,6 +4,7 @@ using Godot;
 [Tool, GlobalClass]
 public partial class WaveResource : Resource
 {
+    [Export] public WaveScheduleMode Schedule { get; set; } = WaveScheduleMode.Sequential;
     [Export] public WaveSpawnSourceResource Source { get; set; }
     [Export(PropertyHint.Range, "1,10000,1,or_greater")] public int Number { get; set; } = 1;
     [Export] public Godot.Collections.Array<WaveBatchResource> Batches { get; set; } = new();
@@ -23,7 +24,7 @@ public partial class WaveResource : Resource
     // Copy both metadata and nested batches for independent wave duplication.
     public WaveResource Copy()
     {
-        var copy = new WaveResource { Source = Source?.Copy(), Number = Number, NextWaveDelaySeconds = NextWaveDelaySeconds, Alert = Alert, BannerTitle = BannerTitle,
+        var copy = new WaveResource { Schedule = Schedule, Source = Source?.Copy(), Number = Number, NextWaveDelaySeconds = NextWaveDelaySeconds, Alert = Alert, BannerTitle = BannerTitle,
             BannerDescription = BannerDescription, Speaker = Speaker, NarrationText = NarrationText, VoiceCueId = VoiceCueId };
         foreach (WaveBatchResource batch in Batches) copy.Batches.Add(batch?.Copy());
         return copy;

@@ -1,3 +1,9 @@
+## SPAWN4 — parallel attack groups — 2026-11-06
+
+Source implemented / awaiting owner validation. Wave Schedule defaults to Sequential; Parallel uses per-batch StartOffsetSeconds from accepted wave start (After ignored). WaveManager.Parallel shares the existing attempt cap, RNG, exact compositions and ownership, with fair independent cooldowns/retries/readiness waits and no catch-up backlog. Wave Editor adds mode/start controls, timing bars and exact source-selector quotas/side weights; resource copy/build/validation retain settings. Existing mission recipes unchanged; SPAWN5 deferred. Brief authoring guide and plan status updated. Focused source/diff review only; .NET unavailable. Owner to check overlapping groups, blocked/forming sources, pause, zero intervals, wave completion/offspring, parallel→sequential transitions and editor save/duplicate. Existing content-hash rules still apply to older checkpoints after source updates.
+
+---
+
 ## Level002 foundation-platform briefing — 2026-11-06
 
 Added `LEVELS/Level002/Level002Briefing.tres` and assigned it through `Level002Config.tres.MissionBriefing`, following Level001's existing load-time top-right typewriter route. Short text explains foundations can carry towers and reroute enemies. Optional objective metadata is supplied; voice cue intentionally blank pending a future Fish Audio MP3. No wave, foundation tile, audio catalog, runtime code or level balance changes. Resource/config source checked; owner to verify a **fresh** Level002 load shows the message and that Continue skips it.

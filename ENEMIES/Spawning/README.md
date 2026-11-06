@@ -7,7 +7,7 @@ Define `LevelConfig.EdgeSectors` with unique IDs, one side and normalized [start
 
 Wave Editor exposes complete source overrides and side weights at all three scopes, plus policy/sector/weight summaries in composition preview. Sector definitions belong to the map Inspector; their IDs/permissions are checked at deployment. Duplicate wave/batch/entry operations deep-copy source settings. No existing mission/wave resources were edited. C# recipes may use `with { Source = new SpawnSourceOptions(...) }`; Enemy helper also accepts named `source:`.
 
-Source geometry/sectors share the existing navigation-revision cache; retained candidate lists avoid per-request allocations or extra path searches. Existing readiness, ownership, placement protection and between-wave RNG persistence remain authoritative. SPAWN4 concurrent groups are not implemented. Source/reference review only; .NET unavailable. Owner to check mixed sources, weighted sides/sectors, blocked requests, multi-Citadel protection, editor save/duplicate and a fresh checkpoint.
+Source geometry/sectors share the existing navigation-revision cache; retained candidate lists avoid per-request allocations or extra path searches. Existing readiness, ownership, placement protection and between-wave RNG persistence remain authoritative. SPAWN4 concurrent groups are now source implemented; opt in with wave Schedule=Parallel and batch StartOffsetSeconds. See LEVELS/Waves/Authoring.md. Source/reference review only; .NET unavailable. Owner to check mixed sources, weighted sides/sectors, blocked requests, multi-Citadel protection, editor save/duplicate and a fresh checkpoint.
 
 ---
 

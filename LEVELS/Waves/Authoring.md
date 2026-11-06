@@ -1,3 +1,13 @@
+## SPAWN4 — overlapping attack groups
+
+Source implemented / awaiting owner validation. In Wave Editor choose **Batch scheduling → Parallel**, then set each batch’s **Start after wave begins (seconds)**. Timing starts when the wave is accepted, includes portal opening time and pauses with gameplay. Each group uses its own existing Count, Interval, enemy mix and inherited SPAWN3 Source. `After` is ignored in Parallel; start offsets are ignored in Sequential (the unchanged default). Duplicate/copy preserves these settings.
+
+Example: Group 1 starts at 0s with 20 ships every 0.5s; Group 2 starts at 3s with 10 ships every 0.9s. Their streams overlap. A blocked/forming source retains its selected ship and waits independently, without rerouting or holding up other groups. The wave clears only after all groups and their owned ships/offspring resolve. Delays do not accumulate catch-up spawns; a shared round-robin attempt budget still applies. Lazy per-group seeded composition and source selection use the existing wave RNG.
+
+The editor previews approximate first–last spawn times and exact quotas per source selector; physical random portal/side distribution depends on map eligibility and weights. Blocking, portal formation and frame budgets can extend the previewed duration. C# recipes use `wave with { Schedule = WaveScheduleMode.Parallel }` and `batch with { StartOffsetSeconds = 3 }`. Existing missions remain Sequential; checkpoints still save between waves only. SPAWN5 triggers are outside this pass.
+
+---
+
 ## Level001 beginner mission and editable wave narration — 2026-11-03
 
 **Current authoritative source:** `LEVELS/Level001/Level001Waves.tres`, assigned in `Level001Config.tres.WaveSource`. The three introductory waves contain **10 Standard**, **14 Standard**, then **10 Standard followed by 10 mixed (5 Standard + 5 Scout)**. The fast Scouts first appear **after half of Wave 3's scheduled ships have spawned**. All 44 enemies are plain/unshielded/unstealthed; there are no Bulwarks or support units. Spawning intervals are 0.9s, 0.8s, and in Wave 3 0.75s/0.65s, with a one-second delay before the mixed half.

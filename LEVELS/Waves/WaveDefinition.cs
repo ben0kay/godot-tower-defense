@@ -1,9 +1,11 @@
 // Immutable C# authoring data; runtime counters live exclusively in WaveManager.
 using System.Collections.Immutable;
 
+public enum WaveScheduleMode { Sequential, Parallel }
+
 public sealed record WaveEnemyEntry(string EnemyId, double Weight = 100, string Portal = "", bool SpawnWithShield = false, bool SpawnWithStealth = false, SpawnSourceOptions Source = null);
-public sealed record WaveBatch(int Count, double Interval, double After, ImmutableArray<WaveEnemyEntry> Entries, SpawnSourceOptions Source = null);
-public sealed record WaveDefinition(int Number, ImmutableArray<WaveBatch> Batches, WavePresentation Presentation = null, double NextWaveDelaySeconds = -1, SpawnSourceOptions Source = null);
+public sealed record WaveBatch(int Count, double Interval, double After, ImmutableArray<WaveEnemyEntry> Entries, SpawnSourceOptions Source = null, double StartOffsetSeconds = 0);
+public sealed record WaveDefinition(int Number, ImmutableArray<WaveBatch> Batches, WavePresentation Presentation = null, double NextWaveDelaySeconds = -1, SpawnSourceOptions Source = null, WaveScheduleMode Schedule = WaveScheduleMode.Sequential);
 
 public static class WaveBuilder
 {

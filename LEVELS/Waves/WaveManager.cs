@@ -99,8 +99,10 @@ public partial class WaveManager : Node
         if (!CanStart || GetTree().Paused) return false;
         _nextWaveCountdown = -1;
         _waveIndex++; _batchIndex = 0; _entryIndex = 0;
+        _parallelGroups = null; _waitingForPortal = false;
         PlannedRemaining = _waves[_waveIndex].Batches.Sum(b => b.Count);
-        _sequence = WaveCatalog.Compose(_waves[_waveIndex].Batches[0], _random);
+        if (_waves[_waveIndex].Schedule == WaveScheduleMode.Parallel) PrepareParallel();
+        else _sequence = WaveCatalog.Compose(_waves[_waveIndex].Batches[0], _random);
         _countdown = 0; StatusMessage = ""; State = WaveState.Spawning;
         // Explicit ordering: reveal and refresh eligibility before observers or the immediate spawn.
         _spawns.ActivatePortalsForWave(_waves[_waveIndex].Number);
@@ -134,6 +136,7 @@ public partial class WaveManager : Node
     private void Advance(double delta, int limit)
     {
         if (_outcomeStopped || (State != WaveState.Spawning && State != WaveState.SpawnBlocked)) return;
+        if (_parallelGroups != null) { AdvanceParallel(delta, limit); return; }
         _countdown = Math.Max(0, _countdown - Math.Max(0, delta));
         if (_countdown > 0.0000001) return;
         for (int attempt = 0; attempt < limit; attempt++)
@@ -186,6 +189,8 @@ public partial class WaveManager : Node
     // A forming portal sleeps the scheduler; readiness wakes the same selected entry without RNG or count loss.
     private void OnPortalReadinessChanged()
     {
+        if (_outcomeStopped) return;
+        if (_parallelGroups != null) { WakeParallelPortals(); return; }
         if (!_waitingForPortal || State != WaveState.Spawning) return;
         _waitingForPortal = false; _countdown = 0; _startAttemptReserved = false;
         StatusMessage = ""; SetPhysicsProcess(true); Publish();
@@ -249,7 +254,7 @@ public partial class WaveManager : Node
     internal void StopForOutcome()
     {
         if (GodotObject.IsInstanceValid(_spawns)) _spawns.SetPortalWaveSmoke(false);
-        _outcomeStopped = true; _nextWaveCountdown = -1; _waitingForPortal = false;
+        _outcomeStopped = true; _nextWaveCountdown = -1; _waitingForPortal = false; _parallelGroups = null;
         SetPhysicsProcess(false); Publish();
     }
 
@@ -258,6 +263,7 @@ public partial class WaveManager : Node
     private void ReleaseOwnership()
     {
         if (GodotObject.IsInstanceValid(_spawns)) _spawns.SetPortalWaveSmoke(false);
+        _parallelGroups = null; _parallelClock = 0; _parallelCursor = 0;
         _waitingForPortal = false; _nextWaveCountdown = -1;
         foreach (Enemy ship in _owned) ship.Removed -= OnEnemyRemoved;
         _owned.Clear(); _ownershipEpoch++; PendingDeathSpawns = 0;
@@ -271,6 +277,7 @@ public partial class WaveManager : Node
     {
         if (GodotObject.IsInstanceValid(_spawns)) _spawns.SetPortalWaveSmoke(false);
         _nextWaveCountdown = -1;
+        _parallelGroups = null;
         State = WaveState.PausedError; StatusMessage = message; SetPhysicsProcess(false);
         GD.PushWarning("Wave setup: " + message); Publish();
     }
@@ -311,6 +318,7 @@ public partial class WaveManager : Node
         CompletedWaves = completed; _waveIndex = completed - 1; _random.State = randomState;
         State = completed == 0 ? WaveState.Ready : WaveState.Completed;
         _waitingForPortal = false;
+        _parallelGroups = null; _parallelClock = 0; _parallelCursor = 0;
         PlannedRemaining = PendingDeathSpawns = 0; _sequence = null; _countdown = 0;
         // CompletedWaves is an array count, not an authored wave Number (numbers may have gaps).
         _spawns.RestorePortalActivation(_waves, completed);
