@@ -1,3 +1,9 @@
+## Faint violet shield restoration range — 2026-11-06
+
+The Shield Emitter now displays a thin, translucent violet perimeter at the exact **192px default `ShieldEmitterConfig.RadiusPixels`** (including a barely visible filled interior), moving with its ship in world space. The optional `ShieldRangeVisual` node draws behind the hull and follows live range edits; it hides when the emitter cannot actively pulse, on death or on removal. Rendering does not run an additional visual timer or physics tick. The ring shows **potential restoration reach**, not a guarantee that every nearby ship receives shielding; actual pulses still use MaxShield, eligibility and bounded recipient checks. This changes visuals only, not recipient shields, existing movement or combat. See [Shield Emitter component](../../Abilities/ShieldEmitter/README.md).
+
+---
+
 ## Dark/red Shield Emitter artwork — 2026-11-06
 
 `Artwork/enemy003.svg` now has solid charcoal and black mechanical armour with small red faction stripes on its split projector forks. Its central **violet/purple shield reactor and projection details are deliberately preserved** to distinguish support ships. This is the same 40×32 right-facing silhouette, with the same gameplay shield emitter component and no gradient/filter use. The earlier blue-grey gradient hull description below is historical. No enemy health, shield mechanics, class, waves, IDs or scripts changed; owner visual review pending.

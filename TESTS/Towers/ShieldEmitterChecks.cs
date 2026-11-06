@@ -23,6 +23,16 @@ public static class ShieldEmitterChecks
         Require(a.Config != b.Config && a.Config != source && first.CurrentShield == 0 && ally.CurrentShield == 0 &&
             ally.GetNodeOrNull<Node>("Abilities") == null && fast.GetNodeOrNull<Node>("Abilities") == null,
             "Only generator scenes carry optional nodes; plain types remain zero-cost with unshielded starts");
+        ShieldEmitterRangeVisual ring = first.GetNode<ShieldEmitterRangeVisual>("ShieldRangeVisual");
+        ShieldEmitterRangeVisual secondRing = second.GetNode<ShieldEmitterRangeVisual>("ShieldRangeVisual");
+        Require(ring.Visible && secondRing.Visible && ring.RadiusPixels == 192f && secondRing.RadiusPixels == 192f
+            && !ring.IsProcessing() && !ring.IsPhysicsProcessing()
+            && ally.GetNodeOrNull<ShieldEmitterRangeVisual>("ShieldRangeVisual") == null,
+            "Emitter range is visible at actual ability radius; plain ships have no range visual or visual tick");
+        a.Config.RadiusPixels = 224f;
+        Require(ring.Visible && ring.RadiusPixels == 224f && secondRing.RadiusPixels == 192f && source.RadiusPixels == 192f,
+            "Runtime range change updates only this source's cached ring, not the shared default or other emitter");
+        a.Config.RadiusPixels = 192f;
         Require(ally.RestoreShield(-1) == 0 && ally.RestoreShield(float.NaN) == 0 && ally.RestoreShield(float.PositiveInfinity) == 0 && zero.RestoreShield(10) == 0,
             "Safe recipient API rejects invalid amounts and zero capacity");
         a._PhysicsProcess(0); b._PhysicsProcess(0);
@@ -56,12 +66,17 @@ public static class ShieldEmitterChecks
         Require(a.Pulses == pulses + 1, "Lag cannot create a catch-up burst");
         a.Enabled = false; pulses = a.Pulses; float preserved = ally.CurrentShield;
         a._PhysicsProcess(10);
-        Require(a.Pulses == pulses && !a.IsPhysicsProcessing() && ally.CurrentShield == preserved, "Disabled source does no work");
+        Require(a.Pulses == pulses && !a.IsPhysicsProcessing() && ally.CurrentShield == preserved && !ring.Visible,
+            "Disabled source does no work and hides its displayed range");
         a.Enabled = true; a.Config = null; a._PhysicsProcess(10);
-        Require(a.Pulses == pulses && !a.IsPhysicsProcessing(), "Null config is a safe inert component");
+        Require(a.Pulses == pulses && !a.IsPhysicsProcessing() && !ring.Visible,
+            "Null config is a safe inert component with no advertised range");
         a.Config = (ShieldEmitterConfig)source.Duplicate(); a.Config.PulseIntervalSeconds = 0; a._PhysicsProcess(10);
-        Require(a.Pulses == pulses && !a.IsPhysicsProcessing(), "Invalid interval cannot create unbounded queries");
-        a.Config.PulseIntervalSeconds = 1; a.Config.MaxCandidatesPerPulse = 512; a._PhysicsProcess(1);
+        Require(a.Pulses == pulses && !a.IsPhysicsProcessing() && !ring.Visible,
+            "Invalid interval cannot create unbounded queries or show a fake range");
+        a.Config.PulseIntervalSeconds = 1; a.Config.MaxCandidatesPerPulse = 512;
+        Require(ring.Visible && ring.RadiusPixels == 192f, "Valid live source re-enables its true range visual");
+        a._PhysicsProcess(1);
         preserved = ally.CurrentShield; first.TakeDamage(10000); a._PhysicsProcess(10);
         Require(a.Pulses == pulses + 1 && ally.CurrentShield == preserved, "Source death stops future pulses without erasing allies' shields");
         int otherPulses = b.Pulses; second.Arrive(); b._PhysicsProcess(10);

@@ -8,6 +8,7 @@ public partial class ShieldEmitter : Node
     private bool _ready, _enabled = true, _running;
     private Enemy _host;
     private EnemyRegistry _registry;
+    private ShieldEmitterRangeVisual _rangeVisual;
     private float _timer;
     private int _cursor;
     [ExportGroup("Shield Emitter")]
@@ -44,6 +45,8 @@ public partial class ShieldEmitter : Node
         for (Node parent = GetParent(); _host == null && parent != null; parent = parent.GetParent())
             if (parent is Enemy enemy) _host = enemy;
         if (_host == null) return;
+        _rangeVisual = _host.GetNodeOrNull<ShieldEmitterRangeVisual>("ShieldRangeVisual");
+        if (GodotObject.IsInstanceValid(_rangeVisual)) _rangeVisual.SetActive(false);
         // Mutable tuning is private to this ability; no source Resource or allied Definition is modified.
         _config = _config == null ? null : (ShieldEmitterConfig)_config.Duplicate(true);
         _ready = true;
@@ -57,6 +60,12 @@ public partial class ShieldEmitter : Node
     {
         if (_running || !Enabled || Config?.IsValid != true || !host.IsAlive || host.IsQueuedForDeletion() || host.Registry == null) return;
         _registry = host.Registry; _running = true; _cursor = 0;
+        // Both the pulse test and the visible circle use the same per-instance ability config.
+        if (GodotObject.IsInstanceValid(_rangeVisual))
+        {
+            _rangeVisual.SetRadius(Config.RadiusPixels);
+            _rangeVisual.SetActive(Config.ShieldPerPulse > 0f);
+        }
         _timer = Config.PulseIntervalSeconds * (0.25f + 0.75f * (host.GetInstanceId() % 97) / 97f);
         SetPhysicsProcess(true);
     }
@@ -69,7 +78,11 @@ public partial class ShieldEmitter : Node
     private void OnHostRemoved(Enemy host) => Stop();
     // =========================================================
     // Disable processing and release cached world service references on removal/disable.
-    private void Stop() { _running = false; _registry = null; SetPhysicsProcess(false); }
+    private void Stop()
+    {
+        _running = false; _registry = null; SetPhysicsProcess(false);
+        if (GodotObject.IsInstanceValid(_rangeVisual)) _rangeVisual.SetActive(false);
+    }
     // =========================================================
     // Release host/resource subscriptions on component or level unload.
     public override void _ExitTree()
@@ -77,7 +90,7 @@ public partial class ShieldEmitter : Node
         Stop();
         if (GodotObject.IsInstanceValid(_host)) { _host.Initialized -= OnHostInitialized; _host.Removed -= OnHostRemoved; }
         if (_ready && GodotObject.IsInstanceValid(_config)) _config.Changed -= OnConfigChanged;
-        _ready = false; _host = null;
+        _ready = false; _host = null; _rangeVisual = null;
     }
     #endregion
     #region Budgeted Pulse
