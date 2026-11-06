@@ -16,8 +16,8 @@ public static class BlasterCannonLevels
     // Optional named MaxHealth column is absolute per level; Level 1 is 1,000 HP; each paid tier adds 5% to the previous absolute HP.
     private static readonly Row[] Rows =
     {
-        new(1, 300, 5, 60, 0.5f, 323.4f, 575, 216, 12, 0.15f, 0, 80, 0.25f, DamageType.Explosive, false, 1, false, 1, 600, 3, SpreadDegrees: 1f),
-        new(2, 200, 6, 66, 0.5f, 334.4f, 575, 216, 12, 0.15f, 0, 88, 0.25f, DamageType.Explosive, false, 1, false, 1, 600, 3, MaxHealth: 1050f, SpreadDegrees: 0.75f),
+        new(1, 300, 5, 60, 0.5f, 323.4f, 575, 216, 4, 0.15f, 0, 80, 0.25f, DamageType.Explosive, false, 1, false, 1, 600, 3, SpreadDegrees: 1f),
+        new(2, 200, 6, 66, 0.5f, 334.4f, 575, 216, 4, 0.15f, 0, 88, 0.25f, DamageType.Explosive, false, 1, false, 1, 600, 3, MaxHealth: 1050f, SpreadDegrees: 0.75f),
     };
 
     // =========================================================

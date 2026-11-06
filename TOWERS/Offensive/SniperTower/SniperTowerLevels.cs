@@ -7,7 +7,7 @@ public static class SniperTowerLevels
     {
         // =========================================================
         // All levels share Kinetic damage/weapon behavior, with numeric snapshots replaced in full.
-        public TowerLevel Create() => new(Level, Credits, new TowerStatBlock(Range, Rate, Damage, Speed, Turn, 8f, .18f,
+        public TowerLevel Create() => new(Level, Credits, new TowerStatBlock(Range, Rate, Damage, Speed, Turn, 3f, .18f,
             ShieldPenetration: .15f, Ammunition: new(AmmoCapacity, AmmoPerShot)) with { Heat = Heat, MaxHealth = MaxHealth, Handling = new(SpreadDegrees) }, WorkSeconds);
     }
 

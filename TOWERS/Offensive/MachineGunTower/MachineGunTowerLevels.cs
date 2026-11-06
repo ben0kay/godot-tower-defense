@@ -7,7 +7,7 @@ public static class MachineGunTowerLevels
     {
         // =========================================================
         // One bullet per sequential attack; the two muzzles never double total authored fire rate.
-        public TowerLevel Create() => new(Level, Credits, new TowerStatBlock(Range, Rate, Damage, Speed, Turn, 12f, .12f,
+        public TowerLevel Create() => new(Level, Credits, new TowerStatBlock(Range, Rate, Damage, Speed, Turn, 5f, .12f,
             ShieldPenetration: 0f, Ammunition: new(AmmoCapacity, AmmoPerShot)) with { Heat = Heat, MaxHealth = MaxHealth, Handling = new(SpreadDegrees) }, WorkSeconds);
     }
 

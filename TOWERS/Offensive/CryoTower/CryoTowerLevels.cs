@@ -8,7 +8,7 @@ public static class CryoTowerLevels
     {
         // =========================================================
         // Rank modifies damage/range later; Slow remains the selected row's absolute strength.
-        public TowerLevel Create() => new(Level, Credits, new TowerStatBlock(Range, Rate, Damage, Speed, Turn, 8, .15f,
+        public TowerLevel Create() => new(Level, Credits, new TowerStatBlock(Range, Rate, Damage, Speed, Turn, 4, .15f,
             Weapon: new(DamageType.Energy, false, 1, false, 1), Ammunition: new(AmmoCapacity, AmmoPerShot),
             Slow: new(Slow)) with { Heat = Heat, MaxHealth = MaxHealth, Handling = new(SpreadDegrees) }, WorkSeconds);
     }

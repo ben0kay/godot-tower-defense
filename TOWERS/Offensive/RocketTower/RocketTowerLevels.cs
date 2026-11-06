@@ -8,7 +8,7 @@ public static class RocketTowerLevels
     {
         // =========================================================
         // Reuse typed Explosive damage and the same AreaBlastStats snapshot as Blaster Cannon.
-        public TowerLevel Create() => new(Level, Credits, new TowerStatBlock(Range, Rate, Damage, Speed, 264, 12, .12f,
+        public TowerLevel Create() => new(Level, Credits, new TowerStatBlock(Range, Rate, Damage, Speed, 264, 4, .12f,
             Area: new(Radius, Edge), Weapon: new(DamageType.Explosive, false, 1, false, 1),
             Ammunition: new(AmmoCapacity, AmmoPerShot), MaxHealth: MaxHealth, Handling: new(SpreadDegrees, CanUnlockHoming: false)), WorkSeconds);
     }

@@ -16,9 +16,9 @@ public static class BattleTowerLevels
     // Optional named MaxHealth column is absolute per level; Level 1 is 1,000 HP; each paid tier adds 5% to the previous absolute HP.
     private static readonly Row[] Rows =
     {
-        new(1, 200, 3, 30, 1.68f, 323.4f, 2300, 216, 12, 0.15f, 0.05f, 1000, 1, SpreadDegrees: 2.5f),
-        new(2, 150, 4, 33, 1.764f, 334.4f, 2300, 216, 12, 0.15f, 0.05f, 1000, 1, MaxHealth: 1050f, SpreadDegrees: 2f),
-        new(3, 250, 5, 36, 1.848f, 344.3f, 2300, 216, 12, 0.15f, 0.05f, 1000, 1, MaxHealth: 1102.5f, SpreadDegrees: 1.5f),
+        new(1, 200, 3, 30, 1.68f, 323.4f, 2300, 216, 4, 0.15f, 0.05f, 1000, 1, SpreadDegrees: 2.5f),
+        new(2, 150, 4, 33, 1.764f, 334.4f, 2300, 216, 4, 0.15f, 0.05f, 1000, 1, MaxHealth: 1050f, SpreadDegrees: 2f),
+        new(3, 250, 5, 36, 1.848f, 344.3f, 2300, 216, 4, 0.15f, 0.05f, 1000, 1, MaxHealth: 1102.5f, SpreadDegrees: 1.5f),
     };
 
     // =========================================================
