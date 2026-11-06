@@ -1,8 +1,18 @@
+## Portal 4 debut and faster opening waves — 2026-11-06
+
+**Source Implemented / Awaiting Owner Gameplay Validation.** The already-authored fourth portal at `(7136, 3552)`, with `AppearAtWave = 6` and its existing `RouteCheckpoint3a` link, is now included in `Level011Config.tres → ActivePortals`. SPAWN1 keeps it hidden/ineligible for waves 1–5 and activates it at the **accepted start of Wave 6**, before the first spawn. Wave 6 now sends **26 of its existing 216 scheduled ships** through `Portals/EnemyPortal4`: 4 Reinforced Drones from its first batch, 10 Elite Assault Ships from its second, and 12 Heavy Gunner Drones from its final batch. The mix is shuffled within each batch, so Portal4 ships are interleaved rather than a deterministic immediate first spawn. Every other wave 6 ship and the entire waves 7–10 roster remains unchanged.
+
+**Waves 1–5** now use approximately **20% shorter between-spawn intervals** and **0.5 seconds shorter inter-batch gaps** where a positive gap existed. The authored enemy IDs, counts (54/84/120/162/204), weights, shields, portal assignments, wave order and all five banners stay unchanged. This is a pacing change, not extra enemies or faster enemy movement. The original values can be compared in Git history and adjusted through the existing Wave Editor.
+
+**Owner check:** refresh Godot resources, confirm Portal4 is invisible during waves 1–5, appears when wave 6 begins, and successfully spawns its three assigned ship groups; inspect F3 routing from its central/lower checkpoint and check for `SETUP ERROR`/`BLOCKED`. The Wave Editor should display the new per-batch intervals and portal selectors. Source-only validation here; no in-engine gameplay or FPS claims.
+
+---
+
 # Level011 — Three-Lane Fleet Defence
 
 ## Waves 1–10 — 2026-11-06
 
-**Source Implemented / Awaiting Owner Gameplay Validation.** The existing 192×120 map, three active portal paths, terrain, Citadel, routes and level settings are unchanged. This pass adds Waves 6–10 to the native editable `Level011Waves.tres`, preserves Waves 1–5 exactly, and makes Wave 10 the mission's final encounter.
+**Source Implemented / Awaiting Owner Gameplay Validation.** The earlier waves 6–10 authoring preserved the 192×120 map and initial three portal paths; the subsequent Portal4 registration/pacing update above supersedes that status. This pass adds Waves 6–10 to the native editable `Level011Waves.tres`, preserves Waves 1–5 exactly, and makes Wave 10 the mission's final encounter.
 
 | Wave | Banner | Scheduled ships | Composition and lanes |
 | --- | --- | ---: | --- |
@@ -22,15 +32,15 @@
 
 **Balancing:** Waves 6–9 progressively shift toward heavier Heavy/Superheavy and shield-support enemies; no new enemy type, global balance or navigation rule is introduced. Counts/intervals are deliberately spaced (mostly 0.42–0.74 seconds per spawn) rather than instant dumps; heavy transporter destruction can release up to ten additional children each. Heavy waves and boss survivability remain provisional pending Godot gameplay/FPS testing.
 
-**Portal activation:** SPAWN1 can activate authored late portals at Wave N, but this pass does not alter existing portal `AppearAtWave` values or portal scenes. Every explicitly referenced Portal1/2/3 must be active and reachable when its wave starts. If a portal is configured to appear after a wave that references it, the existing wave preflight will report a setup error until the authoring is corrected.
+**Portal activation:** SPAWN1 can activate authored late portals at Wave N, but this pass does not alter existing portal `AppearAtWave` values or portal scenes. Portals 1–3 are active from deployment; Portal4 is registered but reveals at the accepted start of Wave 6. Every explicitly referenced portal must be active and reachable when its wave starts. If a portal is configured to appear after a wave that references it, the existing wave preflight will report a setup error until the authoring is corrected.
 
 ## Existing map and editing
 
 - **Map dimensions:** `Level011Config.tres → WorldConfig` explicitly references `Level011WorldConfig.tres` = 192×120 cells at 64px. The runtime loader applies it before Grid/Camera initialize; an unassigned link falls back to the shared 100×80 default.
 - **Inheritance:** `Level011.tscn` inherits `LEVELS/Shared/BaseLevelMap.tscn`, with four level-local paintable TileMapLayers; its authored terrain is untouched.
-- **Existing routes:** upper portal at (1504,2016), middle at (1504,3424), lower at (1440,4832). Each portal references its own `Checkpoints/RouteCheckpoint*` chain. Do not rename portal paths without updating the config and wave entry selectors.
+- **Existing routes:** upper portal at (1504,2016), middle at (1504,3424), lower at (1440,4832), and late fourth portal at (7136,3552) (Wave 6, linked to RouteCheckpoint3a). Each portal references its own `Checkpoints/RouteCheckpoint*` chain. Do not rename portal paths without updating the config and wave entry selectors.
 - **Citadel:** `Objectives/Citadel` at (10336,3488), unchanged.
-- **Level config:** `Level011Config.tres` has three active portals, 4,000 starting Credits, 1,000 Citadel HP and wave ID `level011`.
+- **Level config:** `Level011Config.tres` registers four portal paths (fourth activates at wave 6), 4,000 starting Credits, 1,000 Citadel HP and wave ID `level011`.
 - **Campaign:** `Level011Mission.tres` remains enabled and deploys through shared Battlefield/World services.
 
 To rebalance, enable the existing Godot Wave Editor, open `res://LEVELS/Level011/Level011Waves.tres`, change batches/enemies and Save. For map edits open `res://LEVELS/Level011/Level011.tscn` in the 2D editor. Confirm all three routes are reachable before judging balance. Waves 6–9 now emphasize Heavy/Superheavy ships, and Wave 10 uses the registered Capital. Titan remains unregistered.

@@ -1,3 +1,9 @@
+## Level011 Portal4 wave-6 debut and opening wave pacing — 2026-11-06
+
+**Source Implemented / Awaiting Owner Gameplay Validation.** Level011's existing fourth portal (`AppearAtWave = 6`) is now registered in `ActivePortals`, and 26 scheduled Wave 6 enemies are routed through it (4 Reinforced Drones, 10 Elites, 12 Heavy Gunners across existing batches). Waves 1–5 retain their exact enemy counts/compositions but have 20% shorter spawn intervals and smaller inter-batch gaps for quicker playtesting. Waves 7–10, the map, portal placement and enemy stats are unchanged. [Level011 details](LEVELS/Level011/README.md).
+
+---
+
 ## Construction percentage widget and portal feedback polish — 2026-11-06
 
 **Source Implemented / Awaiting Owner Visual Validation.** Construction telemetry is percentage-only, uniformly 20% smaller, anchored upper-right of the footprint; successful completion counts to 100% then fades. Inbound/locked/online labels and job caption are removed. Portal spin defaults to 120 degrees/sec; 48 brighter/larger GPU sparks spawn from explicit 64-point rim geometry and travel radially outward. Existing event ownership, work/gameplay rules, shared bounded drawing, 750ms burst cap and culling remain. Source/resource sanity review only; .NET unavailable, owner visual/FPS checks pending. See [construction visuals](TOWERS/Shared/Construction/Visuals/README.md) and [portal feedback](WORLD/PORTALS/EnemyPortal/README.md).

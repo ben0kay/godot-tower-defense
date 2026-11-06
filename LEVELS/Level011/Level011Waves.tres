@@ -19,8 +19,8 @@ Portal = "Portals/EnemyPortal1"
 [sub_resource type="Resource" id="W1B1"]
 script = ExtResource("batch")
 Count = 18
-Interval = 0.65
-After = 2.0
+Interval = 0.52
+After = 1.50
 Enemies = Array[ExtResource("enemy")]([SubResource("W1B1E1"), SubResource("W1B1E2")])
 
 [sub_resource type="Resource" id="W1B2E1"]
@@ -37,8 +37,8 @@ Portal = "Portals/EnemyPortal2"
 [sub_resource type="Resource" id="W1B2"]
 script = ExtResource("batch")
 Count = 18
-Interval = 0.6
-After = 2.0
+Interval = 0.48
+After = 1.50
 Enemies = Array[ExtResource("enemy")]([SubResource("W1B2E1"), SubResource("W1B2E2")])
 
 [sub_resource type="Resource" id="W1B3E1"]
@@ -55,7 +55,7 @@ Portal = "Portals/EnemyPortal3"
 [sub_resource type="Resource" id="W1B3"]
 script = ExtResource("batch")
 Count = 18
-Interval = 0.55
+Interval = 0.44
 Enemies = Array[ExtResource("enemy")]([SubResource("W1B3E1"), SubResource("W1B3E2")])
 
 [sub_resource type="Resource" id="W1"]
@@ -84,8 +84,8 @@ Portal = "Portals/EnemyPortal1"
 [sub_resource type="Resource" id="W2B1"]
 script = ExtResource("batch")
 Count = 24
-Interval = 0.55
-After = 1.5
+Interval = 0.44
+After = 1.00
 Enemies = Array[ExtResource("enemy")]([SubResource("W2B1E1"), SubResource("W2B1E2"), SubResource("W2B1E3")])
 
 [sub_resource type="Resource" id="W2B2E1"]
@@ -108,8 +108,8 @@ Portal = "Portals/EnemyPortal2"
 [sub_resource type="Resource" id="W2B2"]
 script = ExtResource("batch")
 Count = 30
-Interval = 0.55
-After = 1.5
+Interval = 0.44
+After = 1.00
 Enemies = Array[ExtResource("enemy")]([SubResource("W2B2E1"), SubResource("W2B2E2"), SubResource("W2B2E3")])
 
 [sub_resource type="Resource" id="W2B3E1"]
@@ -133,7 +133,7 @@ Portal = "Portals/EnemyPortal3"
 [sub_resource type="Resource" id="W2B3"]
 script = ExtResource("batch")
 Count = 30
-Interval = 0.5
+Interval = 0.40
 Enemies = Array[ExtResource("enemy")]([SubResource("W2B3E1"), SubResource("W2B3E2"), SubResource("W2B3E3")])
 
 [sub_resource type="Resource" id="W2"]
@@ -169,8 +169,8 @@ Portal = "Portals/EnemyPortal1"
 [sub_resource type="Resource" id="W3B1"]
 script = ExtResource("batch")
 Count = 30
-Interval = 0.48
-After = 1.5
+Interval = 0.38
+After = 1.00
 Enemies = Array[ExtResource("enemy")]([SubResource("W3B1E1"), SubResource("W3B1E2"), SubResource("W3B1E3"), SubResource("W3B1E4")])
 
 [sub_resource type="Resource" id="W3B2E1"]
@@ -194,8 +194,8 @@ Portal = "Portals/EnemyPortal3"
 [sub_resource type="Resource" id="W3B2"]
 script = ExtResource("batch")
 Count = 30
-Interval = 0.45
-After = 1.5
+Interval = 0.36
+After = 1.00
 Enemies = Array[ExtResource("enemy")]([SubResource("W3B2E1"), SubResource("W3B2E2"), SubResource("W3B2E3")])
 
 [sub_resource type="Resource" id="W3B3E1"]
@@ -226,8 +226,8 @@ Shield = true
 [sub_resource type="Resource" id="W3B3"]
 script = ExtResource("batch")
 Count = 30
-Interval = 0.55
-After = 1.0
+Interval = 0.44
+After = 0.50
 Enemies = Array[ExtResource("enemy")]([SubResource("W3B3E1"), SubResource("W3B3E2"), SubResource("W3B3E3"), SubResource("W3B3E4")])
 
 [sub_resource type="Resource" id="W3B4E1"]
@@ -251,7 +251,7 @@ Portal = "Portals/EnemyPortal3"
 [sub_resource type="Resource" id="W3B4"]
 script = ExtResource("batch")
 Count = 30
-Interval = 0.48
+Interval = 0.38
 Enemies = Array[ExtResource("enemy")]([SubResource("W3B4E1"), SubResource("W3B4E2"), SubResource("W3B4E3")])
 
 [sub_resource type="Resource" id="W3"]
@@ -289,8 +289,8 @@ Shield = true
 [sub_resource type="Resource" id="W4B1"]
 script = ExtResource("batch")
 Count = 36
-Interval = 0.48
-After = 1.5
+Interval = 0.38
+After = 1.00
 Enemies = Array[ExtResource("enemy")]([SubResource("W4B1E1"), SubResource("W4B1E2"), SubResource("W4B1E3"), SubResource("W4B1E4")])
 
 [sub_resource type="Resource" id="W4B2E1"]
@@ -320,8 +320,8 @@ Portal = "Portals/EnemyPortal2"
 [sub_resource type="Resource" id="W4B2"]
 script = ExtResource("batch")
 Count = 36
-Interval = 0.45
-After = 1.5
+Interval = 0.36
+After = 1.00
 Enemies = Array[ExtResource("enemy")]([SubResource("W4B2E1"), SubResource("W4B2E2"), SubResource("W4B2E3"), SubResource("W4B2E4")])
 
 [sub_resource type="Resource" id="W4B3E1"]
@@ -351,8 +351,8 @@ Portal = "Portals/EnemyPortal3"
 [sub_resource type="Resource" id="W4B3"]
 script = ExtResource("batch")
 Count = 36
-Interval = 0.42
-After = 2.0
+Interval = 0.34
+After = 1.50
 Enemies = Array[ExtResource("enemy")]([SubResource("W4B3E1"), SubResource("W4B3E2"), SubResource("W4B3E3"), SubResource("W4B3E4")])
 
 [sub_resource type="Resource" id="W4B4E1"]
@@ -395,7 +395,7 @@ Portal = "Portals/EnemyPortal3"
 [sub_resource type="Resource" id="W4B4"]
 script = ExtResource("batch")
 Count = 54
-Interval = 0.55
+Interval = 0.44
 Enemies = Array[ExtResource("enemy")]([SubResource("W4B4E1"), SubResource("W4B4E2"), SubResource("W4B4E3"), SubResource("W4B4E4"), SubResource("W4B4E5"), SubResource("W4B4E6")])
 
 [sub_resource type="Resource" id="W4"]
@@ -434,8 +434,8 @@ Shield = true
 [sub_resource type="Resource" id="W5B1"]
 script = ExtResource("batch")
 Count = 45
-Interval = 0.45
-After = 1.5
+Interval = 0.36
+After = 1.00
 Enemies = Array[ExtResource("enemy")]([SubResource("W5B1E1"), SubResource("W5B1E2"), SubResource("W5B1E3"), SubResource("W5B1E4")])
 
 [sub_resource type="Resource" id="W5B2E1"]
@@ -465,8 +465,8 @@ Portal = "Portals/EnemyPortal3"
 [sub_resource type="Resource" id="W5B2"]
 script = ExtResource("batch")
 Count = 45
-Interval = 0.38
-After = 1.5
+Interval = 0.30
+After = 1.00
 Enemies = Array[ExtResource("enemy")]([SubResource("W5B2E1"), SubResource("W5B2E2"), SubResource("W5B2E3"), SubResource("W5B2E4")])
 
 [sub_resource type="Resource" id="W5B3E1"]
@@ -496,8 +496,8 @@ Portal = "Portals/EnemyPortal2"
 [sub_resource type="Resource" id="W5B3"]
 script = ExtResource("batch")
 Count = 45
-Interval = 0.42
-After = 2.0
+Interval = 0.34
+After = 1.50
 Enemies = Array[ExtResource("enemy")]([SubResource("W5B3E1"), SubResource("W5B3E2"), SubResource("W5B3E3"), SubResource("W5B3E4")])
 
 [sub_resource type="Resource" id="W5B4E1"]
@@ -546,8 +546,8 @@ Portal = "Portals/EnemyPortal3"
 [sub_resource type="Resource" id="W5B4"]
 script = ExtResource("batch")
 Count = 45
-Interval = 0.65
-After = 2.5
+Interval = 0.52
+After = 2.00
 Enemies = Array[ExtResource("enemy")]([SubResource("W5B4E1"), SubResource("W5B4E2"), SubResource("W5B4E3"), SubResource("W5B4E4"), SubResource("W5B4E5"), SubResource("W5B4E6"), SubResource("W5B4E7")])
 
 [sub_resource type="Resource" id="W5B5E1"]
@@ -590,7 +590,7 @@ Portal = "Portals/EnemyPortal3"
 [sub_resource type="Resource" id="W5B5"]
 script = ExtResource("batch")
 Count = 24
-Interval = 0.45
+Interval = 0.36
 Enemies = Array[ExtResource("enemy")]([SubResource("W5B5E1"), SubResource("W5B5E2"), SubResource("W5B5E3"), SubResource("W5B5E4"), SubResource("W5B5E5"), SubResource("W5B5E6")])
 
 [sub_resource type="Resource" id="W5"]
@@ -630,7 +630,7 @@ Portal = "Portals/EnemyPortal1"
 script = ExtResource("enemy")
 EnemyId = "reinforced_drone_mk1"
 Weight = 4.0
-Portal = "Portals/EnemyPortal1"
+Portal = "Portals/EnemyPortal4"
 
 [sub_resource type="Resource" id="W6B1"]
 script = ExtResource("batch")
@@ -649,7 +649,7 @@ Portal = "Portals/EnemyPortal2"
 script = ExtResource("enemy")
 EnemyId = "elite_mk1"
 Weight = 10.0
-Portal = "Portals/EnemyPortal2"
+Portal = "Portals/EnemyPortal4"
 
 [sub_resource type="Resource" id="W6B2E3"]
 script = ExtResource("enemy")
@@ -756,7 +756,7 @@ Portal = "Portals/EnemyPortal1"
 script = ExtResource("enemy")
 EnemyId = "heavy_gunner_drone_mk1"
 Weight = 12.0
-Portal = "Portals/EnemyPortal3"
+Portal = "Portals/EnemyPortal4"
 
 [sub_resource type="Resource" id="W6B4E8"]
 script = ExtResource("enemy")
