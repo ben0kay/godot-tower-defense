@@ -1,3 +1,9 @@
+## Level011 — Ten-wave fleet campaign (2026-11-06)
+
+**Source Implemented / Awaiting Owner Validation.** Level011 now authors all ten waves in its editable `Level011Waves.tres`: waves 6–9 steadily raise Heavy/Superheavy, shield, carrier and gunship pressure; wave 10 opens with one Obsidian Dreadnought from the middle portal, followed by 264 staged support ships from all three lanes. Waves 1–5 and the map/portals remain unchanged. 1,825 ships are scheduled before possible carrier releases; owner Godot balance/FPS validation pending. [Wave details](LEVELS/Level011/README.md).
+
+---
+
 ## RT2 — Restoration Tower shared heat — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** Restoration Tower now uses the existing continuous-beam heat/overheat/cooling system, configurable in `TOWERS/Support/RepairTower/DefaultRepairTowerConfig.tres` (**3 minutes** sustained funded healing, **10 seconds** to recover to **35% heat**). Heat accrues only for actual successful hull repair, not idle aiming or unfunded seconds; the existing HEAT bar, disable handling, source-owned timer and checkpoint state are reused. No new power service, repair balance or save schema. [Repair details](TOWERS/Support/RepairTower/README.md). Owner Godot verification pending.

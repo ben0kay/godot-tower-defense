@@ -1,29 +1,28 @@
-## Future multi-lane/portal activation work (2026-11-06 — planned only)
-
-Wave 1's 54 enemies arrive in three **ordered 18-enemy batches**: Portal1 (0.65s intervals, 2s `After`), Portal2 (0.60s, 2s `After`), Portal3 (0.55s). Each batch contains 12 Standards and 6 Scouts shuffled by seeded RNG; they are not random portal selections. The already shipped wave scheduler permits interleaving portals within one batch, but not independently timed parallel batches. See the [spawning/portal design plan](../../ENEMIES/Spawning/IMPLEMENTATION_PLAN.md) for future per-portal `AppearAtWave`, materialization/telegraph, all-side edge attacks, and concurrent lane pressure.
-
-**Wave 6 does not yet exist in Level011's playable wave set.** A future portal configured for Wave 6 would require authoring that wave before activation could occur. This is a documentation-only plan; no portals, lanes, spawn rules or waves are changed.
-
----
-
 # Level011 — Three-Lane Fleet Defence
 
-## Waves 1–5 (2026-11-05)
+## Waves 1–10 — 2026-11-06
 
-**Source Implemented / Awaiting Owner Gameplay Validation.** The current painted **192×120** map (64px cells = 12,288×7,680 world pixels) retains its existing terrain, background, route checkpoints, three portal positions, Citadel, and independent WorldConfig. This pass changes only the Level011 wave resource, local active-portal list, mission description and this README.
+**Source Implemented / Awaiting Owner Gameplay Validation.** The existing 192×120 map, three active portal paths, terrain, Citadel, routes and level settings are unchanged. This pass adds Waves 6–10 to the native editable `Level011Waves.tres`, preserves Waves 1–5 exactly, and makes Wave 10 the mission's final encounter.
 
-| Wave | Name | Scheduled | Content |
+| Wave | Banner | Scheduled ships | Composition and lanes |
 | --- | --- | ---: | --- |
-| 1 | Three-Lane Contact | 54 | Standard Drones and Swift Interceptors from all three entrances |
-| 2 | Interceptor Wings | 84 | Reinforced/Racer ships, Gunner Drones and Shield Emitters |
-| 3 | Crossfire Formation | 120 | Bulwarks, Heavy Gunners, shielded Shield Frigates and fast flanking groups |
-| 4 | Armoured Breakthrough | 162 | Heavy Bulwarks, Elite Assault Ships and two Drone Transporters |
-| 5 | Fleet Spearhead | 204 | A shielded Cruiser, three Heavy Warships, a Heavy Transporter and varied escorts |
-| **Total** | **First half of ten-wave plan** | **624** | Plus transported drones/interceptors released on death |
+| 1 | Three-Lane Contact | 54 | Standard Drones and Scouts across three portals |
+| 2 | Interceptor Wings | 84 | Reinforced/Racer ships, Gunners and Shield Emitters |
+| 3 | Crossfire Formation | 120 | Bulwarks, heavy gunners, shielded frigates and flankers |
+| 4 | Armoured Breakthrough | 162 | Elite escorts and first drone carriers |
+| 5 | Fleet Spearhead | 204 | Warships, shielded cruiser, Heavy Transporter, escorts |
+| 6 | Heavy Fleet Escalation | 216 | More Heavy Bulwarks, Heavy Gunners, elites, shielded frigates and warships |
+| 7 | Carrier Strike | 228 | Heavy Transporters/Drone Transporters behind elite and shield escorts |
+| 8 | Shielded Armada | 240 | Shielded Cruisers, Heavy Warships, shield support on all lanes |
+| 9 | Siege Vanguard | 252 | Concentrated heavy warships, cruisers, carriers and gunner screens |
+| **10** | **Obsidian Dreadnought** | **265** | **Exactly one Capital first from Portal2**, then 264 escorts/support from all three lanes |
+| **Total** | | **1,825** | Scheduled ships; transporter death releases may add children |
 
-The authored `Level011Waves.tres` remains a native editable `WaveSetResource` for the existing **Wave Editor**. Each batch uses explicit `Portals/EnemyPortal1` (upper), `Portals/EnemyPortal2` (middle), or `Portals/EnemyPortal3` (lower). Batches may mix entries from multiple lanes; exact weighted enemy quotas are deterministically shuffled by the existing scheduler. Intervals and pauses vary, and several entries opt into shields. All 15 registered enemy types appear across the five waves: Tiny, Light, Standard, Heavy and Superheavy physical Classes. **Capital and Titan have no registered ships yet.**
+**Boss arrival:** Wave10 batch 1 has exactly one `obsidian_dreadnought_mk1` from `Portals/EnemyPortal2`, followed by a 7-second gap before a 36-ship shield/elite escort batch on that same lane. Subsequent staged batches bring 60 ships from Portal1, 60 from Portal3, 60 more heavy vessels and shield screens from Portal2, then a 48-ship mixed-lane final reinforcement. Existing batch ordering is sequential; each batch's weighted mix is shuffled deterministically **within** that batch, not independently spawned at all three entrances at once. The Capital is configured in its enemy resource with 13,500 hull HP and four guns; this wave does not alter its stats.
 
-**Important:** only waves 1–5 are authored. The game will currently award mission victory after clearing wave 5; waves 6–10 can be appended later as heavier encounters. Carrier DeathSpawn children can increase the real enemy total beyond 624. Counts, timing, bonuses, waves and difficulty are provisional until you test them; no global enemy/tower balance changed.
+**Balancing:** Waves 6–9 progressively shift toward heavier Heavy/Superheavy and shield-support enemies; no new enemy type, global balance or navigation rule is introduced. Counts/intervals are deliberately spaced (mostly 0.42–0.74 seconds per spawn) rather than instant dumps; heavy transporter destruction can release up to ten additional children each. Heavy waves and boss survivability remain provisional pending Godot gameplay/FPS testing.
+
+**Portal activation:** SPAWN1 can activate authored late portals at Wave N, but this pass does not alter existing portal `AppearAtWave` values or portal scenes. Every explicitly referenced Portal1/2/3 must be active and reachable when its wave starts. If a portal is configured to appear after a wave that references it, the existing wave preflight will report a setup error until the authoring is corrected.
 
 ## Existing map and editing
 
@@ -34,6 +33,6 @@ The authored `Level011Waves.tres` remains a native editable `WaveSetResource` fo
 - **Level config:** `Level011Config.tres` has three active portals, 4,000 starting Credits, 1,000 Citadel HP and wave ID `level011`.
 - **Campaign:** `Level011Mission.tres` remains enabled and deploys through shared Battlefield/World services.
 
-To rebalance, enable the existing Godot Wave Editor, open `res://LEVELS/Level011/Level011Waves.tres`, change batches/enemies and Save. For map edits open `res://LEVELS/Level011/Level011.tscn` in the 2D editor. Confirm all three routes are reachable before judging balance. Wave 6 onward should shift toward more Heavy/Superheavy ships, with Capital/Titan only after those types actually exist.
+To rebalance, enable the existing Godot Wave Editor, open `res://LEVELS/Level011/Level011Waves.tres`, change batches/enemies and Save. For map edits open `res://LEVELS/Level011/Level011.tscn` in the 2D editor. Confirm all three routes are reachable before judging balance. Waves 6–9 now emphasize Heavy/Superheavy ships, and Wave 10 uses the registered Capital. Titan remains unregistered.
 
 **Validation:** source/resource structure reviewed; Godot editor import, active portal reachability, in-game performance and balance not tested here.

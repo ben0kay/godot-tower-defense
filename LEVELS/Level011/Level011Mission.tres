@@ -6,6 +6,6 @@
 script = ExtResource("mission")
 Number = 11
 Title = "LEVEL 11 — OPEN EXPANSE"
-Description = "Large 192x120 battlefield with three checkpoint-guided attack routes and five authored mixed-fleet waves. More waves planned."
+Description = "Large 192x120 battlefield with three checkpoint-guided attack routes and ten authored mixed-fleet waves, culminating in an Obsidian Dreadnought assault."
 MapScenePath = "res://LEVELS/Level011/Level011.tscn"
 Enabled = true
