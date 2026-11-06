@@ -1,3 +1,9 @@
+## RT2 — Restoration Tower heat — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** The existing Repair Tower's power funding was already live; the remaining RT2 heat integration now uses shared continuous-beam timing, actual repaired/energy-funded seconds, overheat disable and automatic cooling. Default Heat preset: 3 minutes nonstop repair to overheat, 10 seconds to cool to 35%; configurable in `DefaultRepairTowerConfig.tres`. Existing Inspector HEAT meter and saves apply. No power-generation, target-policy, XP or other tower changes. Verify heat during real repairs, pauses/full HP, energy exhaustion, overheat/EMP and upgrade/reload in Godot.
+
+---
+
 ## TS1 — Health-based tower selling
 
 **Source Implemented / Awaiting Owner Validation.**
@@ -46,7 +52,7 @@ Selected distribution Inspector status remains bounded to three lines, with conc
 | Area | Verified current source status | Remaining boundary |
 | --- | --- | --- |
 | **Power PW0–PW4-D** | Conducting islands, 100/s Citadel and 250/s Industrial output, tower capacitors, cached distance falloff, **distance-first finite allocation**, selected ENERGY/rate feedback. All **nine offensive types plus Restoration** opt into shared consumer funding; NoPower uses the existing disable system. | Owner tuning/QA; **PW5 relays** and **PW6 Solar/Fusion** unimplemented. Saved PowerPriority is dormant; any mild priority bias needs separate approval. |
-| **Restoration RT0/RT1 and tiers** | Friendly hull-targeting, aimed healing beam, sticky target until fully repaired, purchased **Levels 2–3** with tier art, and actual shared funded power consumption. | **RT2 heat is not yet wired**; additional friendly-target selector/support-XP choices and RT4 multi-target/shield/drone/material extensions require separate approval. |
+| **Restoration RT0/RT1 and tiers** | Friendly hull-targeting, aimed healing beam, sticky target until fully repaired, purchased **Levels 2–3** with tier art, and actual shared funded power consumption. | **RT2 heat is source implemented; owner validation pending**; additional friendly-target selector/support-XP choices and RT4 multi-target/shield/drone/material extensions require separate approval. |
 | **LM1 and large Level011** | Shared `LEVELS/Shared/BaseLevelMap.tscn` with local paintable layers; Level001/002/003/011/020/100 and template now inherit it. Level011 has **192×120** local dimensions, **three portals/checkpoint routes**, and **five** escalating authored waves (**54/84/120/162/204 = 624** scheduled ships) across all 15 registered enemy types. | Godot owner route/performance/balance QA; **Waves 6–10** remain to author. Mission currently ends after Wave 5; transport death children increase actual counts. |
 | **Enemies and debug** | Separate physical **Class / threat Rank / functional Role** metadata; 15-ship roster and size-class boundaries now reserve Capital/Titan for future huge ships. F2 groups by physical Class, shows native art; existing wave editor keeps IDs. New Heavy Gunner included. | No registered Capital/Titan yet; EG4 larger armed groups and multi-weapon ships remain future design/profile work. |
 | **Map, tower and UI improvements** | Mars mountains with cached visuals and tower sight blocking; selected range marks obscured sectors red; Restoration holds target; selected Inspector PowerDetails no longer resizes for NoPower; shared warning triangle and tint indicate disabled placed towers. Three-tier directional Stealth Beacon, Results victory hold and Level011 authored terrain are in source. | Desktop visual checks, mountain sight/visual sorting, and selected-panel viewport acceptance remain. |
@@ -70,7 +76,7 @@ Selected distribution Inspector status remains bounded to three lines, with conc
 | Domain | Recommended next task | Distinction |
 | --- | --- | --- |
 | **Level011 content** | Author **Waves 6–10** with increasing Heavy/Superheavy counts; use future Capital/Titan only after actual enemy types exist. | First five editable waves already implemented; layout and three routes already authored. |
-| **Repair/durability** | Decide RT2 heat profile and repair support-XP/target policy; design true **tower shields** as a separate durability feature. | Hull repair, sticky targeting, L2/L3 and funded power are already functional in source. |
+| **Repair/durability** | Validate RT2 heat and decide repair support-XP/target policy; design true **tower shields** as a separate durability feature. | Hull repair, sticky targeting, L2/L3 and funded power are already functional in source. |
 | **Performance** | PF0/PF3 Level100 measured 400/500-ship baseline, then one evidenced PF4 optimization and PF5 retest; EG4 gunner groups. | PF1 routing/cache work and PF2 F4 instrumention exist; no FPS gain should be claimed without measurements. |
 | **Wave Editor** | WP2 sprite/stats preview, WP3 action buttons, WP4 composition summary, WP5 renumber, WP6 Save As, WP7 enemy search. | Editor core/WP1/Layout V2 exist; Level001/003/011 currently use editable wave resources. |
 | **Progression/encounters** | Campaign enemy/tower unlock ladder, research/doctrines, advanced enemy EMP/abilities, boss encounter scripting and remaining wave controls. | Keep Class, Rank and Role independent; avoid inventing Capital/Titan entries for existing small ships. |

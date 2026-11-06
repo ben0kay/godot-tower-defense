@@ -36,12 +36,12 @@ public static class SafetyClampsStage
     };
 
     // =========================================================
-    // Beam damage is funded per second; wavefronts are emitted by interval; ordinary weapons fire by shot rate.
+    // Continuous damage and repair beams heat per funded second; emitted waves and shots use their cadence.
     // Explicit selected-level HeatStats always wins, and heatless towers never resolve a fallback capability.
     private static HeatStats? ResolveAuthoredHeat(TowerStatBlock stats, HeatTiming? timing)
     {
         if (!timing.HasValue) return null;
-        if (stats.Beam.HasValue) return timing.Value.ResolveBeam();
+        if (stats.Beam.HasValue || stats.Repair.HasValue) return timing.Value.ResolveBeam();
         if (stats.Shockwave.HasValue)
         {
             float interval = stats.Shockwave.Value.IntervalSeconds;

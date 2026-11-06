@@ -1,3 +1,5 @@
+> **2026-11-06 RT2 update — Source Implemented / Awaiting Owner Validation.** The shared PW4 repair capacitor was already implemented. RT2 now enables shared sustained-beam heat (default 3 continuous healing minutes, 10-second cooling from full to the 35% restart threshold), with Inspector-editable controls, actual funded healing seconds, existing disable/recovery and HEAT Inspector presentation. No new power architecture or save fields. RT3 paid tiers/art are already source implemented; its optional friendly-priority selector and support XP remain future decisions. Any older RT2/RT3 planned-only language below is historical.
+
 > **2026-11-05 amendment:** The owner's requested paid **Level 2/3 repair throughput/radius upgrades and split SVG upgrade art have now been source-implemented** (see [README.md](README.md)). This completes the paid-tier/art subset originally planned for RT3; RT3's optional friendly-target policy selector and support-XP design, plus RT2 actual shared power/heat, remain future work. Existing 1-tier wording further below is historical.
 
 # RT0–RT4 — Restoration Tower / Shared Friendly Targeting
@@ -118,7 +120,7 @@ Level 2/3 (separate approved phase) should increase absolute repair HP/s, perhap
 - Keep status transitions and beam teardown safe. Do not touch existing Laser Tower behavior.
 - No fake power gating until PW4 exists; clearly document current boundary.
 
-### RT2 — Heat and actual power consumer wiring
+### RT2 — Heat and actual power consumer wiring (Source Implemented / Awaiting Owner Validation)
 - Opt in to shared beam heat with Inspector-configurable timing, using actual funded repair seconds only.
 - **Once PW4 consumer code exists**, wire this turret to exactly that authoritative capacitor/network and NoPower disable. Use real active draw only during actual repair; idle otherwise. Respect partial charge and simultaneous heat/EMP/upgrade disables. Do not fork PW4 or pre-implement PW5.
 - If RT1 must be power-gated from day one, defer RT1 release until this dependency is available rather than creating free or pretend energy accounting.

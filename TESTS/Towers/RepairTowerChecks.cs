@@ -17,9 +17,10 @@ public partial class RepairTowerChecks : Node
                 SubsystemBattlefield.DetachSession(f.Main);
                 Check(f);
                 CheckStickyTarget(f);
+                CheckRepairHeat(f);
             }
             await SubsystemBattlefield.DrainFreedFixtures(this);
-            GD.Print("PASS: RT1 repair stats, friendly hull/beam, pause/disable/full/range/work and checkpoint inputs");
+            GD.Print("PASS: RT1/RT2 repair, heat, funded-beam gating, pause/disable, purchased tiers and checkpoint inputs");
             GetTree().Quit();
         }
         catch (Exception error) { GetTree().Paused = false; GD.PushError(error.ToString()); GetTree().Quit(1); }
@@ -118,6 +119,47 @@ public partial class RepairTowerChecks : Node
         Near(second.Health, 28, "Completion releases the lock and selects the next damaged tower");
         healer.Free(); first.Free(); second.Free();
     }
+    // =========================================================
+    // Focused RT2: almost-full targets cannot charge unused beam time; shared heat disables and recovers.
+    private void CheckRepairHeat(AmmoLoopFixture f)
+    {
+        Vector2 origin = new(2000, 2000);
+        RepairTower healer = f.Add<RepairTower>("repair", origin);
+        BattleTower target = f.Add<BattleTower>("battle", origin + Vector2.Up * 100,
+            config => { config.Power = null; config.MaxHealth = 100; });
+        Require(healer.Config.HeatEnabled && healer.FinalStats.Heat.HasValue,
+            "Restoration default opts into shared timed heat");
+        for (int level = 1; level <= healer.Levels.Count; level++)
+        {
+            HeatStats? actual = healer.ResolveLevel(level).Heat;
+            HeatStats? expected = new HeatTiming(180, 10).ResolveBeam();
+            Require(actual.HasValue && expected.HasValue && actual.Value == expected.Value,
+                "Repair tiers resolve continuous-beam heat despite having no shot cadence");
+        }
+        healer.Config.SetLevelStats(1, healer.Levels[0].Stats with { Heat = new(100, 0, 2, 0, .35f) });
+        Hurt(target, 1);
+        healer._PhysicsProcess(.5);
+        Near(target.Health, 100, "Partial repair restores exactly missing hull");
+        Near(healer.CurrentHeat, .125f, "Only 1/16 second of healing produces heat");
+        healer.Config.SetLevelStats(1, healer.Levels[0].Stats with { Heat = new(1, 0, 2, 1, .35f) });
+        healer.AdvanceConditions(.2);
+        Hurt(target, 80);
+        healer._PhysicsProcess(.5);
+        Require(healer.IsOverheated && !healer.GetNode<BeamRenderer>("BeamRenderer").IsActive
+            && !healer.IsPhysicsProcessing(), "Overheating immediately stops the repair beam and activity");
+        float before = target.Health;
+        healer._PhysicsProcess(1);
+        Require(target.Health == before, "Overheated healer cannot repair");
+        var emp = healer.ApplyDisable(TowerDisableReason.EMP);
+        healer.AdvanceConditions(.7);
+        Require(!healer.IsOverheated && healer.IsDisabled,
+            "Cooling clears only the overheat while EMP remains active");
+        healer.RemoveDisable(emp);
+        healer._PhysicsProcess(.5);
+        Require(target.Health > before, "Healer resumes after cooldown and EMP clearance");
+        healer.Free(); target.Free();
+    }
+
     private static void Hurt(TowerBase tower, float amount) => tower.ApplyDamage(new DamageInfo(amount, DamageType.Kinetic, hullCoefficientOverride: 1));
     private static void Near(float a, float b, string message) => Require(Math.Abs(a - b) < .001, message);
 }

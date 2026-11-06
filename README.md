@@ -1,3 +1,9 @@
+## RT2 — Restoration Tower shared heat — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Restoration Tower now uses the existing continuous-beam heat/overheat/cooling system, configurable in `TOWERS/Support/RepairTower/DefaultRepairTowerConfig.tres` (**3 minutes** sustained funded healing, **10 seconds** to recover to **35% heat**). Heat accrues only for actual successful hull repair, not idle aiming or unfunded seconds; the existing HEAT bar, disable handling, source-owned timer and checkpoint state are reused. No new power service, repair balance or save schema. [Repair details](TOWERS/Support/RepairTower/README.md). Owner Godot verification pending.
+
+---
+
 ## PW6-A/B — Solar and Fusion generators — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** Ctrl → Economy registers Solar Generator (1×1, 75 power/sec) and Fusion Reactor (4×4, 900 power/sec). Both reuse Industrial Generator's single shared producer, construction, power-network and checkpoint systems, with independent 0/35/70% SVG build stages and finished visuals. Balance is provisional and Inspector-configurable; no fuel, solar time-of-day or new distribution service. [Power implementation plan](TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md). Godot editor acceptance is pending.

@@ -1,17 +1,35 @@
-// Non-offensive support config with three absolute repair tiers; private level rows and existing construction/Inspector contracts.
+// Restoration support configuration: absolute repair tiers plus optional Inspector-authored sustained-beam heat.
 using Godot;
 
 [GlobalClass]
 public partial class RepairTowerConfig : TowerConfig
 {
     // =========================================================
-    // Shared Power is inherited; no offensive policy, ammo, heat or combat-rank progression is added.
+    // Shared power and heat use the existing tower pipeline; no ammunition or offensive policy.
     public RepairTowerConfig()
     {
         DisplayName = "Restoration Tower";
         Description = "Rotating beam restores damaged friendly tower hulls.";
         Levels = RepairTowerLevels.Create();
     }
+    #region Heat
+    // =========================================================
+    // Match other continuous-beam towers: timed overheating is derived once from actual repair seconds.
+    private bool _heatEnabled;
+    private double _overheatMinutes = 3, _recoverySeconds = 10;
+    [ExportGroup("Heat")]
+    [Export] public bool HeatEnabled
+    { get => _heatEnabled; set { if (_heatEnabled == value) return; _heatEnabled = value; EmitChanged(); } }
+    [Export(PropertyHint.Range, "0.1,30,0.1,or_greater,suffix:min")]
+    public double OverheatAfterMinutes
+    { get => _overheatMinutes; set { if (_overheatMinutes == value) return; _overheatMinutes = value; EmitChanged(); } }
+    [Export(PropertyHint.Range, "1,120,0.5,or_greater,suffix:s")]
+    public double OverheatRecoverySeconds
+    { get => _recoverySeconds; set { if (_recoverySeconds == value) return; _recoverySeconds = value; EmitChanged(); } }
+    public override HeatTiming? SustainedHeatTiming =>
+        HeatEnabled ? new(OverheatAfterMinutes * 60, OverheatRecoverySeconds) : null;
+    #endregion
+
     [ExportGroup("Hull Repair")]
     [Export(PropertyHint.Range, "0,100,0.5,or_greater")] public float HullPerSecond
     { get => Levels[0].Stats.Repair?.HullPerSecond ?? 0; set => SetLevelStats(1, Levels[0].Stats with { Repair = new(value) }); }
@@ -41,7 +59,7 @@ public partial class RepairTowerConfig : TowerConfig
     // Pipeline source copies keep level/rate edits local to one placed tower.
     public override RepairTowerConfig CreateInstanceCopy() => (RepairTowerConfig)base.CreateInstanceCopy();
     public override TowerFinalStats ResolveStats(int level) => TowerStatPipeline.Resolve(this, level);
-    public override string DescribeStats(TowerFinalStats stats) => $"Repair: {stats.Repair?.HullPerSecond ?? 0:0.##} hull HP/s\nRange: {stats.RangePixels:0}px\nTargeting: Lowest Integrity\nNo operating resource cost";
+    public override string DescribeStats(TowerFinalStats stats) => $"Repair: {stats.Repair?.HullPerSecond ?? 0:0.##} hull HP/s\nRange: {stats.RangePixels:0}px\nTargeting: Lowest Integrity\nPowered hull repair; no ammunition";
 
     // =========================================================
     // Upgrade Inspector: show the paid repair/range gain without inventing offensive damage stats.

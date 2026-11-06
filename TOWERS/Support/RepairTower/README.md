@@ -1,3 +1,11 @@
+## RT2 — Sustained hull-repair heat — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Restoration Tower now opts into the existing shared `HeatTiming` and `TowerConditions` system: **3 minutes** of uninterrupted, energy-funded healing from cold before overheating; cooling to the shared **35% restart threshold** takes approximately **10 seconds** while no repair is occurring. Configure `HeatEnabled`, `OverheatAfterMinutes` and `OverheatRecoverySeconds` in `DefaultRepairTowerConfig.tres` under **Heat**. The optional capability travels through the normal eight-stage tower stat pipeline at every purchased level, and its current value/recovery/disable reasons use the existing selected Inspector HEAT meter.
+
+Only actual, successful, paid repair seconds create heat, capped by missing target HP and available thermal headroom. Seeking, turning, full targets, unfunded work, EMP/NoPower disables, construction and upgrades cannot accumulate active repair heat; passive cooling and overheat recovery use the existing dormant shared clock. Heat can overlap EMP/NoPower without clearing other disable reasons. No changes to repair HP/s, range, tower prices, ammunition, power consumption, save schema or target policy. One small Stage07 extension recognizes the existing `RepairStats` continuous capability alongside damaging `BeamStats`. Focused fixture assertions added but **not executed** here; check a damaged allied target, sustained healing, heat bar, overheat beam stop, cooling/EMP recovery, tiers and checkpoint restore in Godot. Historic RT1/RT3 scope notes below describe their own older baselines.
+
+---
+
 ## Shared power consumption — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** Restoration now opts into the PW4-A–D shared capacitor via `DefaultRepairTowerConfig.tres → RepairTowerPower.tres`: provisional 100 capacity, 10/s nominal recharge, 0.15/s idle, 8/s total active, empty initial fill, 15% restart. Existing selected ENERGY bar and power details apply automatically. Earlier cost-free RT1 notes are historical.

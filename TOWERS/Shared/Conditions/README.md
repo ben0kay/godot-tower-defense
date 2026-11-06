@@ -1,3 +1,9 @@
+## RT2 — Restoration Tower joins shared sustained-beam heat — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Stage07 now treats an authored `RepairStats` capability as a continuous beam for existing `HeatTiming.ResolveBeam`, even though it has no damaging `BeamStats` or shot cadence. Only successfully delivered, power-funded repair seconds charge `TowerConditions` via `RecordAttackHeat(0, seconds)`. Heat headroom limits work before consuming power, and shared overheat disabling immediately retires the repair beam. Default Repair config: 3 minutes of continuous healing and 10-second recovery to 35%. The generic HEAT meter, save state, cooldown and overlapping disable ownership are reused; no new clock or stats pipeline. Focused source/fixture checks only; owner Godot validation pending.
+
+---
+
 ## Disabled tower feedback and stable NoPower presentation — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** Placed disabled towers now show a small amber outlined exclamation triangle above the upper-right footprint corner and a subtle red art tint. `FEEDBACK/Disabled/DefaultTowerDisabledStyle.tres` tunes tint, badge color/size/offset. The shared TowerBase condition notification attaches one lazy `TowerDisabledVisual` only after native artwork initialization and only when needed. Initial construction sites hide the warning; completed disabled structures and paid upgrades show it. Work/disable/death events update presentation. No polling, bobbing animation, timer, active shader or per-frame redraw; active/never-disabled towers allocate no helper.

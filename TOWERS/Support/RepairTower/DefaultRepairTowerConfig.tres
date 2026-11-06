@@ -8,3 +8,4 @@
 Power = ExtResource("power")
 script = ExtResource("1")
 ConstructionArt = ExtResource("art")
+HeatEnabled = true

@@ -1,4 +1,4 @@
-// RT1 aimed friendly hull repair; reuses registry targeting, durability, construction and world-endpoint beams.
+// Aimed friendly hull repair with shared funded power and sustained-beam heat; no separate repair clock.
 using Godot;
 using System.Collections.Generic;
 
@@ -83,7 +83,7 @@ public partial class RepairTower : TowerBase
 
     #region Repair and Lock Lifetime
     // =========================================================
-    // Real missing hull caps the paid interval; aiming and seeking never spend active power.
+    // Missing hull and thermal headroom cap funded repair time; searching and turning produce no active heat.
     public override void _PhysicsProcess(double delta)
     {
         if (!CanAttack || IsBusy || !double.IsFinite(delta) || delta <= 0) return;
@@ -102,10 +102,14 @@ public partial class RepairTower : TowerBase
         TowerBase locked = _target;
         double missing = (double)locked.MaxHealth - locked.Health;
         double seconds = System.Math.Min(delta, missing / repair.HullPerSecond);
+        if (FinalStats.Heat is HeatStats heat && heat.PerBeamSecond > 0)
+            seconds = System.Math.Min(seconds, System.Math.Max(0, (heat.Capacity - CurrentHeat) / heat.PerBeamSecond));
         seconds = FundPoweredWork(seconds);
         if (seconds <= 0) { StopBeam(); return; }
         float before = locked.Health;
         locked.RestoreHealth((float)System.Math.Min(missing, repair.HullPerSecond * seconds));
+        // Only delivered repair time heats the emitter. Full targets and aborted work remain free.
+        if (GodotObject.IsInstanceValid(locked) && locked.Health > before) RecordAttackHeat(0, seconds);
         CompletePowerAttack();
         // HealthChanged can clear a full lock or remove either participant synchronously.
         if (!GodotObject.IsInstanceValid(this) || !IsInsideTree() || IsQueuedForDeletion()) return;
