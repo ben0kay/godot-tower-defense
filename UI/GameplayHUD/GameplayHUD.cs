@@ -435,7 +435,7 @@ public partial class GameplayHUD : Control
         }
         string status = tower.DescribeRuntime();
         int separator = status.LastIndexOf('\n');
-        SetRuntimeDetails(separator >= 0 ? status[(separator + 1)..] : status);
+        SetRuntimeDetails(tower is PowerDistributionBuilding ? status : separator >= 0 ? status[(separator + 1)..] : status);
     }
 
     // =========================================================

@@ -204,7 +204,7 @@ public partial class PerformanceOverlay : CanvasLayer
             Write(22, $"Power hover {cell}: island {region} · {_power.CellCount(region)} cells (0 = no island)", Normal);
             PowerNetworkTotals totals = _power.Totals, local = _power.TotalsForRegion(region);
             Write(23, $"Power Σ supply {totals.Supply:0.##} · requested {totals.RequestedDemand:0.##} · unassigned {_power.UnassignedProducers} sources / {_power.UnassignedConsumers} consumers", Normal);
-            Write(24, $"Hovered island supply {local.Supply:0.##} · requested {local.RequestedDemand:0.##} · margin {local.Margin:0.##} · accounting only", Normal);
+            Write(24, $"Hovered island supply {local.Supply:0.##} · {_power.NetworkSummary(region)}", Normal);
         }
         else { Write(21, "Power topology N/A", Normal); Write(22, "Power hover N/A", Normal);
             Write(23, "Power accounting N/A", Normal); Write(24, "Power island totals N/A", Normal); }

@@ -1,4 +1,4 @@
-// Event-driven passive Relay/Transmitter lifecycle and static core/link visuals; no processing loop.
+// Event-driven distribution lifecycle; cosmetic helpers own selected coverage and bounded link animation.
 using Godot;
 using System.Collections.Generic;
 
@@ -9,9 +9,26 @@ public abstract partial class PowerDistributionBuilding : TowerBase
     public override TowerFinalStats ResolveLevel(int level) => null;
     public override bool ValidateScene() => AuthoredConfig is PowerDistributionConfig config && config.Levels.Count == 0 && float.IsFinite(config.MaxHealth) && config.MaxHealth > 0 && GetNodeOrNull<Sprite2D>("Sprite") != null && GetNodeOrNull<Sprite2D>("Core") != null;
     private Sprite2D _core;
-    private Line2D _link;
+    private PowerTransmitterLinkVisual _link;
+    private PowerRelaySelectionVisual _relaySelection;
+    private bool _selected;
+    private string _details = "";
     private string _status = "Preview · no live power network";
-    public override string DescribeRuntime() => _status;
+    public override string DescribeRuntime()
+    {
+        int separator = _status.IndexOf(" · ", System.StringComparison.Ordinal);
+        string heading = separator >= 0 ? _status[..separator] : _status;
+        return heading + (_details.Length > 0 ? "\n" + _details : "");
+    }
+    public override void SetSelected(bool selected)
+    {
+        base.SetSelected(selected); _selected = selected;
+        if (this is PowerRelay relay)
+        {
+            if (selected && _relaySelection == null) { _relaySelection = new PowerRelaySelectionVisual { Name = "RelayCoverage" }; AddChild(_relaySelection); }
+            _relaySelection?.Present(relay, selected);
+        }
+    }
     public override void _Ready()
     {
         SetProcess(false); SetOperationalPhysicsProcess(false);
@@ -45,13 +62,14 @@ public abstract partial class PowerDistributionBuilding : TowerBase
             bool owns = peer != null && string.CompareOrdinal(SaveId, peer.SaveId) < 0;
             if (owns)
             {
-                if (_link == null) { _link = new Line2D { Name = "PowerLink", Width = 1.5f, ZIndex = -1, Antialiased = true }; AddChild(_link); }
-                _link.Points = new[] { Vector2.Zero, ToLocal(peer.GlobalPosition) };
-                _link.DefaultColor = powered ? new Color(.2f, .75f, 1f, .5f) : new Color(.5f, .44f, .24f, .22f);
+                if (_link == null) { _link = new PowerTransmitterLinkVisual { Name = "PowerLink" }; AddChild(_link); }
+                _link.Present(ToLocal(peer.GlobalPosition), true, PowerNetworks.LinkVisualState(transmitter));
             }
-            if (_link != null) _link.Visible = owns;
+            if (!owns) _link?.Present(Vector2.Zero, false, PowerLinkVisualState.Suspended);
         }
-        if (_status == next) return; _status = next; NotifyRuntimeChanged();
+        if (this is PowerRelay relay) _relaySelection?.Present(relay, _selected);
+        string details = PowerNetworks.DistributionDetails(this);
+        if (_status == next && _details == details) return; _status = next; _details = details; NotifyRuntimeChanged();
     }
     public override void _ExitTree()
     {

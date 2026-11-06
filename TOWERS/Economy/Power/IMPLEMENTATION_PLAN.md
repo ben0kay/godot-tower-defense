@@ -1,3 +1,20 @@
+## PW5-C — distribution visuals and inspection — 2026-11-05
+
+**Source Implemented / Awaiting Owner Visual Validation.** Selecting a Power Relay now shows faint cyan filled/outlined **reachable conductive cells**, plus a thin dashed shortest route to a live source and the label **Nearest live source / Island supply shared**. No circular coverage spanning gaps. Inactive/source-less Relays show no coverage/route. Deselecting hides the diagnostic immediately. The route follows cached conductive distance and positive Transmitter hops when supply is remote; ties are deterministic and a source footprint terminates the path.
+
+Powered Transmitter pairs now have a narrow cyan core, faint halo and two restrained travelling highlights. Unpowered retained links are dashed blue-grey; suspended links are dashed amber; unlink/removal hides the line. Only the lower-SaveId endpoint owns a renderer. Highlights are cosmetic, not an exclusive source or measured energy-flow direction. No power generation, allocation, booster, hop cost, consumer charge, combat, construction or save-format changes.
+
+Selected distribution Inspector status remains bounded to three lines, with concise state, physical island / effective network / shared supply, plus peer identity/island or Relay boost coverage/ceiling. F4's existing throttled power row now distinguishes hovered physical-island output from joined-network supply and global active pair count. No new diagnostic polling loop or growing status rows.
+
+**Tuning:** `FEEDBACK/Power/DefaultPowerDistributionVisuals.tres` exposes coverage fill/edge, source path/dash length, link core/halo/status colors and widths, pulse period (default 2.8s) and animation cadence (15 Hz default; clamped 5–30). Restart/redeploy after authoring style changes. Art and simulation settings stay with their existing owners.
+
+**Performance/lifecycle:** Relay geometry uses retained buffers and caches by delivery revision/selected transform, and only builds while selected. Coverage extraction reuses the bounded conductive search scratch; route reconstruction descends the existing cost field without a second source search. Straight route sections collapse to one drawn segment; exceptional paths cap at 4,096 steps with an explicit preview-capped label. No per-frame map traversal/pathfinding. Link geometry updates on lifecycle/transform/state events. Only an onscreen powered pair processes its small local cosmetic clock; redraw is capped at 15 Hz by default, processing sleeps offscreen/hidden/unpowered/suspended, and inherited scene pause freezes animation. Static visuals rely on normal canvas culling. Removing a tower destroys its owned child visuals; no autoload or new power service.
+
+**Validation:** minimal source/diff and native resource-reference checks only; .NET unavailable. No C# build, full Godot gameplay/visual acceptance or FPS benchmark is claimed. Owner: pull/rebuild, load Level011, select a powered Relay near a gap, then select/deselect and remove its source. Pair Transmitters, inspect active/unpowered/EMP-suspended styles, pan away/back, pause and try a fresh save/load. PW6/new generators and the optional priority slider remain deferred.
+
+
+---
+
 ## PW5-A/B — Relay and Transmitter implemented — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** Two distinct Utility entries now reuse the existing tower construction/health/disable/placement/catalog/Inspector and `World/PowerNetworks` owner. PW5-C coverage routes/animation and PW6/new generators/priority slider remain deferred.
@@ -36,7 +53,7 @@ Owner: rebuild in Godot .NET, place both Utility types, select/link two islands 
 
 # PW5 AUTHORITATIVE REVISION — Two separate power buildings (2026-11-05)
 
-**PW5-A/B SOURCE IMPLEMENTED / AWAITING OWNER VALIDATION; PW5-C PLANNED.** This decision supersedes every earlier PW5 plan below or in older READMEs that describes **pairable Power Relays**. PW0–PW4-D are already source implemented; preserve all existing behavior. Codex must implement **only the separately requested phase**, not the whole roadmap. See [Relay](../../Utility/PowerRelay/README.md), [Transmitter](../../Utility/PowerTransmitter/README.md), and [Backlog](../../../NOTES/IMPLEMENTATION_BACKLOG.md).
+**PW5-A/B/C SOURCE IMPLEMENTED / AWAITING OWNER VALIDATION.** This decision supersedes every earlier PW5 plan below or in older READMEs that describes **pairable Power Relays**. PW0–PW4-D are already source implemented; preserve all existing behavior. Codex must implement **only the separately requested phase**, not the whole roadmap. See [Relay](../../Utility/PowerRelay/README.md), [Transmitter](../../Utility/PowerTransmitter/README.md), and [Backlog](../../../NOTES/IMPLEMENTATION_BACKLOG.md).
 
 | Building | Exclusive gameplay responsibility | Player-visible minimum |
 | --- | --- | --- |
@@ -340,7 +357,7 @@ future relay changes rebuild only network unions, not terrain islands. Never sca
 | **PW2** | Shared producer/demand accounting + configurable Citadel baseline registration | Source implemented / owner validation pending. DefaultCitadelPower.tres Output=100 provisional; event-driven source lifetime, per-island cached totals and F4 accounting. No actual consumers/outages yet. Check multiple Citadels, isolation, death/removal and a new Save/Load. |
 | **PW3** | Shared generator/config in `Shared/`, Industrial scene/config/art in its type folder | Source implemented / owner validation pending. `industrial_generator` in Economy, provisional 250 output / 300 Credits / 5s / 1200 HP / 2×2, assembly stages, work/disable/lifetime registration and existing checkpoint reconstruction. |
 | **PW4-A–D** | Tower buffers and charge/use (A); cached distance recharge (B); distance-first finite supply allocation (C); Inspector stored-energy bar/rates (D) | **PW4-A/B/C/D source implemented / owner validation pending.** Follow the authoritative PW4 subpass table above. Protect existing power topology and generator output. |
-| **PW5-A/B/C** | **Two building types:** local-only Power Relay (A), manually paired cross-island Power Transmitter + basic visible link (B), advanced connection/coverage visuals (C). | **A/B source implemented / owner validation pending; C planned.** See canonical PW5 revision at TOP, which supersedes combined-Relay descriptions below. Implement one pass per request. |
+| **PW5-A/B/C** | **Two building types:** local-only Power Relay (A), manually paired cross-island Power Transmitter + basic visible link (B), advanced connection/coverage visuals (C). | **A/B/C source implemented / owner validation pending.** See canonical PW5 revision at TOP, which supersedes combined-Relay descriptions below. Implement one pass per request. |
 | **PW6** | Solar/Fusion variants, shared status feedback and tuning | Planned. Distinct IDs/configs, one producer implementation; readable capacity/shortage feedback and measured desktop cost. |
 
 Each phase includes its relevant save integration, feature documentation and brief source/build checks.
