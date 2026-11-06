@@ -33,6 +33,8 @@ mouse_filter = 2
 [node name="Message" type="RichTextLabel" parent="Card/Margin/Lines"]
 layout_mode = 2
 size_flags_vertical = 3
+fit_content = true
+visible_characters_behavior = 1
 bbcode_enabled = false
 scroll_active = false
 mouse_filter = 2

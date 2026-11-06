@@ -1,3 +1,11 @@
+## Content-sized narration cards — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** The shared card now grows vertically to fit the full wrapped message, including Level001's multi-paragraph briefing. `PanelWidth` remains the preferred width (clamped on narrow windows); `PanelHeight` is now the minimum height. RichTextLabel fits content and reveals characters after shaping, reserving the full message layout before typing so the box does not grow per character. Container minimum-size and viewport resize events recalculate height; shorter replacements shrink back to their own content/minimum. Existing typography, mouse transparency, voice hold, fade and idle sleep remain unchanged. Very long messages may extend past a very short viewport; no automatic scrolling or text truncation is introduced.
+
+Source/scene review only; .NET is unavailable. Owner: open fresh Level001, check the final paragraph remains inside the cyan border, resize the window, then check a short wave transmission returns to a compact card.
+
+---
+
 ## Voice-aware typewriter hold — 2026-11-06
 
 The existing narrator now accepts optional `ShowMessage(text, speaker, waitForVoiceEnd: true)` for spoken mission intros. It stays in the ordinary top-right card and does not fade during a voiced line; `ReleaseVoiceHold()` runs only after the voice playback-end event and restarts the usual hold/fade. The optional flag leaves all existing two-argument wave narration unchanged. The narrator never owns sound playback and keeps processing disabled while idle. See [mission briefing](../../LEVELS/Briefing/README.md).---
@@ -16,7 +24,7 @@ The existing narrator now accepts optional `ShowMessage(text, speaker, waitForVo
 
 - `NarrationDisplay.tscn`: one mouse-transparent CanvasLayer (layer 23) and a compact text card with a speaker label and RichTextLabel.
 - `NarrationDisplay.cs`: event-triggered typed-character reveal, fade-in, post-typing hold, fade-out, message replacement, public FinishTyping() for future skip binding and Clear() for wave/results/unload. Stops _Process completely when idle; only one display per HUD.
-- `NarrationConfig.cs` / `DefaultNarrationConfig.tres`: Inspector settings for enable, characters/second, hold and fade times, card size, top/right margins and colours/font sizes. Defaults: **34 chars/sec, 5s hold**, 390×136px, **top-right, 64px down / 18px from right**, 0.18s entrance / 0.3s exit. Edit the default resource in Godot; no recompilation required.
+- `NarrationConfig.cs` / `DefaultNarrationConfig.tres`: Inspector settings for enable, characters/second, hold and fade times, card size, top/right margins and colours/font sizes. Defaults: **34 chars/sec, 5s hold**, 390px preferred width / 136px minimum height, **top-right, 64px down / 18px from right**, 0.18s entrance / 0.3s exit. Edit the default resource in Godot; no recompilation required.
 - `LEVELS/Waves/Presentation/WavePresentationController.cs`: existing NP1 WaveStarted event now independently routes optional `Text` and `Speaker` to narrator, alongside the existing major wave banner. No extra polling or timers in WaveManager.
 
 ## Layout

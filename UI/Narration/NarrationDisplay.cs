@@ -43,6 +43,7 @@ public partial class NarrationDisplay : CanvasLayer
         _message.AddThemeColorOverride("default_color", Config.TextColor);
         _message.AddThemeFontSizeOverride("normal_font_size", Config.BodyFontSize);
         _message.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        _card.MinimumSizeChanged += LayoutCard;
         GetViewport().SizeChanged += LayoutCard;
         LayoutCard(); Clear();
     }
@@ -66,7 +67,9 @@ public partial class NarrationDisplay : CanvasLayer
             if (x < alertLeft + alertWidth && x + width > alertLeft)
                 top = Mathf.Max(top, settings.MajorTopMargin + settings.MajorHeight + config.AlertClearance);
         }
-        float height = Mathf.Min(Mathf.Max(80, config.PanelHeight), Mathf.Max(48, viewport.Y - top - 12));
+        // FitContent measures the entire wrapped message, including characters not yet revealed.
+        // Container minimum-size changes reflow this card after text/width updates without frame polling.
+        float height = Mathf.Max(Mathf.Max(80, config.PanelHeight), _card.GetCombinedMinimumSize().Y);
         _card.Position = new Vector2(x, top);
         _card.Size = new Vector2(width, height);
     }
@@ -76,6 +79,7 @@ public partial class NarrationDisplay : CanvasLayer
     public override void _ExitTree()
     {
         GetViewport().SizeChanged -= LayoutCard;
+        if (GodotObject.IsInstanceValid(_card)) _card.MinimumSizeChanged -= LayoutCard;
         SetProcess(false);
     }
     #endregion

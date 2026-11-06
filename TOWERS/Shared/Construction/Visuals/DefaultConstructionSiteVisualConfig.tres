@@ -7,6 +7,7 @@ script = ExtResource("1")
 Enabled = true
 RefreshHz = 24.0
 MaxVisibleSites = 128
+TelemetryScale = 0.8
 TelemetryRingRadius = 40.0
 TelemetryOuterDegreesPerSecond = 30.0
 TelemetryMiddleDegreesPerSecond = 48.0
