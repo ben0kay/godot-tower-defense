@@ -57,6 +57,39 @@ public static class UIButtonFactory
         focus.DrawCenter = false;
         button.AddThemeStyleboxOverride("focus", focus);
     }
+    // =========================================================
+    // Opt-in bright halo for selected/hovered mission cards and future featured buttons.
+    // Native StyleBox shadows render only in hover/focus/pressed states; no per-frame UI tick.
+    public static void ApplySelectionGlow(Button button, Color idleFill, Color activeFill, Color accent)
+    {
+        if (button == null) throw new ArgumentNullException(nameof(button));
+        StyleBoxFlat idle = Box(idleFill, new Color(accent.R, accent.G, accent.B, 0.65f));
+        idle.ContentMarginLeft = idle.ContentMarginRight = 0;
+        idle.ContentMarginTop = idle.ContentMarginBottom = 0;
+
+        StyleBoxFlat hover = Box(activeFill, accent.Lightened(0.25f));
+        hover.SetBorderWidthAll(2);
+        hover.ShadowColor = new Color(accent.R, accent.G, accent.B, 0.55f);
+        hover.ShadowSize = 13;
+        hover.ContentMarginLeft = hover.ContentMarginRight = 0;
+        hover.ContentMarginTop = hover.ContentMarginBottom = 0;
+
+        StyleBoxFlat pressed = (StyleBoxFlat)hover.Duplicate();
+        pressed.BgColor = activeFill.Lightened(0.13f);
+        pressed.ShadowSize = 9;
+
+        StyleBoxFlat focus = (StyleBoxFlat)hover.Duplicate();
+        focus.DrawCenter = false;
+        focus.SetBorderWidthAll(3);
+        focus.ShadowColor = new Color(accent.R, accent.G, accent.B, 0.70f);
+        focus.ShadowSize = 15;
+
+        button.AddThemeStyleboxOverride("normal", idle);
+        button.AddThemeStyleboxOverride("hover", hover);
+        button.AddThemeStyleboxOverride("pressed", pressed);
+        button.AddThemeStyleboxOverride("focus", focus);
+    }
+
     #endregion
 
     #region Shared Surfaces
