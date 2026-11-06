@@ -7,7 +7,7 @@ public partial class TowerMasterConfig : Resource
     [ExportGroup("Global Tower Rules")]
     [Export] public bool AllowUpgrades { get; set; } = true;
     [Export] public bool AllowSelling { get; set; } = true;
-    [Export(PropertyHint.Range, "0,1,0.05")] public float DefaultSellRefundFraction { get; set; } = 0.75f;
+    [Export(PropertyHint.Range, "0,0.5,0.01")] public float DefaultSellRefundFraction { get; set; } = 0.50f;
 
     [ExportGroup("Tower Experience")]
     [Export(PropertyHint.Range, "0,100,0.1,or_greater")] public float KillXpMultiplier { get; set; } = 10f;

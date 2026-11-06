@@ -72,6 +72,7 @@ public partial class TowerPlacementController : Node2D
         _rangeOverlay = new TowerRangeOverlay { Name = "SelectedTowerRange", ZIndex = 9 };
         AddChild(_rangeOverlay); _rangeOverlay.Configure(_grid, Settings);
         BindPowerLinkActions();
+        _hud.TowerSellRequested += OnSellRequested; _hud.TowerSellConfirmed += OnSellConfirmed;
         Catalog.Rebuild();
         _hud.BindCatalog(Catalog);
         foreach (TowerDefinition definition in Catalog.Definitions)
@@ -97,12 +98,15 @@ public partial class TowerPlacementController : Node2D
     // =========================================================
     // Clear a held modifier when the window loses focus before key-up arrives.
     public override void _Notification(int what)
-    { if (what == NotificationWMWindowFocusOut || what == NotificationApplicationFocusOut) _rightShiftHeld = false; }
+    { if (what == NotificationWMWindowFocusOut || what == NotificationApplicationFocusOut) _rightShiftHeld = false;
+      if (what == NotificationPaused) InvalidateSale(); }
 
     // =========================================================
     // Avoid subscriptions retaining scenes that are no longer alive.
     public override void _ExitTree()
     {
+        InvalidateSale();
+        if (GodotObject.IsInstanceValid(_hud)) { _hud.TowerSellRequested -= OnSellRequested; _hud.TowerSellConfirmed -= OnSellConfirmed; }
         UnbindPowerLinkActions();
         ObserveWork(null);
         foreach (var pair in _placementExits) if (GodotObject.IsInstanceValid(pair.Key)) pair.Key.TreeExiting -= pair.Value;
@@ -303,7 +307,7 @@ public partial class TowerPlacementController : Node2D
             return;
         }
         TowerBase tower = null;
-        if (!_economy.TryPurchase(_buildDefinition.DefaultConfig.ConstructionCosts, () => CommitTower(cell, out tower)))
+        if (!_economy.TryPurchase(_buildDefinition.DefaultConfig.ConstructionCosts, () => CommitTower(cell, out tower), paid => tower.RecordCreditsPaid(paid)))
         {
             ShowPlacementFailure(_economy.CanAfford(_buildDefinition.DefaultConfig.ConstructionCosts)
                 ? "Tower creation failed; no resources charged." : "Insufficient resources.");
@@ -405,7 +409,7 @@ public partial class TowerPlacementController : Node2D
     // A selected placed tower shares the existing HUD Inspector with build previews.
     private void SelectTower(TowerBase tower)
     {
-        if (tower != _selected) CancelPowerLink();
+        if (tower != _selected) { InvalidateSale(); CancelPowerLink(); }
         if (_selected == tower && (tower == null || _hud.IsInspectionVisible)) return;
         if (GodotObject.IsInstanceValid(_selected))
         { _selected.StatsChanged -= OnSelectedStatsChanged; _selected.TargetPriorityChanged -= OnSelectedTargetPriorityChanged; _selected.ExperienceChanged -= OnSelectedExperienceChanged; _selected.RuntimeChanged -= OnSelectedRuntimeChanged; _selected.HeatChanged -= OnSelectedConditionsChanged; _selected.DisableStateChanged -= OnSelectedConditionsChanged; _selected.SetSelected(false); }
@@ -476,6 +480,7 @@ public partial class TowerPlacementController : Node2D
     // Retain existing selection semantics but stop hidden progress notifications until reselected.
     private void OnInspectionClosed()
     {
+        InvalidateSale();
         if (_selected is PowerDistributionBuilding distribution) distribution.SetSelected(false);
         CancelPowerLink();
         _selectionOverlay?.Clear();
@@ -523,7 +528,7 @@ public partial class TowerPlacementController : Node2D
         _runtimeRefreshQueued = true; Callable.From(() =>
         {
             _runtimeRefreshQueued = false;
-            if (GodotObject.IsInstanceValid(_selected) && _hud.IsInspectionVisible) _hud.SetDefenseDetails(_selected);
+            if (GodotObject.IsInstanceValid(_selected) && _hud.IsInspectionVisible) { _hud.SetDefenseDetails(_selected); RefreshSelling(); }
         }).CallDeferred();
     }
 
@@ -560,6 +565,7 @@ public partial class TowerPlacementController : Node2D
     // Preview uses the same pipeline as a real upgrade and cannot mutate/spend.
     private void RefreshUpgradePreview()
     {
+        RefreshSelling();
         if (!GodotObject.IsInstanceValid(_selected))
         { _hud.SetUpgradeComparison(null, null); _hud.SetUpgradeDetails("", "", false); return; }
         _displayedUpgradeLevel = _selected.UpgradeLevel;

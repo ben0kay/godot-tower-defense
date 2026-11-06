@@ -41,7 +41,7 @@ public static class LaserTowerChecks
             "Selected Laser Inspector refreshes coefficients without mutating the shared source");
         tower.Config.HullCoefficient = 0.15f;
         TowerFinalStats preview = tower.ResolveLevel(2); int revision = grid.NavigationRevision;
-        hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeButton").EmitSignal(Button.SignalName.Pressed); ConstructionTestClock.FinishWork(main);
+        hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/Actions/UpgradeButton").EmitSignal(Button.SignalName.Pressed); ConstructionTestClock.FinishWork(main);
         Require(tower.UpgradeLevel == 2 && tower.FinalStats == preview && tower.FinalStats.Beam.Value.DamagePerSecond == 14 &&
             tower.FinalStats.RangePixels == 334.4f && wallet.GetBalance(wallet.CreditsResource) == 575 && grid.NavigationRevision == revision,
             "Laser175-Credit tier applies exact DPS/range preview without changing navigation");

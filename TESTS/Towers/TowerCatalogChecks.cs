@@ -51,7 +51,7 @@ public static class TowerCatalogChecks
         Require(wallet.GetBalance(wallet.CreditsResource) == 925 && p.AuthoredConfig != passive.DefaultConfig &&
             p.AuthoredConfig.ConstructionCosts[0] != passive.DefaultConfig.ConstructionCosts[0], "Passive recipe paid with private config/cost data");
         Require(hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Heading/TowerName").Text == "Passive fixture · Lv 1" &&
-            !hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeButton").Visible, "Actual passive selection has safe no-upgrades Inspector");
+            hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/Actions/UpgradeButton").Disabled, "Actual passive selection has safe no-upgrades Inspector");
         placement.Call("TryPlace", first); ConstructionTestClock.FinishInitial(main);
         Require(wallet.GetBalance(wallet.CreditsResource) == 925, "Repeat passive placement never charges");
         hud.EmitSignal(GameplayHUD.SignalName.TowerChoiceRequested, "battle");

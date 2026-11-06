@@ -1,3 +1,11 @@
+## TS1 — Health-based tower selling
+
+**Source Implemented / Awaiting Owner Validation.**
+
+Shared paid-cost history, health-based refund calculation, guarded modal sale, existing lifecycle removal, compact side-by-side Inspector actions and checkpoint persistence are source implemented. Owner acceptance: inspect normal/maximum/passive towers, construction/upgrades, damage/repair and stale confirmation; double-click, wallet cap, multi-cell rebuilding, power/logistics/repair cleanup and save/load. No balance/combat/wave changes.
+
+---
+
 ## PW6-A/B generator additions — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** Solar 1×1 (75/sec, 125 Credits, 3s, 700 HP) and Fusion 4×4 (900/sec, 1,200 Credits, 12s, 2,500 HP) are registered and share the existing Industrial Generator code, normal construction/staged SVGs, operations and save seams. No new source algorithm or priority slider. **PW6-C** UI polish and balancing remain planned. See [Power Plan](../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md). Brief editor checks: exact footprints, stages, F4 output, disable/removal and new between-wave save.

@@ -128,7 +128,7 @@ public partial class EconomyManager : Node
     // =========================================================
     // Validate payment, commit the build, then deduct once; failed builds never need a refund.
     // The synchronous callback must roll back its own world changes on failure.
-    public bool TryPurchase(Godot.Collections.Array<ResourceCost> costs, Func<bool> commit)
+    public bool TryPurchase(Godot.Collections.Array<ResourceCost> costs, Func<bool> commit, Action<int> creditsPaid = null)
     {
         if (_transactionActive || commit == null || !Aggregate(costs, out var totals) || !Affordable(totals))
             return false;
@@ -142,6 +142,7 @@ public partial class EconomyManager : Node
                 _balances.TryGetValue(pair.Key, out int balance);
                 _balances[pair.Key] = balance - pair.Value;
             }
+            creditsPaid?.Invoke(totals.GetValueOrDefault(CreditsResource.ResourceId));
             committed = true;
         }
         finally { _transactionActive = false; }

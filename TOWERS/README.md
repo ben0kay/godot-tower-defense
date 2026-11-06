@@ -1,3 +1,11 @@
+## TS1 — Health-based tower selling
+
+**Source Implemented / Awaiting Owner Validation.**
+
+All registered player placements use shared hull-based resale, including passive and maximum-level towers. Actual construction/upgrade Credits are recorded by the successful wallet transaction; rank, XP, stock and materials never count. TowerMasterConfig.DefaultSellRefundFraction defaults to 0.50 and resale clamps it to 0–0.50. See Shared/Selling/README.md.
+
+---
+
 ## Between-wave checkpoint integration — 2026-10-26
 
 S2/S3 now provide source-owned capture/restore seams for this feature through

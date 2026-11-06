@@ -1,3 +1,11 @@
+## TS1 — Health-based tower selling
+
+**Source Implemented / Awaiting Owner Validation.**
+
+The existing left action area now contains a 65% cyan UPGRADE / 35% red SELL row, 6px gap, 28px minimum height; width and right-side information stay unchanged. SELL +amount has a Credits/formula tooltip and remains available at max level or on passive buildings. Build previews hide actions. A compact CANCEL / CONFIRM SELL dialog quotes the amount. Selection/removal, busy work, pause or changed quote invalidates it; execution rechecks current hull and eligibility. Runtime health/repair notifications refresh resale with no new polling.
+
+---
+
 ## Disabled tower feedback and stable NoPower presentation — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** Placed disabled towers now show a small amber outlined exclamation triangle above the upper-right footprint corner and a subtle red art tint. `FEEDBACK/Disabled/DefaultTowerDisabledStyle.tres` tunes tint, badge color/size/offset. The shared TowerBase condition notification attaches one lazy `TowerDisabledVisual` only after native artwork initialization and only when needed. Initial construction sites hide the warning; completed disabled structures and paid upgrades show it. Work/disable/death events update presentation. No polling, bobbing animation, timer, active shader or per-frame redraw; active/never-disabled towers allocate no helper.

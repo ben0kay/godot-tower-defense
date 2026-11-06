@@ -246,12 +246,12 @@ public static class ShockwaveChecks
             Require(ReferenceEquals(cached, tower.FinalStats), "Emitting does not recalculate cached stats");
             int revision = grid.NavigationRevision;
             await main.ToSignal(main.GetTree(), SceneTree.SignalName.ProcessFrame);
-            hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeButton").EmitSignal(Button.SignalName.Pressed); ConstructionTestClock.FinishWork(main);
+            hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/Actions/UpgradeButton").EmitSignal(Button.SignalName.Pressed); ConstructionTestClock.FinishWork(main);
             Require(tower.UpgradeLevel == 2 && tower.FinalStats == upgraded && wallet.GetBalance(wallet.CreditsResource) == 425
                 && grid.NavigationRevision == revision && tower.NextUpgrade == null, "Paid225 level2 matches preview and detects maximum without navigation edits");
             Require(upgraded.Shockwave == new ShockwaveStats(44, 260, 3.9f, .25f) && upgraded.RangePixels == 262.9f, "Level2 has exact independent complete stats");
             emission._PhysicsProcess(.2); Near(emission.CurrentRadius, 100, "Upgrade cannot change a launched emission's speed/range");
-            Require(details.Text.Contains("Damage per wave: 44") && !hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeButton").Visible, "Inspector applies paid stats and maximum-level state");
+            Require(details.Text.Contains("Damage per wave: 44") && hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/Actions/UpgradeButton").Disabled, "Inspector applies paid stats and maximum-level state");
             Require(!TowerUpgradeController.TryUpgrade(tower, wallet, placement.Settings, 2, out _)
                 && wallet.GetBalance(wallet.CreditsResource) == 425, "Maximum cannot spend again");
             tower.Config.SetLevelStats(1, tower.Config.Levels[0].Stats with { RangePixels = 900, Shockwave = new(999, 999, .1f, 1) });

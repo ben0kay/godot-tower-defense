@@ -20,6 +20,10 @@ public partial class GameplayHUD : Control
     // =========================================================
     // The placement/upgrade controller validates the selected tower and payment.
     [Signal] public delegate void TowerUpgradeRequestedEventHandler();
+    [Signal] public delegate void TowerSellRequestedEventHandler();
+    [Signal] public delegate void TowerSellConfirmedEventHandler();
+    private Button _sellButton;
+    private ConfirmationDialog _sellConfirmation;
     [Signal] public delegate void TargetPriorityRequestedEventHandler(int priority);
     #endregion
 
@@ -149,8 +153,16 @@ public partial class GameplayHUD : Control
         SetupSingleCitadelCredits();
         _topBar.GetNode<Control>("Status").Resized += LayoutStatus;
         _upgradeInfo = GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeInfo");
-        _upgradeButton = GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeButton");
+        _upgradeButton = GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/Actions/UpgradeButton");
         _upgradeButton.Pressed += () => EmitSignal(SignalName.TowerUpgradeRequested);
+        _sellButton = _upgradeButton.GetParent().GetNode<Button>("SellButton");
+        UIButtonFactory.Apply(_sellButton, UIButtonStyle.Danger, Config);
+        CompactSaleButton(_sellButton);
+        _sellButton.Pressed += () => EmitSignal(SignalName.TowerSellRequested);
+        _sellConfirmation = new ConfirmationDialog { Name = "SellConfirmation", OkButtonText = "CONFIRM SELL", CancelButtonText = "CANCEL" };
+        AddChild(_sellConfirmation);
+        UIButtonFactory.Apply(_sellConfirmation.GetOkButton(), UIButtonStyle.Danger, Config);
+        _sellConfirmation.Confirmed += () => EmitSignal(SignalName.TowerSellConfirmed);
         Resized += ApplyLayout;
         ApplyLayout();
         ApplyAppearance();
@@ -323,7 +335,7 @@ public partial class GameplayHUD : Control
     public void ShowTowerDetails(string name, string category, string stats, string notes = "", bool newSelection = false)
     {
         bool preview = category.EndsWith("Build Preview", StringComparison.Ordinal) || category == "Placement rejected";
-        _buildPreview = preview; SetPowerLinkActions(null);
+        _buildPreview = preview; SetPowerLinkActions(null); SetSellDetails(false, false, 0, "");
         SetRuntimeDetails(""); SetWorkDetails(null); SetConditionDetails(null); SetUpgradeComparison(null, null); SetUpgradeDetails("", "", false);
         _targetSection.Hide(); _rankSection.Hide(); _defenseMeters.Hide(); _powerMeters.Hide(); _powerDetails.Hide();
         _towerName.Text = name; _towerName.TooltipText = category + "\n" + notes + "\n" + stats;
@@ -532,7 +544,34 @@ public partial class GameplayHUD : Control
     }
 
     // =========================================================
-    // Display an authoritative controller preview; buttons carry no payment or stat logic.
+    // Compact action styles retain the existing 28px row without forcing the Inspector wider.
+    private static void CompactSaleButton(Button button)
+    {
+        button.AddThemeFontSizeOverride("font_size", 11);
+        foreach (string state in new[] { "normal", "hover", "pressed", "disabled", "focus" })
+        {
+            var box = (StyleBox)button.GetThemeStylebox(state).Duplicate();
+            box.ContentMarginLeft = 3; box.ContentMarginRight = 3;
+            box.ContentMarginTop = 3; box.ContentMarginBottom = 3;
+            button.AddThemeStyleboxOverride(state, box);
+        }
+    }
+
+    // =========================================================
+    // Selling remains independent from upgrade availability and max tier.
+    public void SetSellDetails(bool visible, bool eligible, int refund, string tooltip)
+    {
+        _sellButton.Visible = visible && !_buildPreview; _sellButton.Disabled = !eligible;
+        _sellButton.Text = $"SELL +{refund}"; _sellButton.TooltipText = $"Refund: {refund} Credits.\n" + tooltip;
+    }
+    public void ShowSellConfirmation(string name, int refund)
+    {
+        _sellConfirmation.Title = $"SELL {name.ToUpperInvariant()}?";
+        _sellConfirmation.DialogText = $"You will receive {refund} Credits.";
+        _sellConfirmation.PopupCentered();
+    }
+    public void CloseSellConfirmation() => _sellConfirmation?.Hide();
+
     public void SetUpgradeDetails(string preview, string button, bool affordable)
     {
         bool present = !_buildPreview && (preview.Length > 0 || button.Length > 0);
@@ -545,7 +584,7 @@ public partial class GameplayHUD : Control
         int extraLine = preview.IndexOf('\n');
         _upgradeInfo.Text = _workSection.Visible && _workBar.Visible && extraLine >= 0 ? preview[..extraLine] : preview;
         _upgradeInfo.TooltipText = preview; _upgradeInfo.Visible = present && preview.Length > 0;
-        _upgradeButton.Text = button; _upgradeButton.Visible = present && button.Length > 0;
+        _upgradeButton.Text = button.Length > 0 ? button : "UPGRADE"; _upgradeButton.Visible = !_buildPreview && _hasInspectionDetails;
         _upgradeButton.Disabled = !affordable;
     }
 
@@ -909,6 +948,7 @@ public partial class GameplayHUD : Control
         _targetSection.GetNode<Label>("TargetHeading").AddThemeColorOverride("font_color", Config.AccentColor);
 
         UIButtonFactory.Apply(_upgradeButton, UIButtonStyle.Action, Config);
+        CompactSaleButton(_upgradeButton);
         UIButtonFactory.Apply(_startWave, UIButtonStyle.Action, Config);
         _healthFill = new StyleBoxFlat { BgColor = Config.HealthHealthyColor };
         _healthBar.AddThemeStyleboxOverride("fill", _healthFill);

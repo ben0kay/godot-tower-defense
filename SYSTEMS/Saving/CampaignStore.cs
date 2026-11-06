@@ -26,7 +26,7 @@ public sealed class CampaignStore
             if (info.Type.Assembly != typeof(CampaignData).Assembly) return;
             foreach (var property in info.Properties)
                 if (property.Set != null) property.IsRequired = !((info.Type == typeof(BuilderSaveData) && property.Name == nameof(BuilderSaveData.Motion))
-                    || (info.Type == typeof(TowerSaveData) && property.Name == nameof(TowerSaveData.Power)));
+                    || (info.Type == typeof(TowerSaveData) && (property.Name == nameof(TowerSaveData.Power) || property.Name == nameof(TowerSaveData.CreditsInvested))));
         });
         return resolver;
     }

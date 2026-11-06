@@ -53,7 +53,7 @@ public partial class HudCategoryChecks : Node
                     && Mathf.Abs(inspector.GetGlobalRect().End.Y - hud.GetGlobalRect().End.Y) < 1.1f
                     && Mathf.Abs(tray.GetGlobalRect().End.Y - hud.GetGlobalRect().End.Y) < 1.1f,
                     "Compact Inspector stays onscreen while category tray retains its configured height");
-                Require(inspector.Size.X >= hud.Config.InspectorWidth - 1 && inspector.GetNode<Button>("Insets/Body/Columns/Main/UpgradeButton").IsVisibleInTree(),
+                Require(inspector.Size.X >= hud.Config.InspectorWidth - 1 && inspector.GetNode<Button>("Insets/Body/Columns/Main/Actions/UpgradeButton").IsVisibleInTree(),
                     "Upgrade action is directly visible without scrolling");
                 foreach (string path in new[] { "BottomArea/Inspector", "BottomArea/TraySlot/TowerBar" })
                 {

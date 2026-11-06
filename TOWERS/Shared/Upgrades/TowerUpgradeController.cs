@@ -38,7 +38,7 @@ public static class TowerUpgradeController
         }
         catch (Exception exception) { failure = exception.Message; return false; }
         bool instant = next.WorkSeconds == 0;
-        if (!wallet.TryPurchase(next.Costs, () => tower.NextUpgrade == next && tower.BeginUpgrade(expectedLevel, next, preview)))
+        if (!wallet.TryPurchase(next.Costs, () => tower.NextUpgrade == next && tower.BeginUpgrade(expectedLevel, next, preview), tower.RecordCreditsPaid))
         { failure = "Insufficient resources or tower changed; no upgrade purchased."; return false; }
         if (GodotObject.IsInstanceValid(tower)) tower.PublishUpgradePurchase(instant);
         return true;

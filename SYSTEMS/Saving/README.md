@@ -1,3 +1,11 @@
+## TS1 — Health-based tower selling
+
+**Source Implemented / Awaiting Owner Validation.**
+
+TowerSaveData.CreditsInvested persists nullable actual paid Credits. The only new optional input is this field: missing/null legacy history stays unknown and that tower cannot be sold, even after subsequent upgrades. Never infer past spending from current prices. Negative history rejects validation. Envelope v2, content fingerprints, strict other fields and combat-save restrictions remain unchanged. Loading restores history without purchase/refund replay. Sold towers leave the tree immediately and cannot enter subsequent checkpoints.
+
+---
+
 # Saving — between-wave checkpoints (S0–S3)
 
 S2/S3 source implemented 2026-10-26 on the shared battlefield used by all catalog missions.

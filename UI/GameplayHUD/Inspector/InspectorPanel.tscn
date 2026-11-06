@@ -86,10 +86,26 @@ text = ""
 theme_override_font_sizes/font_size = 11
 autowrap_mode = 3
 
-[node name="UpgradeButton" type="Button" parent="Insets/Body/Columns/Main"]
+[node name="Actions" type="HBoxContainer" parent="Insets/Body/Columns/Main"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="UpgradeButton" type="Button" parent="Insets/Body/Columns/Main/Actions"]
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.65
+clip_text = true
 layout_mode = 2
 text = "UPGRADE"
 custom_minimum_size = Vector2(0, 28)
+
+[node name="SellButton" type="Button" parent="Insets/Body/Columns/Main/Actions"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.35
+custom_minimum_size = Vector2(0, 28)
+clip_text = true
+visible = false
+text = "SELL +0"
 
 [node name="DisableReasons" type="Label" parent="Insets/Body/Columns/Main"]
 layout_mode = 2

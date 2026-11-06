@@ -19,7 +19,7 @@ public abstract partial class TowerBase
         return new()
         {
             Id = SaveId, TypeId = TowerTypeId, X = GridCell.X, Y = GridCell.Y, Tier = UpgradeLevel,
-            XP = RankProgress.TotalXp, Health = Health, Priority = TargetPriority, Work = CaptureWorkState(), Held = AwaitingConstructionDrone,
+            XP = RankProgress.TotalXp, Health = Health, CreditsInvested = CreditsInvested, Priority = TargetPriority, Work = CaptureWorkState(), Held = AwaitingConstructionDrone,
             Heat = CurrentHeat, Overheated = IsOverheated, Disables = _conditions?.CaptureCheckpoint(sourceKey, Power?.NoPowerHandle ?? default) ?? new(),
             Ammo = inventory?.Amount, Consumed = Ammunition?.ConsumedRounds ?? 0, Discarded = Ammunition?.DiscardedRounds ?? 0,
             BeamCredit = Ammunition?.SavedBeamCredit ?? 0,
@@ -34,6 +34,8 @@ public abstract partial class TowerBase
     // Set progression/work before Ready so no wrong-tier activation or initial construction transaction can occur.
     internal void PrepareCheckpoint(TowerSaveData data, ConstructionWorkManager work, ConstructionDroneManager builders)
     {
+        if (data.CreditsInvested < 0) throw new InvalidDataException("Invalid purchased Credits history.");
+        CreditsInvested = data.CreditsInvested; // Missing legacy history stays unknown, including later upgrades.
         SaveId = data.Id; AuthoredConfig.InitialAmmoFraction = 0;
         if (data.Tier < 1 || (Levels.Count > 0 ? data.Tier > Levels.Count : data.Tier != 1)) throw new InvalidDataException("Saved tower tier is unavailable.");
         UpgradeLevel = data.Tier; RankProgress.Add(data.XP, AuthoredConfig.Ranks);

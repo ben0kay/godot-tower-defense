@@ -46,6 +46,7 @@ public sealed record TowerSaveData
     public int Tier { get; init; }
     public double XP { get; init; }
     public float Health { get; init; }
+    public long? CreditsInvested { get; init; }
     public TowerTargeting.Priority? Priority { get; init; }
     public TowerWorkState Work { get; init; }
     public bool Held { get; init; }

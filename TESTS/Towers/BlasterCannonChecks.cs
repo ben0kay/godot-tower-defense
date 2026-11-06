@@ -40,7 +40,7 @@ public static class BlasterCannonChecks
         Require(details.Text.Contains("Base damage: 60") && details.Text.Contains("Blast radius: 80") && details.Text.Contains("Edge damage: 25%")
             && UpgradeTableChecks.HasRow(hud, "Damage", "60", "66", "(+6)") && UpgradeTableChecks.HasRow(hud, "Blast Radius (px)", "80", "88", "(+8)"), "Placed Inspector shows real AoE stats and next-tier preview");
         TowerFinalStats preview = tower.ResolveLevel(2); int revision = grid.NavigationRevision;
-        hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeButton").EmitSignal(Button.SignalName.Pressed); ConstructionTestClock.FinishWork(main);
+        hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/Actions/UpgradeButton").EmitSignal(Button.SignalName.Pressed); ConstructionTestClock.FinishWork(main);
         Require(tower.UpgradeLevel == 2 && tower.FinalStats == preview && tower.FinalStats.DamagePerShot == 66
             && tower.FinalStats.Area == new AreaBlastStats(88, 0.25f) && wallet.GetBalance(wallet.CreditsResource) == 500
             && grid.NavigationRevision == revision, "Paid200 tier matches preview and never changes falloff or occupancy");

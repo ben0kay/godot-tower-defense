@@ -28,7 +28,7 @@ internal static class TimedUpgradeChecks
         var body = f.Hud.GetNode("BottomArea/Inspector/Insets/Body");
         Label status = body.GetNode<Label>("Heading/WorkSection/Status"), time = body.GetNode<Label>("Heading/WorkSection/Time");
         ProgressBar bar = body.GetNode<ProgressBar>("Heading/WorkSection/Progress");
-        Button button = body.GetNode<Button>("Columns/Main/UpgradeButton"); Label preview = body.GetNode<Label>("Columns/Main/UpgradeInfo");
+        Button button = body.GetNode<Button>("Columns/Main/Actions/UpgradeButton"); Label preview = body.GetNode<Label>("Columns/Main/UpgradeInfo");
         int started = 0, completed = 0, changed = 0;
         tower.WorkStarted += () => { started++; Require(f.Wallet.GetBalance(f.Wallet.CreditsResource) == (started == 1 ? 850 : 600), "WorkStarted publishes after payment"); };
         tower.WorkCompleted += () => completed++; tower.StatsChanged += () => changed++;
