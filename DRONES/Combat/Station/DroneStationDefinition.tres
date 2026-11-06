@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TowerDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://TOWERS/Shared/TowerDefinition.cs" id="definition"]
+[ext_resource type="PackedScene" path="res://DRONES/Combat/Station/DroneStation.tscn" id="scene"]
+[ext_resource type="Resource" path="res://DRONES/Combat/Station/DefaultDroneStationConfig.tres" id="config"]
+[ext_resource type="Texture2D" path="res://DRONES/Combat/Station/Artwork/drone_station.svg" id="icon"]
+
+[resource]
+script = ExtResource("definition")
+TowerId = "drone_station"
+Category = 3
+Scene = ExtResource("scene")
+DefaultConfig = ExtResource("config")
+Icon = ExtResource("icon")
+Footprint = Vector2i(2, 3)

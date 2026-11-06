@@ -1,3 +1,9 @@
+## FD1-A — new 2×3 Drone Station building (2026-11-06)
+
+**SOURCE IMPLEMENTED / OWNER QA OPEN.** The [Drone Station](Combat/Station/README.md) is a normal Utility build in the tower catalog, with **2 wide × 3 long** grid cells, dark armoured hangar artwork (128×192px), two depicted dock bays, 0/35/70% construction stages, provisional 600 Credits / 8s / 1,800 HP, and shared placement, selection, construction, health, sell and checkpoint foundations. It deliberately **does not yet launch fighters** or require/build ammunition or run fighter simulation. Codex's next task is **FD1-B**, then Auto-pilot, Auto-patrol, weapons, real resupply and state persistence. [Fighter plan](Combat/FIGHTER_DRONES_IMPLEMENTATION_PLAN.md). Existing construction/cargo drone services unchanged.
+
+---
+
 ## FIGHTER — future persistent combat/fighter squad (new roadmap, 2026-11-06)
 
 **PLANNED / NOT IMPLEMENTED.** [The fighter-drone implementation plan](Combat/FIGHTER_DRONES_IMPLEMENTATION_PLAN.md) defines a new placeable **Drone Station** and multiple persistent friendly fighter drones. Initial modes: **Auto-pilot** (intercept the enemy with shortest remaining journey to an assigned Citadel, attack while orbiting/figure-eight/kiting) and **Auto-patrol** (select a fighter and click two map waypoints for a repeating figure-eight, firing opportunistically). Finite HP/ammo, return-to-home service, real station resupply and future enemy anti-air are included. Phases FD0–FD6 keep fighter behaviour, controller, station, weapons, input and feature-local saving under `DRONES/Combat/`; reuse `DRONES/Shared/` and integration with existing combat, catalog, enemy targeting and ammo logistics **without moving or merging current construction/courier job managers**. The older one-off corridor-strike player ability remains a separate long-term idea, not a substitute for persistent fighters.

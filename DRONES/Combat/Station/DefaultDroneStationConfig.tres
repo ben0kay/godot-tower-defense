@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="DroneStationConfig" load_steps=3 format=3]
+[ext_resource type="Script" path="res://DRONES/Combat/Station/DroneStationConfig.cs" id="station_config"]
+[ext_resource type="Resource" path="res://DRONES/Combat/Station/Artwork/DroneStationConstructionArt.tres" id="construction"]
+
+[resource]
+script = ExtResource("station_config")
+ConstructionCredits = 600
+ConstructionSeconds = 8.0
+MaxHealth = 1800.0
+ConstructionArt = ExtResource("construction")

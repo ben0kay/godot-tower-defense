@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="192" viewBox="0 0 128 192">
+<!-- Station 2 cells wide x 3 cells tall, centred at (64,96). +Y is bottom in the game. -->
+<defs>
+<linearGradient id="floor" x1="0" y1="0" x2=".95" y2="1"><stop stop-color="#425867"/><stop offset=".55" stop-color="#1b2b37"/><stop offset="1" stop-color="#0d1823"/></linearGradient>
+<linearGradient id="deck" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#263c49"/><stop offset=".42" stop-color="#112330"/><stop offset="1" stop-color="#091825"/></linearGradient>
+<linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#829aa7"/><stop offset=".32" stop-color="#415968"/><stop offset="1" stop-color="#1b2c38"/></linearGradient>
+<linearGradient id="cyan" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#123a45"/><stop offset=".5" stop-color="#78e9ef"/><stop offset="1" stop-color="#174652"/></linearGradient>
+<linearGradient id="amber" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#593f2a"/><stop offset=".5" stop-color="#f6b46b"/><stop offset="1" stop-color="#69422a"/></linearGradient>
+</defs>
+<g stroke-linejoin="round" stroke-linecap="round">
+<!-- Monolithic manufactured pad footprint with bevel-cut corners and internal trenches. -->
+<path d="M13 4H115L125 16V176L114 188H14L3 176V16Z" fill="#08151e" stroke="#607b87" stroke-width="2"/>
+<path d="M16 9H112L120 20V172L109 183H19L8 172V20Z" fill="url(#floor)" stroke="#344f5e" stroke-width="1.5"/>
+<path d="M23 16H105L113 25V165L103 176H25L15 165V25Z" fill="url(#deck)" stroke="#698494" stroke-width="1"/>
+<!-- Segmented 3-cell structural seam lines are tiny: one continuous two-by-three structure. -->
+<path d="M14 64H114M14 128H114" stroke="#486575" stroke-width="1" stroke-dasharray="3 5" opacity=".55"/>
+<!-- Recessed lengthwise launch trench / approach channel. -->
+<path d="M51 24H77L82 30V166L76 174H52L46 166V30Z" fill="#061923" stroke="#324d5d" stroke-width="2"/>
+<path d="M57 31V166M71 31V166" fill="none" stroke="#275461" stroke-width="2"/>
+<path d="M62 37V165M66 37V165" fill="none" stroke="#3a6873" stroke-width=".8" stroke-dasharray="3 8"/>
+<!-- Port position indicators for future launch/docking ownership (visual-only for now). -->
+<path d="M25 27L38 15H50M103 27L90 15H78M25 165L38 177H50M103 165L90 177H78" fill="none" stroke="#879fab" stroke-width="2"/>
+<path d="M30 33L30 155M98 33V155" stroke="#476572" stroke-width="2.5" stroke-dasharray="8 9"/>
+<!-- Unbuilt foundation marks / steel corner plates -->
+<path d="M20 21H108M20 171H108" stroke="#71a9bb" stroke-width="1.5" stroke-dasharray="6 5"/>
+<path d="M19 72H109M19 122H109" stroke="#386a7a" stroke-width="1.5" stroke-dasharray="3 5"/>
+<path d="M28 87H50V106H28Z M78 87H100V106H78Z" fill="none" stroke="#3d7080" stroke-dasharray="4 3" stroke-width="1.2"/></g></svg>

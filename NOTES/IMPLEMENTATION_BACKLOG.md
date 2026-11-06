@@ -1,3 +1,9 @@
+## FD1-A — buildable 2×3 Drone Station (2026-11-06)
+
+**SOURCE IMPLEMENTED / AWAITING OWNER VALIDATION.** New `DRONES/Combat/Station/` contains passive `DroneStation` TowerBase type, Inspector config (600 Credits / 8s / 1,800 HP), category Utility registration (`drone_station`), precise `Footprint=Vector2i(2,3)`, original 128×192 twin-bay hangar art, and 0/35/70% staged SVG construction via shared work/drone visuals. Generic placement, select/health/damage/disabled/sell/between-wave tower checkpoint are inherited; no fighter instances, station inventory, combat, docking or patrol yet. **Codex next is FD1-B** (one actual fighter, station ownership and launch/return) and subsequently FD2–FD6. No construction/courier service changes. No Godot runtime acceptance yet. [Station](../DRONES/Combat/Station/README.md) · [Fighter plan](../DRONES/Combat/FIGHTER_DRONES_IMPLEMENTATION_PLAN.md).
+
+---
+
 ## FIGHTER — persistent player combat drones + Drone Station (2026-11-06)
 
 **APPROVED DESIGN / NOT IMPLEMENTED.** New [FD0–FD6 fighter-drone plan](../DRONES/Combat/FIGHTER_DRONES_IMPLEMENTATION_PLAN.md): multiple persistent armed friendly drones owned by a buildable Drone Station, **Auto-pilot** nearest-enemy-to-Citadel interception and orbit/figure-eight/kiting, and **Auto-patrol** two-click A/B figure-eight with opportunistic firing. Independent HP/ammo, station return/resupply/repair, selected-drone orders, real ammo logistics and checkpoint-safe state; future enemy anti-air is explicitly a later feature. Fighter-specific scripts/scenes/art/orders/station belong in `DRONES/Combat/`; keep existing Construction and Transport dispatch ownership unchanged. Recommend Codex implement FD0+FD1 first, then FD2/3/4/5/6 as separate passes. No code or balance changes.

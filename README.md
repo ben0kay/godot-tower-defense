@@ -1,3 +1,9 @@
+## FD1-A — Drone Station built as a 2×3 Utility building (2026-11-06)
+
+**Source implemented / awaiting owner Godot validation.** A new buildable [Drone Station](DRONES/Combat/Station/README.md) is registered in the shared catalog under Utility, using a true **2 cells wide × 3 cells tall** footprint and 128×192 native SVG hangar art with two illustrated docking bays and cyan launch rails. The construction site passes through 0/35/70% purpose-made SVG stages before the completed art, using existing building/drone work mechanics. Provisional Inspector config is **600 Credits, 8s construction, 1,800 HP**. Normal selection, durability, selling and between-wave base tower saving are inherited; no fighter launches, slots, ammo, repair service or combat logic are active. **Codex next: FD1-B**, adding first fighter/docking to this existing station without replacing the artwork or registration. [Fighter roadmap](DRONES/Combat/FIGHTER_DRONES_IMPLEMENTATION_PLAN.md). Source-only validation pending editor acceptance.
+
+---
+
 ## Automatic wave progression and live victory hold — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** Wave 1 remains manual; subsequent waves auto-start 30 seconds after the previous wave fully clears, with per-wave overrides in the Wave Editor and an upper-right AUTO START countdown beside the still-available NEXT WAVE button. Pause/checkpoint Continue retain the countdown. Early start, outcomes, reset and unload cancel it safely. Victory keeps the map/drones/effects alive during the existing 4-second delay, while the official stat snapshot stays fixed; the map pauses when Results opens. Defeat remains immediate. Source/lifecycle and authored-fixture review only; .NET unavailable, owner visual/gameplay acceptance pending. See LEVELS/Waves/README.md and LEVELS/Session/README.md.

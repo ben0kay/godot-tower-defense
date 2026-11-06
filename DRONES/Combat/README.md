@@ -1,3 +1,9 @@
+## FD1-A — station base building added (2026-11-06)
+
+**SOURCE IMPLEMENTED / OWNER VALIDATION PENDING.** [Drone Station](Station/README.md) is now a **2×3** centered (128×192) placeable Utility building with dedicated SVG, three construction stages, provisional **600 Credits / 8s / 1,800 HP** and normal TowerBase build, HP, selection, sell and save hooks. The hangar's two illustrated landing bays are *not* physical fighters or functional docks yet. All player-owned fighters, autopilot, two-point patrol, combat, health/ammo service and anti-air remain planned. Codex should proceed with **FD1-B (one fighter + docking/ownership)** and reuse the delivered station rather than build a second one. [Implementation roadmap](FIGHTER_DRONES_IMPLEMENTATION_PLAN.md).
+
+---
+
 # Fighter / Combat Drones — persistent friendly air wing
 
 **PLANNED / NOT IMPLEMENTED (2026-11-06).** The authoritative new direction is **multiple player-owned fighter drones**, based at a **new placeable Drone Station**, with two initial modes: **Auto-pilot** (intercept the nearest threat to a Citadel using remaining route distance; attack while orbiting/figure-eight/kiting) and **Auto-patrol** (select one drone, choose two map points A/B, fly a continuous figure-eight between them and fire at enemies entering range). Fighters have independent HP, finite ammo, return-to-station resupply/repair and eventual enemy anti-air vulnerability.

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="192" viewBox="0 0 128 192">
+<!-- Station 2 cells wide x 3 cells tall, centred at (64,96). +Y is bottom in the game. -->
+<defs>
+<linearGradient id="floor" x1="0" y1="0" x2=".95" y2="1"><stop stop-color="#425867"/><stop offset=".55" stop-color="#1b2b37"/><stop offset="1" stop-color="#0d1823"/></linearGradient>
+<linearGradient id="deck" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#263c49"/><stop offset=".42" stop-color="#112330"/><stop offset="1" stop-color="#091825"/></linearGradient>
+<linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#829aa7"/><stop offset=".32" stop-color="#415968"/><stop offset="1" stop-color="#1b2c38"/></linearGradient>
+<linearGradient id="cyan" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#123a45"/><stop offset=".5" stop-color="#78e9ef"/><stop offset="1" stop-color="#174652"/></linearGradient>
+<linearGradient id="amber" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#593f2a"/><stop offset=".5" stop-color="#f6b46b"/><stop offset="1" stop-color="#69422a"/></linearGradient>
+</defs>
+<g stroke-linejoin="round" stroke-linecap="round">
+<!-- Monolithic manufactured pad footprint with bevel-cut corners and internal trenches. -->
+<path d="M13 4H115L125 16V176L114 188H14L3 176V16Z" fill="#08151e" stroke="#607b87" stroke-width="2"/>
+<path d="M16 9H112L120 20V172L109 183H19L8 172V20Z" fill="url(#floor)" stroke="#344f5e" stroke-width="1.5"/>
+<path d="M23 16H105L113 25V165L103 176H25L15 165V25Z" fill="url(#deck)" stroke="#698494" stroke-width="1"/>
+<!-- Segmented 3-cell structural seam lines are tiny: one continuous two-by-three structure. -->
+<path d="M14 64H114M14 128H114" stroke="#486575" stroke-width="1" stroke-dasharray="3 5" opacity=".55"/>
+<!-- Recessed lengthwise launch trench / approach channel. -->
+<path d="M51 24H77L82 30V166L76 174H52L46 166V30Z" fill="#061923" stroke="#324d5d" stroke-width="2"/>
+<path d="M57 31V166M71 31V166" fill="none" stroke="#275461" stroke-width="2"/>
+<path d="M62 37V165M66 37V165" fill="none" stroke="#3a6873" stroke-width=".8" stroke-dasharray="3 8"/>
+<!-- Port position indicators for future launch/docking ownership (visual-only for now). -->
+<path d="M25 27L38 15H50M103 27L90 15H78M25 165L38 177H50M103 165L90 177H78" fill="none" stroke="#879fab" stroke-width="2"/>
+<path d="M30 33L30 155M98 33V155" stroke="#476572" stroke-width="2.5" stroke-dasharray="8 9"/>
+<!-- Reinforced gantry and bay frames -->
+<path d="M16 25L26 16H102L112 25V54L106 62H22L16 54Z" fill="#192d39" stroke="#627b87" stroke-width="2"/>
+<path d="M16 66H112V127H16Z" fill="#223541" stroke="#587584" stroke-width="2"/>
+<path d="M16 136H112V167L104 176H24L16 167Z" fill="#1e303d" stroke="#607a89" stroke-width="2"/>
+<!-- Landing bay perimeters: two mirror-symmetrical fighter slots. -->
+<path d="M22 73H55V120H22Z M73 73H106V120H73Z" fill="#0b202b" stroke="#637e8b" stroke-width="1.8"/>
+<path d="M26 78H51V115H26Z M77 78H102V115H77Z" fill="#122e3a" stroke="#446674" stroke-width="1"/>
+<path d="M24 78V86M24 108V116M53 78V86M53 108V116M75 78V86M75 108V116M104 78V86M104 108V116" fill="none" stroke="#7bd9d9" stroke-width="2"/>
+<!-- Bevelled armour spars and access ramps. -->
+<path d="M18 67L29 59H45L55 66M110 67L99 59H83L73 66M18 126L29 134H45L55 126M110 126L99 134H83L73 126" fill="none" stroke="#9aabb1" stroke-width="2"/>
+<path d="M27 144H44L50 150V161H21V150Z M84 144H101L107 150V161H78V150Z" fill="url(#steel)" stroke="#142634" stroke-width="1.5"/>
+<path d="M23 74L27 70H50L55 75V80H22Z M73 75L78 70H101L105 74V80H73Z" fill="url(#steel)" stroke="#a7bec6" stroke-width=".9"/>
+<path d="M25 81V113M52 81V113M76 81V113M103 81V113" stroke="#357787" stroke-width="1.5"/>
+<path d="M54 32V163M74 32V163" stroke="#3e7787" stroke-width="3"/>
+<path d="M59 46L64 39L69 46M59 64L64 57L69 64" stroke="#77d7df" stroke-width="1.7" fill="none"/>
+<rect x="21" y="145" width="25" height="16" rx="3" fill="#142a38" stroke="#90a5ab" stroke-width="1.1"/>
+<rect x="82" y="145" width="25" height="16" rx="3" fill="#142a38" stroke="#90a5ab" stroke-width="1.1"/></g></svg>

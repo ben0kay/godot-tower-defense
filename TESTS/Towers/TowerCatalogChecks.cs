@@ -15,6 +15,22 @@ public static class TowerCatalogChecks
         GameplayHUD hud = main.GetNode<GameplayHUD>("UI/GameplayHUD");
         Node2D towers = main.GetNode<Node2D>("World/Towers");
         TowerDefinition battle = placement.Catalog.Find("battle");
+        TowerDefinition droneStation = placement.Catalog.Find("drone_station");
+        Require(droneStation != null && droneStation.Category == TowerDefinition.TowerCategory.Utility
+            && droneStation.Footprint == new Vector2I(2, 3) && droneStation.TowerId == "drone_station",
+            "Drone Station is registered as a buildable 2-wide x 3-long utility building");
+        Require(droneStation.DefaultConfig is DroneStationConfig stationConfig
+            && stationConfig.ConstructionCredits == 600 && stationConfig.MaxHealth == 1800
+            && stationConfig.BuildSeconds == 8 && stationConfig.Levels.Count == 0
+            && stationConfig.ConstructionArt != null
+            && stationConfig.ConstructionArt.BuildStages.Count == 3
+            && droneStation.Icon.GetSize() == new Vector2(128, 192),
+            "Drone Station has a passive 128x192 sprite, three construction stages and provisional cost/health");
+        using (var stationScene = droneStation.Scene.Instantiate<DroneStation>())
+        {
+            Require(stationScene.ValidateScene() && stationScene.GetNode<Sprite2D>("Sprite").Texture.GetSize() == new Vector2(128, 192),
+                "Drone Station scene is a passive TowerBase specialization with centered 2x3 artwork");
+        }
         TowerDefinition passive = new() { TowerId = "test-passive", Category = TowerDefinition.TowerCategory.Utility,
             Scene = GD.Load<PackedScene>("res://TESTS/Towers/PassiveTestTower.tscn"),
             DefaultConfig = new TowerConfig { DisplayName = "Passive fixture", Description = "No weapon loop.",
