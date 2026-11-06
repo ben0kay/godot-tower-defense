@@ -21,9 +21,9 @@ public partial class PortalActivationChecks : Node
             var grid = f.Grid; var spawns = f.Spawns; var waves = f.Waves;
             LevelConfig original = grid.Level.Settings;
             grid.Level.Settings = (LevelConfig)original.Duplicate(true);
-            try { CheckActivation(f); CheckEdges(f); }
+            try { CheckActivation(f); CheckMaterializationGate(f); CheckEdges(f); }
             finally { grid.Level.Settings = original; }
-            GD.Print("PASS: SPAWN0/1 activation, source exclusion, exact wave numbers, restore, reservation and edge baseline");
+            GD.Print("PASS: SPAWN0/1/2 materialization readiness, activation, source exclusion, exact wave numbers, restore, reservation and edge baseline");
             GetTree().Quit();
         }
         catch (Exception error) { GD.PushError(error.ToString()); GetTree().Paused = false; GetTree().Quit(1); }
@@ -41,7 +41,13 @@ public partial class PortalActivationChecks : Node
         var scenes = spawns.Catalog.ToSceneMap(); waves.Configure(data, scenes);
         Require(waves.State == WaveManager.WaveState.Ready && first.IsSpawnActive && !future.IsSpawnActive
             && !future.GetNode<Node2D>("Visuals").Visible, "Future portal hidden; START portal preserved");
+        Require(first.OpeningState == EnemyPortal.PortalState.Forming && !first.IsSpawnReady,
+            "Fresh START portal forms before becoming eligible");
         var rng = new RandomNumberGenerator { Seed = 12 };
+        ulong before = rng.State;
+        Require(spawns.SpawnWave("basic_mk1", rng, firstPath) == null && spawns.WaitingForPortal && rng.State == before,
+            "Required forming portal waits without random consumption");
+        first.FinishMaterialization();
         Require(spawns.SpawnWave("basic_mk1", rng, futurePath) == null, "Required dormant portal refuses spawn without fallback");
         for (int i = 0; i < 8; i++)
         {
@@ -66,6 +72,9 @@ public partial class PortalActivationChecks : Node
         void Started(WaveDefinition wave) { if (wave.Number == 6) revealedBeforeEvent = future.IsSpawnActive; }
         waves.WaveStarted += Started;
         Require(waves.StartWave(), "Accepted Wave 6 starts"); waves.WaveStarted -= Started;
+        Require(!future.IsSpawnReady && waves.PlannedRemaining == 1 && !waves.IsPhysicsProcessing(),
+            "Wave 6 retains its selected entry and sleeps during formation");
+        future.FinishMaterialization(); waves._PhysicsProcess(0);
         Require(revealedBeforeEvent && future.IsSpawnActive && future.GetNode<Node2D>("Visuals").Visible
             && spawns.Registry.Living.Single().GlobalPosition == future.GlobalPosition, "Activation precedes observers and first required ship");
         Require(grid.NavigationRevision == revision && spawns.CitadelAssignments.SelectionQueries == comparisons,
@@ -80,6 +89,37 @@ public partial class PortalActivationChecks : Node
         Require(waves.State == WaveManager.WaveState.PausedError && waves.StatusMessage.Contains("appears at Wave 6"),
             "Required portal before appearance fails setup instead of retrying forever");
         future.AppearAtWave = 0;
+    }
+
+    // =========================================================
+    // Directly complete the opening seam: keep this fixture deterministic without multi-second scene runs.
+    private static void CheckMaterializationGate(DeathSpawnFixture f)
+    {
+        var spawns = f.Spawns; var waves = f.Waves;
+        string path = f.Grid.Level.Settings.ActivePortals[0].ToString();
+        var portal = f.Grid.Level.GetNode<EnemyPortal>(path);
+        var data = new[] { Wave(1, Batch(1, 0, 0, Enemy("basic_mk1", portal: path))),
+            Wave(6, Batch(1, 0, 0, Enemy("basic_mk1", portal: path))) };
+        waves.Configure(data, spawns.Catalog.ToSceneMap());
+        Require(waves.StartWave() && waves.PlannedRemaining == 1 && waves.AliveCount == 0 &&
+            waves.State == WaveManager.WaveState.Spawning && !waves.IsPhysicsProcessing(),
+            "Immediate Start cannot release a ship from the unfinished START portal");
+        ulong state = waves.SavedRandomState;
+        int revision = f.Grid.NavigationRevision; long queries = spawns.CitadelAssignments.SelectionQueries;
+        portal.FinishMaterialization();
+        int eligibility = spawns.PortalEligibilityRevision;
+        portal.FinishMaterialization();
+        Require(spawns.PortalEligibilityRevision == eligibility && waves.SavedRandomState == state,
+            "One ready event per formation; readiness consumes no wave RNG");
+        waves._PhysicsProcess(0);
+        Require(waves.AliveCount == 1 && waves.PlannedRemaining == 0 &&
+            f.Grid.NavigationRevision == revision && spawns.CitadelAssignments.SelectionQueries == queries,
+            "Readiness resumes exactly the retained ship without terrain or destination work");
+        spawns.Registry.Living.Single().TakeDamage(99999);
+        waves.RestoreCheckpoint(0, waves.SavedRandomState);
+        Require(portal.IsSpawnReady && portal.OpeningState == EnemyPortal.PortalState.Open &&
+            !portal.GetNode<Node2D>("Visuals/Materialization").Visible,
+            "Even a wave-zero checkpoint opens START portals immediately without replay");
     }
 
     // =========================================================

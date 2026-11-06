@@ -31,7 +31,7 @@ public partial class WaveManager : Node
     private WaveEnemyEntry[] _sequence;
     private int _waveIndex = -1, _batchIndex, _entryIndex;
     private double _countdown;
-    private bool _startAttemptReserved;
+    private bool _startAttemptReserved, _waitingForPortal;
 
     #region Lifecycle
     // =========================================================
@@ -41,6 +41,7 @@ public partial class WaveManager : Node
         _spawns = GetNode<SpawnManager>("../World/EnemySystems/Spawning");
         _hud = GetNode<GameplayHUD>("../UI/GameplayHUD");
         _spawns.WaveOwner = this; _spawns.WaveEnemyCreated += OnWaveCreating;
+        _spawns.PortalReadinessChanged += OnPortalReadinessChanged;
         _hud.WaveStartRequested += OnStartRequested;
         try
         {
@@ -55,7 +56,7 @@ public partial class WaveManager : Node
     public override void _ExitTree()
     {
         ReleaseOwnership();
-        if (GodotObject.IsInstanceValid(_spawns)) { _spawns.WaveEnemyCreated -= OnWaveCreating; _spawns.WaveOwner = null; }
+        if (GodotObject.IsInstanceValid(_spawns)) { _spawns.PortalReadinessChanged -= OnPortalReadinessChanged; _spawns.WaveEnemyCreated -= OnWaveCreating; _spawns.WaveOwner = null; }
         if (GodotObject.IsInstanceValid(_hud)) _hud.WaveStartRequested -= OnStartRequested;
     }
 
@@ -65,7 +66,14 @@ public partial class WaveManager : Node
     {
         ReleaseOwnership(); CompletedWaves = 0; _waveIndex = -1; PlannedRemaining = 0; _sequence = null; _countdown = 0; _startAttemptReserved = false;
         _waves = Array.Empty<WaveDefinition>(); _scenes = null;
-        try { WaveCatalog.Validate(waves, scenes); _spawns.ConfigurePortalActivation(waves); }
+        try
+        {
+            WaveCatalog.Validate(waves, scenes);
+            var checkpoint = (GetParent() as BattlefieldLauncher)?.RestoringCampaign?.Checkpoint;
+            _spawns.ConfigurePortalActivation(waves, checkpoint != null
+                ? SpawnManager.PortalActivationContext.CheckpointRestore : SpawnManager.PortalActivationContext.FreshDeployment,
+                checkpoint?.CompletedWaves ?? 0);
+        }
         catch (Exception exception) { SetError(exception.Message); return; }
         _waves = (WaveDefinition[])waves.Clone();
         _scenes = new Dictionary<string, PackedScene>(scenes);
@@ -129,6 +137,11 @@ public partial class WaveManager : Node
             finally { _acceptingSpawn = false; }
             if (ship == null)
             {
+                if (_spawns.WaitingForPortal)
+                {
+                    _waitingForPortal = true; State = WaveState.Spawning;
+                    StatusMessage = _spawns.LastMessage; SetPhysicsProcess(false); Publish(); return;
+                }
                 State = WaveState.SpawnBlocked; StatusMessage = _spawns.LastMessage;
                 _countdown = Mathf.Max(0.1f, _spawns.Paths.Config.WaveSpawnRetrySeconds);
                 Publish(); return;
@@ -150,6 +163,15 @@ public partial class WaveManager : Node
             Publish();
             if (_countdown > 0) return;
         }
+    }
+
+    // =========================================================
+    // A forming portal sleeps the scheduler; readiness wakes the same selected entry without RNG or count loss.
+    private void OnPortalReadinessChanged()
+    {
+        if (!_waitingForPortal || State != WaveState.Spawning) return;
+        _waitingForPortal = false; _countdown = 0; _startAttemptReserved = false;
+        StatusMessage = ""; SetPhysicsProcess(true); Publish();
     }
 
     // =========================================================
@@ -197,6 +219,7 @@ public partial class WaveManager : Node
     // Unsubscribe without killing ships; loading a new Main scene owns physical cleanup.
     private void ReleaseOwnership()
     {
+        _waitingForPortal = false;
         foreach (Enemy ship in _owned) ship.Removed -= OnEnemyRemoved;
         _owned.Clear(); _ownershipEpoch++; PendingDeathSpawns = 0;
         if (GodotObject.IsInstanceValid(_spawns?.DeathReleases)) _spawns.DeathReleases.CancelWave(this);
@@ -239,6 +262,7 @@ public partial class WaveManager : Node
         if (completed < 0 || completed >= _waves.Length || _owned.Count != 0) throw new System.IO.InvalidDataException("Invalid wave checkpoint.");
         CompletedWaves = completed; _waveIndex = completed - 1; _random.State = randomState;
         State = completed == 0 ? WaveState.Ready : WaveState.Completed;
+        _waitingForPortal = false;
         PlannedRemaining = PendingDeathSpawns = 0; _sequence = null; _countdown = 0;
         // CompletedWaves is an array count, not an authored wave Number (numbers may have gaps).
         _spawns.RestorePortalActivation(_waves, completed);

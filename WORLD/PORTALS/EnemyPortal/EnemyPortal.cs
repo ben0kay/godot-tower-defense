@@ -4,10 +4,10 @@ using Godot;
 [Tool]
 public partial class EnemyPortal : WorldObjectFootprint
 {
-    /// <summary>0: visible at deployment. Positive: reveal when this authored wave Number starts.</summary>
+    /// <summary>0: materialize at deployment. Positive: begin forming when this authored wave Number starts.</summary>
     [ExportGroup("Wave Activation (0 = START)")]
     [Export(PropertyHint.Range, "0,10000,1,or_greater")] public int AppearAtWave { get; set; }
-    public bool IsSpawnActive { get; private set; } = true;
+    public bool IsSpawnActive { get; private set; }
 
     [ExportGroup("Route Checkpoint")]
     private NodePath _checkpointPath = new("");
@@ -45,22 +45,20 @@ public partial class EnemyPortal : WorldObjectFootprint
     // Apply authored overrides in the editor and game without any processing or navigation rebuild.
     public override void _Ready()
     {
-        SetProcess(false); SetPhysicsProcess(false); UpdateVisualSize(); SetupPresentation();
-        if (!Engine.IsEditorHint()) ResetActivation();
+        SetProcess(false); SetPhysicsProcess(false); UpdateVisualSize(); SetupPresentation(); SetupMaterialization();
+        if (!Engine.IsEditorHint()) { ProcessMode = ProcessModeEnum.Pausable; ResetActivation(); }
     }
 
     // =========================================================
     // Hide presentation only: footprint/exit/checkpoint nodes remain registered and protected.
     internal void ResetActivation()
     {
-        IsSpawnActive = AppearAtWave == 0;
-        GetNode<Node2D>("Visuals").Visible = IsSpawnActive;
-        if (!IsSpawnActive) StopSpawnFeedback();
+        RestoreActivation(false);
     }
     internal bool ActivateForWave(int number)
     {
         if (IsSpawnActive || AppearAtWave != number) return false;
-        IsSpawnActive = true; GetNode<Node2D>("Visuals").Show(); return true;
+        BeginMaterialization(); return true;
     }
 
     // =========================================================

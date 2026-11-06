@@ -51,7 +51,7 @@ public partial class EnemyPortal
     // One 48-particle emitter per portal; dense waves coalesce to at most one burst per 750ms.
     public void PlaySpawnFeedback()
     {
-        if (!IsInsideTree() || !IsSpawnActive || !IsVisibleInTree() || GetTree().Paused || _onScreen?.IsOnScreen() != true) return;
+        if (!IsInsideTree() || !IsSpawnReady || !IsVisibleInTree() || GetTree().Paused || _onScreen?.IsOnScreen() != true) return;
         _energy?.PlaySpawnPulse();
         ulong now = Time.GetTicksMsec();
         if (!SpawnParticlesEnabled || _spawnParticles == null || now < _nextBurstMs) return;
@@ -61,5 +61,6 @@ public partial class EnemyPortal
     private void StopSpawnFeedback()
     {
         if (_spawnParticles != null) _spawnParticles.Emitting = false;
+        StopOpeningParticles();
     }
 }

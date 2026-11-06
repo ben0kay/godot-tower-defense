@@ -48,7 +48,7 @@ public partial class SpawnManager : Node
     // =========================================================
     // Release the level edit subscription with its spawning service.
     public override void _ExitTree()
-    { if (GodotObject.IsInstanceValid(Paths?.Navigation?.Grid)) Paths.Navigation.Grid.TerrainRebuilt -= InvalidateSources; }
+    { ClearPortalReadiness(); if (GodotObject.IsInstanceValid(Paths?.Navigation?.Grid)) Paths.Navigation.Grid.TerrainRebuilt -= InvalidateSources; }
 
     // =========================================================
     // Catalog IDs provide generic spawn requests while preserving debug's original scene overload.
@@ -121,7 +121,7 @@ public partial class SpawnManager : Node
                 GD.PushWarning("Portal SpawnExit is blocked or cannot reach the Citadel: " + _portalPaths[i]);
         if (nav.Goals.Count == 0)
             GD.PushWarning("No usable Citadel approach markers; enemies cannot find a destination.");
-        RefreshPortalEligibility();
+        WatchPortalReadiness(); RefreshPortalEligibility();
         _cachedRevision = nav.Revision;
     }
 
@@ -176,6 +176,7 @@ public partial class SpawnManager : Node
     private Enemy SpawnRandom(PackedScene scene, RandomNumberGenerator random, string requiredPortal,
         bool spawnWithShield, bool spawnWithStealth, bool portalOnly, bool waveOwned)
     {
+        WaitingForPortal = false;
         RefreshSources();
         if (scene == null || random == null) { LastMessage = "Wave enemy scene/RNG is missing."; return null; }
         if (Registry.Living.Count >= Paths.Config.MaxActiveEnemies)
@@ -200,6 +201,8 @@ public partial class SpawnManager : Node
         if (chosen < 0)
         {
             ship.Free();
+            WaitingForPortal = HasFormingPortal(requiredPortal);
+            if (WaitingForPortal) { LastMessage = "Portal forming; awaiting readiness."; return null; }
             LastMessage = requiredPortal.Length > 0 ? "Required portal unavailable: " + requiredPortal
                 : "No permitted reachable source with enemy clearance; wave spawn will retry.";
             return null;

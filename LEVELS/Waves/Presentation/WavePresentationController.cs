@@ -4,6 +4,7 @@ using Godot;
 public partial class WavePresentationController : Node
 {
     private WaveManager _waves;
+    private SpawnManager _portalSpawns;
     private NotificationManager _alerts;
     private NarrationDisplay _narration;
     private MissionBriefingDefinition _missionBriefing;
@@ -26,6 +27,8 @@ public partial class WavePresentationController : Node
             _voice.CueEnded += OnVoiceCueEnded;
         }
         if (_waves != null) _waves.WaveStarted += OnWaveStarted;
+        _portalSpawns = GetNodeOrNull<SpawnManager>("../World/EnemySystems/Spawning");
+        if (_portalSpawns != null) _portalSpawns.PortalOpeningWarning += OnPortalOpening;
 
         // An optional mission intro is a load event, not a wave-start event.
         // A restored checkpoint skips it and keeps its own pause/restore lifecycle.
@@ -78,6 +81,22 @@ public partial class WavePresentationController : Node
     }
 
     // =========================================================
+    // One batched later-wave warning, never one banner per portal or any deployment-intel interruption.
+    private void OnPortalOpening(int count)
+    {
+        if (!GodotObject.IsInstanceValid(_alerts)) return;
+        _alerts.ShowMajor(new MajorAlertDefinition
+        {
+            Id = $"portal_opening_{_waves.CurrentWave}",
+            Title = count == 1 ? "NEW HOSTILE PORTAL" : $"{count} HOSTILE PORTALS OPENING",
+            Description = "Dimensional breach detected. Prepare your defenses.",
+            Footer = "SECTOR WARNING", BadgeText = "!",
+            Tone = MajorAlertTone.Warning, Priority = 65, DurationSeconds = 2.2f,
+            CooldownSeconds = 0, OncePerSession = false
+        });
+    }
+
+    // =========================================================
     // Route independently: un-narrated waves clear the card; an explicitly suppressed alert can still speak.
     private void OnWaveStarted(WaveDefinition wave)
     {
@@ -123,6 +142,8 @@ public partial class WavePresentationController : Node
     // Avoid cross-session event listeners when a mission reloads or returns to the campaign.
     public override void _ExitTree()
     {
+        if (GodotObject.IsInstanceValid(_portalSpawns)) _portalSpawns.PortalOpeningWarning -= OnPortalOpening;
+        _portalSpawns = null;
         if (GodotObject.IsInstanceValid(_waves)) _waves.WaveStarted -= OnWaveStarted;
         if (GodotObject.IsInstanceValid(_voice))
         {

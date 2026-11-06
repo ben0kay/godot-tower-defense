@@ -6,9 +6,15 @@ using System.Linq;
 
 public partial class SpawnManager
 {
+    internal enum PortalActivationContext { FreshDeployment, CheckpointRestore }
+    public event Action PortalReadinessChanged;
+    public event Action<int> PortalOpeningWarning;
+    public bool WaitingForPortal { get; private set; }
+    private readonly HashSet<EnemyPortal> _watchedPortals = new();
+
     // =========================================================
     // Authoring validation runs at wave-set setup, never inside per-ship selection or navigation queries.
-    internal void ConfigurePortalActivation(WaveDefinition[] waves)
+    internal void ConfigurePortalActivation(WaveDefinition[] waves, PortalActivationContext context = PortalActivationContext.FreshDeployment, int completed = 0)
     {
         RefreshSources();
         var grid = Paths.Navigation.Grid;
@@ -60,7 +66,20 @@ public partial class SpawnManager
                     throw new ArgumentException($"Wave {wave.Number}: required portal '{entry.Portal}' appears at Wave {typed.AppearAtWave}; activate it by this wave or move the batch later.");
             }
         }
-        RestorePortalActivation(waves, 0);
+        WatchPortalReadiness();
+        if (context == PortalActivationContext.CheckpointRestore) RestorePortalActivation(waves, completed);
+        else
+        {
+            int order = 0;
+            foreach (var node in _portalObjects)
+            {
+                if (node is not EnemyPortal portal) continue;
+                portal.ResetActivation();
+                if (portal.AppearAtWave == 0)
+                    portal.BeginMaterialization(order++ * PortalMaterializationStyle.Safe(portal.MaterializationStyle.StartStaggerSeconds, 0, 0, .2f));
+            }
+            RefreshPortalEligibility();
+        }
     }
 
     // =========================================================
@@ -69,23 +88,61 @@ public partial class SpawnManager
     {
         if (_portalEligible.Length != _portalCount) _portalEligible = new bool[_portalCount];
         for (int i = 0; i < _portalCount; i++)
-            _portalEligible[i] = _portalObjects[i] is not EnemyPortal portal || portal.IsSpawnActive;
+            _portalEligible[i] = _portalObjects[i] is not EnemyPortal portal || portal.IsSpawnReady;
         PortalEligibilityRevision++;
     }
     internal void ActivatePortalsForWave(int number)
     {
-        bool changed = false;
-        foreach (var node in _portalObjects) if (node is EnemyPortal portal) changed |= portal.ActivateForWave(number);
+        bool changed = false; int warnings = 0;
+        foreach (var node in _portalObjects)
+            if (node is EnemyPortal portal && portal.ActivateForWave(number))
+            { changed = true; if (portal.MaterializationStyle.WarningEnabled) warnings++; }
         if (changed) RefreshPortalEligibility();
+        if (warnings > 0) PortalOpeningWarning?.Invoke(warnings);
     }
 
     // =========================================================
     // Between-wave restore replays availability only, using actual completed authored numbers; no VFX/spawns.
     internal void RestorePortalActivation(WaveDefinition[] waves, int completed)
     {
-        foreach (var node in _portalObjects) if (node is EnemyPortal portal) portal.ResetActivation();
-        for (int i = 0; i < completed; i++)
-            foreach (var node in _portalObjects) if (node is EnemyPortal portal) portal.ActivateForWave(waves[i].Number);
+        foreach (var node in _portalObjects)
+        {
+            if (node is not EnemyPortal portal) continue;
+            bool active = portal.AppearAtWave == 0;
+            for (int i = 0; i < completed && !active; i++) active = waves[i].Number == portal.AppearAtWave;
+            portal.RestoreActivation(active);
+        }
+        WaitingForPortal = false;
         RefreshPortalEligibility();
+    }
+
+    // =========================================================
+    // Readiness changes one eligibility slot; terrain and destination caches are untouched.
+    private void WatchPortalReadiness()
+    {
+        ClearPortalReadiness();
+        foreach (var node in _portalObjects)
+            if (node is EnemyPortal portal && _watchedPortals.Add(portal)) portal.SpawnReady += OnPortalReady;
+    }
+    private void ClearPortalReadiness()
+    {
+        foreach (var portal in _watchedPortals)
+            if (GodotObject.IsInstanceValid(portal)) portal.SpawnReady -= OnPortalReady;
+        _watchedPortals.Clear();
+    }
+    private void OnPortalReady(EnemyPortal portal)
+    {
+        int source = _portalObjects.IndexOf(portal);
+        if (source < 0 || source >= _portalEligible.Length) return;
+        _portalEligible[source] = portal.IsSpawnReady;
+        PortalEligibilityRevision++;
+        PortalReadinessChanged?.Invoke();
+    }
+    private bool HasFormingPortal(string requiredPortal = "")
+    {
+        for (int i = 0; i < _portalCount; i++)
+            if ((requiredPortal.Length == 0 || _portalPaths[i] == requiredPortal) &&
+                _portalObjects[i] is EnemyPortal { OpeningState: EnemyPortal.PortalState.Forming }) return true;
+        return false;
     }
 }
