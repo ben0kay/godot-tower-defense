@@ -1,3 +1,9 @@
+## Portal smoke softened — square/cloud-edge artifacts (2026-11-06)
+
+**Visual shader fix, owner Godot acceptance pending.** `WORLD/PORTALS/EnemyPortal/Visuals/PortalSmoke.gdshader` now uses quintic-smoothed, rotated and gently bent two-octave noise rather than visibly grid-aligned billows. A broader cloud-density falloff and explicit smooth alpha feather on all four particle-quad boundaries remove the hard rectangular/blotchy edges reported in the portal screenshot, including the larger faint smoke layer. Kept the same shader resource, palette, `smoke_tint`/`opacity` parameters, particle age-based animation, emitter counts/size/lifetime, pause, offscreen handling, and SPAWN2/SPAWN2.5 mechanics. No new materials/nodes, CPU loops, or additional noise samples. Source-only check; test the clouds during a wave and at large portal scale in Godot. 
+
+---
+
 ## FD4.1 targeting + FD5 Codex handoff — 2026-11-06
 
 **Planning only, no gameplay implementation.** Added detailed FD4.1 to `DRONES/Combat/FIGHTER_DRONES_IMPLEMENTATION_PLAN.md`: keep Citadel-risk enemy as movement anchor, independently choose nearest actually shootable in-range/forward-arc/terrain-clear enemy for fixed twin guns, with separate short target hold, bounded shared spatial queries, shot-time LOS, pause/recall and checkpoint safety. Preserved the full FD5-A–E specification for real Depot→Station ammo deliveries, finite timed rearming/paid repair and small vertical per-fighter service telemetry. Recommended Codex order **FD4.1 then FD5**, with lightweight checks and separate status reporting. Corrected the outdated backlog note that called already-source-implemented FD4 weapons only planned.
