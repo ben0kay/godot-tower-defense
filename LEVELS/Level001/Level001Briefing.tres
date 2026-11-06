@@ -1,12 +1,19 @@
-[gd_resource type="Resource" script_class="MissionBriefingDefinition" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="MissionBriefingDefinition" format=3 uid="uid://bx1m511lkusdy"]
 
-[ext_resource type="Script" path="res://LEVELS/Briefing/MissionBriefingDefinition.cs" id="1"]
+[ext_resource type="Script" uid="uid://wp8k6saxg34f" path="res://LEVELS/Briefing/MissionBriefingDefinition.cs" id="1"]
 
 [resource]
 script = ExtResource("1")
-Enabled = true
 Title = "DEFEND THE CITADEL"
-Speaker = "COMMAND INTELLIGENCE"
-Message = "Commander, Standard Drones are inbound. Defend the Citadel through three waves. Faster Scouts may follow. Deploy towers first."
-Objectives = "• Protect the Citadel.\n• Build a defensive line along the approach.\n• Press START WAVE when you are ready."
-VoiceCueId = "voice_mission_level001_intro"
+Message = "Commander, welcome to the field.
+
+Today's assignment is a little unconventional. We've recovered several hostile drones and successfully reprogrammed them for target practice.
+
+Your objective is simple: deploy a few Battle Towers and put their combat capabilities to the test.
+
+I'll be monitoring their performance and keeping an eye on you.
+
+Let's see what these towers can do, Commander. Good luck."
+Objectives = "• Protect the Citadel.
+• Build a defensive line along the approach.
+• Press START WAVE when you are ready."
