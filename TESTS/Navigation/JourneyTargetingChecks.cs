@@ -43,6 +43,9 @@ public static class JourneyTargetingChecks
         Require(TowerTargeting.Find(f.Spawns.Registry, origin, 4096, TowerTargeting.Priority.First) == directShip
             && TowerTargeting.Find(f.Spawns.Registry, origin, 4096, TowerTargeting.Priority.Last) == checkpointShip,
             "First/Last compare the full estimated journey across portals");
+        directShip.TakeDamage(1);
+        Require(TowerTargeting.Find(f.Spawns.Registry, origin, 4096, TowerTargeting.Priority.Strongest) == directShip,
+            "Equal maximum HP uses First across portals even when the earlier ship has more current hull");
         ShieldPreference(f, checkpointShip, directShip, origin);
         FreezeExclusion(f, checkpointShip, directShip, origin);
         for (int i = 0; i < 1000; i++) TowerTargeting.Find(f.Spawns.Registry, origin, 4096, TowerTargeting.Priority.Last);
@@ -86,11 +89,15 @@ public static class JourneyTargetingChecks
             Func<Enemy, float> score = mode switch
             {
                 TowerTargeting.Priority.First or TowerTargeting.Priority.Last => e => e.RemainingJourneyDistance,
-                TowerTargeting.Priority.Strongest or TowerTargeting.Priority.Weakest => e => e.Health + e.CurrentShield,
+                TowerTargeting.Priority.Strongest => e => e.Definition.MaxHealth,
+                TowerTargeting.Priority.Weakest => e => e.Health + e.CurrentShield,
                 _ => e => e.GlobalPosition.DistanceSquaredTo(origin)
             };
             bool maximum = mode is TowerTargeting.Priority.Last or TowerTargeting.Priority.Farthest or TowerTargeting.Priority.Strongest;
-            Enemy expected = maximum ? burst.OrderByDescending(score).First() : burst.OrderBy(score).First();
+            Enemy expected = mode == TowerTargeting.Priority.Strongest
+                ? burst.OrderByDescending(score).ThenBy(e => float.IsFinite(e.RemainingJourneyDistance)
+                    ? e.RemainingJourneyDistance : float.PositiveInfinity).First()
+                : maximum ? burst.OrderByDescending(score).First() : burst.OrderBy(score).First();
             Require(TowerTargeting.Find(f.Spawns.Registry, origin, 4096, mode) == expected, "500-enemy brute-force ranking parity for " + mode);
         }
         GD.Print($"IT4 BENCH: 500 enemies; shared tail cache={paths.Journeys.CachedEdges}, total tail queries={paths.TotalJourneyCalculations}, per-frame combined cap={paths.Config.MaxPathCalculationsPerFrame}");

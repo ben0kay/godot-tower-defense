@@ -378,7 +378,7 @@ public partial class GameplayHUD : Control
                 TowerTargeting.Priority.Last => "Longest valid estimated remaining journey to the Citadel; unavailable routes are excluded.",
                 TowerTargeting.Priority.Closest => "Nearest eligible enemy within weapon range.",
                 TowerTargeting.Priority.Farthest => "Farthest eligible enemy within weapon range.",
-                TowerTargeting.Priority.Strongest => "Most currently remaining hull + shield points.",
+                TowerTargeting.Priority.Strongest => "Highest maximum hull HP; ties target First (shortest remaining Citadel journey).",
                 _ => "Fewest currently remaining hull + shield points."
             };
             choices.AddChild(button); _targetButtons.Add(priority, button);

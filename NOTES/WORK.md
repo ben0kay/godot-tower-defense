@@ -1,3 +1,9 @@
+## Strongest uses maximum hull HP, then First — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Shared tower targeting now scores Strongest by `Enemy.Definition.MaxHealth`, independently of current hull/shield points. Equal maxima compare First's cached remaining Citadel journey; finite routes beat unavailable estimates, then registration order resolves exact/unavailable ties. Existing preferences/status filters and sight/range checks remain; Weakest is unchanged. Updated Inspector tooltip, targeting README, existing Inspector/Journey regression expectations. No added scans, A* requests, save fields or enum changes. Focused source review only; .NET unavailable and fixtures not executed. Owner: inspect a badly damaged heavy enemy versus a full-health weaker enemy, then equal-max enemies from different portals.
+
+---
+
 ## SPAWN2 — shared portal materialization — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** Every registered START portal now forms on fresh deployment; Wave N portals use the same Dormant → Forming → Open presentation on their accepted authored wave. No Level011 map or wave data changed. A 2.2s pausable tween drives a localized violet spiral shader, growing segmented ring, art/label reveal, inward GPU curls and concentrated ignition/ripple. No fullscreen effects, audio assets or idle CPU animation loop were added. Existing 120°/s rotation and 48-particle outward per-spawn rim bursts remain the Open-state presentation.

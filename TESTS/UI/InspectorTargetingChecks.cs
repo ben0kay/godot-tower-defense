@@ -36,7 +36,7 @@ public partial class InspectorTargetingChecks : Node
     }
 
     // =========================================================
-    // Durability is remaining hull plus shield, not authored maximum, speed, reward or attempted damage.
+    // Strongest uses maximum hull HP; Weakest still uses remaining hull plus shield.
     private static void Ranking(AmmoLoopFixture f)
     {
         var registry = f.Spawns.Registry;
@@ -46,12 +46,18 @@ public partial class InspectorTargetingChecks : Node
         near.ApplyDamage(new(9900, DamageType.Kinetic));
         Require(TowerTargeting.Find(registry, new(2000, 2000), 208, TowerTargeting.Priority.Closest) == near, "Closest physical distance");
         Require(TowerTargeting.Find(registry, new(2000, 2000), 208, TowerTargeting.Priority.Farthest) == far, "Farthest physical distance");
-        // Equal 100 hull: earlier registered enemy wins both extrema.
-        Require(TowerTargeting.Find(registry, new(2000, 2000), 208, TowerTargeting.Priority.Strongest) == near, "Stable equal-durability order");
+        // Both currently have 100 hull, but the damaged large enemy retains its stronger maximum.
+        Require(TowerTargeting.Find(registry, new(2000, 2000), 208, TowerTargeting.Priority.Strongest) == near, "Damaged high-maximum hull remains Strongest");
         far.ApplyDamage(new(30, DamageType.Kinetic));
         Require(TowerTargeting.Find(registry, new(2000, 2000), 208, TowerTargeting.Priority.Weakest) == far, "Damaged hull affects Weakest");
-        near.RestoreShield(200);
-        Require(TowerTargeting.Find(registry, new(2000, 2000), 208, TowerTargeting.Priority.Strongest) == near, "Restored shield affects Strongest");
+        far.Definition.MaxShield = 500; far.RestoreShield(500);
+        Require(TowerTargeting.Find(registry, new(2000, 2000), 208, TowerTargeting.Priority.Strongest) == near,
+            "Current shield cannot outweigh higher maximum hull HP");
+        float maximum = near.Definition.MaxHealth;
+        near.Definition.MaxHealth = far.Definition.MaxHealth;
+        Require(TowerTargeting.Find(registry, new(2000, 2000), 208, TowerTargeting.Priority.Strongest) == near,
+            "Equal maximum HP with unavailable journeys falls back to registration order");
+        near.Definition.MaxHealth = maximum;
         near.GlobalPosition = new(5000, 5000);
         foreach (TowerTargeting.Priority mode in new[] { TowerTargeting.Priority.Closest, TowerTargeting.Priority.Farthest, TowerTargeting.Priority.Strongest, TowerTargeting.Priority.Weakest })
             Require(TowerTargeting.Find(registry, new(2000, 2000), 208, mode) == far, "Out-of-range enemy excluded for " + mode);

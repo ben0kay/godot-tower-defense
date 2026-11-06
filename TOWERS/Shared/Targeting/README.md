@@ -1,3 +1,11 @@
+## Strongest targets maximum hull HP — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Shared Strongest scoring now compares maximum hull HP, so damage or shield depletion does not make a heavy ship lose priority to a weaker full-health ship. Equal maximum HP uses First's cached full remaining Citadel journey; a finite estimate beats an unavailable estimate, with stable registration order as the final fallback. Existing preference/status tiers, detection, range and sight checks remain authoritative. Weakest retains current hull + shield. No new path queries, loops, enum values or saved fields.
+
+Focused source review only; .NET unavailable. Existing Inspector/Journey fixtures updated for damaged high-maximum targets, shield independence, equal-HP route ties, unavailable-route fallback and brute-force parity; not executed. Owner: compare a damaged heavy ship against a healthy drone, then several identical ships from different portals.
+
+---
+
 ## CTX1 optional affected-status fallback
 
 **Source Implemented / Awaiting Owner Validation.** `TowerTargeting.Find/Eligible` append an optional `affectedFallback=false` argument. With a required identity and opt-in, susceptible unaffected candidates outrank affected candidates before ordinary priority scoring/ties. One spatial visitor, normal detection/range/terrain sight, no second scan. ProjectileTurretBase exposes a protected opt-in hook; only Corruptor enables it. Cryo/Slow and Stasis/Freeze keep strict existing exclusion and no damage-only fallback.
@@ -32,7 +40,7 @@ New Ctrl / Utility Stealth Beacon:250 Credits,1×1,2s build,180 HP,256px range, 
 
 ## Laser shield preference — implemented 2026-10-18
 
-Laser configs now expose **Targeting → TargetPreference**, default **Shielded** (None opts out). This preference is separate from First/Last/Closest/Farthest/Strongest/Weakest: choose eligible in-range enemies with **CurrentShield > 0** first, apply the chosen mode within that group, and fall back to ordinary eligible targets when no preferred candidate qualifies. First/Last retain full remaining-journey distance across portals; Strongest/Weakest retain current hull + shield scoring and stable registration-order ties.
+Laser configs now expose **Targeting → TargetPreference**, default **Shielded** (None opts out). This preference is separate from First/Last/Closest/Farthest/Strongest/Weakest: choose eligible in-range enemies with **CurrentShield > 0** first, apply the chosen mode within that group, and fall back to ordinary eligible targets when no preferred candidate qualifies. First/Last retain full remaining-journey distance across portals. Strongest uses maximum hull HP with First as its tie-breaker; Weakest uses current hull + shield and stable registration-order ties.
 
 TowerTargeting.Find accepts an optional preference after its existing required-effect argument. One existing spatial traversal ranks preference tiers before ordinary scores; no second scan/list allocation, new per-frame loop or tower-local pathfinding. Other towers default to None. Eligibility/range/finite-route checks still run before preferences; Cryo's required-effect filter is unchanged. Laser reacquires on its existing staggered interval, including after shield depletion. Damage/beam/ammo/heat/rank values are unchanged.
 
@@ -44,7 +52,7 @@ Validation: .NET SDK build (zero warnings/errors); ShieldTargetingChecks passed,
 
 # Shared target selection — IT3–IT4
 
-`TowerTargeting.Find` visits the world's existing spatial index within firing range. One compact visitor scores eligible living enemies; no result lists, scene searches, tower-local A* or per-frame enemy-registry scans are added. Equal scores use the existing stable registration order.
+`TowerTargeting.Find` visits the world's existing spatial index within firing range. One compact visitor scores eligible living enemies; no result lists, scene searches, tower-local A* or per-frame enemy-registry scans are added. Equal Strongest scores use First's cached remaining journey, then stable registration order. Other equal scores use stable registration order.
 
 | Priority | Score policy |
 |---|---|
@@ -52,7 +60,7 @@ Validation: .NET SDK build (zero warnings/errors); ShieldTargetingChecks passed,
 | Closest (serialized 1) | Smallest squared physical tower distance |
 | Last (2) | Largest finite estimated remaining Citadel journey |
 | Farthest (3) | Largest squared physical tower distance |
-| Strongest (4) | Largest **current Health + CurrentShield** |
+| Strongest (4) | Largest **Definition.MaxHealth**; equal maxima use **First** (smallest finite remaining journey), then stable registration order |
 | Weakest (5) | Smallest **current Health + CurrentShield** |
 
 First/Closest retain original enum values and First remains the default. First/Last ignore unavailable, stale, failed or infinite estimates; infinity never wins Last. Scores are distance, not arrival time, so Slow does not arbitrarily change priority. Removed/out-of-range enemies never qualify. Cryo additionally filters already-slowed/immune enemies before scoring every mode, without fallback damage.

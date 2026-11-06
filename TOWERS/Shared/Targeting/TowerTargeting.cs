@@ -43,7 +43,7 @@ public static class TowerTargeting
         public Preference PreferredGroup;
         public bool BestPreferred, DetectsStealth, AffectedFallback;
         // =========================================================
-        // Strict finite best-score selection plus the original earlier-living-entry tie-break.
+        // Strict finite scoring; Strongest ties use First before the stable registration-order fallback.
         public void Accept(EnemySpatialIndex.Neighbor nearby)
         {
             if (!TowerDetection.CanDetect(nearby.Enemy, DetectsStealth) || !Eligible(nearby.Enemy, RequiredEffect, AffectedFallback)) return;
@@ -52,7 +52,8 @@ public static class TowerTargeting
             float candidate = Mode switch
             {
                 Priority.First or Priority.Last => nearby.Enemy.RemainingJourneyDistance,
-                Priority.Strongest or Priority.Weakest => nearby.Enemy.Health + nearby.Enemy.CurrentShield,
+                Priority.Strongest => nearby.Enemy.Definition.MaxHealth,
+                Priority.Weakest => nearby.Enemy.Health + nearby.Enemy.CurrentShield,
                 _ => distance
             };
             if (!float.IsFinite(candidate)) return;
@@ -60,12 +61,24 @@ public static class TowerTargeting
                 : PreferredGroup == Preference.Shielded && nearby.Enemy.CurrentShield > 0;
             // Preferences rank eligible groups first; ordinary mode scoring/ties apply within each group.
             if (Best == null || (preferred && !BestPreferred) || (preferred == BestPreferred &&
-                ((Largest(Mode) ? candidate > Score : candidate < Score) || (candidate == Score && nearby.Order < Order))))
+                ((Largest(Mode) ? candidate > Score : candidate < Score) || (candidate == Score && WinsTie(nearby)))))
             {
                 // Only contenders pay for a line traversal; no allocations, raycast objects or full-map scans.
                 if (GodotObject.IsInstanceValid(Grid) && !Grid.HasWeaponLineOfSight(Position, nearby.Position)) return;
                 Score = candidate; Best = nearby.Enemy; Order = nearby.Order; BestPreferred = preferred;
             }
+        }
+
+        // =========================================================
+        // Equal maximum hull HP uses First's cached full journey; unavailable routes fall back to stable order.
+        private bool WinsTie(EnemySpatialIndex.Neighbor nearby)
+        {
+            if (Mode != Priority.Strongest) return nearby.Order < Order;
+            float candidateJourney = nearby.Enemy.RemainingJourneyDistance;
+            float bestJourney = Best.RemainingJourneyDistance;
+            if (!float.IsFinite(candidateJourney)) candidateJourney = float.PositiveInfinity;
+            if (!float.IsFinite(bestJourney)) bestJourney = float.PositiveInfinity;
+            return candidateJourney < bestJourney || (candidateJourney == bestJourney && nearby.Order < Order);
         }
     }
 
