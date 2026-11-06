@@ -9,7 +9,7 @@ script = ExtResource("waves_script")
 [resource]
 script = ExtResource("1")
 StartingCredits = 1700
-ActivePortals = Array[NodePath]([NodePath("Portals/EnemyPortal01"), NodePath("Portals/EnemyPortal02"), NodePath("Portals/EnemyPortal03"), NodePath("Portals/EnemyPortal04"), NodePath("Portals/EnemyPortal05")])
+ActivePortals = Array[NodePath]([NodePath("Portals/EnemyPortal01"), NodePath("Portals/EnemyPortal02"), NodePath("Portals/EnemyPortal03"), NodePath("Portals/EnemyPortal04")])
 WaveSource = SubResource("wave_source")
 WaveSetId = "level020"
 CitadelMaxHealth = 1200

@@ -1,3 +1,13 @@
+## RT2 source audit and fixes — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Audited continuous heat timing, all three tier snapshots, power funding, missing-hull/thermal limits, overheat/EMP ownership and shared checkpoint/Inspector paths. The 3-minute / 10-second / 35% heat calibration and stats remain unchanged.
+
+Corrected DefaultRepairTowerConfig.tres assignment order: attach the C# script before assigning its exported Power property, matching the other tower presets. Hardened repair delivery against HealthChanged and heat/disable callbacks removing the source before further native/condition/power access. Heat is limited to observed delivered hull divided by repair rate, bounded by the paid interval.
+
+Updated the focused fixture's outdated power-free assumptions. Tests explicitly seed real capacitor stock instead of assuming free power; fresh defaults still start empty. Added empty/limited-charge repair, heat proportional to funded work, saved heat/energy restoration and synchronous source-removal checks. Fixtures remain authored but unrun because .NET is unavailable. Owner: powered repair, partial/full targets, overheat + EMP recovery and a fresh Save/Load.
+
+---
+
 ## RT2 — Sustained hull-repair heat — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** Restoration Tower now opts into the existing shared `HeatTiming` and `TowerConditions` system: **3 minutes** of uninterrupted, energy-funded healing from cold before overheating; cooling to the shared **35% restart threshold** takes approximately **10 seconds** while no repair is occurring. Configure `HeatEnabled`, `OverheatAfterMinutes` and `OverheatRecoverySeconds` in `DefaultRepairTowerConfig.tres` under **Heat**. The optional capability travels through the normal eight-stage tower stat pipeline at every purchased level, and its current value/recovery/disable reasons use the existing selected Inspector HEAT meter.

@@ -108,10 +108,14 @@ public partial class RepairTower : TowerBase
         if (seconds <= 0) { StopBeam(); return; }
         float before = locked.Health;
         locked.RestoreHealth((float)System.Math.Min(missing, repair.HullPerSecond * seconds));
-        // Only delivered repair time heats the emitter. Full targets and aborted work remain free.
-        if (GodotObject.IsInstanceValid(locked) && locked.Health > before) RecordAttackHeat(0, seconds);
+        // Hull callbacks may free the healer, not just its target. Never access disposed runtime owners.
+        if (!GodotObject.IsInstanceValid(this) || !IsInsideTree() || IsQueuedForDeletion()) return;
+        // Charge only the observed hull actually delivered, bounded by the already funded interval.
+        if (GodotObject.IsInstanceValid(locked) && locked.Health > before)
+            RecordAttackHeat(0, System.Math.Min(seconds, ((double)locked.Health - before) / repair.HullPerSecond));
+        // Heat/disable listeners can also remove the healer synchronously.
+        if (!GodotObject.IsInstanceValid(this) || !IsInsideTree() || IsQueuedForDeletion()) return;
         CompletePowerAttack();
-        // HealthChanged can clear a full lock or remove either participant synchronously.
         if (!GodotObject.IsInstanceValid(this) || !IsInsideTree() || IsQueuedForDeletion()) return;
         if (!CanOperate || _target != locked || !ValidateLock() || locked.Health <= before) { StopBeam(); return; }
         _beam.SetBeam(_muzzle.GlobalPosition, locked.GlobalPosition, true); SetRepairing(true);

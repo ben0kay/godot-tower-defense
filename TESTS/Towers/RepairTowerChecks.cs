@@ -18,6 +18,8 @@ public partial class RepairTowerChecks : Node
                 Check(f);
                 CheckStickyTarget(f);
                 CheckRepairHeat(f);
+                CheckFundedRepair(f);
+                CheckCallbackRemoval(f);
             }
             await SubsystemBattlefield.DrainFreedFixtures(this);
             GD.Print("PASS: RT1/RT2 repair, heat, funded-beam gating, pause/disable, purchased tiers and checkpoint inputs");
@@ -31,6 +33,7 @@ public partial class RepairTowerChecks : Node
     {
         Vector2 origin = new(2000, 2000);
         RepairTower healer = f.Add<RepairTower>("repair", origin);
+        PrimeRepairPower(healer);
         BattleTower target = f.Add<BattleTower>("battle", origin + Vector2.Up * 100,
             config => { config.Power = null; config.MaxHealth = 100; });
         TowerDefinition definition = f.Placement.Catalog.Find("repair");
@@ -48,8 +51,8 @@ public partial class RepairTowerChecks : Node
             && healer.Config.DescribeChanges(healer.FinalStats, second).Contains("Range:"),
             "Upgrade Inspector reports repair and radius gains");
         Require(healer.FinalStats.Repair?.HullPerSecond == 16 && healer.FinalStats.RangePixels == 320
-            && healer.FinalStats.MaxHealth == 1000 && healer.Ammunition == null && healer.Power == null && healer.FinalStats.Beam == null,
-            "Independent repair capability has no fabricated damage/ammo/power");
+            && healer.FinalStats.MaxHealth == 1000 && healer.Ammunition == null && healer.Power != null && healer.FinalStats.Beam == null,
+            "Independent repair capability uses shared power without fabricated damage/ammo");
         Require(TowerUpgradeComparison.Build(healer.FinalStats, healer.FinalStats).Any(r => r.Name == "Repair (HP/s)")
             && !TowerUpgradeComparison.Build(healer.FinalStats, healer.FinalStats).Any(r => r.Name == "Damage"), "Inspector labels repair independently");
         var beam = healer.GetNode<BeamRenderer>("BeamRenderer");
@@ -83,7 +86,7 @@ public partial class RepairTowerChecks : Node
         site.StartConstruction(work); f.Towers.AddChild(site); site.GlobalPosition = origin; Disable(site);
         before = target.Health; site._PhysicsProcess(1);
         Require(target.Health == before && !site.GetNode<BeamRenderer>("BeamRenderer").IsActive, "Unfinished structure never repairs");
-        ConstructionTestClock.FinishWork(f.Main); site._PhysicsProcess(.5);
+        ConstructionTestClock.FinishWork(f.Main); PrimeRepairPower(site); site._PhysicsProcess(.5);
         Require(target.Health > before, "Completed shared work enables repair without another purchase");
         Hurt(site, 100);
         TowerSaveData saved = site.CaptureCheckpoint(_ => null); site.Free();
@@ -91,8 +94,11 @@ public partial class RepairTowerChecks : Node
         restored.PrepareCheckpoint(saved, work, null); f.Towers.AddChild(restored);
         restored.SetPlacement(new(saved.X, saved.Y), origin); restored.RestoreCheckpoint(saved, _ => 0); Disable(restored);
         Near(restored.Health, saved.Health, "Existing checkpoint reconstruction preserves hull without repurchase");
-        Require(restored.Power == null && restored.Ammunition == null && restored.FinalStats.Repair?.HullPerSecond == 16,
-            "Restore derives repair capability with no transient target/beam save fields");
+        Require(restored.Power != null && restored.Ammunition == null && restored.FinalStats.Repair?.HullPerSecond == 16,
+            "Restore derives powered repair capability with no transient target/beam save fields");
+        Near(restored.CurrentHeat, saved.Heat, "Checkpoint restores repair heat without adding work");
+        Require(saved.Power.HasValue && Math.Abs(restored.Power.Capacitor.Energy - saved.Power.Value.Energy) < .001,
+            "Checkpoint restores actual paid repair energy");
         restored.Free(); target.Free();
     }
     // =========================================================
@@ -101,6 +107,7 @@ public partial class RepairTowerChecks : Node
     {
         Vector2 origin = new(2000, 2000);
         RepairTower healer = f.Add<RepairTower>("repair", origin);
+        PrimeRepairPower(healer);
         BattleTower first = f.Add<BattleTower>("battle", origin + Vector2.Up * 100,
             config => { config.Power = null; config.MaxHealth = 100; });
         BattleTower second = f.Add<BattleTower>("battle", origin + Vector2.Up * 150,
@@ -125,6 +132,7 @@ public partial class RepairTowerChecks : Node
     {
         Vector2 origin = new(2000, 2000);
         RepairTower healer = f.Add<RepairTower>("repair", origin);
+        PrimeRepairPower(healer);
         BattleTower target = f.Add<BattleTower>("battle", origin + Vector2.Up * 100,
             config => { config.Power = null; config.MaxHealth = 100; });
         Require(healer.Config.HeatEnabled && healer.FinalStats.Heat.HasValue,
@@ -158,6 +166,46 @@ public partial class RepairTowerChecks : Node
         healer._PhysicsProcess(.5);
         Require(target.Health > before, "Healer resumes after cooldown and EMP clearance");
         healer.Free(); target.Free();
+    }
+
+    // =========================================================
+    // Seed only the fixture capacitor; real presets remain empty and no free/infinite energy is configured.
+    private static void PrimeRepairPower(RepairTower healer, double energy = 100)
+    {
+        Require(healer.Power != null && healer.Config.Power != null, "Authored Restoration resource loads its power profile");
+        healer.Power.Restore(new(energy, 50, false, 0, 0));
+    }
+    private void CheckFundedRepair(AmmoLoopFixture f)
+    {
+        Vector2 origin = new(2000, 2000);
+        RepairTower healer = f.Add<RepairTower>("repair", origin);
+        BattleTower target = f.Add<BattleTower>("battle", origin + Vector2.Up * 100,
+            config => { config.Power = null; config.MaxHealth = 100; });
+        Require(healer.Power != null && healer.Power.Capacitor.Energy == 0 && healer.IsDisabled,
+            "Fresh default healer starts empty and waits for power");
+        Hurt(target, 10); healer._PhysicsProcess(.5);
+        Near(target.Health, 90, "Unfunded repair delivers no hull"); Near(healer.CurrentHeat, 0, "Unfunded repair adds no heat");
+        PrimeRepairPower(healer, .25); // 8 energy/s funds exactly 1/32s, hence 0.5 hull at 16 HP/s.
+        healer._PhysicsProcess(.5);
+        Near(target.Health, 90.5f, "Low stored energy limits actual delivered hull");
+        Near(healer.CurrentHeat, healer.FinalStats.Heat.Value.PerBeamSecond / 32f, "Only funded repair seconds generate heat");
+        Require(healer.Power.Capacitor.Energy == 0 && healer.IsDisabled, "Depletion publishes NoPower after paid repair");
+        float before = target.Health; healer._PhysicsProcess(1);
+        Near(target.Health, before, "Depleted healer cannot perform another free repair");
+        healer.Free(); target.Free();
+    }
+    private void CheckCallbackRemoval(AmmoLoopFixture f)
+    {
+        Vector2 origin = new(2000, 2000);
+        RepairTower healer = f.Add<RepairTower>("repair", origin); PrimeRepairPower(healer);
+        BattleTower target = f.Add<BattleTower>("battle", origin + Vector2.Up * 100,
+            config => { config.Power = null; config.MaxHealth = 100; });
+        Hurt(target, 50);
+        Action removed = () => healer.Free(); target.HealthChanged += removed;
+        healer._PhysicsProcess(.5);
+        target.HealthChanged -= removed;
+        Require(!GodotObject.IsInstanceValid(healer), "Hull callback may remove the healer without stale heat/power access");
+        Near(target.Health, 58, "Already delivered repair survives healer removal"); target.Free();
     }
 
     private static void Hurt(TowerBase tower, float amount) => tower.ApplyDamage(new DamageInfo(amount, DamageType.Kinetic, hullCoefficientOverride: 1));

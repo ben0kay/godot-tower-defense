@@ -1,3 +1,9 @@
+## Portal registration repair — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** ActivePortals now names the four portals actually present (01–04). Removed stale `EnemyPortal05`, which the new SPAWN1 registration validator would otherwise turn into SETUP ERROR. No portal, terrain, placement or authored wave was added/changed; legacy Five Gates names/narration remain authored content. Owner: launch Level020 and start its first wave.
+
+---
+
 ## NP2 tactical narrator sample (2026-10-20; source updated / runtime QA pending)
 
 Level020 now authors presentation **only** on waves 1,4,6,7, using optional `Presentation(...)` in its existing `WaveSetSource`. Introductory first contact, transporter warning, heavy fleet warning and final assault each supply a `TACTICAL COMMAND` typewriter message and a reserved voice cue ID. Waves 2/3/5 show only standard NP1 banners. The shared narrator lives **top-right below the Wave/Start controls**, stacked below the centred alert on narrower displays. **All seven waves still spawn the same enemy counts (52/68/80/72/72/60/58), IDs, shields, weights and timing.** Voice playback is not implemented. See [wave presentations](../Waves/Presentation/README.md) and [narrator UI](../../UI/Narration/README.md).

@@ -1,3 +1,9 @@
+## SPAWN1 startup repair and RT2 audit — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Removed stale registrations for absent Level001 Portal2 and Level020 Portal05 (SPAWN1 had promoted previous warnings into startup SETUP ERROR). Normalized Restoration resource script-before-Power assignment; guarded post-heal/heat callback removal and bounded heat to delivered hull. Corrected power-aware repair fixtures and Level001 activation fixture setup. Source/resource/diff checks only; .NET unavailable. Owner: start Level001/020 waves; confirm funded Restoration repair, overheat/EMP recovery and heat/energy save/load. No tower costs, rates, heat timings or wave content changed.
+
+---
+
 # Implementation Backlog — Live Status (2026-11-06, `dev`)
 
 > **Authority:** audited `ben0kay/godot-tower-defense` on `dev` at [`2fa1d5f0c9`](https://github.com/ben0kay/godot-tower-defense/commit/2fa1d5f0c9f8380e6a5f35fc5567185bd75d3876) against the root README, `NOTES/CodePreferences.md`, latest commits and feature-owned notes. **`main` is stable; never write/merge to main unless asked.** This document is a planning/status change only, not authorization to implement all proposals.

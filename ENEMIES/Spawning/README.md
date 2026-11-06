@@ -1,3 +1,9 @@
+## SPAWN1 startup registration follow-up — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Level001's config still named a removed second portal, and Level020 named an absent fifth portal. Removed those stale entries to match each actual map; missing required source validation remains strict. The new activation fixture now checks real Level001 setup separately and uses Level002's two actual portals for its future-portal scenario. Maps, wave recipes, active source selection, schedules and portal coordinates are unchanged.
+
+---
+
 ## SPAWN0 / SPAWN1 — authored portal activation
 
 **Source Implemented / Awaiting Owner Validation.**

@@ -5,7 +5,7 @@
 [ext_resource type="Resource" path="res://TOWERS/Support/RepairTower/RepairTowerPower.tres" id="power"]
 
 [resource]
-Power = ExtResource("power")
 script = ExtResource("1")
+Power = ExtResource("power")
 ConstructionArt = ExtResource("art")
 HeatEnabled = true

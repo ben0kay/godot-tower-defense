@@ -13,7 +13,11 @@ public partial class PortalActivationChecks : Node
     {
         try
         {
-            using DeathSpawnFixture f = new(this, MenuNavigation.Level001Scene);
+            // Level001 intentionally has one portal; its unedited authored config must prepare waves.
+            using (MissionFixture levelOne = new(this, MenuNavigation.Level001Scene))
+                Require(levelOne.Waves.State == WaveManager.WaveState.Ready, "Real Level001 starts without stale portal setup errors");
+            // Level002 supplies two real portals for the isolated future-source test.
+            using DeathSpawnFixture f = new(this, MenuNavigation.Level002Scene);
             var grid = f.Grid; var spawns = f.Spawns; var waves = f.Waves;
             LevelConfig original = grid.Level.Settings;
             grid.Level.Settings = (LevelConfig)original.Duplicate(true);

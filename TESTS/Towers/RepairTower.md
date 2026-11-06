@@ -1,3 +1,9 @@
+## RT2 audit follow-up — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** The fixture now requires the actual authored power profile, seeds its capacitor explicitly for deterministic repair/heat checks, and confirms a fresh empty healer cannot repair or accumulate heat. It also checks limited stored energy funding, checkpoint heat/energy and safe removal of the healer inside the target's hull callback. Default script assignment precedes exported Power in the resource. No fixture execution/build was possible here (.NET unavailable); earlier heat/power-free fixture assumptions are superseded.
+
+---
+
 ## Restoration Tower paid levels 2–3 (2026-11-05)
 
 The focused `RepairTowerChecks.cs` now expects three absolute support tiers, checks L2/L3 price/work and 20/24 hull HP/s, 344/368 px range, 1,050/1,102.5 hull cap, and confirms the Repair/Range Inspector descriptions. These are lightweight authored checks **not executed** in this connector session. Owner should visually confirm finished SVG split layers, rotating gun on each tier, staged 35%/70% upgrade overlays, and saved/restored progression.

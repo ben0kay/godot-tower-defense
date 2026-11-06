@@ -1,3 +1,9 @@
+## Wave setup repair — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Removed stale `Portals/EnemyPortal2` from Level001Config.ActivePortals: the authored map contains only `Portals/EnemyPortal`. SPAWN1 correctly validates registrations but had promoted this pre-existing warning into a fatal SETUP ERROR. The remaining source, map, terrain and three wave recipes are unchanged. Reload Level001 and confirm START WAVE works. Strict validation remains enabled for missing/early required sources.
+
+---
+
 # Level 001 — Beginner Tower Defense Introduction
 
 `Level001.tscn` is loaded by `WORLD/World.tscn` when you run the game (F5). It is a saved, hand-editable TileMapLayer layout, not generated during gameplay. Placeholder artwork is deliberately replaceable.
