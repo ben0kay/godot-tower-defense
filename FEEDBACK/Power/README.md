@@ -1,3 +1,14 @@
+## Selection-weighted Transmitter links and drain verification — 2026-11-05
+
+**Source Implemented / Awaiting Owner Visual Validation.** Unselected Transmitter pairs now draw only an extremely faint static line: `UnselectedOpacity=0.04` multiplies existing alpha (powered core about 2.2% final alpha). No halo/pulses or animation processing while unselected. Selecting **either** endpoint restores the current brighter core/halo/pulses using `SelectedOpacity=1.0`. Both opacity knobs live in `FEEDBACK/Power/DefaultPowerDistributionVisuals.tres`. One lower-SaveId renderer remains; it observes the peer's selection event and detaches on unlink/re-pair/exit. Closing inspection clears distribution selection, returning the line to faint and hiding Relay coverage. Existing offscreen, pause and inactive-state gates remain.
+
+Checked current default configs and attack/repair seams: all other eight offensive tower types and Repair **already have nonzero idle/active drain** through the existing shared capacitor. Machine Gun 0.15/10, Sniper/Cryo/Stasis 0.10/8, Blaster/Rocket 0.15/14, Laser 0.20/12, Shockwave 0.20/14, Repair 0.15/8 energy/s (idle/total active). Battle reference remains 0/12. Configs reference their individual Power resources; volleys/pulses pay once and continuous Laser/Repair pays the funded duration. Idle applies outside paid work while operational; active replaces idle. Recharge can offset drain and keep a bar full. Rates, funding, generation, save schema and combat balance were not changed or duplicated.
+
+Minimal source/diff/resource checks only; .NET unavailable, no C# build or in-game acceptance claim. Owner: select each endpoint independently, close inspection, unlink/re-pair, and check faint/selected link styles; inspect actual Use versus Refill on idle/firing/repairing towers. For visible depletion, temporarily remove supply or inspect a source-limited network.
+
+
+---
+
 # Power distribution feedback — PW5-C
 
 `PowerRelaySelectionVisual` draws only selected actual conductive coverage and a shortest source route extracted from the existing grid caches. `PowerTransmitterLinkVisual` replaces PW5-B’s static Line2D with a culled, bounded-cadence core/halo/pulse renderer; one endpoint owns each pair. `PowerDistributionVisualConfig` / `DefaultPowerDistributionVisuals.tres` own cosmetic tuning only.

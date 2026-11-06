@@ -10,6 +10,8 @@ public partial class PowerDistributionVisualConfig : Resource
     [Export] public Color SourceRoute { get; set; } = new(.55f, 1f, 1f, .72f);
     [Export(PropertyHint.Range, "2,16,1")] public float DashLength { get; set; } = 8;
     [ExportGroup("Transmitter Link")]
+    [Export(PropertyHint.Range, "0,1,0.01")] public float UnselectedOpacity { get; set; } = .04f;
+    [Export(PropertyHint.Range, "0,1,0.01")] public float SelectedOpacity { get; set; } = 1f;
     [Export] public Color PoweredCore { get; set; } = new(.25f, .8f, 1f, .55f);
     [Export] public Color PoweredHalo { get; set; } = new(.15f, .65f, 1f, .09f);
     [Export] public Color Unpowered { get; set; } = new(.35f, .48f, .6f, .25f);

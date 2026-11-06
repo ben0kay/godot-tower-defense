@@ -1,5 +1,6 @@
 // Event-driven distribution lifecycle; cosmetic helpers own selected coverage and bounded link animation.
 using Godot;
+using System;
 using System.Collections.Generic;
 
 public abstract partial class PowerDistributionBuilding : TowerBase
@@ -12,6 +13,9 @@ public abstract partial class PowerDistributionBuilding : TowerBase
     private PowerTransmitterLinkVisual _link;
     private PowerRelaySelectionVisual _relaySelection;
     private bool _selected;
+    private PowerDistributionBuilding _linkPeer;
+    private event Action LinkSelectionChanged;
+    internal bool DistributionSelected => _selected;
     private string _details = "";
     private string _status = "Preview · no live power network";
     public override string DescribeRuntime()
@@ -22,7 +26,9 @@ public abstract partial class PowerDistributionBuilding : TowerBase
     }
     public override void SetSelected(bool selected)
     {
-        base.SetSelected(selected); _selected = selected;
+        base.SetSelected(selected);
+        bool changed = _selected != selected; _selected = selected;
+        if (this is PowerTransmitter && changed) { RefreshPresentation(); LinkSelectionChanged?.Invoke(); }
         if (this is PowerRelay relay)
         {
             if (selected && _relaySelection == null) { _relaySelection = new PowerRelaySelectionVisual { Name = "RelayCoverage" }; AddChild(_relaySelection); }
@@ -60,10 +66,11 @@ public abstract partial class PowerDistributionBuilding : TowerBase
         {
             PowerTransmitter peer = PowerNetworks.TransmitterPeer(transmitter);
             bool owns = peer != null && string.CompareOrdinal(SaveId, peer.SaveId) < 0;
+            ObserveLinkPeer(owns ? peer : null);
             if (owns)
             {
                 if (_link == null) { _link = new PowerTransmitterLinkVisual { Name = "PowerLink" }; AddChild(_link); }
-                _link.Present(ToLocal(peer.GlobalPosition), true, PowerNetworks.LinkVisualState(transmitter));
+                _link.Present(ToLocal(peer.GlobalPosition), true, PowerNetworks.LinkVisualState(transmitter), _selected || peer.DistributionSelected);
             }
             if (!owns) _link?.Present(Vector2.Zero, false, PowerLinkVisualState.Suspended);
         }
@@ -71,8 +78,17 @@ public abstract partial class PowerDistributionBuilding : TowerBase
         string details = PowerNetworks.DistributionDetails(this);
         if (_status == next && _details == details) return; _status = next; _details = details; NotifyRuntimeChanged();
     }
+    // Only the pair's visual owner observes its peer's selection; unlink/re-pair/teardown detach the old event.
+    private void ObserveLinkPeer(PowerDistributionBuilding peer)
+    {
+        if (_linkPeer == peer) return;
+        if (GodotObject.IsInstanceValid(_linkPeer)) _linkPeer.LinkSelectionChanged -= RefreshPresentation;
+        _linkPeer = peer;
+        if (GodotObject.IsInstanceValid(_linkPeer)) _linkPeer.LinkSelectionChanged += RefreshPresentation;
+    }
     public override void _ExitTree()
     {
+        ObserveLinkPeer(null);
         WorkStarted -= RefreshRegistration; WorkCompleted -= RefreshRegistration; HealthChanged -= RefreshRegistration;
         DisableStateChanged -= RefreshRegistration; SpatialChanged -= Moved;
         if (GodotObject.IsInstanceValid(AuthoredConfig)) AuthoredConfig.Changed -= ConfigChanged;

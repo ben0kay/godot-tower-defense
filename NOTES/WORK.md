@@ -1,3 +1,14 @@
+## Selection-weighted Transmitter links and drain verification — 2026-11-05
+
+**Source Implemented / Awaiting Owner Visual Validation.** Unselected Transmitter pairs now draw only an extremely faint static line: `UnselectedOpacity=0.04` multiplies existing alpha (powered core about 2.2% final alpha). No halo/pulses or animation processing while unselected. Selecting **either** endpoint restores the current brighter core/halo/pulses using `SelectedOpacity=1.0`. Both opacity knobs live in `FEEDBACK/Power/DefaultPowerDistributionVisuals.tres`. One lower-SaveId renderer remains; it observes the peer's selection event and detaches on unlink/re-pair/exit. Closing inspection clears distribution selection, returning the line to faint and hiding Relay coverage. Existing offscreen, pause and inactive-state gates remain.
+
+Checked current default configs and attack/repair seams: all other eight offensive tower types and Repair **already have nonzero idle/active drain** through the existing shared capacitor. Machine Gun 0.15/10, Sniper/Cryo/Stasis 0.10/8, Blaster/Rocket 0.15/14, Laser 0.20/12, Shockwave 0.20/14, Repair 0.15/8 energy/s (idle/total active). Battle reference remains 0/12. Configs reference their individual Power resources; volleys/pulses pay once and continuous Laser/Repair pays the funded duration. Idle applies outside paid work while operational; active replaces idle. Recharge can offset drain and keep a bar full. Rates, funding, generation, save schema and combat balance were not changed or duplicated.
+
+Minimal source/diff/resource checks only; .NET unavailable, no C# build or in-game acceptance claim. Owner: select each endpoint independently, close inspection, unlink/re-pair, and check faint/selected link styles; inspect actual Use versus Refill on idle/firing/repairing towers. For visible depletion, temporarily remove supply or inspect a source-limited network.
+
+
+---
+
 ## PW5-C — distribution visuals and inspection — 2026-11-05
 
 **Source Implemented / Awaiting Owner Visual Validation.** Selecting a Power Relay now shows faint cyan filled/outlined **reachable conductive cells**, plus a thin dashed shortest route to a live source and the label **Nearest live source / Island supply shared**. No circular coverage spanning gaps. Inactive/source-less Relays show no coverage/route. Deselecting hides the diagnostic immediately. The route follows cached conductive distance and positive Transmitter hops when supply is remote; ties are deterministic and a source footprint terminates the path.

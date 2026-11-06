@@ -1,3 +1,9 @@
+## Consumer drain verification — 2026-11-05
+
+Confirmed all nine offensive defaults and Repair reference their per-type Power resources and use the shared attack/work funding paths. Eight non-Battle offensive types plus Repair already have nonzero idle and active draw; no duplicate implementation or balance change was needed. Battle intentionally retains 0 idle / 12 active as the unchanged reference. Idle drains only while operational outside a paid active window; active replaces idle. Incoming recharge may keep stored energy full despite consumption. Inspect the existing selected **Use** and **Refill** rates, or remove supply to see depletion. Source checks only; owner gameplay validation pending.
+
+---
+
 ## Offensive and Repair power rollout — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** All nine implemented offensive types plus Restoration Tower now use the existing `TowerPowerConsumer`, `PowerCapacitor`, `PowerGridManager` and owned `NoPower` handle. No additional power clock, per-tower polling, source, relay or priority slider is added. Existing selected ENERGY bar and PW4-D actual refill/limit/use/distance/status details automatically apply to every consumer. Earlier Battle-only phase notes below are historical.

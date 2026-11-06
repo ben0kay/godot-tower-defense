@@ -476,6 +476,7 @@ public partial class TowerPlacementController : Node2D
     // Retain existing selection semantics but stop hidden progress notifications until reselected.
     private void OnInspectionClosed()
     {
+        if (_selected is PowerDistributionBuilding distribution) distribution.SetSelected(false);
         CancelPowerLink();
         _selectionOverlay?.Clear();
         _rangeOverlay?.Clear();
