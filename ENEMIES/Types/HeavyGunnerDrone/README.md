@@ -1,3 +1,9 @@
+## Flat black/red Heavy Gunner artwork — 2026-11-06
+
+The 62×42 hull `Artwork/heavy_gunner_drone.svg` and separate 18×50 `Artwork/heavy_gunner_cannon.svg` now use the modern charcoal/scarlet fleet style rather than blue-grey reflective gradients. The Heavy Gunner retains its armoured twin-stabilizer silhouette, centred gun mount `(-2,0)`, precise muzzle `(0,-21)` and heavier-barrel profile. Small red armour and heat-sink strips distinguish it from the starter gunner. No SVG gradients, filters or runtime effects. Weapon ballistics, health, shields, movement, enemy logic and weapon nodes are unchanged; source reviewed, owner Godot acceptance pending.
+
+---
+
 # Heavy Gunner Drone — implemented (HG1)
 
 **Weapon refinement — 2026-11-05:** The Heavy Gunner's own minigun now fires **5 Kinetic damage** at **2.5 shots/s**, with **650px/s** bullet travel and a larger **14.6×2.9px** red tapered streak (roughly 33% longer/wider than its previous 11×2.2). This changes only the heavy gun weapon and tracer resources. Its 260 HP, 52px/s movement, 275px range, hull/gun artwork, 2.8s bullet lifetime and existing muzzle flash remain unchanged. The starter Gunner's weapon, visuals and balance remain untouched.

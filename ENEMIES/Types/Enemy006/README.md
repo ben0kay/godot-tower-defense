@@ -1,3 +1,9 @@
+## Flat charcoal/red Elite Assault Ship artwork — 2026-11-06
+
+`Artwork/enemy006.svg` now matches the flat black/charcoal/scarlet fleet palette: a recessed red reactor, scarlet upper and lower talon markings, dark flat surface plating and small orange-red drives. The unique 80×60 **swept talon-wing predator** silhouette and right-facing nose are retained, with no SVG gradients, filters or extra runtime visual layers. This is artwork only; its optional shields, HP, wave ID, movement and combat are unchanged. Older grey/violet art notes below describe the previous generation.
+
+---
+
 ## Current artwork — alien robotic pass (2026-10-18)
 
 **Talon-wing predator**, right-facing, native **80×60px**. Curved forward-reaching attack blades around a separate narrow fuselage, violet reactor and twin forward rails. Artwork only: stable identity, scenes, gameplay/ability settings and navigation clearance are unchanged. Earlier art/color descriptions below are historical. See `../ART_DIRECTION.md` for fleet-wide conventions and the review sheet.

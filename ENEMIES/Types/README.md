@@ -1,3 +1,9 @@
+## Five remaining fleet ships polished in black/scarlet style — 2026-11-06
+
+Seven native SVG assets now match the flat black/charcoal and restrained red fleet direction: both Gunner Drone hull/gun sprites, both Heavy Gunner Drone hull/gun sprites, Shield Emitter, Shield Frigate and Elite Assault Ship. Shield support ships retain clear **violet energy** while their armour now belongs to the same dark faction. Elite's reactor is red. The existing silhouette, imported dimensions, independent muzzle alignment, class/rank/role and all gameplay behavior remain unchanged. No gradients, runtime filters or new renderer nodes. Details: [fleet art direction](ART_DIRECTION.md). Source implemented; owner Godot visual acceptance pending.
+
+---
+
 ## Heavy Warship and cargo fleet dark/red re-polish — 2026-11-05
 
 Updated `Enemy005/Artwork/enemy005.svg` (112×120), `Transporter/Artwork/transporter.svg` (112×72), and `HeavyTransporter/Artwork/heavy_transporter_mk1.svg` (**160×112**, previously 144×100). Flat charcoal/scarlet graphics retain distinct four-lance warship and ribbed industrial carrier silhouettes. The heavy carrier's size increase is visual only; no changes to gameplay, scene IDs, navigation, releases or waves. See [ART_DIRECTION.md](ART_DIRECTION.md). Owner Godot visual validation pending.

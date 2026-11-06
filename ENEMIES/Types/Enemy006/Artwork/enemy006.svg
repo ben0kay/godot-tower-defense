@@ -1,26 +1,25 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="80" height="60" viewBox="0 0 80 60">
-<!-- Right-facing alien robotic hull; baked vector lighting only. Keep native canvas and forward axis. -->
-<defs>
-  <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#53626e"/><stop offset=".25" stop-color="#263440"/><stop offset=".56" stop-color="#111a23"/><stop offset="1" stop-color="#070c12"/></linearGradient>
-  <linearGradient id="plate" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#78858d"/><stop offset=".17" stop-color="#3b4b57"/><stop offset=".6" stop-color="#19242e"/><stop offset="1" stop-color="#0d151d"/></linearGradient>
-  <linearGradient id="core" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#bc70ef"/><stop offset=".5" stop-color="#eed7ff"/><stop offset="1" stop-color="#bc70ef"/></linearGradient>
-</defs>
+<!-- Elite Assault Ship: flat dark/scarlet predator; same 80x60 talon hull and +X nose. -->
 <g transform="translate(0 0) scale(0.8 0.6)" stroke-linejoin="round" stroke-linecap="round">
 <!-- C-shaped talon wings curve forward around a separate narrow attack fuselage -->
-<path d="M7 37Q4 13 45 6Q69 2 96 9L77 22 89 14Q57 11 35 28L28 40Z M7 63Q4 87 45 94Q69 98 96 91L77 78 89 86Q57 89 35 72L28 60Z" fill="url(#hull)" stroke="#7b8b95" stroke-width="1.2"/>
-<path d="M13 29Q23 13 50 11L76 11Q48 16 29 32Z M13 71Q23 87 50 89L76 89Q48 84 29 68Z" fill="url(#plate)"/>
-<path d="M27 16 31 24 M43 10 44 18 M27 84 31 76 M43 90 44 82" stroke="#080e14" stroke-width="1.6"/>
-<path d="M18 34 43 34 58 41 81 42 97 47V53L81 58 58 59 43 66 18 66 9 57V43Z" fill="url(#plate)" stroke="#8595a0" stroke-width="1.1"/>
-<path d="M28 40 50 40 65 46 81 48V52L65 54 50 60 28 60 19 50Z" fill="#0a141e" stroke="#435c6f" stroke-width="1"/>
-<path d="M30 44 48 43 60 48V52L48 57 30 56 24 50Z" fill="#6f38a9" opacity=".55"/>
-<ellipse cx="39" cy="50" rx="8" ry="6" fill="url(#core)"/>
-<ellipse cx="39" cy="50" rx="3" ry="3" fill="#f8eaff"/>
-<path d="M51 48H66 M51 52H66" stroke="#b68cdd" stroke-width="1.1"/>
-<path d="M71 43H88 M71 57H88" stroke="#09111a" stroke-width="3"/>
-<path d="M72 43H89 M72 57H89" stroke="#94a6b2" stroke-width=".9"/>
-<path d="M11 44V56" stroke="#f46c32" stroke-width="3.4"/>
-<path d="M19 22 28 18 M19 78 28 82 M59 12 67 11 M59 88 67 89" stroke="#fc4b2c" stroke-width="1.6"/>
-<path d="M24 36 35 36 44 39 M24 64 35 64 44 61" fill="none" stroke="#afbbc2" stroke-width=".7"/>
+<path d="M7 37Q4 13 45 6Q69 2 96 9L77 22 89 14Q57 11 35 28L28 40Z M7 63Q4 87 45 94Q69 98 96 91L77 78 89 86Q57 89 35 72L28 60Z" fill="#111920" stroke="#05080c" stroke-width="1.2"/>
+<path d="M13 29Q23 13 50 11L76 11Q48 16 29 32Z M13 71Q23 87 50 89L76 89Q48 84 29 68Z" fill="#30363c"/>
+<path d="M27 16 31 24 M43 10 44 18 M27 84 31 76 M43 90 44 82" stroke="#090e14" stroke-width="1.6"/>
+<!-- Scarlet talon armour identifiers: preserve curved forward-pincer silhouette. -->
+<path d="M23 21Q43 10 66 11L57 15Q38 15 28 27Z M23 79Q43 90 66 89L57 85Q38 85 28 73Z" fill="#ad2729"/>
+<path d="M28 20Q44 13 58 13 M28 80Q44 87 58 87" stroke="#ff6039" stroke-width="1.4" fill="none"/>
+<path d="M11 43 15 44V56L11 57Z" fill="#ad2729"/>
+<path d="M18 34 43 34 58 41 81 42 97 47V53L81 58 58 59 43 66 18 66 9 57V43Z" fill="#30363c" stroke="#05080c" stroke-width="1.1"/>
+<path d="M28 40 50 40 65 46 81 48V52L65 54 50 60 28 60 19 50Z" fill="#101820" stroke="#080d12" stroke-width="1"/>
+<path d="M30 44 48 43 60 48V52L48 57 30 56 24 50Z" fill="#0a1016" opacity=".55"/>
+<ellipse cx="39" cy="50" rx="8" ry="6" fill="#ad2729"/>
+<ellipse cx="39" cy="50" rx="3" ry="3" fill="#ff6039"/>
+<path d="M51 48H66 M51 52H66" stroke="#ad2729" stroke-width="1.1"/>
+<path d="M71 43H88 M71 57H88" stroke="#070d13" stroke-width="3"/>
+<path d="M72 43H89 M72 57H89" stroke="#293139" stroke-width=".9"/>
+<path d="M11 44V56" stroke="#ad2729" stroke-width="3.4"/>
+<path d="M19 22 28 18 M19 78 28 82 M59 12 67 11 M59 88 67 89" stroke="#e74931" stroke-width="1.6"/>
+<path d="M24 36 35 36 44 39 M24 64 35 64 44 61" fill="none" stroke="#30363c" stroke-width=".7"/>
 
 </g>
 </svg>

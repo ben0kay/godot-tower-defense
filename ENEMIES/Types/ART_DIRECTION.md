@@ -1,3 +1,11 @@
+## Remaining five hulls and separate guns converted to flat fleet style — 2026-11-06
+
+The pending visual pass is complete in source: **Gunner Drone** (48×30 hull and 12×44 gun), **Heavy Gunner Drone** (62×42 hull and 18×50 gun), **Shield Emitter** (40×32), **Shield Frigate** (72×48) and **Elite Assault Ship** (80×60) now follow the charcoal `#111920`/`#1e252c`/`#30363c`, near-black `#05080c`, muted scarlet `#ad2729` and tiny orange-red `#ff6039` palette. All seven SVG source files use **solid fills and strokes only**—no baked gradients, filters or per-frame rendering code. The two shield support ships deliberately keep **violet reactor/projection accents**. Elite is now red, not violet. Starter and Heavy Gunner retain independent rotating barrel sprites and the original Godot muzzle origins.
+
+All original hull outlines, native canvas sizes, right-facing directions, gun socket alignments and independent weapon/payload scenes are preserved. No changes to ships' gameplay statistics, shields, weapons, classifications, IDs, waves or F2 registration. Obsidian Dreadnought remains a distinct advanced capital-ship art variant; its already-black/red palette is not modified. Source/file sanity checks only; owner visual approval in Godot pending. Older statements describing which subset has the finished flat style are historical.
+
+---
+
 ## Flat dark fleet substyle — 2026-10-26 baseline; 2026-11-05 companion passes
 
 The original `Enemy001`, `Enemy002`, `Enemy004` and `Cruiser/cruiser_mk1` redesigns are now joined by `ReinforcedDrone`, `Racer`, `HeavyBulwark`, `Enemy005`, `Transporter` and `HeavyTransporter`. These ten have a *deliberately consistent look*: solid charcoal armour (#111920, #1e252c, #30363c), thick almost-black recess/outline (#05080c), muted scarlet (#ad2729) and small orange-red drive/core details (#ff6039). **No baked gradients, reflection highlights, SVG filters, glow or particles** in these assets; each keeps its unique silhouette and its original native canvas/facing. This flat style supersedes earlier gradient-oriented descriptions **for these ten ships only**; other fleet assets are unchanged pending a separate art pass.

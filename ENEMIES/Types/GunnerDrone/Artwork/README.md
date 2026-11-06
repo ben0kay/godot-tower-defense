@@ -1,3 +1,9 @@
+## Fleet art palette upgrade — 2026-11-06
+
+The 48×30 `gunner_drone.svg` and 12×44 `gunner_minigun.svg` were repolished as true source SVGs to match the same **flat near-black / charcoal / restrained red** family as Standard Drone, with small red wing markers, a darkened independent turret and compact scarlet barrel/motor markings. There are no gradients, filters, textures or added animated art layers. The existing authored right-facing hull shape, turret socket `(-2,0)` and muzzle `(0,-18)` are preserved. Source checks only; review in Godot at native zoom.
+
+---
+
 # Gunner Drone artwork
 
 ## Starter gunner — second silhouette refinement (2026-11-05)

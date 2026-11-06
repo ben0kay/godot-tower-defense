@@ -1,36 +1,29 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="44" viewBox="0 0 12 44">
-<!-- Starter gun: 12px narrow, 44px long. Centre (6,22); exact muzzle (6,4) = Marker2D(0,-18). -->
-<defs>
-  <linearGradient id="casing" x1="0" y1="0" x2="1" y2="1">
-    <stop stop-color="#b4cad0"/><stop offset=".35" stop-color="#75929d"/>
-    <stop offset=".75" stop-color="#365363"/><stop offset="1" stop-color="#172d3a"/>
-  </linearGradient>
-  <linearGradient id="tube" x1="0" y1="0" x2="1" y2="0">
-    <stop stop-color="#172938"/><stop offset=".36" stop-color="#728f9b"/>
-    <stop offset=".57" stop-color="#b5d0d6"/><stop offset="1" stop-color="#1a3442"/>
-  </linearGradient>
-</defs>
+<!-- Refinished in flat charcoal/scarlet fleet style (2026-11-06). Starter gun: 12px narrow, 44px long. Centre (6,22); exact muzzle (6,4) = Marker2D(0,-18). -->
 <g stroke-linecap="round" stroke-linejoin="round">
   <!-- One long narrow central barrel. Tip stays aligned with existing projectile muzzle. -->
-  <path d="M4.3 26V7.1L5.1 4H6.9L7.7 7.1V26Z" fill="url(#tube)"
-        stroke="#101f2a" stroke-width=".8"/>
-  <path d="M5.35 7V22.8" stroke="#d4e6e8" stroke-width=".75" opacity=".84"/>
-  <path d="M6.75 7V22.8" stroke="#233d4b" stroke-width=".7"/>
-  <path d="M4.3 4H7.7V6H4.3Z" fill="#263c47" stroke="#bdd3d6" stroke-width=".7"/>
+  <path d="M4.3 26V7.1L5.1 4H6.9L7.7 7.1V26Z" fill="#111920"
+        stroke="#05080c" stroke-width=".8"/>
+  <path d="M5.35 7V22.8" stroke="#30363c" stroke-width=".75" opacity=".84"/>
+  <path d="M6.75 7V22.8" stroke="#05080c" stroke-width=".7"/>
+  <path d="M4.3 4H7.7V6H4.3Z" fill="#101820" stroke="#30363c" stroke-width=".7"/>
   <!-- Light barrel clamps and tiny side heat rails; no wide rotating gun shield. -->
-  <path d="M2.9 14.5H9.1V17H2.9Z" fill="#536e79" stroke="#9cb3ba" stroke-width=".7"/>
-  <path d="M2.7 23H9.3V25.8H2.7Z" fill="#8ca9b2" stroke="#192f3b" stroke-width=".8"/>
-  <path d="M3.2 19V23M8.8 19V23" fill="none" stroke="#668e99" stroke-width=".9"/>
+  <path d="M2.9 14.5H9.1V17H2.9Z" fill="#293139" stroke="#05080c" stroke-width=".7"/>
+  <path d="M2.7 23H9.3V25.8H2.7Z" fill="#30363c" stroke="#05080c" stroke-width=".8"/>
+  <path d="M3.2 19V23M8.8 19V23" fill="none" stroke="#293139" stroke-width=".9"/>
+  <!-- Flat scarlet cooling stripe on the long barrel; unchanged tip at (6,4). -->
+  <path d="M4.5 11.5H7.5V12.8H4.5Z M3.2 23.7H8.8" fill="#ad2729" stroke="#ad2729" stroke-width=".7"/>
+  <path d="M5 11.8H7" stroke="#ff6039" stroke-width=".6"/>
   <!-- Narrow breech and small circular motor housing over the existing turret socket. -->
   <path d="M3.1 25.2H8.9L10 28V36L8 39H4L2 36V28Z"
-        fill="url(#casing)" stroke="#c3d7db" stroke-width=".95"/>
-  <path d="M3.7 27.5H8.3L8.8 32.5H3.2Z" fill="#263e49" stroke="#72909c" stroke-width=".65"/>
+        fill="#1e252c" stroke="#05080c" stroke-width=".95"/>
+  <path d="M3.7 27.5H8.3L8.8 32.5H3.2Z" fill="#101820" stroke="#30363c" stroke-width=".65"/>
   <path d="M2.5 30.5L3.5 32.5V35L2.5 34Z M9.5 30.5L8.5 32.5V35L9.5 34Z"
-        fill="#a56560"/>
-  <circle cx="6" cy="33.2" r="3.1" fill="#132936" stroke="#a9c4ca" stroke-width=".85"/>
-  <circle cx="6" cy="33.2" r="1.65" fill="#de876f" stroke="#793d37" stroke-width=".65"/>
-  <circle cx="6" cy="33.2" r=".55" fill="#ffe5be"/>
-  <path d="M4.5 39H7.5L8 41H4Z" fill="#4f6c78" stroke="#9ebbc5" stroke-width=".75"/>
-  <path d="M5 40.8H7" stroke="#ed9676" stroke-width=".9"/>
+        fill="#ad2729"/>
+  <circle cx="6" cy="33.2" r="3.1" fill="#0a1016" stroke="#05080c" stroke-width=".85"/>
+  <circle cx="6" cy="33.2" r="1.65" fill="#ad2729" stroke="#05080c" stroke-width=".65"/>
+  <circle cx="6" cy="33.2" r=".55" fill="#ff6039"/>
+  <path d="M4.5 39H7.5L8 41H4Z" fill="#1e252c" stroke="#05080c" stroke-width=".75"/>
+  <path d="M5 40.8H7" stroke="#e74931" stroke-width=".9"/>
 </g>
 </svg>

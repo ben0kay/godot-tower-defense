@@ -1,3 +1,9 @@
+## Flat charcoal/scarlet gunner artwork — 2026-11-06
+
+**Artwork source updated; owner Godot visual acceptance pending.** `Artwork/gunner_drone.svg` and `Artwork/gunner_minigun.svg` now use the flat black/charcoal, near-black outline, muted scarlet panel and small orange-red drive/weapon detailing of Enemy001. The sharp 48×30 light gunner silhouette and the separate narrow 12×44 gun are preserved; all previous SVG gradients have been replaced by solid vector fills. Existing hull-local mount `(-2,0)`, gun muzzle `(0,-18)`, native dimensions, sprites/scene structure, stats, targeting, tracers and animation behavior are unchanged. This palette pass supersedes the earlier blue-grey art descriptions below.
+
+---
+
 ## Starter Gunner art refinement — 2026-11-05
 
 The Gunner Drone's native hull is now **48×30** (formerly 52×38), with a slender body and short swept fins. Its independent gun is **12×44** (formerly 20×40), with an obvious longer exposed barrel and much less bulky rotating housing. **Muzzle stays at `(0,-18)`**, exactly the barrel tip on the new image; the turret still mounts at hull-local `(-2,0)`. These are SVG-only changes: the scene, bullets/tracers, muzzle flashes, 6/s cadence, 2 kinetic damage, HP, radius, speed, targeting and existing weapon code are untouched.

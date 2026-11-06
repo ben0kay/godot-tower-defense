@@ -1,3 +1,9 @@
+## Dark/red Shield Emitter artwork — 2026-11-06
+
+`Artwork/enemy003.svg` now has solid charcoal and black mechanical armour with small red faction stripes on its split projector forks. Its central **violet/purple shield reactor and projection details are deliberately preserved** to distinguish support ships. This is the same 40×32 right-facing silhouette, with the same gameplay shield emitter component and no gradient/filter use. The earlier blue-grey gradient hull description below is historical. No enemy health, shield mechanics, class, waves, IDs or scripts changed; owner visual review pending.
+
+---
+
 ## Enemy003 asset rename — 2026-10-26
 
 The former ShieldGenerator source asset is now `ENEMIES/Types/Enemy003/Enemy003.tscn` with `Enemy003.tres` and `Artwork/enemy003.svg`. Its user-facing display name is **Shield Emitter** and its stable wave/save/spawn identity remains **`shield_emitter_mk1`**. The same `Abilities/ShieldEmitter` component and its independent Inspector config remain attached. Stats (100 hull, 80 optional shields, 70 px/s, 16px radius, 2 Citadel damage and 5 kill Credits), scene inheritance, 40×32 artwork and shield restoration behavior are unchanged.

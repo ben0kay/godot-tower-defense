@@ -1,44 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="30" viewBox="0 0 48 30">
 <!-- Small right-facing starter gunner. Centre is (24,15), gun socket (22,15) = local (-2,0). -->
-<defs>
-  <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1">
-    <stop stop-color="#657986"/><stop offset=".32" stop-color="#334652"/>
-    <stop offset=".75" stop-color="#192631"/><stop offset="1" stop-color="#0b151d"/>
-  </linearGradient>
-  <linearGradient id="fin" x1="0" y1="0" x2="1" y2="1">
-    <stop stop-color="#506571"/><stop offset=".55" stop-color="#273845"/>
-    <stop offset="1" stop-color="#0e1b25"/>
-  </linearGradient>
-  <linearGradient id="thruster" x1="0" y1="0" x2="1" y2="0">
-    <stop stop-color="#ffd1a2"/><stop offset=".42" stop-color="#df7450"/>
-    <stop offset="1" stop-color="#7f3028"/>
-  </linearGradient>
-</defs>
 <g stroke-linecap="round" stroke-linejoin="round">
   <!-- Slender, sharply swept stabilizers, not the broad armour of a medium gunship. -->
   <path d="M8 10L18 5L28 8L35 11L41 9L39 13L29 14L16 12Z
            M8 20L18 25L28 22L35 19L41 21L39 17L29 16L16 18Z"
-        fill="url(#fin)" stroke="#708390" stroke-width=".85"/>
+        fill="#111920" stroke="#05080c" stroke-width=".85"/>
   <path d="M13 10L20 7L29 10L25 13L15 12Z
-           M13 20L20 23L29 20L25 17L15 18Z" fill="#465b66"/>
+           M13 20L20 23L29 20L25 17L15 18Z" fill="#30363c"/>
   <path d="M19 8L21 12M19 22L21 18M29 10L31 12M29 20L31 18"
-        fill="none" stroke="#101f29" stroke-width="1.15"/>
+        fill="none" stroke="#080d12" stroke-width="1.15"/>
   <!-- Compact narrow fuselage, with a clear single point-forward nose. -->
   <path d="M6 11L19 9L31 11L46 15L31 19L19 21L6 19L3 17V13Z"
-        fill="url(#hull)" stroke="#91a5af" stroke-width="1.05"/>
+        fill="#1e252c" stroke="#05080c" stroke-width="1.05"/>
   <path d="M12 12L24 10.7L32 12.3L41.5 15L32 17.7L24 19.3L12 18L8.2 15Z"
-        fill="#192b37" stroke="#526875" stroke-width=".75"/>
-  <path d="M36 13.1L44 15L36 16.9L39.5 15Z" fill="#8e9ca7"/>
-  <path d="M38.5 14.3L42 15L38.5 15.7" stroke="#d87966" stroke-width=".9" fill="none"/>
+        fill="#111820" stroke="#080d12" stroke-width=".75"/>
+  <path d="M36 13.1L44 15L36 16.9L39.5 15Z" fill="#30363c"/>
+  <path d="M38.5 14.3L42 15L38.5 15.7" stroke="#ad2729" stroke-width=".9" fill="none"/>
   <!-- Small single rear drive. The shared thruster stays mounted by the real hull dimensions. -->
-  <path d="M4 12H7V18H4Z" fill="#111d27" stroke="#5d7079" stroke-width=".7"/>
-  <path d="M4.9 12.8H6.3V17.2H4.9Z" fill="url(#thruster)"/>
+  <path d="M4 12H7V18H4Z" fill="#0a1016" stroke="#05080c" stroke-width=".7"/>
+  <path d="M4.9 12.8H6.3V17.2H4.9Z" fill="#ad2729"/>
   <path d="M10 9L12.5 10M10 21L12.5 20M32 10L35 11M32 20L35 19"
-        stroke="#bf7160" stroke-width="1.0" fill="none"/>
+        stroke="#ad2729" stroke-width="1.0" fill="none"/>
+  <!-- Fleet-red wing identification and tiny orange-red nose/drive glints. -->
+  <path d="M13 10.2 20 7.8 24 9.5 17 11.4Z M13 19.8 20 22.2 24 20.5 17 18.6Z"
+        fill="#ad2729"/>
+  <path d="M17 10.1 21 9.1M17 19.9 21 20.9" fill="none" stroke="#ff6039" stroke-width=".8"/>
+  <path d="M27 11.5 34 12.7 37 14 30 13.6Z M27 18.5 34 17.3 37 16 30 16.4Z"
+        fill="#ad2729"/>
+  <path d="M38 14.5 43 15 38 15.5Z" fill="#ff6039"/>
   <!-- Unchanged local mount at (-2,0), matched to the separate narrow minigun. -->
-  <circle cx="22" cy="15" r="5.1" fill="#0d1c26" stroke="#8296a2" stroke-width=".95"/>
-  <circle cx="22" cy="15" r="3.55" fill="#2c424e" stroke="#4c6470" stroke-width=".65"/>
+  <circle cx="22" cy="15" r="5.1" fill="#0a1016" stroke="#05080c" stroke-width=".95"/>
+  <circle cx="22" cy="15" r="3.55" fill="#293139" stroke="#090f15" stroke-width=".65"/>
   <path d="M13 13L16 12M13 17L16 18M28 11L31 12M28 19L31 18"
-        stroke="#a4b5bb" stroke-width=".7"/>
+        stroke="#30363c" stroke-width=".7"/>
 </g>
 </svg>
