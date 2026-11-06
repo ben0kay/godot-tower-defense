@@ -60,11 +60,11 @@ public partial class SpawnManager : Node
     }
     // =========================================================
     // Wave callers retain portal/shield policy; this adapter only resolves the registered type.
-    public Enemy SpawnWave(string enemyId, RandomNumberGenerator random, string requiredPortal = "", bool spawnWithShield = false, bool spawnWithStealth = false)
+    public Enemy SpawnWave(string enemyId, RandomNumberGenerator random, string requiredPortal = "", bool spawnWithShield = false, bool spawnWithStealth = false, SpawnSourceOptions source = null)
     {
         PackedScene scene = Catalog.Find(enemyId);
         if (scene == null) { LastMessage = "Unknown EnemyId: " + enemyId; return null; }
-        return SpawnWave(scene, random, requiredPortal, spawnWithShield, spawnWithStealth);
+        return SpawnWave(scene, random, requiredPortal, spawnWithShield, spawnWithStealth, source);
     }
     // =========================================================
     // Current single-cell routing guarantees clearance only below half a navigation cell.
@@ -82,7 +82,7 @@ public partial class SpawnManager : Node
     {
         NavigationGrid nav = Paths.Navigation;
         if (_cachedRevision == nav.Revision) return;
-        _entries.Clear(); _portalPaths.Clear(); _portalObjects.Clear(); bool[] reachable = nav.ReachableWithout();
+        _entries.Clear(); _portalPaths.Clear(); _portalObjects.Clear(); _edgeSides.Clear(); bool[] reachable = nav.ReachableWithout();
         if (_reachable == null || _reachable.Length != reachable.Length) _reachable = new bool[reachable.Length];
         System.Array.Copy(reachable, _reachable, reachable.Length);
         WorldGrid grid = nav.Grid; LevelConfig settings = grid.Level.Settings;
@@ -100,13 +100,13 @@ public partial class SpawnManager : Node
         {
             for (int x = 0; x < grid.Config.WidthCells; x++)
             {
-                if (settings.AllowedEdges.HasFlag(LevelConfig.MapEdge.Top)) _entries.Add(grid.CellToWorldCenter(new(x, 0)));
-                if (settings.AllowedEdges.HasFlag(LevelConfig.MapEdge.Bottom)) _entries.Add(grid.CellToWorldCenter(new(x, grid.Config.HeightCells - 1)));
+                if (settings.AllowedEdges.HasFlag(LevelConfig.MapEdge.Top)) AddEdgeSource(new(x, 0), LevelConfig.MapEdge.Top);
+                if (settings.AllowedEdges.HasFlag(LevelConfig.MapEdge.Bottom)) AddEdgeSource(new(x, grid.Config.HeightCells - 1), LevelConfig.MapEdge.Bottom);
             }
             for (int y = 0; y < grid.Config.HeightCells; y++)
             {
-                if (settings.AllowedEdges.HasFlag(LevelConfig.MapEdge.Left)) _entries.Add(grid.CellToWorldCenter(new(0, y)));
-                if (settings.AllowedEdges.HasFlag(LevelConfig.MapEdge.Right)) _entries.Add(grid.CellToWorldCenter(new(grid.Config.WidthCells - 1, y)));
+                if (settings.AllowedEdges.HasFlag(LevelConfig.MapEdge.Left)) AddEdgeSource(new(0, y), LevelConfig.MapEdge.Left);
+                if (settings.AllowedEdges.HasFlag(LevelConfig.MapEdge.Right)) AddEdgeSource(new(grid.Config.WidthCells - 1, y), LevelConfig.MapEdge.Right);
             }
         }
         if (nav.Destinations.Count > 1 && settings.SpawnMode != LevelConfig.SpawnSourceMode.Portals)
@@ -121,6 +121,7 @@ public partial class SpawnManager : Node
                 GD.PushWarning("Portal SpawnExit is blocked or cannot reach the Citadel: " + _portalPaths[i]);
         if (nav.Goals.Count == 0)
             GD.PushWarning("No usable Citadel approach markers; enemies cannot find a destination.");
+        CacheEdgeSectors();
         WatchPortalReadiness(); RefreshPortalEligibility();
         _cachedRevision = nav.Revision;
     }
@@ -163,8 +164,8 @@ public partial class SpawnManager : Node
     // =========================================================
     // Wave requests sample eligible portals uniformly, falling back to permitted edges in Both.
     // Reservoir sampling avoids a per-spawn candidate allocation or any additional A* calls.
-    public Enemy SpawnWave(PackedScene scene, RandomNumberGenerator random, string requiredPortal = "", bool spawnWithShield = false, bool spawnWithStealth = false)
-        => SpawnRandom(scene, random, requiredPortal, spawnWithShield, spawnWithStealth, false, true);
+    public Enemy SpawnWave(PackedScene scene, RandomNumberGenerator random, string requiredPortal = "", bool spawnWithShield = false, bool spawnWithStealth = false, SpawnSourceOptions source = null)
+        => SpawnRandom(scene, random, requiredPortal, spawnWithShield, spawnWithStealth, false, true, source);
 
     // =========================================================
     // Random portal delivery shares source validation without emitting wave ownership notifications.
@@ -174,7 +175,7 @@ public partial class SpawnManager : Node
     // =========================================================
     // One reservoir sampler owns random delivery; portal-only callers never fall back to map edges.
     private Enemy SpawnRandom(PackedScene scene, RandomNumberGenerator random, string requiredPortal,
-        bool spawnWithShield, bool spawnWithStealth, bool portalOnly, bool waveOwned)
+        bool spawnWithShield, bool spawnWithStealth, bool portalOnly, bool waveOwned, SpawnSourceOptions source = null)
     {
         WaitingForPortal = false;
         RefreshSources();
@@ -184,26 +185,38 @@ public partial class SpawnManager : Node
         Enemy ship = scene.Instantiate<Enemy>();
         if (!FitsNavigation(ship)) { ship.Free(); return null; }
         NavigationGrid nav = Paths.Navigation;
-        int chosen = -1, eligible = 0;
-        for (int i = 0; i < _entries.Count; i++)
+        source ??= SpawnSourceOptions.Legacy;
+        try { source.Validate(requiredPortal); }
+        catch (System.ArgumentException error) { ship.Free(); LastMessage = error.Message; return null; }
+        if (source.EdgeSector.Length > 0 && _sectorError.Length > 0)
+        { ship.Free(); LastMessage = _sectorError; return null; }
+        int chosen;
+        if (source.Policy == SpawnSourcePolicy.LegacyPortalPreferred || portalOnly || requiredPortal.Length > 0)
         {
-            bool portal = i < _portalCount;
-            if (portalOnly && !portal) continue;
-            if (requiredPortal.Length > 0 && (!portal || _portalPaths[i] != requiredPortal)) continue;
-            // If any eligible portal was found, Both mode ignores all map-edge candidates.
-            if (!portal && chosen >= 0 && chosen < _portalCount) break;
-            Vector2 position = _entries[i];
-            if (!SourceUsable(i, ship.Definition.RadiusPixels)
-                || !nav.HasClearance(position, ship.Definition.RadiusPixels)) continue;
-            eligible++;
-            if (random.RandiRange(1, eligible) == 1) chosen = i;
+            chosen = -1; int eligible = 0;
+            for (int i = 0; i < _entries.Count; i++)
+            {
+                bool portal = i < _portalCount;
+                if (portalOnly && !portal) continue;
+                if (requiredPortal.Length > 0 && (!portal || _portalPaths[i] != requiredPortal)) continue;
+                // If any eligible portal was found, Both mode ignores all map-edge candidates.
+                if (!portal && chosen >= 0 && chosen < _portalCount) break;
+                Vector2 position = _entries[i];
+                if (!SourceUsable(i, ship.Definition.RadiusPixels)
+                    || !nav.HasClearance(position, ship.Definition.RadiusPixels)) continue;
+                eligible++;
+                if (random.RandiRange(1, eligible) == 1) chosen = i;
+            }
         }
+        else chosen = SelectPolicySource(source, ship.Definition.RadiusPixels, random);
         if (chosen < 0)
         {
             ship.Free();
-            WaitingForPortal = HasFormingPortal(requiredPortal);
+            WaitingForPortal = source.Policy != SpawnSourcePolicy.EdgesOnly && HasFormingPortal(requiredPortal);
             if (WaitingForPortal) { LastMessage = "Portal forming; awaiting readiness."; return null; }
-            LastMessage = requiredPortal.Length > 0 ? "Required portal unavailable: " + requiredPortal
+            LastMessage = source.EdgeSector.Length > 0 ? "Required edge sector unavailable (side, route or clearance): " + source.EdgeSector
+                : source.Policy == SpawnSourcePolicy.EdgesOnly ? "No permitted reachable edge source; multi-Citadel edges remain disabled."
+                : requiredPortal.Length > 0 ? "Required portal unavailable: " + requiredPortal
                 : "No permitted reachable source with enemy clearance; wave spawn will retry.";
             return null;
         }

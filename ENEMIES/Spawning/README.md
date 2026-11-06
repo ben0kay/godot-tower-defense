@@ -1,3 +1,16 @@
+## SPAWN3 — source implemented / awaiting owner validation
+Wave, batch and enemy resources now have optional `Source` overrides. The most specific non-null override wins; missing fields keep the original portal-preferred sampler/RNG path. Policies: LegacyPortalPreferred, AnyEligible, PortalsOnly, EdgesOnly, RequiredPortal. Existing entry Portal paths remain exact, and shield/stealth flags and sequential timing are unchanged.
+
+AnyEligible genuinely mixes permitted portals and edges: each usable portal has weight 1; each usable side has its authored Top/Bottom/Left/Right weight. A second uniform draw selects a safe position on the chosen side, so long sides don't dominate. Level SpawnMode/AllowedEdges still constrain every request; multi-Citadel edges remain disabled. EdgesOnly never sleeps waiting for an unrelated forming portal.
+
+Define `LevelConfig.EdgeSectors` with unique IDs, one side and normalized [start,end) ranges (e.g. Left 0–0.5 = upper half; Top 0–0.333 = first third). An EdgesOnly Source can require an exact sector ID. Optional portal-footprint exclusion and minimum portal spacing are radius-checked; disabled sides, missing/empty sectors and contradictory selectors report errors. Temporarily blocked/unclearable sectors retry without fallback or source RNG consumption.
+
+Wave Editor exposes complete source overrides and side weights at all three scopes, plus policy/sector/weight summaries in composition preview. Sector definitions belong to the map Inspector; their IDs/permissions are checked at deployment. Duplicate wave/batch/entry operations deep-copy source settings. No existing mission/wave resources were edited. C# recipes may use `with { Source = new SpawnSourceOptions(...) }`; Enemy helper also accepts named `source:`.
+
+Source geometry/sectors share the existing navigation-revision cache; retained candidate lists avoid per-request allocations or extra path searches. Existing readiness, ownership, placement protection and between-wave RNG persistence remain authoritative. SPAWN4 concurrent groups are not implemented. Source/reference review only; .NET unavailable. Owner to check mixed sources, weighted sides/sectors, blocked requests, multi-Citadel protection, editor save/duplicate and a fresh checkpoint.
+
+---
+
 ## SPAWN2.5 — new visual-only Codex pass before SPAWN3
 
 **Approved plan / not implemented (2026-11-06).** Successful wave/F2 portal spawns should animate a soft 12% expand/recover pulse and release large puffy shader-driven violet clouds while keeping the existing outward spark burst. No impact on actual spawned ships, source selection or readiness. `WORLD/PORTALS/EnemyPortal/` owns visuals; `SpawnManager` already calls `PlaySpawnFeedback` on success. SPAWN2 (2.2s opening) remains independent; SPAWN3 map-edge mixing and SPAWN4 concurrent batches remain later. [Full handoff](IMPLEMENTATION_PLAN.md#phase-spawn25--per-spawn-portal-expansion--violet-dimensional-smoke-codex-handoff-approved-plan--not-implemented).

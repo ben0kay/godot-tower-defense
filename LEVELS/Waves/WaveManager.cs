@@ -149,7 +149,8 @@ public partial class WaveManager : Node
             WaveEnemyEntry entry = _sequence[_entryIndex];
             Enemy ship;
             _acceptingSpawn = true;
-            try { ship = _spawns.SpawnWave(_scenes[entry.EnemyId], _random, entry.Portal, entry.SpawnWithShield, entry.SpawnWithStealth); }
+            try { ship = _spawns.SpawnWave(_scenes[entry.EnemyId], _random, entry.Portal, entry.SpawnWithShield, entry.SpawnWithStealth,
+                entry.Source ?? batch.Source ?? _waves[_waveIndex].Source); }
             finally { _acceptingSpawn = false; }
             if (ship == null)
             {

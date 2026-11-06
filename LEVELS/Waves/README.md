@@ -1,3 +1,6 @@
+## SPAWN3 source authoring — 2026-11-06
+Optional Source resources on waves/batches/enemy entries now select legacy, mixed, portal-only, edge-only or exact-portal policies, with named sectors and side weights. Missing overrides inherit; existing recipes/resources retain legacy behaviour. Configure map sectors in LevelConfig and overrides in Wave Editor. [Usage](../../ENEMIES/Spawning/README.md). Source implemented, owner validation pending; no parallel scheduling added.
+
 ## Automatic next waves and upper-right countdown — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** The first authored wave remains manual. After any non-final wave fully clears (all scheduled ships, owned live ships and reserved death children resolved), the next wave starts automatically after 30 seconds by default. NEXT WAVE remains enabled throughout so the player can start early. Automatic/manual starts share StartWave and preserve once-only banners, portal activation, RNG/ownership and spawn budgets; zero delay starts on the next scheduler tick rather than recursively inside a death callback.

@@ -12,7 +12,7 @@ Tune `WORLD/PORTALS/EnemyPortal/Visuals/DefaultPortalMaterializationStyle.tres`:
 
 # Enemy Spawn Sources and Dynamic Portals — implementation plan
 
-**Status: SPAWN0 / SPAWN1 Source Implemented / Awaiting Owner Validation (2026-11-06). SPAWN2 is Source Implemented / Awaiting Owner Validation; SPAWN2.5 is Source Implemented / Awaiting Owner Validation; SPAWN3–5 remain PLANNED. The original cinematic specification is retained below.**
+**Status: SPAWN0 / SPAWN1 Source Implemented / Awaiting Owner Validation (2026-11-06). SPAWN2 is Source Implemented / Awaiting Owner Validation; SPAWN2.5 is Source Implemented / Awaiting Owner Validation; SPAWN3 is Source Implemented / Awaiting Owner Validation; SPAWN4–5 remain PLANNED. The original cinematic specification is retained below.**
 
 SPAWN0 source identity/baseline contract is documented in README.md; an isolated owner-run fixture covers all edges and legacy Both preference. SPAWN1 now implements START/Wave N visibility/eligibility, route reservation, authoring errors and exact-number checkpoint restoration. Existing Level011 scenes/waves are unchanged. The separately requested slow rotation and bounded purple per-spawn particles are included; **they are not the SPAWN2 cinematic opening**. Existing START portals are visible instantly until SPAWN2 is implemented. C# fixtures are authored but unrun (.NET unavailable); gameplay/visual acceptance is pending.
 
@@ -179,7 +179,9 @@ Owner checks in Godot: watch an Open portal when one ship emerges, then a quick 
 
 ---
 
-## Phase SPAWN3 — map-edge and mixed source policy (medium)
+## Phase SPAWN3 — map-edge and mixed source policy (source implemented)
+
+**Source Implemented / Awaiting Owner Validation.** Policies, wave/batch/entry inheritance, weighted side/position sampling, named sector ranges with portal spacing, Wave Editor controls and validation delivered. Existing mission data unchanged; multi-Citadel edges remain disabled. See README.md for authoring. SPAWN4 remains planned.
 
 **Baseline exists:** `LevelConfig.SpawnMode = MapEdges` + `AllowedEdges = Top|Bottom|Left|Right` allows spawning at all **reachable** boundary-cell candidates on a single-Citadel map. Current `Both` = **PortalPreferred** with edge fallback, not simultaneous.
 

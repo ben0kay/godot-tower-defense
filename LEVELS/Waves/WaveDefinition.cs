@@ -1,9 +1,9 @@
 // Immutable C# authoring data; runtime counters live exclusively in WaveManager.
 using System.Collections.Immutable;
 
-public sealed record WaveEnemyEntry(string EnemyId, double Weight = 100, string Portal = "", bool SpawnWithShield = false, bool SpawnWithStealth = false);
-public sealed record WaveBatch(int Count, double Interval, double After, ImmutableArray<WaveEnemyEntry> Entries);
-public sealed record WaveDefinition(int Number, ImmutableArray<WaveBatch> Batches, WavePresentation Presentation = null, double NextWaveDelaySeconds = -1);
+public sealed record WaveEnemyEntry(string EnemyId, double Weight = 100, string Portal = "", bool SpawnWithShield = false, bool SpawnWithStealth = false, SpawnSourceOptions Source = null);
+public sealed record WaveBatch(int Count, double Interval, double After, ImmutableArray<WaveEnemyEntry> Entries, SpawnSourceOptions Source = null);
+public sealed record WaveDefinition(int Number, ImmutableArray<WaveBatch> Batches, WavePresentation Presentation = null, double NextWaveDelaySeconds = -1, SpawnSourceOptions Source = null);
 
 public static class WaveBuilder
 {
@@ -30,6 +30,6 @@ public static class WaveBuilder
 
     // =========================================================
     // Optional portal is level-root-relative; shield defaults OFF unless the wave opts in.
-    public static WaveEnemyEntry Enemy(string id, double weight = 100, string portal = "", bool shield = false, bool stealth = false) =>
-        new(id, weight, portal, shield, stealth);
+    public static WaveEnemyEntry Enemy(string id, double weight = 100, string portal = "", bool shield = false, bool stealth = false, SpawnSourceOptions source = null) =>
+        new(id, weight, portal, shield, stealth, source);
 }

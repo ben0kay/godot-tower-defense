@@ -33,11 +33,11 @@ public partial class WaveSetResource : WaveSetSource
                     if (enemy == null || string.IsNullOrWhiteSpace(enemy.EnemyId) ||
                         !double.IsFinite(enemy.Weight) || enemy.Weight < 0 || enemy.Portal == null)
                         throw new ArgumentException($"Wave {wave.Number}: invalid enemy ID, weight or portal.");
-                    entries.Add(Enemy(enemy.EnemyId, enemy.Weight, enemy.Portal, enemy.Shield, enemy.Stealth));
+                    entries.Add(Enemy(enemy.EnemyId, enemy.Weight, enemy.Portal, enemy.Shield, enemy.Stealth, enemy.Source?.Capture()));
                     totalWeight += enemy.Weight;
                 }
                 if (!double.IsFinite(totalWeight) || totalWeight <= 0) throw new ArgumentException($"Wave {wave.Number}: weights must sum to more than zero.");
-                batches.Add(Batch(batch.Count, batch.Interval, batch.After, entries.ToArray()));
+                batches.Add(Batch(batch.Count, batch.Interval, batch.After, entries.ToArray()) with { Source = batch.Source?.Capture() });
             }
             bool hasPresentation = wave.Alert != WaveAlertKind.Standard || !string.IsNullOrEmpty(wave.BannerTitle) ||
                 !string.IsNullOrEmpty(wave.BannerDescription) || !string.IsNullOrEmpty(wave.Speaker) ||
@@ -46,7 +46,7 @@ public partial class WaveSetResource : WaveSetSource
                 ? Wave(wave.Number, Presentation(wave.Alert, wave.BannerTitle, wave.BannerDescription,
                     wave.Speaker, wave.NarrationText, wave.VoiceCueId), batches.ToArray())
                 : Wave(wave.Number, batches.ToArray());
-            result.Add(definition with { NextWaveDelaySeconds = wave.NextWaveDelaySeconds });
+            result.Add(definition with { NextWaveDelaySeconds = wave.NextWaveDelaySeconds, Source = wave.Source?.Capture() });
         }
         return result.ToArray();
     }

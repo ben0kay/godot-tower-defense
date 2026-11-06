@@ -17,6 +17,7 @@ public partial class SpawnManager
     internal void ConfigurePortalActivation(WaveDefinition[] waves, PortalActivationContext context = PortalActivationContext.FreshDeployment, int completed = 0)
     {
         RefreshSources();
+        ValidateSourcePolicies(waves);
         var grid = Paths.Navigation.Grid;
         HashSet<string> registered = new();
         HashSet<Vector2I> reserved = new();

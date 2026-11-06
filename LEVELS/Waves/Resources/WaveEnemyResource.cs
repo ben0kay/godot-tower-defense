@@ -4,6 +4,7 @@ using Godot;
 [Tool, GlobalClass]
 public partial class WaveEnemyResource : Resource
 {
+    [Export] public WaveSpawnSourceResource Source { get; set; }
     [Export] public string EnemyId { get; set; } = "basic_mk1";
     [Export(PropertyHint.Range, "0,10000,1,or_greater")] public double Weight { get; set; } = 100;
     [Export] public string Portal { get; set; } = "";
@@ -13,5 +14,5 @@ public partial class WaveEnemyResource : Resource
     // =========================================================
     // Clone resources explicitly so duplicated batches are independent in the visual editor.
     public WaveEnemyResource Copy() => new()
-    { EnemyId = EnemyId, Weight = Weight, Portal = Portal, Shield = Shield, Stealth = Stealth };
+    { Source = Source?.Copy(), EnemyId = EnemyId, Weight = Weight, Portal = Portal, Shield = Shield, Stealth = Stealth };
 }

@@ -22,6 +22,8 @@ public partial class LevelConfig : Resource
     [Export(PropertyHint.Flags, "Top,Bottom,Left,Right")] public MapEdge AllowedEdges { get; set; } = MapEdge.Left;
     [Export] public Godot.Collections.Array<NodePath> ActivePortals { get; set; } = new();
 
+    [Export] public Godot.Collections.Array<SpawnEdgeSector> EdgeSectors { get; set; } = new();
+
     [ExportGroup("Mission Intro (optional)")]
     [Export] public MissionBriefingDefinition MissionBriefing { get; set; }
 

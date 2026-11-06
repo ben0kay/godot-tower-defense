@@ -63,6 +63,8 @@ public static class WaveCatalog
                         || !double.IsFinite(entry.Weight) || entry.Weight < 0 || entry.Portal == null
                         || (entry.Portal.Length > 0 && (entry.Portal.StartsWith("/") || entry.Portal.Split('/').Contains(".."))))
                         throw new ArgumentException($"Wave {wave.Number}: invalid enemy ID, weight or portal selector.");
+                    try { (entry.Source ?? batch.Source ?? wave.Source ?? SpawnSourceOptions.Legacy).Validate(entry.Portal); }
+                    catch (ArgumentException error) { throw new ArgumentException($"Wave {wave.Number}: {error.Message}", error); }
                     weight += entry.Weight;
                 }
                 if (!double.IsFinite(weight) || weight <= 0 || count > int.MaxValue)

@@ -20,6 +20,7 @@ public partial class WaveEditorPanel : VBoxContainer
     private ItemList _waves, _batches, _enemies;
     private ScrollContainer _detailsScroll;
     private VBoxContainer _waveFields, _batchFields, _enemyFields, _presentationFields, _compositionPreview;
+    private SpawnSourceEditor _waveSpawnSource, _batchSpawnSource, _entrySpawnSource;
     private SpinBox _waveDelay, _waveNumber, _count, _interval, _after, _weight;
     private OptionButton _alert, _enemyId;
     private LineEdit _bannerTitle, _bannerDescription, _speaker, _narration, _voiceCue, _portal;
@@ -154,6 +155,9 @@ public partial class WaveEditorPanel : VBoxContainer
         var footer = new HBoxContainer(); AddChild(footer);
         _status = new Label { Text = "Choose a .tres wave set.", SizeFlagsHorizontal = SizeFlags.ExpandFill };
         _totals = new Label(); footer.AddChild(_status); footer.AddChild(_totals);
+        _waveSpawnSource = AddSourceEditor(_waveFields, () => Wave?.Source, value => { if (Wave != null) Wave.Source = value; });
+        _batchSpawnSource = AddSourceEditor(_batchFields, () => Batch?.Source, value => { if (Batch != null) Batch.Source = value; });
+        _entrySpawnSource = AddSourceEditor(_enemyFields, () => Entry?.Source, value => { if (Entry != null) Entry.Source = value; });
         SetupDialogs(); ReloadEnemyCatalog(); LoadPath(ExamplePath);
     }
 
@@ -198,6 +202,13 @@ public partial class WaveEditorPanel : VBoxContainer
         row.AddChild(new Label { Text = label, CustomMinimumSize = new Vector2(175, 0) });
         control.SizeFlagsHorizontal = SizeFlags.ExpandFill; row.AddChild(control);
     }
+    private SpawnSourceEditor AddSourceEditor(VBoxContainer parent, Func<WaveSpawnSourceResource> read, Action<WaveSpawnSourceResource> write)
+    {
+        var editor = new SpawnSourceEditor();
+        editor.Initialize(read, write, () => { Dirty(); RefreshComposition(); });
+        parent.AddChild(editor); return editor;
+    }
+
     private SpinBox Number(VBoxContainer parent, string label, double min, double max, double step, Action<double> changed)
     {
         var box = new SpinBox { MinValue = min, MaxValue = max, Step = step, Rounded = step >= 1 };
@@ -514,6 +525,10 @@ public partial class WaveEditorPanel : VBoxContainer
                 if (enemy?.Shield == true) label += " [shield]";
                 if (enemy?.Stealth == true) label += " [stealth]";
                 if (!string.IsNullOrEmpty(enemy?.Portal)) label += " [" + enemy.Portal + "]";
+                var spawnSource = enemy?.Source ?? batch.Source ?? Wave?.Source;
+                if (spawnSource != null)
+                    label += $" [{spawnSource.Policy}" + (string.IsNullOrEmpty(spawnSource.EdgeSector) ? "" : ": " + spawnSource.EdgeSector) +
+                        $" · sides {spawnSource.TopWeight:0.#}/{spawnSource.BottomWeight:0.#}/{spawnSource.LeftWeight:0.#}/{spawnSource.RightWeight:0.#}]";
                 var row = new HBoxContainer();
                 _compositionPreview.AddChild(row);
                 row.AddChild(new Label { Text = label, SizeFlagsHorizontal = SizeFlags.ExpandFill,
@@ -573,6 +588,7 @@ public partial class WaveEditorPanel : VBoxContainer
                 SelectEnemyId(Entry.EnemyId); _weight.Value = Entry.Weight; _portal.Text = Entry.Portal ?? "";
                 _shield.ButtonPressed = Entry.Shield; _stealth.ButtonPressed = Entry.Stealth;
             }
+            _waveSpawnSource?.RefreshValues(); _batchSpawnSource?.RefreshValues(); _entrySpawnSource?.RefreshValues();
             RefreshComposition();
             _fileLabel.Text = _path + (_dirty ? "  * UNSAVED" : "");
             _saveButton.Disabled = !_dirty || _source == null;
