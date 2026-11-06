@@ -7,6 +7,7 @@ ShowVisuals = true
 ServiceUpgrades = true
 RequireDroneToBuild = false
 TravelSpeed = 280.0
+SiteAcquisitionSeconds = 0.2
 BeamScanBands = 4
 BeamScanCyclesPerSecond = 1.5
 BeamPulseHz = 2.0

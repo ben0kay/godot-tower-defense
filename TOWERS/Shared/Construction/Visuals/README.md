@@ -1,3 +1,13 @@
+## DRONE2 site telemetry and acquisition
+
+**Source Implemented / Awaiting Owner Validation.** The same capped ConstructionSiteHologram canvas now draws one tiny panel outside the full footprint: DRONE INBOUND while held; SITE LOCKED during acquisition/deployment; real CONSTRUCTING/UPGRADING N% after release; SYSTEM ONLINE for1s only on successful WorkCompleted. No-builder work uses the authoritative work phase/progress immediately. No GUI scene, timer or process per site/drone. Existing work events cache strings, with the bounded redraw cadence recovering live visual toggles. Completion readouts cap32 (hard64), clear on removal/unload and are not restored/replayed. One new paid job replaces that tower's earlier completion panel.
+
+Panels use fixed retained placement bounds and at most eight vertical lanes to avoid overlapping nearby readouts; excess crowded cosmetics may skip rather than overlap or expand unbounded work. Existing active-site cap remains128 (hard256), cadence24Hz and camera culling. Renderer sleeps after the last site/completion readout. Cancelled/destroyed/rolled-back work never shows SYSTEM ONLINE.
+
+During the manager's new0.20s Acquiring phase, existing footprint brackets brighten once and four thin cross strokes converge on its center. This does not advance work or deploy the beam. The original0.25s deployment follows and remains the release gate. AcquisitionCueEnabled/tint and telemetry enabled/font/size/colors/background/width/offset/completion-duration/cap are Inspector settings in DefaultConstructionSiteVisualConfig.tres. The original blueprint, fabrication sparks and purchased-tier art stay unchanged. Runtime visual/performance acceptance remains pending.
+
+---
+
 ## GPU sparks now use explicit perimeter points — November 3, 2026
 
 Both orange and white-hot construction/upgrade `GPUParticles2D` layers are now sourced from **64 explicit outer-footprint positions** supplied in a small float emission texture on paid work registration. This replaces prior ring/sphere spawn settings that still looked centre-biased in user screenshots. All resulting sparks travel radially outward; no additional processing loops or render emitters. Read [Sparks](Sparks/README.md) for the authoritative source geometry and source-level regression check. In-game visual/FPS acceptance remains pending.

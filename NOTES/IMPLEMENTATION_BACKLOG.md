@@ -1,3 +1,9 @@
+## DRONE2 — shared drone body/flight and site UX — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Replaced ammo's obsolete TransportDrone/procedural art with CargoDrone and the builder SVG/body. Extracted one cubic/eased flight primitive, preserving280px/s builder/default source courier speeds and independent business managers/caps. Added shared retained twin-engine ignition/propulsion and speed-responsive32-point thin path history, capped one-panel-per-site telemetry and Acquiring=5 before the unchanged beam deployment hold gate. Courier optional exact-motion checkpoints and legacy remaining-leg fallback; builder flat fields/old phase numbers preserved. No inventory, dispatch, combat or balance changes. Source/resource/field-parity/diff checks only; .NET unavailable, narrow owner fixtures authored but unrun. [Owner checks](../TESTS/Drones/README.md).
+
+---
+
 ## CTX1 — Corruptor and shared DoT — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** Registered graphite/violet Corruptor with three paid tiers/five ranks and normal projectiles, construction stages, power/ammo/heat, selling and checkpoints. Shared Corruption status: hull-only1s ticks, stronger-DPS duration refresh, latest weak source attribution, safe active-only versioned scheduler and Slow/Freeze coexistence. Single-pass unaffected-first / affected fallback is Corruptor-only; Cryo stays strict. Inspector shows initial/periodic/total damage. Source/resource/SVG/diff checks + one art render only; .NET unavailable and focused fixture unrun. Owner: all six priorities, actual DoT/XP/kill flow, pause/lifecycle, art/UI, economy/heat and fresh save/load.

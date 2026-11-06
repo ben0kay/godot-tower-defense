@@ -4,7 +4,7 @@ public sealed class AmmoDeliveryJob
     public AmmoBuilding Source { get; internal set; }
     public TowerBase Destination { get; internal set; }
     public AmmoInventory Cargo { get; internal set; }
-    public TransportDrone Drone { get; internal set; }
+    public CargoDrone Drone { get; internal set; }
     internal AmmoInventory DestinationInventory;
     internal int Reserved;
     internal bool Finished;

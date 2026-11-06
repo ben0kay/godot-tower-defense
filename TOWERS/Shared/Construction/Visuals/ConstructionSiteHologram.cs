@@ -24,6 +24,7 @@ public partial class ConstructionSiteHologram : Node2D
     {
         SetProcess(false); SetPhysicsProcess(false);
         _work = GetNodeOrNull<ConstructionWorkManager>("../../ConstructionWork");
+        _builders = GetNodeOrNull<ConstructionDroneManager>("../../ConstructionDrones");
         _cellSize = GetNodeOrNull<WorldGrid>("../../Grid")?.Config?.CellSize ?? 64;
         if (_work != null)
         {
@@ -40,7 +41,7 @@ public partial class ConstructionSiteHologram : Node2D
     {
         if (tower == null || !tower.IsBusy || _sites.Contains(tower)) return;
         if (_sites.Count >= Mathf.Clamp(Config?.MaxVisibleSites ?? 128, 1, 256)) return;
-        _sites.Add(tower);
+        TrackTelemetry(tower); _sites.Add(tower);
         RefreshProcessing();
     }
 
@@ -49,6 +50,7 @@ public partial class ConstructionSiteHologram : Node2D
     private void OnUnregistered(TowerBase tower)
     {
         if (!_sites.Remove(tower)) return;
+        RetireTelemetry(tower);
         RefreshProcessing();
     }
 
@@ -56,7 +58,10 @@ public partial class ConstructionSiteHologram : Node2D
     // Resource changes or a new paid job can wake the visual; an empty/disabled world stays asleep.
     public void RefreshProcessing()
     {
-        bool active = IsInsideTree() && Config?.Enabled == true && _sites.Count > 0;
+        if (Config?.Enabled != true) DiscardCompletions();
+        else if (Config.TelemetryEnabled)
+            foreach (var tower in _sites) if (_telemetry.TryGetValue(tower, out var site)) UpdateReadout(site);
+        bool active = IsInsideTree() && Config?.Enabled == true && (_sites.Count > 0 || _completions.Count > 0);
         if (active) _tick = 0;
         SetProcess(active);
         QueueRedraw();
@@ -68,10 +73,11 @@ public partial class ConstructionSiteHologram : Node2D
     // A single ~24Hz cosmetic clock updates only while there are active sites, not one tick per tower.
     public override void _Process(double delta)
     {
-        if (_sites.Count == 0 || Config?.Enabled != true)
+        if ((_sites.Count == 0 && _completions.Count == 0) || Config?.Enabled != true)
         { SetProcess(false); QueueRedraw(); return; }
         if (GetTree().Paused) return;
         if (!double.IsFinite(delta) || delta <= 0) return;
+        AdvanceTelemetry((float)System.Math.Min(delta, 3600));
         _clock += (float)Mathf.Min((float)delta, .25f);
         _tick += (float)Mathf.Min((float)delta, .25f);
         float interval = 1f / Mathf.Clamp(Config.RefreshHz, 8f, 48f);
@@ -86,6 +92,7 @@ public partial class ConstructionSiteHologram : Node2D
     {
         ConstructionSiteVisualConfig c = Config;
         if (c?.Enabled != true) return;
+        _readoutCount = 0;
         float inset = Mathf.Clamp(c.InsetPixels, 0, 12);
         // Camera-space culling prevents offscreen sites from issuing canvas draw calls.
         Transform2D toWorldCanvas = GetGlobalTransformWithCanvas().AffineInverse();
@@ -103,19 +110,29 @@ public partial class ConstructionSiteHologram : Node2D
             Vector2 size = cells * _cellSize;
             Vector2 center = ToLocal(tower.GlobalPosition);
             Rect2 bounds = new(center - size * .5f + Vector2.One * inset, size - Vector2.One * (inset * 2));
-            if (bounds.Size.X <= 2 || bounds.Size.Y <= 2 || !visible.Intersects(bounds.Grow(8))) continue;
-            DrawSite(bounds, tower.AwaitingConstructionDrone, c);
+            if (bounds.Size.X <= 2 || bounds.Size.Y <= 2 || !visible.Intersects(bounds.Grow(c.TelemetryEnabled ? 240 : 8))) continue;
+            float locked = GodotObject.IsInstanceValid(_builders) ? _builders.AcquisitionProgressFor(tower) : -1;
+            DrawSite(bounds, tower.AwaitingConstructionDrone, c, locked);
+            if (_telemetry.TryGetValue(tower, out var site))
+            {
+                UpdateReadout(site); // Cached strings also recover when visual toggles change while a site is held.
+                bool acquired = locked >= 0 || (GodotObject.IsInstanceValid(_builders) && _builders.PhaseFor(tower) == ConstructionDronePhase.Deploying);
+                DrawTelemetry(bounds, acquired ? "SITE LOCKED" : site.Text, 1, c);
+            }
         }
+        DrawCompletions(visible, c);
     }
 
     // =========================================================
     // A faint full-footprint blueprint, fixed perimeter, travelling indicator and rotating engineering HUD.
-    private void DrawSite(Rect2 r, bool waiting, ConstructionSiteVisualConfig c)
+    private void DrawSite(Rect2 r, bool waiting, ConstructionSiteVisualConfig c, float locked = -1)
     {
         float baseAlpha = Mathf.Clamp(waiting ? c.WaitingOpacity : c.BuildingOpacity, 0, 1);
         float pulse = 1f + Mathf.Clamp(c.PulseDepth, 0, .5f) * Mathf.Sin(_clock * Mathf.Tau * Mathf.Clamp(c.PulseHz, 0, 5));
         float alpha = Mathf.Min(1, baseAlpha * pulse);
-        Color tint = c.Tint;
+        bool acquiring = locked >= 0 && c.AcquisitionCueEnabled;
+        if (acquiring) alpha = Mathf.Clamp(alpha + .45f * Mathf.Sin(Mathf.Pi * Mathf.Clamp(locked, 0, 1)), 0, 1);
+        Color tint = acquiring ? c.AcquisitionTint : c.Tint;
         Color line = new(tint.R, tint.G, tint.B, alpha * .52f);
         Color bright = new(tint.R, tint.G, tint.B, alpha);
         Color fade = new(tint.R, tint.G, tint.B, alpha * .15f);
@@ -147,6 +164,16 @@ public partial class ConstructionSiteHologram : Node2D
             float a = angle + i * Mathf.Tau / 10;
             DrawArc(mid, radius, a, a + .40f, 5, line, 1.25f, true);
             DrawArc(mid, radius * .7f, -a, -a + .24f, 4, fade, 1, true);
+        }
+        if (acquiring)
+        {
+            float converge = (1 - Mathf.Clamp(locked, 0, 1)) * Mathf.Min(r.Size.X, r.Size.Y) * .6f;
+            for (int i = 0; i < 4; i++)
+            {
+                Vector2 direction = Vector2.FromAngle(i * Mathf.Pi / 2), side = direction.Orthogonal() * 4;
+                Vector2 point = mid + direction * converge;
+                DrawLine(point - side, point + side, bright, 1, true);
+            }
         }
         DrawCircle(mid, 2, new Color(.72f, .96f, 1, alpha * .7f));
         DrawLine(mid + Vector2.Left * radius * .4f, mid + Vector2.Right * radius * .4f, fade, 1, true);
@@ -185,6 +212,7 @@ public partial class ConstructionSiteHologram : Node2D
             _work.JobRegistered -= OnRegistered;
             _work.JobUnregistered -= OnUnregistered;
         }
+        ClearTelemetry(); _builders = null;
         _work = null;
         _sites.Clear();
         SetProcess(false);

@@ -1,17 +1,14 @@
-## DRONE2 — Unified construction/ammunition drone model and VFX (planned, 2026-11-06)
+# DRONES — shared flight and presentation, separate job owners
 
-**Approved Codex plan; not implemented.** [DRONE2_UNIFIED_DRONES_IMPLEMENTATION_PLAN.md](DRONE2_UNIFIED_DRONES_IMPLEMENTATION_PLAN.md) specifies replacing the old ammo courier visuals/straight flight with the construction-drone artwork and curved/eased movement, shared cyan twin thrusters and speed-sensitive contrails, plus one floating construction telemetry readout per site and a brief `SITE LOCKED` arrival effect. Construction and ammunition managers **remain separate**; ammo quantities/reservations and construction work holds stay authoritative. The historical implemented notes below describe the present pre-DRONE2 behavior.
+## DRONE2
 
----
+**Source Implemented / Awaiting Owner Validation.** Builders and ammunition couriers now use the same36×28 cyan drone model, shared cubic/eased flight math and shared twin-engine/ion-trail presenter. Construction work and ammunition dispatchers remain independent.
 
-## Separate construction builder role — 2026-10-21
+- [Shared](Shared/README.md): plain flight state, shared body scene and cosmetic configuration.
+- [Transport](Transport/README.md): active CargoDrone adapter for Factory→Depot and Depot→Tower, then return. AmmunitionLogistics owns stock, reservations, slots and callbacks.
+- [Construction](../TOWERS/ConstructionDrones/README.md): ConstructionDroneManager retains FIFO, Citadel assignment, pooled visuals, site orbit, acquisition/deployment holds and return.
+- [Combat](Combat/README.md): future player-ability concept; no combat drone system is introduced.
 
-Citadel builders live under TOWERS/ConstructionDrones because they coordinate paid tower construction. They own separate pooled artwork/beam and a central airborne dispatcher; Transport couriers and ammunition reservations/delivery remain unchanged. No shared drone health/combat/navigation framework is introduced. See ../TOWERS/ConstructionDrones/README.md.
+Both roles ignite two tiny rear cyan-white engines at outbound/return departure, soften propulsion while braking, and draw a thin fading trail from bounded recent actual positions. Builder hover has only a tiny glow and no trail. Hidden/parked entries reset their effects and have no processing. The existing movement updates drive presentation; no extra effect timers, particle nodes or flight scheduler.
 
-# DRONES — Reusable mobile units
-
-[Transport](Transport/README.md) is implemented: visible direct flights carry actual ammunition **Factory→Depot and Depot→Tower**, then return to their home building. Shared flight/lifecycle and small vector visuals remain independent of ammo inventories, transactions and reservations, which belong to [ammunition logistics](../TOWERS/Economy/Ammunition/Shared/Logistics/README.md).
-
-Transport drones are not placeable towers and do not inherit mandatory targeting/combat behavior. Home buildings provide editable speed, payload and finite drone slots. Only active vehicles have processing nodes. Pause/unload follows the world; no saving is implemented.
-
-[Combat](Combat/README.md) remains a future player-ability concept: possible corridor-following attack drones must integrate COMBAT attribution/spatial queries later. This pass does not add weapons, health or an unused shared drone framework.
+Construction-only telemetry/acquisition lives in the existing shared site hologram canvas. Courier jobs never show a construction beam or site labels. Both systems preserve existing gameplay pause and save ownership. See [implementation/acceptance plan](DRONE2_UNIFIED_DRONES_IMPLEMENTATION_PLAN.md) and [focused owner checks](../TESTS/Drones/README.md). Source/resource/diff checks only; .NET unavailable, Godot visual/performance acceptance pending.

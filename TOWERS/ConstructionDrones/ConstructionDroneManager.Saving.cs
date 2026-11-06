@@ -64,7 +64,7 @@ public partial class ConstructionDroneManager
                 _active.Add(job);
                 float duration = ConstructionDroneMasterConfig.Safe(Config.BeamDeploymentSeconds, .25f, 0, 1);
                 float strength = saved.Phase == ConstructionDronePhase.Beaming ? 1 : saved.Phase == ConstructionDronePhase.Deploying ? (duration <= 0 ? 1 : Mathf.Min(1, job.Deploy / duration)) : 0;
-                Present(job, strength);
+                Present(job, strength, ignite: false);
             }
         }
         foreach (var tower in towers.Values)

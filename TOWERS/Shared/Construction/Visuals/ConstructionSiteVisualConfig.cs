@@ -11,6 +11,20 @@ public partial class ConstructionSiteVisualConfig : Resource
     [Export(PropertyHint.Range, "1,256,1")] public int MaxVisibleSites { get; set; } = 128;
     #endregion
 
+    [ExportGroup("Site Telemetry")]
+    [Export] public bool TelemetryEnabled { get; set; } = true;
+    [Export] public Font TelemetryFont { get; set; }
+    [Export(PropertyHint.Range, "8,18,1")] public int TelemetryFontSize { get; set; } = 11;
+    [Export] public Color TelemetryColor { get; set; } = new(.8f, .98f, 1, .95f);
+    [Export] public Color TelemetryBackground { get; set; } = new(.02f, .06f, .1f, .75f);
+    [Export] public Vector2 TelemetryOffset { get; set; } = new(8, -14);
+    [Export(PropertyHint.Range, "88,220,1")] public float TelemetryWidth { get; set; } = 132;
+    [Export(PropertyHint.Range, ".8,1.2,.05")] public float CompletionReadoutSeconds { get; set; } = 1;
+    [Export(PropertyHint.Range, "1,64,1")] public int MaxCompletionReadouts { get; set; } = 32;
+    [ExportGroup("Site Acquisition")]
+    [Export] public bool AcquisitionCueEnabled { get; set; } = true;
+    [Export] public Color AcquisitionTint { get; set; } = new(.65f, 1, 1, 1);
+
     #region Holographic Palette
     [ExportGroup("Colors and Opacity")]
     [Export] public Color Tint { get; set; } = new Color(.25f, .82f, 1f);

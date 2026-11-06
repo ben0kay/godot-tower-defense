@@ -4,7 +4,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public enum ConstructionDronePhase { Flying, Deploying, Beaming, Returning, Cancelled }
+public enum ConstructionDronePhase { Flying = 0, Deploying = 1, Beaming = 2, Returning = 3, Cancelled = 4, Acquiring = 5 }
 public partial class ConstructionDroneManager : Node2D
 {
     #region Configuration and Assignments
@@ -46,6 +46,8 @@ public partial class ConstructionDroneManager : Node2D
     public ConstructionDrone DroneFor(TowerBase tower) => _jobs.TryGetValue(tower, out var job) ? job.Drone : null;
     public CitadelDestination SourceFor(TowerBase tower) => _jobs.TryGetValue(tower, out var job) ? job.Source : null;
     public ConstructionDronePhase? PhaseFor(TowerBase tower) => _jobs.TryGetValue(tower, out var job) ? job.Phase : null;
+    public float AcquisitionProgressFor(TowerBase tower) => _jobs.TryGetValue(tower, out var job) && job.Phase == ConstructionDronePhase.Acquiring
+        ? Mathf.Clamp(job.Deploy / Mathf.Max(.001f, ConstructionDroneMasterConfig.Safe(Config.SiteAcquisitionSeconds, .2f, 0, .5f)), 0, 1) : -1;
     // =========================================================
     // Tokens are unique even if a site is cancelled and the same instance is reused by a fixture later.
     internal ulong Reserve() => ++_reservation;
@@ -278,7 +280,7 @@ public partial class ConstructionDroneManager : Node2D
                 job.Home = LaunchPoint(job.Source); BeginReturn(job);
             }
             if (job.Motion.Fly(dt, ref job.Position, Config)) job.Cancelled = true;
-            Present(job, 0); return;
+            Present(job, 0, dt); return;
         }
         if (!GodotObject.IsInstanceValid(job.Tower) || job.Tower.IsDestroyed || job.Tower.IsQueuedForDeletion()) { Cancel(job); return; }
         if (job.Phase != ConstructionDronePhase.Beaming && !ValidHome(job.Source))
@@ -288,21 +290,28 @@ public partial class ConstructionDroneManager : Node2D
         {
             if (job.Motion.Fly(dt, ref job.Position, Config))
             {
-                job.Phase = ConstructionDronePhase.Deploying;
+                job.Phase = ConstructionDronePhase.Acquiring; job.Deploy = 0;
                 job.Motion.HoverStart = SavePoint.From(job.Position); job.Motion.HoverBlend = 0;
             }
-            Present(job, 0); return;
+            Present(job, 0, dt); return;
         }
         job.Age += dt;
         job.Motion.Hover(hover, job.Age, job.Hover, dt, ref job.Position, Config);
+        if (job.Phase == ConstructionDronePhase.Acquiring)
+        {
+            job.Deploy += dt; Present(job, 0, dt);
+            if (job.Deploy >= ConstructionDroneMasterConfig.Safe(Config.SiteAcquisitionSeconds, .2f, 0, .5f))
+            { job.Phase = ConstructionDronePhase.Deploying; job.Deploy = 0; }
+            return; // No overshoot may enter beam deployment or the held work clock.
+        }
         float deployment = ConstructionDroneMasterConfig.Safe(Config.BeamDeploymentSeconds, .25f, 0, 1);
         if (job.Phase == ConstructionDronePhase.Deploying)
         {
             job.Deploy += dt; float amount = deployment <= 0 ? 1 : Mathf.Min(1, job.Deploy / deployment);
-            Present(job, amount);
+            Present(job, amount, dt);
             if (amount >= 1) { job.Phase = ConstructionDronePhase.Beaming; Release(job); }
         }
-        else Present(job, 1);
+        else Present(job, 1, dt);
     }
     // =========================================================
     // WorkCompleted is authoritative; hide the beam immediately and leave the now operational tower alone.
@@ -315,7 +324,9 @@ public partial class ConstructionDroneManager : Node2D
     }
     // =========================================================
     // A fixed site center and bounded footprint-derived hover/beam make large factories use the same implementation.
-    private void Present(Assignment job, float strength) => job.Drone.Present(job.Position, job.Target, job.HalfWidth, strength, Config, job.Age, job.Motion.Heading);
+    private void Present(Assignment job, float strength, float dt = 0, bool ignite = true) => job.Drone.Present(job.Position, job.Target, job.HalfWidth, strength, Config,
+        job.Age, job.Motion.Heading, job.Motion.Velocity.Vector(), job.Phase is ConstructionDronePhase.Flying or ConstructionDronePhase.Returning,
+        job.Phase == ConstructionDronePhase.Returning ? 1 : 0, dt, ignite);
     #endregion
 
     #region Disable and Teardown

@@ -87,6 +87,7 @@ public static class SaveValidation
             if (!towerIds.Contains(job.Source) || job.Destination == null || (job.Destination.Length > 0 && !towerIds.Contains(job.Destination)) || job.Source == job.Destination ||
                 job.Cargo < 0 || job.Reserved < 0 || (job.Returning ? job.Reserved != 0 : job.Reserved != job.Cargo || job.Cargo == 0 || job.Destination.Length == 0))
                 throw new InvalidDataException("Invalid saved shipment.");
+            job.Motion?.ValidateFlight();
             Point(job.Position); Number(job.Speed); if (job.Speed == 0) throw new InvalidDataException("Invalid drone speed.");
         }
         if (data.Builders.Count(b => !b.Queued) > 64) throw new InvalidDataException("Too many active builders.");
@@ -95,6 +96,7 @@ public static class SaveValidation
         {
             if (builder.Tower == null || builder.HomeId == null || !Enum.IsDefined(builder.Phase) || builder.Phase == ConstructionDronePhase.Cancelled ||
                 (builder.Tower.Length > 0 && !towerIds.Contains(builder.Tower)) ||
+                (builder.Queued && builder.Phase != ConstructionDronePhase.Flying) ||
                 (builder.Phase == ConstructionDronePhase.Returning && builder.Tower.Length > 0) || (!builder.Queued && !data.Citadels.Any(c => c.Id == builder.HomeId)))
                 throw new InvalidDataException("Invalid saved builder.");
             builder.Motion?.Validate();

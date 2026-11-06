@@ -16,7 +16,7 @@
 [ext_resource type="Script" path="res://TOWERS/Economy/Ammunition/Shared/Logistics/AmmunitionLogistics.cs" id="11_ammo"]
 
 [ext_resource type="Resource" path="res://TOWERS/Shared/Ammunition/DefaultAmmunitionConfig.tres" id="12_ammo_config"]
-[ext_resource type="PackedScene" path="res://DRONES/Transport/TransportDrone.tscn" id="13_drone"]
+[ext_resource type="PackedScene" path="res://DRONES/Transport/CargoDrone.tscn" id="13_drone"]
 
 [ext_resource type="Script" path="res://TOWERS/Shared/Construction/ConstructionWorkManager.cs" id="14_work"]
 [ext_resource type="Script" path="res://TOWERS/Shared/Construction/Visuals/ConstructionSiteHologram.cs" id="site_hologram"]

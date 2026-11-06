@@ -32,9 +32,9 @@ internal sealed class AmmoLoopFixture : IDisposable
     }
     internal void Dispatch() { Logistics._PhysicsProcess(.25); foreach (AmmoDeliveryJob job in Logistics.Jobs) job.Drone.SetPhysicsProcess(false); }
     internal void Arrive(AmmoDeliveryJob job)
-    { job.Drone._PhysicsProcess(job.Drone.GlobalPosition.DistanceTo(job.Destination.GlobalPosition) / job.Drone.Speed + .01); }
+    { job.Drone._PhysicsProcess(job.Drone.RemainingFlightSeconds + .01); }
     internal void Return(AmmoDeliveryJob job)
-    { job.Drone._PhysicsProcess(job.Drone.GlobalPosition.DistanceTo(job.Source.GlobalPosition) / job.Drone.Speed + .01); }
+    { job.Drone._PhysicsProcess(job.Drone.RemainingFlightSeconds + .01); }
 
     // =========================================================
     // Exercise real build buttons and the authoritative paid placement transaction.

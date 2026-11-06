@@ -104,6 +104,11 @@ public partial class ConstructionDroneChecks : Node
         var drone = builders.DroneFor(tower); Vector2 position = drone.GlobalPosition;
         GetTree().Paused = true; builders._PhysicsProcess(10); clock.Advance(999); GetTree().Paused = false;
         Require(drone.GlobalPosition == position && tower.ElapsedWorkSeconds == 0, "Pause freezes flight and work");
+        for (int i = 0; i < 2000 && builders.PhaseFor(tower) == ConstructionDronePhase.Flying; i++) builders._PhysicsProcess(.05);
+        Require(builders.PhaseFor(tower) == ConstructionDronePhase.Acquiring && tower.AwaitingConstructionDrone
+            && !drone.BeamVisible, "SITE LOCKED acquisition precedes beam deployment and work release");
+        builders._PhysicsProcess(.1);
+        Require(tower.AwaitingConstructionDrone && !drone.BeamVisible, "Acquisition cannot advance work or deploy the beam early");
         Arrive(builders, tower);
         var beam = drone.GetNode<ConstructionBeam>("Beam");
         Require(sparks.IsEmitting(tower) && sparks.IsWelding(tower),
@@ -210,8 +215,10 @@ public partial class ConstructionDroneChecks : Node
                 !overlay.Visible && gun.Texture == GD.Load<Texture2D>(art + "battle_gun_l" + level + ".svg")
                 && builders.PhaseFor(tower) == null, "Completed tier activates finished gun; drone returns independently");
             Require(!upgradeSparks.HasEmitter(tower), "Upgrade completion stops both spark layers");
-            Require(!sites.HasSite(tower) && sites.ActiveSites == 0 && !sites.IsProcessing(),
-                "Finished upgrade immediately removes the shared hologram and sleeps when empty");
+            Require(!sites.HasSite(tower) && sites.ActiveSites == 0 && sites.CompletionReadouts == 1,
+                "Finished upgrade removes the hologram and briefly shows one SYSTEM ONLINE readout");
+            sites._Process(1.3);
+            Require(sites.CompletionReadouts == 0 && !sites.IsProcessing(), "Completion telemetry expires and sleeps");
             Return(builders);
         }
         Require(credits - f.Wallet.GetBalance(f.Wallet.CreditsResource) == 400,
@@ -223,8 +230,9 @@ public partial class ConstructionDroneChecks : Node
             !noDrone.AwaitingConstructionDrone && builders.PendingCount == 0 && clock.HeldCount == 0
             && sites.HasSite(noDrone), "Opting out of upgrade drones still shows the shared site hologram");
         clock.Advance(noDrone.RemainingWorkSeconds);
-        Require(noDrone.UpgradeLevel == 2 && !sites.HasSite(noDrone) && !sites.IsProcessing(),
-            "Disabled upgrade drone option cannot strand work or leave a ghost hologram");
+        Require(noDrone.UpgradeLevel == 2 && !sites.HasSite(noDrone) && sites.CompletionReadouts == 1,
+            "No-drone work uses its real clock and successful completion readout");
+        sites._Process(1.3); Require(!sites.IsProcessing(), "No-drone completion readout retires");
     }
 
     // =========================================================

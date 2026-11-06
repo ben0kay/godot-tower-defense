@@ -1,3 +1,11 @@
+## DRONE2 courier migration
+
+**Source Implemented / Awaiting Owner Validation.** Both existing routes now instantiate DRONES/Transport/CargoDrone.tscn, using builder artwork/shared organic flight and thruster/contrail presentation. CargoDrone only reports one-shot arrival/return/abort. All stock transfer,1000-round full Factory shipments, flexible Depot refills, reservations, source slots through return, surplus/loss and demand/cap rules remain here; business code is unchanged apart from type and save adaptation. ConstructionDroneManager remains separate with an independent cap.
+
+New DeliverySaveData.Motion optionally persists exact flight controls/time/heading. Restore does not relaunch cargo or replay arrival; older absent-motion records ease a remaining leg from saved position. Strict motion validation and endpoint checks apply, original cargo/source/destination fields remain required, and campaign fingerprints/version/combat-save restrictions are preserved. No saved scene path requires the removed obsolete TransportDrone files. Owner: both routes, partial/full target, endpoint loss, conservation and fresh outbound/return save/load.
+
+---
+
 ## Between-wave checkpoint integration — 2026-10-26
 
 S2/S3 now provide source-owned capture/restore seams for this feature through

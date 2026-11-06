@@ -3,18 +3,10 @@
 using Godot;
 using System;
 
-public sealed class ConstructionDroneMotion
+public sealed class ConstructionDroneMotion : DroneFlightMotion
 {
-    public SavePoint Start { get; set; }
-    public SavePoint Control1 { get; set; }
-    public SavePoint Control2 { get; set; }
-    public SavePoint End { get; set; }
-    public SavePoint Velocity { get; set; }
     public SavePoint Radii { get; set; }
     public SavePoint HoverStart { get; set; }
-    public float FlightElapsed { get; set; }
-    public float FlightSeconds { get; set; }
-    public float Heading { get; set; }
     public float Angle { get; set; }
     public float OrbitFrom { get; set; }
     public float OrbitTo { get; set; }
@@ -40,36 +32,9 @@ public sealed class ConstructionDroneMotion
 
     // =========================================================
     // Cubic flight starts along the supplied departure heading and bends into its arrival direction.
-    internal void BeginFlight(Vector2 start, Vector2 end, Vector2 departure, Vector2 arrival, ConstructionDroneMasterConfig config)
-    {
-        Vector2 offset = end - start;
-        float distance = offset.Length(); Vector2 direction = distance > .001f ? offset / distance : Vector2.Right;
-        if (departure.LengthSquared() < .001f) departure = direction;
-        if (arrival.LengthSquared() < .001f) arrival = direction;
-        float bend = Mathf.Min(distance * .45f, ConstructionDroneMasterConfig.Safe(config.FlightCurvePixels, 100, 0, 400));
-        Start = SavePoint.From(start); End = SavePoint.From(end);
-        Control1 = SavePoint.From(start + departure.Normalized() * bend);
-        Control2 = SavePoint.From(end - arrival.Normalized() * bend);
-        float estimate = (distance + start.DistanceTo(Control1.Vector()) + Control1.Vector().DistanceTo(Control2.Vector()) + Control2.Vector().DistanceTo(end)) * .5f;
-        float speed = ConstructionDroneMasterConfig.Safe(config.TravelSpeed, 280, 32, 2000);
-        // Smoothstep's peak derivative is 1.5; keep the configured speed approximately the peak cruise speed.
-        FlightSeconds = Mathf.Max(.12f, estimate * 1.5f / speed); FlightElapsed = 0;
-        Velocity = default;
-    }
-
-    // =========================================================
-    // Acceleration/braking are the derivative of one bounded curve, avoiding steering overshoot and catch-up loops.
-    internal bool Fly(float dt, ref Vector2 position, ConstructionDroneMasterConfig config)
-    {
-        Vector2 before = position;
-        FlightElapsed = Mathf.Min(FlightSeconds, FlightElapsed + dt);
-        float time = FlightSeconds <= 0 ? 1 : FlightElapsed / FlightSeconds;
-        float t = Ease(time), inverse = 1 - t;
-        position = Start.Vector() * (inverse * inverse * inverse) + Control1.Vector() * (3 * inverse * inverse * t)
-            + Control2.Vector() * (3 * inverse * t * t) + End.Vector() * (t * t * t);
-        Face(position - before, dt, config); Velocity = SavePoint.From((position - before) / Mathf.Max(dt, .0001f));
-        return time >= 1;
-    }
+    internal void BeginFlight(Vector2 start, Vector2 end, Vector2 departure, Vector2 arrival, ConstructionDroneMasterConfig config) =>
+        base.BeginFlight(start, end, departure, arrival, ConstructionDroneMasterConfig.Safe(config.TravelSpeed, 280, 32, 2000), config.FlightCurvePixels);
+    internal bool Fly(float dt, ref Vector2 position, ConstructionDroneMasterConfig config) => base.Fly(dt, ref position, config.TurnDegreesPerSecond);
 
     // =========================================================
     // An elevated ellipse is sized by the manager to each building footprint; gentle bobbing is visual motion only.
@@ -121,17 +86,7 @@ public sealed class ConstructionDroneMotion
 
     // =========================================================
     // Rotate the sprite toward travel with a bounded angular speed; the beam's coordinate system stays fixed.
-    private void Face(Vector2 movement, float dt, ConstructionDroneMasterConfig config)
-    {
-        if (movement.LengthSquared() < .000001f) return;
-        float turn = Mathf.DegToRad(ConstructionDroneMasterConfig.Safe(config.TurnDegreesPerSecond, 240, 30, 720)) * dt;
-        float difference = Mathf.AngleDifference(Heading, movement.Angle());
-        Heading = Mathf.Wrap(Heading + Mathf.Clamp(difference, -turn, turn), -Mathf.Pi, Mathf.Pi);
-    }
-
-    // =========================================================
-    // Zero endpoint velocity gives an unhurried launch/arrival and smooth orbit starts/stops.
-    private static float Ease(float t) => t * t * (3 - 2 * t);
+    private void Face(Vector2 movement, float dt, ConstructionDroneMasterConfig config) => base.Face(movement, dt, config.TurnDegreesPerSecond);
     // =========================================================
     // File data cannot inject invalid clocks, positions or unbounded orbit state into the active updater.
     internal void Validate()

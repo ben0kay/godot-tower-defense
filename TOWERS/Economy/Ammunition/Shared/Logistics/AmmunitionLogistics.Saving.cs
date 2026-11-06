@@ -13,7 +13,7 @@ public partial class AmmunitionLogistics
     {
         Jobs = _jobs.Select(j => new DeliverySaveData(j.Source.SaveId,
             GodotObject.IsInstanceValid(j.Destination) && !j.Destination.IsQueuedForDeletion() ? j.Destination.SaveId : "",
-            j.Cargo.Amount, j.Reserved, j.Drone.Returning, SavePoint.From(j.Drone.GlobalPosition), j.Drone.Speed)).ToList(),
+            j.Cargo.Amount, j.Reserved, j.Drone.Returning, SavePoint.From(j.Drone.GlobalPosition), j.Drone.Speed) { Motion = j.Drone.CaptureFlight() }).ToList(),
         Pending = _pending.Select(t => t.SaveId).ToList(), Factories = _factories.Select(t => t.SaveId).ToList(),
         Depots = _depots.Select(t => t.SaveId).ToList(), FactoryCursor = _factoryCursor, RequestCursor = _requestCursor,
         FactoryTurn = _factoryTurn, Elapsed = _elapsed, Lost = LostRounds, Delivered = DeliveredRounds
@@ -46,7 +46,7 @@ public partial class AmmunitionLogistics
                 throw new InvalidDataException("Delivery reservation exceeds available capacity.");
             var job = new AmmoDeliveryJob { Source = source, Destination = destination, DestinationInventory = inventory,
                 Cargo = new AmmoInventory(source.DronePayload, saved.Cargo), Reserved = saved.Reserved };
-            job.Drone = DroneScene.Instantiate<TransportDrone>();
+            job.Drone = DroneScene.Instantiate<CargoDrone>();
             _jobs.Add(job); _busy[source] = BusySlots(source) + 1;
             if (destination != null)
             {
@@ -54,8 +54,8 @@ public partial class AmmunitionLogistics
                 if (destination.Ammunition != null) _delivering.Add(destination, job);
             }
             job.Drone.Initialize(source, destination, saved.Speed, () => Arrive(job), () => Complete(job, false), () => Complete(job, true));
-            AddChild(job.Drone); job.Drone.GlobalPosition = saved.Position.Vector();
-            job.Drone.SetLoaded(saved.Cargo > 0); if (saved.Returning) job.Drone.ReturnHome();
+            AddChild(job.Drone); job.Drone.SetLoaded(saved.Cargo > 0);
+            job.Drone.RestoreFlight(saved.Returning, saved.Position.Vector(), saved.Motion);
         }
         // Registration may have generated demands from creation stock; replace that order after restoring all inventory.
         _pending.Clear(); _pendingSet.Clear();

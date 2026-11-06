@@ -2,7 +2,9 @@
 
 **Repository:** `ben0kay/godot-tower-defense`  
 **Branch:** `dev` only  
-**Status:** **PLANNED / Approved for Codex implementation** (2026-11-06). **No gameplay implementation in this plan commit.**
+**Status:** **Source Implemented / Awaiting Owner Validation** (2026-11-06).
+
+DRONE2-A–F are implemented in source: shared cubic/eased motion/body, independent builder/ammo owners, retained twin-thruster/contrail presentation, bounded site telemetry/acquisition and compatible flight saves. DRONE2-G source/resource/diff checks completed; .NET unavailable, focused fixtures authored but unrun. Full Godot visual, logistics/work and checkpoint/FPS acceptance remains with the owner. The specification below is retained as the acceptance contract.
 
 ## Objective and design decision
 

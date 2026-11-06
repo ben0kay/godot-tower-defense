@@ -1,3 +1,9 @@
+## DRONE2 — unified builder/ammunition drone presentation
+
+**Source Implemented / Awaiting Owner Validation.** Construction and ammo couriers now share the cyan drone body, cubic/eased flight, twin thruster ignition and thin speed-responsive actual-path ion trails. Construction adds a short SITE LOCKED cue before the existing beam deployment and one compact shared site telemetry readout through SYSTEM ONLINE. Construction and ammo managers/caps/stock/work remain separate; authored speeds and balances are preserved. Save motion/phase compatibility and bounded active-only presentation are source implemented. .NET unavailable; owner gameplay/visual/FPS and fresh checkpoint checks pending. [Details](DRONES/README.md).
+
+---
+
 ## SPAWN2 planning update — all-portals dimensional warp-in (2026-11-06)
 
 The [SPAWN2 Codex handoff](ENEMIES/Spawning/IMPLEMENTATION_PLAN.md#phase-spawn2--shared-cinematic-dimensional-warp-in-for-all-portals-codex-implementation-specification) now specifies a **shared, cinematic violet swirly portal materialization** with inward curling GPU particles, growing ring, bright breach pulse and settling idle portal. **Every START (AppearAtWave=0) portal animates on fresh level deployment**, while portals due at Wave N play the same effect on their activation wave. Add a safe pausable Forming/Ready gate so no enemy can emerge from an unformed portal; between-wave checkpoint restore must not replay old appearances. Reuse existing SPAWN1 route reservations, idle rotation and short purple spawn bursts. **Documentation only: SPAWN2 not yet implemented.**

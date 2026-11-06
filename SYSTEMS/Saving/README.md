@@ -1,3 +1,11 @@
+## DRONE2 flight compatibility
+
+**Source Implemented / Awaiting Owner Validation.** DeliverySaveData gains optional Motion with DroneFlightMotion's exact controls, elapsed/duration, heading and velocity. All original shipment fields remain required and validated. Legacy missing/null motion starts an eased remaining leg from saved position, without cargo removal/arrival replay. New snapshots validate finite/bounded fields and their target endpoint before resume.
+
+ConstructionDroneMotion keeps every existing flat JSON property through inherited shared flight state. Existing phase IDs0–4 are unchanged; Acquiring=5 adds the pre-beam cue and reuses Deploy as its elapsed phase clock. Old Deploying=1 saves resume beam deployment without replaying acquisition; new acquisition saves remain held until acquisition then the original beam gate complete. No readout/trail/flare save fields, version bump or combat-save expansion. Cosmetic completion text is never reconstructed from already finished towers. Existing authored dependency fingerprints remain conservative and may reject prior content checkpoints. Owner save/load acceptance pending.
+
+---
+
 ## CTX1 checkpoint boundary
 
 **Source Implemented / Awaiting Owner Validation.** Corruptor is a normal registered tower: identity, paid tier/rank, actual Credits invested, hull, work, ammo, heat, power and cooldown reuse existing capture/restore. No new JSON fields or version. Live enemies/projectiles already prohibit saving; Corruption runtime is cleared with those enemies, so no active effect/source serialization is added. Load re-resolves capabilities from the authored config without replaying shots/ticks/refunds. Existing fingerprints and strict compatibility remain unchanged.

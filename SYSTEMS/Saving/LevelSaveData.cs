@@ -65,7 +65,8 @@ public sealed record TowerSaveData
     public PowerSaveData? Power { get; init; }
     public string PowerPeerId { get; init; } = "";
 }
-public sealed record DeliverySaveData(string Source, string Destination, int Cargo, int Reserved, bool Returning, SavePoint Position, float Speed);
+public sealed record DeliverySaveData(string Source, string Destination, int Cargo, int Reserved, bool Returning, SavePoint Position, float Speed)
+{ public DroneFlightMotion Motion { get; init; } }
 public sealed record LogisticsSaveData
 {
     public List<DeliverySaveData> Jobs { get; init; } = new();

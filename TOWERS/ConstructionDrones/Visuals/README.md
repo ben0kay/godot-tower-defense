@@ -1,3 +1,9 @@
+## DRONE2 common presentation
+
+**Source Implemented / Awaiting Owner Validation.** ConstructionDrone now instances DRONES/Shared/DroneBody.tscn, the same cyan36×28 model used by ammunition couriers. The original SVG remains at its stable path. Sprite-only heading plus rear cyan-white ignition/propulsion and thin speed-sensitive actual-path contrail are driven by the existing manager update. Shared cosmetic controls live in DRONES/Shared/DefaultDroneVisualConfig.tres. The beam remains on the builder's fixed root and retains its original deployment and renderer. No courier beam, extra engine particles, animation timers or idle processing. Old three-node/independent-courier descriptions below are historical; current builder composition adds one body container around its sprite. Godot visual/performance acceptance pending.
+
+---
+
 ## Smooth shader projection — 2026-10-27
 
 The construction-drone cone now uses **one cached four-vertex polygon**, rather than drawing three superimposed translucent polygons with distinct sharp boundaries. `ConstructionBeamGradient.gdshader` provides a continuous cyan falloff across its width with fragment-level `smoothstep` and pixel-derivative edge feathering. The nozzle remains brighter, while ground contact keeps a visible (but slightly softer) center. There is no texture render-to-cache, low-resolution viewport, noise, `TIME`, shader animation, or texture lookup.

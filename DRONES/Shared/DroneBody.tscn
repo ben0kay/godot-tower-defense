@@ -1,0 +1,10 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://DRONES/Shared/DroneBody.cs" id="1"]
+[ext_resource type="Texture2D" path="res://TOWERS/ConstructionDrones/Visuals/ConstructionDrone.svg" id="art"]
+[ext_resource type="Resource" path="res://DRONES/Shared/DefaultDroneVisualConfig.tres" id="config"]
+[node name="Body" type="Node2D"]
+script = ExtResource("1")
+Config = ExtResource("config")
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("art")
+show_behind_parent = true

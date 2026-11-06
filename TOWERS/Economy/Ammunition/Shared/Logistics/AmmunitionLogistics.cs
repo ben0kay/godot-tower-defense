@@ -31,7 +31,7 @@ public partial class AmmunitionLogistics : Node2D
     public override void _Ready()
     {
         Config ??= GD.Load<AmmunitionMasterConfig>("res://TOWERS/Shared/Ammunition/DefaultAmmunitionConfig.tres");
-        DroneScene ??= GD.Load<PackedScene>("res://DRONES/Transport/TransportDrone.tscn");
+        DroneScene ??= GD.Load<PackedScene>("res://DRONES/Transport/CargoDrone.tscn");
         Config.Changed += RefreshRequests; SetProcess(false);
     }
     public int BusySlots(AmmoBuilding source) => _busy.GetValueOrDefault(source);
@@ -149,7 +149,7 @@ public partial class AmmunitionLogistics : Node2D
         else amount = Math.Min(source.DronePayload, Math.Min(source.Inventory.Amount, freeRoom));
         if (amount <= 0) return;
         AmmoDeliveryJob job = new() { Source = source, Destination = destination, Cargo = new AmmoInventory(source.DronePayload), DestinationInventory = target };
-        TransportDrone drone = DroneScene.Instantiate<TransportDrone>(); job.Drone = drone;
+        CargoDrone drone = DroneScene.Instantiate<CargoDrone>(); job.Drone = drone;
         if (!source.Inventory.TryTransferTo(job.Cargo, amount)) { drone.Free(); return; }
         job.Reserved = amount;
         _reserved[destination] = ReservedSpace(destination) + amount;

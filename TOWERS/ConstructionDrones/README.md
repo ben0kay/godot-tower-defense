@@ -1,3 +1,17 @@
+## DRONE2 — shared body, flight and site acquisition
+
+**Source Implemented / Awaiting Owner Validation.** Builder flight mathematics now lives in DRONES/Shared/DroneFlightMotion, with the existing flat ConstructionDroneMotion checkpoint fields inherited unchanged. Orbit/hover/PRNG, Citadel selection, FIFO/cap, pooled visuals and real work holds remain with this manager; default max speed is still280px/s. Ammo uses the primitive/body but its own dispatcher and source speeds.
+
+ConstructionDrone instances the common DroneBody scene and passes real heading/velocity/flight phase into its twin thrusters and32-point thin history. Only flying/returning legs trail; hover has a tiny glow. Parked/hidden entries reset and sleep. No per-drone effect loop, particles or timers.
+
+New state sequence: Flying(0) → **Acquiring(5)** → Deploying(1) → Beaming(2) → Returning(3); Cancelled remains4. Acquisition adds0.20s before the existing0.25s beam deployment, retaining the original work hold until beam completion. `SiteAcquisitionSeconds` is Inspector editable. The same assignment Deploy clock stores acquisition/deployment elapsed time; overshoot never advances a later phase or construction time. Missing home/site, pause, fallback, strict mode and cancellation retain their existing owners.
+
+Existing site holograms draw the brief bright brackets/converging cross and one cached telemetry panel per site. Actual work registration/progress/completion supplies DRONE INBOUND, SITE LOCKED, CONSTRUCTING/UPGRADING N% and brief SYSTEM ONLINE, including no-builder work. See Shared/Construction/Visuals.
+
+New acquisition saves restore held with their cue elapsed; old Deploying records resume their existing deployment directly, and no older phase values change. Current builder motion resumes exactly; legacy missing-motion fallback remains. Cosmetic trail/ignition/readouts are transient. Source/resource/field-parity/diff checks only; .NET unavailable. Owner visual, callback and checkpoint acceptance pending.
+
+---
+
 ## CD4 — construction drones also service paid upgrades (2026-10-27)
 
 **Implemented in source; Godot/.NET runtime and rendered appearance still require a local smoke check.** Positive-duration paid tower upgrades now use the existing Citadel construction drone manager: payment and the **UPGRADING** disable state take effect immediately; a pooled drone is queued from the nearest available Citadel; the **upgrade progress clock remains held at 0** during travel/deployment; the cyan beam finishes deploying before that specific work reservation is released; the shared `ConstructionWorkManager` then advances the existing paid-tier `WorkSeconds`. The tower stays combat-disabled throughout, new tier stats/sprites commit at 100%, and the drone flies home independently. This is the **same** bounded FIFO/flight/hover/beam/return lifecycle as initial construction, not a separate upgrade-drone class or work timer.
