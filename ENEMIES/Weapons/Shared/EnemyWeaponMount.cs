@@ -112,22 +112,27 @@ public partial class EnemyWeaponMount : Node2D
         { Stop(); return; }
         if (!_host.GlobalPosition.IsFinite() || !_pivot.GlobalPosition.IsFinite() || !_muzzle.GlobalPosition.IsFinite())
         { Target = null; Aligned = false; ResetWeapon(); return; }
-        // A lost lock never waits out the longer hold interval; validate cheaply without a spatial search.
-        if (Target != null && !EnemyTowerTargeting.Valid(_registry, Target, _pivot.GlobalPosition, _settings.Range))
+        Vector2 sightOrigin = _muzzle.GlobalPosition;
+        // A lost/occluded lock never waits out the longer hold interval; use this mount's muzzle, not hull center.
+        if (Target != null && !EnemyTowerTargeting.Valid(_registry, Target, _pivot.GlobalPosition, _settings.Range, sightOrigin))
         { Target = null; Aligned = false; ResetWeapon(); _search = System.Math.Min(_search, _settings.SearchSeconds); }
         _search -= delta;
         if (_search <= 0)
         {
-            Target = EnemyTowerTargeting.Closest(_registry, _pivot.GlobalPosition, _settings.Range, _scratch);
+            Target = EnemyTowerTargeting.Closest(_registry, _pivot.GlobalPosition, _settings.Range, _scratch, sightOrigin);
             TargetQueries++; LastCandidates = _registry.LastCandidates; _search = Target != null ? _settings.LockedSearchSeconds : _settings.SearchSeconds;
         }
-        if (!EnemyTowerTargeting.Valid(_registry, Target, _pivot.GlobalPosition, _settings.Range))
-        { Target = null; Aligned = false; ResetWeapon(); return; }
+        if (Target == null) { Aligned = false; ResetWeapon(); return; }
         // Stasis halts the optional gun as well as locomotion; permanent Cryo slow remains a movement modifier.
         if (_host.HasStatus(StatusEffectId.Freeze)) { Aligned = false; ResetWeapon(); return; }
         _pivot.GlobalRotation = _heading; // Counter hull turning before applying the gun's independent turn limit.
         Aligned = TurretAiming.Track(_pivot, Target.GlobalPosition, _settings.TurnSpeed, _settings.Tolerance, true, delta);
         _heading = _pivot.GlobalRotation;
+        // Turning/countering hull rotation can move a long barrel around a corner in this same tick.
+        // Recheck only if an aligned gun's actual muzzle moved since the acquisition/lock check.
+        if (Aligned && _muzzle.GlobalPosition != sightOrigin
+            && !EnemyTowerTargeting.Valid(_registry, Target, _pivot.GlobalPosition, _settings.Range, _muzzle.GlobalPosition))
+        { Target = null; Aligned = false; ResetWeapon(); _search = System.Math.Min(_search, _settings.SearchSeconds); return; }
         if (Aligned) OnAimReady(delta); else ResetWeapon();
     }
     // =========================================================

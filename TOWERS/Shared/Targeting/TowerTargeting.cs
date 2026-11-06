@@ -62,7 +62,7 @@ public static class TowerTargeting
                 ((Largest(Mode) ? candidate > Score : candidate < Score) || (candidate == Score && nearby.Order < Order))))
             {
                 // Only contenders pay for a line traversal; no allocations, raycast objects or full-map scans.
-                if (GodotObject.IsInstanceValid(Grid) && !Grid.HasTowerLineOfSight(Position, nearby.Position)) return;
+                if (GodotObject.IsInstanceValid(Grid) && !Grid.HasWeaponLineOfSight(Position, nearby.Position)) return;
                 Score = candidate; Best = nearby.Enemy; Order = nearby.Order; BestPreferred = preferred;
             }
         }
@@ -82,7 +82,7 @@ public static class TowerTargeting
         TowerDetection.CanDetect(enemy, detectsStealth)
         && position.DistanceSquaredTo(enemy.GlobalPosition) <= range * range
         && (!GodotObject.IsInstanceValid(enemy.Registry?.TerrainGrid)
-            || enemy.Registry.TerrainGrid.HasTowerLineOfSight(position, enemy.GlobalPosition));
+            || enemy.Registry.TerrainGrid.HasWeaponLineOfSight(position, enemy.GlobalPosition));
     #endregion
 }
 

@@ -118,12 +118,12 @@ public partial class TowerRangeOverlay : Node2D
     // Binary refinement costs at most ten short traversals per ray, only when rebuilding selection.
     private float VisibleFraction(Vector2 origin, Vector2 end)
     {
-        if (_grid.HasTowerLineOfSight(origin, end)) return 1;
+        if (_grid.HasWeaponLineOfSight(origin, end)) return 1;
         float low = 0, high = 1;
         for (int i = 0; i < 10; i++)
         {
             float middle = (low + high) * 0.5f;
-            if (_grid.HasTowerLineOfSight(origin, origin.Lerp(end, middle))) low = middle;
+            if (_grid.HasWeaponLineOfSight(origin, origin.Lerp(end, middle))) low = middle;
             else high = middle;
         }
         return low;

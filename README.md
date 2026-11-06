@@ -1,3 +1,9 @@
+## Mountains block weapon vision on both sides — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Friendly towers and enemy guns now share `WorldGrid.HasWeaponLineOfSight` over the existing terrain cache. Enemy acquisition skips hidden towers; blocked locks stop aiming/firing, and every Capital gun checks from its own muzzle. Existing range/scoring, terrain metadata, navigation, weapon balance, saves and projectile collision are preserved. Narrow source checks only; .NET unavailable, Godot gameplay verification pending. [Shared terrain vision](WORLD/GRID/README.md).
+
+---
+
 ## Obsidian Dreadnought and larger ranked F2 picker — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** The default enemy catalog now has 16 ships, including its first **Capital / Champion / Fighter**, `obsidian_dreadnought_mk1`. Native 352×208 black/charcoal armour with sleek crimson accents, baked vector lighting, four reinforced weapon sockets and a separate native 24×72 rotating cannon sprite. Four independent existing EnemyMinigun mounts sit at front-left/front-right/rear-left/rear-right positions (112,−62), (112,62), (−104,−62), (−104,62), each with its own aiming/target/cooldown state and exact barrel-tip Marker2D (0,−32).

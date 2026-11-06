@@ -1,3 +1,9 @@
+## Shared weapon sight checks — 2026-11-06
+
+MountainSightChecks now covers shared/legacy API parity, bidirectional mountain blockage, enemy hidden-lock rejection, visible fallback selection, an independently offset visible muzzle, terrain removal and actual Heavy Gunner mount acquire/aim/shot suppression followed by restored firing. Existing friendly checks, corner blocking and movement-only terrain distinction remain. Source-authored only; **not executed** (.NET unavailable). No broad suite or gameplay/benchmark run. Owner Godot .NET build and the optional focused fixture remain pending.
+
+---
+
 ## E1/E2 rendering checks — 2026-10-21
 
 Run TerrainEdgeRenderingChecks.tscn for shared soft mask topology, generic profile/source opt-in, layer transforms/fallback, deterministic images, no navigation work from visual rebuilds, tower-occupancy isolation, exact material restoration and bounded4800-cell generation. It uses temporary Level002 terrain only. Diagnostic images save under user://terrain-edge-mask.png and user://mars-after.png. Headless tests do not assert desktop GPU shader output; real gameplay zoom/filtering review remains pending. Existing route/overlay regression checks are run separately.

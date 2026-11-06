@@ -1,3 +1,16 @@
+## Shared weapon terrain vision — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Mountains now block enemy weapon acquisition, aiming and firing as well as friendly tower targeting. `WorldGrid.HasWeaponLineOfSight(from, to)` is the neutral shared API, using the existing allocation-free cached terrain traversal. `HasTowerLineOfSight` remains a compatibility wrapper; the existing `blocks_tower_sight` tile metadata, blocker count/cache, corner rules and no-blocker fast path are preserved. Friendly target queries and the selected red/visible range overlay call the neutral API; no second visibility cache, terrain scan, physics ray system or global fog system.
+
+Enemy `TowerRegistry` exposes its already-cached owning grid. `EnemyTowerTargeting.Valid` and `Closest` use that same terrain test, with an optional sight origin independent of range origin. Enemy mounts pass their **own muzzle** for sight while retaining pivot-based range/closest scoring and stable registration-order ties. Only candidate score contenders traverse terrain, so a hidden nearest tower cannot suppress a visible fallback. Existing staggered acquisition and lock-hold intervals remain. A newly obstructed lock is cleared before aiming/firing; if aiming/countering hull rotation moves an aligned muzzle, sight is revalidated before emission. The redundant identical pre-aim lock check was removed. All four Capital guns and both Gunner variants inherit this behavior through `EnemyWeaponMount`; no per-ship branches or new processing loops.
+
+Projectile flight/collision, already-emitted bullets, damage, splash/pulses, repair, stealth rules, navigation, tile flags, weapon balance and saves are unchanged. This pass concerns weapon line of sight only.
+
+**Minimal validation:** focused source/diff checks only; .NET unavailable. Existing MountainSightChecks was extended with neutral/legacy API parity, reverse blockage, hostile hidden-target rejection/visible fallback, independent offset muzzle visibility, and a real Heavy Gunner mount refusing shots until terrain removal. C# checks are authored but **not executed** here; no build, gameplay or performance claim. Owner: rebuild, place a mountain between a tower and Gunner/Capital, verify neither side targets/fires through it, move around the mountain and inspect each Capital muzzle independently. Already-fired projectile collision remains unchanged by design.
+
+
+---
+
 ## Obsidian Dreadnought and larger ranked F2 picker — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** The default enemy catalog now has 16 ships, including its first **Capital / Champion / Fighter**, `obsidian_dreadnought_mk1`. Native 352×208 black/charcoal armour with sleek crimson accents, baked vector lighting, four reinforced weapon sockets and a separate native 24×72 rotating cannon sprite. Four independent existing EnemyMinigun mounts sit at front-left/front-right/rear-left/rear-right positions (112,−62), (112,62), (−104,−62), (−104,62), each with its own aiming/target/cooldown state and exact barrel-tip Marker2D (0,−32).

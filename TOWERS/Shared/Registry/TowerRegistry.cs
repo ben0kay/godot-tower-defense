@@ -25,6 +25,7 @@ public partial class TowerRegistry : Node
         public readonly List<(double X, double Y)> Cells = new();
         public bool Wide, Indexed;
     }
+    public WorldGrid TerrainGrid => _grid;
     public int Count => _entries.Count;
     public int LastCandidates { get; private set; }
     // =========================================================

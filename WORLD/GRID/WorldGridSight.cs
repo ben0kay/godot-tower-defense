@@ -1,4 +1,4 @@
-// Allocation-free tower sight queries over explicit cached terrain metadata, independent of navigation/art.
+// Allocation-free weapon sight shared by friendly towers and enemy mounts over explicit cached terrain metadata, independent of navigation/art.
 using Godot;
 using System;
 
@@ -9,7 +9,7 @@ public partial class WorldGrid
     // =========================================================
     // Traverse only cells touched by this segment. Corner contact conservatively checks both sides.
     // No-blocker worlds return before transforms/traversal; placement occupancy never blocks sight.
-    public bool HasTowerLineOfSight(Vector2 from, Vector2 to)
+    public bool HasWeaponLineOfSight(Vector2 from, Vector2 to)
     {
         if (!float.IsFinite(from.X) || !float.IsFinite(from.Y)
             || !float.IsFinite(to.X) || !float.IsFinite(to.Y)) return false;
@@ -44,6 +44,9 @@ public partial class WorldGrid
         return false;
     }
 
+    // =========================================================
+    // Existing callers/assets can retain the old name; there is only one terrain cache and traversal.
+    public bool HasTowerLineOfSight(Vector2 from, Vector2 to) => HasWeaponLineOfSight(from, to);
     // =========================================================
     // Map bounds are handled by the segment query; off-map neighbours have no authored obstruction.
     private bool SightBlockedAt(int x, int y) => x >= 0 && y >= 0
