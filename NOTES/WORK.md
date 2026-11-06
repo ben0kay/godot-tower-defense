@@ -1,3 +1,9 @@
+## Capital cannon +33% weapon range — 2026-11-06
+
+Changed only `ENEMIES/Types/ObsidianDreadnought/CapitalCannon.tres`: `RangePixels` 275.0 → **365.75** (+33%). All four capital weapon mounts share that preset, so each gains range without a gun script, target logic, damage, rate of fire, bullet speed or other ship changes. Adjusted its directly relevant README balance line. Source-only review; Godot targeting acceptance pending.
+
+---
+
 ## CW1 shared weapon recoil — 2026-11-06
 Extracted the existing motion/style into `FEEDBACK/Weapons/Recoil/`; tower scripts remain compatible adapters with unchanged presets, paths and smoothstep behaviour. Gunner/Heavy/Capital use 0.8/1.5/2px presets, one retained controller per opted-in mount (four independent Capital guns). Enemy physical muzzles moved to fixed sibling markers at unchanged rest coordinates; request/flash captured before accepted-shot recoil. Lifecycle/style edits cancel/reset, idle controllers sleep. Updated existing Gunner source checks/paths; source/resource review only, .NET unavailable and fixtures unrun. Owner to check visual alignment/return/pause and tower compatibility. CW2 untouched.
 

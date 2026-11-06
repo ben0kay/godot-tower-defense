@@ -8,7 +8,7 @@
 
 [resource]
 script = ExtResource("config")
-RangePixels = 275.0
+RangePixels = 365.75
 TargetSearchSeconds = 0.2
 LockedTargetSearchSeconds = 1.0
 RotationSpeedDegrees = 180.0
