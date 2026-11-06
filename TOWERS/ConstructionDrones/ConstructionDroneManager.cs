@@ -49,6 +49,16 @@ public partial class ConstructionDroneManager : Node2D
     public float AcquisitionProgressFor(TowerBase tower) => _jobs.TryGetValue(tower, out var job) && job.Phase == ConstructionDronePhase.Acquiring
         ? Mathf.Clamp(job.Deploy / Mathf.Max(.001f, ConstructionDroneMasterConfig.Safe(Config.SiteAcquisitionSeconds, .2f, 0, .5f)), 0, 1) : -1;
     // =========================================================
+    // Constant-time presentation query; queued or distant builders do not reveal a site's widget.
+    public bool IsNearSite(TowerBase tower, float radius)
+    {
+        if (!_jobs.TryGetValue(tower, out var job) || job.Cancelled || !GodotObject.IsInstanceValid(job.Drone)) return false;
+        if (job.Phase is ConstructionDronePhase.Acquiring or ConstructionDronePhase.Deploying or ConstructionDronePhase.Beaming) return true;
+        return job.Phase == ConstructionDronePhase.Flying &&
+            job.Position.DistanceSquaredTo(job.Motion.End.Vector()) <= radius * radius;
+    }
+
+    // =========================================================
     // Tokens are unique even if a site is cancelled and the same instance is reused by a fixture later.
     internal ulong Reserve() => ++_reservation;
     #endregion

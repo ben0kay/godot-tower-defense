@@ -601,6 +601,19 @@ Alert = 1
 BannerTitle = "Fleet Spearhead"
 BannerDescription = "A mass assault culminates in cruisers, warships and heavy transports."
 
+[sub_resource type="Resource" id="W6OpeningEnemy"]
+script = ExtResource("enemy")
+EnemyId = "reinforced_drone_mk1"
+Weight = 1.0
+Portal = "Portals/EnemyPortal4"
+
+[sub_resource type="Resource" id="W6Opening"]
+script = ExtResource("batch")
+Count = 1
+Interval = 0.5
+After = 0.5
+Enemies = Array[ExtResource("enemy")]([SubResource("W6OpeningEnemy")])
+
 [sub_resource type="Resource" id="W6B1E1"]
 script = ExtResource("enemy")
 EnemyId = "medium_mk1"
@@ -629,12 +642,12 @@ Portal = "Portals/EnemyPortal1"
 [sub_resource type="Resource" id="W6B1E5"]
 script = ExtResource("enemy")
 EnemyId = "reinforced_drone_mk1"
-Weight = 4.0
+Weight = 3.0
 Portal = "Portals/EnemyPortal4"
 
 [sub_resource type="Resource" id="W6B1"]
 script = ExtResource("batch")
-Count = 54
+Count = 53
 Interval = 0.5
 After = 2.0
 Enemies = Array[ExtResource("enemy")]([SubResource("W6B1E1"), SubResource("W6B1E2"), SubResource("W6B1E3"), SubResource("W6B1E4"), SubResource("W6B1E5")])
@@ -774,7 +787,7 @@ Enemies = Array[ExtResource("enemy")]([SubResource("W6B4E1"), SubResource("W6B4E
 [sub_resource type="Resource" id="W6"]
 script = ExtResource("wave")
 Number = 6
-Batches = Array[ExtResource("batch")]([SubResource("W6B1"), SubResource("W6B2"), SubResource("W6B3"), SubResource("W6B4")])
+Batches = Array[ExtResource("batch")]([SubResource("W6Opening"), SubResource("W6B1"), SubResource("W6B2"), SubResource("W6B3"), SubResource("W6B4")])
 Alert = 1
 BannerTitle = "Heavy Fleet Escalation"
 BannerDescription = "Heavy gunners, elites and shield frigates replace the earlier drone skirmishes."

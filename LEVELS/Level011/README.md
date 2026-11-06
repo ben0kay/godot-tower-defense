@@ -1,3 +1,11 @@
+## Faster opening and immediate Level011 Wave 6 debut — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Default shared materialization duration is halved from 2.2s to 1.1s; opening particle lifetimes scale down to drain before completion. Enemy delivery still waits for the genuine Open/readiness event, then resumes on the scheduler's next tick without a separate post-opening timer. Checkpoint/no-replay and pause semantics remain.
+
+Level011 Wave 6 formerly shuffled four Portal4 Reinforced Drones among the first 54 ships, so a formed portal could wait for its first selected entry. One existing Reinforced Drone is now a guaranteed opening batch from Portal4, followed 0.5s later by the remaining 53 ships in that original batch (three remaining Reinforced Drones). Total wave count stays 216; Portal4 stays 26 ships; all other enemy quotas, portal assignments, later batch gaps and other waves are unchanged. The first ship waits safely through opening and launches immediately when ready. Source/resource quota review only; owner in-engine acceptance pending.
+
+---
+
 ## Portal 4 debut and faster opening waves — 2026-11-06
 
 **Source Implemented / Awaiting Owner Gameplay Validation.** The already-authored fourth portal at `(7136, 3552)`, with `AppearAtWave = 6` and its existing `RouteCheckpoint3a` link, is now included in `Level011Config.tres → ActivePortals`. SPAWN1 keeps it hidden/ineligible for waves 1–5 and activates it at the **accepted start of Wave 6**, before the first spawn. Wave 6 now sends **26 of its existing 216 scheduled ships** through `Portals/EnemyPortal4`: 4 Reinforced Drones from its first batch, 10 Elite Assault Ships from its second, and 12 Heavy Gunner Drones from its final batch. The mix is shuffled within each batch, so Portal4 ships are interleaved rather than a deterministic immediate first spawn. Every other wave 6 ship and the entire waves 7–10 roster remains unchanged.

@@ -17,10 +17,12 @@ public partial class ConstructionSiteVisualConfig : Resource
     [Export(PropertyHint.Range, "8,18,1")] public int TelemetryFontSize { get; set; } = 11;
     [Export] public Color TelemetryColor { get; set; } = new(.8f, .98f, 1, .95f);
     [Export] public Color TelemetryBackground { get; set; } = new(.02f, .06f, .1f, .75f);
-    [Export] public Vector2 TelemetryOffset { get; set; } = new(8, -14);
+    [Export] public Vector2 TelemetryOffset { get; set; } = new(-8, -4);
     [Export(PropertyHint.Range, "88,220,1")] public float TelemetryWidth { get; set; } = 132;
+    [Export(PropertyHint.Range, "32,300,4")] public float TelemetryRevealDistance { get; set; } = 140;
+    [Export(PropertyHint.Range, ".05,1,.05")] public float TelemetryFadeInSeconds { get; set; } = .25f;
     [ExportGroup("Circular Site Progress")]
-    [Export(PropertyHint.Range, ".4,1.5,.05")] public float TelemetryScale { get; set; } = .8f;
+    [Export(PropertyHint.Range, ".4,1.5,.05")] public float TelemetryScale { get; set; } = .72f;
     [Export(PropertyHint.Range, "26,56,1")] public float TelemetryRingRadius { get; set; } = 40;
     [Export(PropertyHint.Range, "0,180,1")] public float TelemetryOuterDegreesPerSecond { get; set; } = 30;
     [Export(PropertyHint.Range, "0,180,1")] public float TelemetryMiddleDegreesPerSecond { get; set; } = 48;

@@ -1,3 +1,9 @@
+## Drone travel, site widget and portal pacing — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Shared builder/ammo flights use fixed 800px/s² acceleration and braking with real cruise time, preserving curves and source speeds. Construction/upgrade widgets are another 10% smaller (0.72 scale), closer upper-right and fade in over 0.25s as the builder approaches within 140px. Portal opening defaults to 1.1s, and Level011 Wave 6 leads with one existing Portal4 ship rather than waiting for a shuffled request; total 216 ships / Portal4 26 preserved. Flight snapshots append optional profile data and retain legacy active legs. Source review and numerical flight/quota checks only; .NET unavailable, owner gameplay/visual acceptance pending. Details: DRONES/Shared/README.md, TOWERS/Shared/Construction/Visuals/README.md and WORLD/PORTALS/EnemyPortal/README.md.
+
+---
+
 ## Power-capacitor resource-order fix — 2026-11-06
 
 **Source fixed; gameplay acceptance pending.** The Sniper and several other offensive towers had authored `Power` resources but did not show ENERGY or pay for shots. Eight `Default*Config.tres` resources placed `Power` before `script`; the working Battle/Corruptor resources had the correct `script`-first order. Reordered only the script/power assignment lines in Sniper, Machine Gun, Rocket, Laser, Cryo, Stasis, Shockwave and Blaster Cannon. Underlying shared power/payment/energy values and balance unchanged. Test **fresh** deployments after reimport, especially disconnected Sniper and Laser. [Power guide](TOWERS/Shared/Power/README.md).

@@ -3,3 +3,4 @@
 [ext_resource type="Script" path="res://WORLD/PORTALS/EnemyPortal/Visuals/PortalMaterializationStyle.cs" id="1"]
 [resource]
 script = ExtResource("1")
+DurationSeconds = 1.1

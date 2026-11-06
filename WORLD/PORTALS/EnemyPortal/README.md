@@ -1,3 +1,11 @@
+## Faster opening and immediate Level011 Wave 6 debut — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Default shared materialization duration is halved from 2.2s to 1.1s; opening particle lifetimes scale down to drain before completion. Enemy delivery still waits for the genuine Open/readiness event, then resumes on the scheduler's next tick without a separate post-opening timer. Checkpoint/no-replay and pause semantics remain.
+
+Level011 Wave 6 formerly shuffled four Portal4 Reinforced Drones among the first 54 ships, so a formed portal could wait for its first selected entry. One existing Reinforced Drone is now a guaranteed opening batch from Portal4, followed 0.5s later by the remaining 53 ships in that original batch (three remaining Reinforced Drones). Total wave count stays 216; Portal4 stays 26 ships; all other enemy quotas, portal assignments, later batch gaps and other waves are unchanged. The first ship waits safely through opening and launches immediately when ready. Source/resource quota review only; owner in-engine acceptance pending.
+
+---
+
 ## SPAWN2 — shared portal materialization — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** Every registered START portal now forms on fresh deployment; Wave N portals use the same Dormant → Forming → Open presentation on their accepted authored wave. No Level011 map or wave data changed. A 2.2s pausable tween drives a localized violet spiral shader, growing segmented ring, art/label reveal, inward GPU curls and concentrated ignition/ripple. No fullscreen effects, audio assets or idle CPU animation loop were added. Existing 120°/s rotation and 48-particle outward per-spawn rim bursts remain the Open-state presentation.

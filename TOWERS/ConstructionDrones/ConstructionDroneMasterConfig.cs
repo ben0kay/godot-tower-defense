@@ -24,6 +24,8 @@ public partial class ConstructionDroneMasterConfig : Resource
     #endregion
     #region Organic Movement
     [ExportGroup("Organic Movement")]
+    [Export(PropertyHint.Range, "32,10000,10")] public float FlightAcceleration { get; set; } = 800;
+    [Export(PropertyHint.Range, "32,10000,10")] public float FlightDeceleration { get; set; } = 800;
     [Export(PropertyHint.Range, "0,400,1")] public float FlightCurvePixels { get; set; } = 100;
     [Export(PropertyHint.Range, "30,720,5")] public float TurnDegreesPerSecond { get; set; } = 240;
     [Export(PropertyHint.Range, "8,160,1")] public float OrbitRadius { get; set; } = 28;

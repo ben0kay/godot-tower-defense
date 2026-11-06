@@ -33,7 +33,7 @@ public sealed class ConstructionDroneMotion : DroneFlightMotion
     // =========================================================
     // Cubic flight starts along the supplied departure heading and bends into its arrival direction.
     internal void BeginFlight(Vector2 start, Vector2 end, Vector2 departure, Vector2 arrival, ConstructionDroneMasterConfig config) =>
-        base.BeginFlight(start, end, departure, arrival, ConstructionDroneMasterConfig.Safe(config.TravelSpeed, 280, 32, 2000), config.FlightCurvePixels);
+        base.BeginFlight(start, end, departure, arrival, ConstructionDroneMasterConfig.Safe(config.TravelSpeed, 280, 32, 2000), config.FlightCurvePixels, config.FlightAcceleration, config.FlightDeceleration);
     internal bool Fly(float dt, ref Vector2 position, ConstructionDroneMasterConfig config) => base.Fly(dt, ref position, config.TurnDegreesPerSecond);
 
     // =========================================================
@@ -91,6 +91,7 @@ public sealed class ConstructionDroneMotion : DroneFlightMotion
     // File data cannot inject invalid clocks, positions or unbounded orbit state into the active updater.
     internal void Validate()
     {
+        ValidateFlight();
         foreach (float number in new[] { FlightElapsed, FlightSeconds, Heading, Angle, OrbitFrom, OrbitTo, OrbitElapsed, OrbitSeconds, HoldSeconds, HoverBlend, BobPhase })
             if (!float.IsFinite(number) || Mathf.Abs(number) > 1e9f) throw new System.IO.InvalidDataException("Invalid saved builder motion.");
         foreach (var point in new[] { Start, Control1, Control2, End, Velocity, Radii, HoverStart })

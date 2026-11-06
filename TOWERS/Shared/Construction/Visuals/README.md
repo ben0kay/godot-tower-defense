@@ -1,3 +1,9 @@
+## Smaller approach-fading widget — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Build/upgrade telemetry scales from 0.80 to 0.72 (another 10% smaller) and moves closer to the upper-right footprint corner (offset -8,-4). It stays hidden while queued/distant, then fades over 0.25s when its assigned builder is within 140px of the final hover arrival point. Visibility stays latched during work/orbit and composes with the existing 100% completion fade. Work without a held builder also fades in. Reveal distance/fade/scale/offset are editable in DefaultConstructionSiteVisualConfig.tres. The existing shared active-only clock reads an O(1) assignment query; no new scan, timer or process per building. Source review only; owner visual acceptance pending.
+
+---
+
 ## Percentage-only construction widget — 2026-11-06
 
 **Source Implemented / Awaiting Owner Visual Validation.** Removed DRONE INBOUND, SITE LOCKED, SYSTEM ONLINE and the job caption. The same animated circular percentage is shown while waiting/working and briefly counts up to 100% on successful completion before fading. The entire widget (arcs, dots and number) defaults to 80% scale via `TelemetryScale`, and anchors above/right of the building's upper-right footprint corner. Existing collision-avoidance lanes, shared bounded redraw, work progress, pause and save ownership remain. Acquisition footprint flashes remain visual-only and do not display status text. Source review only; .NET unavailable. Owner: check queue/acquire/build/upgrade/completion and crowded sites in Godot.

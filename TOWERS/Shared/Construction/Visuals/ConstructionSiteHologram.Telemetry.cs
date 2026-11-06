@@ -14,7 +14,7 @@ public partial class ConstructionSiteHologram
         public int LastDrawnPercent = -1;
         public string PercentLabel;
         public bool Waiting, Upgrading;
-        public float Age;
+        public float Age, Opacity;
         public Action Progress, Completed, Removed;
     }
     private readonly Dictionary<TowerBase, Readout> _telemetry = new();
@@ -70,8 +70,13 @@ public partial class ConstructionSiteHologram
     {
         // Reuse the shared site animation clock; no per-readout process or timer.
         float rate = ConstructionDroneMasterConfig.Safe(Config.TelemetryCountUpPerSecond, 160, 20, 400);
+        float revealDistance = ConstructionDroneMasterConfig.Safe(Config.TelemetryRevealDistance, 140, 32, 300);
+        float fadeSeconds = ConstructionDroneMasterConfig.Safe(Config.TelemetryFadeInSeconds, .25f, .05f, 1);
         foreach (Readout site in _telemetry.Values)
         {
+            bool reveal = !site.Waiting || (GodotObject.IsInstanceValid(_builders) && _builders.IsNearSite(site.Tower, revealDistance));
+            // Latch visibility once approached; orbit motion cannot flicker the widget off again.
+            if (reveal || site.Opacity > 0) site.Opacity = Mathf.MoveToward(site.Opacity, 1, dt / fadeSeconds);
             if (!site.DisplayInitialized || site.Waiting) continue;
             site.DisplayedPercent = Mathf.MoveToward(site.DisplayedPercent, site.Percent, rate * dt);
         }
@@ -107,12 +112,13 @@ public partial class ConstructionSiteHologram
     // Keep the old bounded eight-lane placement to prevent overlap on crowded sites.
     private void DrawTelemetry(Rect2 bounds, Readout site, bool acquiring, float opacity, ConstructionSiteVisualConfig c)
     {
+        opacity *= site.Opacity;
         if (!c.TelemetryEnabled || site.Text == null || opacity <= 0) return;
-        float scale = ConstructionDroneMasterConfig.Safe(c.TelemetryScale, .8f, .4f, 1.5f);
+        float scale = ConstructionDroneMasterConfig.Safe(c.TelemetryScale, .72f, .4f, 1.5f);
         float radius = ConstructionDroneMasterConfig.Safe(c.TelemetryRingRadius, 40, 26, 56);
         float diameter = (radius + 9) * 2;
         float width = diameter * scale, height = diameter * scale;
-        Vector2 offset = c.TelemetryOffset.IsFinite() ? c.TelemetryOffset : new(8, -14);
+        Vector2 offset = c.TelemetryOffset.IsFinite() ? c.TelemetryOffset : new(-8, -4);
         // Place the complete widget above/right of the footprint corner, rather than alongside it.
         Rect2 panel = new(new Vector2(bounds.End.X, bounds.Position.Y - height) + offset, new(width, height));
         Vector2 anchor = panel.Position;

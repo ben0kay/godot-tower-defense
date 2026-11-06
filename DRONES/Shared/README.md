@@ -1,3 +1,13 @@
+## Fixed acceleration and braking — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Builder and ammunition flight now integrates fixed acceleration/deceleration rates (800px/s² each by default) around the owner's configured cruising speed. Long trips add constant-speed cruise; very short trips lower peak speed without changing rates. Organic cubic routes and heading remain; one 64-segment distance table per leg plus bounded local refinement maps physical distance onto the curve instead of easing over the whole journey. No per-frame arrays, routefinding or extra Nodes/timers. Tune FlightAcceleration/FlightDeceleration on the builder config or courier scene.
+
+New flat optional flight-profile checkpoint properties preserve timing; restored old snapshots retain their current legacy eased leg, with new rates applied on their next leg. Tables are derived, privately retained and rebuilt once after deserialization. Existing work/cargo/arrival/return ownership stays intact.
+
+**Checks:** numerical smoke comparison of 1,000px/10,000px legs gives ~16px launch travel at 0.2s and ~16px braking distance at 0.2s before arrival for both. Existing Drone2Checks extended with distance-independent rates, short-leg peak speed, endpoint/no-overshoot and JSON/legacy cases, but not run: .NET unavailable. Owner: compare short/long builder and ammunition trips, arrival/return, pause and a fresh checkpoint.
+
+---
+
 # Shared drone flight and body — DRONE2
 
 **Source Implemented / Awaiting Owner Validation.**

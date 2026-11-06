@@ -3,6 +3,8 @@ using Godot;
 using System;
 public partial class CargoDrone : Node2D
 {
+    [Export] public float FlightAcceleration { get; set; } = 800;
+    [Export] public float FlightDeceleration { get; set; } = 800;
     [Export] public float FlightCurvePixels { get; set; } = 100;
     [Export] public float TurnDegreesPerSecond { get; set; } = 240;
     public bool Returning { get; private set; }
@@ -44,7 +46,7 @@ public partial class CargoDrone : Node2D
         bool first = _motion.FlightSeconds <= 0;
         Vector2 departure = _motion.Velocity.Vector();
         if (departure.LengthSquared() < 1) departure = first ? direction.Rotated(.35f) : Vector2.FromAngle(_motion.Heading);
-        _motion.BeginFlight(GlobalPosition, end, departure, direction.Rotated(-.3f), Speed, FlightCurvePixels);
+        _motion.BeginFlight(GlobalPosition, end, departure, direction.Rotated(-.3f), Speed, FlightCurvePixels, FlightAcceleration, FlightDeceleration);
         if (first && direction.LengthSquared() > .001f) _motion.Heading = departure.Angle();
         _body?.Present(_motion.Heading, Vector2.Zero, Speed, true, Returning ? 1 : 0, _loaded, 0);
     }
