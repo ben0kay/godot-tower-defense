@@ -1,3 +1,9 @@
+## PW6-A/B — Solar and Fusion generators — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Ctrl → Economy registers Solar Generator (1×1, 75 power/sec) and Fusion Reactor (4×4, 900 power/sec). Both reuse Industrial Generator's single shared producer, construction, power-network and checkpoint systems, with independent 0/35/70% SVG build stages and finished visuals. Balance is provisional and Inspector-configurable; no fuel, solar time-of-day or new distribution service. [Power implementation plan](TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md). Godot editor acceptance is pending.
+
+---
+
 ## Mountains block weapon vision on both sides — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** Friendly towers and enemy guns now share `WorldGrid.HasWeaponLineOfSight` over the existing terrain cache. Enemy acquisition skips hidden towers; blocked locks stop aiming/firing, and every Capital gun checks from its own muzzle. Existing range/scoring, terrain metadata, navigation, weapon balance, saves and projectile collision are preserved. Narrow source checks only; .NET unavailable, Godot gameplay verification pending. [Shared terrain vision](WORLD/GRID/README.md).

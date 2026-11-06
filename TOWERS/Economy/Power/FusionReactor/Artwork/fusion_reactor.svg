@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240">
+<defs><linearGradient id="m" x2="1" y2="1"><stop stop-color="#657f90"/><stop offset=".5" stop-color="#304655"/><stop offset="1" stop-color="#14222d"/></linearGradient><radialGradient id="p"><stop stop-color="#efffff"/><stop offset=".2" stop-color="#a7f4ff"/><stop offset=".45" stop-color="#55c9e4"/><stop offset=".74" stop-color="#5059ae"/><stop offset="1" stop-color="#202043"/></radialGradient><radialGradient id="h"><stop stop-color="#56bfe0" stop-opacity=".5"/><stop offset="1" stop-color="#56bfe0" stop-opacity="0"/></radialGradient></defs>
+<path d="M23 4H217L236 23V217L217 236H23L4 217V23Z" fill="#0a1620" stroke="#a4bac6" stroke-width="3"/>
+<path d="M26 13H214L227 26V214L214 227H26L13 214V26Z" fill="url(#m)" stroke="#547589" stroke-width="2"/>
+<rect x="24" y="24" width="192" height="192" fill="#112331" stroke="#607d8a" stroke-width="2"/>
+<path d="M24 67H216M24 173H216M67 24V216M173 24V216" stroke="#4e7686" stroke-width="3"/>
+<path d="M22 22L44 44M218 22L196 44M22 218L44 196M218 218L196 196" stroke="#bb7c92" stroke-width="4"/>
+<circle cx="24" cy="24" r="5" fill="#b5ccd3"/><circle cx="216" cy="24" r="5" fill="#b5ccd3"/><circle cx="24" cy="216" r="5" fill="#b5ccd3"/><circle cx="216" cy="216" r="5" fill="#b5ccd3"/>
+<path d="M75 32H165L208 75V165L165 208H75L32 165V75Z" fill="#1c3442" stroke="#8daebd" stroke-width="5"/>
+<path d="M85 43H155L197 85V155L155 197H85L43 155V85Z" fill="#071824" stroke="#4e6f85" stroke-width="3"/>
+<path d="M63 63L84 84M177 63L156 84M63 177L84 156M177 177L156 156" stroke="#b47f9d" stroke-width="8"/>
+<rect x="69" y="12" width="102" height="20" rx="4" fill="url(#m)" stroke="#a4b9c6" stroke-width="2"/>
+<rect x="69" y="208" width="102" height="20" rx="4" fill="url(#m)" stroke="#a4b9c6" stroke-width="2"/>
+<rect x="12" y="69" width="20" height="102" rx="4" fill="url(#m)" stroke="#a4b9c6" stroke-width="2"/>
+<rect x="208" y="69" width="20" height="102" rx="4" fill="url(#m)" stroke="#a4b9c6" stroke-width="2"/>
+<path d="M82 22H158M82 218H158M22 82V158M218 82V158" stroke="#c77a9b" stroke-width="3"/>
+<circle cx="120" cy="120" r="76" fill="#0c1a2a" stroke="#6f91a1" stroke-width="8"/>
+<circle cx="120" cy="120" r="65" fill="none" stroke="#9874b6" stroke-width="8" stroke-dasharray="30 12"/>
+<circle cx="120" cy="120" r="54" fill="#13253b" stroke="#7db5c8" stroke-width="4"/>
+<circle cx="120" cy="120" r="43" fill="#1b2540" stroke="#adb3d5" stroke-width="5"/>
+<path d="M108 47V64M132 47V64M108 176V193M132 176V193M47 108H64M47 132H64M176 108H193M176 132H193" stroke="#b6b9e0" stroke-width="7"/>
+<path d="M70 70L83 83M170 70L157 83M70 170L83 157M170 170L157 157" stroke="#d29eb1" stroke-width="4"/>
+<circle cx="120" cy="120" r="69" fill="url(#h)"/>
+<circle cx="120" cy="120" r="38" fill="url(#p)" stroke="#d6f8ff" stroke-width="3"/>
+<circle cx="120" cy="120" r="28" fill="none" stroke="#c6f8ff" stroke-width="2" stroke-dasharray="12 8"/>
+<path d="M101 109Q120 84 133 100T140 128Q125 154 104 135T101 109Z" fill="none" stroke="#d5ffff" stroke-width="5" stroke-linecap="round"/>
+<path d="M111 94L124 114L113 132L135 141" stroke="#f5ffff" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+<circle cx="120" cy="120" r="9" fill="#e6ffff" opacity=".8"/>
+<path d="M76 76l13 13M164 76l-13 13M76 164l13-13M164 164l-13-13" stroke="#ffaac4" stroke-width="5"/>
+<path d="M81 21H159M81 219H159M21 81V159M219 81V159" stroke="#7be8ef" stroke-width="3"/>
+</svg>

@@ -1,3 +1,9 @@
+## PW6 generator roster — 2026-11-06
+
+Solar Generator (1×1/75 output) and Fusion Reactor (4×4/900 output) are now registered alongside Industrial (2×2/250 output), all using shared PowerGenerator and existing finite island accounting. Source implemented; owner Godot validation pending. No new fuel or production system. See [power](Power/README.md).
+
+---
+
 ## Tower durability rebalance — 2026-10-20 (source updated; Godot runtime tests pending)
 
 **Current authoritative defaults supersede older HP references below:** Base/max hull health for every available player-built tower/structure is **10× the previous level-1 value**. All **nine offensive towers** (Battle, Laser, Blaster Cannon, Shockwave, Machine Gun, Sniper, Rocket, Cryo, Stasis) have explicit, independent paid level snapshots: **1,000 → 1,050 → 1,102.5 HP** (two-level towers stop at 1,050). **Every purchased upgrade adds 5% of the previous tier's Max HP**, compounded, not 5 percentage points of the original at every tier; the values are authored as complete absolute tier stats, not runtime additive bonuses.

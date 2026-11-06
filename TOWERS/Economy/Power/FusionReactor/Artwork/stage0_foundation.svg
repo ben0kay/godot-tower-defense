@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240">
+<defs><linearGradient id="m" x2="1" y2="1"><stop stop-color="#657f90"/><stop offset=".5" stop-color="#304655"/><stop offset="1" stop-color="#14222d"/></linearGradient><radialGradient id="p"><stop stop-color="#efffff"/><stop offset=".2" stop-color="#a7f4ff"/><stop offset=".45" stop-color="#55c9e4"/><stop offset=".74" stop-color="#5059ae"/><stop offset="1" stop-color="#202043"/></radialGradient><radialGradient id="h"><stop stop-color="#56bfe0" stop-opacity=".5"/><stop offset="1" stop-color="#56bfe0" stop-opacity="0"/></radialGradient></defs>
+<path d="M23 4H217L236 23V217L217 236H23L4 217V23Z" fill="#0a1620" stroke="#a4bac6" stroke-width="3"/>
+<path d="M26 13H214L227 26V214L214 227H26L13 214V26Z" fill="url(#m)" stroke="#547589" stroke-width="2"/>
+<rect x="24" y="24" width="192" height="192" fill="#112331" stroke="#607d8a" stroke-width="2"/>
+<path d="M24 67H216M24 173H216M67 24V216M173 24V216" stroke="#4e7686" stroke-width="3"/>
+<path d="M22 22L44 44M218 22L196 44M22 218L44 196M218 218L196 196" stroke="#bb7c92" stroke-width="4"/>
+<circle cx="24" cy="24" r="5" fill="#b5ccd3"/><circle cx="216" cy="24" r="5" fill="#b5ccd3"/><circle cx="24" cy="216" r="5" fill="#b5ccd3"/><circle cx="216" cy="216" r="5" fill="#b5ccd3"/>
+</svg>

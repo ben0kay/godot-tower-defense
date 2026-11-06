@@ -1,3 +1,9 @@
+## PW6-A/B generator additions — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Solar 1×1 (75/sec, 125 Credits, 3s, 700 HP) and Fusion 4×4 (900/sec, 1,200 Credits, 12s, 2,500 HP) are registered and share the existing Industrial Generator code, normal construction/staged SVGs, operations and save seams. No new source algorithm or priority slider. **PW6-C** UI polish and balancing remain planned. See [Power Plan](../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md). Brief editor checks: exact footprints, stages, F4 output, disable/removal and new between-wave save.
+
+---
+
 ## PW5-C — distribution visuals and inspection — 2026-11-05
 
 **Source Implemented / Awaiting Owner Visual Validation.** Selecting a Power Relay now shows faint cyan filled/outlined **reachable conductive cells**, plus a thin dashed shortest route to a live source and the label **Nearest live source / Island supply shared**. No circular coverage spanning gaps. Inactive/source-less Relays show no coverage/route. Deselecting hides the diagnostic immediately. The route follows cached conductive distance and positive Transmitter hops when supply is remote; ties are deterministic and a source footprint terminates the path.

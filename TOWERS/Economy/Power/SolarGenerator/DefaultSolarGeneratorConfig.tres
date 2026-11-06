@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PowerGeneratorConfig" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://TOWERS/Economy/Power/Shared/PowerGeneratorConfig.cs" id="1"]
+[ext_resource type="Resource" path="res://TOWERS/Economy/Power/SolarGenerator/Artwork/SolarGeneratorConstructionArt.tres" id="construction"]
+
+[resource]
+script = ExtResource("1")
+DisplayName = "Solar Generator"
+Description = "Compact low-output generator for small islands and outposts."
+Output = 75.0
+ConstructionCredits = 125
+ConstructionSeconds = 3.0
+MaxHealth = 700.0
+ConstructionArt = ExtResource("construction")

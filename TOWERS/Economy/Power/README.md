@@ -1,3 +1,9 @@
+## PW6-A/B — Solar 1×1 and Fusion 4×4 — 2026-11-06
+
+**Source Implemented / Awaiting Owner Validation.** Two independent Economy catalog definitions share the existing Industrial `PowerGenerator` logic. Solar: **1×1**, 75/sec, 125 Credits, 3s, 700 HP. Fusion: **4×4**, 900/sec, 1,200 Credits, 12s, 2,500 HP. Separate resource configs and finished/staged SVGs; no algorithm, fuel or save format changes. [Solar](SolarGenerator/README.md) · [Fusion](FusionReactor/README.md). **PW6-C** Inspector polish and game balance remain planned. Prior future-only sections below are superseded.
+
+---
+
 ## PW5 — Local Relay and separate cross-island Transmitter (2026-11-05)
 
 **Approved design / not implemented.** PW5-A Power Relay only boosts local recharge across conducting cells; Relays do **not** pair. PW5-B adds a distinct Power Transmitter building which pairs with another Transmitter on a different island to share existing finite producer output and displays a real blue connection beam. PW5-C polishes selected Relay coverage/nearest-live-source conductive route and transmitter beam pulses. This supersedes older combined Relay/pair wording further down. [Canonical Codex pass plan](IMPLEMENTATION_PLAN.md), [Relay owner](../../Utility/PowerRelay/README.md), [Transmitter owner](../../Utility/PowerTransmitter/README.md).

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PowerGeneratorConfig" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://TOWERS/Economy/Power/Shared/PowerGeneratorConfig.cs" id="1"]
+[ext_resource type="Resource" path="res://TOWERS/Economy/Power/FusionReactor/Artwork/FusionReactorConstructionArt.tres" id="construction"]
+
+[resource]
+script = ExtResource("1")
+DisplayName = "Fusion Reactor"
+Description = "High-output reactor powering large defensive installations."
+Output = 900.0
+ConstructionCredits = 1200
+ConstructionSeconds = 12.0
+MaxHealth = 2500.0
+ConstructionArt = ExtResource("construction")

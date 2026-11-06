@@ -1,3 +1,11 @@
+## PW6-A/B — new generator roster (2026-11-06)
+
+**Source Implemented / Awaiting Owner Validation.** `solar_generator` (1×1; 75 energy/s; 125 Credits; 3-second construction; 700 HP) and `fusion_reactor` (4×4; 900 energy/s; 1,200 Credits; 12-second construction; 2,500 HP) are separate catalog entries but reuse `Shared/PowerGenerator`, existing producer registration, work/disable/health, construction-stage presentation and saving. All sixteen Fusion footprint cells must be eligible and part of one conductive island. Output is zero before work completes or when disabled/destroyed. Live sources contribute once to the finite connected budget across PW5 Transmitter links; PW4 distance-first allocation and Relay boosts remain unchanged. Shared generator values remain provisional. No daytime/fuel/meltdown, extra manager, per-frame processing, power-priority slider or save schema.
+
+**PW6-C remains planned:** generator/network Inspector status and source-demand balancing after owner playtest. Minimal asset/resource consistency review only, not a Godot build. Check both build-menu entries, 1×1/4×4 placement preview, artwork transitions, F4 +75/+900 supply on completion, removal/EMP and fresh checkpoint restoration. Older PW6-planned text below is historical.
+
+---
+
 ## PW5-C — distribution visuals and inspection — 2026-11-05
 
 **Source Implemented / Awaiting Owner Visual Validation.** Selecting a Power Relay now shows faint cyan filled/outlined **reachable conductive cells**, plus a thin dashed shortest route to a live source and the label **Nearest live source / Island supply shared**. No circular coverage spanning gaps. Inactive/source-less Relays show no coverage/route. Deselecting hides the diagnostic immediately. The route follows cached conductive distance and positive Transmitter hops when supply is remote; ties are deterministic and a source footprint terminates the path.
