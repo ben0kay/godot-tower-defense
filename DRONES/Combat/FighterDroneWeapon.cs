@@ -36,7 +36,7 @@ public partial class FighterDroneWeapon : Node
 
     // =========================================================
     // No turret tracking: the full configurable firing arc permits tracking across the forward hemisphere.
-    internal bool Step(float dt)
+    internal bool Step(float dt, bool acquireTargets = true)
     {
         if (!float.IsFinite(dt) || dt <= 0 || !GodotObject.IsInstanceValid(_fighter) ||
             !GodotObject.IsInstanceValid(_grid) || !_grid.IsInsideTree() ||
@@ -45,17 +45,22 @@ public partial class FighterDroneWeapon : Node
             _fighter.GetTree().Paused) return false;
 
         _cooldown = Math.Max(-Math.Min(dt, .05f), _cooldown - dt);
-        if (_fighter.Ammo <= 0) { ClearTarget(); return false; }
-        _scan -= dt; _hold = Mathf.Max(0, _hold - dt);
-        bool valid = GodotObject.IsInstanceValid(_weaponTarget) && _weaponTarget.SpawnGeneration == _targetGeneration &&
-            TryAim(_weaponTarget, out _, out _);
-        bool invalidated = _weaponTarget != null && !valid;
-        if (!valid) _weaponTarget = null;
+        if (_fighter.Ammo <= 0 || !GodotObject.IsInstanceValid(_registry) || _registry.Living.Count == 0)
+        { ClearTarget(); return false; }
+        _scan = Mathf.Max(0, _scan - dt); _hold = Mathf.Max(0, _hold - dt);
         bool regular = _scan <= 0;
-        if (regular || invalidated && _replacementReady)
+        // Cheap liveness/detection checks between scheduled validation and actual firing opportunities.
+        bool valid = GodotObject.IsInstanceValid(_weaponTarget) && _weaponTarget.SpawnGeneration == _targetGeneration &&
+            TowerDetection.CanDetect(_weaponTarget) && _registry.Contains(_weaponTarget);
+        Marker2D muzzle = null; Vector2 direction = Vector2.Zero;
+        bool aimed = valid && (regular || _cooldown <= 0);
+        if (aimed) valid = TryAim(_weaponTarget, out muzzle, out direction);
+        bool invalidated = _weaponTarget != null && !valid;
+        if (!valid) ClearTarget();
+        if (regular) { _scan = FighterDroneConfig.Safe(_fighter.Config.WeaponSearchSeconds, .2f, .1f, 2); _replacementReady = true; }
+        if (acquireTargets && (regular || invalidated && _replacementReady))
         {
-            if (regular) { _scan = FighterDroneConfig.Safe(_fighter.Config.WeaponSearchSeconds, .2f, .1f, 2); _replacementReady = true; }
-            else _replacementReady = false;
+            if (!regular) _replacementReady = false;
             if (!valid || _hold <= 0)
             {
                 var visitor = new WeaponVisitor { Weapon = this, Origin = NextMuzzle.GlobalPosition,
@@ -66,10 +71,13 @@ public partial class FighterDroneWeapon : Node
                 if (_weaponTarget != visitor.Best)
                     _hold = FighterDroneConfig.Safe(_fighter.Config.WeaponTargetHoldSeconds, .25f, 0, 2);
                 _weaponTarget = visitor.Best; _targetGeneration = _weaponTarget?.SpawnGeneration ?? 0;
+                aimed = false; // A newly selected muzzle/target needs fresh shot geometry below.
             }
         }
         Enemy target = _weaponTarget;
-        if (_cooldown > 0 || !TryAim(target, out Marker2D muzzle, out Vector2 direction)) return false;
+        if (_cooldown > 0 || target == null) return false;
+        // Reuse this step's full validation only for the unchanged lock; never reuse LOS across shots.
+        if (!aimed && !TryAim(target, out muzzle, out direction)) return false;
         FighterDroneConfig config = _fighter.Config;
         float speed = FighterDroneConfig.Safe(config.BulletSpeed, 1200, 40, 3000);
         float damage = FighterDroneConfig.Safe(config.DamagePerShot, 4, 0, 1000);

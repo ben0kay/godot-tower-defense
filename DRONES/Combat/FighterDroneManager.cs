@@ -129,8 +129,8 @@ public partial class FighterDroneManager : Node
                 Recall(i, FighterReturnReason.AutoService);
             if (fighter.IsFlying)
             {
-                _targeting?.Tick(dt);
                 bool arrived = fighter.Step(dt); changed |= arrived;
+                if (fighter.NeedsTargeting) _targeting?.Tick(dt);
                 if (arrived && fighter.State == FighterDroneState.Docked) BeginDockService(fighter);
                 changed |= fighter.StepAutoPilot(dt, _targeting, LaunchPoint(i), _clamp);
             }

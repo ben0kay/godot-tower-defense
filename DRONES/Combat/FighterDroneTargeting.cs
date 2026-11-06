@@ -9,7 +9,10 @@ public partial class FighterDroneTargeting : Node
     private ulong _frame = ulong.MaxValue;
     private int _cursor;
     private float _wait;
-    private bool _scanning;
+    private bool _scanning, _combatReady, _buildingCombat;
+    // Weapons can engage detectable debug/unowned ships even without a valid Citadel journey.
+    internal bool HasCombatCandidates => _registry.Living.Count > 0 && (_combatReady || _buildingCombat);
+    internal bool HasThreatCandidates => _registry.Living.Count > 0 && _ranked.Count > 0;
     private const int CandidateLimit = 64, ScanBudget = 96;
     public override void _Ready() { SetProcess(false); SetPhysicsProcess(false); }
     internal static FighterDroneTargeting For(EnemyRegistry registry)
@@ -20,29 +23,34 @@ public partial class FighterDroneTargeting : Node
         service = new FighterDroneTargeting { Name = "FighterThreats", _registry = registry };
         registry.AddChild(service); return service;
     }
-    internal bool Valid(Enemy enemy) => TowerDetection.CanDetect(enemy) && _registry.Contains(enemy)
+    internal bool Valid(Enemy enemy) => TowerDetection.CanDetect(enemy) && ValidJourney(enemy);
+    private bool ValidJourney(Enemy enemy) => _registry.Contains(enemy)
         && enemy.AssignedCitadel?.Available == true && float.IsFinite(enemy.RemainingJourneyDistance);
     // =========================================================
-    // Called by active station managers, at most once per world physics frame; no enemy work between waves.
+    // Only deployed combat-ready fighters request this shared, once-per-frame budget.
+    // Empty worlds do no scanning; the existing cadence also detects stealth/eligibility changes.
     internal void Tick(float dt)
     {
         ulong frame = Engine.GetPhysicsFrames(); if (_frame == frame) return; _frame = frame;
-        if (_registry.Living.Count == 0) { _ranked.Clear(); _building.Clear(); _cursor = 0; _scanning = false; _wait = 0; return; }
+        if (_registry.Living.Count == 0) { _ranked.Clear(); _building.Clear(); _cursor = 0; _scanning = _combatReady = _buildingCombat = false; _wait = 0; return; }
         if (!_scanning)
         {
             _wait -= dt; if (_wait > 0) return;
-            _building.Clear(); _cursor = 0; _scanning = true;
+            _building.Clear(); _buildingCombat = false; _cursor = 0; _scanning = true;
         }
         int end = System.Math.Min(_cursor + ScanBudget, _registry.Living.Count);
         for (; _cursor < end; _cursor++)
         {
-            Enemy enemy = _registry.Living[_cursor]; if (!Valid(enemy)) continue;
+            Enemy enemy = _registry.Living[_cursor];
+            if (!TowerDetection.CanDetect(enemy)) continue;
+            _buildingCombat = true;
+            if (!ValidJourney(enemy)) continue;
             int at = 0; while (at < _building.Count && _building[at].Distance <= enemy.RemainingJourneyDistance) at++;
             if (at >= CandidateLimit) continue;
             _building.Insert(at, (enemy, enemy.RemainingJourneyDistance)); if (_building.Count > CandidateLimit) _building.RemoveAt(CandidateLimit);
         }
         if (_cursor < _registry.Living.Count) return;
-        _ranked.Clear(); _ranked.AddRange(_building); _scanning = false; _wait = .25f;
+        _ranked.Clear(); _ranked.AddRange(_building); _combatReady = _buildingCombat; _buildingCombat = false; _scanning = false; _wait = .25f;
     }
     internal void Release(FighterDrone fighter) => _leases.Remove(fighter);
     internal Enemy Acquire(FighterDrone fighter, Enemy current)

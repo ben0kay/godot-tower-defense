@@ -1,3 +1,9 @@
+## Fighter drone targeting optimization — 2026-11-06
+
+Four fighter scripts now avoid per-frame weapon LOS (scheduled validation or real firing only, fresh shot geometry), skip acquisition/spatial queries for empty/ineligible caches, and request the shared ranker only from deployed combat-ready fighters after transit. Existing bounded cache also tracks detectable weapon candidates independently of valid Citadel journeys; its cadence detects later eligibility/stealth changes. Debug/unowned combat between waves preserved; movement, service, ammo/cooldown/save contracts unchanged. Short Combat README note added. Source/diff review only; .NET unavailable. Owner to check mountain LOS/lead, target death/stealth/reacquisition, empty and debug-only worlds, launch/recall and checkpoint continuation; no measured FPS claim.
+
+---
+
 ## Backlog cleanup — outstanding-only live index — 2026-11-06
 
 Rebuilt `NOTES/IMPLEMENTATION_BACKLOG.md` against `dev` HEAD `e1a68dd77f`: removed duplicate completed-pass tables, dated implementation receipts and superseded “planned” claims. Left a current queue of genuinely unimplemented phases, optional feature-design decisions, a separately marked owner QA/performance list, unapproved idea IDs and Markdown-only accuracy debt. Reconciled recent FD4.1/FD5 and SPAWN3/SPAWN4 source delivery, complete Level011 Waves 1–10 and next-wave auto-start; older histories remain in this file and feature docs. Documentation only, no game build or Godot playtest.

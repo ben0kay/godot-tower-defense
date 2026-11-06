@@ -1,3 +1,8 @@
+## Fighter targeting performance — 2026-11-06
+Cached weapons use cheap liveness/generation/detection checks between scheduled validation and firing; full muzzle range/arc/target+lead LOS is fresh for every shot, with same-step validation reused only for the unchanged lock. Existing staggered searches, bounded replacement, lead, cadence and ammo remain. Shared threat work is requested only by deployed, healthy fighters with ammunition, after launch completes; launch/return/service alone never requests it. Empty registries skip scans and spatial acquisition; shared bounded scans cache detectable weapon candidates separately from Citadel-ranked threats, suppressing per-fighter acquisition when none qualify. The existing shared cadence still probes nonempty populations for eligibility changes (including stealth reveals). Debug/unowned enemies remain legitimate combat targets between waves; wave ownership is deliberately not a combat gate. Movement/loiter, transit and save fields are unchanged. Source/diff review only; .NET unavailable, owner gameplay/performance validation pending.
+
+---
+
 ## FD4.1 + FD5 — source implemented / awaiting owner validation
 **Weapons:** movement still follows the existing Citadel-threat anchor; guns now independently select the nearest shootable enemy around the next physical muzzle. Shared spatial queries run at a staggered 0.2s cadence with 0.25s weapon hold, bounded invalid-target replacement and range/180° arc/detection/target+lead LOS checks before each shot. No hull turning toward weapon-only targets. Fixed twin guns, 9 rounds/s, 4 damage, 275px range and 200-round capacity remain.
 
