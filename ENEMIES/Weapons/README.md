@@ -1,3 +1,9 @@
+## CW1/CW2 — shared enemy recoil and future splash — 2026-11-06
+
+**Planned / not implemented.** Shared tower recoil can be extracted to a weapon-neutral visual controller; existing enemy Minigun should kick only after a successful accepted world bullet. Later an opt-in hostile explosive gun can reuse `COMBAT/AreaDamage` falloff with a tower-recipient query, rather than copying Blaster logic. No weapon balance, bullets or current scenes changed by this plan. [Codex implementation phases](../../COMBAT/SHARED_WEAPON_CAPABILITIES_PLAN.md).
+
+---
+
 ## Gunner handling and energy streak polish — 2026-10-20
 
 Gunner Drone now holds valid tower targets for1s between closest-target reconsiderations; no-target acquisition remains staggered at0.2s. Dead, removed, queued or out-of-range locks clear immediately and cap the next search delay at0.2s. TargetSearchSeconds and LockedTargetSearchSeconds are separate validated, spawn-captured Inspector settings. Pause still freezes both clocks; navigation is unchanged.

@@ -1,3 +1,9 @@
+## CW1/CW2 — shared weapon recoil and hostile splash — 2026-11-06
+
+**PLANNED / CODEX HANDOFF; no gameplay code changed.** CW1: extract tower-bound recoil into backwards-compatible shared presentation under `FEEDBACK/Weapons/Recoil/`, opt in Gunner, Heavy Gunner and four Obsidian Dreadnought guns, only after accepted shots; no idle processing or muzzle/aim changes. CW2 (separate later pass): keep existing `COMBAT/AreaDamage.AtDistance` and add `TowerRegistry` splash recipients plus optional enemy bullet impact settings. Preserve ordinary bullets, tower Blaster, balance and missions. [Brief plan](../COMBAT/SHARED_WEAPON_CAPABILITIES_PLAN.md).
+
+---
+
 ## SPAWN2.5 — Portal spawn expansion + dimensional smoke — 2026-11-06
 
 **APPROVED PLAN / NOT IMPLEMENTED; Codex before SPAWN3.** Add an event-driven, soft expanding/settling pulse to an Open portal on successful enemy spawn, plus ~4–6 large rolling purple/lavender shader-driven smoke puffs, alongside existing 48 sparks and energy flash. Reuse `PlaySpawnFeedback()`; keep emissions budgeted, offscreen-cullable, pause/unload-safe and independent of SPAWN2's restored 2.2s opening. Do not change wave/portal mechanics or implement SPAWN3/4. [Codex-ready detail](../ENEMIES/Spawning/IMPLEMENTATION_PLAN.md#phase-spawn25--per-spawn-portal-expansion--violet-dimensional-smoke-codex-handoff-approved-plan--not-implemented).

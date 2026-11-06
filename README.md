@@ -1,3 +1,9 @@
+## Shared weapon recoil and future enemy splash — CW1/CW2 (planned 2026-11-06)
+
+**Codex plan only.** CW1 will extract the existing friendly-tower recoil motion into a backwards-compatible weapon-neutral visual controller, allowing Gunner/Heavy Gunner and all four Capital ship cannons to recoil on successful shots. CW2 later extends the **already shared** `COMBAT/AreaDamage` falloff to hostile explosive bullets against friendly building footprints, without rewriting Blaster Cannon or enemy bullet pooling. No code/asset/balance changes yet. [Implementation handoff](COMBAT/SHARED_WEAPON_CAPABILITIES_PLAN.md).
+
+---
+
 ## SPAWN2.5 — per-enemy portal puff and expansion — planned 2026-11-06
 
 **Approved Codex visual-effects handoff, not implemented.** Ahead of SPAWN3 (mixed portal/edge spawning), each successful spawn from an Open portal should briefly enlarge the portal (~12%) and emit several big translucent violet, shader-billowing smoke puffs alongside its existing outward sparks. Event-driven and visually coalesced for crowded waves; no change to SPAWN2's 2.2s opening, portal activation, wave scheduling or spawn success. [SPAWN2.5 plan](ENEMIES/Spawning/IMPLEMENTATION_PLAN.md#phase-spawn25--per-spawn-portal-expansion--violet-dimensional-smoke-codex-handoff-approved-plan--not-implemented).

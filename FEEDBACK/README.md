@@ -1,3 +1,9 @@
+## CW1 — weapon-neutral recoil (planned 2026-11-06)
+
+**Plan only.** Extract the existing tower recoil's visual motion into shared `FEEDBACK/Weapons/Recoil/` ownership with backwards-compatible tower wiring, then opt in Gunner/Heavy Gunner and four Capital gun mounts on accepted shots only. Active-only, bounded and visually cosmetic; no recoil code moved yet. [Codex handoff](../COMBAT/SHARED_WEAPON_CAPABILITIES_PLAN.md).
+
+---
+
 ## Disabled tower feedback and stable NoPower presentation — 2026-11-05
 
 **Source Implemented / Awaiting Owner Validation.** Placed disabled towers now show a small amber outlined exclamation triangle above the upper-right footprint corner and a subtle red art tint. `FEEDBACK/Disabled/DefaultTowerDisabledStyle.tres` tunes tint, badge color/size/offset. The shared TowerBase condition notification attaches one lazy `TowerDisabledVisual` only after native artwork initialization and only when needed. Initial construction sites hide the warning; completed disabled structures and paid upgrades show it. Work/disable/death events update presentation. No polling, bobbing animation, timer, active shader or per-frame redraw; active/never-disabled towers allocate no helper.

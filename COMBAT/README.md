@@ -1,3 +1,9 @@
+## Shared recoil and hostile splash roadmap — 2026-11-06
+
+**Plan only.** Existing Blaster/friendly AoE remains in `COMBAT/AreaDamage/`; future hostile splash should reuse `AreaDamage.AtDistance` and add a TowerRegistry recipient path, not recreate the falloff system. Generic gun recoil is visual-only and belongs under `FEEDBACK/Weapons/Recoil/`, with compatibility for the current tower recoil scripts. [CW1/CW2 Codex handoff](SHARED_WEAPON_CAPABILITIES_PLAN.md).
+
+---
+
 # Shared combat
 
 Damage/ owns typed base hit payloads, the single shield/hull resolver and the canonical Inspector-editable response profile. Delivery, targeting, enemy lifecycle, rewards and presentation remain with their existing owners. No armor, effects or enemy-specific resistance overrides are implemented.

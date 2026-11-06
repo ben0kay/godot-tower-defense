@@ -1,3 +1,9 @@
+## CW1 — planned weapon-neutral recoil extraction (2026-11-06)
+
+**Plan only.** Preserve the current TowerRecoilController/TowerRecoilStyle and all tower presets/scene-resource paths while extracting a shared visual-only recoil core that enemy Gunner/Heavy Gunner and Capital gun mounts can use. New shared presentation location: `FEEDBACK/Weapons/Recoil/`. No migration has been performed. [Codex handoff](../../../../COMBAT/SHARED_WEAPON_CAPABILITIES_PLAN.md).
+
+---
+
 ## Projectile tower rollout — implemented in source (2026-10-20)
 
 The Battle pilot is now joined by Machine Gun, Sniper, Blaster Cannon, Rocket, Cryo and Stasis. Earlier Battle-only scope below records the pilot and is superseded for these six scenes. Laser keeps its continuous beam; stationary Shockwave keeps its existing radial front. Neither receives directional recoil or artificial rotation.
