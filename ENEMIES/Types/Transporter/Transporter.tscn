@@ -4,7 +4,7 @@
 [ext_resource type="Resource" path="res://ENEMIES/Types/Transporter/Transporter.tres" id="2"]
 [ext_resource type="Texture2D" path="res://ENEMIES/Types/Transporter/Artwork/transporter.svg" id="3"]
 [ext_resource type="Script" path="res://ENEMIES/Abilities/DeathSpawn/DeathSpawn.cs" id="6"]
-[ext_resource type="Resource" path="res://ENEMIES/Abilities/DeathSpawn/DefaultDeathSpawnConfig.tres" id="7"]
+[ext_resource type="Resource" path="res://ENEMIES/Types/Transporter/TransporterDeathSpawn.tres" id="7"]
 
 [node name="Transporter" instance=ExtResource("1_base")]
 Definition = ExtResource("2")

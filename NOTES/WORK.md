@@ -1,3 +1,9 @@
+## Transporter death-release rate doubled — 2026-11-06
+
+The regular Drone Transporter now uses its own `ENEMIES/Types/Transporter/TransporterDeathSpawn.tres` (six Standard Drones, **0.06s** between releases instead of the former 0.12s). The Heavy Transporter's independently authored six-Drone and four-Interceptor configs each now use **0.08s** intervals (formerly 0.16s). No changes to the shared DeathSpawnConfig/default, DeathReleaseQueue safety budgets, child counts, scatter, inherited routes, kill-only trigger, ownership, weapons or gameplay balance. Source/preset wiring checks only; owner in-game release pacing pending.
+
+---
+
 ## SPAWN3 — 2026-11-06
 Source implemented: append-only optional wave/batch/entry source overrides, unchanged legacy sampler, genuine mixed/portal/edge/required-portal policies, separate weighted-side and safe-position draws, cached named edge sectors/ranges with optional portal exclusion/spacing, editor controls/preview/copy and authoring validation. Level source permissions and multi-Citadel edge prohibition retained; required blocked sectors never fall back. No mission/wave changes or SPAWN4 scheduling. Key owners: SpawnManager.SourcePolicies, SpawnSourceOptions, WaveSpawnSourceResource, SpawnEdgeSector, addons/wave_editor. Source/resource review only; .NET unavailable, owner gameplay/editor/checkpoint validation pending.
 

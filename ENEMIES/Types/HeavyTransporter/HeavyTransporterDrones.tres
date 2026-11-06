@@ -4,5 +4,5 @@
 script = ExtResource("1")
 ChildEnemyId = "basic_mk1"
 ChildCount = 6
-SpawnIntervalSeconds = 0.16
+SpawnIntervalSeconds = 0.08
 ScatterRadiusPixels = 56.0
