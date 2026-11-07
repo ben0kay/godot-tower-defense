@@ -158,7 +158,7 @@ Create a **small, editor-visible set** of industrial accents under `WORLD/TERRAI
 
 ## VE5 — Environmental lighting and emissive surfaces (new, opt-in)
 
-**Updated LGT0 Codex handoff (2026-11-06):** [Real lighting foundation](../../SYSTEMS/Lighting/IMPLEMENTATION_PLAN.md) now takes priority before VE4. The owner selected native `CanvasModulate` + `PointLight2D`, with the central implementation under `SYSTEMS/Lighting/`; start with a Citadel and Battle Tower, shadowless, and Shift+F3 comparison (F3 remains route preview). This is **a plan, not yet implemented**, and does not revive VE5C bloom. The historical VE5 list below remains later-scope reference.
+**Updated LGT0 Codex handoff (2026-11-06):** [Real lighting foundation](../../SYSTEMS/Lighting/IMPLEMENTATION_PLAN.md) now takes priority before VE4. The owner selected native `CanvasModulate` + `PointLight2D`, with the central implementation under `SYSTEMS/Lighting/`; start with Citadel/Battle Tower lights (LGT0-A) and then basic completed-tower/procedural-mountain shadow casters (LGT0-B), with Shift+F3 comparison (F3 remains route preview). This is **a plan, not yet implemented**, and does not revive VE5C bloom. The historical VE5 list below remains later-scope reference.
 
 
 **Goal:** give the top-down battlefield a cohesive lighting identity, not blanket bloom or thousands of lights.

@@ -1,3 +1,9 @@
+## LGT0-B — tower and mountain shadows added to lighting plan — 2026-11-06
+
+Expanded `SYSTEMS/Lighting/IMPLEMENTATION_PLAN.md` with native basic `LightOccluder2D` shadows from **all completed placed towers** and `mountain_visual` procedural mountain clusters. LGT0-A first delivers Citadel/Battle Tower lighting; LGT0-B adds shared tower footprints and grouped/cached mountain outlines, separate `ShadowsEnabled` Inspector toggle, hard shadows initially, cap 6 shadow-enabled lights out of 16 sources, self-shadow prevention, and owner ON/OFF GPU testing. Normal walls, enemies, decals, power/LOS changes and reverted bloom excluded. **Plan only, not implemented.**
+
+---
+
 ## LGT0 — native Godot 2D light plan — 2026-11-06
 
 Created `SYSTEMS/Lighting/IMPLEMENTATION_PLAN.md` for a small shadowless native `CanvasModulate` + `PointLight2D` pilot on Citadel and Battle Tower with Inspector configs, visible light cap (provisional 16), source lifecycle and owner GPU profiling. Shift+F3 toggles entire lighting vs original undimmed scene; F3 route preview and F4 performance overlay preserved. Owner prioritizes this VE5-derived slice before VE4; reverted bloom is excluded. **Documentation only; no system implemented.**

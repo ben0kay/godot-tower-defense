@@ -4,4 +4,4 @@ The isolated VE5C Cinematic Blue bloom experiment was removed by request. No blo
 
 ## New LGT0 real lighting handoff — 2026-11-06
 
-Primary controller, configs, presets and proposed delivery belong under [`SYSTEMS/Lighting/`](../../../SYSTEMS/Lighting/IMPLEMENTATION_PLAN.md). This plan uses native Godot CanvasModulate/PointLight2D and a debug Shift+F3 ON/OFF comparison, with shadows/bloom disabled. Existing WORLD/VISUALS shader glows remain cosmetic. **No lighting gameplay code is delivered by this plan.**
+Primary controller, configs, presets and proposed delivery belong under [`SYSTEMS/Lighting/`](../../../SYSTEMS/Lighting/IMPLEMENTATION_PLAN.md). This plan uses native Godot CanvasModulate/PointLight2D and a debug Shift+F3 ON/OFF comparison, with basic LightOccluder2D tower/mountain shadows now approved for LGT0-B (separate toggle and measured budget); bloom remains disabled. Existing WORLD/VISUALS shader glows remain cosmetic. **No lighting gameplay code is delivered by this plan.**
