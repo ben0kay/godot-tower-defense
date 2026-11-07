@@ -1,3 +1,21 @@
+## Research six-branch expansion specification — 2026-11-06
+
+**Planning only; no research nodes/effects authored.** Added `SYSTEMS/Progression/Research/RESEARCH_EXPANSION_IMPLEMENTATION_PLAN.md` with six radial divisions and 36 proposed paid nodes (34 new), unique connected hex coordinates, costs/prerequisites/effect contracts, staged EX1-A/B/C (~22 new nodes) and later EX2 capstones/optional DME EX3. Existing Core/Citadel Master I/Battle Weapons I remain unchanged; new effect kinds require real, snapshot-safe handlers before publication. Linked the plan from the feature README and outstanding backlog. Current `dev` gameplay research catalog still contains only three nodes.
+
+---
+
+## Level003 lava tutorial briefing — 2026-11-06
+
+Created `LEVELS/Level003/Level003Briefing.tres` with a short Lava Fields introduction explaining that crossing lava damages enemies and Foundation Platforms can funnel routes over it. Assigned the resource in `Level003Config.tres.MissionBriefing` using the already shared top-right typewriter, with no custom HUD, gameplay changes or voice/audio dependency; `VoiceCueId` stays blank until a recording is supplied. Existing waves, lava damage and map layout are unchanged. Focused resource/config review only; verify the briefing appears on fresh Level003 deployment and is skipped on checkpoint Continue.
+
+---
+
+## Profile Welcome Commander voice replacement — 2026-11-06
+
+Replaced `AUDIO/VoiceAssistant/Welcome_Commander.mp3` with the owner's latest uploaded Fish Audio MP3 from the repository root, reusing its original Git blob without transcoding. Removed the long export filename from the root. The existing `voice_profile_welcome` cue, path, playback settings, audio catalog and Godot import-sidecar remain in place; profile greetings will use the replacement after Godot reimports. Source and asset references reviewed; audio playback remains for owner acceptance.
+
+---
+
 ## Portal spin surge, bubbling spawn reaction and wider violet clouds — 2026-11-06
 
 In `WORLD/PORTALS/EnemyPortal/`, idle portal art spin rises from 120°/s to **180°/s** (Inspector `RotationDegreesPerSecond`); an accepted, cooldown-budgeted spawn burst integrates an additional ~210°/s decaying surge over ~0.7s, rebasing GPU rotation without phase jump or CPU idle loop. Spawn feedback now runs more frequently (~230–630ms irregular cooldown, down from ~390–910ms), with variable-density/scatter spark bursts and a short, randomly single- or double-peaked "volcanic bubble" expansion. Smoke continues in the two **existing** GPU emitters: normal puffs ~125px, ~5.5s, 26px/s outward; large faint puffs ~2.7×, ~9s, ~72% base drift speed (rather than 55%) with stronger swirl and capped 22/10 clouds. All visuals stay optional/local and do not affect portal readiness, wave count, routes, SpawnExit or saves; offscreen/paused cleanup remains. One shader/resource/source check only; Godot visual/FPS inspection remains with owner.

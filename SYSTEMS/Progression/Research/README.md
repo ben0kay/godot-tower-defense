@@ -1,3 +1,9 @@
+## Six-branch Research Expansion plan — 2026-11-06
+
+**PLAN ONLY — NOT IMPLEMENTED.** The owner selected a six-division technology tree (Weapons, Citadel, Industry, Energy, Recon and Drones) as the baseline for expanding the current three-node Research Room. The [Codex-ready implementation plan](RESEARCH_EXPANSION_IMPLEMENTATION_PLAN.md) specifies unique axial paths, 36 proposed paid nodes (34 additional), real effect/mission/save integration, and staged EX1-A/B/C → EX2 capstones, with future optional Dark Matter convergence. All existing three node IDs/positions/costs/effects stay unchanged. Current supported effect kinds and gameplay remain as described below until a phase is separately implemented.
+
+---
+
 # Permanent Research — first playable foundation
 
 ## Battle Tower Weapons I extension — 2026-10-17
