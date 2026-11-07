@@ -1,3 +1,9 @@
+## LGT0 — native Godot 2D light plan — 2026-11-06
+
+Created `SYSTEMS/Lighting/IMPLEMENTATION_PLAN.md` for a small shadowless native `CanvasModulate` + `PointLight2D` pilot on Citadel and Battle Tower with Inspector configs, visible light cap (provisional 16), source lifecycle and owner GPU profiling. Shift+F3 toggles entire lighting vs original undimmed scene; F3 route preview and F4 performance overlay preserved. Owner prioritizes this VE5-derived slice before VE4; reverted bloom is excluded. **Documentation only; no system implemented.**
+
+---
+
 ## Tower idle draw and level ambience — 2026-11-06
 
 Battle idle draw is 0.10 energy/s. The other ten powered tower profiles doubled their idle rates. The allocation fixture explicitly disables idle drain to isolate refill accounting. The shared battlefield starts and releases a non-positional Ambience emitter using a crossfaded 5.6-second Ogg loop. The uploaded MP3 is preserved byte-for-byte alongside it. Godot 4.6.3 imported the loop with native looping enabled. C# gameplay and audible mix checks are pending.

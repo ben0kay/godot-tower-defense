@@ -158,6 +158,9 @@ Create a **small, editor-visible set** of industrial accents under `WORLD/TERRAI
 
 ## VE5 — Environmental lighting and emissive surfaces (new, opt-in)
 
+**Updated LGT0 Codex handoff (2026-11-06):** [Real lighting foundation](../../SYSTEMS/Lighting/IMPLEMENTATION_PLAN.md) now takes priority before VE4. The owner selected native `CanvasModulate` + `PointLight2D`, with the central implementation under `SYSTEMS/Lighting/`; start with a Citadel and Battle Tower, shadowless, and Shift+F3 comparison (F3 remains route preview). This is **a plan, not yet implemented**, and does not revive VE5C bloom. The historical VE5 list below remains later-scope reference.
+
+
 **Goal:** give the top-down battlefield a cohesive lighting identity, not blanket bloom or thousands of lights.
 
 - [ ] Investigate Godot 4 **`CanvasModulate`** for global ambient/tint darkness and carefully placed **`PointLight2D`** for a few localized cyan/amber industrial lights. Add `DirectionalLight2D` only where it contributes to readability. Never assume a 3D `WorldEnvironment` automatically supplies the desired 2D lighting.
