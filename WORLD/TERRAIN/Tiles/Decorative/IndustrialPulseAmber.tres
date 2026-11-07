@@ -1,0 +1,7 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://WORLD/VISUALS/Shaders/MetalPulse.gdshader" id="1"]
+
+[resource]
+shader = ExtResource("1")
+shader_parameter/accent_tint = Color(0.97, 0.68, 0.36, 1)

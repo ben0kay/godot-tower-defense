@@ -1,6 +1,6 @@
 ## VE2 implementation — 2026-10-21
 
-Shared WORLD/VISUALS/Shaders/EnergyField.gdshader now animates portal inner swirl and Citadel teal reactor, independently per scene with low-cost shader time. Successful portal spawns briefly pulse the matching visual via a tween; no failed attempts or map edge spawns trigger it. The built-in bloom experiment was removed. The rest of VE3–VE7 remains planned; live Godot appearance testing is pending.
+Shared WORLD/VISUALS/Shaders/EnergyField.gdshader now animates portal inner swirl and Citadel teal reactor, independently per scene with low-cost shader time. Successful portal spawns briefly pulse the matching visual via a tween; no failed attempts or map edge spawns trigger it. The built-in bloom experiment was removed. VE4–VE7 remain planned; live Godot appearance testing is pending.
 
 ---
 
@@ -92,9 +92,9 @@ Treat those names as **suggestions**, not files that exist. Prefer a small `[Glo
 - [ ] Don't alter `WorldObjectFootprint`, clickable Credit hit areas, HUD overlays, independent Citadel buffers/health, portal assignments or F2/wave spawns. Different visuals must not interfere with top-centre Credits/HP UI.
 - [ ] Use restrained alpha/additive overlay effects where needed. **Real fullscreen HDR bloom is not guaranteed** just by calling a material "glow"; don't require a new global post-process for this pass.
 
-## VE3 — Industrial metal and corridor details (Codex handoff, planned)
+## VE3 — Industrial metal and corridor details (Codex handoff)
 
-**Status: APPROVED IMPLEMENTATION PLAN — NOT IMPLEMENTED.** The authoring model is now decided: **manually paint purely visual, transparent accent tiles onto the existing `Terrain/Decorations` TileMapLayer, over existing Passable or Impassable terrain**. Do not treat VE3 as a new terrain type, power-network subsystem, map auto-populator, or replacement for the E1–E3 terrain edge renderer.
+**Status: Source Implemented / Awaiting Owner Validation.** Sources 1 and 2 provide static and animated accents through per-tile materials. See the [atlas guide](../TERRAIN/Tiles/Decorative/README.md). The authoring model is: **manually paint purely visual, transparent accent tiles onto the existing `Terrain/Decorations` TileMapLayer, over existing Passable or Impassable terrain**. Do not treat VE3 as a new terrain type, power-network subsystem, map auto-populator, or replacement for the E1–E3 terrain edge renderer.
 
 ### 1. Preserve current terrain and Decorations ownership
 

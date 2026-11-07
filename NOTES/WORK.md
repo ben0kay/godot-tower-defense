@@ -1,3 +1,9 @@
+## VE3 — paintable industrial accents — 2026-11-06
+
+Added 32 transparent cyan/amber shapes in static source 1 and animated source 2 of the existing Decorations TileSet. The animated TileData uses shared MetalPulse materials with a static switch. The legacy source 0 and all painted maps retain their existing data. Checked Godot 4.6.3 renderer source for per-tile material isolation and placed all 65 tile choices in a headless scratch project. Desktop appearance, seams and FPS await owner review. See [atlas coordinates](../WORLD/TERRAIN/Tiles/Decorative/README.md).
+
+---
+
 ## VE3 decorative industrial atlas — clarified Codex handoff (2026-11-06)
 
 Updated `WORLD/BACKGROUNDS/README.md` VE3 plan: new transparent paintable 64×64 cyan/amber conduit, corner, junction, edge and indicator tiles inside the **existing** Decorations TileSet; preserve old atlas source 0/coordinate 5:0/0 and all maps. Animation is opt-in and local to new accent atlas cells via `MetalPulse.gdshader`, never an all-Decorations shader. VE3 is purely cosmetic, no power coupling, new runtime entity per tile, auto-repaint, VE4 or gameplay changes. Codex must verify actual Godot atlas/material isolation before committing an animated approach. **Planning only; not implemented.**
