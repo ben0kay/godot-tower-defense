@@ -6,9 +6,19 @@ public partial class LightingMasterConfig : Resource
 {
     [Export] public bool Enabled { get; set; } = true;
     [Export] public bool StartLit { get; set; } = true;
-    [Export] public Color AmbientTint { get; set; } = new Color("#65727e");
+    [Export] public Color AmbientTint { get; set; } = new Color("#515e6b");
     [Export(PropertyHint.Range, "0,64,1")] public int MaxActiveLights { get; set; } = 16;
     [Export] public bool AllowDebugComparison { get; set; } = true;
+
+    [ExportGroup("Source Profiles")]
+    [Export] public LightSourceConfig Tower { get; set; }
+    [Export] public LightSourceConfig Citadel { get; set; }
+    [Export] public LightSourceConfig Drone { get; set; }
+    [Export] public LightSourceConfig Lava { get; set; }
+    [Export(PropertyHint.Range, "0.1,1,0.05")] public float ConstructionRadiusFactor { get; set; } = 0.5f;
+    [Export(PropertyHint.Range, "0.1,1,0.05")] public float ConstructionEnergyFactor { get; set; } = 0.55f;
+    [Export(PropertyHint.Range, "0,16,1")] public int MaxDroneLights { get; set; } = 2;
+    [Export(PropertyHint.Range, "0,16,1")] public int MaxLavaLights { get; set; } = 3;
 
     [ExportGroup("Viewport Culling")]
     [Export] public bool CullOffscreenLights { get; set; } = true;

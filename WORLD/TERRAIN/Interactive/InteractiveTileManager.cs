@@ -17,6 +17,8 @@ public partial class InteractiveTileManager : Node
     private bool _entry;
     public int ActiveCount => _active.Count;
     public int LavaCellCount => _lava.Count;
+    // LGT0-A.1 reads the canonical hazard cells on terrain rebuild only.
+    internal IEnumerable<Vector2I> EnumerateLavaCells() => _lava;
     public long TraversedCells { get; private set; }
 
     // =========================================================

@@ -57,9 +57,9 @@
 [ext_resource type="Script" path="res://UI/Power/IslandInspection/IslandPowerInspection.cs" id="island_power_ui"]
 
 ; LGT0-A world lighting. Remove these resources and the Lighting child to detach the controller.
-[ext_resource type="Script" path="res://SYSTEMS/Lighting/WorldLightingController.cs" id="lighting_controller"]
-[ext_resource type="Resource" path="res://SYSTEMS/Lighting/DefaultLightingConfig.tres" id="lighting_config"]
-[ext_resource type="Texture2D" path="res://SYSTEMS/Lighting/SoftLightFalloff.tres" id="lighting_falloff"]
+[ext_resource type="Script" path="res://SYSTEMS/Lighting/Runtime/WorldLightingController.cs" id="lighting_controller"]
+[ext_resource type="Resource" path="res://SYSTEMS/Lighting/Config/DefaultLightingConfig.tres" id="lighting_config"]
+[ext_resource type="Texture2D" path="res://SYSTEMS/Lighting/Textures/SoftLightFalloff.tres" id="lighting_falloff"]
 
 [node name="World" type="Node2D"]
 script = ExtResource("loader")

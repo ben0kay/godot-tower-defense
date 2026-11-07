@@ -2,7 +2,7 @@
 
 **Repository:** `ben0kay/godot-tower-defense`  
 **Branch:** `dev` only  
-**Status:** **LGT0-A source implemented and initial appearance reviewed by owner. LGT0-A.1 and LGT0-B planned.**
+**Status:** **LGT0-A source implemented and initial appearance reviewed by owner. LGT0-A.1 source implemented, awaiting owner validation. LGT0-B planned.**
 **Priority:** Implement this real-world-lighting pilot before VE4 regional atmosphere and the remaining VE5/VE6 passes. Do not restore reverted VE5C bloom.  
 **System ownership:** `SYSTEMS/Lighting/` (the existing repository folder is plural `SYSTEMS`, not `SYSTEM`).
 
@@ -40,7 +40,7 @@ Reference: [Godot 4.6 2D lighting and shadows](https://docs.godotengine.org/en/4
 - Placement ghosts, off-tree preview scenes and in-progress construction do **not** emit light. When a real tower finishes construction its light may enable. Destroying/selling/unloading unregisters and frees it. Check save/Continue restore and upgrade/disable paths without changing save data.
 - Future tower types opt in as light emitters via typed source presets/attachments, not tower-ID switches. **Only Citadel and Battle Tower emit light in LGT0, but ALL finished placed tower types cast simple shadows.**
 
-### A.1. Organize and extend the shadowless lighting baseline (next implementation pass)
+### A.1. Organize and extend the shadowless lighting baseline (source implemented)
 
 The Battle Tower preset was the first set of tuning values for the shared light code. Replace that pilot preset and scene attachment with generic placed-tower registration. Ship this as one focused, reversible commit before the shadow pass.
 

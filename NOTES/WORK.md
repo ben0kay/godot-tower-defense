@@ -1,3 +1,9 @@
+## LGT0-A.1 — shared lighting expansion
+
+**Source Implemented / Awaiting Owner Validation.** Organized lighting by runtime, config, presets and textures. Shared tower defaults and radius overrides, dimmer construction pools, darker cyan dusk, flying-drone lights and grouped lava spill use a bounded native light pool. See [Lighting](../SYSTEMS/Lighting/README.md) for settings and rollback. LGT0-B shadows remain planned. Full Godot .NET build, visual and GPU checks await owner validation.
+
+---
+
 ## LGT0-A.1 — shared lighting expansion planned
 
 The [lighting plan](../SYSTEMS/Lighting/IMPLEMENTATION_PLAN.md) now puts folder organization, shared tower defaults and overrides, smaller construction lights, darker ambient, stronger cyan, flying-drone lights and warm lava spill ahead of LGT0-B shadows. Documentation only.

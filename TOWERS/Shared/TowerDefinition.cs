@@ -16,6 +16,11 @@ public partial class TowerDefinition : Resource
     [Export] public Texture2D Icon { get; set; }
     [ExportGroup("Placement")]
     [Export] public Vector2I Footprint { get; set; } = Vector2I.One;
+    // LGT0-A.1 optional visual overrides. Zero radius inherits the shared lighting preset.
+    [ExportGroup("Lighting")]
+    [Export(PropertyHint.Range, "0,512,1,or_greater")] public float LightRadiusOverride { get; set; }
+    [Export] public Vector2 LightOffset { get; set; }
+    [Export] public bool EmitsWorldLight { get; set; } = true;
     public string DisplayName => DefaultConfig?.DisplayName ?? TowerId;
     public string Description => DefaultConfig?.Description ?? "";
 

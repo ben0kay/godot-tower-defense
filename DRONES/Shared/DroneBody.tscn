@@ -2,9 +2,17 @@
 [ext_resource type="Script" path="res://DRONES/Shared/DroneBody.cs" id="1"]
 [ext_resource type="Texture2D" path="res://TOWERS/ConstructionDrones/Visuals/ConstructionDrone.svg" id="art"]
 [ext_resource type="Resource" path="res://DRONES/Shared/DefaultDroneVisualConfig.tres" id="config"]
+; LGT0-A.1 common flying-drone light attachment.
+[ext_resource type="Script" path="res://SYSTEMS/Lighting/Runtime/DroneLightAttachment.cs" id="lighting"]
+
 [node name="Body" type="Node2D"]
 script = ExtResource("1")
 Config = ExtResource("config")
 [node name="Sprite" type="Sprite2D" parent="."]
 texture = ExtResource("art")
 show_behind_parent = true
+
+[node name="FlightLight" type="RemoteTransform2D" parent="."]
+update_rotation = false
+update_scale = false
+script = ExtResource("lighting")

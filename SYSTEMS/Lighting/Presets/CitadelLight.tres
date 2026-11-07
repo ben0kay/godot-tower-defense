@@ -1,10 +1,10 @@
 [gd_resource type="Resource" script_class="LightSourceConfig" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://SYSTEMS/Lighting/LightSourceConfig.cs" id="1_source"]
+[ext_resource type="Script" path="res://SYSTEMS/Lighting/Config/LightSourceConfig.cs" id="1_source"]
 
 [resource]
 script = ExtResource("1_source")
-Tint = Color(0.55, 0.93, 1, 1)
+Tint = Color(0.28, 0.96, 1, 1)
 Energy = 0.65
 RadiusPixels = 320.0
 LocalOffset = Vector2(64, 64)
