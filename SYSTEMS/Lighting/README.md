@@ -2,9 +2,11 @@
 
 `Runtime/` owns the world controller, pooled lights, drone attachment and lava grouping. `Config/` holds typed settings and the default world resource. `Presets/` contains source profiles and `Textures/` holds the shared falloff.
 
-Tune ambient, startup state, budgets, viewport culling and construction multipliers in `Config/DefaultLightingConfig.tres`. The default is `#2f363e` dusk with up to 16 active lights, including up to 8 drone lights. Visible Citadels take priority, then one visible tower when available, then the capped drone share and any remaining towers. F6 in a running debug battlefield compares lighting with original colors. The override resets on level entry. Reopen the level after editing resources.
+Tune ambient, startup state, budgets, viewport culling and construction multipliers in `Config/DefaultLightingConfig.tres`. The default is `#2f363e` dusk with up to 24 active lights, including up to 8 drone lights. Visible Citadels take priority, then one visible tower when available, then the capped drone share and any remaining towers. F6 in a running debug battlefield compares lighting with original colors. The override resets on level entry. Reopen the level after editing resources.
 
 Placed towers inherit a 384px cyan radius from `Presets/DefaultTowerLight.tres`. In a tower definition's **Lighting** group, zero radius inherits the default. Each definition can also adjust the offset or opt out. Construction uses half the resolved radius and 55% energy until completion. Citadel reactors keep their 320px radius and (64,64) local offset. Deployed drone bodies get a 62px following light, including builders hovering at worksites. Parked and docked drones release their slots. Lava uses cached connected patches inside 4×4-cell sections, centred on a real lava cell. Shadows are reserved for LGT0-B.
+
+Nearby tower lamps of similar size share a capped glow. Neighbouring groups soften each other, and visible groups near the camera centre get priority if the pool fills. Reveal still uses each eligible tower's own footprint.
 
 Disabled towers release their cyan light and reveal until they recover. Foundation tiles have subtle cyan accents and each playable lava tile has a warm accent. Lava uses the same base glow on every tile. Regional footprints still provide reveal. F6 toggles the terrain glows with the rest of the presentation.
 

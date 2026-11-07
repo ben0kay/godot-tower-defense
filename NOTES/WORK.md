@@ -1,3 +1,9 @@
+## Shared tower glows and a larger light pool
+
+Nearby towers of similar light size share one cosmetic lamp, and neighbouring groups dim their overlapping glow. The default pool increased to 24 lights and prioritizes tower groups near the camera when full. Individual tower reveal remains independent of grouping.
+
+---
+
 ## Root documentation reorganization — 2026-11-07
 
 Moved the former root README into `devlog.md` (historical contents preserved), added `project.md` as the concise game/vision overview, and relocated `NOTES/CodePreferences.md` to root `CodePreferences.md`. Updated cross-document references and the backlog handoff. Documentation-only; no C# or gameplay checks required.

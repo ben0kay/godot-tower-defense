@@ -14,6 +14,11 @@ public partial class WorldLightingController : Node2D
         float Radius, Func<bool> Eligible, Func<bool> UnderConstruction = null, DroneLightAttachment Follower = null, ProjectileLight Projectile = null)
     {
         public Slot Slot;
+        // Only tower representatives use these values. Reveal continues to use each source's footprint.
+        public Vector2? GroupCentre;
+        public float GroupRadius;
+        public float GroupEnergy = 1;
+        public float CameraDistance;
     }
     private sealed class Slot(PointLight2D light)
     {
@@ -89,6 +94,7 @@ public partial class WorldLightingController : Node2D
     private void QueueRefresh()
     {
         _revealDirty = true;
+        _towerGlowsDirty = true;
         if ((!_lightingEnabled && !RevealActive) || _refreshQueued) return;
         _refreshQueued = true;
         Callable.From(FlushRefresh).CallDeferred();
@@ -220,11 +226,12 @@ public partial class WorldLightingController : Node2D
         Transform2D canvas = cull ? GetCanvasTransform() : default;
         Rect2 viewport = cull ? GetViewportRect().Grow(Mathf.Max(0, Config.ScreenMarginPixels)) : default;
         _selected.Clear();
+        if (cap > 0) PrepareTowerGlows(cull, canvas, viewport);
         bool hasCandidates = Select(_citadels, cap, cull, canvas, viewport);
         hasCandidates |= Select(_portals, cap, cull, canvas, viewport);
-        if (_selected.Count < cap) hasCandidates |= Select(_towers, _selected.Count + 1, cull, canvas, viewport);
+        if (_selected.Count < cap) hasCandidates |= Select(_towerGlows, _selected.Count + 1, cull, canvas, viewport);
         hasCandidates |= Select(_drones, Mathf.Min(cap, _selected.Count + Mathf.Clamp(Config.MaxDroneLights, 0, 16)), cull, canvas, viewport);
-        hasCandidates |= Select(_towers, cap, cull, canvas, viewport);
+        hasCandidates |= Select(_towerGlows, cap, cull, canvas, viewport);
 
         Select(_projectileSources, Mathf.Min(cap, _selected.Count + Mathf.Clamp(Config.MaxProjectileLights, 0, 8)), cull, canvas, viewport);
         for (int i = _projectileSources.Count - 1; i >= 0; i--)
@@ -255,7 +262,7 @@ public partial class WorldLightingController : Node2D
     }
 
     private bool Overlaps(Source source, Transform2D canvas, Rect2 viewport) =>
-        OverlapsLight(PositionFor(source), RadiusFor(source), canvas, viewport);
+        OverlapsLight(VisualPositionFor(source), VisualRadiusFor(source), canvas, viewport);
 
     private static bool OverlapsLight(Vector2 position, float radius, Transform2D canvas, Rect2 viewport)
     {
@@ -279,11 +286,11 @@ public partial class WorldLightingController : Node2D
         PointLight2D light = slot.Light;
         if (acquired || source.Follower == null)
         {
-            Vector2 position = PositionFor(source);
+            Vector2 position = VisualPositionFor(source);
             if (light.GlobalPosition != position) light.GlobalPosition = position;
         }
-        float scale = 2 * RadiusFor(source) / Falloff.GetWidth();
-        float energy = source.Profile.Energy *
+        float scale = 2 * VisualRadiusFor(source) / Falloff.GetWidth();
+        float energy = source.Profile.Energy * source.GroupEnergy *
             (source.UnderConstruction?.Invoke() == true ? Mathf.Clamp(Config.ConstructionEnergyFactor, 0.1f, 1) : 1);
         if (light.TextureScale != scale) light.TextureScale = scale;
         if (light.Energy != energy) light.Energy = energy;
