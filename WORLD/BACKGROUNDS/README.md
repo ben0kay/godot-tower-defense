@@ -92,14 +92,53 @@ Treat those names as **suggestions**, not files that exist. Prefer a small `[Glo
 - [ ] Don't alter `WorldObjectFootprint`, clickable Credit hit areas, HUD overlays, independent Citadel buffers/health, portal assignments or F2/wave spawns. Different visuals must not interfere with top-centre Credits/HP UI.
 - [ ] Use restrained alpha/additive overlay effects where needed. **Real fullscreen HDR bloom is not guaranteed** just by calling a material "glow"; don't require a new global post-process for this pass.
 
-## VE3 — Industrial metal and corridor details (moderate complexity)
+## VE3 — Industrial metal and corridor details (Codex handoff, planned)
 
-**Scope:** opt-in decorative accent lighting on selected powered metal and Foundation surfaces, especially Level020.
+**Status: APPROVED IMPLEMENTATION PLAN — NOT IMPLEMENTED.** The authoring model is now decided: **manually paint purely visual, transparent accent tiles onto the existing `Terrain/Decorations` TileMapLayer, over existing Passable or Impassable terrain**. Do not treat VE3 as a new terrain type, power-network subsystem, map auto-populator, or replacement for the E1–E3 terrain edge renderer.
 
-- [ ] Design narrow cyan/amber conduit strips, occasional very subtle brightness pulses, inset indicator lights or a rare short energy sweep. Prefer **dedicated cosmetic overlay/decal tiles, material-masked atlas regions or cached local accent batches**, never a per-tile Node or per-tile timer.
-- [ ] Respect the current multiple TileSet atlases and atlas UVs. A shader applied blindly to the whole `TileMapLayer` may animate unrelated tiles or repeat patterns incorrectly in atlas space. Decide whether to render on a selected overlay layer or use a verified UV/mask-aware material. No blanket glow over all floor textures.
-- [ ] `MetalPulse.gdshader` should expose parameters for dark/light balance, pulse speed, emissive-looking tint, coverage/mask and per-level variation, with adjustable low-intensity presets `IndustrialBlue` and `IndustrialAmber`. Keep effects in the decoration layer unless visual-only TileSet ownership dictates otherwise.
-- [ ] Level020: emphasize a few corridor junctions and Foundation wall edges, not every tile; Level001/002: sparse highlights around selected metal areas. No automatic repainting of user maps or mutation of gameplay TileData.
+### 1. Preserve current terrain and Decorations ownership
+
+- Read `NOTES/CodePreferences.md`, root README, `WORLD/TERRAIN/Tiles/Decorative/README.md`, `WORLD/TERRAIN/TileSets/DecorationTerrain.tres`, `WORLD/TERRAIN/Edges/IMPLEMENTATION_PLAN.md`, `WORLD/VISUALS/README.md` and this plan first; inspect the existing level scene and TileSet resources before editing.
+- **Verified starting point:** `WORLD/TERRAIN/TileSets/DecorationTerrain.tres` is a **64×64** TileSet with one `TileSetAtlasSource` at `sources/0`, using `Tiles/Metal/prototype_atlas.svg` and the existing painted coordinate `5:0/0`. Preserve source ID **0**, its atlas coordinates, that tile's appearance and all existing painted level references.
+- Extend this **same TileSet resource** with new, dedicated industrial accent atlas source(s) (use the first confirmed unused source ID; never recycle existing IDs). No changes to `Terrain/Passable`, `Impassable`, `Interactive`, TileSet custom-data gameplay layers, `WorldGrid`, collision, construction, enemy navigation or terrain masks. A cosmetic overlay must not secretly become a blocking/buildable terrain source.
+- All new accent art must have **transparent 64×64 cells with no opaque background or hidden solid fill**, aligned to the map's 64px tile grid. They overlay the existing floor/wall pixels instead of hiding their material. Keep trim thin enough not to resemble a buildable wall, path boundary or enemy.
+
+### 2. Paintable atlas contents (small first pass)
+
+Create a **small, editor-visible set** of industrial accents under `WORLD/TERRAIN/Tiles/Decorative/` (e.g. `IndustrialAccentsStatic.svg` and, only if warranted for shader isolation, `IndustrialAccentsAnimated.svg`), then register their `TileSetAtlasSource` entries in `DecorationTerrain.tres`. Prefer a compact grid of transparent 64px cells; document the exact atlas layout and source IDs after implementation.
+
+| Paintable shape | Cyan variant | Amber variant | Intended placement |
+| --- | --- | --- | --- |
+| Narrow straight conduit (horizontal / vertical) | Yes | Yes | Metal corridors |
+| Conduit 90° bend / corner | Yes | Yes | Corridor turns |
+| Conduit T-junction / crossing | Yes | Yes | Corridor intersections |
+| Foundation edge / inset illuminated strip | Yes | Yes | Selected Foundation boundaries |
+| Tiny status light / warning indicator | Yes | Yes | Machinery or selected walls |
+
+- Equivalent rotated variants may use stable atlas coordinates or Godot-supported tile transforms, whichever the editor authoring actually supports reliably. Verify orientation and no neighbour seams. Keep a static fallback for every essential decorative shape; animated variants are opt-in, not compulsory.
+- **Do not** add a new background or fill-only metal tile; only subtle accents. Do **not** repaint any existing level in this pass, even Level020. The owner decides where to place each accent using the existing Decorations painting tools.
+
+### 3. Reusable, isolated shader/material
+
+- Implement `WORLD/VISUALS/Shaders/MetalPulse.gdshader` for optional soft local emissive-looking movement **on only the authored animated accent pixels**: a faint passing highlight or slow glow along a conduit, restrained indicator blink, or a short rare energy sweep. Set low-energy defaults rather than an always-flashing arcade effect.
+- Expose editable **enabled/static fallback**, accent tint (cyan/amber), baseline brightness, pulse strength, speed/frequency, mask/coverage and optional phase variation. Provide reusable low-intensity preset materials for industrial cyan and amber. The existing `IndustrialBlue.tres`/`IndustrialAmber.tres` are **VE1 level-atmosphere presets**, not automatic per-tile glow materials; keep their identity/values intact.
+- **Material isolation is a hard acceptance requirement:** never apply an animation shader blindly to the entire `Terrain/Decorations` layer or the existing `prototype_atlas.svg` source; this would animate unrelated decorations and may conflict with E2 masks or the wrong atlas UVs. First verify actual Godot 4 tile/atlas material behaviour against this project's assets. Prefer a dedicated *animated-accent atlas source* or genuinely per-tile material if verified to isolate rendering; if Godot cannot isolate animated cells in the existing Decoration TileMap safely, do **not** silently create per-cell nodes or repaint/migrate the layer. Document the limitation and propose a **separate strictly cosmetic overlay layer** as an explicit fallback for owner approval.
+- Shader geometry must use correct local texture coordinates/masks so the pulse does not wrap across atlas cells, bleed at tile edges or illuminate the underlying terrain. Normal unlit/non-animated accents remain static, and disabling animation preserves the same artwork and placement.
+- Do **not** require VE5 real 2D lights, shadow occluders, HDR or global bloom. Any visible glow is a restrained local color/alpha effect only. Shared shader code and shared immutable art are preferable; use independent materials only when instance-specific uniform changes truly require them.
+
+### 4. Performance and separation from gameplay
+
+- **No `Node2D`, `Timer`, `Tween` or C# `_Process` per tile.** Prefer the TileMap's existing batched drawing and shader `TIME` for gentle movement; avoid per-cell scene-tree entities, screen reads, heavy noise loops, CPU image generation or a new terrain-neighbour cache.
+- Avoid full-map animated transparent overdraw. Limit accents to manually selected areas; start with a few junctions/strips, not a complete blinking labyrinth. Use a master off/static fallback or preset intensity 0 so VE3 can be compared with original appearance.
+- **Do not connect glow to `PowerGridManager` in VE3.** The word "powered" describes the visual look; electrical outages, light failures and other gameplay reactions are possible later opt-ins, not part of this pass. VE4 regional dust, VE5 physical lighting and VE6 steam/lava are separate phases.
+- All scenes, painted maps, mission behaviour, checkpoint formats and enemy/tower readability stay unchanged. Draw order must keep subtle accents behind ships, bullets, health bars, targeting lines and the UI.
+
+### 5. Minimal Codex delivery / owner acceptance
+
+- Limit this job to the two small accent atlas resources (or a verified simpler single-source layout), their **new TileSet source IDs**, the shared `MetalPulse.gdshader`/isolated presets, and a concise atlas-coordinate README. Do **not** automatically place accents in Level001/002/011/020, modify E2 masks, or start VE4/5/6/7.
+- Check (lightly): existing Decorations art at `sources/0` and existing level TileMap serialized IDs are unchanged; all new tiles are visible and paintable in the Godot TileSet editor; texture cells/rotation line up at normal and zoomed-out scales; disabled animation leaves static art; only opted-in accent pixels animate; E2 and other existing layer shaders are not overwritten. No new gameplay data or processing loops.
+- Owner checks in editor: on a **scratch map or non-committed test placement**, paint cyan/amber straights, corners and junctions over both Passable and Impassable; ensure underlying terrain remains visible, no changes in placement/LOS/navigation, no full-layer glow or shader bleed, and stable FPS at ordinary zoom.
+- Keep source checks minimal per CodePreferences; update a short entry in `NOTES/WORK.md` and the decorative tile atlas README with the actual source ID/coordinates after coding; commit/push to `dev` only. Status becomes **Source Implemented / Awaiting Owner Validation** only when the assets and shader are actually delivered.
 
 ## VE4 — Regional ambience and atmospheric accents (optional)
 
