@@ -1,3 +1,9 @@
+## Fighter lamps, disabled towers and terrain glow
+
+Wired the light attachment into the authored fighter, builder and cargo scenes. Disabled towers go dark until recovery. Buildable terrain and playable lava use chunked emissive accents, independent of the native light pool.
+
+---
+
 ## Drone lights and brighter ambient
 
 Active builders retain their glow during construction. Drone light and reveal radius increased from 62px to 186px. Fighters can target dark radar contacts. Ambient starts at `#2f363e` and the default world pool admits up to eight drone lights.

@@ -43,8 +43,8 @@ public partial class WorldLightingController : Node2D
         foreach (Node child in PlacedTowers.GetChildren()) TrackTower(child);
         PlacedTowers.ChildEnteredTree += TrackTower;
         PlacedTowers.ChildExitingTree += OnTowerExiting;
-        Grid.TerrainRebuilt += RebuildLava;
-        RebuildLava();
+        Grid.TerrainRebuilt += RebuildTerrainLights;
+        RebuildTerrainLights();
         TrackPortals();
         SetupRevealPresentation();
         SetProcessUnhandledKeyInput(OS.IsDebugBuild() && Config.AllowDebugComparison &&
@@ -59,6 +59,7 @@ public partial class WorldLightingController : Node2D
         if (_ambient == null) return;
         _lightingEnabled = enabled && Config.Enabled;
         _ambient.Visible = _lightingEnabled;
+        if (_terrainGlow != null) _terrainGlow.Visible = _lightingEnabled;
         RefreshLights();
         ApplyRevealToggle();
     }
@@ -109,16 +110,18 @@ public partial class WorldLightingController : Node2D
         float radius = definition?.LightRadiusOverride ?? 0;
         if (!float.IsFinite(radius) || radius <= 0) radius = Config.Tower.RadiusPixels;
         Vector2 offset = Config.Tower.LocalOffset + (definition?.LightOffset ?? Vector2.Zero);
-        Source source = new(tower, Config.Tower, offset, radius, () => !tower.IsDestroyed,
+        Source source = new(tower, Config.Tower, offset, radius, () => !tower.IsDestroyed && !tower.IsDisabled,
             () => tower.WorkPhase == TowerWorkPhase.Constructing);
         Watch(_towers, source, tower);
         tower.SpatialChanged += OnRevealTowerMoved;
+        tower.DisableStateChanged += QueueRefresh;
         tower.WorkStarted += QueueRefresh;
         tower.WorkCompleted += QueueRefresh;
         tower.Destroyed += QueueRefresh;
         _disconnect[tower] += () =>
         {
             tower.SpatialChanged -= OnRevealTowerMoved;
+            tower.DisableStateChanged -= QueueRefresh;
             tower.WorkStarted -= QueueRefresh;
             tower.WorkCompleted -= QueueRefresh;
             tower.Destroyed -= QueueRefresh;
@@ -189,7 +192,7 @@ public partial class WorldLightingController : Node2D
 
     // =========================================================
     // Cache grouped lava candidates only when the canonical hazard cache is rebuilt.
-    private void RebuildLava()
+    private void RebuildTerrainLights()
     {
         foreach (Source source in _lava) ReleaseSlot(source);
         _lava.Clear();
@@ -197,6 +200,7 @@ public partial class WorldLightingController : Node2D
             foreach (Vector2I cell in LavaLightRegions.FindAnchors(terrain.EnumerateLavaCells()))
                 _lava.Add(new Source(null, Config.Lava, Grid.CellToWorldCenter(cell) + Config.Lava.LocalOffset,
                     Config.Lava.RadiusPixels, null));
+        RebuildTerrainGlow();
         QueueRefresh();
     }
 
@@ -328,7 +332,7 @@ public partial class WorldLightingController : Node2D
         StopRevealPresentation();
         PlacedTowers.ChildEnteredTree -= TrackTower;
         PlacedTowers.ChildExitingTree -= OnTowerExiting;
-        Grid.TerrainRebuilt -= RebuildLava;
+        Grid.TerrainRebuilt -= RebuildTerrainLights;
         foreach (Action disconnect in _disconnect.Values) disconnect();
         _disconnect.Clear();
         foreach (Slot slot in _slots)

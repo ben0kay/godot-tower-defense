@@ -6,6 +6,8 @@ Tune ambient, startup state, budgets, viewport culling and construction multipli
 
 Placed towers inherit a 384px cyan radius from `Presets/DefaultTowerLight.tres`. In a tower definition's **Lighting** group, zero radius inherits the default. Each definition can also adjust the offset or opt out. Construction uses half the resolved radius and 55% energy until completion. Citadel reactors keep their 320px radius and (64,64) local offset. Deployed drone bodies get a 186px following light, including builders hovering at worksites. Parked and docked drones release their slots. Lava uses cached connected patches inside 4×4-cell sections, centred on a real lava cell. Shadows are reserved for LGT0-B.
 
+Disabled towers release their cyan light and reveal until they recover. Foundation tiles have subtle cyan accents and each playable lava tile has a warm accent. These retained terrain glows are separate from the pooled lava spill lights, so the pool cannot leave individual tiles dark. F6 toggles both.
+
 ## Projectile lights
 
 A.2 adds tiny lights for opt-in friendly and hostile rounds. The shared `Presets/ProjectileLight.tres` sets a 34px radius and 0.34 energy. Each round uses its tracer body or splash color. Enable `EmitsWorldLight` on a tracer style, or `ProjectileWorldLight` on Rocket/Blaster configs. `MaxProjectileLights` defaults to four spare slots within the world cap. With a cap above one, a single side can use up to the cap minus one. Already-flying rounds keep their normal visuals if they lose their slot. Set the category cap to zero to disable this pass.

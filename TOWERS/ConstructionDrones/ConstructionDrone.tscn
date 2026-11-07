@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=10 format=3]
 [ext_resource type="Script" path="res://TOWERS/ConstructionDrones/ConstructionDrone.cs" id="1"]
 [ext_resource type="PackedScene" path="res://DRONES/Shared/DroneBody.tscn" id="2"]
 [ext_resource type="Script" path="res://TOWERS/ConstructionDrones/Visuals/ConstructionBeam.cs" id="3"]
@@ -6,6 +6,8 @@
 [ext_resource type="Script" path="res://TOWERS/ConstructionDrones/Visuals/ConstructionBeamGlow.cs" id="5"]
 [ext_resource type="Script" path="res://TOWERS/ConstructionDrones/Visuals/ConstructionBeamScan.cs" id="6"]
 [ext_resource type="Shader" path="res://TOWERS/ConstructionDrones/Visuals/ConstructionBeamGradient.gdshader" id="7"]
+
+[ext_resource type="Script" path="res://SYSTEMS/Lighting/Runtime/DroneLightAttachment.cs" id="lighting"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_cone"]
 shader = ExtResource("7")
@@ -34,3 +36,8 @@ GroundContact = true
 script = ExtResource("5")
 
 [node name="Body" parent="." instance=ExtResource("2")]
+
+[node name="FlightLight" type="RemoteTransform2D" parent="Body"]
+update_rotation = false
+update_scale = false
+script = ExtResource("lighting")

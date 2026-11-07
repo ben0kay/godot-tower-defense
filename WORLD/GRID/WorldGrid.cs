@@ -177,6 +177,16 @@ public partial class WorldGrid : Node2D
     // Constant-time shared queries; outside-map cells cannot be traversed or built on.
     private int Index(Vector2I cell) => cell.Y * Config.WidthCells + cell.X;
     public bool CanBuild(Vector2I cell) => IsInsideMap(cell) && _buildable[Index(cell)] && !_reserved[Index(cell)];
+    // Static buildable footprint for terrain presentation. Existing tower occupancy leaves the tile's glow intact.
+    internal IEnumerable<Vector2I> EnumerateBuildableTerrain()
+    {
+        for (int y = 0; y < Config.HeightCells; y++)
+            for (int x = 0; x < Config.WidthCells; x++)
+            {
+                Vector2I cell = new(x, y);
+                if (CanBuild(cell)) yield return cell;
+            }
+    }
     public bool TerrainConductsPower(Vector2I cell) => IsInsideMap(cell) && _conductsPower[Index(cell)];
     public bool IsOccupied(Vector2I cell) => IsInsideMap(cell) && _occupied[Index(cell)];
     public bool TerrainBlocksEnemies(Vector2I cell) => !IsInsideMap(cell) || _terrainBlocked[Index(cell)];
