@@ -6,7 +6,7 @@ public partial class LightingMasterConfig : Resource
 {
     [Export] public bool Enabled { get; set; } = true;
     [Export] public bool StartLit { get; set; } = true;
-    [Export] public Color AmbientTint { get; set; } = new Color("#3b444e");
+    [Export] public Color AmbientTint { get; set; } = new Color("#4a5562");
     [Export(PropertyHint.Range, "0,64,1")] public int MaxActiveLights { get; set; } = 24;
     [Export] public bool AllowDebugComparison { get; set; } = true;
 
