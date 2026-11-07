@@ -1,3 +1,9 @@
+## LGT0-A — change planned lighting debug hotkey to F6 — 2026-11-06
+
+Updated the lighting plan to use **F6** (without Shift) for the debug ON/OFF comparison, replacing Shift+F3 throughout. Existing F3 route preview, F4 diagnostics, F5 profiling and other level shortcuts remain unchanged. Godot Editor's F6 Run Current Scene is separate from in-game input. **Documentation only**: LGT0-A/B still await implementation.
+
+---
+
 ## LGT0-B — tower and mountain shadows added to lighting plan — 2026-11-06
 
 Expanded `SYSTEMS/Lighting/IMPLEMENTATION_PLAN.md` with native basic `LightOccluder2D` shadows from **all completed placed towers** and `mountain_visual` procedural mountain clusters. LGT0-A first delivers Citadel/Battle Tower lighting; LGT0-B adds shared tower footprints and grouped/cached mountain outlines, separate `ShadowsEnabled` Inspector toggle, hard shadows initially, cap 6 shadow-enabled lights out of 16 sources, self-shadow prevention, and owner ON/OFF GPU testing. Normal walls, enemies, decals, power/LOS changes and reverted bloom excluded. **Plan only, not implemented.**
