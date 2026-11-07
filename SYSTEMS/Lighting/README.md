@@ -2,9 +2,9 @@
 
 `Runtime/` owns the world controller, pooled lights, drone attachment and lava grouping. `Config/` holds typed settings and the default world resource. `Presets/` contains source profiles and `Textures/` holds the shared falloff.
 
-Tune ambient, startup state, budgets, viewport culling and construction multipliers in `Config/DefaultLightingConfig.tres`. The default is `#292f36` dusk with up to 16 active lights, including up to 2 drone lights and 3 lava lights. Visible Citadels take priority, then one visible tower when available, then the capped drone and lava shares and any remaining towers. F6 in a running debug battlefield compares lighting with original colors. The override resets on level entry. Reopen the level after editing resources.
+Tune ambient, startup state, budgets, viewport culling and construction multipliers in `Config/DefaultLightingConfig.tres`. The default is `#2f363e` dusk with up to 16 active lights, including up to 8 drone lights and 3 lava lights. Visible Citadels take priority, then one visible tower when available, then the capped drone and lava shares and any remaining towers. F6 in a running debug battlefield compares lighting with original colors. The override resets on level entry. Reopen the level after editing resources.
 
-Placed towers inherit a 384px cyan radius from `Presets/DefaultTowerLight.tres`. In a tower definition's **Lighting** group, zero radius inherits the default. Each definition can also adjust the offset or opt out. Construction uses half the resolved radius and 55% energy until completion. Citadel reactors keep their 320px radius and (64,64) local offset. Flying drone bodies get a small following light. Lava uses cached connected patches inside 4×4-cell sections, centred on a real lava cell. Shadows are reserved for LGT0-B.
+Placed towers inherit a 384px cyan radius from `Presets/DefaultTowerLight.tres`. In a tower definition's **Lighting** group, zero radius inherits the default. Each definition can also adjust the offset or opt out. Construction uses half the resolved radius and 55% energy until completion. Citadel reactors keep their 320px radius and (64,64) local offset. Deployed drone bodies get a 186px following light, including builders hovering at worksites. Parked and docked drones release their slots. Lava uses cached connected patches inside 4×4-cell sections, centred on a real lava cell. Shadows are reserved for LGT0-B.
 
 ## Projectile lights
 
@@ -12,7 +12,7 @@ A.2 adds tiny lights for opt-in friendly and hostile rounds. The shared `Presets
 
 ## Light-based fog of war
 
-Towers retain their local cyan base lights. In darkness, a subtle red radar contact replaces the enemy hull and health bar. The two fade across lamp edges. Citadels, forming/open portals, flying drones and lava also reveal entities. Ground towers can fire and guide rounds at dark contacts with normal range, stealth and terrain rules. Fighter and enemy direct targeting still require light. Projectile lights illuminate the floor without granting reveal.
+Towers retain their local cyan base lights. In darkness, a subtle red radar contact replaces the enemy hull and health bar. The two fade across lamp edges. Citadels, forming/open portals, flying drones and lava also reveal entities. Ground towers can fire and guide rounds at dark contacts with normal range, stealth and terrain rules. Fighters can also target dark contacts. Enemy direct targeting still requires light. Projectile lights illuminate the floor without granting reveal.
 
 Use `RevealEnabled` to opt out. Reopen the level after editing this setting. F6 disables the visible mask and contacts for comparison. `SetSourceSuppressed(owner, suppressed)` controls a registered light's blackout state without changing damage, navigation or overlapping sources. Native portal lights have priority after Citadels. Gameplay coverage is independent of the cosmetic light cap.
 

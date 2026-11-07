@@ -6,7 +6,7 @@ public partial class LightingMasterConfig : Resource
 {
     [Export] public bool Enabled { get; set; } = true;
     [Export] public bool StartLit { get; set; } = true;
-    [Export] public Color AmbientTint { get; set; } = new Color("#292f36");
+    [Export] public Color AmbientTint { get; set; } = new Color("#2f363e");
     [Export(PropertyHint.Range, "0,64,1")] public int MaxActiveLights { get; set; } = 16;
     [Export] public bool AllowDebugComparison { get; set; } = true;
 
@@ -17,7 +17,7 @@ public partial class LightingMasterConfig : Resource
     [Export] public LightSourceConfig Lava { get; set; }
     [Export(PropertyHint.Range, "0.1,1,0.05")] public float ConstructionRadiusFactor { get; set; } = 0.5f;
     [Export(PropertyHint.Range, "0.1,1,0.05")] public float ConstructionEnergyFactor { get; set; } = 0.55f;
-    [Export(PropertyHint.Range, "0,16,1")] public int MaxDroneLights { get; set; } = 2;
+    [Export(PropertyHint.Range, "0,16,1")] public int MaxDroneLights { get; set; } = 8;
     [Export(PropertyHint.Range, "0,16,1")] public int MaxLavaLights { get; set; } = 3;
 
     [ExportGroup("Projectile Lighting")]

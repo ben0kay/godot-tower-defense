@@ -51,7 +51,7 @@ public partial class FighterDroneWeapon : Node
         bool regular = _scan <= 0;
         // Cheap liveness/detection checks between scheduled validation and actual firing opportunities.
         bool valid = GodotObject.IsInstanceValid(_weaponTarget) && _weaponTarget.SpawnGeneration == _targetGeneration &&
-            TowerDetection.CanDetect(_weaponTarget) && _registry.Contains(_weaponTarget);
+            TowerDetection.CanTargetRadarContact(_weaponTarget) && _registry.Contains(_weaponTarget);
         Marker2D muzzle = null; Vector2 direction = Vector2.Zero;
         bool aimed = valid && (regular || _cooldown <= 0);
         if (aimed) valid = TryAim(_weaponTarget, out muzzle, out direction);
@@ -100,7 +100,7 @@ public partial class FighterDroneWeapon : Node
     private bool TryAim(Enemy target, out Marker2D muzzle, out Vector2 direction)
     {
         muzzle = NextMuzzle; direction = Vector2.Zero;
-        if (!TowerDetection.CanDetect(target) || !target.IsInsideTree() ||
+        if (!TowerDetection.CanTargetRadarContact(target) || !target.IsInsideTree() ||
             !GodotObject.IsInstanceValid(_registry) || !_registry.Contains(target)) return false;
         var config = _fighter.Config;
         Vector2 delta = target.GlobalPosition - muzzle.GlobalPosition;

@@ -46,7 +46,7 @@ public static class TowerTargeting
         // Strict finite scoring; Strongest ties use First before the stable registration-order fallback.
         public void Accept(EnemySpatialIndex.Neighbor nearby)
         {
-            if (!TowerDetection.CanTargetFromTower(nearby.Enemy, DetectsStealth) || !Eligible(nearby.Enemy, RequiredEffect, AffectedFallback)) return;
+            if (!TowerDetection.CanTargetRadarContact(nearby.Enemy, DetectsStealth) || !Eligible(nearby.Enemy, RequiredEffect, AffectedFallback)) return;
             float distance = Position.DistanceSquaredTo(nearby.Position);
             if (distance > RangeSquared) return;
             float candidate = Mode switch
@@ -93,7 +93,7 @@ public static class TowerTargeting
     // =========================================================
     // Cached targets are checked cheaply between staggered searches.
     public static bool Valid(Enemy enemy, Vector2 position, float range, bool detectsStealth = false) =>
-        TowerDetection.CanTargetFromTower(enemy, detectsStealth)
+        TowerDetection.CanTargetRadarContact(enemy, detectsStealth)
         && position.DistanceSquaredTo(enemy.GlobalPosition) <= range * range
         && (!GodotObject.IsInstanceValid(enemy.Registry?.TerrainGrid)
             || enemy.Registry.TerrainGrid.HasWeaponLineOfSight(position, enemy.GlobalPosition));

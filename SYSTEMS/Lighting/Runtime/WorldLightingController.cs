@@ -152,16 +152,16 @@ public partial class WorldLightingController : Node2D
     }
 
     // =========================================================
-    // The shared drone body publishes flight transitions for builders, couriers and fighters.
+    // The shared drone body publishes light eligibility transitions for builders, couriers and fighters.
     internal void TrackDrone(DroneLightAttachment attachment, DroneBody body)
     {
         if (_ambient == null || !HasOutput(Config.Drone) || _disconnect.ContainsKey(attachment)) return;
         attachment.Position = Config.Drone.LocalOffset;
         Source source = new(attachment, Config.Drone, Vector2.Zero, Config.Drone.RadiusPixels,
-            () => body.IsFlightPresented && !body.GetParent().IsQueuedForDeletion(), Follower: attachment);
+            () => body.IsLightPresented && !body.GetParent().IsQueuedForDeletion(), Follower: attachment);
         Watch(_drones, source, attachment);
-        body.FlightPresentationChanged += QueueRefresh;
-        _disconnect[attachment] += () => body.FlightPresentationChanged -= QueueRefresh;
+        body.LightPresentationChanged += QueueRefresh;
+        _disconnect[attachment] += () => body.LightPresentationChanged -= QueueRefresh;
         QueueRefresh();
     }
 

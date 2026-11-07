@@ -8,8 +8,8 @@ public static class TowerDetection
     public static bool CanDetect(Enemy enemy, bool detectsStealth = false) =>
         Detectable(enemy, detectsStealth) && IsLit(enemy);
 
-    // Ground tower fire can track radar contacts through darkness. Stealth still needs a detector.
-    internal static bool CanTargetFromTower(Enemy enemy, bool detectsStealth) =>
+    // Friendly weapons can track radar contacts through darkness. Stealth still needs a detector.
+    internal static bool CanTargetRadarContact(Enemy enemy, bool detectsStealth = false) =>
         Detectable(enemy, detectsStealth);
 
     private static bool Detectable(Enemy enemy, bool detectsStealth) =>

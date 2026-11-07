@@ -103,7 +103,7 @@ public partial class ProjectileAccuracyChecks : Node
         while (lighting.IsRevealed(centre) || lighting.IsRevealed(centre + Vector2.Right * 80))
             centre += Vector2.Right * 400;
         Enemy target = f.Target(centre + Vector2.Right * 80);
-        Require(!TowerDetection.CanDetect(target), "An unlit enemy fails the fighter visibility rule");
+        Require(!TowerDetection.CanDetect(target), "An unlit enemy is outside reveal coverage");
 
         BattleTower first = f.Add<BattleTower>("battle", centre);
         BattleTower second = f.Add<BattleTower>("battle", centre + Vector2.Down * 100);
@@ -114,9 +114,9 @@ public partial class ProjectileAccuracyChecks : Node
         lighting.SetSourceSuppressed(second, true);
         lighting.SetLightingEnabled(false);
         Require(!TowerDetection.CanDetect(target), "F6 comparison leaves a blackout authoritative");
-        Require(TowerDetection.CanTargetFromTower(target, false), "Towers can still lock a dark radar contact");
+        Require(TowerDetection.CanTargetRadarContact(target, false), "Towers can still lock a dark radar contact");
         target.GlobalPosition = centre + new Vector2(80, 60);
-        Require(TowerDetection.CanTargetFromTower(target, false) && !TowerDetection.CanDetect(target),
+        Require(TowerDetection.CanTargetRadarContact(target, false) && !TowerDetection.CanDetect(target),
             "Targeting remains available after the dark contact moves off the launch heading");
         float before = target.Health;
         shot._PhysicsProcess(.16);

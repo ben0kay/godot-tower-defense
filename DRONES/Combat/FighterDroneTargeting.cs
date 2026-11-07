@@ -23,7 +23,7 @@ public partial class FighterDroneTargeting : Node
         service = new FighterDroneTargeting { Name = "FighterThreats", _registry = registry };
         registry.AddChild(service); return service;
     }
-    internal bool Valid(Enemy enemy) => TowerDetection.CanDetect(enemy) && ValidJourney(enemy);
+    internal bool Valid(Enemy enemy) => TowerDetection.CanTargetRadarContact(enemy) && ValidJourney(enemy);
     private bool ValidJourney(Enemy enemy) => _registry.Contains(enemy)
         && enemy.AssignedCitadel?.Available == true && float.IsFinite(enemy.RemainingJourneyDistance);
     // =========================================================
@@ -42,7 +42,7 @@ public partial class FighterDroneTargeting : Node
         for (; _cursor < end; _cursor++)
         {
             Enemy enemy = _registry.Living[_cursor];
-            if (!TowerDetection.CanDetect(enemy)) continue;
+            if (!TowerDetection.CanTargetRadarContact(enemy)) continue;
             _buildingCombat = true;
             if (!ValidJourney(enemy)) continue;
             int at = 0; while (at < _building.Count && _building[at].Distance <= enemy.RemainingJourneyDistance) at++;

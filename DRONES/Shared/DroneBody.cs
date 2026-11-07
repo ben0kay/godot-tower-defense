@@ -6,9 +6,9 @@ public partial class DroneBody : Node2D
     [Export] public DroneVisualConfig Config { get; set; }
     [Export] public Vector2 EngineOffset { get; set; } = new(9, 6);
     [Export(PropertyHint.Range, "0,64,1")] public float TrailStartPixels { get; set; } = 8;
-    // LGT0-A.1 observes flight transitions from the existing presentation path.
-    public bool IsFlightPresented { get; private set; }
-    public event Action FlightPresentationChanged;
+    // LGT0-A.1 observes light eligibility transitions from the existing presentation path.
+    public bool IsLightPresented { get; private set; }
+    public event Action LightPresentationChanged;
     private Sprite2D _sprite;
     private readonly Vector2[] _history = new Vector2[32];
     private int _count, _leg = -1;
@@ -17,10 +17,10 @@ public partial class DroneBody : Node2D
     public override void _Ready() { _sprite = GetNode<Sprite2D>("Sprite"); SetProcess(false); SetPhysicsProcess(false); }
     // =========================================================
     // A leg transition ignites both rear strips. History follows actual world positions, never the target vector.
-    public void Present(float heading, Vector2 velocity, float maximumSpeed, bool flying, int leg, bool? cargo, float dt, bool ignite = true)
+    public void Present(float heading, Vector2 velocity, float maximumSpeed, bool flying, int leg, bool? cargo, float dt, bool ignite = true, bool lightWhileStationary = false)
     {
         if (!IsVisibleInTree()) { Reset(); return; }
-        SetFlightPresented(flying);
+        SetLightPresented(flying || lightWhileStationary);
         _heading = heading; _sprite.Rotation = heading + Mathf.Pi / 2; _cargo = cargo;
         if (Config == null) return;
         if (flying && _leg != leg)
@@ -47,14 +47,14 @@ public partial class DroneBody : Node2D
         }
         QueueRedraw();
     }
-    public void Reset() { SetFlightPresented(false); if (_count > 0 || _glow > 0 || _cargo.HasValue) QueueRedraw(); _count = 0; _leg = -1; _ignition = _glow = _lastSpeed = _accelerationGlow = 0; _cargo = null; }
+    public void Reset() { SetLightPresented(false); if (_count > 0 || _glow > 0 || _cargo.HasValue) QueueRedraw(); _count = 0; _leg = -1; _ignition = _glow = _lastSpeed = _accelerationGlow = 0; _cargo = null; }
     // =========================================================
     // Publish only state transitions, including pool reset and fighter docking.
-    private void SetFlightPresented(bool flying)
+    private void SetLightPresented(bool lit)
     {
-        if (IsFlightPresented == flying) return;
-        IsFlightPresented = flying;
-        FlightPresentationChanged?.Invoke();
+        if (IsLightPresented == lit) return;
+        IsLightPresented = lit;
+        LightPresentationChanged?.Invoke();
     }
     // =========================================================
     // Bounded segments fade outward. Engines/cargo rotate with the sprite, never the construction beam.

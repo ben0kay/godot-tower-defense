@@ -14,7 +14,7 @@ public partial class ConstructionDrone : Node2D
     public void Present(Vector2 position, Vector2 target, float halfWidth, float strength, ConstructionDroneMasterConfig config, float beamAge = 0, float heading = -Mathf.Pi / 2, Vector2 velocity = default, bool flying = false, int leg = 0, float dt = 0, bool ignite = true)
     {
         GlobalPosition = position; Visible = config.ShowVisuals;
-        _body.Present(heading, velocity, ConstructionDroneMasterConfig.Safe(config.TravelSpeed, 280, 32, 2000), flying, leg, null, dt, ignite);
+        _body.Present(heading, velocity, ConstructionDroneMasterConfig.Safe(config.TravelSpeed, 280, 32, 2000), flying, leg, null, dt, ignite, lightWhileStationary: true);
         _beam.Present(target, halfWidth, config.ShowVisuals ? strength : 0, config, beamAge);
     }
     // =========================================================

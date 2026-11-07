@@ -1,3 +1,9 @@
+## Drone lights and brighter ambient
+
+Active builders retain their glow during construction. Drone light and reveal radius increased from 62px to 186px. Fighters can target dark radar contacts. Ambient starts at `#2f363e` and the default world pool admits up to eight drone lights.
+
+---
+
 ## Wider tower glow and more projectile lights
 
 The shared tower light radius is 384px. Machine Gun, fighter and the optional traveling Sniper tracer now opt into the existing projectile light pool.
