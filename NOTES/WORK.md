@@ -1,3 +1,9 @@
+## Research six-branch expansion specification — 2026-11-06
+
+**Planning only; no research nodes/effects authored.** Added `SYSTEMS/Progression/Research/RESEARCH_EXPANSION_IMPLEMENTATION_PLAN.md` with six radial divisions and 36 proposed paid nodes (34 new), unique connected hex coordinates, costs/prerequisites/effect contracts, staged EX1-A/B/C (~22 new nodes) and later EX2 capstones/optional DME EX3. Existing Core/Citadel Master I/Battle Weapons I remain unchanged; new effect kinds require real, snapshot-safe handlers before publication. Linked the plan from the feature README and outstanding backlog. Current `dev` gameplay research catalog still contains only three nodes.
+
+---
+
 ## Level003 lava tutorial briefing — 2026-11-06
 
 Created `LEVELS/Level003/Level003Briefing.tres` with a short Lava Fields introduction explaining that crossing lava damages enemies and Foundation Platforms can funnel routes over it. Assigned the resource in `Level003Config.tres.MissionBriefing` using the already shared top-right typewriter, with no custom HUD, gameplay changes or voice/audio dependency; `VoiceCueId` stays blank until a recording is supplied. Existing waves, lava damage and map layout are unchanged. Focused resource/config review only; verify the briefing appears on fresh Level003 deployment and is skipped on checkpoint Continue.
