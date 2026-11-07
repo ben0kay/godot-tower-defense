@@ -590,10 +590,22 @@ public partial class TowerPlacementController : Node2D
             if (_selected.IsBusy) changes += upgrading ? "\nUpgrade in progress." : "\nAvailable after construction.";
             else if (!Settings.AllowUpgrades) changes += "\nUpgrades disabled.";
             else if (!enabled) changes += "\nInsufficient resources.";
-            _hud.SetUpgradeDetails(changes, upgrading ? "UPGRADING…" : $"UPGRADE TO LEVEL {next.Level}", enabled);
+            _hud.SetUpgradeDetails(changes, upgrading ? "UPGRADING…" : $"UPGRADE LEVEL {next.Level}",
+                enabled, upgrading ? "" : UpgradeButtonPrice(next));
         }
         catch (Exception exception)
         { _hud.SetUpgradeComparison(null, null); _hud.SetUpgradeDetails("Invalid upgrade data: " + exception.Message, "", false); }
+    }
+
+    // =========================================================
+    // Keep the button short: show Credits, while its tooltip lists every resource and work time.
+    private static string UpgradeButtonPrice(TowerLevel level)
+    {
+        if (level?.Costs == null) return "";
+        foreach (ResourceCost cost in level.Costs)
+            if (cost?.Resource?.ResourceId == "credits")
+                return $"{cost.Amount:N0} CREDITS";
+        return TowerPresentation.DescribeResourceCosts(level.Costs).ToUpperInvariant();
     }
 
     // =========================================================

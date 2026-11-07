@@ -44,7 +44,7 @@ public partial class GameplayHUD : Control
     private Control _traySlot;
     private Label _wave, _credits, _core, _towerName, _towerCategory, _towerStats, _towerNotes;
     private Button _startWave, _upgradeButton;
-    private Label _upgradeInfo, _runtimeStats, _upgradeTitle, _targetValue;
+    private Label _upgradeInfo, _upgradeActionText, _upgradeCostText, _runtimeStats, _upgradeTitle, _targetValue;
     private VBoxContainer _targetSection;
     private GridContainer _upgradeComparison;
     private Control _upgradeDivider;
@@ -159,6 +159,8 @@ public partial class GameplayHUD : Control
         _topBar.GetNode<Control>("Status").Resized += LayoutStatus;
         _upgradeInfo = GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeInfo");
         _upgradeButton = GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/Actions/UpgradeButton");
+        _upgradeActionText = _upgradeButton.GetNode<Label>("Content/ActionText");
+        _upgradeCostText = _upgradeButton.GetNode<Label>("Content/CostText");
         _upgradeButton.Pressed += () => EmitSignal(SignalName.TowerUpgradeRequested);
         _sellButton = _upgradeButton.GetParent().GetNode<Button>("SellButton");
         UIButtonFactory.Apply(_sellButton, UIButtonStyle.Danger, Config);
@@ -578,20 +580,29 @@ public partial class GameplayHUD : Control
     }
     public void CloseSellConfirmation() => _sellConfirmation?.Hide();
 
-    public void SetUpgradeDetails(string preview, string button, bool affordable)
+    // =========================================================
+    // Keep the full price/time/status in the tooltip; the normal upgrade cost row is gone.
+    // The button itself shows action on the left and its Credit price on the right.
+    public void SetUpgradeDetails(string preview, string button, bool affordable, string price = "")
     {
         bool present = !_buildPreview && (preview.Length > 0 || button.Length > 0);
         _upgradeTitle.Visible = present || _upgradeComparison.Visible;
         _upgradeTitle.Text = (_comparisonNext != null ? "STATS · PAID UPGRADE" : "CURRENT STATS")
             + (_comparisonNow != null ? " · " + (_comparisonNow.Repair.HasValue ? "HULL REPAIR" : (_comparisonNow.Weapon?.Type ?? DamageType.Kinetic).ToString().ToUpperInvariant()) : "");
         _upgradeDivider.Hide();
-        _upgradeButton.TooltipText = "";
-        // Busy status already appears in the header/button; retain the full explanation as a tooltip.
-        int extraLine = preview.IndexOf('\n');
-        _upgradeInfo.Text = _workSection.Visible && _workBar.Visible && extraLine >= 0 ? preview[..extraLine] : preview;
-        _upgradeInfo.TooltipText = preview; _upgradeInfo.Visible = present && preview.Length > 0;
-        _upgradeButton.Text = button.Length > 0 ? button : "UPGRADE"; _upgradeButton.Visible = !_buildPreview && _hasInspectionDetails;
+        _upgradeInfo.Text = "";
+        _upgradeInfo.Hide();
+        _upgradeButton.Text = "";
+        _upgradeButton.TooltipText = preview;
+        _upgradeActionText.Text = button.Length > 0 ? button
+            : preview.StartsWith("MAX LEVEL", StringComparison.Ordinal) ? "MAX LEVEL" : "UPGRADE";
+        _upgradeCostText.Text = price;
+        _upgradeCostText.Visible = price.Length > 0;
+        _upgradeButton.Visible = !_buildPreview && _hasInspectionDetails;
         _upgradeButton.Disabled = !affordable;
+        Color ink = affordable ? Config.TextColor : Config.MutedTextColor;
+        _upgradeActionText.AddThemeColorOverride("font_color", ink);
+        _upgradeCostText.AddThemeColorOverride("font_color", affordable ? Config.AccentColor : Config.MutedTextColor);
     }
 
     // =========================================================
@@ -639,7 +650,13 @@ public partial class GameplayHUD : Control
 
     // =========================================================
     // Keep a refreshed retry button available while reporting rejected upgrade attempts.
-    public void SetUpgradeError(string message) => _upgradeInfo.Text = message + "\n" + _upgradeInfo.Text;
+    public void SetUpgradeError(string message)
+    {
+        if (string.IsNullOrWhiteSpace(message) || !IsInspectionVisible) return;
+        _upgradeInfo.Text = message;
+        _upgradeInfo.TooltipText = message;
+        _upgradeInfo.Show();
+    }
 
     // =========================================================
     // Retire details while keeping the reserved blank shell visible beside an open build tray.

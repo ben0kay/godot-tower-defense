@@ -58,9 +58,11 @@ public static class TowerUpgradeChecks
                 "Closing build tray leaves the bottom-docked 560px Inspector open");
             Button button = hud.GetNode<Button>("BottomArea/Inspector/Insets/Body/Columns/Main/Actions/UpgradeButton");
             Label info = hud.GetNode<Label>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeInfo");
-            Require(button.Visible && !button.Disabled && info.Text.Contains("150 Credits") &&
-                UpgradeTableChecks.HasRow(hud, "Damage", "30", "33", "(+3)")
-                && UpgradeTableChecks.HasRow(hud, "Max HP", "1000", "1050", "(+50)"), "Inspector shows next tier, typed gain and affordable price");
+            Label action = button.GetNode<Label>("Content/ActionText"), cost = button.GetNode<Label>("Content/CostText");
+            Require(button.Visible && !button.Disabled && !info.Visible && button.TooltipText.Contains("150 Credits")
+                && action.Text == "UPGRADE LEVEL 2" && cost.Text == "150 CREDITS"
+                && UpgradeTableChecks.HasRow(hud, "Damage", "30", "33", "(+3)")
+                && UpgradeTableChecks.HasRow(hud, "Max HP", "1000", "1050", "(+50)"), "Inspector button shows next tier and its credit price without an extra row");
             hud.EmitSignal(GameplayHUD.SignalName.TowerUpgradeRequested); ConstructionTestClock.FinishWork(battle);
             Require(first.UpgradeLevel == 2 && first.FinalStats == preview &&
                 wallet.GetBalance(wallet.CreditsResource) == 250, "Actual HUD upgrade action pays once and matches preview");
@@ -84,7 +86,8 @@ public static class TowerUpgradeChecks
                 wallet.GetBalance(wallet.CreditsResource) == 0, "Second purchase selects the complete level3 snapshot");
             Require(stats.Text.Contains("Shield Penetration: 5%") && first.FinalStats.ShieldPenetration == 0.05f,
                 "Level3 Inspector retains baseline penetration");
-            Require(button.Disabled && info.Text.Contains("MAX LEVEL") && hud.GetNode<GridContainer>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeComparison").Columns == 2,
+            Require(button.Disabled && !info.Visible && action.Text == "MAX LEVEL" && !cost.Visible
+                && button.TooltipText.Contains("MAX LEVEL") && hud.GetNode<GridContainer>("BottomArea/Inspector/Insets/Body/Columns/Main/UpgradeComparison").Columns == 2,
                 "Maximum tier removes upgrade action and hypothetical comparison");
             Require(!ConstructionTestClock.PurchaseAndFinish(first, wallet, placement.Settings, 3, out _) &&
                 wallet.GetBalance(wallet.CreditsResource) == 0, "Maximum tier cannot spend again");

@@ -1,3 +1,9 @@
+## Tower Inspector compact upgrade cost button — 2026-11-07
+
+The selected Inspector no longer displays a separate `LEVEL N · Cost · WorkSeconds` upgrade row. The Upgrade button now shows `UPGRADE LEVEL N` on the left and a right-aligned `X CREDITS` price. Its tooltip retains the full resource recipe and time, including any non-Credit resources. Busy jobs show `UPGRADING…` without a second price; completed maximum-tier towers show `MAX LEVEL`. The former UpgradeInfo label is only shown for actual upgrade errors. Upgrade selection/payment, wallet eligibility, timers, Sell behaviour and stats are unchanged; focused existing test assertions updated. Source review only; owner Godot visual and gameplay acceptance pending.
+
+---
+
 ## LGT0-A — native battlefield lighting
 
 **Source Implemented / Awaiting Owner Validation.** Shared world dusk tint, capped and optionally culled Citadel/Battle Tower lights, and debug F6 comparison. Scene attachments and rollback steps are documented in [Lighting](../SYSTEMS/Lighting/README.md). Source review only. Godot .NET build, appearance and GPU timing await owner validation. LGT0-B shadows remain planned.

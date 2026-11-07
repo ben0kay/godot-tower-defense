@@ -39,7 +39,9 @@ internal static class TimedUpgradeChecks
             && tower.GetDisableReason(0) == TowerDisableReason.Upgrading && tower.CaptureWorkState().PendingUpgradeLevel == 2 && tower.PendingUpgradeLevel == 2 && tower.WorkSeconds == 4 && started == 1 && changed == 0
             && tower.Ammunition.Inventory.Amount == 900 && tower.Ammunition.Inventory.Capacity == 1000, "Purchase charges once but preserves old tier/cached stats/XP/ammo");
         Require(f.Wallet.GetBalance(f.Wallet.CreditsResource) == 850 && button.Disabled && status.Text.Contains("UPGRADING") && status.Text.Contains("→ 2")
-            && preview.Text.Contains("Cost already paid") && tower.UpgradeLevel == 1, "Inspector distinguishes paid work from another purchase");
+            && !preview.Visible && button.TooltipText.Contains("Cost already paid")
+            && button.GetNode<Label>("Content/ActionText").Text == "UPGRADING…"
+            && tower.UpgradeLevel == 1, "Inspector distinguishes paid work via the button and tooltip");
         Require(!TowerUpgradeController.TryUpgrade(tower, f.Wallet, f.Placement.Settings, 1, out _) && f.Wallet.GetBalance(f.Wallet.CreditsResource) == 850, "Repeat purchase while busy cannot spend again");
         manager.Advance(1);
         Require(bar.Value == 25 && time.Text.Contains("3.0s remaining") && tower.FinalStats == old && changed == 0, "Progress updates only work controls/cache remains untouched");
@@ -64,7 +66,10 @@ internal static class TimedUpgradeChecks
             && tower.RankProgress.TotalXp == 1000 && tower.Ammunition.Inventory.Amount == stock && tower.Ammunition.Inventory.Capacity == 1200
             && completed == 1 && changed == 2 && inventoryChanges == 1 && tower.PendingUpgradeLevel == 0
             && !tower.IsDisabled && tower.CanAttack && tower.IsPhysicsProcessing(), "Completion resolves current rank, updates capacity once and never refills ammunition");
-        Require(status.Text == "OPERATIONAL" && !bar.Visible && !button.Disabled && preview.Text.Contains("LEVEL 3") && f.Wallet.GetBalance(f.Wallet.CreditsResource) == 850,
+        Require(status.Text == "OPERATIONAL" && !bar.Visible && !button.Disabled && !preview.Visible
+            && button.GetNode<Label>("Content/ActionText").Text == "UPGRADE LEVEL 3"
+            && button.GetNode<Label>("Content/CostText").Text == "250 CREDITS"
+            && f.Wallet.GetBalance(f.Wallet.CreditsResource) == 850,
             "Completion updates actual Inspector stats/next preview with no additional payment");
         manager.Advance(99); Require(completed == 1 && changed == 2, "Repeated clock ticks cannot reapply a completed tier");
         Require(!TowerUpgradeController.TryUpgrade(tower, f.Wallet, f.Placement.Settings, 1, out _), "Stale expected level rejects without purchase");
