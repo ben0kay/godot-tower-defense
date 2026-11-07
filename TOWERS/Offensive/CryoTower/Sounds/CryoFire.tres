@@ -11,6 +11,7 @@ Mode = 0
 Category = 0
 Priority = 35
 CooldownSeconds = 0.1
+MergeNearbyShots = true
 MaximumInstances = 10
 Positional = true
 AllowOffscreen = false

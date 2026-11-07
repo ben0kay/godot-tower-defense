@@ -36,6 +36,13 @@ public partial class AudioMasterConfig : Resource
     [Export] public bool PauseWorldAudioWithGame { get; set; } = true;
     #endregion
 
+    [ExportGroup("Spatial One-Shot Mix")]
+    [Export(PropertyHint.Range, "0,150,1")] public int NearbyShotWindowMs { get; set; } = 65;
+    [Export(PropertyHint.Range, "0,500,1")] public float NearbyShotWorldRadius { get; set; } = 160;
+    [Export(PropertyHint.Range, "0,300,1")] public float NearbyShotScreenRadius { get; set; } = 140;
+    [Export(PropertyHint.Range, "1.1,4,.1")] public float ViewHearingReach { get; set; } = 2.4f;
+    [Export(PropertyHint.Range, "0,15,.5")] public float ZoomOutDbPerOctave { get; set; } = 6;
+
     #region Voice assistant
     [ExportGroup("Voice Assistant")]
     [Export(PropertyHint.Range, "0,16,1")] public int VoiceQueueLimit { get; set; } = 4;

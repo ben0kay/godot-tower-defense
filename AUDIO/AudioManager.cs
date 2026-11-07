@@ -154,14 +154,24 @@ public partial class AudioManager : Node2D
     // Enforce culling, per-owner cooldown, per-sound overlap and category budgets.
     private bool PlayOneShot(AudioDefinition sound, Vector2 position, bool positioned, ulong sourceId)
     {
-        if (sound.Stream == null || sound.Mode == GameAudioMode.Loop || (sound.Positional && (!positioned || !IsAudible(sound, position)))) return false;
+        if (sound.Stream == null || sound.Mode == GameAudioMode.Loop) return false;
+        WorldShotMix mix = default;
+        if (sound.Positional && (!positioned || !TryGetWorldShotMix(sound, position, out mix))) return false;
         var key = (sound.Id, sourceId);
         if (_lastPlay.TryGetValue(key, out double previous) &&
             _clock - previous < Mathf.Max(0f, sound.CooldownSeconds)) return false;
 
+        ulong now = 0;
+        if (sound.Positional && sound.MergeNearbyShots)
+        {
+            now = Time.GetTicksMsec();
+            if (IsNearbyDuplicate(sound.Id, sourceId, position, mix.Canvas, now)) return false;
+        }
+
         Slot slot = Acquire(sound, false);
         if (slot == null) return false;
-        Begin(slot, sound, position, false);
+        Begin(slot, sound, position, false, mix);
+        if (sound.Positional && sound.MergeNearbyShots) RememberShot(sound.Id, sourceId, position, now);
         _lastPlay[key] = _clock;
         return true;
     }
@@ -319,7 +329,7 @@ public partial class AudioManager : Node2D
 
     // =========================================================
     // Configure and start a reused native Godot AudioStreamPlayer or AudioStreamPlayer2D.
-    private void Begin(Slot slot, AudioDefinition sound, Vector2 position, bool loop)
+    private void Begin(Slot slot, AudioDefinition sound, Vector2 position, bool loop, WorldShotMix mix = default)
     {
         StopFade(slot);
         slot.Active = true; slot.Stopping = false; slot.Loop = loop;
@@ -328,8 +338,8 @@ public partial class AudioManager : Node2D
         if (slot.World != null)
         {
             slot.World.Stream = sound.Stream; slot.World.Bus = bus;
-            slot.World.VolumeDb = sound.VolumeDb; slot.World.PitchScale = Mathf.Max(0.1f, sound.PitchScale);
-            slot.World.MaxDistance = Mathf.Max(1f, sound.MaxDistance);
+            slot.World.VolumeDb = sound.VolumeDb + mix.ZoomDb; slot.World.PitchScale = Mathf.Max(0.1f, sound.PitchScale);
+            slot.World.MaxDistance = loop ? Mathf.Max(1f, sound.MaxDistance) : mix.Distance;
             slot.World.Attenuation = Mathf.Max(0.1f, sound.Attenuation);
             slot.World.GlobalPosition = position; slot.World.StreamPaused = false; slot.World.Play();
         }
@@ -422,20 +432,13 @@ public partial class AudioManager : Node2D
 
     #region Camera and culling
     // =========================================================
-    // The tower defense has no player actor: the active Camera2D is the audio listener.
+    // Godot's default listener uses the viewport centre and canvas transform for panning.
     private void RefreshCamera()
     {
         Camera2D current = GetViewport().GetCamera2D();
-        if (current == _camera && GodotObject.IsInstanceValid(_camera)) return;
+        if (current == _camera) return;
         _camera = current;
-        if (!GodotObject.IsInstanceValid(_camera)) return;
-        AudioListener2D listener = _camera.GetNodeOrNull<AudioListener2D>("WorldAudioListener");
-        if (listener == null)
-        {
-            listener = new AudioListener2D { Name = "WorldAudioListener" };
-            _camera.AddChild(listener);
-        }
-        listener.MakeCurrent();
+        _recentSpatialShots.Clear();
     }
 
     // =========================================================

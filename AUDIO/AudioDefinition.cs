@@ -19,6 +19,7 @@ public partial class AudioDefinition : Resource
     [ExportGroup("Playback Rules")]
     [Export(PropertyHint.Range, "0,100,1")] public int Priority { get; set; } = 50;
     [Export(PropertyHint.Range, "0,10,0.01")] public float CooldownSeconds { get; set; }
+    [Export] public bool MergeNearbyShots { get; set; }
     [Export(PropertyHint.Range, "1,64,1")] public int MaximumInstances { get; set; } = 4;
     #endregion
 

@@ -1,3 +1,9 @@
+## Weapon audio overlap and camera reach
+
+Opt-in firing clips suppress nearby duplicate starts, and viewport-scaled hearing reach preserves edge/zoom-out playback with a separate zoom gain reduction. Ambient tint increased to `#3b444e`. Source/config checks only, live mix pending.
+
+---
+
 ## Tower build tray: level-one thumbnails and vertical scrolling — 2026-11-07
 
 The catalog already provided 22 authored level-one SVG icons; only some were visible in the old intrinsic-width Button layout. The build tray now uses a reusable `UI/GameplayHUD/TowerBar/TowerBuildCard.cs` to reserve a dedicated 40px image slot for **every** tower alongside consistently left-aligned name and category/price text. All cards are 200px wide by 62px high by default and remain keyboard/click/hover-accessible. The card grid chooses a column count from the available tray width, reserves room for the vertical scrollbar, never uses tower count to stretch cards, and now scrolls **vertically**, not horizontally. Category changes reset vertical scrolling; 22-tower and 40-variant cases fit the same clipped tray without covering the Inspector. Original tower SVGs, catalog metadata, placement actions and inspector remain unchanged. Updated existing targeted tray assertions; source-only review, owner in-game layout/mouse-wheel testing pending.

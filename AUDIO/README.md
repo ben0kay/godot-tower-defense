@@ -51,7 +51,7 @@ Do **not** create duplicate Tower/Enemy audio managers, a second `AUDIO/Sounds/T
 
 `project.godot` autoloads `AUDIO/AudioManager.tscn` as `/root/GameAudio`. It is available in Boot, Main Menu, Campaign and gameplay, and remains alive between menu/level scene changes. You do **not** instance another copy in `Main.tscn` or `WORLD/World.tscn`.
 
-The current gameplay `CameraRig/Camera2D` is the **positional listener** (there is no player character). The manager attaches a `WorldAudioListener` to the current Camera2D when present, including after scene transitions. Menus without a world camera can still play UI, music and voice audio. Positional sounds are not played when no world camera is active.
+World one-shots use the viewport-centred positional listener and retain native stereo panning. Their attenuation distance scales to the visible world at the current zoom, with a 200px screen margin and 6dB reduction per octave below 1×. Menus without a world camera can still play UI, music and voice audio. Positional sounds are not played when no world camera is active.
 
 Open `AUDIO/DefaultAudioConfig.tres` in the Inspector to adjust global levels and limits; open `AUDIO/AudioBuses.tres` or Godot's Audio dock for bus routing/effects; open `AUDIO/DefaultAudioCatalog.tres` to register sounds. `AudioManager.ApplyBusVolumes()` reapplies config values if changed during a run; player preferences are **not persisted yet**.
 
@@ -80,6 +80,7 @@ These IDs are **examples**, not currently registered audio. Missing IDs or unset
 - **OneShot:** played on demand, returns to the audio pool on completion. `Play` only accepts non-positional definitions; `PlayAt` and `PlayFrom` accept positional definitions.
 - **Loop:** register once on activation, unregister once on deactivation; the manager pools players and stops distant sounds while retaining the source registration. Loops **must actually be marked looped** in Godot's WAV/OGG import settings.
 - **Intermittent:** register a source once; play discrete one-shots after randomized configured intervals. No permanently running stream between calls.
+- **Nearby shots:** opt-in weapon sounds merge duplicates from different nearby sources within 65ms, 160 world pixels and 140 screen pixels. A single gun retains its cadence and separated sources retain stereo positioning.
 - **Owner identity:** `PlayFrom` cooldown is per (sound ID, owner instance), so many towers with the same firing clip don't incorrectly silence one another. `PlayAt` and `Play` use one shared per-ID cooldown. Global per-ID polyphony and category budgets prevent audio spam. Excess requests may be rejected, or higher-priority requests may replace lower-priority playback.
 - **Distance and screen rules:** use Godot's native `AudioStreamPlayer2D` pan/attenuation, center on the active camera. Distance uses world pixels and `MaxDistance` per definition; an optional per-sound offscreen rule checks the viewport and margin. Pan/zoom do not trigger extra sound events.
 - **Owner lifetime:** loop/intermittent registrations hold weak references to `Node2D` owners. Deleted towers/enemies clean up on the next periodic scan. No per-frame lookup in tower code.
