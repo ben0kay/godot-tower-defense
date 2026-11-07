@@ -1,3 +1,11 @@
+## Original GameMaker typewriter sound — 2026-11-07
+
+The shared tactical narration card uses the original `snd_msg_tut.wav` from `ben0kay/SPACE-SHOOTER-TD-IDLE-CLICKER-HYBRID`, kept in `UI/Narration/Sounds/` and registered as `ui_narration_typewriter` through the existing `AudioManager` UI bus. The imported WAV loops while characters are revealed at the original game's approximate 30% volume (-10.5 dB); it stops immediately on typing completion, skip, replacement, pause, clear/results or unload, and resumes when typing is unpaused. No new per-character sound or polling loop.
+
+Tune `TypingSoundEnabled` / `TypingSoundId` in `DefaultNarrationConfig.tres`, and `VolumeDb` in `Sounds/TypewriterSound.tres`. The WAV `.import` selects forward looping. Any spoken mission briefing keeps its existing voice timing and hold behavior. Godot editor playback/import and mixing still require owner validation.
+
+---
+
 ## Content-sized narration cards — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** The shared card now grows vertically to fit the full wrapped message, including Level001's multi-paragraph briefing. `PanelWidth` remains the preferred width (clamped on narrow windows); `PanelHeight` is now the minimum height. RichTextLabel fits content and reveals characters after shaping, reserving the full message layout before typing so the box does not grow per character. Container minimum-size and viewport resize events recalculate height; shorter replacements shrink back to their own content/minimum. Existing typography, mouse transparency, voice hold, fade and idle sleep remain unchanged. Very long messages may extend past a very short viewport; no automatic scrolling or text truncation is introduced.

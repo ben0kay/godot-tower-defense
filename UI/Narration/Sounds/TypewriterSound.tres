@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="AudioDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://AUDIO/AudioDefinition.cs" id="1"]
+[ext_resource type="AudioStream" path="res://UI/Narration/Sounds/snd_msg_tut.wav" id="2"]
+
+[resource]
+script = ExtResource("1")
+Id = "ui_narration_typewriter"
+Stream = ExtResource("2")
+Mode = 1
+Category = 1
+Priority = 55
+MaximumInstances = 1
+Positional = false
+VolumeDb = -10.5
+PitchScale = 1.0
+FadeInSeconds = 0.0
+FadeOutSeconds = 0.0

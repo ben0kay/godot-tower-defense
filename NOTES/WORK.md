@@ -1,3 +1,9 @@
+## Original GameMaker narration typewriter audio — 2026-11-07
+
+Imported the original 5-second `snd_msg_tut.wav` from the old GameMaker hybrid repo into `UI/Narration/Sounds/`, with forward looping and a feature-local `ui_narration_typewriter` audio definition registered in the shared catalog. The shared `NarrationDisplay` starts its UI loop only when characters reveal and stops on completion, skip, replacement, pause, clear/results and scene unload; unpause restarts only while typing. Tuning: `UI/Narration/DefaultNarrationConfig.tres` enables/chooses the cue, `Sounds/TypewriterSound.tres` controls mix (~30% / -10.5 dB). Existing narration timing, voice hold and gameplay unchanged. Source review only; Godot import/playback/mixing owner validation pending.
+
+---
+
 ## Fighter lamps, disabled towers and terrain glow
 
 Wired the light attachment into the authored fighter, builder and cargo scenes. Disabled towers go dark until recovery. Buildable terrain and playable lava use chunked emissive accents, independent of the native light pool.

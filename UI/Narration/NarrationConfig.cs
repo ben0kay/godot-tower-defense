@@ -17,6 +17,12 @@ public partial class NarrationConfig : Resource
     public float FadeOutSeconds { get; set; } = .30f;
     #endregion
 
+    #region Typewriter Audio
+    [ExportGroup("Typewriter Audio")]
+    [Export] public bool TypingSoundEnabled { get; set; } = true;
+    [Export] public string TypingSoundId { get; set; } = "ui_narration_typewriter";
+    #endregion
+
     #region Top-Right Layout
     [ExportGroup("Layout - Top Right")]
     [Export(PropertyHint.Range, "220,700,10,suffix:px")]

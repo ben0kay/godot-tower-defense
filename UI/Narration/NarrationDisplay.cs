@@ -15,6 +15,8 @@ public partial class NarrationDisplay : CanvasLayer
     private float _elapsed, _typed;
     private int _totalCharacters;
     private bool _waitForVoiceEnd;
+    private bool _typingSoundRegistered;
+    private string _activeTypingSoundId = "";
     public bool IsActive => _phase != Phase.Hidden;
     public bool IsTyping => _phase == Phase.Typing;
     public int RevealedCharacters => _message?.VisibleCharacters ?? 0;
@@ -80,18 +82,51 @@ public partial class NarrationDisplay : CanvasLayer
     // Disconnect on HUD unload; no timer or per-wave event stays registered inside the display.
     public override void _ExitTree()
     {
+        StopTypingSound();
         GetViewport().SizeChanged -= LayoutCard;
         if (GodotObject.IsInstanceValid(_card)) _card.MinimumSizeChanged -= LayoutCard;
         SetProcess(false);
+    }
+    // =========================================================
+    // UI audio is normally allowed during a pause, but narration typing itself pauses.
+    // Stop and resume its registered loop on the same node pause transitions.
+    public override void _Notification(int what)
+    {
+        if (what == NotificationPaused) StopTypingSound();
+        else if (what == NotificationUnpaused && _phase == Phase.Typing) StartTypingSound();
     }
     #endregion
 
     #region Typewriter
     // =========================================================
+    // One non-positional UI loop per active typing message, owned by the existing audio manager.
+    private void StartTypingSound()
+    {
+        if (_typingSoundRegistered || Config?.TypingSoundEnabled != true ||
+            string.IsNullOrWhiteSpace(Config.TypingSoundId) || GetTree().Paused) return;
+        string soundId = Config.TypingSoundId;
+        if (AudioManager.Find(this)?.StartEmitter(soundId) != true) return;
+        _typingSoundRegistered = true;
+        _activeTypingSoundId = soundId;
+    }
+
+    // =========================================================
+    // Stop on completion, skip, replacement, pause, result or scene unload.
+    private void StopTypingSound()
+    {
+        if (!_typingSoundRegistered) return;
+        if (GodotObject.IsInstanceValid(AudioManager.Instance))
+            AudioManager.Instance.StopEmitter(_activeTypingSoundId);
+        _typingSoundRegistered = false;
+        _activeTypingSoundId = "";
+    }
+
+    // =========================================================
     // A new transmission replaces the previous one. Empty/disabled text removes the card immediately.
     public void ShowMessage(string text, string speaker = "", bool waitForVoiceEnd = false)
     {
         if (Config?.Enabled != true || string.IsNullOrWhiteSpace(text)) { Clear(); return; }
+        StopTypingSound();
         text = text.Trim();
         _speaker.Text = string.IsNullOrWhiteSpace(speaker) ? "TACTICAL COMMAND" : speaker.Trim();
         _message.Text = text;
@@ -108,6 +143,7 @@ public partial class NarrationDisplay : CanvasLayer
     public void FinishTyping()
     {
         if (!IsActive || _phase == Phase.FadingOut) return;
+        StopTypingSound();
         _message.VisibleCharacters = _totalCharacters;
         _typed = _totalCharacters; _elapsed = 0; _phase = Phase.Holding;
         _card.Modulate = Colors.White;
@@ -127,6 +163,7 @@ public partial class NarrationDisplay : CanvasLayer
     // Clear on an un-narrated wave, on mission result, or when a replacement is dismissed.
     public void Clear()
     {
+        StopTypingSound();
         _phase = Phase.Hidden; _elapsed = 0; _typed = 0; _totalCharacters = 0; _waitForVoiceEnd = false;
         if (GodotObject.IsInstanceValid(_card)) _card.Hide();
         SetProcess(false);
@@ -143,12 +180,12 @@ public partial class NarrationDisplay : CanvasLayer
         {
             case Phase.FadingIn:
                 _card.Modulate = new Color(1, 1, 1, Mathf.Clamp(_elapsed / Mathf.Max(.01f, Config.FadeInSeconds), 0, 1));
-                if (_elapsed >= Config.FadeInSeconds) { _elapsed = 0; _phase = Phase.Typing; }
+                if (_elapsed >= Config.FadeInSeconds) { _elapsed = 0; _phase = Phase.Typing; StartTypingSound(); }
                 break;
             case Phase.Typing:
                 _typed += dt * Mathf.Max(1f, Config.CharactersPerSecond);
                 _message.VisibleCharacters = Mathf.Min(_totalCharacters, Mathf.FloorToInt(_typed));
-                if (_message.VisibleCharacters >= _totalCharacters) { _elapsed = 0; _phase = Phase.Holding; }
+                if (_message.VisibleCharacters >= _totalCharacters) { StopTypingSound(); _elapsed = 0; _phase = Phase.Holding; }
                 break;
             case Phase.Holding:
                 if (_waitForVoiceEnd) { _elapsed = 0; break; }
