@@ -44,6 +44,7 @@ public partial class GameplayHUD : Control
 
     #region Cached Nodes
     private PanelContainer _topBar, _towerBar, _inspector;
+    private ScrollContainer _buildScroll;
     private HBoxContainer _bottomArea;
     private Control _traySlot;
     private Label _wave, _credits, _core, _towerName, _towerCategory, _towerStats, _towerNotes;
@@ -107,6 +108,8 @@ public partial class GameplayHUD : Control
         _topBar = GetNode<PanelContainer>("TopBar");
         _bottomArea = GetNode<HBoxContainer>("BottomArea");
         _towerBar = GetNode<PanelContainer>("BottomArea/TraySlot/TowerBar");
+        _buildScroll = GetNode<ScrollContainer>("BottomArea/TraySlot/TowerBar/Insets/Tray/Scroll");
+        _buildScroll.Resized += FitBuildGridColumns;
         _traySlot = GetNode<Control>("BottomArea/TraySlot");
         _traySlot.Resized += FitTrayToSlot;
         _inspector = GetNode<PanelContainer>("BottomArea/Inspector");
@@ -191,6 +194,7 @@ public partial class GameplayHUD : Control
     public override void _ExitTree()
     {
         if (GodotObject.IsInstanceValid(_input)) _input.Unbind(this);
+        if (GodotObject.IsInstanceValid(_buildScroll)) _buildScroll.Resized -= FitBuildGridColumns;
         if (_singleBuffer != null) _singleBuffer.Changed -= UpdateSingleCredits;
     }
 
@@ -260,7 +264,7 @@ public partial class GameplayHUD : Control
 
     #region Tower Selection and Inspector
     // =========================================================
-    // Render registered available metadata only; no tower scenes or combat loops are instantiated.
+    // Render registered level-one icon textures and metadata only; no tower scenes or combat loops are instantiated.
     // Call after Catalog.Rebuild when registration/availability changes, never each physics frame.
     public void BindCatalog(TowerCatalog catalog)
     {
@@ -271,23 +275,18 @@ public partial class GameplayHUD : Control
         {
             if (!definition.Available) continue;
             string id = definition.TowerId;
-            Button button = UIButtonFactory.Create(definition.DisplayName + "\n" + definition.Category + " · " +
-                TowerPresentation.DescribeResourceCosts(definition.DefaultConfig.ConstructionCosts),
-                () => EmitSignal(SignalName.TowerChoiceRequested, id), UIButtonStyle.TowerTile, height: 56f, config: Config);
+            Button button = TowerBuildCard.Create(definition,
+                () => EmitSignal(SignalName.TowerChoiceRequested, id), Config);
             button.MouseEntered += () => { if (!IsPlacementPresentation && _trayOpen && !_suppressRestoredHover) EmitSignal(SignalName.TowerPreviewRequested, id); };
             button.FocusEntered += () => { if (!IsPlacementPresentation && _trayOpen) EmitSignal(SignalName.TowerPreviewRequested, id); };
             button.Name = "Tower_" + entries.GetChildCount();
-            button.CustomMinimumSize = new Vector2(Config.TowerButtonWidth, 56f);
-            button.TooltipText = definition.Description;
-            button.Icon = definition.Icon;
-            button.ExpandIcon = true;
-            button.AddThemeConstantOverride("icon_max_width", 32);
             entries.AddChild(button);
             _buildButtons.Add(id, button); _buildCategories.Add(id, definition.Category);
         }
         if (_buildButtons.Count == 0)
             entries.AddChild(new Label { Text = "No towers available.", MouseFilter = MouseFilterEnum.Ignore });
         RebuildCategories();
+        FitBuildGridColumns();
     }
 
     // =========================================================
@@ -326,15 +325,25 @@ public partial class GameplayHUD : Control
     // Toggle visibility/focus states without rebuilding controls or polling the catalog.
     private void FilterBuildButtons()
     {
-        int visible = 0;
         foreach (var entry in _buildButtons)
-        {
             entry.Value.Visible = !BuildCategory.HasValue || _buildCategories[entry.Key] == BuildCategory.Value;
-            if (entry.Value.Visible) visible++;
-        }
-        GetNode<GridContainer>("BottomArea/TraySlot/TowerBar/Insets/Tray/Scroll/Buttons").Columns = Math.Max(1, (visible + 1) / 2);
+        FitBuildGridColumns();
         foreach (var entry in _categoryButtons) entry.Value.SetPressedNoSignal(entry.Key == (BuildCategory?.ToString() ?? "All"));
-        GetNode<ScrollContainer>("BottomArea/TraySlot/TowerBar/Insets/Tray/Scroll").ScrollHorizontal = 0;
+        _buildScroll.ScrollVertical = 0;
+    }
+
+    // =========================================================
+    // Fit complete, equal-width cards across the visible tray. Reserve room for the vertical
+    // scrollbar even when it has not appeared yet; do not calculate columns from tower count.
+    private void FitBuildGridColumns()
+    {
+        if (!GodotObject.IsInstanceValid(_buildScroll) || Config == null) return;
+        GridContainer grid = _buildScroll.GetNode<GridContainer>("Buttons");
+        const float gap = 7f;
+        const float scrollbarReserve = 20f;
+        float available = Mathf.Max(0f, _buildScroll.Size.X - scrollbarReserve);
+        int columns = Mathf.Max(1, Mathf.FloorToInt((available + gap) / (Config.TowerButtonWidth + gap)));
+        if (grid.Columns != columns) grid.Columns = columns;
     }
 
     // =========================================================

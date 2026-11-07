@@ -51,7 +51,7 @@ public partial class PlacementHudChecks : Node
 
     #region Stable Build Tray Regression
     // =========================================================
-    // Reserve Inspector space before hover, keep a blank shell and prove two rows/overflow with real catalog data.
+    // Reserve Inspector space before hover; keep cards equal-width and vertically scrollable.
     private async Task StableBuildTray()
     {
         using AmmoLoopFixture f = new(this);
@@ -81,9 +81,10 @@ public partial class PlacementHudChecks : Node
             rocket.EmitSignal(Control.SignalName.MouseEntered); await SettleTray();
             Require(body.Visible && tray.GetGlobalRect() == before && before.End.X <= panel.GetGlobalRect().Position.X,
                 "Hover cannot move tray or cover Rocket at " + size);
-            Require(entries.Columns == (f.Placement.Catalog.Definitions.Count(d => d.Available) + 1) / 2 &&
-                entries.Size.Y <= 121 && scroll.GetVScrollBar().Visible == false
-                && scroll.Size.Y >= entries.Size.Y + (scroll.GetHScrollBar().Visible ? scroll.GetHScrollBar().Size.Y : 0), "Compact two-row buttons and horizontal scrollbar fit vertically");
+            Require(entries.Columns >= 1 && scroll.GetVScrollBar().MaxValue > scroll.Size.Y
+                && !scroll.GetHScrollBar().Visible && hud.GetBuildButton("battle").CustomMinimumSize.X == hud.Config.TowerButtonWidth
+                && hud.GetBuildButton("blaster_cannon").CustomMinimumSize == hud.GetBuildButton("battle").CustomMinimumSize,
+                "Uniform tower cards use a vertical wheel-scroll grid without horizontal clipping");
             scroll.EnsureControlVisible(rocket); await SettleTray();
             Vector2 cursor = rocket.GetGlobalRect().GetCenter();
             GetViewport().PushInput(new InputEventMouseMotion { Position = cursor, GlobalPosition = cursor, Relative = Vector2.One });
@@ -102,13 +103,16 @@ public partial class PlacementHudChecks : Node
             many.Definitions.Add(new TowerDefinition { TowerId = "tray-layout-" + n, Scene = source.Scene,
                 DefaultConfig = source.DefaultConfig, Icon = source.Icon, Category = source.Category });
         many.Rebuild(); hud.BindCatalog(many); await SettleTray();
-        Require(entries.Columns == 20 && entries.Size.Y <= 121 && scroll.GetHScrollBar().MaxValue > scroll.Size.X,
-            "Forty entries remain two rows and overflow horizontally");
+        Require(entries.Columns >= 1 && entries.Size.Y > scroll.Size.Y && scroll.GetVScrollBar().MaxValue > scroll.Size.Y
+            && !scroll.GetHScrollBar().Visible, "Forty entries extend downward in the clipped vertical grid");
         scroll.EnsureControlVisible(hud.GetBuildButton("tray-layout-39")); await SettleTray();
-        Require(scroll.ScrollHorizontal > 0 && tray.GetGlobalRect().End.X <= panel.GetGlobalRect().Position.X, "Final tile scrolls into reserved tray");
+        Require(scroll.ScrollVertical > 0 && tray.GetGlobalRect().End.X <= panel.GetGlobalRect().Position.X,
+            "Last tile is reachable by vertical scrolling without overlapping Inspector");
         hud.BindCatalog(f.Placement.Catalog); hud.SelectBuildCategory(TowerDefinition.TowerCategory.Economy); await SettleTray();
-        Require(entries.Columns == 1, "Filtering recomputes two-row columns without empty gaps");
-        GD.Print("PASS: blank Ctrl shell, stable non-overlapping Rocket tray, two-row categories and forty-tile horizontal scrolling at three sizes");
+        Require(entries.Columns >= 1 && scroll.ScrollVertical == 0
+            && hud.GetBuildButton("ammo_factory").Visible && !hud.GetBuildButton("battle").Visible,
+            "Category filtering preserves the responsive grid and resets vertical scroll");
+        GD.Print("PASS: blank Ctrl shell, stable non-overlapping Rocket tray, equal-size icon cards and forty-tile vertical scrolling at three sizes");
     }
     // =========================================================
     // Native containers settle before geometry assertions; there is no wall-clock delay.

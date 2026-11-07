@@ -33,8 +33,11 @@ public static class TowerBuildBarChecks
         Require(entries.GetChildCount() == 39 && hud.GetBuildButton("variant-5") == null &&
             main.GetNode("World/Towers").GetChildCount() == active, "Arbitrary registered types render without inactive placeholders or live tower instances");
         Button last = hud.GetBuildButton("variant-39");
-        Require(last.Text.Contains("240 Credits") && last.Icon == battle.Icon && last.FocusMode == Control.FocusModeEnum.All,
-            "Generated button reads canonical recipe/art and retains keyboard focus");
+        Require(last.GetNode<Label>("Content/Text/Details").Text.Contains("240 Credits")
+            && last.GetNode<TextureRect>("Content/Icon").Texture == battle.Icon
+            && last.GetNode<Label>("Content/Text/Title").Text == "Test variant 39"
+            && last.FocusMode == Control.FocusModeEnum.All,
+            "Generated uniform card reads the authored level-one art, price and text; retains keyboard focus");
         string requested = null;
         void Chosen(string id) => requested = id;
         hud.TowerChoiceRequested += Chosen;
@@ -47,12 +50,13 @@ public static class TowerBuildBarChecks
         await hud.ToSignal(hud.GetTree(), SceneTree.SignalName.ProcessFrame);
         await hud.ToSignal(hud.GetTree(), SceneTree.SignalName.ProcessFrame);
         ScrollContainer scroll = entries.GetParent<ScrollContainer>();
-        Require(scroll.GetHScrollBar().MaxValue > scroll.Size.X && scroll.GetGlobalRect().End.X <= hud.GetGlobalRect().End.X,
-            "Large catalog scrolls inside viewport without widening the HUD");
+        Require(scroll.GetVScrollBar().MaxValue > scroll.Size.Y && !scroll.GetHScrollBar().Visible
+            && scroll.GetGlobalRect().End.X <= hud.GetGlobalRect().End.X,
+            "Large catalog scrolls vertically without overflowing the tray horizontally");
         scroll.EnsureControlVisible(last);
         await hud.ToSignal(hud.GetTree(), SceneTree.SignalName.ProcessFrame);
         await hud.ToSignal(hud.GetTree(), SceneTree.SignalName.ProcessFrame);
-        Require(scroll.ScrollHorizontal > 0, "Last registered entry is reachable via scrolling");
+        Require(scroll.ScrollVertical > 0, "Last registered entry is reachable by scrolling down");
         hud.SetTowerBarOpen(false, true);
         Require(!hud.IsInspectionVisible, "Closing large tray clears active build-preview Inspector");
         placement.Call("CancelPlacement");

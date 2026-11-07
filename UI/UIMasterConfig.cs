@@ -13,7 +13,7 @@ public partial class UIMasterConfig : Resource
     [Export(PropertyHint.Range, "180,600,1")] public int InspectorHeight { get; set; } = 252;
     [Export(PropertyHint.Range, "0.5,1,0.01")] public float BottomPanelOpacity { get; set; } = 0.90f;
     [Export(PropertyHint.Range, "0,36,1")] public int EdgeMargin { get; set; } = 12;
-    [Export(PropertyHint.Range, "80,180,1")] public int TowerButtonWidth { get; set; } = 112;
+    [Export(PropertyHint.Range, "150,260,1")] public int TowerButtonWidth { get; set; } = 200;
 
     #endregion
 
