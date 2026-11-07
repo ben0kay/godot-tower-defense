@@ -1,3 +1,9 @@
+## EX1-A first-ring research milestone — 2026-11-06
+
+**PLAN ONLY — NOT IMPLEMENTED.** First delivery is explicitly **Core + exactly one functional 1-RP starter upgrade in each of six divisions**: keep the existing Citadel Master I and Battle Tower Weapons I, and add Reinforced Fighter Hulls, Stealth Enhancement I, Mass Production I and Capacitor Banks I. These are six independent siblings of the Core, each buyable in any order, with real effects on the next deployment. **Stop after the four additions**; later EX1-B/C and EX2 upgrades are optional fan-out work, not part of the first task. [Exact six-node implementation handoff](RESEARCH_EXPANSION_IMPLEMENTATION_PLAN.md#ex1-a--first-deliverable-six-functioning-starter-branches-owner-selected).
+
+---
+
 ## Six-branch Research Expansion plan — 2026-11-06
 
 **PLAN ONLY — NOT IMPLEMENTED.** The owner selected a six-division technology tree (Weapons, Citadel, Industry, Energy, Recon and Drones) as the baseline for expanding the current three-node Research Room. The [Codex-ready implementation plan](RESEARCH_EXPANSION_IMPLEMENTATION_PLAN.md) specifies unique axial paths, 36 proposed paid nodes (34 additional), real effect/mission/save integration, and staged EX1-A/B/C → EX2 capstones, with future optional Dark Matter convergence. All existing three node IDs/positions/costs/effects stay unchanged. Current supported effect kinds and gameplay remain as described below until a phase is separately implemented.

@@ -1,3 +1,9 @@
+## Six starter Research branches — first implementation milestone clarified — 2026-11-06
+
+**Plan/documentation only; no new research nodes or gameplay source changed.** Clarified EX1-A as a complete, standalone first ring: preserve Core/Citadel Master I/Battle Tower Weapons I; add only four genuine 1-RP upgrades for Drone hull HP, Stealth Beacon detection range, initial tower construction duration and tower capacitor capacity. Each of six first-tier nodes depends only on the free Core and can be purchased in any order. Specified stable IDs/hexes, the real effect owners, next-deployment/saving compatibility, no dummy unlocks and an explicit Codex stop point. Optional EX1-B/C and EX2 remain future fan-out, not part of the first phase. Linked milestone from Research README and outstanding backlog.
+
+---
+
 ## VE3 — paintable industrial accents — 2026-11-06
 
 Added 32 transparent cyan/amber shapes in static source 1 and animated source 2 of the existing Decorations TileSet. The animated TileData uses shared MetalPulse materials with a static switch. The legacy source 0 and all painted maps retain their existing data. Checked Godot 4.6.3 renderer source for per-tile material isolation and placed all 65 tile choices in a headless scratch project. Desktop appearance, seams and FPS await owner review. See [atlas coordinates](../WORLD/TERRAIN/Tiles/Decorative/README.md).

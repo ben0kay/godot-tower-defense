@@ -5,9 +5,47 @@
 **Status:** **Owner-selected design baseline / implementation PLAN ONLY. No new nodes or effects have been added to the game by this document.**  
 **Source of ideas:** the owner's childhood GameMaker research notes, adapted to modern Godot tower damage, construction, power islands, fighters, real ammo logistics and mission progression. Research costs, effect strengths, node order and unlock restrictions below are **provisional modern proposals**, not literal original-game balances.
 
+## EX1-A — First deliverable: six functioning starter branches (OWNER-SELECTED)
+
+**This is the implementation milestone to do first and it can stand alone indefinitely.** The owner wants **one real purchasable starting upgrade in each of the six branches**, radiating from the existing Research Core, with the option to *fan outward later* only when specific additional upgrades are requested. **EX1-B, EX1-C, EX2 and EX3 are optional future extensions, not dependencies, not part of an EX1-A request, and not authorization to populate the rest of the graph.**
+
+The game already has the **first two** starter upgrades. **Codex builds exactly four additional upgrades**, resulting in **seven nodes total: 1 free Core + 6 real first-tier purchases**:
+
+| First-ring branch | Upgrade | Stable research ID | Position | RP | Gameplay effect | EX1-A task |
+| --- | --- | --- | --- | ---: | --- | --- |
+| **Citadel Defence** | Citadel Master I | `citadel_master_1` | `(1,0)` | 1 | +10% initial/max Citadel HP | **Existing — preserve unchanged** |
+| **Drone Technology** | Reinforced Fighter Hulls | `reinforced_fighter_hulls` | `(0,1)` | 1 | +10% maximum/current hull HP on newly purchased fighters in a newly deployed mission | **Implement** |
+| **Reconnaissance** | Stealth Enhancement I | `stealth_enhancement_1` | `(-1,1)` | 1 | +10% effective Stealth Beacon detection/scanning range | **Implement** |
+| **Weapons Technology** | Battle Tower Weapons I | `battle_weapons_1` | `(-1,0)` | 1 | +5% Battle Tower damage | **Existing — preserve unchanged** |
+| **Industry & Logistics** | Mass Production I | `mass_production_1` | `(0,-1)` | 1 | -5% time for newly scheduled tower construction | **Implement** |
+| **Energy Engineering** | Capacitor Banks I | `capacitor_banks_1` | `(1,-1)` | 1 | +10% maximum internal energy capacity of newly deployed eligible towers | **Implement** |
+
+**The six starter nodes are all independent siblings of the Core.** Their *only* prerequisite is `research_core` (automatically researched), so the player can purchase **any of the six in any order** without buying another division's upgrade. Each costs 1 RP; they are **separate permanent profile purchases**, not one six-for-one purchase. Preserve the existing two nodes' effects, prices, IDs and coordinates exactly. All four additions require real runtime effects—no empty research placeholders.
+
+### Codex EX1-A deliverable boundaries
+
+- **Catalog/UI:** Author only the four new `ResearchDefinition` entries in the existing `DefaultResearchCatalog.tres`, each with the stable ID, coordinate, single Core prerequisite, 1 RP cost and truthful effect description above. The existing `ResearchGraph` should display the Core with six directly connected hexagons. ResearchMenu must correctly state each real bonus, price, LOCKED/AVAILABLE/INSUFFICIENT RP/RESEARCHED, without changing the usual selection/zoom/pan/keyboard/purchase flow. Do not create six separate root nodes or research rooms.
+- **Effect wiring:** Extend `ResearchEffectKind` by **appending** supported new kinds (preserve numeric identities `None=0`, `CitadelMaxHealthPercent=1`, `TowerDamagePercent=2`); update catalog validation, immutable `ResearchDeployment` (and compatible checkpoint snapshot), display and the actual existing gameplay owner. Reuse domain-level typed bonuses rather than checking individual research IDs in towers, fighters, logistics or UI. Any new static stat resource/integer rounding should be deterministic and display actual effective value.
+- **Fighter hull:** Apply the researched +10% to a **newly purchased fighter** using its existing station/fighter creation/max-health owner, based on the deployment's frozen research snapshot. Do not heal or rescale existing saved fighters, alter FD4.1 targeting, FD5 station stock/service/ammo/repair pricing or manufacture fighters.
+- **Stealth Beacon range:** Apply +10% to its **actual scan/detection area and any corresponding visible sector**, reusing the existing directional SE2 scanning system; avoid divergent range visuals, spatial index loops or stealth leaks to unrelated towers.
+- **Construction time:** Apply -5% to the **duration when new tower construction is scheduled** using the current shared construction workflow; do not shorten in-progress/restored jobs, change paid costs, completion events or builder/courier flight speeds. Ensure correct Inspector previews if they currently show construction duration.
+- **Capacitor maximum:** Apply +10% to the maximum internal buffer in the shared power consumer system, **not** generation rate, stored starting energy, recharge ceiling, island supply or `NoPower` policy. Preserve available charge as-is when the larger capacity is applied (do not give a free +10% charge), clamp safely and show the correct capacitor total in existing ENERGY telemetry.
+- **Permanence/saves:** Purchase commits RP + stable ID atomically via the existing `ResearchService` guard; purchased upgrades affect **future deployments**, not the currently running mission. Existing profiles and Citadel/Battle research stay intact. New checkpoint fields must be optional/default-neutral; old checkpoint/research data must restore without free stock/HP or double application. Research UI should not access battlefield services on every frame.
+- **Strict stop point:** EX1-A must end with **exactly four new purchases** and **six total first-tier branches**. **Do not implement EX1-B/C, unlock future tiers, show fake locked tiers, add the 36-node catalog, extra RP sources, rework UI architecture, introduce Dark Matter/Zy0n resources, or invent a new research-slot system.** The later coordinates/catalog tables in this document are planning references for future requests only.
+
+### EX1-A acceptance (short owner-led check)
+
+A new/test profile sees **Core + six surrounding starter purchases** immediately. The two original purchases are still owned on an already-researched profile; otherwise any first-tier branch is buyable for 1 RP. Each new upgrade saves once; reentering the room retains RESEARCHED state, no double RP deduction, and starting a *new mission* produces the stated mechanical bonus. Compare fighter hull values, Beacon arc/radius, new-build construction time and tower capacitor capacity **against a control without research**. Verify old profile/save/restore behaviour. Codex performs focused source review and at most one basic build when practical; owner checks Godot gameplay/visuals.
+
+### Expansion later, without rebuilding EX1-A
+
+Once EX1-A is delivered, the six starter hexes become permanent **anchor/prerequisite nodes**. The additional coordinates, unique IDs and prerequisite chains already listed in §3 show how to extend each branch one or two nodes at a time. A later EX1-B/EX1-C task may add only an approved division (e.g., **Citadel Master II** next to **Citadel Master I**), rather than requiring all divisions at once. New branches must not rename/move earlier nodes or invalidate saved purchases. **The game remains complete as a six-branch starter Research Room even if no later phases are ever requested.**
+
+---
+
 ## 1. Target and what already exists
 
-Turn the currently very small Research Room into an interconnected **six-direction technology tree**, with distinct Weapons, Citadel, Industry, Energy, Recon and Drone branches radiating from **one existing free Research Core**. Users progressively unlock connected technologies; locked nodes remain visibly connected and show requirements. A first substantial delivery targets **24 purchased nodes total (22 new + 2 existing), distributed across all six branches**; the longer catalog contains **36 purchased nodes total (34 new), plus the free core**. Stage hard capstones separately; no filler/pretend research.
+Turn the currently very small Research Room into an interconnected **six-direction technology tree**, with distinct Weapons, Citadel, Industry, Energy, Recon and Drone branches radiating from **one existing free Research Core**. Users progressively unlock connected technologies; locked nodes remain visibly connected and show requirements. **The selected first playable deliverable is EX1-A:** **six existing/new first-tier purchases (two already present + four new), plus the free Core**. All six work independently and the owner can stop there. The *optional, future* expanded catalog contains **36 paid nodes total (34 new), plus the free Core**; do not build additional nodes until requested. Stage hard capstones separately; no filler/pretend research.
 
 The live `dev` catalog currently contains exactly **three displayed nodes**, not three separate research branches:
 - `research_core` — free at axial `(0,0)`.
@@ -123,14 +161,9 @@ Bounded capacitors, transmission, cooling and powered weapon trade-offs.
 
 ## 4. Staged Codex implementation handoff
 
-### EX1-A — Six visible research divisions / first-ring completion
+### EX1-A — Six visible research divisions / first-ring completion (implement **this phase only** first)
 
-**Four new nodes:** `reinforced_fighter_hulls`, `stealth_enhancement_1`, `mass_production_1` and `capacitor_banks_1`. The other first-ring nodes, `citadel_master_1` and `battle_weapons_1`, are already shipped. Integrate these four with small, typed, actual deployment effects before adding to `DefaultResearchCatalog.tres`. Result: Core + **six functioning first-tier branches** (seven visible nodes).
-
-- Extend the research effect vocabulary/resolver with explicit finite effects. Prefer typed bounded fields grouped by real consumer rather than one special case per ID or a generic `effectName` string.
-- Cache the selected profile's purchased bonuses **once** per new deployment using the existing `ResearchDeployment` approach. Research remains profile-permanent and never changes an already active battlefield retroactively.
-- Construction reduction must modify scheduled *new* work through existing construction cost/time owners; it must not shorten running jobs on load. Capacitor capacity and Beacon range must respect existing per-tower stats and limits. Fighter max HP is for **newly deployed / purchased** fighters and must not alter already-saved health without an explicit restore policy.
-- Add one real `.tres` node per supported effect, existing stable IDs intact. Node descriptions and ResearchMenu's effect text must state the actual behaviour accurately.
+**Codex contract:** Follow the **EX1-A first-deliverable specification at the top of this plan**. Reuse the existing Research Core, Citadel Master I and Battle Tower Weapons I and add **exactly four** real 1-RP nodes: `reinforced_fighter_hulls`, `stealth_enhancement_1`, `mass_production_1`, `capacitor_banks_1`. All six first-tier purchases directly depend only on the Core and are independently available from the start. Their effects apply from new deployment; preserve saved purchased IDs and the world/checkpoint lifecycle. Do not implement further tiers automatically. **Result: exactly seven displayed nodes, one central Core plus one paid starter upgrade in each of six branches.**
 
 ### EX1-B — Six linear second-tier extensions
 
@@ -170,6 +203,6 @@ Keep the total at **six primary divisions**. A *later* shared research convergen
 4. **Visual check (owner):** Read 36-node mock coordinates at gameplay UI sizes before shipping full EX2; ensure controls, selected info, legible hex text and ResetView stay practical. Graph should be visibly a *branching hex tree*, not six isolated columns of buttons.
 5. **Minimal implementation verification:** Codex reads root README, `NOTES/CodePreferences.md`, this plan, feature docs and actual `dev` HEAD. Make one focused code job/subphase at a time; source/diff sanity plus at most one basic build if practical, no routine large fixtures/regressions. Update brief `NOTES/WORK.md` status and this plan's delivered stages, commit/push `dev` only. In-game gameplay, appearance and FPS validation remain with owner.
 
-**Handoff request when ready:** “Implement **EX1-A**, the six-branch Research Room first ring, following `SYSTEMS/Progression/Research/RESEARCH_EXPANSION_IMPLEMENTATION_PLAN.md`. Preserve existing three nodes and IDs, make the four new effects real using the existing research pipeline, perform lightweight checks, document briefly and commit/push to `dev`.”
+**Handoff request when ready:** “Implement **EX1-A ONLY — six independent starter research branches** from `SYSTEMS/Progression/Research/RESEARCH_EXPANSION_IMPLEMENTATION_PLAN.md`. Preserve Research Core, Citadel Master I and Battle Tower Weapons I, and add precisely the four real 1-RP first-ring upgrades (fighter hull HP, Stealth Beacon range, tower construction time, tower capacitor capacity). Each of six first-tier purchases needs only the free Core. End at seven total displayed nodes; do not add EX1-B/EX1-C/EX2 research yet. Keep current profile purchases, frozen next-deployment effects, save compatibility, shared systems and lightweight checks. Update notes, commit and push to `dev`.”
 
 **This Markdown plan does not add any nodes, gameplay effects, UI elements or new research purchases to the current game.**
