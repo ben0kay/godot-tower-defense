@@ -1,6 +1,6 @@
 # Enemy Movement — Route Preview Overlay and Portal Checkpoint Areas
 
-> **STATUS: ROUTE PREVIEW AND REQUIRED CHECKPOINT AREAS IMPLEMENTED.** F3 opens the debug route panel. The first-pass direct portal-to-Citadel overlay is implemented; checkpoint nodes/stages and checkpoint-aware previews are now implemented. See WORLD/ROUTING/RouteCheckpoint/README.md for authoring and TESTS/Navigation/Checkpoints.md for actual tests and bounded-sampling limitations. Read the latest GitHub commit, `NOTES/CodePreferences.md`, `ENEMIES/Movement/README.md`, `WORLD/NAVIGATION/README.md`, `WORLD/PORTALS/EnemyPortal/README.md` and the relevant scripts before implementing. Preserve existing movement, combat, terrain, wave, and placement behavior.
+> **STATUS: ROUTE PREVIEW AND REQUIRED CHECKPOINT AREAS IMPLEMENTED.** F3 opens the debug route panel. The first-pass direct portal-to-Citadel overlay is implemented; checkpoint nodes/stages and checkpoint-aware previews are now implemented. See WORLD/ROUTING/RouteCheckpoint/README.md for authoring and TESTS/Navigation/Checkpoints.md for actual tests and bounded-sampling limitations. Read the latest GitHub commit, `CodePreferences.md`, `ENEMIES/Movement/README.md`, `WORLD/NAVIGATION/README.md`, `WORLD/PORTALS/EnemyPortal/README.md` and the relevant scripts before implementing. Preserve existing movement, combat, terrain, wave, and placement behavior.
 
 ## Why this is needed
 

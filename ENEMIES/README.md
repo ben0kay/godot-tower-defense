@@ -100,7 +100,7 @@ See **[enemypathing.md](enemypathing.md)** for the standalone Phase N4 implement
 
 **Design goal:** Support many enemy types—fast scouts, heavy tanks, generators, carriers, electrical ships, attackers, healers, stealth units, bosses and hybrids—without growing `Enemy.cs` into a giant switch on IDs or writing a full replacement AI/spawn/health script for each one. An enemy may have **zero, one or several independent optional abilities**. Keep ordinary enemies lightweight: speed, HP, shield *capacity*, Citadel damage, reward and navigation radius are already `EnemyDefinition` data.
 
-**E2A/E2B/E3A are implemented; E3B remains a separate future pass.** This section records the accepted contracts and future roadmap. Preserve all previously implemented wave, shield, navigation, tower, audio and UI features. Prefer compact C#, `[GlobalClass]` Inspector-editable Resources, exported scene references when appropriate, method separators and feature READMEs as described in `NOTES/CodePreferences.md`.
+**E2A/E2B/E3A are implemented; E3B remains a separate future pass.** This section records the accepted contracts and future roadmap. Preserve all previously implemented wave, shield, navigation, tower, audio and UI features. Prefer compact C#, `[GlobalClass]` Inspector-editable Resources, exported scene references when appropriate, method separators and feature READMEs as described in `CodePreferences.md`.
 
 ### Actual existing code versus future components
 
@@ -452,7 +452,7 @@ Test multiple ships, multiple buildable placements, navigation revision/repath b
 
 ## Project conventions
 
-**C#/.NET only, not GDScript.** Follow `NOTES/CodePreferences.md`: short header comments explaining scripts, `// =========================================================` above methods, reasonable `#region` blocks, Inspector `[Export]` / `[ExportGroup]`, compact reusable code, and a README in each feature folder. Keep per-enemy nodes minimal; one central registry and a bounded navigation-request manager support future hundreds of ships. Refer to the user's existing `isometric-new-2d` project when appropriate.
+**C#/.NET only, not GDScript.** Follow `CodePreferences.md`: short header comments explaining scripts, `// =========================================================` above methods, reasonable `#region` blocks, Inspector `[Export]` / `[ExportGroup]`, compact reusable code, and a README in each feature folder. Keep per-enemy nodes minimal; one central registry and a bounded navigation-request manager support future hundreds of ships. Refer to the user's existing `isometric-new-2d` project when appropriate.
 
 **Current status:** Enemy001, finite waves, kill rewards, Citadel HP/damage, shield-capacity opt-in, the economy wallet, 4A/4B generic tower catalog/UI and tested baseline navigation are implemented. `TESTS/Integration/EnemyIntegrationChecks.tscn` exercises the integrated systems. Larger-ship route edge cases, ship separation, flow fields, reusable enemy abilities, enemy attacks and advanced target priorities remain future work. The E2A/E2B/E3A/E3B roadmap above supersedes the historical initial implementation plan.
 

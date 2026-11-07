@@ -2,9 +2,9 @@
 
 > **Applies only to:** `ben0kay/godot-tower-defense` (Godot 4 .NET / C#, 2D).
 > **Default development branch:** `dev`; `main` is stable and is updated only when the owner explicitly requests it.
-> **Start here:** Read the [root README](../README.md) for the game's direction and current structure, then the owning feature README/notes and relevant code. Reference repositories are examples, not permission to import their architectures.
+> **Start here:** Read the [project overview](project.md) for the game's direction and current structure, then the owning feature README/notes and relevant code. Reference repositories are examples, not permission to import their architectures.
 
-These preferences guide both AI-assisted and manual development. **Keep the existing Tower Defense game modular, approachable and performance-conscious.** Favour a simple, understandable solution over a large framework. The near-term priority is a polished, playable Tower Defense game; the README's possible future multi-genre integration is **not** authorization for premature refactoring.
+These preferences guide both AI-assisted and manual development. **Keep the existing Tower Defense game modular, approachable and performance-conscious.** Favour a simple, understandable solution over a large framework. The near-term priority is a polished, playable Tower Defense game; project.md's possible future multi-genre integration is **not** authorization for premature refactoring.
 
 ## Branch workflow (2026-10-26 — preserved from `dev`)
 
@@ -15,7 +15,7 @@ These preferences guide both AI-assisted and manual development. **Keep the exis
 
 ## Before every AI task
 
-1. Confirm the **repository, branch, requested scope and actual files** before editing. Read the root README, this file and the relevant feature documentation; check the current code rather than trusting older plans alone. If an `AGENTS.md` exists, read it as well.
+1. Confirm the **repository, branch, requested scope and actual files** before editing. Read the root project.md, this file and the relevant feature documentation; check the current code rather than trusting older plans alone. If an `AGENTS.md` exists, read it as well.
 2. Identify the feature's current owner and reuse existing shared systems, scene patterns and configuration instead of building parallel implementations.
 3. Keep the change **focused**. Preserve unrelated work, authored levels, balance and visuals unless the task explicitly includes them. Don't add speculative features or refactor unrelated systems.
 4. Prefer **one Git commit per authorized job**, not many small commits. Push authorized work by default unless the owner says not to; report the commit SHA and changed files. Never force-reset, force-push or overwrite unrelated changes.

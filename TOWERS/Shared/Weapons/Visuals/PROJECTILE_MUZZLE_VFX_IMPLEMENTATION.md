@@ -13,7 +13,7 @@ Think crisp and restrained, not heavy particles or full-screen bloom. Combat mec
 
 ## Read current code before making changes
 
-- `NOTES/CodePreferences.md`, `TOWERS/Shared/Weapons/README.md`, `TOWERS/Shared/Projectiles/README.md` and appropriate per-tower READMEs.
+- `CodePreferences.md`, `TOWERS/Shared/Weapons/README.md`, `TOWERS/Shared/Projectiles/README.md` and appropriate per-tower READMEs.
 - `TOWERS/Shared/Projectiles/BasicProjectile.cs`: the current `_Draw()` draws a **3-pixel circle**; projectile movement is guided and may change direction during flight. Its separate `DamageInfo` and optional `StatusEffectPayload` handling must remain intact.
 - `TOWERS/Offensive/BattleTower/BattleTower.cs` + `BattleTower.tscn`: still spawns a bullet from the **tower root/global center**. Has a rotating `TurretPivot/Sprite` but currently **no muzzle Marker2D**. Add one aligned to the actual visible barrel tip.
 - `TOWERS/Shared/Weapons/MultiBarrel/ProjectileTurretBase.cs`: already selects `Marker2D` children in `TurretPivot/Muzzles`, spawns a projectile from each selected muzzle, charges ammunition, and supports Single/Sequential/Simultaneous via `BarrelFireController`. The current Machine Gun has `MuzzleA (-9,-25)` and `MuzzleB (9,-25)`; do not replace this selector.

@@ -178,7 +178,7 @@ Shared spatial targeting and area queries are implemented behind the world Enemy
 - Favor cached per-tower state, event-driven updates and budgeted/staggered operations; avoid one scene-tree search, resupply route solve or stat recalculation for **every** tower **every** frame. Target 500+ enemies without unnecessary per-frame allocation.
 - Future save/load should persist source data (type, position, purchased level, XP/rank inputs, health/shield/ammo, construction/reload progress, as needed), then rebuild derived final stats. Do not serialize `FinalStats` as a replacement for actual state.
 - Other separate future decisions: selling, rotated/irregular footprints, additional support/production tower mechanics, line-of-sight, special rank abilities and player research/active effects.
-- Read `NOTES/CodePreferences.md` plus each feature's current README before working. Follow compact C#, labeled rows, comment separators, realistic Godot/compile tests and precise documentation. Never claim tests ran if they did not.
+- Read `CodePreferences.md` plus each feature's current README before working. Follow compact C#, labeled rows, comment separators, realistic Godot/compile tests and precise documentation. Never claim tests ran if they did not.
 
 ## Reserved future infrastructure folders — README-only
 

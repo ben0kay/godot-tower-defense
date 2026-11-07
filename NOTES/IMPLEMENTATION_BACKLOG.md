@@ -2,7 +2,7 @@
 
 **Repository:** `ben0kay/godot-tower-defense` · **Branch:** `dev` · **Audited:** 2026-11-06 · **Source baseline:** [`e1a68dd77f`](https://github.com/ben0kay/godot-tower-defense/commit/e1a68dd77f90e1c8f90cad5d24c314caef098eb0)
 
-This is the **live unfinished-work index**, not a cumulative changelog. Completed/source-delivered phases have been **removed**, including the old dated receipts and duplicate 26-area status table. Their implementation history remains in [WORK.md](WORK.md), the [root README](../README.md) and owning feature documents. Read actual `dev` source before scheduling any job; this snapshot can become stale.
+This is the **live unfinished-work index**, not a cumulative changelog. Completed/source-delivered phases have been **removed**, including the old dated receipts and duplicate 26-area status table. Their implementation history remains in [WORK.md](WORK.md), the [historical devlog](../devlog.md) and owning feature documents. Read actual `dev` source before scheduling any job; this snapshot can become stale.
 
 **Status definitions:** **Planned** = an existing phase/feature guide, not yet fully implemented; **Needs scope/approval** = design decision or idea, not permission to code; **Owner QA** = source already delivered, not an unimplemented pass. A source commit is *not* automatically in-game acceptance. These rows are recommendations for **remaining work**, not blanket authorization.
 
@@ -80,7 +80,7 @@ The canonical original idea IDs and fuller wording remain in [Ideas.md](Ideas.md
 
 Feature guides contain older historical “planned/not implemented” passages below newer implemented updates. These are **not** new engine work; fix their status only when touching that feature, or perform one separate Markdown-only cleanup later.
 
-- [ ] Refresh older root [README](../README.md) controls/F2/catalog, mission/research/save descriptions, and old fighter/spawning entries against latest source.
+- [x] Replace the former root README with [project.md](../project.md) as the current overview and preserve the dated implementation history in [devlog.md](../devlog.md). Older devlog claims are historical and can be superseded.
 - [ ] Correct [LEVELS/README.md](../LEVELS/README.md) and [Performance findings](AGENT_FINDINGS/Performance.md) references to retired five-wave Level100 recipes; current benchmark is two 400/500-ship waves.
 - [ ] Mark obsolete planned-only paragraphs as **historical** where contradicted by source in [fighter plan](../DRONES/Combat/FIGHTER_DRONES_IMPLEMENTATION_PLAN.md), [spawning plan](../ENEMIES/Spawning/IMPLEMENTATION_PLAN.md), [wave README](../LEVELS/Waves/README.md), [power plan](../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md) and [Restoration plan](../TOWERS/Support/RepairTower/IMPLEMENTATION_PLAN.md).
 - [ ] On a targeted pass, reconcile old “not implemented” prose in enemy weapons, construction drones, wave narration, terrain edges, environment, old recoil/muzzle/projectile guides, Results/progression, Economy production, Campaign, Saving, World, tower roadmap and Audio. **Do not delete design notes or rename stable paths.** See current source and [WORK history](WORK.md).
@@ -90,4 +90,4 @@ Feature guides contain older historical “planned/not implemented” passages b
 
 - **Not approved by this list:** optional `PowerPriority` slider, intentionally reverted VE5C bloom, new mid-combat or multi-slot saving, speculative empire/shooter integration, or sweeping balance changes. Get separate approval before scoping any of these.
 - **Never confuse QA with missing mechanics.** Only add tasks that still lack source or a specific confirmed bug fix. Source-implemented phases should remain in feature documents/WORK history, **not migrate back into this backlog** after a future audit.
-- For a chosen job: read [CodePreferences](CodePreferences.md), root README, owning feature docs and fresh `dev` source; implement one clear slice; keep gameplay/save/performance boundaries; note the implementation briefly in WORK; commit and push `dev` only. This file records remaining work but grants no blanket build authorization.
+- For a chosen job: read [CodePreferences](../CodePreferences.md), [project.md](../project.md), owning feature docs and fresh `dev` source; implement one clear slice; keep gameplay/save/performance boundaries; note the implementation briefly in WORK; commit and push `dev` only. This file records remaining work but grants no blanket build authorization.

@@ -1,6 +1,6 @@
 # Enemy Pathing — Corridor-Aware Individual Route Variation (Phase N4, IMPLEMENTED — visual playtest pending)
 
-> **Codex implementation specification — NOT IMPLEMENTED.** This document lives in `ENEMIES/` and is linked from `ENEMIES/README.md`. It is a focused optional navigation feature, separate from Enemy E2A/E2B abilities and tower work. First read `NOTES/CodePreferences.md`, `ENEMIES/Movement/README.md`, `WORLD/NAVIGATION/README.md` and the existing C# scripts before changing code.
+> **Codex implementation specification — NOT IMPLEMENTED.** This document lives in `ENEMIES/` and is linked from `ENEMIES/README.md`. It is a focused optional navigation feature, separate from Enemy E2A/E2B abilities and tower work. First read `CodePreferences.md`, `ENEMIES/Movement/README.md`, `WORLD/NAVIGATION/README.md` and the existing C# scripts before changing code.
 
 ## Objective
 

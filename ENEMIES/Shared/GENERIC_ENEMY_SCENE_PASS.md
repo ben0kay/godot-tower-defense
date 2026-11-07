@@ -1,6 +1,6 @@
 # Shared Generic Enemy Scene — Inherited-Type Migration (GE1–GE3)
 
-**STATUS: IMPLEMENTED (GE1–GE3).** Native Godot inherited scenes; see `TESTS/Enemies/GenericEnemy.md` for executed checks and environment limits. Follow `NOTES/CodePreferences.md` and read `ENEMIES/README.md`, `Shared/Enemy.cs`, `Shared/EnemyCatalog.cs` and the existing enemy scenes before implementing.
+**STATUS: IMPLEMENTED (GE1–GE3).** Native Godot inherited scenes; see `TESTS/Enemies/GenericEnemy.md` for executed checks and environment limits. Follow `CodePreferences.md` and read `ENEMIES/README.md`, `Shared/Enemy.cs`, `Shared/EnemyCatalog.cs` and the existing enemy scenes before implementing.
 
 ## Objective
 

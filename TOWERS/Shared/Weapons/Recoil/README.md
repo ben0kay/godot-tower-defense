@@ -49,7 +49,7 @@ Add a short, physical-looking gun kick when a **real shot** fires: the moving ba
 
 The user previously liked a GameMaker tower built from a *fixed hull/base* and a *recoiling gun*. Godot 4 C# can do this using ordinary Node2D transforms; **Skeleton2D, AnimationTree and one AnimationPlayer per tower are unnecessary**. Prioritize small, simple, inspector-tweakable and performance-friendly code.
 
-Read before implementation: `NOTES/CodePreferences.md`, `TOWERS/Shared/Weapons/README.md`, `TOWERS/Shared/Weapons/Visuals/README.md`, `TOWERS/Offensive/BattleTower/README.md`, and `TOWERS/Shared/Construction/README.md`.
+Read before implementation: `CodePreferences.md`, `TOWERS/Shared/Weapons/README.md`, `TOWERS/Shared/Weapons/Visuals/README.md`, `TOWERS/Offensive/BattleTower/README.md`, and `TOWERS/Shared/Construction/README.md`.
 
 ## Current Battle Tower — verified source paths
 
@@ -111,7 +111,7 @@ Do not add recoil properties to every `TowerBase`, require other towers to add n
 - [ ] Existing `SetSelected` sprite tint, construction stage art, upgraded final artwork and scene validation still work.
 - [ ] Sniper, Machine Gun, Rocket, Blaster, Cryo, Stasis, Laser, Shockwave and passive towers are **unchanged**.
 - [ ] Add automated regression assertions for true shot versus unfunded/no-shot recoil, bounded repeated impulses, recovery and transform reset; verify the look manually at actual zoom (headless tests cannot judge animation aesthetics).
-- [ ] Update this README with actual created files, chosen motion math, test execution and known limitations; **one GitHub commit for this Codex job**, per `NOTES/CodePreferences.md`.
+- [ ] Update this README with actual created files, chosen motion math, test execution and known limitations; **one GitHub commit for this Codex job**, per `CodePreferences.md`.
 
 ## R2 — fixed base + recoiling gun/barrel art (future, do NOT implement yet)
 

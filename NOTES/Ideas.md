@@ -2,7 +2,7 @@
 
 > **Status:** Brainstorming only. None of the ideas below are authorized for implementation by this document.
 >
-> **Before implementation:** Read the root `README.md`, `NOTES/CodePreferences.md`, the relevant feature README and current code. Check whether an idea is already implemented, partially implemented or superseded. Keep gameplay and cosmetic effects separate, use existing shared owners, Inspector-editable configuration and bounded/event-driven processing. Keep validation lightweight per CodePreferences.
+> **Before implementation:** Read the root `project.md`, `CodePreferences.md`, the relevant feature README and current code. Check whether an idea is already implemented, partially implemented or superseded. Keep gameplay and cosmetic effects separate, use existing shared owners, Inspector-editable configuration and bounded/event-driven processing. Keep validation lightweight per CodePreferences.
 
 ## 1. Feedback, UI and visual polish
 

@@ -80,7 +80,7 @@ Validation: TESTS/Research/README.md plus the updated existing R1 outcome expect
 
 ---
 
-R0's shared visual foundation is now connected to real mission outcomes in both battlefield launchers. Player XP, rewards, saving and advanced statistics remain deferred. Follow `NOTES/CodePreferences.md`.
+R0's shared visual foundation is now connected to real mission outcomes in both battlefield launchers. Player XP, rewards, saving and advanced statistics remain deferred. Follow `CodePreferences.md`.
 
 ## Ownership and lifecycle
 

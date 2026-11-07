@@ -24,7 +24,7 @@ Registered the uploaded `VoiceAssistant/Welcome_Commander.mp3` with the shared a
 
 # AUDIO — Shared Playback, Mixing and Voice Foundation
 
-**Foundation implemented (October 2026). The first recorded voice cue is now registered and requested on valid profile entry; other sound events remain unconnected.** This is the shared audio service, adapted from `ben0kay/isometric-new-2d/AUDIO/` for a camera-controlled, many-tower space defense game. `AUDIO/` owns sound playback and policies; each gameplay feature owns **its own clips and per-sound .tres definitions**. See `NOTES/CodePreferences.md`.
+**Foundation implemented (October 2026). The first recorded voice cue is now registered and requested on valid profile entry; other sound events remain unconnected.** This is the shared audio service, adapted from `ben0kay/isometric-new-2d/AUDIO/` for a camera-controlled, many-tower space defense game. `AUDIO/` owns sound playback and policies; each gameplay feature owns **its own clips and per-sound .tres definitions**. See `CodePreferences.md`.
 
 ## Folder ownership
 

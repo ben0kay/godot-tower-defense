@@ -64,7 +64,7 @@ Level 100 is an intentionally difficult **five-gate stress-test mission**, not a
 
 ## Codex rules and scope
 
-Read **root `README.md`**, **`NOTES/CodePreferences.md`**, this file, **`ENEMIES/ENEMYPERFORMANCE.md`**, **`TOWERS/Offensive/Shared/README.md`**, **`DEBUG/README.md`**, and the feature README of every touched folder. Follow the user's C# preferences: small modular changes, regions when useful, file header explanations, comments above methods preceded by `// =========================================================`, Inspector/export groups for truly tweakable values, performance-conscious code and minimal scene-tree clutter.
+Read **root `README.md`**, **`CodePreferences.md`**, this file, **`ENEMIES/ENEMYPERFORMANCE.md`**, **`TOWERS/Offensive/Shared/README.md`**, **`DEBUG/README.md`**, and the feature README of every touched folder. Follow the user's C# preferences: small modular changes, regions when useful, file header explanations, comments above methods preceded by `// =========================================================`, Inspector/export groups for truly tweakable values, performance-conscious code and minimal scene-tree clutter.
 
 **Work one approved pass at a time.** Each pass: inspect current HEAD; modify only the necessary files; update related README/tests with what was really done; create **one atomic GitHub commit per approved job**. If tooling cannot run Godot/.NET or collect desktop timings, state *unverified* instead of inventing a pass or claiming an FPS gain. No gameplay code change is authorized by this documentation update alone.
 

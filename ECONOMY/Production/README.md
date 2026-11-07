@@ -140,5 +140,5 @@ CP1B now exposes the same session-owned `CreditBuffer` in **two clickable places
 - The wallet is always authoritative; collection is idempotent and single-source.
 - No added per-enemy producer logic or scanning every tower each frame; prefer subscribe/unsubscribe to relevant events and one active timer per producer (or a central staggered producer scheduler if profiling warrants it).
 - Pause/wave gates are centrally interpreted, not reimplemented inconsistently by every generator. Beware that \`WaveManager\` disables its own physics processing while WaitingForClear: the producer clock must be independently scheduled/gated.
-- Align with \`NOTES/CodePreferences.md\`: simple small helpers, comment header, \`// =========================================================\` above methods, reasonable \`#region\` and Inspector tweaks. **One commit per job/pass**.
+- Align with \`CodePreferences.md\`: simple small helpers, comment header, \`// =========================================================\` above methods, reasonable \`#region\` and Inspector tweaks. **One commit per job/pass**.
 - Existing kill rewards, Citadel HP/multi-Citadel targeting, Level001/002/020 wave content, and current wallet/HUD/UI must remain intact unless a deliberate separate pass changes them.

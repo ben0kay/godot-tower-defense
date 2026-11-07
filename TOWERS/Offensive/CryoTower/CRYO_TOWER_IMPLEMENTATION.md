@@ -6,7 +6,7 @@
 
 ## Before coding
 
-1. Read `README.md`, `NOTES/CodePreferences.md`, `TOWERS/README.md`, `TOWERS/Offensive/README.md` and the relevant shared tower/enemy/combat READMEs. Inspect the **current source**, not just documentation; some top-level READMEs lag recent implementation.
+1. Read `README.md`, `CodePreferences.md`, `TOWERS/README.md`, `TOWERS/Offensive/README.md` and the relevant shared tower/enemy/combat READMEs. Inspect the **current source**, not just documentation; some top-level READMEs lag recent implementation.
 2. Inspect `ENEMIES/Shared/Enemy.cs`, `EnemyDefinition.cs`, `ENEMIES/Movement/EnemyMovement.cs`, `TOWERS/Shared/Targeting/TowerTargeting.cs`, `TOWERS/Shared/Projectiles/BasicProjectile.cs`, `TOWERS/Shared/Weapons/MultiBarrel/ProjectileTurretBase.cs` and `ProjectileTurretConfig.cs`, plus the shared stat pipeline, rank/upgrade contracts, ammo logistics, tower construction/operational state and catalog registration.
 3. **Architectural design checkpoint:** Answer the questions under **"Codex: choose the future-proof status architecture"**, record your chosen approach/trade-offs in this file or a linked status-system README, and then implement it. You are empowered to choose a better internal design than the sketches below, provided it satisfies the acceptance criteria and remains easy to extend.
 4. Other work may be landing on `main` (especially build HUD changes). **Do not edit UI layout/CTRL tray code, campaign menus, navigation algorithms, or unrelated towers.** Re-read upstream before committing; preserve concurrent work.

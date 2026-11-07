@@ -140,7 +140,7 @@ This turns a functional build timer into a clear sci-fi event, *not* a separate 
 - `WORLD/World.tscn` already has a `ConstructionWork` service and a *different* existing `DRONES/Transport/TransportDrone.tscn` for ammunition logistics. **Never reuse the ammo transport drone as a builder or alter its delivery pipeline.** Construction drones are a distinct entity/visual even if motion utility code is shared later.
 - Existing `UI/GameplayHUD/` Inspector work display and `LEVELS/Session/` outcome management must stay intact; pausing or ending a mission cannot leave an unfinished site secretly constructing.
 
-Read `NOTES/CodePreferences.md`, `TOWERS/Placement/README.md`, `TOWERS/Shared/Construction/README.md`, `WORLD/OBJECTIVES/Citadel/README.md`, `DRONES/Transport/README.md`, and the existing tests before changing code.
+Read `CodePreferences.md`, `TOWERS/Placement/README.md`, `TOWERS/Shared/Construction/README.md`, `WORLD/OBJECTIVES/Citadel/README.md`, `DRONES/Transport/README.md`, and the existing tests before changing code.
 
 ## Suggested owned files (design proposal; do not build all at once)
 

@@ -1,3 +1,9 @@
+# Development Log — Historical Project Notes
+
+> This file preserves the former root README, including dated implementation reports and older planning text. **Earlier entries may be superseded by later work.** For the current game description and vision read [project.md](project.md); for coding rules read [CodePreferences.md](CodePreferences.md). Ongoing implementation records are in [NOTES/WORK.md](NOTES/WORK.md).
+
+---
+
 ## CW1 — shared recoil source implemented — 2026-11-06
 Motion/style now live under `FEEDBACK/Weapons/Recoil/`; existing tower classes, preset paths and behaviour remain compatible adapters. Gunner, Heavy Gunner and four Capital cannons have independent accepted-shot recoil. Only gun art moves; fixed physical muzzle/aim and bullet cadence remain unchanged. Source review only; owner validation pending. CW2 remains planned.
 

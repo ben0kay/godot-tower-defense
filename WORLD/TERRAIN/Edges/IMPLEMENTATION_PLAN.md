@@ -20,7 +20,7 @@ Validation: C# build/import and TESTS/Terrain/TerrainEdgeRenderingChecks.tscn pa
 
 ## Constraints / invariants
 
-1. Read `README.md`, `NOTES/CodePreferences.md`, `WORLD/TERRAIN/README.md`, `Tiles/Mars/README.md` and this file first. Aim for **one atomic GitHub commit per requested Codex job**, with docs and tests. Do not rename/reorder existing atlas sources or change active levels merely to exercise this feature.
+1. Read `README.md`, `CodePreferences.md`, `WORLD/TERRAIN/README.md`, `Tiles/Mars/README.md` and this file first. Aim for **one atomic GitHub commit per requested Codex job**, with docs and tests. Do not rename/reorder existing atlas sources or change active levels merely to exercise this feature.
 2. Existing `WorldGrid` owns cached gameplay `can_build`, `blocks_enemies`, reservations, tower occupancy and navigation revisions. **Do not** move or rewrite those rules or mutate the existing `TileMapLayer` cells to draw curved visual edges.
 3. Materials are keyed by `TerrainEdgeProfile.MaterialId`, not tile texture/color or whether the cell is passable. Source+atlas coordinates distinguish authored variants, all variants of one material ID blend internally. Layer precedence is `Passable → Interactive → Impassable`; Decorations do not affect gameplay or edge classification.
 4. World-scoped and **opt-in**. No per-cell `Node`, no enemy checks, no `_Process` or `_PhysicsProcess` terrain sampling. Update once on load/explicit `WorldGrid.TerrainRebuilt`, and eventually only changed cells + 1-cell neighbourhood when authoring APIs provide local-change hints. Avoid calling `WorldGrid.RebuildTerrain` just to regenerate visuals.

@@ -64,7 +64,7 @@ Component authoring: add EnemyWeaponMount (or EnemyMinigun with EnemyMinigunConf
 
 The first enemy with a gun should be a **new Gunner Drone**, using a **small forward-firing minigun with narrow, slightly red-tinted tracer rounds**. Later enemies can share the same code for autocannons, multi-gun Cruisers, lasers and different firing patterns. This is a documentation-only handoff: no C# scripts, Godot scenes, resources, wave definitions or tests have been created by this planning pass.
 
-Read the **root `README.md`**, **`NOTES/CodePreferences.md`**, **`ENEMIES/README.md`**, **`ENEMIES/Abilities/README.md`**, **`TOWERS/Shared/Durability/README.md`**, and this document *before* implementing any phase. Review the actual repo HEAD: other work may have advanced. Follow existing structure and simple modular, performance-conscious C# patterns. **One atomic GitHub commit per approved implementation job** and update test/docs status honestly.
+Read the **root `README.md`**, **`CodePreferences.md`**, **`ENEMIES/README.md`**, **`ENEMIES/Abilities/README.md`**, **`TOWERS/Shared/Durability/README.md`**, and this document *before* implementing any phase. Review the actual repo HEAD: other work may have advanced. Follow existing structure and simple modular, performance-conscious C# patterns. **One atomic GitHub commit per approved implementation job** and update test/docs status honestly.
 
 ## Core gameplay decisions
 

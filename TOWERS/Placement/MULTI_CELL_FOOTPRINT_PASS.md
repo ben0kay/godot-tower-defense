@@ -18,7 +18,7 @@ Extend generic tower placement to support rectangular `TowerDefinition.Footprint
 
 ## Read these files before implementation
 
-- `NOTES/CodePreferences.md`, root `README.md`, [Placement README](README.md).
+- `CodePreferences.md`, root `README.md`, [Placement README](README.md).
 - `TOWERS/Shared/TowerDefinition.cs`: the exported footprint property already exists, but `Validate()` rejects any size other than 1×1.
 - `TOWERS/Shared/TowerBase.cs`: `GridCell` anchor, `Footprint`, `SetPlacement`.
 - `TOWERS/Placement/TowerPlacementController.cs`: single-cell preview, one-cell placement, one-cell selection index, commit/rollback and wallet transaction.

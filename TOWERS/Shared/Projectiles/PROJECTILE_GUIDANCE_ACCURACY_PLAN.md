@@ -28,7 +28,7 @@ Validation runner: `TESTS/Towers/ProjectileAccuracyChecks.tscn`. Desktop visual/
 
 ## Read first
 
-Read the repository `README.md`, `NOTES/CodePreferences.md`, `TOWERS/README.md`, `TOWERS/Shared/Stats/README.md`, `TOWERS/Shared/Stats/Pipeline/README.md`, `TOWERS/Shared/Ranks/README.md`, `TOWERS/Shared/Projectiles/README.md`, relevant weapon READMEs, `SYSTEMS/Progression/Research/README.md`, and the actual current C# source **before editing**. READMEs sometimes retain historical descriptions. Follow the existing comments-above-methods with `// =========================================================`, small regions, strongly typed optional capability groups, clear folder ownership, vertically compact code, no unnecessary scene nodes, performance-minded loops and one GitHub commit for the completed job.
+Read the repository `README.md`, `CodePreferences.md`, `TOWERS/README.md`, `TOWERS/Shared/Stats/README.md`, `TOWERS/Shared/Stats/Pipeline/README.md`, `TOWERS/Shared/Ranks/README.md`, `TOWERS/Shared/Projectiles/README.md`, relevant weapon READMEs, `SYSTEMS/Progression/Research/README.md`, and the actual current C# source **before editing**. READMEs sometimes retain historical descriptions. Follow the existing comments-above-methods with `// =========================================================`, small regions, strongly typed optional capability groups, clear folder ownership, vertically compact code, no unnecessary scene nodes, performance-minded loops and one GitHub commit for the completed job.
 
 ## Goal and decisions
 

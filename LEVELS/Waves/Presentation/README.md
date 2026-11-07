@@ -37,7 +37,7 @@ Example behaviour:
 
 ## Read and respect current code first
 
-- Root `README.md` and `NOTES/CodePreferences.md`: C# style, comments/regions, modularity, performance, **one commit per job**.
+- Root `README.md` and `CodePreferences.md`: C# style, comments/regions, modularity, performance, **one commit per job**.
 - `LEVELS/Waves/WaveDefinition.cs`: immutable `WaveDefinition(int Number, ImmutableArray<WaveBatch> Batches)` plus `WaveBuilder.Wave(number, params batches)`. `WaveEnemyEntry` already supports `shield:` and `stealth:`.
 - `LEVELS/Waves/WaveManager.cs`: finite manually started waves. `StartWave()` returns false when it cannot start; on accepted start it sets up the first batch, calls `Publish()`, and **immediately attempts the first spawn** via `Advance(0,1)`. Existing `WaveCompleted(int)` and `Changed` events must remain compatible.
 - `LEVELS/Waves/WaveSetSource.cs` and `LEVELS/LevelConfig.cs`: each mission's `WaveSource` is an Inspector-assignable Resource; `Level020Waves : WaveSetSource` exposes `Build() => Create()`. Do **not** restore an obsolete `WaveCatalog` switch or create a second level-wide wave array.

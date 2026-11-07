@@ -56,7 +56,7 @@ The original combined P1–P5 checkboxes below are intentionally retained as the
 
 ---
 
-> **STATUS: PARTIAL — initial profile progression/menu slice implemented; full P1–P5 remain open.** Implement in the ordered, testable phases P1–P5 below. This is a narrow **first playable foundation**, not the complete research tree, account economy, or full campaign save/load. Last checked against the Godot C# repository on 2026-10-16. Follow `NOTES/CodePreferences.md` and the current code before writing.
+> **STATUS: PARTIAL — initial profile progression/menu slice implemented; full P1–P5 remain open.** Implement in the ordered, testable phases P1–P5 below. This is a narrow **first playable foundation**, not the complete research tree, account economy, or full campaign save/load. Last checked against the Godot C# repository on 2026-10-16. Follow `CodePreferences.md` and the current code before writing.
 
 ## Smaller first slice selected by user (2026-10-17)
 

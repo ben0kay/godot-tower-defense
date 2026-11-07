@@ -33,7 +33,7 @@ When a **Battle Tower, Machine Gun Tower, or Sniper Tower** bullet strikes and a
 
 ### Prerequisites and conventions
 
-Read root `README.md`, `NOTES/CodePreferences.md`, `FEEDBACK/README.md`, `FEEDBACK/Shields/README.md`, `TOWERS/Shared/Projectiles/README.md`, `TOWERS/Shared/Weapons/Visuals/README.md`, `COMBAT/Damage/README.md`, `TESTS/README.md`, and **current implementations** first. Feature documentation may be historical. Use compact modular C#, region groupings, descriptive top-of-file comments, and the user's `// =========================================================` line plus comment **above methods**. Avoid per-effect scene nodes, duplicate logic and expensive allocations. Make **one GitHub commit for the complete implementation**, including tests and updated READMEs.
+Read root `project.md`, `CodePreferences.md`, `FEEDBACK/README.md`, `FEEDBACK/Shields/README.md`, `TOWERS/Shared/Projectiles/README.md`, `TOWERS/Shared/Weapons/Visuals/README.md`, `COMBAT/Damage/README.md`, `TESTS/README.md`, and **current implementations** first. Feature documentation may be historical. Use compact modular C#, region groupings, descriptive top-of-file comments, and the user's `// =========================================================` line plus comment **above methods**. Avoid per-effect scene nodes, duplicate logic and expensive allocations. Make **one GitHub commit for the complete implementation**, including tests and updated READMEs.
 
 ## Existing integration points (reviewed 2026-10-21)
 

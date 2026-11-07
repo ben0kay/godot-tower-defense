@@ -2,7 +2,7 @@
 
 > **Weapon-family proposal; foundation4A/4B and typed damage/continuous Laser4C are now implemented.** This document records a scalable direction for approximately 30 offensive towers, with room for many more, while also supporting passive, support, economy and hybrid towers. Do not treat planned files, features or tower names here as existing code.
 >
-> Before implementing: read `NOTES/CodePreferences.md`, `TOWERS/README.md`, `TOWERS/Shared/README.md`, `TOWERS/Shared/Stats/README.md`, `TOWERS/Placement/README.md`, and the relevant tower-specific README. Prefer lightweight, reusable, Inspector-editable C# systems and compact scene trees.
+> Before implementing: read `CodePreferences.md`, `TOWERS/README.md`, `TOWERS/Shared/README.md`, `TOWERS/Shared/Stats/README.md`, `TOWERS/Placement/README.md`, and the relevant tower-specific README. Prefer lightweight, reusable, Inspector-editable C# systems and compact scene trees.
 
 ## Goals
 

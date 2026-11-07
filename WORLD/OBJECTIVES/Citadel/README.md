@@ -183,7 +183,7 @@ A level can contain **two or more independently damageable Citadels**. Each regi
 
 ### Implementation constraints / definition of done
 
-Follow \`NOTES/CodePreferences.md\`: simple reusable code, explanatory script header, \`// =========================================================\` before methods, sensible \`#region\` organization and Inspector-friendly config, update relevant READMEs. Avoid extra per-enemy nodes, per-frame goal scans and wholesale refactors. Implement in **small reviewable MC1/MC2/MC3 phases** and use **one GitHub commit per implementation job**.
+Follow \`CodePreferences.md\`: simple reusable code, explanatory script header, \`// =========================================================\` before methods, sensible \`#region\` organization and Inspector-friendly config, update relevant READMEs. Avoid extra per-enemy nodes, per-frame goal scans and wholesale refactors. Implement in **small reviewable MC1/MC2/MC3 phases** and use **one GitHub commit per implementation job**.
 
 **Done only when:** multiple independently damageable Citadels function in an authored test mission; every spawn gets its portal's cached fixed destination; normal varied movement, mandatory checkpoints and DeathSpawn inheritance respect that destination; First/Last compares remaining journeys correctly; tower placement cannot cut the assigned route; independent HP/HUD and one-time defeat work; and existing one-Citadel levels/test suites still pass.
 

@@ -1,6 +1,6 @@
 # Timed Construction, Timed Upgrades and Visual Build Stages — Codex Implementation Pass
 
-> **STATUS: C1–C3 IMPLEMENTED; C4 BATTLE-ART PILOT IMPLEMENTED.** This file is the implementation brief for **C1–C4**. Complete stages sequentially, test each, and update this checklist **only after code really lands**. Follow `NOTES/CodePreferences.md` and the existing Godot 4 C# architecture. Documentation created 2026-10-16.
+> **STATUS: C1–C3 IMPLEMENTED; C4 BATTLE-ART PILOT IMPLEMENTED.** This file is the implementation brief for **C1–C4**. Complete stages sequentially, test each, and update this checklist **only after code really lands**. Follow `CodePreferences.md` and the existing Godot 4 C# architecture. Documentation created 2026-10-16.
 
 ## C4 scope revision — user request (2026-10-16)
 
@@ -121,4 +121,4 @@ This is one shared, optional construction capability: a Battle Tower, passive Am
 
 ### Suggested Codex request
 
-Read `TOWERS/Shared/Construction/TIMED_CONSTRUCTION_PASS.md` and `NOTES/CodePreferences.md`. Implement **C1–C4 sequentially**, checking the current GitHub HEAD for other work before changes and validating after each phase. Preserve generic tower/economy code and existing footage/upgrade/payment/navigation behavior. Provide a list of changed files, timings chosen, verification and any explicitly deferred items.
+Read `TOWERS/Shared/Construction/TIMED_CONSTRUCTION_PASS.md` and `CodePreferences.md`. Implement **C1–C4 sequentially**, checking the current GitHub HEAD for other work before changes and validating after each phase. Preserve generic tower/economy code and existing footage/upgrade/payment/navigation behavior. Provide a list of changed files, timings chosen, verification and any explicitly deferred items.
