@@ -8,14 +8,15 @@ public static class TowerDetection
     public static bool CanDetect(Enemy enemy, bool detectsStealth = false) =>
         Detectable(enemy, detectsStealth) && IsLit(enemy);
 
-    internal static bool CanDetectAt(Enemy enemy, Vector2 position, bool detectsStealth) =>
-        Detectable(enemy, detectsStealth) && (enemy.Registry?.TerrainGrid?.Lighting?.IsRevealed(position) ?? true);
+    // Ground tower fire can track radar contacts through darkness. Stealth still needs a detector.
+    internal static bool CanTargetFromTower(Enemy enemy, bool detectsStealth) =>
+        Detectable(enemy, detectsStealth);
 
     private static bool Detectable(Enemy enemy, bool detectsStealth) =>
         GodotObject.IsInstanceValid(enemy) && enemy.IsAlive && !enemy.IsQueuedForDeletion()
         && (!enemy.IsEffectivelyStealthed || detectsStealth);
 
-    internal static bool IsLit(Enemy enemy)
+    private static bool IsLit(Enemy enemy)
     {
         WorldLightingController lighting = enemy.Registry?.TerrainGrid?.Lighting;
         return lighting == null || lighting.IsRevealed(enemy.GlobalPosition);

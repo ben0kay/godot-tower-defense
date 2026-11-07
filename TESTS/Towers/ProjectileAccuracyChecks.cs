@@ -103,22 +103,26 @@ public partial class ProjectileAccuracyChecks : Node
         while (lighting.IsRevealed(centre) || lighting.IsRevealed(centre + Vector2.Right * 80))
             centre += Vector2.Right * 400;
         Enemy target = f.Target(centre + Vector2.Right * 80);
-        Require(!TowerDetection.CanDetect(target), "An unlit enemy cannot be acquired");
+        Require(!TowerDetection.CanDetect(target), "An unlit enemy fails the fighter visibility rule");
 
         BattleTower first = f.Add<BattleTower>("battle", centre);
         BattleTower second = f.Add<BattleTower>("battle", centre + Vector2.Down * 100);
-        Require(TowerDetection.CanDetect(target), "Placed tower coverage makes the same enemy targetable");
+        Require(TowerDetection.CanDetect(target), "The local cyan pool reveals the contact");
         var shot = Launch(f, target, centre, Vector2.Right, handling: new(0, ProjectileGuidance.Homing));
         lighting.SetSourceSuppressed(first, true);
         Require(TowerDetection.CanDetect(target), "A second source keeps overlapping coverage active");
         lighting.SetSourceSuppressed(second, true);
         lighting.SetLightingEnabled(false);
         Require(!TowerDetection.CanDetect(target), "F6 comparison leaves a blackout authoritative");
+        Require(TowerDetection.CanTargetFromTower(target, false), "Towers can still lock a dark radar contact");
+        target.GlobalPosition = centre + new Vector2(80, 60);
+        Require(TowerDetection.CanTargetFromTower(target, false) && !TowerDetection.CanDetect(target),
+            "Targeting remains available after the dark contact moves off the launch heading");
         float before = target.Health;
-        shot._PhysicsProcess(.12);
-        Require(target.Health < before && shot.IsQueuedForDeletion(), "Lost guidance still permits a physical hit");
+        shot._PhysicsProcess(.16);
+        Require(target.Health < before && shot.IsQueuedForDeletion(), "Guidance still tracks a moving radar contact");
         lighting.SetSourceSuppressed(second, false);
-        Require(TowerDetection.CanDetect(target), "Restoring one lamp restores targeting");
+        Require(TowerDetection.CanDetect(target), "Restoring one lamp restores reveal");
         f.ClearProjectiles();
         target.Free();
         first.Free();

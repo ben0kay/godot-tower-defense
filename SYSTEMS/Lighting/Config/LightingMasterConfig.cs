@@ -27,7 +27,6 @@ public partial class LightingMasterConfig : Resource
     [ExportGroup("Light-based Fog of War")]
     [Export] public bool RevealEnabled { get; set; } = true;
     [Export] public LightSourceConfig Portal { get; set; }
-    [Export(PropertyHint.Range, "0,0.25,0.005")] public float TowerRangeLift { get; set; } = .075f;
 
     [ExportGroup("Viewport Culling")]
     [Export] public bool CullOffscreenLights { get; set; } = true;

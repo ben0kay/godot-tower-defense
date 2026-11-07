@@ -113,14 +113,12 @@ public partial class WorldLightingController : Node2D
             () => tower.WorkPhase == TowerWorkPhase.Constructing);
         Watch(_towers, source, tower);
         tower.SpatialChanged += OnRevealTowerMoved;
-        tower.StatsChanged += QueueRefresh;
         tower.WorkStarted += QueueRefresh;
         tower.WorkCompleted += QueueRefresh;
         tower.Destroyed += QueueRefresh;
         _disconnect[tower] += () =>
         {
             tower.SpatialChanged -= OnRevealTowerMoved;
-            tower.StatsChanged -= QueueRefresh;
             tower.WorkStarted -= QueueRefresh;
             tower.WorkCompleted -= QueueRefresh;
             tower.Destroyed -= QueueRefresh;

@@ -56,5 +56,5 @@ void fragment() {
     vec3 plum = smoke_tint.rgb * (0.38 + billow * 0.45);
     vec3 lavender = min(vec3(1.0), smoke_tint.rgb + vec3(0.32, 0.19, 0.25));
     COLOR = vec4(mix(plum, lavender, rim),
-        body * border_fade * density * fade_in * dissolve * opacity * smoke_tint.a * (reveal_enabled ? sample_reveal().r : 1.0));
+        body * border_fade * density * fade_in * dissolve * opacity * smoke_tint.a * (reveal_enabled ? sample_reveal() : 1.0));
 }

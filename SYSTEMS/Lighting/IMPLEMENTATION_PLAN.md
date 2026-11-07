@@ -8,7 +8,7 @@
 
 ## Outcome and scope
 
-Deliver genuinely lit/dark 2D battlefields using **Godot `CanvasModulate` + native `PointLight2D`**. LGT0-A delivered soft light from Citadels and completed Battle Towers. LGT0-A.1 expands the shared lighting to placed towers, construction sites, flying drones and lava before LGT0-B adds shadows. Areas away from those structures remain dimmed by configurable ambient lighting. **Basic real shadows now belong in LGT0-B:** all completed placed towers and painted procedural mountains cast directional shadows where qualifying lights reach them. **A.3 adds a shared light-reveal requirement for direct combat locks.** Existing terrain LOS, stealth, movement, collision and damage rules continue to apply. The later B shadow maps are presentation. No normal-map rewrite, postprocessing/bloom or gameplay light-detection logic in LGT0.
+Deliver genuinely lit/dark 2D battlefields using **Godot `CanvasModulate` + native `PointLight2D`**. LGT0-A delivered soft light from Citadels and completed Battle Towers. LGT0-A.1 expands the shared lighting to placed towers, construction sites, flying drones and lava before LGT0-B adds shadows. Areas away from those structures remain dimmed by configurable ambient lighting. **Basic real shadows now belong in LGT0-B:** all completed placed towers and painted procedural mountains cast directional shadows where qualifying lights reach them. **A.3 uses light for presentation and direct fighter and enemy locks. Ground towers can fire at dark contacts.** Existing terrain LOS, stealth, movement, collision and damage rules continue to apply. The later B shadow maps are presentation. No normal-map rewrite, postprocessing/bloom or gameplay light-detection logic in LGT0.
 
 Reference: [Godot 4.6 2D lighting and shadows](https://docs.godotengine.org/en/4.6/tutorials/2d/2d_lights_and_shadows.html), [PointLight2D](https://docs.godotengine.org/en/stable/classes/class_pointlight2d.html), [Light2D](https://docs.godotengine.org/en/stable/classes/class_light2d.html) and [GPU optimization](https://docs.godotengine.org/en/stable/tutorials/performance/gpu_optimization.html).
 
@@ -67,11 +67,11 @@ Opt-in friendly tracers, splash rounds and hostile streaks can borrow shadowless
 
 ### A.3. Light-based fog of war (source implemented)
 
-Terrain remains visible at a darker ambient `#292f36`. Towers keep their cyan base lamps and add neutral, feathered range coverage. Overlaps use maximum brightness. Citadel, forming/open portal, drone and lava pools also reveal. Portal lights have a purple preset. Projectile spill illuminates terrain without contributing reveal.
+Terrain remains visible at ambient `#292f36`. Tower cyan lamps retain their local radius. The earlier white attack-range overlay and range-wide reveal were removed after visual review. Dark ships and health bars fade into subtle red radar contacts. Citadel, portal, drone and lava pools also reveal. Projectile spill illuminates terrain without contributing reveal.
 
-The indexed world-space field gates direct weapons on both sides. Existing stealth and terrain LOS still apply. Losing reveal clears direct locks, breaks homing and leaves committed shots and splash damage physically active. Splash homing holds its last visible destination. The same field drives enemy fades and a bounded mask for projectile surfaces, particles, portal smoke and the ground lift. Source changes invalidate coverage immediately and flying drone positions update on a shared 100ms cadence. Blackout callers use `SetSourceSuppressed`. Camera culling, cosmetic pool pressure and F6 do not change combat coverage.
+Ground towers can shoot and guide rounds at radar contacts using normal accuracy, range, stealth and terrain LOS. Fighter and enemy direct locks still require a lit target. A possible miss modifier for radar contacts is future work. The indexed field drives enemy fades and the mask for projectiles, particles and portal smoke. Blackouts use `SetSourceSuppressed`. Camera culling, cosmetic pool pressure and F6 do not affect combat coverage.
 
-Owner acceptance: compare a portal spawn entering a dark gap, tower range entry, two overlapping sources with one suppressed, direct weapon/beam lock loss, a fired shot crossing darkness and F6 while a blackout is active. Repeat in a dense wave to check mask updates and frame cost.
+Owner acceptance: watch an enemy cross a lamp edge, fire at its red contact from a tower and confirm F6 restores full ship presentation for comparison.
 
 ### B2. Basic tower and mountain shadows — LGT0-B (approved)
 

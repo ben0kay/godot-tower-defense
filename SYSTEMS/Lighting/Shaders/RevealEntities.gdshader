@@ -7,6 +7,6 @@ void vertex() {
 
 void fragment() {
     if (reveal_enabled) {
-        COLOR.a *= sample_reveal().r;
+        COLOR.a *= sample_reveal();
     }
 }

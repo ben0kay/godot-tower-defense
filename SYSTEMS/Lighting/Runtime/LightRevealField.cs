@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 internal sealed class LightRevealField
 {
-    internal readonly record struct Disk(Vector2 Centre, float Radius, bool LiftsGround)
+    internal readonly record struct Disk(Vector2 Centre, float Radius)
     {
         internal float Alpha(float distanceSquared)
         {
@@ -28,10 +28,10 @@ internal sealed class LightRevealField
 
     // =========================================================
     // Static updates rebuild on source events. Large disks avoid an unbounded bucket expansion.
-    internal void Add(Vector2 centre, float radius, bool liftsGround = false)
+    internal void Add(Vector2 centre, float radius)
     {
         if (!centre.IsFinite() || !float.IsFinite(radius) || radius <= 0) return;
-        Disk disk = new(centre, radius, liftsGround);
+        Disk disk = new(centre, radius);
         _disks.Add(disk);
         if (radius > 2048) { _wide.Add(disk); return; }
         Vector2I min = Bucket(centre - Vector2.One * radius), max = Bucket(centre + Vector2.One * radius);
@@ -77,7 +77,7 @@ internal sealed class LightRevealField
     }
 
     // =========================================================
-    // Red stores reveal and green stores tower range lift. Max compositing prevents overlapping brightness buildup.
+    // Keep the strongest reveal where multiple lamp footprints overlap.
     internal void Rasterize(Rect2 bounds, int width, int height, byte[] pixels)
     {
         Array.Clear(pixels);
@@ -95,14 +95,13 @@ internal sealed class LightRevealField
                 float dy = (y + .5f) * step.Y - centre.Y;
                 for (int x = left; x <= right; x++)
                 {
-                    int index = (y * width + x) * 2;
-                    if (pixels[index] == 255 && (!disk.LiftsGround || pixels[index + 1] == 255)) continue;
+                    int index = y * width + x;
+                    if (pixels[index] == 255) continue;
                     float dx = (x + .5f) * step.X - centre.X;
                     float distance = dx * dx + dy * dy;
                     if (distance >= squared) continue;
                     byte value = (byte)(disk.Alpha(distance) * 255);
                     if (value > pixels[index]) pixels[index] = value;
-                    if (disk.LiftsGround && value > pixels[index + 1]) pixels[index + 1] = value;
                 }
             }
         }

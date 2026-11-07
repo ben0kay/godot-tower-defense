@@ -13,13 +13,18 @@ public partial class WorldLightingController
     {
         internal readonly float Original = original;
         internal float Applied = original;
+        internal float ContactOpacity;
+        internal Vector2 ContactPosition;
     }
 
     private readonly Dictionary<Enemy, EnemyReveal> _enemyAlpha = new();
     private readonly HashSet<ShaderMaterial> _smokeMaterials = new();
     private EnemyRegistry _revealEnemies;
-    private ShaderMaterial _entityMask, _rangeMask;
-    private ColorRect _rangeOverlay;
+    private readonly HashSet<EnemyReveal> _darkContacts = new();
+    private ShaderMaterial _entityMask;
+    private Node2D _contactOverlay;
+    private static readonly Color ContactCore = new("#be4b50");
+    private static readonly Color ContactHalo = new("#682c35");
     private Image _maskImage;
     private ImageTexture _maskTexture;
     private byte[] _maskPixels;
@@ -108,8 +113,6 @@ public partial class WorldLightingController
         {
             if (!IsAvailable(source)) continue;
             _reveal.Add(PositionFor(source), RadiusFor(source));
-            if (source.Anchor is TowerBase tower && tower.IsOperational && tower.FinalStats is { } stats)
-                _reveal.Add(tower.GlobalPosition, stats.RangePixels, liftsGround: true);
         }
     }
 
@@ -124,18 +127,17 @@ public partial class WorldLightingController
         _maskBounds = new Rect2(Grid.ToGlobal(gridBounds.Position), Vector2.Zero).Expand(end).Grow(256);
         _maskWidth = Mathf.Clamp(Mathf.CeilToInt(_maskBounds.Size.X / 16), 1, 512);
         _maskHeight = Mathf.Clamp(Mathf.CeilToInt(_maskBounds.Size.Y / 16), 1, 512);
-        _maskPixels = new byte[_maskWidth * _maskHeight * 2];
-        _maskImage = Image.CreateFromData(_maskWidth, _maskHeight, false, Image.Format.Rg8, _maskPixels);
+        _maskPixels = new byte[_maskWidth * _maskHeight];
+        _maskImage = Image.CreateFromData(_maskWidth, _maskHeight, false, Image.Format.R8, _maskPixels);
         _maskTexture = ImageTexture.CreateFromImage(_maskImage);
         _entityMask = NewRevealMaterial("res://SYSTEMS/Lighting/Shaders/RevealEntities.gdshader");
-        _rangeMask = NewRevealMaterial("res://SYSTEMS/Lighting/Shaders/RevealGround.gdshader");
-        _rangeMask.SetShaderParameter("lift", Mathf.Clamp(Config.TowerRangeLift, 0, .25f));
-        _rangeOverlay = new ColorRect
+        _contactOverlay = new Node2D
         {
-            Name = "TowerRangeLight", MouseFilter = Control.MouseFilterEnum.Ignore, ZIndex = 2,
-            Position = ToLocal(_maskBounds.Position), Size = _maskBounds.Size, Material = _rangeMask
+            Name = "DarkContacts", ZIndex = 5,
+            Material = new CanvasItemMaterial { LightMode = CanvasItemMaterial.LightModeEnum.Unshaded }
         };
-        AddChild(_rangeOverlay);
+        _contactOverlay.Draw += DrawDarkContacts;
+        AddChild(_contactOverlay);
 
         _revealEnemies = GetParent().GetNodeOrNull<EnemyRegistry>("EnemySystems/Registry");
         if (_revealEnemies != null)
@@ -195,18 +197,54 @@ public partial class WorldLightingController
 
     private void UntrackEnemyReveal(Enemy enemy)
     {
-        if (_enemyAlpha.Remove(enemy, out EnemyReveal state) && GodotObject.IsInstanceValid(enemy))
-            SetEnemyAlpha(enemy, state.Original);
+        if (!_enemyAlpha.Remove(enemy, out EnemyReveal state)) return;
+        if (_darkContacts.Remove(state)) _contactOverlay.QueueRedraw();
+        if (GodotObject.IsInstanceValid(enemy)) SetEnemyAlpha(enemy, state.Original);
     }
 
     private void UpdateEnemyReveal(Enemy enemy)
     {
         if (!_enemyAlpha.TryGetValue(enemy, out EnemyReveal state)) return;
+        Vector2 position = enemy.GlobalPosition;
         if (RevealVisible) EnsureRevealField();
-        float alpha = state.Original * (RevealVisible ? _reveal.AlphaAt(enemy.GlobalPosition) : 1);
-        if (Mathf.IsEqualApprox(alpha, state.Applied)) return;
-        state.Applied = alpha;
-        SetEnemyAlpha(enemy, alpha);
+        float reveal = RevealVisible ? _reveal.AlphaAt(position) : 1;
+        float alpha = state.Original * reveal;
+        if (!Mathf.IsEqualApprox(alpha, state.Applied))
+        {
+            state.Applied = alpha;
+            SetEnemyAlpha(enemy, alpha);
+        }
+
+        // The contact cross-fades inversely to the whole enemy root, including its health bar.
+        float opacity = 1 - reveal;
+        if (opacity <= .001f)
+        {
+            if (_darkContacts.Remove(state)) _contactOverlay.QueueRedraw();
+            return;
+        }
+        bool changed = _darkContacts.Add(state) || state.ContactPosition != position ||
+            !Mathf.IsEqualApprox(state.ContactOpacity, opacity);
+        if (!changed) return;
+        state.ContactPosition = position;
+        state.ContactOpacity = opacity;
+        _contactOverlay.QueueRedraw();
+    }
+
+    // =========================================================
+    // One unlit canvas draws only contacts that are currently fading or in darkness.
+    private void DrawDarkContacts()
+    {
+        if (_darkContacts.Count == 0) return;
+        _contactOverlay.DrawSetTransformMatrix(_contactOverlay.GlobalTransform.AffineInverse());
+        foreach (EnemyReveal state in _darkContacts)
+        {
+            Color halo = ContactHalo, core = ContactCore;
+            halo.A = state.ContactOpacity * .42f;
+            core.A = state.ContactOpacity * .85f;
+            _contactOverlay.DrawCircle(state.ContactPosition, 5, halo, true, -1, true);
+            _contactOverlay.DrawCircle(state.ContactPosition, 3, core, true, -1, true);
+        }
+        _contactOverlay.DrawSetTransformMatrix(Transform2D.Identity);
     }
 
     private static void SetEnemyAlpha(Enemy enemy, float alpha)
@@ -226,7 +264,7 @@ public partial class WorldLightingController
         if (!RevealVisible || !_maskDirty) return;
         _maskDirty = false;
         _reveal.Rasterize(_maskBounds, _maskWidth, _maskHeight, _maskPixels);
-        _maskImage.SetData(_maskWidth, _maskHeight, false, Image.Format.Rg8, _maskPixels);
+        _maskImage.SetData(_maskWidth, _maskHeight, false, Image.Format.R8, _maskPixels);
         _maskTexture.Update(_maskImage);
         foreach (Enemy enemy in _enemyAlpha.Keys) UpdateEnemyReveal(enemy);
     }
@@ -235,7 +273,6 @@ public partial class WorldLightingController
     {
         if (_entityMask == null) return;
         _entityMask.SetShaderParameter("reveal_enabled", RevealVisible);
-        _rangeMask.SetShaderParameter("reveal_enabled", RevealVisible);
         foreach (ShaderMaterial material in _smokeMaterials)
             material.SetShaderParameter("reveal_enabled", RevealVisible);
         foreach (Enemy enemy in _enemyAlpha.Keys) UpdateEnemyReveal(enemy);
@@ -264,6 +301,8 @@ public partial class WorldLightingController
             _revealEnemies.EnemyPositionChanged -= UpdateEnemyReveal;
         }
         ApplyRevealToggle();
+        _contactOverlay.Draw -= DrawDarkContacts;
+        _darkContacts.Clear();
         _enemyAlpha.Clear();
         _smokeMaterials.Clear();
         _suppressed.Clear();

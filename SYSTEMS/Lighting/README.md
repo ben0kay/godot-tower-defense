@@ -12,9 +12,9 @@ A.2 adds tiny lights for opt-in friendly and hostile rounds. The shared `Presets
 
 ## Light-based fog of war
 
-Towers retain cyan base lights and give their completed attack ranges a faint neutral lift. Citadels, purple forming/open portals, flying drones and lava also reveal entities. The shared field gates direct enemy, tower and fighter weapons while retaining stealth and terrain LOS. Existing rounds can still hit in darkness. A guided tracer drops tracking and keeps its heading. Guided splash holds its last visible point. Projectile lights illuminate the floor without granting reveal.
+Towers retain their local cyan base lights. In darkness, a subtle red radar contact replaces the enemy hull and health bar. The two fade across lamp edges. Citadels, forming/open portals, flying drones and lava also reveal entities. Ground towers can fire and guide rounds at dark contacts with normal range, stealth and terrain rules. Fighter and enemy direct targeting still require light. Projectile lights illuminate the floor without granting reveal.
 
-Use `RevealEnabled` to opt out and `TowerRangeLift` to tune the ground lift. Reopen the level after editing these settings. F6 disables the visible mask for comparison while combat continues to use it. `SetSourceSuppressed(owner, suppressed)` controls a registered light's blackout state without changing damage, navigation or overlapping sources. Native portal lights have priority after Citadels. Gameplay coverage is independent of the cosmetic light cap.
+Use `RevealEnabled` to opt out. Reopen the level after editing this setting. F6 disables the visible mask and contacts for comparison. `SetSourceSuppressed(owner, suppressed)` controls a registered light's blackout state without changing damage, navigation or overlapping sources. Native portal lights have priority after Citadels. Gameplay coverage is independent of the cosmetic light cap.
 
 ## Removal
 
