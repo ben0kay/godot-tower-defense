@@ -194,7 +194,6 @@ public partial class WorldLightingController : Node2D
     // Cache grouped lava candidates only when the canonical hazard cache is rebuilt.
     private void RebuildTerrainLights()
     {
-        foreach (Source source in _lava) ReleaseSlot(source);
         _lava.Clear();
         if (HasOutput(Config.Lava) && Grid.InteractiveTiles is { } terrain)
             foreach (Vector2I cell in LavaLightRegions.FindAnchors(terrain.EnumerateLavaCells()))
@@ -211,7 +210,7 @@ public partial class WorldLightingController : Node2D
 
     #region Light Budget
     // =========================================================
-    // Keep Citadels first, reserve a tower slot when available, and cap drone/lava shares.
+    // Keep Citadels first, reserve a tower slot when available, and cap the drone share.
     private void RefreshLights()
     {
         if (_ambient == null) return;
@@ -225,7 +224,6 @@ public partial class WorldLightingController : Node2D
         hasCandidates |= Select(_portals, cap, cull, canvas, viewport);
         if (_selected.Count < cap) hasCandidates |= Select(_towers, _selected.Count + 1, cull, canvas, viewport);
         hasCandidates |= Select(_drones, Mathf.Min(cap, _selected.Count + Mathf.Clamp(Config.MaxDroneLights, 0, 16)), cull, canvas, viewport);
-        hasCandidates |= Select(_lava, Mathf.Min(cap, _selected.Count + Mathf.Clamp(Config.MaxLavaLights, 0, 16)), cull, canvas, viewport);
         hasCandidates |= Select(_towers, cap, cull, canvas, viewport);
 
         Select(_projectileSources, Mathf.Min(cap, _selected.Count + Mathf.Clamp(Config.MaxProjectileLights, 0, 8)), cull, canvas, viewport);

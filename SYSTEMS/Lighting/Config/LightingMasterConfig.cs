@@ -18,7 +18,6 @@ public partial class LightingMasterConfig : Resource
     [Export(PropertyHint.Range, "0.1,1,0.05")] public float ConstructionRadiusFactor { get; set; } = 0.5f;
     [Export(PropertyHint.Range, "0.1,1,0.05")] public float ConstructionEnergyFactor { get; set; } = 0.55f;
     [Export(PropertyHint.Range, "0,16,1")] public int MaxDroneLights { get; set; } = 8;
-    [Export(PropertyHint.Range, "0,16,1")] public int MaxLavaLights { get; set; } = 3;
 
     [ExportGroup("Projectile Lighting")]
     [Export] public LightSourceConfig Projectile { get; set; }

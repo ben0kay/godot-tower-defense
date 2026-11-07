@@ -9,7 +9,7 @@ public partial class WorldLightingController
     private readonly record struct TileGlow(Vector2 Position, float Radius, Color Tint);
 
     // =========================================================
-    // Draw static emissive accents in chunks. Every lava cell glows even if its regional lamp has no pool slot.
+    // Draw static emissive accents in chunks. Give every lava cell the same base glow without regional light hot spots.
     private void RebuildTerrainGlow()
     {
         if (_terrainGlow != null)
@@ -27,7 +27,7 @@ public partial class WorldLightingController
         if (HasOutput(Config.Lava) && Grid.InteractiveTiles is { } terrain)
         {
             Color lavaTint = Config.Lava.Tint;
-            lavaTint.A = .28f;
+            lavaTint.A = .42f;
             foreach (Vector2I cell in terrain.EnumerateLavaCells())
                 AddTileGlow(chunks, cell, size * .85f, lavaTint);
         }

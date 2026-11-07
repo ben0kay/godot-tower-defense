@@ -6,4 +6,4 @@
 script = ExtResource("1_source")
 Tint = Color(0.38, 0.9, 1, 1)
 Energy = 0.42
-RadiusPixels = 186.0
+RadiusPixels = 62.0
