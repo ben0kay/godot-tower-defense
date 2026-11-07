@@ -14,7 +14,7 @@ public partial class FighterStationPanel : VBoxContainer
         SetProcess(false); SetPhysicsProcess(false); AddThemeConstantOverride("separation", 3);
         _roster = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         _roster.AddThemeFontSizeOverride("font_size", 12);
-        _roster.ItemSelected += index => { _slot = (int)index; Refresh(); };
+        _roster.ItemSelected += index => { CancelPatrolEdit(); _slot = (int)index; Refresh(); };
         AddChild(_roster);
         _stock = UIButtonFactory.Label("", 11, ThemeConfig); _stock.AutowrapMode = TextServer.AutowrapMode.WordSmart; AddChild(_stock);
         _status = UIButtonFactory.Label("", 11, ThemeConfig); AddChild(_status);
@@ -23,8 +23,9 @@ public partial class FighterStationPanel : VBoxContainer
         _launch = UIButtonFactory.Create("LAUNCH", Launch, UIButtonStyle.Compact, 24, ThemeConfig);
         _recall = UIButtonFactory.Create("RECALL", Recall, UIButtonStyle.Compact, 24, ThemeConfig);
         actions.AddChild(_launch); actions.AddChild(_recall);
+        BuildPatrolControls();
         _error = UIButtonFactory.Label("", 10, ThemeConfig); _error.AutowrapMode = TextServer.AutowrapMode.WordSmart; AddChild(_error);
-        _launch.TooltipText = "Launch into Auto-pilot: intercept Citadel threats and manoeuvre nearby. Fixed twin guns engage nearby valid targets. A partial manual launch is allowed when rounds remain.";
+        _launch.TooltipText = "Launch using the selected fighter order. Fixed twin guns engage nearby valid targets. A partial manual launch is allowed when rounds remain.";
         _recall.TooltipText = "Return this fighter to its own reserved dock. Dock service draws real station ammunition and paid repair; manual recall stays docked.";
         Hide();
     }
@@ -37,6 +38,7 @@ public partial class FighterStationPanel : VBoxContainer
         _station.RuntimeChanged += Refresh; _station.TreeExiting += LostStation;
         _wallet = _station.Wallet;
         if (GodotObject.IsInstanceValid(_wallet)) _wallet.BalanceChanged += OnBalance;
+        AttachPatrolPreview();
         Show(); Refresh();
     }
     private void OnBalance(string resource, int amount) => Refresh();
@@ -52,6 +54,8 @@ public partial class FighterStationPanel : VBoxContainer
         }
         _roster.Select(_slot); _stock.Text = _station.DescribeAmmo();
         FighterDrone selected = _station.Fighters?.At(_slot);
+        if (_editing != null && _editing != selected) CancelPatrolEdit();
+        RefreshPatrolControls(selected);
         _status.Text = selected == null ? "Empty fighter slot" : $"HP {selected.Health:0}/{selected.MaxHealth:0} · AMMO {selected.Ammo}/{selected.AmmoCapacity}";
         _status.TooltipText = selected == null ? "" : "Fighter " + selected.SaveId;
         _buy.Text = $"BUY · {Mathf.Clamp(_station.Config.FighterCredits, 0, 1000000)} C"; _buy.Disabled = !_station.CanBuyFighter;
@@ -69,6 +73,7 @@ public partial class FighterStationPanel : VBoxContainer
     private void LostStation() => Bind(null);
     private void Disconnect()
     {
+        DropPatrolPreview();
         if (GodotObject.IsInstanceValid(_station)) { _station.RuntimeChanged -= Refresh; _station.TreeExiting -= LostStation; }
         if (GodotObject.IsInstanceValid(_wallet)) _wallet.BalanceChanged -= OnBalance;
         _station = null; _wallet = null;

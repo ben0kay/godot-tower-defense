@@ -1,3 +1,9 @@
+## FD3 — Auto-patrol
+
+Select a Drone Station and choose a fighter from its roster. **PATROL** starts a new order or resumes the fighter's existing route. Click A and B in the world to commit the figure-eight, or use **EDIT A/B** to replace it. Right-click or Escape cancels the draft. **AUTO-PILOT** switches back to Citadel defence while retaining the route. The station inspector displays the selected order and map cells.
+
+Patrol follows a distance-sampled route and fires at nearby enemies through the existing fixed guns and LOS rules. Returning for service preserves the order during the mission. Checkpoint loads use Auto-pilot until patrol persistence is added in FD6.
+
 ## Fighter targeting performance — 2026-11-06
 Cached weapons use cheap liveness/generation/detection checks between scheduled validation and firing; full muzzle range/arc/target+lead LOS is fresh for every shot, with same-step validation reused only for the unchanged lock. Existing staggered searches, bounded replacement, lead, cadence and ammo remain. Shared threat work is requested only by deployed, healthy fighters with ammunition, after launch completes; launch/return/service alone never requests it. Empty registries skip scans and spatial acquisition; shared bounded scans cache detectable weapon candidates separately from Citadel-ranked threats, suppressing per-fighter acquisition when none qualify. The existing shared cadence still probes nonempty populations for eligibility changes (including stealth reveals). Debug/unowned enemies remain legitimate combat targets between waves; wave ownership is deliberately not a combat gate. Movement/loiter, transit and save fields are unchanged. Source/diff review only; .NET unavailable, owner gameplay/performance validation pending.
 
@@ -20,7 +26,7 @@ Checkpoints preserve station stock via existing tower ammo, per-slot FIFO intent
 Default full firing arc is now **180°** (90° either side), configurable through `FiringArcDegrees`. Fighters may shoot during any deployed pursuit/return-loop stage when the target is in that arc, range and LOS; manual recall/launch still suppress firing. Twin-gun artwork and 9 shots/s stay. A 1.5s target hold reduces switching, but dead/lost targets release immediately. Filtered steering destinations, eased angular speed and smoothed acceleration provide gentler curves. Defaults: 300px/s cruise, 600/500px/s² limits, 90°/s hull turns, 210px return radius and 220px/s manoeuvre speed; response times are Inspector-editable. Corrected a mismatch between the return waypoint and its arrival check. Source review only; owner flight/aim acceptance pending.
 
 # Fighter drones
-**FD1-B, FD2 and FD4: source implemented / awaiting owner validation. FD3 patrol remains deferred.**
+**FD1-B, FD2 and FD4: source implemented / awaiting owner validation. See FD3 above for the current patrol implementation.**
 
 Build a [Drone Station](../../TOWERS/Utility/DroneStation/README.md), buy a fighter, choose its slot and LAUNCH. Fighters prioritize the shortest remaining journey to the enemy's assigned Citadel using the existing shared budgeted targeting. RECALL returns to their own dock; no free HP/ammo refill.
 

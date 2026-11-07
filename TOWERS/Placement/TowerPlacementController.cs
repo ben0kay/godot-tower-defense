@@ -92,7 +92,7 @@ public partial class TowerPlacementController : Node2D
         SetProcessUnhandledInput(true);
         _input = GetNode<GameInput>("/root/GameInput");
         _input.Bind(this, GameInput.BackAction, () =>
-        { if (CancelPowerLink()) return true; if (!_placing && !_browsingBuild) return false; CancelPlacement(); return true; }, 10);
+        { if (_hud.CancelFighterPatrolEdit() || CancelPowerLink()) return true; if (!_placing && !_browsingBuild) return false; CancelPlacement(); return true; }, 10);
     }
 
     // =========================================================
@@ -244,7 +244,7 @@ public partial class TowerPlacementController : Node2D
         if (input is InputEventKey key && !key.Echo && key.Location == KeyLocation.Right &&
             (key.PhysicalKeycode == Key.Shift || key.Keycode == Key.Shift))
         { _rightShiftHeld = key.Pressed; return; }
-        if (input is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Right } && CancelPowerLink())
+        if (input is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Right } && (_hud.CancelFighterPatrolEdit() || CancelPowerLink()))
         { GetViewport().SetInputAsHandled(); return; }
         if ((!_placing && !_browsingBuild) || input is not InputEventMouseButton mouse || !mouse.Pressed
             || mouse.ButtonIndex != MouseButton.Right) return;
@@ -256,10 +256,16 @@ public partial class TowerPlacementController : Node2D
     // Unhandled world clicks only; GUI panels consume mouse events independently.
     public override void _UnhandledInput(InputEvent input)
     {
+        if (input is InputEventMouseMotion)
+        {
+            _hud.UpdateFighterPatrolPreview(!_placing && !IsOverUi() ? GetGlobalMousePosition() : null);
+            return;
+        }
         if (input is not InputEventMouseButton mouse || !mouse.Pressed || IsOverUi()) return;
         if (mouse.ButtonIndex != MouseButton.Left) return;
 
-        HandleWorldClick(_grid.WorldToCell(GetGlobalMousePosition()));
+        Vector2 point = GetGlobalMousePosition();
+        if (_placing || !_hud.HandleFighterPatrolClick(point)) HandleWorldClick(_grid.WorldToCell(point));
         GetViewport().SetInputAsHandled();
     }
 

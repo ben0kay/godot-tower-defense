@@ -20,6 +20,12 @@ public partial class FighterDroneConfig : Resource
     [Export(PropertyHint.Range, ".1,2,.05")] public float SteeringResponseSeconds { get; set; } = .65f;
     [Export(PropertyHint.Range, ".1,2,.05")] public float AccelerationResponseSeconds { get; set; } = .6f;
     [Export(PropertyHint.Range, "0,5,.1")] public float TargetHoldSeconds { get; set; } = 1.5f;
+    [ExportGroup("Auto-patrol")]
+    [Export(PropertyHint.Range, "32,500,1")] public float PatrolWidth { get; set; } = 96;
+    [Export(PropertyHint.Range, "32,600,1")] public float PatrolSpeed { get; set; } = 145;
+    [Export(PropertyHint.Range, "30,720,1")] public float PatrolTurnDegreesPerSecond { get; set; } = 180;
+    [Export(PropertyHint.Range, "16,160,1")] public float PatrolArrivalTolerance { get; set; } = 48;
+    [Export(PropertyHint.Range, "48,300,1")] public float PatrolLeash { get; set; } = 110;
     [ExportGroup("Fighter Weapon (FD4)")]
     [Export(PropertyHint.Range, "16,1600,1")] public float WeaponRangePixels { get; set; } = 275;
     [Export(PropertyHint.Range, "0,1000,0.5")] public float DamagePerShot { get; set; } = 4;

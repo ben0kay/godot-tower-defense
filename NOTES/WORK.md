@@ -1,3 +1,9 @@
+## FD3 — Fighter Auto-patrol
+
+Individual roster controls now switch between Auto-pilot and A/B figure-eight patrol, with world preview and cancellable edits. Patrol uses distance-based steering and the existing opportunistic guns, recall and auto-service. Checkpoint persistence is deferred to FD6. Source and diff checks only. Godot .NET and live flight/UI validation remain pending.
+
+---
+
 ## Shared tower glows and a larger light pool
 
 Nearby towers of similar light size share one cosmetic lamp, and neighbouring groups dim their overlapping glow. The default pool increased to 24 lights and prioritizes tower groups near the camera when full. Individual tower reveal remains independent of grouping.

@@ -69,17 +69,26 @@ internal sealed class FighterDroneMovement
             }
             else destination = staging;
         }
-        destination = clamp(destination);
-        float response = FighterDroneConfig.Safe(config.SteeringResponseSeconds, .65f, .1f, 2);
+        // Only guard/staging can slow on arrival.
+        bool passing = target != null && (_stage == 1 || _stage == 2 || _stage == 3);
+        Steer(fighter, clamp(destination), cruise, passing, dt, clamp);
+    }
+
+    // =========================================================
+    // Patrol uses the same bounded acceleration and heading control as the attack runs.
+    internal void Steer(FighterDrone fighter, Vector2 destination, float cruise, bool passing, float dt,
+        System.Func<Vector2, Vector2> clamp, bool patrol = false)
+    {
+        var config = fighter.Config;
+        float speed = FighterDroneConfig.Safe(config.FlightSpeed, 300, 32, 2000);
+        float response = patrol ? .22f : FighterDroneConfig.Safe(config.SteeringResponseSeconds, .65f, .1f, 2);
         if (!_steeringReady) { _steeringPoint = fighter.GlobalPosition + Vector2.FromAngle(Heading) * 100; _steeringReady = true; }
         _steeringPoint = _steeringPoint.Lerp(destination, 1 - Mathf.Exp(-dt / response));
         Vector2 offset = _steeringPoint - fighter.GlobalPosition;
         float braking = FighterDroneConfig.Safe(config.Deceleration, 500, 32, 10000);
-        // Maintain forward speed through the firing pass and pull-away; only guard/staging can slow on arrival.
-        bool passing = target != null && (_stage == 1 || _stage == 2 || _stage == 3);
         float desiredSpeed = passing ? cruise : Mathf.Min(cruise, Mathf.Sqrt(2 * braking * offset.Length()));
         float desiredHeading = offset.LengthSquared() > .01f ? offset.Angle() : Heading;
-        float maxTurn = Mathf.DegToRad(FighterDroneConfig.Safe(config.TurnDegreesPerSecond, 90, 30, 720));
+        float maxTurn = Mathf.DegToRad(FighterDroneConfig.Safe(patrol ? config.PatrolTurnDegreesPerSecond : config.TurnDegreesPerSecond, 90, 30, 720));
         float wantedTurn = Mathf.Clamp(Mathf.AngleDifference(Heading, desiredHeading) / response, -maxTurn, maxTurn);
         _angularVelocity = Mathf.Lerp(_angularVelocity, wantedTurn, 1 - Mathf.Exp(-dt / (response * .5f)));
         Heading = Mathf.Wrap(Heading + _angularVelocity * dt, -Mathf.Pi, Mathf.Pi);

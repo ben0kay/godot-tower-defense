@@ -16,7 +16,7 @@ public partial class FighterDrone : Node2D
     public int AmmoCapacity => Reserve?.Capacity ?? Mathf.Clamp(Config.AmmoCapacity, 1, 10000);
     public FighterDroneState State { get; private set; } = FighterDroneState.Docked;
     public bool IsFlying => State != FighterDroneState.Docked;
-    internal bool NeedsTargeting => IsFlying && !InTransit && Health > 0 && Ammo > 0;
+    internal bool NeedsTargeting => !IsPatrolling && IsFlying && !InTransit && Health > 0 && Ammo > 0;
     private bool InTransit => State is FighterDroneState.Launching or FighterDroneState.Returning;
     private readonly FighterDroneMovement _steering = new();
     private Enemy _target;
@@ -59,7 +59,7 @@ public partial class FighterDrone : Node2D
             FighterDroneConfig.Safe(Config.FlightSpeed, 340, 32, 2000), 100,
             Config.Acceleration, Config.Deceleration);
         State = returning ? FighterDroneState.Returning : FighterDroneState.Launching;
-        _steering.ResetPass(); _weapon?.Suspend();
+        _patrolJoined = _patrolSeeking = false; _steering.ResetPass(); _weapon?.Suspend();
         Present(0, true);
     }
     internal bool Step(float dt)

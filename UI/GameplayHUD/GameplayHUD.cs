@@ -24,6 +24,10 @@ public partial class GameplayHUD : Control
     [Signal] public delegate void TowerSellConfirmedEventHandler();
     private Button _sellButton;
     private FighterStationPanel _fighterStationPanel;
+    internal bool CancelFighterPatrolEdit() => _fighterStationPanel?.CancelPatrolEdit() == true;
+    internal bool HandleFighterPatrolClick(Vector2 point) => _fighterStationPanel?.HandlePatrolClick(point) == true;
+    internal void UpdateFighterPatrolPreview(Vector2? point) => _fighterStationPanel?.UpdatePatrolPreview(point);
+
     private ConfirmationDialog _sellConfirmation;
     [Signal] public delegate void TargetPriorityRequestedEventHandler(int priority);
     #endregion

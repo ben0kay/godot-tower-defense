@@ -44,7 +44,7 @@ public partial class DroneStation : TowerBase, IAmmoDeliveryConsumer
         Fighters = new FighterDroneManager { Name = "Fighters" };
         AddChild(Fighters); Fighters.Bind(this, grid); RefreshStationService();
     }
-    private bool CanCommand => IsInsideTree() && !IsQueuedForDeletion() && !IsDestroyed && !GetTree().Paused &&
+    internal bool CanCommand => IsInsideTree() && !IsQueuedForDeletion() && !IsDestroyed && !GetTree().Paused &&
         Fighters != null && (_session == null || _session.State == LevelSessionState.Playing);
     private Godot.Collections.Array<ResourceCost> Price() => new()
     {

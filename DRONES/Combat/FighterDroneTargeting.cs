@@ -11,6 +11,7 @@ public partial class FighterDroneTargeting : Node
     private float _wait;
     private bool _scanning, _combatReady, _buildingCombat;
     // Weapons can engage detectable debug/unowned ships even without a valid Citadel journey.
+    internal bool HasLivingEnemies => _registry.Living.Count > 0;
     internal bool HasCombatCandidates => _registry.Living.Count > 0 && (_combatReady || _buildingCombat);
     internal bool HasThreatCandidates => _registry.Living.Count > 0 && _ranked.Count > 0;
     private const int CandidateLimit = 64, ScanBudget = 96;

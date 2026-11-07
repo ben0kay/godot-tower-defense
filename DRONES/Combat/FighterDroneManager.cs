@@ -80,6 +80,20 @@ public partial class FighterDroneManager : Node
     }
     private Vector2 LaunchPoint(int slot) => ClampToMap(DockPoint(slot) + Vector2.Up *
         FighterDroneConfig.Safe(_station.Config.FighterConfig.LaunchDistance, 180, 64, 600));
+    internal WorldGrid PatrolGrid => _grid;
+
+    internal FighterPatrolRoute PreviewPatrol(FighterDrone fighter, Vector2 a, Vector2 b) =>
+        FighterPatrolRoute.Create(a, b, fighter.Config, _grid);
+
+    internal bool SetPatrolMode(FighterDrone fighter, bool patrol, FighterPatrolRoute replacement = null)
+    {
+        if (_shutdown || !_station.CanCommand || !GodotObject.IsInstanceValid(fighter) ||
+            At(fighter.Slot) != fighter || (patrol && replacement == null && fighter.PatrolRoute == null)) return false;
+        fighter.SetPatrolMode(patrol, replacement, _targeting);
+        _station.NotifyRuntimeChanged();
+        return true;
+    }
+
     internal bool Launch(int slot, bool automatic = false)
     {
         FighterDrone fighter = At(slot);
@@ -132,7 +146,9 @@ public partial class FighterDroneManager : Node
                 bool arrived = fighter.Step(dt); changed |= arrived;
                 if (fighter.NeedsTargeting) _targeting?.Tick(dt);
                 if (arrived && fighter.State == FighterDroneState.Docked) BeginDockService(fighter);
-                changed |= fighter.StepAutoPilot(dt, _targeting, LaunchPoint(i), _clamp);
+                changed |= fighter.IsPatrolling
+                    ? fighter.StepPatrol(dt, _targeting?.HasLivingEnemies == true, _clamp)
+                    : fighter.StepAutoPilot(dt, _targeting, LaunchPoint(i), _clamp);
             }
         }
         changed |= ServiceStep(dt);
