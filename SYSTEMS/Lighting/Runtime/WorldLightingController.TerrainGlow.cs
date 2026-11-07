@@ -1,4 +1,4 @@
-// Retained tile glow chunks for buildable foundations and every playable lava cell.
+// Retained tile glow chunks for the cyan passable foundation tile and every playable lava cell.
 using Godot;
 using System.Collections.Generic;
 
@@ -22,8 +22,8 @@ public partial class WorldLightingController
 
         Dictionary<Vector2I, List<TileGlow>> chunks = new();
         float size = Grid.Config.CellSize;
-        foreach (Vector2I cell in Grid.EnumerateBuildableTerrain())
-            AddTileGlow(chunks, cell, size * .72f, new Color(.22f, .80f, 1f, .44f));
+        foreach (Vector2I cell in EnumerateCyanFoundationCells())
+            AddTileGlow(chunks, cell, size * .50f, new Color(.22f, .80f, 1f, .44f));
         if (HasOutput(Config.Lava) && Grid.InteractiveTiles is { } terrain)
         {
             Color lavaTint = Config.Lava.Tint;
@@ -42,6 +42,22 @@ public partial class WorldLightingController
             Node2D chunk = new() { Material = material, TextureFilter = CanvasItem.TextureFilterEnum.Linear };
             chunk.Draw += () => DrawTileGlow(chunk, glows);
             _terrainGlow.AddChild(chunk);
+        }
+    }
+
+    // =========================================================
+    // Only the authored cyan foundation emits. Buildability alone also matches solid walls.
+    private IEnumerable<Vector2I> EnumerateCyanFoundationCells()
+    {
+        TileMapLayer passable = Grid.Level.Passable;
+        Vector2I atlas = new(3, 0);
+        foreach (Vector2I painted in passable.GetUsedCells())
+        {
+            if (passable.GetCellSourceId(painted) != 1 || passable.GetCellAtlasCoords(painted) != atlas ||
+                passable.GetCellAlternativeTile(painted) != 0) continue;
+            Vector2I cell = Grid.WorldToCell(passable.ToGlobal(passable.MapToLocal(painted)));
+            if (!Grid.TerrainBlocksEnemies(cell) && Grid.InteractiveTiles?.IsLava(Grid.CellToWorldCenter(cell)) != true)
+                yield return cell;
         }
     }
 

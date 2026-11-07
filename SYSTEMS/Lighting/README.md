@@ -8,7 +8,7 @@ Placed towers inherit a 384px cyan radius from `Presets/DefaultTowerLight.tres`.
 
 Nearby tower lamps of similar size share a capped glow. Neighbouring groups soften each other, and visible groups near the camera centre get priority if the pool fills. Reveal still uses each eligible tower's own footprint.
 
-Disabled towers release their cyan light and reveal until they recover. Foundation tiles have subtle cyan accents and each playable lava tile has a warm accent. Lava uses the same base glow on every tile. Regional footprints still provide reveal. F6 toggles the terrain glows with the rest of the presentation.
+Disabled towers release their cyan light and reveal until they recover. The cyan passable foundation (source 1, atlas (3, 0), alternative 0) has a cell-contained cyan accent and each playable lava tile has a warm accent. Lava uses the same base glow on every tile. Regional footprints still provide reveal. F6 toggles the terrain glows with the rest of the presentation.
 
 ## Projectile lights
 
