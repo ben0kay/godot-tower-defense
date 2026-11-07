@@ -23,7 +23,7 @@ public partial class WorldLightingController
         Dictionary<Vector2I, List<TileGlow>> chunks = new();
         float size = Grid.Config.CellSize;
         foreach (Vector2I cell in Grid.EnumerateBuildableTerrain())
-            AddTileGlow(chunks, cell, size * .60f, new Color(.29f, .82f, 1f, .11f));
+            AddTileGlow(chunks, cell, size * .72f, new Color(.22f, .80f, 1f, .44f));
         if (HasOutput(Config.Lava) && Grid.InteractiveTiles is { } terrain)
         {
             Color lavaTint = Config.Lava.Tint;

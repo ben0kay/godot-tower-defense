@@ -184,7 +184,7 @@ public partial class WorldGrid : Node2D
             for (int x = 0; x < Config.WidthCells; x++)
             {
                 Vector2I cell = new(x, y);
-                if (CanBuild(cell)) yield return cell;
+                if (_buildable[Index(cell)]) yield return cell;
             }
     }
     public bool TerrainConductsPower(Vector2I cell) => IsInsideMap(cell) && _conductsPower[Index(cell)];
