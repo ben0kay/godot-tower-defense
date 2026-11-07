@@ -1,3 +1,9 @@
+## VE3 decorative industrial atlas — clarified Codex handoff (2026-11-06)
+
+Updated `WORLD/BACKGROUNDS/README.md` VE3 plan: new transparent paintable 64×64 cyan/amber conduit, corner, junction, edge and indicator tiles inside the **existing** Decorations TileSet; preserve old atlas source 0/coordinate 5:0/0 and all maps. Animation is opt-in and local to new accent atlas cells via `MetalPulse.gdshader`, never an all-Decorations shader. VE3 is purely cosmetic, no power coupling, new runtime entity per tile, auto-repaint, VE4 or gameplay changes. Codex must verify actual Godot atlas/material isolation before committing an animated approach. **Planning only; not implemented.**
+
+---
+
 ## Level003 lava briefing voice — 2026-11-06
 
 Replaced Level003 briefing text with the owner's exact revised lava/Citadel wording. Moved the user-uploaded 265,054-byte Fish Audio MP3 from the repository root into `LEVELS/Level003/Level003Briefing.mp3` using the unchanged Git blob (no re-encoding); deleted its long original export name. Added `Level003BriefingVoice.tres`, registered it in `AUDIO/DefaultAudioCatalog.tres`, and set `VoiceCueId = voice_mission_level003_intro`. This uses the existing Level001/002 voice-held top-right typewriter on fresh deployment while checkpoint Continue skips the briefing. No gameplay, waves, lava damage, terrain or save changes. Resource/source check only; owner to verify audible playback and subtitles in Godot after import.
