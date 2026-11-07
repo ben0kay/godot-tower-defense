@@ -1,1 +1,50 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="-32 -32 64 64"><rect x="-28" y="-28" width="56" height="56" rx="6" fill="#102333" stroke="#74dfc1" stroke-width="2"/><path d="M-18-12H18V15H-18Z" fill="#24594f" stroke="#74dfc1" stroke-width="2"/><path d="M-12-6H12M-12 1H12M-12 8H12M-4-12V15M4-12V15" stroke="#74dfc1" stroke-width="2"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="-32 -32 64 64">
+<defs>
+<linearGradient id="frame" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#748f9d"/><stop offset=".46" stop-color="#344d5b"/><stop offset="1" stop-color="#142734"/></linearGradient>
+<linearGradient id="panel" x1="0" y1="0" x2=".85" y2="1"><stop stop-color="#5e7884"/><stop offset=".52" stop-color="#2e4654"/><stop offset="1" stop-color="#102430"/></linearGradient>
+<linearGradient id="teal" x1="0" y1="0" x2=".7" y2="1"><stop stop-color="#e6fff6"/><stop offset=".4" stop-color="#83eed8"/><stop offset="1" stop-color="#258880"/></linearGradient>
+<linearGradient id="brass" x1="0" y1="0" x2="1" y2=".7"><stop stop-color="#ffe9ae"/><stop offset=".46" stop-color="#e3ae63"/><stop offset="1" stop-color="#855536"/></linearGradient>
+</defs>
+<!-- Armoured ammunition storage and dispatch pad: top-down generator-family silhouette. -->
+<path d="M-23-30H23L30-23V23L23 30H-23L-30 23V-23Z" fill="#08151e" stroke="#a4c5c8" stroke-width="1.6"/>
+<path d="M-22-27H22L27-22V22L22 27H-22L-27 22V-22Z" fill="url(#frame)" stroke="#507b84" stroke-width="1"/>
+<path d="M-20-24H20L24-20V20L20 24H-20L-24 20V-20Z" fill="#0e2532" stroke="#6f9aa1" stroke-width="1"/>
+<path d="M-24-14H24M-24 14H24M-14-24V24M14-24V24" stroke="#355866" stroke-width="1"/>
+<path d="M-26-22L-19-15M26-22L19-15M-26 22L-19 15M26 22L19 15" stroke="#74d5be" stroke-width="2.3"/>
+<g fill="#c6d8d8" stroke="#172a35" stroke-width=".65"><circle cx="-24" cy="-24" r="2.3"/><circle cx="24" cy="-24" r="2.3"/><circle cx="-24" cy="24" r="2.3"/><circle cx="24" cy="24" r="2.3"/></g>
+<g fill="#152c37"><circle cx="-24" cy="-24" r=".85"/><circle cx="24" cy="-24" r=".85"/><circle cx="-24" cy="24" r=".85"/><circle cx="24" cy="24" r=".85"/></g>
+<!-- Twin banks of sealed cartridge storage modules. -->
+<rect x="-25" y="-19" width="16" height="38" rx="2" fill="url(#panel)" stroke="#a4c2c6" stroke-width="1"/>
+<rect x="9" y="-19" width="16" height="38" rx="2" fill="url(#panel)" stroke="#a4c2c6" stroke-width="1"/>
+<g fill="#102632" stroke="#60818d" stroke-width=".85">
+<rect x="-22.5" y="-16" width="11" height="9" rx="1"/>
+<rect x="-22.5" y="-4.5" width="11" height="9" rx="1"/>
+<rect x="-22.5" y="7" width="11" height="9" rx="1"/>
+<rect x="11.5" y="-16" width="11" height="9" rx="1"/>
+<rect x="11.5" y="-4.5" width="11" height="9" rx="1"/>
+<rect x="11.5" y="7" width="11" height="9" rx="1"/>
+</g>
+<!-- Munitions indicators in each secured tray, distinctly different from factory press. -->
+<g fill="url(#brass)" stroke="#ffe4ac" stroke-width=".6">
+<rect x="-20" y="-14" width="6" height="5" rx=".8"/><rect x="-20" y="-2.5" width="6" height="5" rx=".8"/><rect x="-20" y="9" width="6" height="5" rx=".8"/>
+<rect x="14" y="-14" width="6" height="5" rx=".8"/><rect x="14" y="-2.5" width="6" height="5" rx=".8"/><rect x="14" y="9" width="6" height="5" rx=".8"/>
+</g>
+<path d="M-25-20H-10M10-20H25M-25 20H-10M10 20H25" stroke="#7be4cd" stroke-width="1.4"/>
+<!-- Vertical secured loading lift, segmented blast-proof hatch. -->
+<path d="M-9-21L-5-25H5L9-21V21L5 25H-5L-9 21Z" fill="url(#frame)" stroke="#a4c5c8" stroke-width="1.5"/>
+<rect x="-6" y="-18" width="12" height="36" rx="1.8" fill="#091e29" stroke="#739ca9" stroke-width="1"/>
+<path d="M-5-11H5M-5-6H5M-5-1H5M-5 4H5M-5 9H5M-5 14H5" stroke="#395f69" stroke-width="2"/>
+<rect x="-4" y="-16" width="8" height="6" rx="1" fill="url(#teal)"/>
+<path d="M-1.5-15L2-13L-1.5-11Z" fill="#194755"/>
+<path d="M-7-1H7M-7 16H7" stroke="#a4c8c7" stroke-width="1.7"/>
+<!-- Cargo-control status screens and automated gate lights. -->
+<path d="M-12-25H12L14-21H-14Z" fill="url(#panel)" stroke="#a3bdc5" stroke-width="1"/>
+<rect x="-7" y="-23.6" width="14" height="1.6" rx=".8" fill="url(#teal)"/>
+<circle cx="-9.5" cy="-23" r="1" fill="#ffc77a"/><circle cx="9.5" cy="-23" r="1" fill="#ffc77a"/>
+<path d="M-12 25H12L14 21H-14Z" fill="url(#panel)" stroke="#a3bdc5" stroke-width="1"/>
+<path d="M-8 23H8" stroke="#73ebd6" stroke-width="2"/>
+<!-- Structural clamps and loading direction symbols. -->
+<path d="M-28-10H-25M-28 10H-25M25-10H28M25 10H28" stroke="#c2d7d6" stroke-width="1.8"/>
+<path d="M-27-6V6M27-6V6" stroke="url(#teal)" stroke-width="2"/>
+<path d="M-15 23L-12 21L-12 25Z M15 23L12 21L12 25Z" fill="#a1ffed"/>
+</svg>

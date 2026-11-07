@@ -1,3 +1,9 @@
+## Ammunition Factory and Depot SVG art overhaul — 2026-11-07
+
+Replaced the existing 64×64 top-down `factory.svg` and `depot.svg` with layered sci-fi industrial art matching the newer power generator metalwork. Factory now has twin forge chambers, a cartridge stamping press, vents, copper ammo and cyan dispatch lighting; Depot has separate storage cassettes, an armoured automated loading lift, sealed cargo bays and teal status lamps. Updated Factory's three 0/35/70% construction SVG stages to evolve toward its new finished silhouette; kept existing `.svg` paths, 64×64 centered viewBoxes, importer/scene references, 3×2/2×2 footprints, sprite scales, construction timing, production, storage and logistics untouched. Dormant future Factory Level 2/3 upgrades remain as previously authored, not enabled. Source SVG and path review only; owner to inspect Godot rendering/reimport and 100%-completion transition.
+
+---
+
 ## Original GameMaker audio archive — 2026-11-07
 
 Copied 12 unchanged sound assets (`snd_voice_victory`, `snd_voice_defeat`, wave cues, notifications, Credits/build placement feedback, and menu buttons) from `ben0kay/SPACE-SHOOTER-TD-IDLE-CLICKER-HYBRID/sounds/` into the root `AUDIO/` folder. Original WAV/MP3 names and bytes preserved. These are *loose assets only*: no catalog registration, event wiring, mixer changes or runtime playback. Godot import/listening remains owner-controlled.

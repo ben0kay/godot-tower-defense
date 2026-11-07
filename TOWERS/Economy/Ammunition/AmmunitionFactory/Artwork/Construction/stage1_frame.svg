@@ -1,3 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="-32 -32 64 64">
-<rect x="-28" y="-28" width="56" height="56" rx="6" fill="#102333" stroke="#ffb552" stroke-width="2"/><path d="M-18 14V-6L-6 0V-8L6-2V-18H16V14Z" fill="#203847" stroke="#b88753" stroke-width="2"/><path d="M-18 14H16M-18 -6L-6 0M-6 -8L6 -2M6 -18V14M16 -18V14" fill="none" stroke="#e1b177" stroke-width="1.7"/><path d="M-22 18V-19H20V18M-22 -19H20" stroke="#799097" stroke-width="1.3" fill="none" stroke-dasharray="4 3"/><rect x="-12" y="6" width="6" height="5" fill="#3b5560" stroke="#a98a68"/><rect x="0" y="6" width="6" height="5" fill="#3b5560" stroke="#a98a68"/>
+<defs><linearGradient id="shell" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#748d99"/><stop offset="1" stop-color="#1d303a"/></linearGradient><linearGradient id="copper" x1="0" y1="0" x2="1" y2=".8"><stop stop-color="#ffe7a7"/><stop offset="1" stop-color="#b66e36"/></linearGradient></defs>
+<path d="M-23-30H23L30-23V23L23 30H-23L-30 23V-23Z" fill="#081720" stroke="#9bb5bc" stroke-width="1.5"/>
+<path d="M-22-27H22L27-22V22L22 27H-22L-27 22V-22Z" fill="url(#shell)" stroke="#486a76"/>
+<path d="M-20-24H20L24-20V20L20 24H-20L-24 20V-20Z" fill="#122a36" stroke="#63828d"/>
+<path d="M-24-15H24M-24 16H24M-14-24V24M14-24V24" stroke="#435c67" stroke-width="1"/>
+<g fill="#a8b9be" stroke="#15232b" stroke-width=".65"><circle cx="-24" cy="-24" r="2.3"/><circle cx="24" cy="-24" r="2.3"/><circle cx="-24" cy="24" r="2.3"/><circle cx="24" cy="24" r="2.3"/></g><!-- Open structural skeleton, unfinished side casings and press rails at 35%. -->
+<path d="M-27-13H-17V14H-27Z M17-13H27V14H17Z" fill="#1f3643" stroke="#b9c6c7" stroke-width="1.3"/>
+<path d="M-26-9H-19M-26-3H-19M-26 3H-19M-26 9H-19M19-9H26M19-3H26M19 3H26M19 9H26" stroke="#3c5b69" stroke-width="1.8"/>
+<path d="M-14-23H-4L-2-19V-8H-17V-19Z M4-23H14L17-19V-8H2V-19Z" fill="#1d3744" stroke="#d2a36d" stroke-width="1.3"/>
+<path d="M-12-8L-8-12H8L12-8V16L8 20H-8L-12 16Z" fill="#0d2632" stroke="#d7ac79" stroke-width="1.6"/>
+<path d="M-9-6V15M9-6V15M-9-6H9M-9 15H9" stroke="#91afb8" stroke-width="1.6" stroke-dasharray="4 2"/>
+<path d="M-17-19V-6L-13-2M17-19V-6L13-2" fill="none" stroke="#b0bdc0" stroke-width="1.6"/>
+<path d="M-12 20H12V28H-12Z" fill="#1b333d" stroke="#cf9459" stroke-width="1"/>
+<path d="M-8 23H8" stroke="#caa36e" stroke-width="1.5"/>
 </svg>

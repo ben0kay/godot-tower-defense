@@ -4,10 +4,10 @@ This building keeps its **single stationary root `Sprite`**, its **`Vector2(3, 2
 
 | Build work milestone | Texture | Look |
 | --- | --- | --- |
-| 0% | `stage0_foundation.svg` | Industrial ground slab, empty machinery mount |
-| 35% | `stage1_frame.svg` | Open conveyor and factory silhouette framework |
-| 70% | `stage2_assembly.svg` | Partially finished factory and incomplete power fixtures |
-| 100% | `../factory.svg` | **Unchanged** original orange/navy completed Level 1 factory |
+| 0% | `stage0_foundation.svg` | Chamfered steel foundation with open press mount |
+| 35% | `stage1_frame.svg` | Open twin-chamber framework, structural skeleton and press rails |
+| 70% | `stage2_assembly.svg` | Nearly completed press and copper cartridge equipment, with unfinished conveyor |
+| 100% | `../factory.svg` | Detailed completed industrial munitions press with metallic casing, cartridge line, vents and cyan/amber accents |
 
 The shared `TowerConstructionArt` resource also includes **future-only** cosmetic Level 2/3 entries, but **the Ammunition Factory currently has no paid production upgrades**. These entries do not create upgrade buttons, prices, tiers, or gameplay rules.
 

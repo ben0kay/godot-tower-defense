@@ -1,6 +1,6 @@
 ## Initial construction and future upgrade artwork — 2026-11-03
 
-Added stage SVGs at **0% foundation**, **35% open frame**, **70% partially assembled factory**, switching back to the unchanged original completed factory art at 100% through shared event-driven `TowerConstructionVisuals`. The scene preserves its single stationary sprite at `Vector2(3,2)` and **3×2** gameplay footprint; original 200-Credit/8-second construction, 100-ammo-per-2s production, logistics, drones, buffer and save data are unchanged.
+Added stage SVGs at **0% foundation**, **35% open frame**, **70% partially assembled factory**, switching to the redesigned completed factory art at 100% through shared event-driven `TowerConstructionVisuals`. The scene preserves its single stationary sprite at `Vector2(3,2)` and **3×2** gameplay footprint; original 200-Credit/8-second construction, 100-ammo-per-2s production, logistics, drones, buffer and save data are unchanged.
 
 Also added **future-only** Level 2/3 finished artwork and 35%/70% upgrade composites. **These are not purchasable upgrades:** no production-tier recipes or paid upgrades exist yet. `DefaultAmmunitionFactoryConfig.tres` deliberately declares the new external construction resource before any subresources, following the Resource Tower parser correction in commit `3ae0e25`. See [construction](Artwork/Construction/README.md) and [prepared upgrades](Artwork/Upgrades/README.md). Source checks only; owner visual testing pending.
 

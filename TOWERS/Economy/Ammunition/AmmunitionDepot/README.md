@@ -1,6 +1,6 @@
 # Ammunition Depot — implemented
 
-A passive Economy building registered as `ammo_depot`; default price **150 Credits**, 2×2 footprint. Uses normal catalog/placement/navigation/payment, with simple vector storage artwork. It has no targeting/weapon loop.
+A passive Economy building registered as `ammo_depot`; default price **150 Credits**, 2×2 footprint. Uses normal catalog/placement/navigation/payment, with detailed top-down armoured storage artwork. It has no targeting/weapon loop.
 
 Each placed node owns the existing `AmmoStorage` helper and its finite `Inventory`. Provisional config defaults: **10,000 capacity**, initially empty, **two home drones**, **250 payload**, **220px/s**. Storage capacity is captured at construction; source drone settings affect subsequent dispatches. Multiple depots remain independent.
 

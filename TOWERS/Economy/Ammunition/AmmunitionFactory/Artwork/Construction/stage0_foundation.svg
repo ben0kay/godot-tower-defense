@@ -1,3 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="-32 -32 64 64">
-<rect x="-28" y="-28" width="56" height="56" rx="6" fill="#102333" stroke="#ffb552" stroke-width="2"/><rect x="-22" y="-19" width="44" height="38" rx="3" fill="#1c3543" stroke="#9c7854" stroke-width="1.5"/><path d="M-20 -11H20M-20 11H20M-15 -17V17M15 -17V17" stroke="#54717a" stroke-width="1.6" stroke-dasharray="4 4"/><circle cx="0" cy="0" r="6" fill="#0e2634" stroke="#e2a667" stroke-width="1.4"/><circle cx="0" cy="0" r="2.5" fill="#b77a42"/>
+<defs><linearGradient id="shell" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#748d99"/><stop offset="1" stop-color="#1d303a"/></linearGradient><linearGradient id="copper" x1="0" y1="0" x2="1" y2=".8"><stop stop-color="#ffe7a7"/><stop offset="1" stop-color="#b66e36"/></linearGradient></defs>
+<path d="M-23-30H23L30-23V23L23 30H-23L-30 23V-23Z" fill="#081720" stroke="#9bb5bc" stroke-width="1.5"/>
+<path d="M-22-27H22L27-22V22L22 27H-22L-27 22V-22Z" fill="url(#shell)" stroke="#486a76"/>
+<path d="M-20-24H20L24-20V20L20 24H-20L-24 20V-20Z" fill="#122a36" stroke="#63828d"/>
+<path d="M-24-15H24M-24 16H24M-14-24V24M14-24V24" stroke="#435c67" stroke-width="1"/>
+<g fill="#a8b9be" stroke="#15232b" stroke-width=".65"><circle cx="-24" cy="-24" r="2.3"/><circle cx="24" cy="-24" r="2.3"/><circle cx="-24" cy="24" r="2.3"/><circle cx="24" cy="24" r="2.3"/></g><!-- Empty press anchor and conduit plate at 0%; central equipment not yet installed. -->
+<path d="M-17-20H17V19H-17Z" fill="#0b202b" stroke="#91aeb6" stroke-width="1.6" stroke-dasharray="4 2"/>
+<path d="M-12-12L-8-16H8L12-12V12L8 16H-8L-12 12Z" fill="#1d3642" stroke="#dc9b5c" stroke-width="1.2"/>
+<path d="M-8-8H8V8H-8Z" fill="#0e2530" stroke="#6c8a97" stroke-width="1.2"/>
+<path d="M-17-7H-12M12-7H17M-17 7H-12M12 7H17" stroke="#96aeb6" stroke-width="1.7"/>
+<circle cx="0" cy="0" r="4" fill="#1c3540" stroke="#cf9459" stroke-width="1.3"/>
+<path d="M-9 23H9" stroke="#b88e62" stroke-width="2"/>
 </svg>
