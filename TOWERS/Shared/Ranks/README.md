@@ -9,12 +9,12 @@ Purchased **Level** and earned **Rank** are independent. TowerBase owns its Upgr
 | Rank | Total XP | XP from previous | Damage bonus | Range bonus | HP bonus (active) |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | Standard | 0 | — | 0% | 0% | 0% |
-| Veteran | 1,000 | 1,000 | 2% | 1% | 2% |
-| Enhanced | 3,000 | 2,000 | 4% | 2% | 4% |
-| Superior | 7,000 | 4,000 | 6% | 3% | 6% |
-| Legendary | 15,000 | 8,000 | 8% | 4% | 8% |
+| Veteran | 3,000 | 3,000 | 2% | 1% | 2% |
+| Enhanced | 8,000 | 5,000 | 4% | 2% | 4% |
+| Superior | 17,500 | 9,500 | 6% | 3% | 6% |
+| Legendary | 30,000 | 12,500 | 8% | 4% | 8% |
 
-These are complete **current-rank totals**, never accumulated bonuses from earlier ranks. Incremental XP requirements double (1,000/2,000/4,000/8,000). Edit each type's compact one-row-per-rank `BattleTowerRanks.cs`, `LaserTowerRanks.cs`, `BlasterCannonRanks.cs` or `ShockwaveTowerRanks.cs` beside its Levels file. Tables are immutable typed C# data, independently customizable per type. TowerRankController.Define validates ordered names, increasing finite thresholds and finite nonnegative bonuses once when each table initializes. The passive test config has only a neutral Standard row; it has no invented weapon/rank loop.
+These are complete **current-rank totals**, never accumulated bonuses from earlier ranks. Incremental XP requirements are 3,000/5,000/9,500/12,500. They do **not** follow the earlier doubling curve. Edit each type's compact one-row-per-rank `BattleTowerRanks.cs`, `LaserTowerRanks.cs`, `BlasterCannonRanks.cs` or `ShockwaveTowerRanks.cs` beside its Levels file. Tables are immutable typed C# data, independently customizable per type. TowerRankController.Define validates ordered names, increasing finite thresholds and finite nonnegative bonuses once when each table initializes. The passive test config has only a neutral Standard row; it has no invented weapon/rank loop.
 
 ## Awarding and bounded damage XP
 
@@ -40,8 +40,8 @@ Stage02 selects the complete explicit Level row. Active Stage03 then applies onl
 
 Ordinary XP awards emit ExperienceChanged only. Promotions rebuild cached FinalStats once and emit StatsChanged, then ExperienceChanged. Paid previews call the same ranked resolver as application. Normal combat ticks reuse FinalStats. No pipeline stage spends money or owns attribution.
 
-The existing bottom-right Inspector shows named Rank, within-rank XP progress/bar, total XP and active Damage/Range/HP bonuses. At Legendary it shows MAX RANK. A Veteran with1,200 total XP shows200 /2,000 XP to Enhanced. Selection subscribes to that actual tower's events; changing selection/unloading unsubscribes. Ordinary XP updates are deferred/coalesced per selected frame and preserve upgrade details. Promotions update combat/preview immediately. Build previews hide rank details. No new window, polling loop or Rank Up button was added.
+The existing bottom-right Inspector shows named Rank, within-rank XP progress/bar, total XP and active Damage/Range/HP bonuses. At Legendary it shows MAX RANK. A Veteran with3,200 total XP shows200 /5,000 XP to Enhanced. Selection subscribes to that actual tower's events; changing selection/unloading unsubscribes. Ordinary XP updates are deferred/coalesced per selected frame and preserve upgrade details. Promotions update combat/preview immediately. Build previews hide rank details. No new window, polling loop or Rank Up button was added.
 
 TowerRankChecks runs in EnemyIntegrationChecks and covers actual/fractional XP, all four production attack deliveries, competing attackers, splash recipients, shields/restoration, overkill, invalid/zero/manual/arrival cases, weak-source lifetime, named thresholds/multiple promotions, type-specific tables, Stage03/order/rounding, explicit level/prices, purchases, Inspector events/layout/MAX and500 recipients. See TESTS/README.md for executed results. Tower HP is now implemented in Shared/Durability; saving and rank abilities remain deferred.
 
-**October 2026 rebalance:** Rank XP thresholds are 10× higher; damage/kill XP income and rank bonus percentages are unchanged. Purchased level balance lives in each tower's `*Levels.cs`.
+**November 2026 rebalance:** Rank thresholds are now 3,000/8,000/17,500/30,000 total XP; this supersedes the October 2026 1,000/3,000/7,000/15,000 curve. Damage/kill XP income, bonuses and paid level balance remain unchanged. Purchased level balance lives in each tower's `*Levels.cs`.

@@ -1,3 +1,9 @@
+## Tower rank XP thresholds rebalanced — 2026-11-07
+
+Set offensive tower Veteran/Enhanced/Superior/Legendary **cumulative** XP requirements to **3,000 / 8,000 / 17,500 / 30,000** in all ten existing `*Ranks.cs` tables. Kept damage/range/HP/spread rank bonuses, shared damage/kill XP multipliers, paid tower Levels and per-tower XP untouched. Updated the shared Ranks README and focused threshold/Inspector test expectations for the new non-doubling increments (3,000/5,000/9,500/12,500). Source-only sanity check; gameplay verification remains with owner.
+
+---
+
 ## LGT0-A.3 — combat reveal before shadows
 
 **Source Implemented / Awaiting Owner Validation.** Darker terrain, neutral tower-range lift and purple portal pools now share reveal with entity rendering and direct combat locks. Blackout suppression, existing projectile hits in darkness, and camera-independent targeting are documented in [Lighting](../SYSTEMS/Lighting/README.md). Native shader/mask loading and source checks passed. Godot .NET, rendered appearance and performance await owner validation.
