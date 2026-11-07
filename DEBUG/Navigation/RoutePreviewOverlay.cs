@@ -40,6 +40,8 @@ public partial class RoutePreviewOverlay : Node2D
     {
         _designOverlay = GetParent().GetNodeOrNull<CheckpointDesignOverlay>("CheckpointOverlay");
         _spawns = spawns; _nav = spawns.Paths.Navigation; ZIndex = 90;
+        // LGT0-A: keep world-space F3 route colors readable through ambient tint and point lights.
+        Material = new CanvasItemMaterial { LightMode = CanvasItemMaterial.LightModeEnum.Unshaded };
         _canvas = new CanvasLayer { Name = "PreviewUI", Layer = 20, Visible = false }; AddChild(_canvas);
         PanelContainer panel = new() { Name = "Panel", Position = new(16, 190), Size = new(420, 490) };
         UIMasterConfig theme = GD.Load<UIMasterConfig>("res://UI/DefaultUIConfig.tres");

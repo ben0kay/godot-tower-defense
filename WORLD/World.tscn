@@ -1,4 +1,4 @@
-[gd_scene load_steps=41 format=3]
+[gd_scene load_steps=44 format=3]
 
 [ext_resource type="Script" path="res://WORLD/GRID/WorldGrid.cs" id="1_script"]
 [ext_resource type="Resource" path="res://WORLD/DefaultWorldConfig.tres" id="2_config"]
@@ -55,6 +55,11 @@
 [ext_resource type="Resource" path="res://WORLD/TERRAIN/Mountains/DefaultMountainVisual.tres" id="mountain_config"]
 
 [ext_resource type="Script" path="res://UI/Power/IslandInspection/IslandPowerInspection.cs" id="island_power_ui"]
+
+; LGT0-A world lighting. Remove these resources and the Lighting child to detach the controller.
+[ext_resource type="Script" path="res://SYSTEMS/Lighting/WorldLightingController.cs" id="lighting_controller"]
+[ext_resource type="Resource" path="res://SYSTEMS/Lighting/DefaultLightingConfig.tres" id="lighting_config"]
+[ext_resource type="Texture2D" path="res://SYSTEMS/Lighting/SoftLightFalloff.tres" id="lighting_falloff"]
 
 [node name="World" type="Node2D"]
 script = ExtResource("loader")
@@ -162,3 +167,10 @@ Config = ExtResource("mountain_config")
 
 [node name="IslandPowerInspection" type="Node2D" parent="."]
 script = ExtResource("island_power_ui")
+
+[node name="Lighting" type="Node2D" parent="." node_paths=PackedStringArray("PlacedTowers", "Grid")]
+script = ExtResource("lighting_controller")
+Config = ExtResource("lighting_config")
+Falloff = ExtResource("lighting_falloff")
+PlacedTowers = NodePath("../Towers")
+Grid = NodePath("../Grid")

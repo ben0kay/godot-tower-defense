@@ -7,6 +7,11 @@
 [ext_resource type="Texture2D" path="res://TOWERS/Offensive/BattleTower/Artwork/battle_gun.svg" id="gun"]
 [ext_resource type="Script" path="res://TOWERS/Shared/Weapons/Recoil/TowerRecoilController.cs" id="recoil"]
 
+
+; LGT0-A light attachment. The world controller enables it for eligible placed sources.
+[ext_resource type="Script" path="res://SYSTEMS/Lighting/WorldLightSource.cs" id="world_light"]
+[ext_resource type="Resource" path="res://SYSTEMS/Lighting/BattleTowerLight.tres" id="world_light_preset"]
+
 [node name="BattleTower" type="Node2D" unique_id=1748537888]
 script = ExtResource("1_tower")
 Config = ExtResource("2_config")
@@ -39,3 +44,8 @@ FinishedVisualPaths = Array[NodePath]([NodePath("../BaseSprite"), NodePath("../T
 
 [node name="Recoil" type="Node" parent="."]
 script = ExtResource("recoil")
+
+[node name="WorldLight" type="PointLight2D" parent="."]
+enabled = false
+script = ExtResource("world_light")
+Preset = ExtResource("world_light_preset")

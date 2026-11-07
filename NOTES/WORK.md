@@ -1,3 +1,9 @@
+## LGT0-A — native battlefield lighting
+
+**Source Implemented / Awaiting Owner Validation.** Shared world dusk tint, capped and optionally culled Citadel/Battle Tower lights, and debug F6 comparison. Scene attachments and rollback steps are documented in [Lighting](../SYSTEMS/Lighting/README.md). Source review only. Godot .NET build, appearance and GPU timing await owner validation. LGT0-B shadows remain planned.
+
+---
+
 ## Campaign level deployment loading UI — 2026-11-06
 
 Campaign/Levels PLAY buttons now open `UI/Loading/LevelLoadingScreen.tscn` via a dedicated `MenuNavigation.OpenLevel` route. One full-screen drawn HUD has a genuine Godot threaded mission/battlefield resource-progress bar across the bottom, counter-rotating percentage rings in the lower-right, and a clear central image area. Optional `UI/Loading/Artwork/LoadingBackdrop.png` works without scene edits, with a dark fallback before artwork exists. Brief 0.6s minimum presentation, errors return to level selection, and async resource completion transitions into the unchanged synchronous battlefield initialization. Direct F6, Continue, results navigation, mission/battlefield logic and saves are unchanged. Source-level sanity only; owner Godot menu/fullscreen/loading acceptance pending.

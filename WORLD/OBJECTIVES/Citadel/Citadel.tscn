@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://WORLD/GRID/WorldObjectFootprint.cs" id="1"]
 [ext_resource type="Script" path="res://WORLD/OBJECTIVES/Citadel/CitadelHealth.cs" id="2_health"]
@@ -7,6 +7,11 @@
 [ext_resource type="Script" path="res://WORLD/VISUALS/EnergyFieldVisual.cs" id="ve2_visual"]
 [ext_resource type="Resource" path="res://WORLD/VISUALS/Presets/CitadelReactor.tres" id="ve2_style"]
 [ext_resource type="Shader" path="res://WORLD/VISUALS/Shaders/EnergyField.gdshader" id="ve2_shader"]
+
+
+; LGT0-A light attachment. The world controller enables it for eligible placed sources.
+[ext_resource type="Script" path="res://SYSTEMS/Lighting/WorldLightSource.cs" id="world_light"]
+[ext_resource type="Resource" path="res://SYSTEMS/Lighting/CitadelLight.tres" id="world_light_preset"]
 
 [sub_resource type="ShaderMaterial" id="ve2_material"]
 shader = ExtResource("ve2_shader")
@@ -48,3 +53,8 @@ position = Vector2(64, 192)
 
 [node name="Health" type="Node" parent="."]
 script = ExtResource("2_health")
+
+[node name="WorldLight" type="PointLight2D" parent="."]
+enabled = false
+script = ExtResource("world_light")
+Preset = ExtResource("world_light_preset")

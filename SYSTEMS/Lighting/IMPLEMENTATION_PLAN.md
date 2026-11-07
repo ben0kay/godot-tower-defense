@@ -2,7 +2,7 @@
 
 **Repository:** `ben0kay/godot-tower-defense`  
 **Branch:** `dev` only  
-**Status:** **Approved plan, NOT IMPLEMENTED**  
+**Status:** **LGT0-A source implemented, awaiting owner validation. LGT0-B planned.**
 **Priority:** Implement this real-world-lighting pilot before VE4 regional atmosphere and the remaining VE5/VE6 passes. Do not restore reverted VE5C bloom.  
 **System ownership:** `SYSTEMS/Lighting/` (the existing repository folder is plural `SYSTEMS`, not `SYSTEM`).
 
