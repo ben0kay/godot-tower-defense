@@ -1,3 +1,9 @@
+## LGT0-A.2 — projectile light spill
+
+**Source Implemented / Awaiting Owner Validation.** Selected friendly and hostile rounds can borrow up to four tiny shadowless lights from the existing world budget. Tracer/body color drives tint, and existing travel and retirement update and release leases. See [Lighting](../SYSTEMS/Lighting/README.md). Source and resource-reference review only. Godot .NET build, visual and GPU checks await owner validation.
+
+---
+
 ## LGT0-A.1 — shared lighting expansion
 
 **Source Implemented / Awaiting Owner Validation.** Organized lighting by runtime, config, presets and textures. Shared tower defaults and radius overrides, dimmer construction pools, darker cyan dusk, flying-drone lights and grouped lava spill use a bounded native light pool. See [Lighting](../SYSTEMS/Lighting/README.md) for settings and rollback. LGT0-B shadows remain planned. Full Godot .NET build, visual and GPU checks await owner validation.

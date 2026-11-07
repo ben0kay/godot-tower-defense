@@ -8,4 +8,5 @@ public struct EnemyBulletData
     public double RemainingSeconds;
     public DamageInfo Hit;
     public ProjectileVisualSnapshot Visual;
+    internal WorldLightingController.ProjectileLight Light;
 }

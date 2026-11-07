@@ -11,6 +11,7 @@ public partial class EnemyBulletSystem : Node
     private readonly List<TowerBase> _candidates = new();
     private TowerRegistry _towers;
     private EnemyBulletRenderer _renderer;
+    private WorldLightingController _lighting;
     private ProjectileVisualSnapshot _defaultVisual;
     private double _lifetime;
     private int _count;
@@ -37,6 +38,7 @@ public partial class EnemyBulletSystem : Node
         _lifetime = double.IsFinite(lifetime) ? Math.Clamp(lifetime, .01, 30) : 2.5;
         _defaultVisual = Config?.DefaultVisual?.Capture() ?? default;
         _renderer.Bind(this);
+        _lighting = GetNodeOrNull<WorldLightingController>("../Lighting");
     }
     // =========================================================
     // Renderer/test access returns a value, never a reference into the mutable live slot buffer.
@@ -59,12 +61,16 @@ public partial class EnemyBulletSystem : Node
         if (length <= 1e-12) { Rejected++; return false; }
         if (_count == _shots.Length) { Overflow++; return false; }
         Vector2 direction = new((float)(request.Direction.X / length), (float)(request.Direction.Y / length));
+        ProjectileVisualSnapshot visual = Sanitize(request.Visual ?? _defaultVisual);
         _shots[_count++] = new()
         {
             Position = request.Origin, Direction = direction, Speed = request.Speed,
             RemainingSeconds = request.LifetimeSeconds > 0 ? request.LifetimeSeconds : _lifetime,
             Hit = new DamageInfo(request.Damage, DamageType.Kinetic),
-            Visual = Sanitize(request.Visual ?? _defaultVisual)
+            Visual = visual,
+            // LGT0-A.2 optional lease follows the dense slot through swap-removal.
+            Light = visual.Enabled && visual.EmitsWorldLight && GodotObject.IsInstanceValid(_lighting)
+                ? _lighting.TryTrackProjectile(request.Origin, visual.Body, true) : null
         };
         Spawned++; SetPhysicsProcess(true); Redraw(); return true;
     }
@@ -76,11 +82,12 @@ public partial class EnemyBulletSystem : Node
         WeaponVisualMath.Color(visual.Body), WeaponVisualMath.Color(visual.Glow), visual.BrightTip,
         GodotObject.IsInstanceValid(visual.Texture) ? visual.Texture : null, visual.Tapered,
         WeaponVisualMath.Safe(visual.TailWidthFraction, 0, 1), WeaponVisualMath.Safe(visual.TailOpacity, 0, 1),
-        WeaponVisualMath.Safe(visual.HeadWidthMultiplier, 1, 2));
+        WeaponVisualMath.Safe(visual.HeadWidthMultiplier, 1, 2), visual.EmitsWorldLight);
     // =========================================================
     // A world may explicitly reset bullets for a restart; source death/removal must never call this.
     public void Clear()
     {
+        for (int i = 0; i < _count; i++) _shots[i].Light?.Release();
         Cleared += _count; Array.Clear(_shots, 0, _count); _count = 0; _candidates.Clear(); SetPhysicsProcess(false); Redraw();
     }
     #endregion
@@ -128,6 +135,7 @@ public partial class EnemyBulletSystem : Node
                 }
                 shot.Position = end; shot.RemainingSeconds -= seconds;
                 if (shot.RemainingSeconds <= 0) { Remove(i); Expired++; continue; }
+                shot.Light?.Move(end);
                 _shots[i++] = shot;
             }
         }
@@ -137,7 +145,11 @@ public partial class EnemyBulletSystem : Node
     }
     // =========================================================
     // Dense slots keep stepping/drawing bounded by actual bullets; clearing the tail releases optional texture references.
-    private void Remove(int index) { _shots[index] = _shots[--_count]; _shots[_count] = default; }
+    private void Remove(int index)
+    {
+        _shots[index].Light?.Release();
+        _shots[index] = _shots[--_count]; _shots[_count] = default;
+    }
     // =========================================================
     // Dirty-on-change rendering sleeps at rest; no Render/Process callback is needed.
     private void Redraw()
@@ -148,7 +160,7 @@ public partial class EnemyBulletSystem : Node
     {
         Clear();
         if (GodotObject.IsInstanceValid(_renderer)) _renderer.Bind(null);
-        _shots = Array.Empty<EnemyBulletData>(); _towers = null; _renderer = null;
+        _shots = Array.Empty<EnemyBulletData>(); _towers = null; _renderer = null; _lighting = null;
     }
     #endregion
 }

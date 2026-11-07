@@ -4,6 +4,8 @@ using Godot;
 [GlobalClass]
 public partial class BlasterCannonConfig : TowerConfig, ITowerTargetingPolicy
 {
+    // LGT0-A.2 optional light for this splash projectile type.
+    [Export] public bool ProjectileWorldLight { get; set; } = true;
     public override System.Collections.Generic.IReadOnlyList<TowerRankDefinition> Ranks => BlasterCannonRanks.Rows;
 
     #region Heat

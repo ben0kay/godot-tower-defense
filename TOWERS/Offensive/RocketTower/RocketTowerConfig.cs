@@ -4,6 +4,8 @@ using Godot;
 [GlobalClass]
 public partial class RocketTowerConfig : BlasterCannonConfig
 {
+    // LGT0-A.2 optional light for this splash projectile type.
+    [Export] public bool ProjectileWorldLight { get; set; } = true;
     public override System.Collections.Generic.IReadOnlyList<TowerRankDefinition> Ranks => RocketTowerRanks.Rows;
 
     // =========================================================

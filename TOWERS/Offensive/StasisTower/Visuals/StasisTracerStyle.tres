@@ -2,6 +2,7 @@
 [ext_resource type="Script" path="res://TOWERS/Shared/Weapons/Visuals/ProjectileVisualStyle.cs" id="1"]
 [resource]
 script = ExtResource("1")
+EmitsWorldLight = true
 LengthPixels = 16.0
 CoreThicknessPixels = 1.6
 CoreColor = Color(0.85, 1, 0.8, 1)

@@ -20,6 +20,7 @@ public partial class BasicProjectile : Node2D
     private bool _impacted, _launched;
     private ProjectileHandlingStats _handling;
     private ProjectileVisualSnapshot? _visual;
+    private WorldLightingController.ProjectileLight _flightLight;
     private Vector2 _travelDirection = Vector2.Up;
     // Reusable per-projectile draw buffers; same taper geometry as enemy Gunner (no per-redraw arrays).
     private readonly Vector2[] _streak = new Vector2[EnemyEnergyStreakGeometry.VertexCount];
@@ -57,6 +58,9 @@ public partial class BasicProjectile : Node2D
         GlobalPosition = worldPosition;
         _travelDirection = ProjectileLaunch.Direction(forward ?? (_initialTarget - worldPosition), _handling.SpreadDegrees, spreadSample);
         GlobalRotation = _travelDirection.Angle(); _launched = true;
+        // LGT0-A.2 cosmetic lease. Unlit projectiles still use the same flight and tracer.
+        if (_visual is { Enabled: true, EmitsWorldLight: true } style)
+            _flightLight = WorldLightingController.TrackFriendly(this, style.Body);
     }
     #endregion
 
@@ -105,12 +109,13 @@ public partial class BasicProjectile : Node2D
             return;
         }
         GlobalPosition = end; _life -= seconds;
+        _flightLight?.Move(end);
         if (_life <= 0) QueueFree();
     }
     // =========================================================
     // World unload is terminal even if a caller manually ticks a retained managed wrapper.
     public override void _ExitTree()
-    { _impacted = true; _target = null; _registry = null; _ricochets = null; _hullSparks = null; }
+    { _flightLight?.Release(); _flightLight = null; _impacted = true; _target = null; _registry = null; _ricochets = null; _hullSparks = null; }
     #endregion
 
     // =========================================================

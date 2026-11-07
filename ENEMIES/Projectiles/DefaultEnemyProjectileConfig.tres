@@ -5,6 +5,7 @@
 
 [sub_resource type="Resource" id="default_tracer"]
 script = ExtResource("visual")
+EmitsWorldLight = true
 LengthPixels = 7.0
 CoreThicknessPixels = 1.3
 GlowWidthMultiplier = 2.0

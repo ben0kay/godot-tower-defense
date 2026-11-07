@@ -2,7 +2,7 @@
 
 **Repository:** `ben0kay/godot-tower-defense`  
 **Branch:** `dev` only  
-**Status:** **LGT0-A source implemented and initial appearance reviewed by owner. LGT0-A.1 source implemented, awaiting owner validation. LGT0-B planned.**
+**Status:** **LGT0-A source implemented and initial appearance reviewed by owner. LGT0-A.1 and A.2 source implemented, awaiting owner validation. LGT0-B planned.**
 **Priority:** Implement this real-world-lighting pilot before VE4 regional atmosphere and the remaining VE5/VE6 passes. Do not restore reverted VE5C bloom.  
 **System ownership:** `SYSTEMS/Lighting/` (the existing repository folder is plural `SYSTEMS`, not `SYSTEM`).
 
@@ -61,11 +61,15 @@ The Battle Tower preset was the first set of tuning values for the shared light 
 - **Budget:** all categories share the existing default ceiling of 16 active native lights. Give drone and lava lights smaller, tunable category caps within that ceiling. Visible Citadels get first priority. Leave room for visible tower and construction pools while allowing nearby drone and lava lights to compete for a bounded share. Use stable ordering and existing throttled culling. Use event-driven registration and bounded reusable light slots for dense candidates. F6 OFF disables every added source and restores the baseline colors.
 - **Acceptance:** compare darker ambient and cyan spill with F6. Place two tower types using the default and one with a radius override. Check ghost → site → completed → upgrade/sale and save/Continue. Pan across moving and docked drones and small, large and disconnected lava areas. Verify that lava lights neighboring ground, transitions clear all sources, and dense overlap stays within budget before starting B.
 
+### A.2. Small pooled projectile lights (source implemented)
+
+Opt-in friendly tracers, splash rounds and hostile streaks can borrow shadowless lights from the same world pool. Use a shared 34px low-energy profile and the projectile's authored body color. Begin with a four-light category cap within the existing 16-light budget. The category takes spare slots after other emitters, reserving room for both sides when its cap is greater than one. The existing travel loops update only leased lights. Impact, expiry, removal, F6 OFF and pool pressure release leases. No additional projectile scene nodes, collision changes or relighting of shots already in flight.
+
 ### B2. Basic tower and mountain shadows — LGT0-B (approved)
 
 Use **Godot native `LightOccluder2D` + `OccluderPolygon2D`** with `PointLight2D.ShadowEnabled` and matching light/occluder shadow masks. The resulting 2D shadow extends away from **each actual light position**, not from a global assumed sun direction. It only affects terrain/sprites in lit regions; it is visual-only and does not modify path blocking or shot-time mountain LOS.
 
-- **Which objects cast?** **ALL real completed placed tower types** (whether they emit light or not) plus **only impassable tiles tagged `mountain_visual` for procedural mountains**. No ordinary walls/Foundation, Citadel hull, enemy ships, drones, bullets or VE3 decal tiles as new occluders. Use the A.1 lighting baseline. Drone, lava and construction lights remain shadowless.
+- **Which objects cast?** **ALL real completed placed tower types** (whether they emit light or not) plus **only impassable tiles tagged `mountain_visual` for procedural mountains**. No ordinary walls/Foundation, Citadel hull, enemy ships, drones, bullets or VE3 decal tiles as new occluders. Use the A.1 lighting baseline. Drone, lava, construction and projectile lights remain shadowless.
 - **Tower occluders:** use one reusable *low-vertex* silhouette per operational tower, based on its authored `TowerDefinition.Footprint` and stationary root (a simple inset rectangle/octagon or small per-type override where needed). Reuse the existing `TowerRegistry` membership and tower `IsOperational`/work-state/destruction lifecycle. Unfinished construction/preview ghosts do not cast; upgrading tower may retain its silhouette. Remove/update on sale, destruction, transform change, and checkpoint reconstruction. **No geometry per barrel/recoiling gun and no per-tower shadow `_Process` loop.**
 - **Tower light self-shadowing:** a point light placed inside its own occluder may black out the light pool or create a black ring. Explicitly test Citadel→Battle Tower and Battle Tower→nearby tower shadows. Keep illumination clear around the emitter itself using a practical mask/offset/footprint solution that *still allows tower-to-tower shadows*. Do not spend one mask bit per individual tower or weaken the light system just to avoid the issue.
 - **Mountain occluders:** `WORLD/TERRAIN/Mountains/MountainTerrainVisual.cs` already consumes `mountain_visual` TileData and caches raised rock/shadow meshes when `WorldGrid.TerrainRebuilt` occurs. Derive the 2D occlusion outlines from that **same marked-cell information/rebuild lifecycle**, not a second terrain-neighbour poll or the separate `blocks_tower_sight` flag. Prefer **coalesced connected mountain-group outlines** (bounded/chunked outlines for huge or complex regions), not a `LightOccluder2D` per painted cell or per mesh triangle. Use conservative projected silhouettes matching actual mountain artwork, cache static polygons, and free/rebuild only when terrain changes.
@@ -89,12 +93,12 @@ Use **Godot native `LightOccluder2D` + `OccluderPolygon2D`** with `PointLight2D.
 - Large lights illuminate more pixels; many overlapping lights and especially soft shadow maps can be costly. Benchmark **the LGT0-A.1 shadowless baseline first, then LGT0-B with shadows enabled**, not assuming either is free on GTX 1080.
 - Reuse a shared gradient texture. No per-light or per-tower C# `_Process`, `Timer` or animation callback; static light transform updates only on needed source movement or registration.
 - Prefer membership events (existing `Towers` child hooks and Citadel map ownership) plus a small cached visible-source list. Offscreen candidates should be disabled using a bounded/low-frequency camera visibility refresh (e.g. 0.25–0.5s when needed) or one practical engine visibility callback, **not** scanning every enemy/tower per physics frame.
-- Do not allocate a light per VE3 glowing decal, per enemy, projectile or short-lived muzzle flash. Do not add power-grid calculations, fog-of-war, visibility queries or new save fields.
+- Projectile lights use only the capped A.2 pool. Do not allocate a native light per VE3 glowing decal, enemy, projectile or short-lived muzzle flash. Do not add power-grid calculations, fog-of-war, visibility queries or new save fields.
 - **Performance goal, not measurement:** strive for roughly **≤1ms incremental GPU cost** at common light counts on a busy 1920×1080 battlefield while maintaining the wider 60FPS goal. No FPS guarantees without the owner's hardware benchmark; F4 CPU timings alone are not GPU timings.
 
 ### E. Deliverables and validation (lightweight, owner-led)
 
-Sequence: **LGT0-A** delivered ambient, pilot lights and F6. **LGT0-A.1** organizes and expands the shadowless baseline. **LGT0-B** then adds only basic tower and mountain shadows on that foundation. Use one focused commit per milestone if practical, log briefly in `NOTES/WORK.md`, push `dev` and do not expand into LGT1–LGT4.
+Sequence: **LGT0-A** delivered ambient, pilot lights and F6. **LGT0-A.1** organizes and expands the shadowless baseline. **LGT0-A.2** adds bounded projectile spill. **LGT0-B** then adds basic tower and mountain shadows on that foundation. Use one focused commit per milestone if practical, log briefly in `NOTES/WORK.md`, push `dev` and do not expand into LGT1–LGT4.
 
 Focused source review / one practical build if available, then leave desktop appearance/performance acceptance to owner:
 

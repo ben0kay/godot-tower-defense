@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("visual")
+EmitsWorldLight = true
 LengthPixels = 14.6
 CoreThicknessPixels = 2.9
 GlowWidthMultiplier = 3.0

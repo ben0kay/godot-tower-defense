@@ -20,6 +20,10 @@ public partial class LightingMasterConfig : Resource
     [Export(PropertyHint.Range, "0,16,1")] public int MaxDroneLights { get; set; } = 2;
     [Export(PropertyHint.Range, "0,16,1")] public int MaxLavaLights { get; set; } = 3;
 
+    [ExportGroup("Projectile Lighting")]
+    [Export] public LightSourceConfig Projectile { get; set; }
+    [Export(PropertyHint.Range, "0,8,1")] public int MaxProjectileLights { get; set; } = 4;
+
     [ExportGroup("Viewport Culling")]
     [Export] public bool CullOffscreenLights { get; set; } = true;
     [Export(PropertyHint.Range, "0.25,0.5,0.01")] public float RefreshSeconds { get; set; } = 0.25f;

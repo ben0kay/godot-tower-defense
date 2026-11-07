@@ -19,6 +19,8 @@ public partial class SplashProjectile : Node2D
     public Vector2 ImpactPoint => _impact;
     public ProjectileHandlingStats Handling => _handling;
     private bool _initialized, _finished, _trackTarget = true;
+    private WorldLightingController.ProjectileLight _flightLight;
+    public bool EmitsWorldLight { get; set; }
     public Color ProjectileColor { get; set; } = new(1f, 0.55f, 0.15f);
     public bool HasDetonated { get; private set; }
     public int AppliedHits { get; private set; }
@@ -53,6 +55,8 @@ public partial class SplashProjectile : Node2D
         Vector2 direction = ProjectileLaunch.Direction(vector, _handling.SpreadDegrees, spreadSample);
         if (!_trackTarget && _handling.SpreadDegrees > 0) _impact = position + direction * vector.Length();
         GlobalRotation = direction.Angle(); _launched = true;
+        // LGT0-A.2 splash rounds inherit their authored projectile color.
+        if (EmitsWorldLight) _flightLight = WorldLightingController.TrackFriendly(this, ProjectileColor);
     }
     // =========================================================
     // No registry queries during travel. Contact is the exact destination point, not an extra direct hit.
@@ -81,6 +85,7 @@ public partial class SplashProjectile : Node2D
         Vector2 direction = _impact - GlobalPosition;
         if (direction.LengthSquared() > .0001f) GlobalRotation = direction.Angle();
         GlobalPosition = GlobalPosition.MoveToward(_impact, step); _life -= seconds;
+        if (_flightLight != null) _flightLight.Move(GlobalPosition);
         if (_life <= 0) Finish();
     }
 
@@ -115,7 +120,7 @@ public partial class SplashProjectile : Node2D
 
     // =========================================================
     // Unloaded projectiles cannot detonate later, even if manually ticked by a caller.
-    public override void _ExitTree() { _finished = true; DetachTarget(); }
+    public override void _ExitTree() { _flightLight?.Release(); _flightLight = null; _finished = true; DetachTarget(); }
 
     // =========================================================
     // Lightweight native projectile artwork; presentation has no effect on blast selection.

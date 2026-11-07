@@ -98,7 +98,7 @@ public partial class RocketTower : TowerBase
         if (!TryFundProjectileAttack(1.0 / FinalStats.ShotsPerSecond)) return;
         DamageInfo hit = Config.CreateHit(FinalStats, DamageSource);
         Marker2D muzzle = _barrels.MuzzleIndex(BarrelFireMode.Sequential, 0) == 0 ? _muzzleA : _muzzleB;
-        SplashProjectile bullet = new() { ProjectileColor = new Color(0.33f, 0.88f, 1f) };
+        SplashProjectile bullet = new() { EmitsWorldLight = Config.ProjectileWorldLight, ProjectileColor = new Color(0.33f, 0.88f, 1f) };
         bullet.Initialize(_target, _registry, _target.GlobalPosition, FinalStats.ProjectileSpeed,
             hit, FinalStats.Area.Value, _effects, style: Config.ImpactStyle, trackTarget: false, handling: FinalStats.Handling);
         _projectiles.AddChild(bullet); bullet.LaunchFrom(muzzle.GlobalPosition);

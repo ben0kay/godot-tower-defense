@@ -93,7 +93,7 @@ public partial class BlasterCannon : TowerBase
         if (!aligned || _shotTimer > 0f || FinalStats.ShotsPerSecond <= 0f) return;
         if (!TryFundProjectileAttack(1.0 / FinalStats.ShotsPerSecond)) return;
         DamageInfo hit = Config.CreateHit(FinalStats, DamageSource);
-        SplashProjectile bullet = new();
+        SplashProjectile bullet = new() { EmitsWorldLight = Config.ProjectileWorldLight };
         bullet.Initialize(_target, _registry, _target.GlobalPosition, FinalStats.ProjectileSpeed,
             hit, FinalStats.Area.Value, _effects, style: Config.ImpactStyle, handling: FinalStats.Handling);
         _projectiles.AddChild(bullet); bullet.LaunchFrom(_muzzle.GlobalPosition);

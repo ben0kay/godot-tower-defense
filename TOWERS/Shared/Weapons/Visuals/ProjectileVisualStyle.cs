@@ -13,6 +13,7 @@ public partial class ProjectileVisualStyle : Resource
     [Export] public Color GlowColor { get; set; } = new(1, .4f, .05f, .2f);
     [Export] public bool BrightTip { get; set; } = true;
     [Export] public Texture2D Texture { get; set; }
+    [Export] public bool EmitsWorldLight { get; set; }
     [ExportGroup("Hostile Energy Streak")]
     [Export] public bool Tapered { get; set; }
     [Export(PropertyHint.Range, "0,1,.01")] public float TailWidthFraction { get; set; } = .08f;
@@ -24,9 +25,9 @@ public partial class ProjectileVisualStyle : Resource
         WeaponVisualMath.Safe(CoreThicknessPixels, .1f, 12), WeaponVisualMath.Safe(GlowWidthMultiplier, 1, 4),
         WeaponVisualMath.Color(CoreColor), WeaponVisualMath.Color(BodyColor), WeaponVisualMath.Color(GlowColor), BrightTip, Texture,
         Tapered, WeaponVisualMath.Safe(TailWidthFraction, 0, 1), WeaponVisualMath.Safe(TailOpacity, 0, 1),
-        WeaponVisualMath.Safe(HeadWidthMultiplier, 1, 2));
+        WeaponVisualMath.Safe(HeadWidthMultiplier, 1, 2), EmitsWorldLight);
 }
 
 public readonly record struct ProjectileVisualSnapshot(bool Enabled, float Length, float Width, float GlowWidth,
     Color Core, Color Body, Color Glow, bool BrightTip, Texture2D Texture,
-    bool Tapered = false, float TailWidthFraction = .08f, float TailOpacity = .08f, float HeadWidthMultiplier = 1.25f);
+    bool Tapered = false, float TailWidthFraction = .08f, float TailOpacity = .08f, float HeadWidthMultiplier = 1.25f, bool EmitsWorldLight = false);

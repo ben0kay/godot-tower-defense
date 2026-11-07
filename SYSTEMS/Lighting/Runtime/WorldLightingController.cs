@@ -11,7 +11,7 @@ public partial class WorldLightingController : Node2D
     [Export] public WorldGrid Grid { get; set; }
 
     private sealed record Source(Node2D Anchor, LightSourceConfig Profile, Vector2 Offset,
-        float Radius, Func<bool> Eligible, Func<bool> UnderConstruction = null, DroneLightAttachment Follower = null)
+        float Radius, Func<bool> Eligible, Func<bool> UnderConstruction = null, DroneLightAttachment Follower = null, ProjectileLight Projectile = null)
     {
         public Slot Slot;
     }
@@ -213,11 +213,15 @@ public partial class WorldLightingController : Node2D
         hasCandidates |= Select(_lava, Mathf.Min(cap, _selected.Count + Mathf.Clamp(Config.MaxLavaLights, 0, 16)), cull, canvas, viewport);
         hasCandidates |= Select(_towers, cap, cull, canvas, viewport);
 
+        Select(_projectileSources, Mathf.Min(cap, _selected.Count + Mathf.Clamp(Config.MaxProjectileLights, 0, 8)), cull, canvas, viewport);
+        for (int i = _projectileSources.Count - 1; i >= 0; i--)
+            if (!_selected.Contains(_projectileSources[i])) RemoveProjectile(i);
+
         foreach (Slot slot in _slots)
             if (slot.Source != null && !_selected.Contains(slot.Source)) Release(slot);
         foreach (Source source in _selected) Apply(source);
 
-        SetProcess(cull && hasCandidates);
+        SetProcess(cull && (hasCandidates || _projectileSources.Count > 0));
     }
 
     // =========================================================
@@ -238,14 +242,17 @@ public partial class WorldLightingController : Node2D
         return hasCandidates;
     }
 
-    private bool Overlaps(Source source, Transform2D canvas, Rect2 viewport)
+    private bool Overlaps(Source source, Transform2D canvas, Rect2 viewport) =>
+        OverlapsLight(PositionFor(source), RadiusFor(source), canvas, viewport);
+
+    private static bool OverlapsLight(Vector2 position, float radius, Transform2D canvas, Rect2 viewport)
     {
-        Vector2 centre = canvas * PositionFor(source);
-        Vector2 extent = (canvas.X.Abs() + canvas.Y.Abs()) * RadiusFor(source);
+        Vector2 centre = canvas * position;
+        Vector2 extent = (canvas.X.Abs() + canvas.Y.Abs()) * radius;
         return viewport.Intersects(new Rect2(centre - extent, 2 * extent), true);
     }
 
-    private static Vector2 PositionFor(Source source) => source.Anchor?.ToGlobal(source.Offset) ?? source.Offset;
+    private static Vector2 PositionFor(Source source) => source.Projectile?.Light?.GlobalPosition ?? source.Anchor?.ToGlobal(source.Offset) ?? source.Offset;
 
     private float RadiusFor(Source source) => source.Radius *
         (source.UnderConstruction?.Invoke() == true ? Mathf.Clamp(Config.ConstructionRadiusFactor, 0.1f, 1) : 1);
@@ -271,7 +278,8 @@ public partial class WorldLightingController : Node2D
         if (!acquired) return;
         slot.Source = source;
         source.Slot = slot;
-        light.Color = source.Profile.Tint;
+        light.Color = source.Projectile?.Tint ?? source.Profile.Tint;
+        if (source.Projectile is { } projectile) projectile.Light = light;
         source.Follower?.FollowWith(light);
         light.Enabled = true;
     }
@@ -314,6 +322,7 @@ public partial class WorldLightingController : Node2D
         _disconnect.Clear();
         foreach (Slot slot in _slots)
             if (slot.Source != null) Release(slot);
+        for (int i = _projectileSources.Count - 1; i >= 0; i--) RemoveProjectile(i);
         _selected.Clear();
         _lava.Clear();
         _ambient = null;
