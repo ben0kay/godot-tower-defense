@@ -1,3 +1,9 @@
+## Replaced Welcome Commander greeting — 2026-11-06
+
+The original `AUDIO/VoiceAssistant/Welcome_Commander.mp3` is now replaced by the owner's newly generated recording, without re-encoding. Its filename, `WelcomeCommander.tres` stream path, stable `voice_profile_welcome` ID, and catalog registration remain unchanged. The new recording is the only working-tree copy; the old version remains available in Git history if needed. On pulling `dev`, allow Godot to reimport and verify the greeting after selecting or creating a profile.
+
+---
+
 # Profile voice cues
 
 Profile selection/creation speech lives in this folder as **AudioDefinition** resources. The first registered cue is `WelcomeCommander.tres` (stable ID `voice_profile_welcome`), referencing the user-provided `res://AUDIO/VoiceAssistant/Welcome_Commander.mp3`. The original binary MP3 is intentionally **not moved or renamed** in this pass; the GitHub connector cannot manipulate its raw bytes safely. The definition and `AUDIO/DefaultAudioCatalog.tres` are now registered so the existing `VoiceAssistant.Say(id)` queue can play it.

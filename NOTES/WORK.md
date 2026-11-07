@@ -1,3 +1,9 @@
+## Profile Welcome Commander voice replacement — 2026-11-06
+
+Replaced `AUDIO/VoiceAssistant/Welcome_Commander.mp3` with the owner's latest uploaded Fish Audio MP3 from the repository root, reusing its original Git blob without transcoding. Removed the long export filename from the root. The existing `voice_profile_welcome` cue, path, playback settings, audio catalog and Godot import-sidecar remain in place; profile greetings will use the replacement after Godot reimports. Source and asset references reviewed; audio playback remains for owner acceptance.
+
+---
+
 ## Portal spin surge, bubbling spawn reaction and wider violet clouds — 2026-11-06
 
 In `WORLD/PORTALS/EnemyPortal/`, idle portal art spin rises from 120°/s to **180°/s** (Inspector `RotationDegreesPerSecond`); an accepted, cooldown-budgeted spawn burst integrates an additional ~210°/s decaying surge over ~0.7s, rebasing GPU rotation without phase jump or CPU idle loop. Spawn feedback now runs more frequently (~230–630ms irregular cooldown, down from ~390–910ms), with variable-density/scatter spark bursts and a short, randomly single- or double-peaked "volcanic bubble" expansion. Smoke continues in the two **existing** GPU emitters: normal puffs ~125px, ~5.5s, 26px/s outward; large faint puffs ~2.7×, ~9s, ~72% base drift speed (rather than 55%) with stronger swirl and capped 22/10 clouds. All visuals stay optional/local and do not affect portal readiness, wave count, routes, SpawnExit or saves; offscreen/paused cleanup remains. One shader/resource/source check only; Godot visual/FPS inspection remains with owner.
