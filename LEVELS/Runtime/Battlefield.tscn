@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" path="res://UI/GameplayHUD/GameplayHUD.tscn" id="4_hud"]
 [ext_resource type="Script" uid="uid://dkqleio3114br" path="res://TOWERS/Placement/TowerPlacementController.cs" id="5_place"]
 [ext_resource type="Resource" path="res://TOWERS/DefaultTowerConfig.tres" id="9_towermaster"]
+[ext_resource type="Resource" path="res://TOWERS/DefaultTowerCatalog.tres" id="tower_catalog"]
 [ext_resource type="Script" uid="uid://wk3csio5egbn" path="res://ECONOMY/Wallet/EconomyManager.cs" id="10_economy"]
 [ext_resource type="Resource" path="res://ECONOMY/DefaultEconomyConfig.tres" id="11_economyconfig"]
 [ext_resource type="Resource" path="res://ECONOMY/Resources/Credits.tres" id="12_credits"]
@@ -32,6 +33,7 @@ script = ExtResource("launcher")
 [node name="TowerPlacement" type="Node2D" parent="." unique_id=177135680]
 script = ExtResource("5_place")
 Settings = ExtResource("9_towermaster")
+Catalog = ExtResource("tower_catalog")
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=19571184]
 

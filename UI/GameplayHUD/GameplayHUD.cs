@@ -108,7 +108,7 @@ public partial class GameplayHUD : Control
         _topBar = GetNode<PanelContainer>("TopBar");
         _bottomArea = GetNode<HBoxContainer>("BottomArea");
         _towerBar = GetNode<PanelContainer>("BottomArea/TraySlot/TowerBar");
-        _buildScroll = GetNode<ScrollContainer>("BottomArea/TraySlot/TowerBar/Insets/Tray/Scroll");
+        _buildScroll ??= GetNode<ScrollContainer>("BottomArea/TraySlot/TowerBar/Insets/Tray/Scroll");
         _buildScroll.Resized += FitBuildGridColumns;
         _traySlot = GetNode<Control>("BottomArea/TraySlot");
         _traySlot.Resized += FitTrayToSlot;
@@ -268,7 +268,9 @@ public partial class GameplayHUD : Control
     // Call after Catalog.Rebuild when registration/availability changes, never each physics frame.
     public void BindCatalog(TowerCatalog catalog)
     {
-        GridContainer entries = GetNode<GridContainer>("BottomArea/TraySlot/TowerBar/Insets/Tray/Scroll/Buttons");
+        // TowerPlacement can bind the catalog before this sibling HUD reaches _Ready.
+        _buildScroll ??= GetNode<ScrollContainer>("BottomArea/TraySlot/TowerBar/Insets/Tray/Scroll");
+        GridContainer entries = _buildScroll.GetNode<GridContainer>("Buttons");
         foreach (Node child in entries.GetChildren()) { entries.RemoveChild(child); child.QueueFree(); }
         _buildButtons.Clear(); _buildCategories.Clear();
         foreach (TowerDefinition definition in catalog.Definitions)

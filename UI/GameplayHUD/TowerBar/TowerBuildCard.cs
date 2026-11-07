@@ -53,14 +53,14 @@ public static class TowerBuildCard
             Name = "Title",
             Text = definition.DisplayName,
             SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
-            CustomMinimumSize = new Vector2(0, 29),
+            CustomMinimumSize = new Vector2(0, 32),
             VerticalAlignment = VerticalAlignment.Center,
             AutowrapMode = TextServer.AutowrapMode.WordSmart,
             MaxLinesVisible = 2,
             ClipText = true,
             MouseFilter = Control.MouseFilterEnum.Ignore
         };
-        title.AddThemeFontSizeOverride("font_size", 11);
+        title.AddThemeFontSizeOverride("font_size", 12);
         title.AddThemeColorOverride("font_color", config.TextColor);
         text.AddChild(title);
 
