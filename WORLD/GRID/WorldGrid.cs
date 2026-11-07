@@ -8,6 +8,8 @@ public partial class WorldGrid : Node2D
 {
     #region Settings and State
     [Export] public WorldMasterConfig Config { get; set; }
+    // LGT0-A.3 binds one reveal owner for this world.
+    internal WorldLightingController Lighting { get; set; }
     public Rect2 WorldBounds => new(Vector2.Zero,
         new Vector2(Config.WidthCells * Config.CellSize, Config.HeightCells * Config.CellSize));
     private Vector2 _lastCamera = new(float.NaN, float.NaN);

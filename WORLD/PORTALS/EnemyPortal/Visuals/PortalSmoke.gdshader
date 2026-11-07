@@ -2,6 +2,7 @@
 // Rotated, softly warped noise prevents square-looking patches; the quad is fully transparent at its border.
 shader_type canvas_item;
 render_mode unshaded;
+#include "res://SYSTEMS/Lighting/Shaders/LightReveal.gdshaderinc"
 
 uniform vec4 smoke_tint : source_color = vec4(0.52, 0.22, 0.76, 1.0);
 uniform float opacity : hint_range(0.0, 1.0) = 0.55;
@@ -23,6 +24,7 @@ void vertex() {
     cloud_seed = INSTANCE_CUSTOM.x * 3.7;
     age = clamp(INSTANCE_CUSTOM.y, 0.0, 1.0);
     VERTEX *= mix(0.6, 2.0, age);
+    reveal_world_position = (MODEL_MATRIX * vec4(VERTEX, 0.0, 1.0)).xy;
 }
 
 void fragment() {
@@ -54,5 +56,5 @@ void fragment() {
     vec3 plum = smoke_tint.rgb * (0.38 + billow * 0.45);
     vec3 lavender = min(vec3(1.0), smoke_tint.rgb + vec3(0.32, 0.19, 0.25));
     COLOR = vec4(mix(plum, lavender, rim),
-        body * border_fade * density * fade_in * dissolve * opacity * smoke_tint.a);
+        body * border_fade * density * fade_in * dissolve * opacity * smoke_tint.a * (reveal_enabled ? sample_reveal().r : 1.0));
 }

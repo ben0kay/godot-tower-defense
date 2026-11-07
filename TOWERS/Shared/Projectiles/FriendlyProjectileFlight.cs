@@ -10,7 +10,7 @@ internal struct FriendlyProjectileFlight
     private double _life;
     private DamageInfo _damage;
     private StatusEffectPayload? _effect;
-    private bool _shieldRicochet;
+    private bool _shieldRicochet, _lostReveal;
     private int _hullSparkCount;
     private WorldLightingController.ProjectileLight _light;
     internal Vector2 Position { get; set; }
@@ -51,11 +51,15 @@ internal struct FriendlyProjectileFlight
     internal bool Advance(double delta, RicochetController ricochets, HullHitSparkController hullSparks)
     {
         if (!RegistryIsLive) return false;
-        if (Handling.Guidance == ProjectileGuidance.Homing)
+        if (Handling.Guidance == ProjectileGuidance.Homing && !_lostReveal)
         {
             if (!GodotObject.IsInstanceValid(_target) || !_target.IsAlive || _target.IsQueuedForDeletion()) return false;
-            Vector2 direction = _target.GlobalPosition - Position;
-            if (direction.IsFinite() && direction.LengthSquared() > .0001f) Direction = direction.Normalized();
+            if (!TowerDetection.IsLit(_target)) { _lostReveal = true; _target = null; }
+            else
+            {
+                Vector2 direction = _target.GlobalPosition - Position;
+                if (direction.IsFinite() && direction.LengthSquared() > .0001f) Direction = direction.Normalized();
+            }
         }
         double seconds = System.Math.Min(delta, _life);
         Vector2 end = new((float)(Position.X + (double)Direction.X * _speed * seconds),

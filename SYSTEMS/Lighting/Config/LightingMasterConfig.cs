@@ -6,7 +6,7 @@ public partial class LightingMasterConfig : Resource
 {
     [Export] public bool Enabled { get; set; } = true;
     [Export] public bool StartLit { get; set; } = true;
-    [Export] public Color AmbientTint { get; set; } = new Color("#515e6b");
+    [Export] public Color AmbientTint { get; set; } = new Color("#292f36");
     [Export(PropertyHint.Range, "0,64,1")] public int MaxActiveLights { get; set; } = 16;
     [Export] public bool AllowDebugComparison { get; set; } = true;
 
@@ -23,6 +23,11 @@ public partial class LightingMasterConfig : Resource
     [ExportGroup("Projectile Lighting")]
     [Export] public LightSourceConfig Projectile { get; set; }
     [Export(PropertyHint.Range, "0,8,1")] public int MaxProjectileLights { get; set; } = 4;
+
+    [ExportGroup("Light-based Fog of War")]
+    [Export] public bool RevealEnabled { get; set; } = true;
+    [Export] public LightSourceConfig Portal { get; set; }
+    [Export(PropertyHint.Range, "0,0.25,0.005")] public float TowerRangeLift { get; set; } = .075f;
 
     [ExportGroup("Viewport Culling")]
     [Export] public bool CullOffscreenLights { get; set; } = true;

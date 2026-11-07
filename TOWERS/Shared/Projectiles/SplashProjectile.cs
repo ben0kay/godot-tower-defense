@@ -94,6 +94,7 @@ public partial class SplashProjectile : Node2D
     private void CaptureTargetPosition()
     {
         if (!GodotObject.IsInstanceValid(_target)) return;
+        if (!TowerDetection.IsLit(_target)) { _trackTarget = false; DetachTarget(); return; }
         Vector2 position = _target.GlobalPosition;
         if (float.IsFinite(position.X) && float.IsFinite(position.Y)) _impact = position;
     }

@@ -46,7 +46,7 @@ public static class TowerTargeting
         // Strict finite scoring; Strongest ties use First before the stable registration-order fallback.
         public void Accept(EnemySpatialIndex.Neighbor nearby)
         {
-            if (!TowerDetection.CanDetect(nearby.Enemy, DetectsStealth) || !Eligible(nearby.Enemy, RequiredEffect, AffectedFallback)) return;
+            if (!TowerDetection.CanDetectAt(nearby.Enemy, nearby.Position, DetectsStealth) || !Eligible(nearby.Enemy, RequiredEffect, AffectedFallback)) return;
             float distance = Position.DistanceSquaredTo(nearby.Position);
             if (distance > RangeSquared) return;
             float candidate = Mode switch

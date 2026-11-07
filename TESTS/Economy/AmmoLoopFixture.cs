@@ -12,9 +12,16 @@ internal sealed class AmmoLoopFixture : IDisposable
     internal TowerPlacementController Placement => Main.GetNode<TowerPlacementController>("TowerPlacement");
     internal GameplayHUD Hud => Main.GetNode<GameplayHUD>("UI/GameplayHUD");
     internal EconomyManager Wallet => Main.GetNode<EconomyManager>("Economy");
-    internal AmmoLoopFixture(Node parent, string scene = "res://Main.tscn")
+    internal AmmoLoopFixture(Node parent, string scene = "res://Main.tscn", bool lightReveal = false)
     {
-        Main = GD.Load<PackedScene>(scene).Instantiate(); parent.AddChild(Main); Disable(Main);
+        Main = GD.Load<PackedScene>(scene).Instantiate();
+        if (!lightReveal && Main.GetNodeOrNull<WorldLightingController>("World/Lighting") is { } lighting)
+        {
+            // Isolated ammo/combat fixtures use synthetic positions without authored lighting.
+            lighting.Config = (LightingMasterConfig)lighting.Config.Duplicate();
+            lighting.Config.RevealEnabled = false;
+        }
+        parent.AddChild(Main); Disable(Main);
         // Existing fixture callers manually inspect and tick standalone nodes.
         Main.GetNode<FriendlyProjectileSystem>("World/Projectiles").UseBufferedTracers = false;
         var builders = Main.GetNodeOrNull<ConstructionDroneManager>("World/ConstructionDrones");

@@ -64,7 +64,7 @@ public partial class EnemyPortal
     internal void BeginMaterialization(float delay = 0)
     {
         StopSpawnFeedback(); CancelMaterialization();
-        IsSpawnActive = true; OpeningState = PortalState.Forming;
+        SetLightActivation(true); OpeningState = PortalState.Forming;
         GetNode<Node2D>("Visuals").Show();
         _opening?.Show();
         if (_energy != null) _energy.Hide();
@@ -130,7 +130,7 @@ public partial class EnemyPortal
     {
         bool notify = OpeningState == PortalState.Forming;
         CancelMaterialization();
-        IsSpawnActive = true; OpeningState = PortalState.Open;
+        SetLightActivation(true); OpeningState = PortalState.Open;
         GetNode<Node2D>("Visuals").Show();
         if (_openingArt != null) { _openingArt.Modulate = Colors.White; _openingArt.Scale = Vector2.One; }
         if (_energy != null) _energy.Visible = _energy.Style?.Enabled == true;
@@ -140,7 +140,7 @@ public partial class EnemyPortal
     internal void RestoreActivation(bool active)
     {
         _waveSmoke = false;
-        CancelMaterialization(); IsSpawnActive = active;
+        CancelMaterialization(); SetLightActivation(active);
         OpeningState = active ? PortalState.Open : PortalState.Dormant;
         GetNode<Node2D>("Visuals").Visible = active;
         if (_openingArt != null) { _openingArt.Modulate = Colors.White; _openingArt.Scale = Vector2.One; }

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="LightingMasterConfig" load_steps=7 format=3]
+[gd_resource type="Resource" script_class="LightingMasterConfig" load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://SYSTEMS/Lighting/Config/LightingMasterConfig.cs" id="1_config"]
 
@@ -9,6 +9,8 @@
 
 [ext_resource type="Resource" path="res://SYSTEMS/Lighting/Presets/ProjectileLight.tres" id="Projectile"]
 
+[ext_resource type="Resource" path="res://SYSTEMS/Lighting/Presets/PortalLight.tres" id="Portal"]
+
 [resource]
 script = ExtResource("1_config")
 Tower = ExtResource("Tower")
@@ -16,3 +18,4 @@ Citadel = ExtResource("Citadel")
 Drone = ExtResource("Drone")
 Lava = ExtResource("Lava")
 Projectile = ExtResource("Projectile")
+Portal = ExtResource("Portal")

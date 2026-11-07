@@ -2,13 +2,13 @@
 
 **Repository:** `ben0kay/godot-tower-defense`  
 **Branch:** `dev` only  
-**Status:** **LGT0-A source implemented and initial appearance reviewed by owner. LGT0-A.1 and A.2 source implemented, awaiting owner validation. LGT0-B planned.**
+**Status:** **LGT0-A source implemented and initial appearance reviewed by owner. LGT0-A.1 through A.3 source implemented, awaiting owner validation. LGT0-B planned.**
 **Priority:** Implement this real-world-lighting pilot before VE4 regional atmosphere and the remaining VE5/VE6 passes. Do not restore reverted VE5C bloom.  
 **System ownership:** `SYSTEMS/Lighting/` (the existing repository folder is plural `SYSTEMS`, not `SYSTEM`).
 
 ## Outcome and scope
 
-Deliver genuinely lit/dark 2D battlefields using **Godot `CanvasModulate` + native `PointLight2D`**. LGT0-A delivered soft light from Citadels and completed Battle Towers. LGT0-A.1 expands the shared lighting to placed towers, construction sites, flying drones and lava before LGT0-B adds shadows. Areas away from those structures remain dimmed by configurable ambient lighting. **Basic real shadows now belong in LGT0-B:** all completed placed towers and painted procedural mountains cast directional shadows where qualifying lights reach them. **No new gameplay visibility**: darkness/shadows must not affect AI, targeting/LOS, stealth, pathfinding, collision or damage. No normal-map rewrite, postprocessing/bloom or gameplay light-detection logic in LGT0.
+Deliver genuinely lit/dark 2D battlefields using **Godot `CanvasModulate` + native `PointLight2D`**. LGT0-A delivered soft light from Citadels and completed Battle Towers. LGT0-A.1 expands the shared lighting to placed towers, construction sites, flying drones and lava before LGT0-B adds shadows. Areas away from those structures remain dimmed by configurable ambient lighting. **Basic real shadows now belong in LGT0-B:** all completed placed towers and painted procedural mountains cast directional shadows where qualifying lights reach them. **A.3 adds a shared light-reveal requirement for direct combat locks.** Existing terrain LOS, stealth, movement, collision and damage rules continue to apply. The later B shadow maps are presentation. No normal-map rewrite, postprocessing/bloom or gameplay light-detection logic in LGT0.
 
 Reference: [Godot 4.6 2D lighting and shadows](https://docs.godotengine.org/en/4.6/tutorials/2d/2d_lights_and_shadows.html), [PointLight2D](https://docs.godotengine.org/en/stable/classes/class_pointlight2d.html), [Light2D](https://docs.godotengine.org/en/stable/classes/class_light2d.html) and [GPU optimization](https://docs.godotengine.org/en/stable/tutorials/performance/gpu_optimization.html).
 
@@ -65,6 +65,14 @@ The Battle Tower preset was the first set of tuning values for the shared light 
 
 Opt-in friendly tracers, splash rounds and hostile streaks can borrow shadowless lights from the same world pool. Use a shared 34px low-energy profile and the projectile's authored body color. Begin with a four-light category cap within the existing 16-light budget. The category takes spare slots after other emitters, reserving room for both sides when its cap is greater than one. The existing travel loops update only leased lights. Impact, expiry, removal, F6 OFF and pool pressure release leases. No additional projectile scene nodes, collision changes or relighting of shots already in flight.
 
+### A.3. Light-based fog of war (source implemented)
+
+Terrain remains visible at a darker ambient `#292f36`. Towers keep their cyan base lamps and add neutral, feathered range coverage. Overlaps use maximum brightness. Citadel, forming/open portal, drone and lava pools also reveal. Portal lights have a purple preset. Projectile spill illuminates terrain without contributing reveal.
+
+The indexed world-space field gates direct weapons on both sides. Existing stealth and terrain LOS still apply. Losing reveal clears direct locks, breaks homing and leaves committed shots and splash damage physically active. Splash homing holds its last visible destination. The same field drives enemy fades and a bounded mask for projectile surfaces, particles, portal smoke and the ground lift. Source changes invalidate coverage immediately and flying drone positions update on a shared 100ms cadence. Blackout callers use `SetSourceSuppressed`. Camera culling, cosmetic pool pressure and F6 do not change combat coverage.
+
+Owner acceptance: compare a portal spawn entering a dark gap, tower range entry, two overlapping sources with one suppressed, direct weapon/beam lock loss, a fired shot crossing darkness and F6 while a blackout is active. Repeat in a dense wave to check mask updates and frame cost.
+
 ### B2. Basic tower and mountain shadows — LGT0-B (approved)
 
 Use **Godot native `LightOccluder2D` + `OccluderPolygon2D`** with `PointLight2D.ShadowEnabled` and matching light/occluder shadow masks. The resulting 2D shadow extends away from **each actual light position**, not from a global assumed sun direction. It only affects terrain/sprites in lit regions; it is visual-only and does not modify path blocking or shot-time mountain LOS.
@@ -98,7 +106,7 @@ Use **Godot native `LightOccluder2D` + `OccluderPolygon2D`** with `PointLight2D.
 
 ### E. Deliverables and validation (lightweight, owner-led)
 
-Sequence: **LGT0-A** delivered ambient, pilot lights and F6. **LGT0-A.1** organizes and expands the shadowless baseline. **LGT0-A.2** adds bounded projectile spill. **LGT0-B** then adds basic tower and mountain shadows on that foundation. Use one focused commit per milestone if practical, log briefly in `NOTES/WORK.md`, push `dev` and do not expand into LGT1–LGT4.
+Sequence: **LGT0-A** delivered ambient, pilot lights and F6. **LGT0-A.1** organizes and expands the shadowless baseline. **LGT0-A.2** adds bounded projectile spill. **LGT0-A.3** adds gameplay reveal before **LGT0-B** adds basic tower and mountain shadows. Use one focused commit per milestone if practical, log briefly in `NOTES/WORK.md`, push `dev` and do not expand into LGT1–LGT4.
 
 Focused source review / one practical build if available, then leave desktop appearance/performance acceptance to owner:
 
@@ -112,7 +120,7 @@ Focused source review / one practical build if available, then leave desktop app
 - **LGT1:** opt manually placed industrial lamps and VE3 small decal fixtures into the shared source preset system. Never make a native light for every lit atlas cell. Optional power-loss responses only using authoritative source state, later.
 - **LGT2:** later **advanced shadow polish only**: detailed hand-authored hulls, optional additional large obstacle casters and measured softer PCF filtering. Basic tower/mountain shadows now belong in LGT0-B, not LGT2. Terrain shot-time LOS remains independent.
 - **LGT3:** authored day/night darkness presets, selected slow light pulses/failed-lamp flicker and per-level identity, event-driven and capped.
-- **LGT4:** actual light-driven stealth/reveal/fog-of-war is a **separate gameplay feature** requiring explicit design; it is not provided by visual darkness.
+- **LGT4:** actual light-driven stealth/reveal/fog-of-war is advanced faction-specific or shadow-aware visibility beyond the shared A.3 reveal rule.
 - **VE5C bloom:** reverted and out of scope. No global HDR/glow restoration.
 
 **Decision:** Real Godot 2D lights, followed by **basic all-tower and procedural mountain shadows**, are the approved first implementation. If shadows cost too much, reduce shadowed-source count, filter quality, caster geometry, radius and overlap. Do not silently omit LGT0-B or claim all basic shadows are complete after LGT0-A.

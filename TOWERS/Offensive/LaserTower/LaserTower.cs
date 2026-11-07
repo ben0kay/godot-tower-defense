@@ -102,8 +102,9 @@ public partial class LaserTower : TowerBase
             SetTarget(TowerTargeting.Find(_registry, GlobalPosition, FinalStats.RangePixels, Config.TargetPriority, preference: Config.TargetPreference, detectsStealth: Config.CanDetectStealth));
             _searchTimer = FinalStats.TargetSearchInterval;
         }
-        if (!TowerTargeting.Valid(_target, GlobalPosition, FinalStats.RangePixels, Config.CanDetectStealth) || FinalStats.Beam.Value.DamagePerSecond <= 0)
-        { ClearBeam(); return; }
+        if (!TowerTargeting.Valid(_target, GlobalPosition, FinalStats.RangePixels, Config.CanDetectStealth))
+        { SetTarget(null); ClearBeam(); return; }
+        if (FinalStats.Beam.Value.DamagePerSecond <= 0) { ClearBeam(); return; }
         bool aligned = TurretAiming.Track(_pivot, _target.GlobalPosition, FinalStats.RotationSpeedDegrees,
             FinalStats.AimToleranceDegrees, Config.RotateWhileTracking, delta);
         if (!aligned) { ClearBeam(); return; }
@@ -121,8 +122,9 @@ public partial class LaserTower : TowerBase
         CompletePowerAttack();
         if (IsDisabled) { ClearBeam(); return; }
         // Removal callbacks may clear/change the lock; never apply this tick to a replacement enemy.
-        if (locked != _target || !TowerTargeting.Valid(locked, GlobalPosition, FinalStats.RangePixels, Config.CanDetectStealth))
-        { ClearBeam(); return; }
+        if (locked != _target) { ClearBeam(); return; }
+        if (!TowerTargeting.Valid(locked, GlobalPosition, FinalStats.RangePixels, Config.CanDetectStealth))
+        { SetTarget(null); return; }
         _beam.SetBeam(_muzzle?.GlobalPosition ?? GlobalPosition, locked.GlobalPosition, true);
     }
     // =========================================================

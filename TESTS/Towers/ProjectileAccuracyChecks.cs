@@ -19,6 +19,7 @@ public partial class ProjectileAccuracyChecks : Node
                 SubsystemBattlefield.DetachSession(f.Main);
                 Stats(f); Straight(f); SweptAndStatus(f); Splash(f); Homing(f); SpatialBudget(f); BufferedOverflow(f);
             }
+            using (AmmoLoopFixture lit = new(this, lightReveal: true)) RevealAndBlackout(lit);
             await SubsystemBattlefield.DrainFreedFixtures(this);
             GD.Print("PASS: PA1-PA3 handling/rank/research/preview, launch spread, straight lifetime, swept first enemy, statuses, homing, splash and spatial budget");
             GetTree().Quit();
@@ -90,6 +91,38 @@ public partial class ProjectileAccuracyChecks : Node
         Near(target.Health, before - 20, "Buffered and overflow shots each resolve one hit");
         f.ClearProjectiles();
         target.Free();
+    }
+
+    // =========================================================
+    // Overlap and F6 use the real world coverage. A fired round still hits after both lamps go dark.
+    private static void RevealAndBlackout(AmmoLoopFixture f)
+    {
+        SubsystemBattlefield.DetachSession(f.Main);
+        var lighting = f.Main.GetNode<WorldLightingController>("World/Lighting");
+        Vector2 centre = new(2000, 2000);
+        while (lighting.IsRevealed(centre) || lighting.IsRevealed(centre + Vector2.Right * 80))
+            centre += Vector2.Right * 400;
+        Enemy target = f.Target(centre + Vector2.Right * 80);
+        Require(!TowerDetection.CanDetect(target), "An unlit enemy cannot be acquired");
+
+        BattleTower first = f.Add<BattleTower>("battle", centre);
+        BattleTower second = f.Add<BattleTower>("battle", centre + Vector2.Down * 100);
+        Require(TowerDetection.CanDetect(target), "Placed tower coverage makes the same enemy targetable");
+        var shot = Launch(f, target, centre, Vector2.Right, handling: new(0, ProjectileGuidance.Homing));
+        lighting.SetSourceSuppressed(first, true);
+        Require(TowerDetection.CanDetect(target), "A second source keeps overlapping coverage active");
+        lighting.SetSourceSuppressed(second, true);
+        lighting.SetLightingEnabled(false);
+        Require(!TowerDetection.CanDetect(target), "F6 comparison leaves a blackout authoritative");
+        float before = target.Health;
+        shot._PhysicsProcess(.12);
+        Require(target.Health < before && shot.IsQueuedForDeletion(), "Lost guidance still permits a physical hit");
+        lighting.SetSourceSuppressed(second, false);
+        Require(TowerDetection.CanDetect(target), "Restoring one lamp restores targeting");
+        f.ClearProjectiles();
+        target.Free();
+        first.Free();
+        second.Free();
     }
 
     #region Straight and Contact

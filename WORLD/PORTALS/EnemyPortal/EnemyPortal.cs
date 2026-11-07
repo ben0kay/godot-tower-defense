@@ -8,6 +8,14 @@ public partial class EnemyPortal : WorldObjectFootprint
     [ExportGroup("Wave Activation (0 = START)")]
     [Export(PropertyHint.Range, "0,10000,1,or_greater")] public int AppearAtWave { get; set; }
     public bool IsSpawnActive { get; private set; }
+    internal event System.Action LightActivationChanged;
+
+    private void SetLightActivation(bool active)
+    {
+        if (IsSpawnActive == active) return;
+        IsSpawnActive = active;
+        LightActivationChanged?.Invoke();
+    }
 
     [ExportGroup("Route Checkpoint")]
     private NodePath _checkpointPath = new("");

@@ -1,3 +1,9 @@
+## LGT0-A.3 — combat reveal before shadows
+
+**Source Implemented / Awaiting Owner Validation.** Darker terrain, neutral tower-range lift and purple portal pools now share reveal with entity rendering and direct combat locks. Blackout suppression, existing projectile hits in darkness, and camera-independent targeting are documented in [Lighting](../SYSTEMS/Lighting/README.md). Native shader/mask loading and source checks passed. Godot .NET, rendered appearance and performance await owner validation.
+
+---
+
 ## Narration card moved below START WAVE — 2026-11-07
 
 The top-right typed tactical narration card now starts at **116px from the top**, about 32px lower than the effective previous placement at the default 46px status header. `DefaultNarrationConfig.tres` and `NarrationConfig.cs` share the new default; `NarrationDisplay.LayoutCard` enforces at least `TopBarHeight + 70px` so START WAVE and its lower edge remain clear. The existing right alignment, adaptive content height, alert-banner clearance, mouse transparency, typewriter timing and audio/voice hooks stay unchanged. Located (but did not import) the original GameMaker typewriter loop at `ben0kay/SPACE-SHOOTER-TD-IDLE-CLICKER-HYBRID/sounds/snd_msg_tut/snd_msg_tut.wav`, used by `scripts/feedback_processes/feedback_processes.gml` and stopped by `scripts/hud_processes_new/hud_processes_new.gml`. Source-only review; owner desktop visual test pending.

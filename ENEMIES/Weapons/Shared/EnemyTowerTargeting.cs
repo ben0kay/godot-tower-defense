@@ -14,7 +14,8 @@ public static class EnemyTowerTargeting
         && origin.IsFinite() && float.IsFinite(radius) && radius > 0 && registry.Contains(tower)
         && DistanceSquared(origin, tower.GlobalPosition) <= (double)radius * radius;
     private static bool ClearSight(TowerRegistry registry, Vector2 from, Vector2 to) => from.IsFinite() && to.IsFinite()
-        && (!GodotObject.IsInstanceValid(registry.TerrainGrid) || registry.TerrainGrid.HasWeaponLineOfSight(from, to));
+        && (!GodotObject.IsInstanceValid(registry.TerrainGrid) ||
+            (registry.TerrainGrid.Lighting?.IsRevealed(to) != false && registry.TerrainGrid.HasWeaponLineOfSight(from, to)));
     // =========================================================
     // A caller-owned scratch list prevents transient result allocations; registration order resolves exact ties.
     public static TowerBase Closest(TowerRegistry registry, Vector2 origin, float radius, List<TowerBase> scratch, Vector2? sightOrigin = null)

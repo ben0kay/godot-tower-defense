@@ -45,6 +45,8 @@ public partial class WorldLightingController : Node2D
         PlacedTowers.ChildExitingTree += OnTowerExiting;
         Grid.TerrainRebuilt += RebuildLava;
         RebuildLava();
+        TrackPortals();
+        SetupRevealPresentation();
         SetProcessUnhandledKeyInput(OS.IsDebugBuild() && Config.AllowDebugComparison &&
             GetParent().GetParent() is BattlefieldLauncher);
         SetLightingEnabled(Config.StartLit);
@@ -58,6 +60,7 @@ public partial class WorldLightingController : Node2D
         _lightingEnabled = enabled && Config.Enabled;
         _ambient.Visible = _lightingEnabled;
         RefreshLights();
+        ApplyRevealToggle();
     }
 
     // =========================================================
@@ -74,6 +77,7 @@ public partial class WorldLightingController : Node2D
     // Camera culling is throttled. Native transforms keep admitted drone lights moving between checks.
     public override void _Process(double delta)
     {
+        TickMovingReveal(delta);
         _refreshRemaining -= delta;
         if (_refreshRemaining <= 0) RefreshLights();
     }
@@ -83,7 +87,8 @@ public partial class WorldLightingController : Node2D
     // Coalesce event bursts and leave scene-tree mutations outside entry/exit callbacks.
     private void QueueRefresh()
     {
-        if (!_lightingEnabled || _refreshQueued) return;
+        _revealDirty = true;
+        if ((!_lightingEnabled && !RevealActive) || _refreshQueued) return;
         _refreshQueued = true;
         Callable.From(FlushRefresh).CallDeferred();
     }
@@ -107,17 +112,23 @@ public partial class WorldLightingController : Node2D
         Source source = new(tower, Config.Tower, offset, radius, () => !tower.IsDestroyed,
             () => tower.WorkPhase == TowerWorkPhase.Constructing);
         Watch(_towers, source, tower);
+        tower.SpatialChanged += OnRevealTowerMoved;
+        tower.StatsChanged += QueueRefresh;
         tower.WorkStarted += QueueRefresh;
         tower.WorkCompleted += QueueRefresh;
         tower.Destroyed += QueueRefresh;
         _disconnect[tower] += () =>
         {
+            tower.SpatialChanged -= OnRevealTowerMoved;
+            tower.StatsChanged -= QueueRefresh;
             tower.WorkStarted -= QueueRefresh;
             tower.WorkCompleted -= QueueRefresh;
             tower.Destroyed -= QueueRefresh;
         };
         QueueRefresh();
     }
+
+    private void OnRevealTowerMoved(TowerBase tower) => QueueRefresh();
 
     private void OnTowerExiting(Node child)
     {
@@ -162,6 +173,7 @@ public partial class WorldLightingController : Node2D
     {
         if (!_disconnect.Remove(key, out Action disconnect)) return;
         disconnect();
+        _suppressed.Remove(key);
         QueueRefresh();
     }
 
@@ -208,6 +220,7 @@ public partial class WorldLightingController : Node2D
         Rect2 viewport = cull ? GetViewportRect().Grow(Mathf.Max(0, Config.ScreenMarginPixels)) : default;
         _selected.Clear();
         bool hasCandidates = Select(_citadels, cap, cull, canvas, viewport);
+        hasCandidates |= Select(_portals, cap, cull, canvas, viewport);
         if (_selected.Count < cap) hasCandidates |= Select(_towers, _selected.Count + 1, cull, canvas, viewport);
         hasCandidates |= Select(_drones, Mathf.Min(cap, _selected.Count + Mathf.Clamp(Config.MaxDroneLights, 0, 16)), cull, canvas, viewport);
         hasCandidates |= Select(_lava, Mathf.Min(cap, _selected.Count + Mathf.Clamp(Config.MaxLavaLights, 0, 16)), cull, canvas, viewport);
@@ -221,7 +234,8 @@ public partial class WorldLightingController : Node2D
             if (slot.Source != null && !_selected.Contains(slot.Source)) Release(slot);
         foreach (Source source in _selected) Apply(source);
 
-        SetProcess(cull && (hasCandidates || _projectileSources.Count > 0));
+        UpdateRevealPresentation();
+        SetProcess((RevealActive && _movingReveal) || (cull && (hasCandidates || _projectileSources.Count > 0)));
     }
 
     // =========================================================
@@ -232,9 +246,7 @@ public partial class WorldLightingController : Node2D
         foreach (Source source in sources)
         {
             if (_selected.Count >= limit) break;
-            if (_selected.Contains(source) || source.Eligible?.Invoke() == false) continue;
-            if (source.Anchor is { } anchor &&
-                (!anchor.IsInsideTree() || anchor.IsQueuedForDeletion() || !anchor.IsVisibleInTree())) continue;
+            if (_selected.Contains(source) || !IsAvailable(source)) continue;
             hasCandidates = true;
             if (cull && !Overlaps(source, canvas, viewport)) continue;
             _selected.Add(source);
@@ -315,6 +327,7 @@ public partial class WorldLightingController : Node2D
     {
         if (_ambient == null) return;
         _lightingEnabled = false;
+        StopRevealPresentation();
         PlacedTowers.ChildEnteredTree -= TrackTower;
         PlacedTowers.ChildExitingTree -= OnTowerExiting;
         Grid.TerrainRebuilt -= RebuildLava;

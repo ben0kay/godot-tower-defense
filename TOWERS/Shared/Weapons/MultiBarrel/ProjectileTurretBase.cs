@@ -117,7 +117,7 @@ public abstract partial class ProjectileTurretBase : TowerBase
         }
         if (!TowerTargeting.Valid(_target, GlobalPosition, Mathf.Max(0, FinalStats.RangePixels), Config.CanDetectStealth)
             || !TowerTargeting.Eligible(_target, RequiredEffect, AffectedStatusFallback))
-        { _visuals.SetAim(null, Vector2.Zero, 0, null, false); return; }
+        { _target = null; _visuals.SetAim(null, Vector2.Zero, 0, null, false); return; }
         bool aligned = TurretAiming.Track(_pivot, _target.GlobalPosition, FinalStats.RotationSpeedDegrees,
             FinalStats.AimToleranceDegrees, Config.RotateWhileTracking, delta);
         _visuals.SetAim(_muzzles[0], _target.GlobalPosition, FinalStats.RangePixels, Config.AimLaser,
