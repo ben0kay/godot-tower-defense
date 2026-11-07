@@ -1,3 +1,9 @@
+## Campaign level deployment loading UI — 2026-11-06
+
+Campaign/Levels PLAY buttons now open `UI/Loading/LevelLoadingScreen.tscn` via a dedicated `MenuNavigation.OpenLevel` route. One full-screen drawn HUD has a genuine Godot threaded mission/battlefield resource-progress bar across the bottom, counter-rotating percentage rings in the lower-right, and a clear central image area. Optional `UI/Loading/Artwork/LoadingBackdrop.png` works without scene edits, with a dark fallback before artwork exists. Brief 0.6s minimum presentation, errors return to level selection, and async resource completion transitions into the unchanged synchronous battlefield initialization. Direct F6, Continue, results navigation, mission/battlefield logic and saves are unchanged. Source-level sanity only; owner Godot menu/fullscreen/loading acceptance pending.
+
+---
+
 ## LGT0-A — change planned lighting debug hotkey to F6 — 2026-11-06
 
 Updated the lighting plan to use **F6** (without Shift) for the debug ON/OFF comparison, replacing Shift+F3 throughout. Existing F3 route preview, F4 diagnostics, F5 profiling and other level shortcuts remain unchanged. Godot Editor's F6 Run Current Scene is separate from in-game input. **Documentation only**: LGT0-A/B still await implementation.

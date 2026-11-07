@@ -12,6 +12,7 @@ public static class MenuNavigation
     public const string Level001Scene = "res://Main.tscn";
     public const string Level002Scene = "res://MainLevel002.tscn";
     public const string Level020Scene = "res://MainLevel020.tscn";
+    public const string LevelLoadingScene = "res://UI/Loading/LevelLoadingScreen.tscn";
 
     // =========================================================
     // Unpause before leaving a menu, restoring the previous pause state on a failed transition.
@@ -39,6 +40,41 @@ public static class MenuNavigation
         if (result == Error.Ok) return;
         tree.Paused = paused;
         throw new InvalidOperationException($"Could not open {scene}: {result}");
+    }
+
+    // =========================================================
+    // Campaign PLAY buttons enter a brief threaded mission-loading screen.
+    // Open() retains its synchronous semantics for direct F6, save restore and fixtures.
+    public static void OpenLevel(Node context, string missionPath)
+    {
+        if (!missionPath.EndsWith(".tres", StringComparison.Ordinal))
+        {
+            Open(context, missionPath);
+            return;
+        }
+
+        SceneTree tree = context.GetTree();
+        bool paused = tree.Paused;
+        LevelLoadingScreen screen = null;
+        try
+        {
+            PackedScene packed = GD.Load<PackedScene>(LevelLoadingScene);
+            if (packed == null) throw new InvalidOperationException("Mission loading screen is missing.");
+            screen = packed.Instantiate<LevelLoadingScreen>();
+            screen.MissionPath = missionPath;
+            string previous = tree.CurrentScene?.SceneFilePath;
+            screen.ReturnScenePath = string.IsNullOrEmpty(previous) ? LevelsScene : previous;
+            tree.Paused = false;
+            Error result = tree.ChangeSceneToNode(screen);
+            if (result != Error.Ok)
+                throw new InvalidOperationException($"Could not show mission loader: {result}");
+        }
+        catch
+        {
+            if (GodotObject.IsInstanceValid(screen) && !screen.IsInsideTree()) screen.Free();
+            tree.Paused = paused;
+            throw;
+        }
     }
 
     // =========================================================

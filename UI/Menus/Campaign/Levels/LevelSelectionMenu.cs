@@ -48,7 +48,11 @@ public partial class LevelSelectionMenu : Control
     // Both authored battlefields use identical shared navigation, combat, UI and wallet systems.
     private void Navigate(string scene)
     {
-        try { MenuNavigation.Open(this, scene); }
+        try
+        {
+            if (scene.EndsWith(".tres", StringComparison.Ordinal)) MenuNavigation.OpenLevel(this, scene);
+            else MenuNavigation.Open(this, scene);
+        }
         catch (Exception error)
         {
             _errorDialog.DialogText = error.Message;

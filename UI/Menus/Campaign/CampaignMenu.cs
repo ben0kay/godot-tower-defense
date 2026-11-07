@@ -32,7 +32,11 @@ public partial class CampaignMenu : Control
     // Route both campaign missions and menu actions through the existing guard.
     private void Navigate(string scene)
     {
-        try { MenuNavigation.Open(this, scene); }
+        try
+        {
+            if (scene.EndsWith(".tres", StringComparison.Ordinal)) MenuNavigation.OpenLevel(this, scene);
+            else MenuNavigation.Open(this, scene);
+        }
         catch (Exception error) { ShowError(error.Message); }
     }
 
