@@ -1,3 +1,9 @@
+## Original GameMaker audio archive — 2026-11-07
+
+Copied 12 unchanged sound assets (`snd_voice_victory`, `snd_voice_defeat`, wave cues, notifications, Credits/build placement feedback, and menu buttons) from `ben0kay/SPACE-SHOOTER-TD-IDLE-CLICKER-HYBRID/sounds/` into the root `AUDIO/` folder. Original WAV/MP3 names and bytes preserved. These are *loose assets only*: no catalog registration, event wiring, mixer changes or runtime playback. Godot import/listening remains owner-controlled.
+
+---
+
 ## Weapon audio overlap and camera reach
 
 Opt-in firing clips suppress nearby duplicate starts, and viewport-scaled hearing reach preserves edge/zoom-out playback with a separate zoom gain reduction. Ambient tint increased to `#3b444e`. Source/config checks only, live mix pending.
