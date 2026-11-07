@@ -36,7 +36,7 @@ Only existing catalog enemies are used: **Enemy001** = `basic_mk1`, **Enemy002**
 
 Waves now live in the editable **`Level003Waves.tres`** (four waves, 9 batches), referenced directly by `Level003Config.tres → WaveSource`. Open the **Wave Editor** workspace tab after enabling the `addons/wave_editor` plugin; edit and Save this resource to tune the waves without changing C# code. The original `Level003Waves.cs` is retained only as a source reference and parity-check fixture, **not** the gameplay wave source. No per-level scheduler or launcher duplication. Waves 1–3 retain their original intervals and gaps. Wave 4 uses two faster mixed batches (0.55s/0.50s intervals), with Bulwarks in each group and only a 0.4s break.
 
-Settings: **1,200 starting Credits**, **1,000 Citadel HP**, normal provisional profile XP (500 on victory, 0 on defeat). Edit the level-local configuration or Wave Editor resource without affecting Level002. A short text-only mission intro now introduces lava hazards and funneling enemies across them; see `Level003Briefing.tres`. No voice recording is registered yet and there is no additional research.
+Settings: **1,200 starting Credits**, **1,000 Citadel HP**, normal provisional profile XP (500 on victory, 0 on defeat). Edit the level-local configuration or Wave Editor resource without affecting Level002. A short text-only mission intro now introduces lava hazards and funneling enemies across them; see `Level003Briefing.tres`. The owner's Level003Briefing.mp3 is registered through Level003BriefingVoice.tres as voice_mission_level003_intro, with the same voice-held typewriter and text-only fallback as Levels 1 and 2. No additional research.
 
 ## Play / campaign
 

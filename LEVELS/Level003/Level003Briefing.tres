@@ -5,5 +5,6 @@
 [resource]
 script = ExtResource("1")
 Title = "LAVA FIELDS"
-Message = "Commander, we've detected lava across this sector. Enemy ships can cross it, but they'll take damage along the way. Use your Foundation Platforms to redirect their paths over the lava, weakening them before they reach our defenses. Let the terrain do some of the work for us."
+Message = "Commander, Lava has flooded this sector. Enemy ships can cross it, but they'll take damage along the way. Use your Foundation Platforms to redirect their paths over the lava, weakening them before they reach our Citadel. Let the terrain do some of the work for us."
 Objectives = "• Guide enemies across lava using Foundation Platforms.\n• Use environmental damage to soften approaching ships.\n• Protect the Citadel."
+VoiceCueId = "voice_mission_level003_intro"

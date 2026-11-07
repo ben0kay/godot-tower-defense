@@ -1,3 +1,9 @@
+## Level003 lava briefing voice — 2026-11-06
+
+Replaced Level003 briefing text with the owner's exact revised lava/Citadel wording. Moved the user-uploaded 265,054-byte Fish Audio MP3 from the repository root into `LEVELS/Level003/Level003Briefing.mp3` using the unchanged Git blob (no re-encoding); deleted its long original export name. Added `Level003BriefingVoice.tres`, registered it in `AUDIO/DefaultAudioCatalog.tres`, and set `VoiceCueId = voice_mission_level003_intro`. This uses the existing Level001/002 voice-held top-right typewriter on fresh deployment while checkpoint Continue skips the briefing. No gameplay, waves, lava damage, terrain or save changes. Resource/source check only; owner to verify audible playback and subtitles in Godot after import.
+
+---
+
 ## Research six-branch expansion specification — 2026-11-06
 
 **Planning only; no research nodes/effects authored.** Added `SYSTEMS/Progression/Research/RESEARCH_EXPANSION_IMPLEMENTATION_PLAN.md` with six radial divisions and 36 proposed paid nodes (34 new), unique connected hex coordinates, costs/prerequisites/effect contracts, staged EX1-A/B/C (~22 new nodes) and later EX2 capstones/optional DME EX3. Existing Core/Citadel Master I/Battle Weapons I remain unchanged; new effect kinds require real, snapshot-safe handlers before publication. Linked the plan from the feature README and outstanding backlog. Current `dev` gameplay research catalog still contains only three nodes.
