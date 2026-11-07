@@ -1,3 +1,9 @@
+## Wider tower glow and more projectile lights
+
+The shared tower light radius is 384px. Machine Gun, fighter and the optional traveling Sniper tracer now opt into the existing projectile light pool.
+
+---
+
 ## LGT0-A.3 — dark radar contacts
 
 Removed the pale attack-range overlay and its reveal footprint. Enemy artwork and health bars crossfade into moving red dots outside local lights. Ground towers can target and guide rounds in darkness at normal accuracy. Fighter and hostile direct-weapon reveal rules remain in place.
