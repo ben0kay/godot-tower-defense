@@ -1,3 +1,9 @@
+## Tower idle draw and level ambience — 2026-11-06
+
+Battle idle draw is 0.10 energy/s. The other ten powered tower profiles doubled their idle rates. The allocation fixture explicitly disables idle drain to isolate refill accounting. The shared battlefield starts and releases a non-positional Ambience emitter using a crossfaded 5.6-second Ogg loop. The uploaded MP3 is preserved byte-for-byte alongside it. Godot 4.6.3 imported the loop with native looping enabled. C# gameplay and audible mix checks are pending.
+
+---
+
 ## Six starter Research branches — first implementation milestone clarified — 2026-11-06
 
 **Plan/documentation only; no new research nodes or gameplay source changed.** Clarified EX1-A as a complete, standalone first ring: preserve Core/Citadel Master I/Battle Tower Weapons I; add only four genuine 1-RP upgrades for Drone hull HP, Stealth Beacon detection range, initial tower construction duration and tower capacitor capacity. Each of six first-tier nodes depends only on the free Core and can be purchased in any order. Specified stable IDs/hexes, the real effect owners, next-deployment/saving compatibility, no dummy unlocks and an explicit Codex stop point. Optional EX1-B/C and EX2 remain future fan-out, not part of the first phase. Linked milestone from Research README and outstanding backlog.

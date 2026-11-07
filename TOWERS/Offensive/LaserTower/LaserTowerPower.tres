@@ -6,7 +6,7 @@
 script = ExtResource("1")
 Capacity = 100.0
 RechargeRatePerSecond = 10.0
-IdleDrawPerSecond = 0.2
+IdleDrawPerSecond = 0.40
 ActiveDrawPerSecond = 12.0
 InitialFillFraction = 0.0
 RestartFraction = 0.15

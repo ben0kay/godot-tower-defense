@@ -84,6 +84,7 @@ internal static class PowerAllocationChecks
         {
             BattleTower tower = definition.Scene.Instantiate<BattleTower>(); tower.InitializeDefinition(definition);
             tower.AuthoredConfig.Power.RechargeRatePerSecond = 5;
+            tower.AuthoredConfig.Power.IdleDrawPerSecond = 0; // Isolate refill allocation from production balance.
             tower.Position = world.ToLocal(grid.CellToWorldCenter(cell)); towers.AddChild(tower); return tower;
         }
         double Sum() => Energy(a) + Energy(b) + Energy(c);

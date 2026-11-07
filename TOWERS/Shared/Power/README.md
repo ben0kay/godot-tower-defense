@@ -1,3 +1,9 @@
+## Idle draw tuning — 2026-11-06
+
+Battle now uses 0.10 energy/s while idle. All other existing idle profiles doubled to 0.20–0.40 energy/s. Five idle Battle Towers draw 0.50 energy/s total once operational. Active draw still replaces idle draw. The rollout table below records the earlier settings.
+
+---
+
 ## Power resource ordering hotfix — 2026-11-06
 
 **Source fixed; in-game confirmation pending.** User evidence showed Battle and Corruptor with live ENERGY meters, while Sniper, Blaster Cannon and Laser had no meter and a disconnected Sniper fired freely. The cause is the order of properties in eight authored `Default*Config.tres` resources: `Power = ExtResource("power")` was serialized **before** `script = ExtResource("1")`. The only two working offensive towers, Battle and Corruptor, had `script` first. Without a recognized `Power` on the loaded scripted resource, `TowerBase.SynchronizePower` constructs no `TowerPowerConsumer`, and the shared `TryFundProjectileAttack`/beam funding fallback treats the weapon as unpowered.

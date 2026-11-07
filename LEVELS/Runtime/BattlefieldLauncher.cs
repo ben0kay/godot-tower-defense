@@ -3,12 +3,22 @@ using Godot;
 
 public partial class BattlefieldLauncher : Node2D
 {
+    private const string AmbienceId = "ambience_atmospheric_space_1";
+
     [Export] public MissionDefinition Mission { get; set; }
     internal CampaignData RestoringCampaign { get; set; }
     public CampaignSession Saves { get; private set; }
     // =========================================================
-    // The save coordinator is dormant: it is called only by explicit UI/tool commands.
-    public override void _Ready() => Saves = new CampaignSession(this);
+    // The battlefield owns the ambient emitter and the on-demand save coordinator.
+    public override void _Ready()
+    {
+        Saves = new CampaignSession(this);
+        AudioManager.Find(this)?.StartEmitter(AmbienceId, this);
+    }
+
+    // =========================================================
+    // Stop the scene's emitter on unload or retry.
+    public override void _ExitTree() => AudioManager.Find(this)?.StopEmitter(AmbienceId, this);
     // =========================================================
     // The parent enters first, allowing the world to mount the correct map before services initialize.
     public override void _EnterTree() => PrepareMap();

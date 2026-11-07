@@ -11,6 +11,8 @@
 [ext_resource type="Resource" path="res://LEVELS/Level002/Level002BriefingVoice.tres" id="8_level002_intro"]
 [ext_resource type="Resource" path="res://LEVELS/Level003/Level003BriefingVoice.tres" id="9_level003_intro"]
 
+[ext_resource type="Resource" path="res://AUDIO/Ambience/AtmosphericSpaceBackground1.tres" id="10_ambience"]
+
 [resource]
 script = ExtResource("1_catalog")
-Sounds = Array[ExtResource("1_qhxs2")]([ExtResource("2_welcome"), ExtResource("3_battle_fire"), ExtResource("4_machine_gun_fire"), ExtResource("5_cryo_fire"), ExtResource("6_stasis_fire"), ExtResource("7_level001_intro"), ExtResource("8_level002_intro"), ExtResource("9_level003_intro")])
+Sounds = Array[ExtResource("1_qhxs2")]([ExtResource("2_welcome"), ExtResource("3_battle_fire"), ExtResource("4_machine_gun_fire"), ExtResource("5_cryo_fire"), ExtResource("6_stasis_fire"), ExtResource("7_level001_intro"), ExtResource("8_level002_intro"), ExtResource("9_level003_intro"), ExtResource("10_ambience")])

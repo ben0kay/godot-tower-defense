@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AudioDefinition" format=3]
+
+[ext_resource type="Script" path="res://AUDIO/AudioDefinition.cs" id="1"]
+[ext_resource type="AudioStream" path="res://AUDIO/Ambience/AtmosphericSpaceBackground1Loop.ogg" id="2"]
+
+[resource]
+script = ExtResource("1")
+Id = "ambience_atmospheric_space_1"
+Stream = ExtResource("2")
+Mode = 1
+Category = 3
+MaximumInstances = 1
+Positional = false
+VolumeDb = -6.0
+FadeInSeconds = 0.8
+FadeOutSeconds = 0.35
