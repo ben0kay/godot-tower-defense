@@ -2,11 +2,13 @@
 
 [ext_resource type="Script" path="res://LEVELS/LevelConfig.cs" id="1"]
 [ext_resource type="Resource" path="res://LEVELS/Level003/Level003Waves.tres" id="waves_resource"]
+[ext_resource type="Resource" path="res://LEVELS/Level003/Level003Briefing.tres" id="mission_briefing"]
 
 [resource]
 script = ExtResource("1")
 StartingCredits = 1200
 ActivePortals = Array[NodePath]([NodePath("Portals/EnemyPortal1")])
+MissionBriefing = ExtResource("mission_briefing")
 WaveSource = ExtResource("waves_resource")
 WaveSetId = "level003"
 CitadelMaxHealth = 1000

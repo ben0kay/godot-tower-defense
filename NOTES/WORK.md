@@ -1,3 +1,9 @@
+## Level003 lava tutorial briefing — 2026-11-06
+
+Created `LEVELS/Level003/Level003Briefing.tres` with a short Lava Fields introduction explaining that crossing lava damages enemies and Foundation Platforms can funnel routes over it. Assigned the resource in `Level003Config.tres.MissionBriefing` using the already shared top-right typewriter, with no custom HUD, gameplay changes or voice/audio dependency; `VoiceCueId` stays blank until a recording is supplied. Existing waves, lava damage and map layout are unchanged. Focused resource/config review only; verify the briefing appears on fresh Level003 deployment and is skipped on checkpoint Continue.
+
+---
+
 ## Profile Welcome Commander voice replacement — 2026-11-06
 
 Replaced `AUDIO/VoiceAssistant/Welcome_Commander.mp3` with the owner's latest uploaded Fish Audio MP3 from the repository root, reusing its original Git blob without transcoding. Removed the long export filename from the root. The existing `voice_profile_welcome` cue, path, playback settings, audio catalog and Godot import-sidecar remain in place; profile greetings will use the replacement after Godot reimports. Source and asset references reviewed; audio playback remains for owner acceptance.
