@@ -1,3 +1,9 @@
+## Friendly tracer buffer
+
+**Source Implemented / Awaiting Owner Validation.** Battle, shared projectile turrets and fighters now use the world-owned friendly tracer buffer with shared hit and drawing behavior. Overflow keeps a standalone shot, splash and wave delivery stay on their existing paths, and save/profiler checks include buffered rounds. Source and scene-reference checks only. Godot .NET regression execution and FPS comparison await owner validation.
+
+---
+
 ## LGT0-A.2 — projectile light spill
 
 **Source Implemented / Awaiting Owner Validation.** Selected friendly and hostile rounds can borrow up to four tiny shadowless lights from the existing world budget. Tracer/body color drives tint, and existing travel and retirement update and release leases. See [Lighting](../SYSTEMS/Lighting/README.md). Source and resource-reference review only. Godot .NET build, visual and GPU checks await owner validation.

@@ -3,6 +3,21 @@ using Godot;
 
 public static class ProjectileLaunch
 {
+    // =========================================================
+    // Common friendly firing entry point. The fallback shares the buffer's flight and drawing logic.
+    internal static void FireFriendly(Node2D projectiles, Enemy target, float speed, DamageInfo damage,
+        Vector2 origin, Vector2 forward, StatusEffectPayload? effect = null, ProjectileVisualStyle visual = null,
+        ProjectileHandlingStats? handling = null, bool shieldRicochet = false, int hullHitSparkCount = 0)
+    {
+        if (projectiles is FriendlyProjectileSystem buffer &&
+            buffer.TryLaunch(target, speed, damage, origin, forward, effect, visual, handling, shieldRicochet, hullHitSparkCount)) return;
+
+        BasicProjectile bullet = new();
+        bullet.Initialize(target, speed, damage, effect, visual, handling, shieldRicochet, hullHitSparkCount);
+        projectiles.AddChild(bullet);
+        bullet.LaunchFrom(origin, forward);
+    }
+
     #region Launch Sampling
     private static readonly RandomNumberGenerator Random = CreateRandom();
     // =========================================================

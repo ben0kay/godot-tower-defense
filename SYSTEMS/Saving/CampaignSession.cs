@@ -23,10 +23,11 @@ public sealed class CampaignSession
         var session = _battle.GetNode<LevelSessionController>("LevelSession");
         var waves = _battle.GetNode<WaveManager>("Waves");
         var spawns = _battle.GetNode<SpawnManager>("World/EnemySystems/Spawning");
+        Node projectiles = _battle.GetNode<Node>("World/Projectiles");
         if (waves.State is WaveManager.WaveState.Spawning or WaveManager.WaveState.SpawnBlocked or WaveManager.WaveState.WaitingForClear ||
             spawns.Registry.Living.Count > 0 || spawns.DeathReleases.PendingJobs > 0 ||
             _battle.GetNode<EnemyBulletSystem>("World/EnemyBullets").ActiveCount > 0 ||
-            _battle.GetNode<Node>("World/Projectiles").GetChildCount() > 0)
+            (projectiles is FriendlyProjectileSystem { ActiveCount: > 0 } || projectiles.GetChildCount() > 0))
             return CombatMessage;
         if (ProfileStore.Selected == null) return "Select a profile to save this battlefield.";
         if (session.SavedRewardTicket?.ProfileId != ProfileStore.Selected.Id) return "This battlefield belongs to another profile or has no reward ticket.";

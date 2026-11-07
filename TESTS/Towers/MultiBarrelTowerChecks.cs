@@ -56,7 +56,9 @@ public static class MultiBarrelTowerChecks
             "Machine Gun purchased levels, faster projectiles and earned ranks resolve");
 
         Node2D towers = main.GetNode<Node2D>("World/Towers");
-        Node projectiles = main.GetNode("World/Projectiles");
+        var projectiles = main.GetNode<FriendlyProjectileSystem>("World/Projectiles");
+        // These muzzle fixtures inspect each standalone node directly.
+        projectiles.UseBufferedTracers = false;
         Enemy enemy = null;
         SniperTower sniper = null;
         MachineGunTower gun = null;

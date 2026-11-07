@@ -101,11 +101,9 @@ public partial class BattleTower : TowerBase
             FinalStats.AimToleranceDegrees, Config.RotateWhileTracking, delta);
         if (!aligned || _shotTimer > 0f || FinalStats.ShotsPerSecond <= 0f) return;
         if (!TryFundProjectileAttack(1.0 / FinalStats.ShotsPerSecond)) return;
-        BasicProjectile bullet = new();
-        bullet.Initialize(_target, FinalStats.ProjectileSpeed,
-            new DamageInfo(FinalStats.DamagePerShot, DamageType.Kinetic, shieldPenetration: FinalStats.ShieldPenetration, source: DamageSource), visual: Config.ProjectileVisual, handling: FinalStats.Handling, shieldRicochet: Config.ShieldRicochet,
-            hullHitSparkCount: Config.HullHitSparkCount);
-        _projectiles.AddChild(bullet); WeaponVisuals.Present(bullet, _muzzle, Config, _visuals);
+        WeaponVisuals.FireFriendly(_projectiles, _muzzle, Config, _visuals, _target, FinalStats.ProjectileSpeed,
+            new DamageInfo(FinalStats.DamagePerShot, DamageType.Kinetic, shieldPenetration: FinalStats.ShieldPenetration, source: DamageSource),
+            null, FinalStats.Handling, Config.ShieldRicochet, Config.HullHitSparkCount);
         // The shot exists and ammunition was paid; audio may be culled without affecting combat.
         if (!string.IsNullOrWhiteSpace(Config.FireSoundId)) _audio?.PlayFrom(Config.FireSoundId, this);
         _recoil.Kick(); // Snapshot the real barrel-tip launch and flash before starting visual motion.

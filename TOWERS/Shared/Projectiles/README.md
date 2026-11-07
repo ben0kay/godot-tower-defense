@@ -1,3 +1,11 @@
+## Buffered friendly tracers
+
+`World/Projectiles` now advances ordinary tower and fighter tracers in one retained buffer and draws them on one canvas item. `FriendlyProjectileFlight` shares straight and homing travel, swept hits, statuses, shield feedback and projectile light leases with the standalone `BasicProjectile` adapter. Splash rounds and wave emitters still use their existing child nodes.
+
+The buffer allocates on first use and sleeps while empty. `MaximumBufferedRounds` defaults to 4,096. Overflow uses the standalone adapter so funded shots are still delivered. Turn off `UseBufferedTracers` on the shared world scene to compare the standalone path. F4/F5 distinguish buffered counts from projectile nodes. The campaign save gate accounts for both.
+
+---
+
 ## HI1 — confirmed hull damage sparks (2026-11-04)
 
 `BasicProjectile` snapshots an optional **0–8 hull spark count at launch** (default zero). When an opted-in kinetic round hits, it retains the exact swept contact point, commits damage exactly once and requests pooled `FEEDBACK/HullHitSparks` only if `Enemy.Health` actually decreased. Shield-only hits continue to use their existing shield response and optional ricochet without metallic hull sparks; misses and zero-effect hits draw nothing. World-owned sparks outlive a lethal enemy's `QueueFree` and do not alter damage/XP/status/ammo. Battle, Machine Gun and Sniper opt in; other projectile consumers remain unchanged. See [Hit Sparks](../../../FEEDBACK/HullHitSparks/README.md).

@@ -70,7 +70,7 @@ public partial class StasisTowerChecks : Node
                 Node projectiles = f.Main.GetNode("World/Projectiles");
                 Require(projectiles.GetChildCount() == 1, "Production Stasis launches one projectile");
                 BasicProjectile launched = projectiles.GetChild<BasicProjectile>(0); launched.SetPhysicsProcess(false);
-                var launchEffect = (StatusEffectPayload?)typeof(BasicProjectile).GetField("_effect", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(launched);
+                var launchEffect = launched.EffectSnapshot;
                 Require(launchEffect?.Id == StatusEffectId.Freeze && launchEffect?.DurationSeconds == 3, "Production launch snapshots resolved Freeze");
                 tower.Config.SetLevelStats(1, tower.Config.Levels[0].Stats with { Freeze = new(9) });
                 launched.GlobalPosition = b.GlobalPosition; launched._PhysicsProcess(.01);

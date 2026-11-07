@@ -72,15 +72,16 @@ public static class TowerStatChecks
             while (spawns.Paths.PendingCount > 0) spawns.Paths._PhysicsProcess(1.0 / 60);
             first.GlobalPosition = target.GlobalPosition + new Vector2(100, 0);
             first.GetNode<Node2D>("TurretPivot").Rotation = -Mathf.Pi * 0.5f;
-            int projectiles = battle.GetNode("World/Projectiles").GetChildCount();
+            var friendlyShots = battle.GetNode<FriendlyProjectileSystem>("World/Projectiles");
+            int projectiles = friendlyShots.ActiveCount;
             for (int tick = 0; tick < 30; tick++) first._PhysicsProcess(1.0 / 60);
-            Require(battle.GetNode("World/Projectiles").GetChildCount() == projectiles && target.Health == target.Definition.MaxHealth,
+            Require(friendlyShots.ActiveCount == projectiles && target.Health == target.Definition.MaxHealth,
                 "Zero final fire rate prevents shots at a living in-range aligned target");
             first.Config.ShotsPerSecond = 1;
             first._PhysicsProcess(1.0 / 60);
-            Require(battle.GetNode("World/Projectiles").GetChildCount() == projectiles + 1,
+            Require(friendlyShots.ActiveCount == projectiles + 1,
                 "Changing Config fire rate enables shooting through updated final stats");
-            foreach (Node bullet in battle.GetNode("World/Projectiles").GetChildren()) bullet.Free();
+            friendlyShots.Clear();
             target.Arrive();
             TowerPlacementController placement = battle.GetNode<TowerPlacementController>("TowerPlacement");
             placement.Call("SelectTower", first);

@@ -1,157 +1,86 @@
-// Shared straight-by-default projectile: immutable launch spread, spatial swept contact, optional explicit homing.
+// Standalone and overflow scene adapter for the same friendly flight used by the shared buffer.
 using Godot;
 
 public partial class BasicProjectile : Node2D
 {
-    #region Launch State
-    private static readonly NodePath RicochetPath = new("../../Effects/Ricochets");
-    private static readonly NodePath HullSparkPath = new("../../Effects/HullHitSparks");
-    private bool _shieldRicochet;
     private RicochetController _ricochets;
     private HullHitSparkController _hullSparks;
-    private int _hullSparkCount;
-    private Enemy _target;
-    private EnemyRegistry _registry;
-    private Vector2 _initialTarget;
-    private float _speed;
-    private double _life = 5;
-    private DamageInfo _damage;
-    private StatusEffectPayload? _effect;
-    private bool _impacted, _launched;
-    private ProjectileHandlingStats _handling;
-    private ProjectileVisualSnapshot? _visual;
-    private WorldLightingController.ProjectileLight _flightLight;
-    private Vector2 _travelDirection = Vector2.Up;
-    // Reusable per-projectile draw buffers; same taper geometry as enemy Gunner (no per-redraw arrays).
-    private readonly Vector2[] _streak = new Vector2[EnemyEnergyStreakGeometry.VertexCount];
-    private readonly Color[] _streakColors = new Color[EnemyEnergyStreakGeometry.VertexCount];
-    public ProjectileVisualSnapshot? VisualSnapshot => _visual;
-    public Vector2 TravelDirection => _travelDirection;
-    public ProjectileHandlingStats Handling => _handling;
+    private FriendlyProjectileFlight _flight;
+    private readonly FriendlyProjectileDrawing _drawing = new();
+    private bool _launched, _finished, _advancing;
+
+    public ProjectileVisualSnapshot? VisualSnapshot => _flight.Visual;
+    public Vector2 TravelDirection => _flight.Direction;
+    public ProjectileHandlingStats Handling => _flight.Handling;
+    internal StatusEffectPayload? EffectSnapshot => _flight.Effect;
+
     // =========================================================
-    // Compatibility payload overload retains zero-spread straight delivery unless a caller explicitly opts into homing.
+    // Retain the existing node API for standalone use and as a safe overflow path for funded rounds.
     public void Initialize(Enemy target, float speed, float damage) => Initialize(target, speed, new DamageInfo(damage, DamageType.Kinetic));
-    // =========================================================
-    // Capture value payloads once; straight shots keep no original-target reference after initialization.
+
     public void Initialize(Enemy target, float speed, DamageInfo damage, StatusEffectPayload? effect = null,
         ProjectileVisualStyle visual = null, ProjectileHandlingStats? handling = null, bool shieldRicochet = false,
         int hullHitSparkCount = 0)
     {
-        if (!float.IsFinite(speed) || speed <= 0) throw new System.ArgumentOutOfRangeException(nameof(speed));
-        _handling = ProjectileHandlingStats.Sanitize(handling ?? new());
-        _registry = GodotObject.IsInstanceValid(target) ? target.Registry : null;
-        _initialTarget = GodotObject.IsInstanceValid(target) ? target.GlobalPosition : Vector2.Zero;
-        _target = _handling.Guidance == ProjectileGuidance.Homing ? target : null;
-        _speed = speed; _damage = damage; _effect = effect; _visual = visual?.Capture();
-        _shieldRicochet = shieldRicochet;
-        _hullSparkCount = Mathf.Clamp(hullHitSparkCount, 0, 8);
-        _life = 5; _impacted = false; _launched = false;
+        _flight.ReleaseLight();
+        _flight = new(target, speed, damage, effect, visual, handling, shieldRicochet, hullHitSparkCount);
+        _launched = _finished = false;
     }
+
     // =========================================================
-    // Production supplies actual barrel forward; legacy deterministic fixtures may aim at the captured initial point.
+    // Compatibility fixtures may omit forward and aim at the captured initial target point.
     public void LaunchFrom(Vector2 worldPosition, Vector2? forward = null, float? spreadSample = null)
     {
-        if (_launched) return;
-        if (!worldPosition.IsFinite()) { _impacted = true; QueueFree(); return; }
-        _ricochets = _shieldRicochet ? GetNodeOrNull<RicochetController>(RicochetPath) : null;
-        _hullSparks = _hullSparkCount > 0 ? GetNodeOrNull<HullHitSparkController>(HullSparkPath) : null;
+        if (_launched || _finished) return;
+        if (!worldPosition.IsFinite()) { Finish(); return; }
+        _ricochets = GetNodeOrNull<RicochetController>("../../Effects/Ricochets");
+        _hullSparks = GetNodeOrNull<HullHitSparkController>("../../Effects/HullHitSparks");
+        _flight.Launch(worldPosition, forward, spreadSample, GetNodeOrNull<WorldLightingController>("../../Lighting"));
         GlobalPosition = worldPosition;
-        _travelDirection = ProjectileLaunch.Direction(forward ?? (_initialTarget - worldPosition), _handling.SpreadDegrees, spreadSample);
-        GlobalRotation = _travelDirection.Angle(); _launched = true;
-        // LGT0-A.2 cosmetic lease. Unlit projectiles still use the same flight and tracer.
-        if (_visual is { Enabled: true, EmitsWorldLight: true } style)
-            _flightLight = WorldLightingController.TrackFriendly(this, style.Body);
+        GlobalRotation = _flight.Direction.Angle();
+        _launched = true;
     }
-    #endregion
 
-    #region Independent Travel
     // =========================================================
-    // Straight rounds ignore former target death/range; homing remains an explicit capability with target-loss cleanup.
+    // One fallback node drives the shared flight state using the normal Godot physics lifecycle.
     public override void _PhysicsProcess(double delta)
     {
-        using var pf2 = SubsystemProfiler.Measure(this, ProfileCategory.Projectiles);
-        if (_impacted || IsQueuedForDeletion() || !IsInsideTree() || GetTree().Paused || !double.IsFinite(delta) || delta <= 0) return;
-        if (!GodotObject.IsInstanceValid(_registry) || !_registry.IsInsideTree() || _registry.IsQueuedForDeletion()) { QueueFree(); return; }
+        using var profile = SubsystemProfiler.Measure(this, ProfileCategory.Projectiles);
+        if (_finished || _advancing || IsQueuedForDeletion() || !IsInsideTree() || GetTree().Paused || !double.IsFinite(delta) || delta <= 0) return;
+        if (!_flight.RegistryIsLive) { Finish(); return; }
         if (!_launched) LaunchFrom(GlobalPosition);
-        if (_impacted) return;
-        if (_handling.Guidance == ProjectileGuidance.Homing)
+        if (_finished) return;
+        _flight.Position = GlobalPosition;
+        _advancing = true;
+        bool live;
+        try { live = _flight.Advance(delta, _ricochets, _hullSparks); }
+        catch
         {
-            if (!GodotObject.IsInstanceValid(_target) || !_target.IsAlive || _target.IsQueuedForDeletion()) { QueueFree(); return; }
-            Vector2 direction = _target.GlobalPosition - GlobalPosition;
-            if (direction.IsFinite() && direction.LengthSquared() > .0001f)
-            { _travelDirection = direction.Normalized(); GlobalRotation = _travelDirection.Angle(); }
+            if (GodotObject.IsInstanceValid(this) && IsInsideTree()) Finish();
+            throw;
         }
-        double seconds = System.Math.Min(delta, _life);
-        Vector2 from = GlobalPosition;
-        Vector2 end = new((float)(from.X + (double)_travelDirection.X * _speed * seconds),
-            (float)(from.Y + (double)_travelDirection.Y * _speed * seconds));
-        if (!end.IsFinite()) { QueueFree(); return; }
-        Enemy hit = ProjectileEnemyContact.First(_registry, from, end, out double entry);
-        if (hit != null)
-        {
-            _impacted = true; GlobalPosition = from.Lerp(end, (float)entry); QueueFree();
-            Vector2 point = default, normal = default, reflected = default;
-            // Extend the incoming line backwards: a prior physics tick may already be inside the larger visual rim.
-            bool bounce = _shieldRicochet && _damage.Type == DamageType.Kinetic && _visual.HasValue &&
-                GodotObject.IsInstanceValid(_ricochets) && _ricochets.Available && hit.TryGetShieldRim(out var ellipse) &&
-                RicochetGeometry.Reflect(ellipse, GlobalPosition - _travelDirection * (2 * (ellipse.X.Length() + ellipse.Y.Length()) + 1),
-                    GlobalPosition, _travelDirection, out point, out normal, out reflected);
-            // Hull-only feedback compares authoritative HP before and after this single hit.
-            float hullBefore = hit.Health;
-            float absorbed = hit.ApplyDamageWithShieldAbsorption(_damage);
-            if (bounce && absorbed > 0 && GodotObject.IsInstanceValid(_ricochets))
-                _ricochets.Spawn(point, normal, reflected, _speed, _visual.Value);
-            if (_damage.Type == DamageType.Kinetic && _hullSparkCount > 0 &&
-                GodotObject.IsInstanceValid(hit) && hit.Health < hullBefore &&
-                GodotObject.IsInstanceValid(_hullSparks))
-                _hullSparks.Spawn(GlobalPosition, _travelDirection, _hullSparkCount);
-            if (_effect.HasValue && GodotObject.IsInstanceValid(hit) && hit.IsAlive && !hit.IsQueuedForDeletion()) hit.ApplyStatus(_effect.Value.WithSource(_damage.Source));
-            return;
-        }
-        GlobalPosition = end; _life -= seconds;
-        _flightLight?.Move(end);
-        if (_life <= 0) QueueFree();
+        finally { _advancing = false; }
+        if (!GodotObject.IsInstanceValid(this) || !IsInsideTree()) return;
+        GlobalPosition = _flight.Position;
+        GlobalRotation = _flight.Direction.Angle();
+        if (!live) Finish();
     }
-    // =========================================================
-    // World unload is terminal even if a caller manually ticks a retained managed wrapper.
+
+    private void Finish()
+    {
+        _finished = true;
+        _flight.ReleaseLight();
+        QueueFree();
+    }
+
     public override void _ExitTree()
-    { _flightLight?.Release(); _flightLight = null; _impacted = true; _target = null; _registry = null; _ricochets = null; _hullSparks = null; }
-    #endregion
-
-    // =========================================================
-    // Layered tracer or legacy circle fallback; local +X follows the cached guided travel rotation.
-    public override void _Draw()
     {
-        if (!_visual.HasValue)
-        { DrawCircle(Vector2.Zero, 3f, _effect.HasValue ? new Color(.35f, .9f, 1f) : new Color(1f, .85f, .35f)); return; }
-        var style = _visual.Value; if (!style.Enabled) return;
-        Vector2 forward = Vector2.Right;
-        Vector2 tail = -forward * style.Length;
-        if (GodotObject.IsInstanceValid(style.Texture))
-        {
-            DrawSetTransform(Vector2.Zero, forward.Angle());
-            DrawTextureRect(style.Texture, new Rect2(-style.Length, -style.Width * .5f, style.Length, style.Width), false, style.Body);
-            DrawSetTransform(Vector2.Zero);
-        }
-        else if (style.Tapered)
-        {
-            // Shared Gunner streak shape, rotated with actual shot direction; only this projectile draws it.
-            if (style.Glow.A > 0) DrawTapered(style, 1, style.GlowWidth, style.Glow);
-            DrawTapered(style, 1, 1, style.Body);
-            DrawTapered(style, .85f, .55f, style.Core);
-        }
-        else
-        {
-            DrawLine(tail, Vector2.Zero, style.Glow, style.Width * style.GlowWidth, true);
-            DrawLine(tail, Vector2.Zero, style.Body, style.Width * 1.6f, true);
-            DrawLine(tail * .75f, Vector2.Zero, style.Core, style.Width, true);
-        }
-        if (style.BrightTip) DrawLine(-forward * style.Width * 1.5f, Vector2.Zero, style.Core, style.Width * 1.2f, true);
+        _flight.ReleaseLight();
+        _flight = default;
+        _finished = true;
+        _ricochets = null;
+        _hullSparks = null;
     }
 
-    private void DrawTapered(ProjectileVisualSnapshot style, float lengthScale, float widthScale, Color color)
-    {
-        EnemyEnergyStreakGeometry.Fill(Vector2.Zero, Vector2.Right, style, lengthScale, widthScale, color, _streak, _streakColors);
-        DrawPolygon(_streak, _streakColors);
-    }
+    public override void _Draw() => _drawing.Draw(this, _flight, Vector2.Zero, Vector2.Right, Transform2D.Identity);
 }

@@ -84,10 +84,10 @@ public static class DamageTypeChecks
         main.GetNode("World/Towers").AddChild(battle); battle.SetPhysicsProcess(false);
         battle.GlobalPosition = shielded.GlobalPosition + new Vector2(0, 64);
         battle._PhysicsProcess(1);
-        Node bullets = main.GetNode("World/Projectiles");
-        Require(bullets.GetChildCount() == 1, "Production Battle fires one guided projectile at the shielded target");
+        var bullets = main.GetNode<FriendlyProjectileSystem>("World/Projectiles");
+        Require(bullets.ActiveCount == 1 && bullets.GetChildCount() == 0, "Production Battle buffers its guided projectile without a child node");
         battle.Config.ShieldPenetration = 0.75f; // A shot already in flight retains its original final payload.
-        bullets.GetChild<BasicProjectile>(0)._PhysicsProcess(1);
+        bullets._PhysicsProcess(1);
         Require(Mathf.IsEqualApprox(shielded.CurrentShield, 100 - 11.4f * profile.KineticShield) && Mathf.IsEqualApprox(shielded.Health, 59.4f)
             && shielded.GetNode<DefenseBar>("DefenseBar").Visible && untouched.Health == 60 && untouched.CurrentShield == 0,
             "Real Battle projectile snapshots5% penetration, hull feedback and target isolation");

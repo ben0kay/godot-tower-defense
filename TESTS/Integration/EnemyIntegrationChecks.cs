@@ -146,7 +146,8 @@ public partial class EnemyIntegrationChecks : Node
             tower.Config.TargetSearchInterval = 0.05f;
             tower.GetNode<Node2D>("TurretPivot").Rotation = Mathf.Pi * 0.5f;
             for (int i = 0; i < 12; i++) tower._PhysicsProcess(1.0 / 60);
-            Check(_battle.GetNode<Node2D>("World/Projectiles").GetChildCount() == 0,
+            var friendlyShots = _battle.GetNode<FriendlyProjectileSystem>("World/Projectiles");
+            Check(friendlyShots.ActiveCount == 0 && friendlyShots.GetChildCount() == 0,
                 "Tower holds fire while turning toward an opposite target");
             Check(tower.Rotation == 0, "Aiming leaves placement root fixed");
             tower.GetNode<Node2D>("TurretPivot").Rotation = -Mathf.Pi * 0.5f;
@@ -156,8 +157,7 @@ public partial class EnemyIntegrationChecks : Node
             for (int i = 0; i < 380 && target.IsAlive; i++)
             {
                 tower._PhysicsProcess(1.0 / 60);
-                foreach (BasicProjectile bullet in _battle.GetNode<Node2D>("World/Projectiles").GetChildren().OfType<BasicProjectile>().ToArray())
-                { bullet.SetPhysicsProcess(false); if (!bullet.IsQueuedForDeletion()) bullet._PhysicsProcess(1.0 / 60); }
+                friendlyShots._PhysicsProcess(1.0 / 60);
                 if (i == 44) Check(target.Health == 30, "One configured 30-damage shot during first 0.75 seconds");
                 if (i == 59) Check(target.Health == 30, "First shot deals half of Enemy001 hull before the second fires");
             }

@@ -151,11 +151,8 @@ public abstract partial class ProjectileTurretBase : TowerBase
             }
             else
             {
-                BasicProjectile bullet = new();
-                bullet.Initialize(_target, FinalStats.ProjectileSpeed, hit, CreateEffect(FinalStats), Config.ProjectileVisual, FinalStats.Handling, Config.ShieldRicochet,
-                    Config.HullHitSparkCount);
-                _projectiles.AddChild(bullet);
-                WeaponVisuals.Present(bullet, muzzle, Config, _visuals);
+                WeaponVisuals.FireFriendly(_projectiles, muzzle, Config, _visuals, _target, FinalStats.ProjectileSpeed,
+                    hit, CreateEffect(FinalStats), FinalStats.Handling, Config.ShieldRicochet, Config.HullHitSparkCount);
             }
             // Each funded, emitted bullet requests one independent one-shot (never a continuous loop).
             if (!string.IsNullOrWhiteSpace(Config.FireSoundId))

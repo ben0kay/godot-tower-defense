@@ -17,7 +17,7 @@ public partial class ProjectileAccuracyChecks : Node
             using (AmmoLoopFixture f = new(this))
             {
                 SubsystemBattlefield.DetachSession(f.Main);
-                Stats(f); Straight(f); SweptAndStatus(f); Splash(f); Homing(f); SpatialBudget(f);
+                Stats(f); Straight(f); SweptAndStatus(f); Splash(f); Homing(f); SpatialBudget(f); BufferedOverflow(f);
             }
             await SubsystemBattlefield.DrainFreedFixtures(this);
             GD.Print("PASS: PA1-PA3 handling/rank/research/preview, launch spread, straight lifetime, swept first enemy, statuses, homing, splash and spatial budget");
@@ -67,6 +67,30 @@ public partial class ProjectileAccuracyChecks : Node
         Require(ProjectileLaunch.Direction(Vector2.Right, 0, 1) == Vector2.Right, "Zero spread is exactly precise");
     }
     #endregion
+
+    // =========================================================
+    // The real launch entry uses the buffer and preserves an already-funded shot when capacity runs out.
+    private static void BufferedOverflow(AmmoLoopFixture f)
+    {
+        var shots = f.Main.GetNode<FriendlyProjectileSystem>("World/Projectiles");
+        shots.MaximumBufferedRounds = 1;
+        shots.UseBufferedTracers = true;
+        Vector2 from = new(2000, 2000);
+        Enemy target = f.Target(from + Vector2.Right * 64);
+        float before = target.Health;
+        DamageInfo damage = new(10, DamageType.Energy);
+        ProjectileLaunch.FireFriendly(shots, target, 1000, damage, from, Vector2.Right);
+        Require(shots.ActiveCount == 1 && shots.GetChildCount() == 0, "Buffered launch creates no per-shot node");
+        ProjectileLaunch.FireFriendly(shots, target, 1000, damage, from, Vector2.Right);
+        var overflow = shots.GetChild<BasicProjectile>(0);
+        Require(shots.ActiveCount == 1, "Overflow retains the first buffered shot");
+        shots._PhysicsProcess(.1);
+        overflow._PhysicsProcess(.1);
+        Require(shots.ActiveCount == 0 && overflow.IsQueuedForDeletion(), "Both paths retire on impact");
+        Near(target.Health, before - 20, "Buffered and overflow shots each resolve one hit");
+        f.ClearProjectiles();
+        target.Free();
+    }
 
     #region Straight and Contact
     // =========================================================

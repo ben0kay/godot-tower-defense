@@ -86,11 +86,8 @@ public partial class FighterDroneWeapon : Node
 
         // =========================================================
         // Same swept contact/shield/Kinetic rules as friendly tower rounds, not the hostile tower-hit system.
-        BasicProjectile bullet = new();
-        bullet.Initialize(target, speed, new DamageInfo(damage, DamageType.Kinetic, source: _source),
-            visual: config.ProjectileVisual);
-        _projectiles.AddChild(bullet);
-        bullet.LaunchFrom(muzzle.GlobalPosition, direction);
+        ProjectileLaunch.FireFriendly(_projectiles, target, speed, new DamageInfo(damage, DamageType.Kinetic, source: _source),
+            muzzle.GlobalPosition, direction, visual: config.ProjectileVisual);
         _visuals?.FlashAt(muzzle, config.MuzzleFlash);
         _fighter.RecordFiredRound();
         _cooldown = Math.Max(0, 1.0 / rate + _cooldown);

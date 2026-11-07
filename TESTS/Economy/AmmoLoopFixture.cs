@@ -15,6 +15,8 @@ internal sealed class AmmoLoopFixture : IDisposable
     internal AmmoLoopFixture(Node parent, string scene = "res://Main.tscn")
     {
         Main = GD.Load<PackedScene>(scene).Instantiate(); parent.AddChild(Main); Disable(Main);
+        // Existing fixture callers manually inspect and tick standalone nodes.
+        Main.GetNode<FriendlyProjectileSystem>("World/Projectiles").UseBufferedTracers = false;
         var builders = Main.GetNodeOrNull<ConstructionDroneManager>("World/ConstructionDrones");
         if (builders != null) builders.Config = new ConstructionDroneMasterConfig { Enabled = false };
     }

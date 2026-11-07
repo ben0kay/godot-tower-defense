@@ -170,9 +170,10 @@ public static class TowerRankChecks
         BattleTower battle = (BattleTower)Create(main, "battle"); Enemy target = Enemy(main, spawns);
         battle.Config.TargetPriority = TowerTargeting.Priority.Closest; battle.Config.AimToleranceDegrees = 180;
         battle._PhysicsProcess(1);
-        BasicProjectile bullet = main.GetNode("World/Projectiles").GetChildren().OfType<BasicProjectile>().Single();
+        var bullets = main.GetNode<FriendlyProjectileSystem>("World/Projectiles");
+        Require(bullets.ActiveCount == 1, "Production Battle buffers one shot");
         Near(battle.RankProgress.TotalXp, 0, "Launching a guided projectile is not damage XP");
-        bullet._PhysicsProcess(.2); Near(battle.RankProgress.TotalXp, 3, "Production guided contact credits its Battle owner"); bullet.Free(); battle.Free(); Clear(main, spawns);
+        bullets._PhysicsProcess(.2); Near(battle.RankProgress.TotalXp, 3, "Production guided contact credits its Battle owner"); battle.Free(); Clear(main, spawns);
         LaserTower laser = (LaserTower)Create(main, "laser"); target = Enemy(main, spawns);
         laser.Config.TargetPriority = TowerTargeting.Priority.Closest; laser.Config.AimToleranceDegrees = 180;
         laser._PhysicsProcess(1); Near(laser.RankProgress.TotalXp, .18, "Continuous Laser credits actual1.8 hull, not12 raw base");
@@ -192,8 +193,8 @@ public static class TowerRankChecks
         wave._PhysicsProcess(.1); Near(shock.RankProgress.TotalXp, 2.125, "One emission cannot award damage XP twice"); shock.Free(); Clear(main, spawns);
         battle = (BattleTower)Create(main, "battle"); target = Enemy(main, spawns);
         battle.Config.TargetPriority = TowerTargeting.Priority.Closest; battle.Config.AimToleranceDegrees = 180; battle._PhysicsProcess(1);
-        bullet = main.GetNode("World/Projectiles").GetChildren().OfType<BasicProjectile>().Single();
-        battle.Free(); bullet._PhysicsProcess(.2);
+        Require(bullets.ActiveCount == 1, "Production Battle buffers its next shot");
+        battle.Free(); bullets._PhysicsProcess(.2);
         Near(target.Health, 30, "Deleting owner does not cancel a fired projectile's combat");
         Near(battle.RankProgress.TotalXp, 0, "Weak source awards nothing to a freed tower"); Clear(main, spawns);
     }
@@ -309,7 +310,9 @@ public static class TowerRankChecks
     private static void Clear(Node main, SpawnManager spawns)
     {
         AreaDamageChecks.Clear(spawns);
-        foreach (Node node in main.GetNode("World/Projectiles").GetChildren()) node.Free();
+        var bullets = main.GetNode<FriendlyProjectileSystem>("World/Projectiles");
+        bullets.Clear();
+        foreach (Node node in bullets.GetChildren()) node.Free();
         foreach (Node node in main.GetNode("World/Effects").GetChildren()) if (node is ShockwaveEffect) node.Free();
     }
     // =========================================================
