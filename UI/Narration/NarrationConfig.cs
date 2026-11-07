@@ -27,7 +27,7 @@ public partial class NarrationConfig : Resource
     [Export(PropertyHint.Range, "0,80,1,suffix:px")]
     public float RightMargin { get; set; } = 18f;
     [Export(PropertyHint.Range, "48,240,1,suffix:px")]
-    public float TopMargin { get; set; } = 64f;
+    public float TopMargin { get; set; } = 116f;
     [Export(PropertyHint.Range, "0,60,1,suffix:px")]
     public float AlertClearance { get; set; } = 14f;
     #endregion
