@@ -1,3 +1,9 @@
+## Results V2 Codex roadmap update — 2026-11-08
+
+Documentation only: added `UI/Menus/Results/RESULTS_ENHANCEMENT_IMPLEMENTATION_PLAN.md` with focused R3-A/R2-B/R3-B/R3-C1/C2/R4-A/R4-B steps for real Credits, compact overview, wave history, tower attribution and DETAILS, then owner-approved XP rules and celebrations/records. Linked from Results README and unfinished backlog. Existing Results, economy, combat, mission XP, authored waves and saves unchanged; no build or gameplay QA applicable to this documentation edit.
+
+---
+
 ## VS1 — Unified Enemy Visual Scale — 2026-11-08
 
 Enemy definitions now author a 0.25–4× visual multiplier. Hull and gun transforms, muzzle positions, thrusters, shield and defense feedback, and F2 artwork use the same scale. Gameplay range and sight retain authored coordinates. Bulwark keeps its 0.8× hull through its definition. Source and scene review only; Godot build and live acceptance remain pending. See [visual authoring notes](../ENEMIES/Shared/Visuals/README.md).
