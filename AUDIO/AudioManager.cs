@@ -59,6 +59,7 @@ public partial class AudioManager : Node2D
         Catalog ??= GD.Load<AudioCatalog>("res://AUDIO/DefaultAudioCatalog.tres") ?? new();
         _rng.Randomize();
         foreach (AudioDefinition sound in Catalog.Sounds) RegisterSound(sound);
+        LoadOptionalUiButtonSounds();
         ApplyBusVolumes();
         RefreshCamera();
     }
@@ -94,6 +95,34 @@ public partial class AudioManager : Node2D
         _emitters.Clear();
         SetMusicDucking(false);
         if (Instance == this) Instance = null;
+    }
+    #endregion
+
+    #region Optional UI button clips
+    // =========================================================
+    // These three recently imported WAVs must never be hard resource dependencies of
+    // the master catalog: a fresh checkout may have the WAV but not its import cache yet.
+    // Use imported streams on exports; read the source WAV directly when an
+    // editor working copy has not finished importing it. Only runs once at startup.
+    private void LoadOptionalUiButtonSounds()
+    {
+        LoadOptionalUiButtonSound("ui_button_hover", "res://AUDIO/snd_btn_hover.wav");
+        LoadOptionalUiButtonSound("ui_button_click", "res://AUDIO/snd_click_success.wav");
+        LoadOptionalUiButtonSound("ui_button_back", "res://AUDIO/snd_btn_back.wav");
+    }
+
+    // =========================================================
+    // A missing clip only silences its own feedback; tower, voice and ambience survive.
+    private void LoadOptionalUiButtonSound(string id, string path)
+    {
+        AudioDefinition sound = FindSound(id);
+        if (sound == null || sound.Stream != null) return;
+        if (FileAccess.FileExists(path))
+            sound.Stream = AudioStreamWav.LoadFromFile(path);
+        if (sound.Stream == null && ResourceLoader.Exists(path, "AudioStream"))
+            sound.Stream = GD.Load<AudioStream>(path);
+        if (sound.Stream == null)
+            GD.PushWarning($"Audio: optional UI clip {path} is not available. Other audio remains enabled.");
     }
     #endregion
 

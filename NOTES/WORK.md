@@ -1,3 +1,9 @@
+## UI audio catalog startup fix — 2026-11-08
+
+Fixed broken `DefaultAudioCatalog.tres` loading caused by hard `AudioStream` external references to newly renamed/copied button WAVs before Godot had imported them. ButtonHover/Click/Back definitions now keep their Inspector-editable mix values but leave `Stream` unbound in the file. `AudioManager` binds these three optional WAVs once at startup (direct source loading in editor, imported resource fallback in export), so missing/unimported button clips cannot invalidate tower/ambience/voice audio. Original recorded sound bytes and audio IDs unchanged. Source-only review; owner should pull dev, restart Godot, verify all three buttons plus existing sound families.
+
+---
+
 ## F08-A — Shared camera shake and Citadel impacts — 2026-11-08
 
 **Source Implemented / Awaiting Owner Validation.** Battlefield camera shake uses visible-rectangle falloff, strongest-hit arbitration and a capped visual offset. Only HP lost to arrivals at the assigned Citadel requests the effect. Tune the [camera settings and Citadel impact profile](../FEEDBACK/CameraEffects/README.md). Source review only. In Godot, check hit strength, offscreen fade, navigation during a shake and cleanup on pause, outcome and Continue.
