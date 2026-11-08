@@ -1,3 +1,9 @@
+## Bulwark sprite display scale — 2026-11-08
+
+The Bulwark Drone hull now draws at **80%** of its previous size: `Sprite → Transform → Scale = (0.8, 0.8)` in `Enemy004.tscn`. The SVG source still imports at 64×48px, while its displayed hull is **51.2×38.4px**. Health/bar and thruster sizing follow the rendered sprite. `Enemy004.tres` does not currently expose a generic visual-scale property; adjust this particular enemy's `Sprite2D.Scale` in its scene. `RadiusPixels = 22` remains a separate navigation clearance value, and the Standard class, HP, movement, abilities, waves and IDs are unchanged. Validate at gameplay zoom.
+
+---
+
 ## Class metadata fix — 2026-11-05
 
 The actual `Enemy004.tres` now explicitly serializes **Standard (Class = 2), Common (Rank = 0), Fighter (Role = 0)**. Previously these properties were absent, making the 64×48 Bulwark appear under F2's Tiny heading because the shared `EnemyDefinition` defaults to Tiny. F2 already groups current catalog classes automatically; no debug-only correction or artwork-based runtime override was needed. This class metadata is descriptive and does not change hull HP, navigation size, movement, waves or combat. See [roster](../ROSTER.md).
