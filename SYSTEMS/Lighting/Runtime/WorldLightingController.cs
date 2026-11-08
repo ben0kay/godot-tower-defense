@@ -26,7 +26,7 @@ public partial class WorldLightingController : Node2D
         public Source Source;
     }
 
-    private readonly List<Source> _citadels = new(), _towers = new(), _drones = new(), _lava = new(), _lavaSpill = new();
+    private readonly List<Source> _citadels = new(), _towers = new(), _drones = new(), _lava = new();
     private readonly Dictionary<Node2D, Action> _disconnect = new();
     private readonly List<Slot> _slots = new();
     private readonly List<Source> _selected = new();
@@ -201,7 +201,6 @@ public partial class WorldLightingController : Node2D
     private void RebuildTerrainLights()
     {
         _lava.Clear();
-        _lavaSpill.Clear();
         _lavaAnchors.Clear();
         if (Grid.InteractiveTiles is { } terrain)
         {
@@ -211,9 +210,6 @@ public partial class WorldLightingController : Node2D
                 _lavaAnchors.Add(centre);
                 if (HasOutput(Config.Lava))
                     _lava.Add(new Source(null, Config.Lava, centre + Config.Lava.LocalOffset, Config.Lava.RadiusPixels, null));
-                if (HasOutput(Config.LavaSpill))
-                    _lavaSpill.Add(new Source(null, Config.LavaSpill, centre + Config.LavaSpill.LocalOffset,
-                        Config.LavaSpill.RadiusPixels, null));
             }
         }
         RebuildTerrainGlow();
@@ -242,8 +238,6 @@ public partial class WorldLightingController : Node2D
         hasCandidates |= Select(_portals, cap, cull, canvas, viewport);
         if (_selected.Count < cap) hasCandidates |= Select(_towerGlows, _selected.Count + 1, cull, canvas, viewport);
         hasCandidates |= Select(_drones, Mathf.Min(cap, _selected.Count + Mathf.Clamp(Config.MaxDroneLights, 0, 16)), cull, canvas, viewport);
-        int lavaBudget = Mathf.Clamp(Config.MaxLavaLights, 0, cap / 4);
-        hasCandidates |= Select(_lavaSpill, Mathf.Min(cap, _selected.Count + lavaBudget), cull, canvas, viewport);
         hasCandidates |= Select(_towerGlows, cap, cull, canvas, viewport);
 
         Select(_projectileSources, Mathf.Min(cap, _selected.Count + Mathf.Clamp(Config.MaxProjectileLights, 0, 8)), cull, canvas, viewport);
@@ -359,7 +353,6 @@ public partial class WorldLightingController : Node2D
         for (int i = _projectileSources.Count - 1; i >= 0; i--) RemoveProjectile(i);
         _selected.Clear();
         _lava.Clear();
-        _lavaSpill.Clear();
         _lavaAnchors.Clear();
         _steamSelection.Clear();
         _steamSlots.Clear();

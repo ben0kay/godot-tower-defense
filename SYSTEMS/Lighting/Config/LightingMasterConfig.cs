@@ -21,7 +21,6 @@ public partial class LightingMasterConfig : Resource
 
     [ExportGroup("Lava Presentation")]
     [Export] public LightSourceConfig LavaSpill { get; set; }
-    [Export(PropertyHint.Range, "0,8,1")] public int MaxLavaLights { get; set; } = 3;
     [Export(PropertyHint.Range, "0,1,0.01")] public float LavaGlowOpacity { get; set; } = .52f;
     [Export] public bool LavaSteamEnabled { get; set; } = true;
     [Export(PropertyHint.Range, "0,8,1")] public int MaxLavaSteamEmitters { get; set; } = 4;

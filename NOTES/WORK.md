@@ -1,3 +1,9 @@
+## Lava glow continuity and bubble pops — 2026-11-08
+
+Replaced first-admitted lava point lights and stacking tile glows with a single chunked coverage field around the lava silhouette. The surface uses continuous self-lit color and the bubbles now swell, flash and throw warm flecks at varied intervals. Source review only. Inspect a long lava strip, chunk boundaries, F6 and bubble timing in Godot.
+
+---
+
 ## Wave Editor catalog loading and Fleet Threat visibility — 2026-11-08
 
 Enabled editor instantiation of the registered catalog, enemy scene metadata and authored capabilities. Gameplay mount and ability setup stays out of the editor. Fleet Threat is pinned in the toolbar and failed catalog loads preserve IDs without calling them unregistered. Godot .NET rebuild and editor acceptance pending.

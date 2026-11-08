@@ -1,4 +1,4 @@
-// Retained tile glow chunks for the cyan passable foundation tile and every playable lava cell.
+// Retained terrain glow chunks for cyan foundations and the merged lava silhouette.
 using Godot;
 using System.Collections.Generic;
 
@@ -9,7 +9,7 @@ public partial class WorldLightingController
     private readonly record struct TileGlow(Vector2 Position, float Radius, Color Tint);
 
     // =========================================================
-    // Draw static emissive accents in chunks. Give every lava cell the same base glow without regional light hot spots.
+    // Draw static emissive accents in chunks. Lava uses a single coverage field per world position.
     private void RebuildTerrainGlow()
     {
         if (_terrainGlow != null)
@@ -24,19 +24,12 @@ public partial class WorldLightingController
         float size = Grid.Config.CellSize;
         foreach (Vector2I cell in EnumerateCyanFoundationCells())
             AddTileGlow(chunks, cell, size * .50f, new Color(.22f, .80f, 1f, .44f));
-        if (HasOutput(Config.Lava) && Grid.InteractiveTiles is { } terrain)
-        {
-            Color lavaTint = Config.Lava.Tint;
-            lavaTint.A = Mathf.Clamp(Config.LavaGlowOpacity, 0f, 1f);
-            foreach (Vector2I cell in terrain.EnumerateLavaCells())
-                AddTileGlow(chunks, cell, size * .85f, lavaTint);
-        }
-
         CanvasItemMaterial material = new()
         {
             BlendMode = CanvasItemMaterial.BlendModeEnum.Add,
             LightMode = CanvasItemMaterial.LightModeEnum.Unshaded
         };
+        BuildLavaHalo(material, size);
         foreach (List<TileGlow> glows in chunks.Values)
         {
             Node2D chunk = new() { Material = material, TextureFilter = CanvasItem.TextureFilterEnum.Linear };
