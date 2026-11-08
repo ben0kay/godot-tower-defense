@@ -1,3 +1,9 @@
+## F08-A — Shared camera shake and Citadel impacts — 2026-11-08
+
+**Source Implemented / Awaiting Owner Validation.** Battlefield camera shake uses visible-rectangle falloff, strongest-hit arbitration and a capped visual offset. Only HP lost to arrivals at the assigned Citadel requests the effect. Tune the [camera settings and Citadel impact profile](../FEEDBACK/CameraEffects/README.md). Source review only. In Godot, check hit strength, offscreen fade, navigation during a shake and cleanup on pause, outcome and Continue.
+
+---
+
 ## World-space tower rank emblems — 2026-11-08
 
 Added five tiny military/sci-fi vector insignia (Standard → Legendary) and one shared non-processing `TowerRankEmblem` sprite for placed combat-ranked towers. Badge is anchored top-right **inside the full tower footprint**, not on the rotating gun, and uses cached shared SVG textures; the existing placement/restore path initializes it and only promotions swap its texture. Passive Standard-only structures, ghosts, XP economy, rank thresholds and save data are untouched. Review source paths/geometry only; owner should inspect legibility, overlaps and visual scale at gameplay zoom in Godot.

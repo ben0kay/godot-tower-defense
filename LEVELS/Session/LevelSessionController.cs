@@ -30,6 +30,7 @@ public partial class LevelSessionController : Node
     private PauseMenu _pause;
     private GameplayHUD _hud;
     private GameInput _input;
+    private CameraShakeManager _cameraShake;
     private readonly Dictionary<Enemy, Action> _waveEnemies = new();
     private int _killed, _breached;
     private string _levelName, _scenePath;
@@ -46,6 +47,7 @@ public partial class LevelSessionController : Node
         _spawns = GetNode<SpawnManager>("../World/EnemySystems/Spawning"); _registry = _spawns.Registry;
         _results = GetNode<LevelResults>("../LevelResults"); _pause = GetNode<PauseMenu>("../PauseMenu");
         _hud = GetNode<GameplayHUD>("../UI/GameplayHUD"); _input = GetNode<GameInput>("/root/GameInput");
+        _cameraShake = GetNodeOrNull<CameraShakeManager>("../CameraShake");
         RunStats = new LevelRunStats { Name = "RunStats" }; AddChild(RunStats);
         _scenePath = GetParent() is BattlefieldLauncher launcher && launcher.Mission != null
             ? launcher.Mission.LaunchPath : GetParent().SceneFilePath;
@@ -137,6 +139,7 @@ public partial class LevelSessionController : Node
     };
     private void Freeze(bool pauseWorld = true)
     {
+        if (_cameraShake != null) _cameraShake.ProcessMode = ProcessModeEnum.Disabled;
         _waves.StopForOutcome();
         RunStats.Freeze();
         _hud.GetNodeOrNull<NarrationDisplay>("NarrationDisplay")?.Clear();

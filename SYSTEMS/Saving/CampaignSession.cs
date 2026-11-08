@@ -160,6 +160,7 @@ public sealed class CampaignSession
         _battle.GetNode<EconomyManager>("Economy").RestoreCheckpoint(data.Balances);
         session.RestoreCheckpoint(data, towers.Values);
         _battle.GetNode<WaveManager>("Waves").RestoreCheckpoint(data.CompletedWaves, data.WaveRandomState, data.NextWaveAutoStartSeconds);
+        _battle.GetNodeOrNull<CameraShakeManager>("CameraShake")?.ResetShake();
         _battle.GetNode<CameraController>("CameraRig").RestoreCamera(data.CameraPosition, data.CameraZoom);
         var power = _battle.GetNode<PowerGridManager>("World/PowerNetworks");
         power.RestoreTransmitterLinks(towers, data.Towers);

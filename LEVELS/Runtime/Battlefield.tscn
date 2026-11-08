@@ -23,12 +23,21 @@
 [ext_resource type="Script" path="res://LEVELS/Runtime/BattlefieldLauncher.cs" id="launcher"]
 [ext_resource type="Resource" path="res://WORLD/OBJECTIVES/Citadel/DefaultCitadelPower.tres" id="citadel_power"]
 
+[ext_resource type="Script" path="res://FEEDBACK/CameraEffects/CameraShakeManager.cs" id="camera_shake"]
+[ext_resource type="Resource" path="res://FEEDBACK/CameraEffects/DefaultCameraShakeSettings.tres" id="camera_shake_settings"]
+
 [node name="Battlefield" type="Node2D" unique_id=1543557823]
 script = ExtResource("launcher")
 
 [node name="World" parent="." unique_id=1714434645 instance=ExtResource("1_world")]
 
 [node name="CameraRig" parent="." unique_id=155204854 instance=ExtResource("2_camera")]
+
+[node name="CameraShake" type="Node" parent="." node_paths=PackedStringArray("Camera")]
+process_mode = 1
+script = ExtResource("camera_shake")
+Camera = NodePath("../CameraRig/Camera2D")
+Settings = ExtResource("camera_shake_settings")
 
 [node name="TowerPlacement" type="Node2D" parent="." unique_id=177135680]
 script = ExtResource("5_place")

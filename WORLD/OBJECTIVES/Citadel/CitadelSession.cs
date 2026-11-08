@@ -24,6 +24,14 @@ public partial class CitadelSession : Node
     private WaveManager _waves;
     private EconomyManager _economy;
     private LevelSessionController _levelSession;
+    private CameraShakeManager _cameraShake;
+
+    [ExportGroup("Impact Shake")]
+    [Export(PropertyHint.Range, "0,8,0.1")] public float SmallImpactPixels { get; set; } = 1.5f;
+    [Export(PropertyHint.Range, "0,8,0.1")] public float HeavyImpactPixels { get; set; } = 6f;
+    [Export(PropertyHint.Range, "0.01,1,0.01")] public float SmallImpactSeconds { get; set; } = .12f;
+    [Export(PropertyHint.Range, "0.01,1,0.01")] public float HeavyImpactSeconds { get; set; } = .22f;
+    [Export(PropertyHint.Range, "2,100,1,or_greater")] public int HeavyImpactDamage { get; set; } = 20;
 
     // =========================================================
     // One state bundle per Citadel, with no extra Node or per-enemy state.
@@ -69,6 +77,7 @@ public partial class CitadelSession : Node
         _economy = GetNode<EconomyManager>("../Economy");
         _waves = GetNode<WaveManager>("../Waves");
         _levelSession = GetNodeOrNull<LevelSessionController>("../LevelSession");
+        _cameraShake = GetNodeOrNull<CameraShakeManager>("../CameraShake");
         _waves.Changed += RefreshProductionClock;
         var nav = GetNode<NavigationGrid>("../World/EnemySystems/Navigation"); nav.Refresh();
         Objectives = nav.Destinations.ToArray();
@@ -145,7 +154,18 @@ public partial class CitadelSession : Node
     private void OnEnemyArrived(Enemy enemy)
     {
         var destination = enemy?.AssignedCitadel;
-        if (destination?.Available == true) destination.Health.TakeDamage(enemy.Definition?.CitadelDamage ?? 0);
+        if (destination?.Available != true) return;
+        CitadelHealth health = destination.Health;
+        int before = health.CurrentHealth;
+        health.TakeDamage(enemy.Definition?.CitadelDamage ?? 0);
+        int applied = before - health.CurrentHealth;
+        if (applied <= 0 || _cameraShake == null) return;
+
+        float fraction = Mathf.Clamp((applied - 1f) / Mathf.Max(1f, HeavyImpactDamage - 1f), 0f, 1f);
+        float weight = Mathf.Pow(fraction, .75f);
+        _cameraShake.RequestShake(destination.Root.GlobalPosition,
+            Mathf.Lerp(SmallImpactPixels, HeavyImpactPixels, weight),
+            Mathf.Lerp(SmallImpactSeconds, HeavyImpactSeconds, weight));
     }
 
     // =========================================================
