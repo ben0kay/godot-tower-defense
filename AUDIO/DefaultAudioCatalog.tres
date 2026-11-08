@@ -15,6 +15,10 @@
 
 [ext_resource type="Resource" path="res://UI/Narration/Sounds/TypewriterSound.tres" id="11_typewriter"]
 
+[ext_resource type="Resource" path="res://AUDIO/ButtonHover.tres" id="12_hover"]
+[ext_resource type="Resource" path="res://AUDIO/ButtonClick.tres" id="13_click"]
+[ext_resource type="Resource" path="res://AUDIO/ButtonBack.tres" id="14_back"]
+
 [resource]
 script = ExtResource("1_catalog")
-Sounds = Array[ExtResource("1_qhxs2")]([ExtResource("2_welcome"), ExtResource("3_battle_fire"), ExtResource("4_machine_gun_fire"), ExtResource("5_cryo_fire"), ExtResource("6_stasis_fire"), ExtResource("7_level001_intro"), ExtResource("8_level002_intro"), ExtResource("9_level003_intro"), ExtResource("10_ambience"), ExtResource("11_typewriter")])
+Sounds = Array[ExtResource("1_qhxs2")]([ExtResource("2_welcome"), ExtResource("3_battle_fire"), ExtResource("4_machine_gun_fire"), ExtResource("5_cryo_fire"), ExtResource("6_stasis_fire"), ExtResource("7_level001_intro"), ExtResource("8_level002_intro"), ExtResource("9_level003_intro"), ExtResource("10_ambience"), ExtResource("11_typewriter"), ExtResource("12_hover"), ExtResource("13_click"), ExtResource("14_back")])

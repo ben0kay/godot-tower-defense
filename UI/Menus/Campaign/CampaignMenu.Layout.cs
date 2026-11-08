@@ -156,7 +156,7 @@ public partial class CampaignMenu
             AllowDebugGrant = ShowProgressionDebugGrant, SizeFlagsHorizontal = SizeFlags.ExpandFill };
         details.AddChild(progression);
         Button back = UIButtonFactory.Create("BACK TO MAIN MENU", () => Navigate(MenuNavigation.MainScene),
-            UIButtonStyle.Compact, 50f, style);
+            UIButtonStyle.Compact, 50f, style, backNavigation: true);
         back.Name = "BackToMainMenu";
         back.AddThemeFontSizeOverride("font_size", 14);
         right.AddChild(back);

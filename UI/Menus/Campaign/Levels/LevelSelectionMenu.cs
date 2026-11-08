@@ -35,12 +35,15 @@ public partial class LevelSelectionMenu : Control
             missions.AddChild(button); play ??= button;
         }
         content.AddChild(UIButtonFactory.Create("BACK TO CAMPAIGN",
-            () => Navigate(MenuNavigation.CampaignScene), UIButtonStyle.Compact));
+            () => Navigate(MenuNavigation.CampaignScene), UIButtonStyle.Compact, backNavigation: true));
         _errorDialog = new AcceptDialog { Title = "Could not launch" };
         AddChild(_errorDialog);
         UIButtonFactory.Apply(_errorDialog.GetOkButton(), UIButtonStyle.Action);
+        MenuNavigation.BindBack(this, () => Navigate(MenuNavigation.CampaignScene));
         play?.GrabFocus();
     }
+    // =========================================================
+    public override void _ExitTree() => MenuNavigation.UnbindBack(this);
     #endregion
 
     #region Routing

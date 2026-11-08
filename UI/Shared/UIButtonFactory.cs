@@ -6,11 +6,18 @@ public enum UIButtonStyle { Menu, Action, TowerTile, Compact, Danger }
 
 public static class UIButtonFactory
 {
+    private const string FeedbackBoundMeta = "ui_audio_feedback_bound";
+    private const string BackMeta = "ui_audio_back_navigation";
+    private const string TowerCardMeta = "ui_audio_tower_card";
+    private const string HoverSoundId = "ui_button_hover";
+    private const string ClickSoundId = "ui_button_click";
+    private const string BackSoundId = "ui_button_back";
+
     #region Creation and Styling
     // =========================================================
     // For dynamically generated menu buttons; existing .tscn buttons should use Apply.
     public static Button Create(string text, Action pressed, UIButtonStyle style = UIButtonStyle.Menu,
-        float height = 48f, UIMasterConfig config = null)
+        float height = 48f, UIMasterConfig config = null, bool backNavigation = false)
     {
         Button button = new()
         {
@@ -18,6 +25,8 @@ public static class UIButtonFactory
             CustomMinimumSize = new Vector2(0f, height),
             SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
         };
+        if (style == UIButtonStyle.TowerTile) button.SetMeta(TowerCardMeta, true);
+        if (backNavigation) button.SetMeta(BackMeta, true);
         Apply(button, style, config);
         if (pressed != null) button.Pressed += pressed;
         return button;
@@ -56,7 +65,42 @@ public static class UIButtonFactory
         StyleBoxFlat focus = Box(Colors.Transparent, accent);
         focus.DrawCenter = false;
         button.AddThemeStyleboxOverride("focus", focus);
+        AttachFeedback(button);
     }
+
+    // =========================================================
+    // Attach once, even if a Results or modal button is restyled repeatedly.
+    // Only menu-screen buttons and in-game TowerTile cards make sound.
+    private static void AttachFeedback(Button button)
+    {
+        if (button.HasMeta(FeedbackBoundMeta)) return;
+        button.SetMeta(FeedbackBoundMeta, true);
+        button.MouseEntered += () =>
+        {
+            if (!button.Disabled && button.IsInsideTree() && button.IsVisibleInTree() && HasFeedback(button))
+                AudioManager.Find(button)?.Play(HoverSoundId);
+        };
+        // Subscribe before the owning action: navigating away cannot cut off the UI cue.
+        button.Pressed += () =>
+        {
+            if (!button.IsInsideTree() || !HasFeedback(button)) return;
+            AudioManager.Find(button)?.Play(button.HasMeta(BackMeta) ? BackSoundId : ClickSoundId);
+        };
+    }
+
+    // =========================================================
+    // Scene-local menu buttons, plus the separate HUD's TowerTile card buttons.
+    private static bool HasFeedback(Button button)
+    {
+        if (button.HasMeta(TowerCardMeta)) return true;
+        string scene = button.GetTree().CurrentScene?.SceneFilePath ?? "";
+        return scene.StartsWith("res://UI/Menus/", StringComparison.Ordinal);
+    }
+
+    // =========================================================
+    // Keyboard Back uses the same audio ID as the explicit Back buttons.
+    public static void PlayBack(Node context) => AudioManager.Find(context)?.Play(BackSoundId);
+
     // =========================================================
     // Opt-in bright halo for selected/hovered mission cards and future featured buttons.
     // Native StyleBox shadows render only in hover/focus/pressed states; no per-frame UI tick.

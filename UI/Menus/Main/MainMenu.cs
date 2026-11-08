@@ -26,13 +26,16 @@ public partial class MainMenu : Control
         Button campaign = UIButtonFactory.Create("CAMPAIGN", () => Navigate(MenuNavigation.CampaignScene),
             UIButtonStyle.Menu, 64f);
         content.AddChild(campaign);
-        content.AddChild(UIButtonFactory.Create("CHANGE PROFILE", ChangeProfile, UIButtonStyle.Action));
+        content.AddChild(UIButtonFactory.Create("CHANGE PROFILE", ChangeProfile, UIButtonStyle.Action, backNavigation: true));
         content.AddChild(UIButtonFactory.Create("EXIT GAME", () => GetTree().Quit(), UIButtonStyle.Compact, 38f));
         _errorDialog = new AcceptDialog { Title = "Menu error" };
         AddChild(_errorDialog);
         UIButtonFactory.Apply(_errorDialog.GetOkButton(), UIButtonStyle.Action);
+        MenuNavigation.BindBack(this, ChangeProfile);
         campaign.GrabFocus();
     }
+    // =========================================================
+    public override void _ExitTree() => MenuNavigation.UnbindBack(this);
     #endregion
 
     #region Routing

@@ -1,3 +1,9 @@
+## Shared UI button sounds — 2026-11-08
+
+Registered original GameMaker hover, click and back WAVs on the existing UI audio bus as `ui_button_hover`, `ui_button_click`, and `ui_button_back`; sound definitions and Inspector mix are `AUDIO/Button{Hover,Click,Back}.tres`. Renamed the imported `snd_btn_main_menu.wav` to `AUDIO/snd_click_success.wav` without changing the audio bytes. Shared `UIButtonFactory` plays a hover once on enabled mouse entry and a normal click on enabled press for menu screens and in-game tower build cards only; explicit Back buttons request back instead of click. `MenuNavigation` binds the existing `GameInput.BackAction` Escape for Main→Boot, Campaign→Main, Research/legacy Levels→Campaign, ignoring active modal dialogs; it unbinds on scene exit. No new audio manager or idle loop. Source review only; Godot WAV import and actual mix/keyboard behaviour await owner playtest.
+
+---
+
 ## Ammunition Factory and Depot SVG art overhaul — 2026-11-07
 
 Replaced the existing 64×64 top-down `factory.svg` and `depot.svg` with layered sci-fi industrial art matching the newer power generator metalwork. Factory now has twin forge chambers, a cartridge stamping press, vents, copper ammo and cyan dispatch lighting; Depot has separate storage cassettes, an armoured automated loading lift, sealed cargo bays and teal status lamps. Updated Factory's three 0/35/70% construction SVG stages to evolve toward its new finished silhouette; kept existing `.svg` paths, 64×64 centered viewBoxes, importer/scene references, 3×2/2×2 footprints, sprite scales, construction timing, production, storage and logistics untouched. Dormant future Factory Level 2/3 upgrades remain as previously authored, not enabled. Source SVG and path review only; owner to inspect Godot rendering/reimport and 100%-completion transition.

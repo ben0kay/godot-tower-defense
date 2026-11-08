@@ -24,9 +24,13 @@ public partial class CampaignMenu : Control
         UIButtonFactory.Apply(_errorDialog.GetOkButton(), UIButtonStyle.Action);
 
         BuildCampaignLayout(out Button resume, out Button firstMission);
+        MenuNavigation.BindBack(this, () => Navigate(MenuNavigation.MainScene));
         if (resume.Disabled) firstMission?.GrabFocus();
         else resume.GrabFocus();
     }
+
+    // =========================================================
+    public override void _ExitTree() => MenuNavigation.UnbindBack(this);
 
     // =========================================================
     // Route both campaign missions and menu actions through the existing guard.

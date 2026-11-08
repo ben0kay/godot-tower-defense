@@ -78,6 +78,26 @@ public static class MenuNavigation
     }
 
     // =========================================================
+    // Menu Escape uses the existing scoped GameInput action; popup dialogs retain Escape.
+    public static void BindBack(Node menu, Action back)
+    {
+        if (back == null) throw new ArgumentNullException(nameof(back));
+        menu.GetNodeOrNull<GameInput>("/root/GameInput")?.Bind(menu, GameInput.BackAction, () =>
+        {
+            foreach (Node child in menu.GetChildren())
+                if (child is Window dialog && dialog.Visible) return false;
+            UIButtonFactory.PlayBack(menu);
+            back();
+            return true;
+        }, priority: 20);
+    }
+
+    // =========================================================
+    // Remove only this scene's binding; no stale handlers after transition.
+    public static void UnbindBack(Node menu) =>
+        menu.GetNodeOrNull<GameInput>("/root/GameInput")?.Unbind(menu);
+
+    // =========================================================
     // Avoid replacing the scene during a screen's own Ready notifications.
     public static void ReturnToBoot(Node context) =>
         Callable.From(() => Open(context, BootScene)).CallDeferred();

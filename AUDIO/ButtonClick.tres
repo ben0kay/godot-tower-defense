@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="AudioDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://AUDIO/AudioDefinition.cs" id="1"]
+[ext_resource type="AudioStream" path="res://AUDIO/snd_click_success.wav" id="2"]
+
+[resource]
+script = ExtResource("1")
+Id = "ui_button_click"
+Stream = ExtResource("2")
+Mode = 0
+Category = 1
+Priority = 65
+CooldownSeconds = 0.04
+MaximumInstances = 3
+Positional = false
+VolumeDb = -8.0
+PitchScale = 1.0

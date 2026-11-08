@@ -49,8 +49,9 @@ public partial class ResearchMenu : Control
         Label hint = UIButtonFactory.Label("Drag empty space / middle-drag: pan   ·   Wheel: zoom   ·   Arrows: browse   ·   Home: reset", 12);
         hint.AutowrapMode = TextServer.AutowrapMode.WordSmart; page.AddChild(hint);
         HBoxContainer footer = new(); page.AddChild(footer);
-        footer.AddChild(UIButtonFactory.Create("BACK TO CAMPAIGN", Back, UIButtonStyle.Action, 42));
+        footer.AddChild(UIButtonFactory.Create("BACK TO CAMPAIGN", Back, UIButtonStyle.Action, 42, backNavigation: true));
         footer.AddChild(UIButtonFactory.Create("RESET VIEW", () => _graph.ResetView(), UIButtonStyle.Compact, 42));
+        MenuNavigation.BindBack(this, Back);
         _graph.SelectionChanged += _ => ShowSelection();
         ProgressionService.Changed += OnProgressionChanged;
         try { _graph.Nodes = ResearchService.Nodes; Refresh(); _graph.ResetView(); _graph.GrabFocus(); }
@@ -124,5 +125,10 @@ public partial class ResearchMenu : Control
         try { MenuNavigation.Open(this, MenuNavigation.CampaignScene); }
         catch (Exception error) { _leaving = false; _message.Text = error.Message; }
     }
-    public override void _ExitTree() { _leaving = true; ProgressionService.Changed -= OnProgressionChanged; }
+    public override void _ExitTree()
+    {
+        _leaving = true;
+        ProgressionService.Changed -= OnProgressionChanged;
+        MenuNavigation.UnbindBack(this);
+    }
 }
