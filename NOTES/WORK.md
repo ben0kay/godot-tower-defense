@@ -1,3 +1,9 @@
+## Wave Editor WP4 planning revision — 2026-11-08
+
+Updated `addons/wave_editor/PLAN.md` to split pending WP4 into WP4-A exact wave stats/schedule and WP4-B an **uncapped, one-decimal Fleet Threat Index** (e.g. 50.0 vs 78.0). The proposed calibrated, explainable model incorporates durability, shields, Citadel damage, speed, real hostile guns and supported abilities plus spawn cadence/parallel pressure, using authoritative catalog data and exact quotas. Explicit partial/unavailable handling prevents invented confidence. This is documentation only; nothing implemented in gameplay/editor and no build needed.
+
+---
+
 ## Tower rank emblem contrast pass — 2026-11-08
 
 Recoloured the five tiny shared `TOWERS/Shared/Ranks/Artwork/*.svg` emblems for better contrast against cyan/navy tower art. All now use a darker plum-toned face: Standard is warm copper/amber, Veteran pearl silver, Enhanced violet, Superior gold, and Legendary rose-gold with brighter crown details. No changes to geometry, 24px SVG size, sprite placement, rank thresholds/bonuses, scene wiring, saves or processing. Source review only; check visibility at regular battlefield zoom in Godot.
