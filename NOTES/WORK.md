@@ -1,3 +1,9 @@
+## NOTES/Ideas.md active-idea audit — 2026-11-08
+
+Removed three fully source-implemented ideas from the active brainstorm: F13 portal activation/materialization, M08 six basic tower targeting priorities, and M09 ammunition factory/depot/courier logistics. Clarified partially delivered F01/F04/F05/F06/F08/F12/F14/F15 and M02/M05/M07 so only incremental work remains; explicitly marked M12 salvage drones as **planned**, already cross-mentioned in DRONES/ideas.md and the planned Scrap Refinery. No gameplay code, XP, UI, saves or balance changed. Source/document review only.
+
+---
+
 ## Wave Editor WP2 / WP4-A / WP4-B — 2026-11-08
 
 **Source Implemented / Awaiting Owner Validation.** Added catalog sprite/stat previews, exact selected-wave totals and an uncapped Fleet Threat Index with capability omissions identified. See the [Wave Editor notes](../addons/wave_editor/README.md) for the v1 formula. Source review only. Check Level003 Wave 4, then compare armed, support, carrier and parallel batches in Godot.
