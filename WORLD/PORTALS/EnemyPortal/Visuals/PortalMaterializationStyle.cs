@@ -1,6 +1,6 @@
 // Shared portal opening quality/timing; disabling motion never bypasses the mechanical readiness delay.
 using Godot;
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class PortalMaterializationStyle : Resource
 {
     [ExportGroup("Opening")]

@@ -1,6 +1,6 @@
 // Portal-local cosmetic spawn response; no readiness, spawn timing or navigation settings.
 using Godot;
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class PortalSpawnFeedbackStyle : Resource
 {
     [ExportGroup("Breathing Pulse")]
