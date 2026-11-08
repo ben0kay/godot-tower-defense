@@ -14,6 +14,7 @@ public partial class DefenseBar : Node2D
     public float WidthPixels { get; private set; }
     private bool _hullAlive;
     private float _ownerHalfHeight;
+    private float _ownerVisualScale = 1f;
     #endregion
 
     #region Lifecycle and State Changes
@@ -53,8 +54,11 @@ public partial class DefenseBar : Node2D
     // =========================================================
     // A large sprite can exceed the default bar offset; cache its height once at spawn.
     // Small ships keep their existing Inspector-authored minimum vertical offset.
-    public void SetOwnerVisualHeight(float height)
-    { _ownerHalfHeight = float.IsFinite(height) ? Mathf.Max(0f, height) * 0.5f : 0f; }
+    public void SetOwnerVisualHeight(float height, float visualScale = 1f)
+    {
+        _ownerHalfHeight = float.IsFinite(height) ? Mathf.Max(0f, height) * 0.5f : 0f;
+        _ownerVisualScale = visualScale;
+    }
 
     // =========================================================
     // Reuse the owner's movement callback for counter-rotation and world position.
@@ -63,7 +67,7 @@ public partial class DefenseBar : Node2D
         if (!Visible || Style == null) return;
         float offset = Mathf.Max(Style.VerticalOffsetPixels, _ownerHalfHeight
             + Mathf.Max(Style.HeightPixels, Style.ShieldHeightPixels) + Style.ShieldGapPixels + 2f);
-        Position = Vector2.Up.Rotated(-ownerRotation) * offset;
+        Position = Vector2.Up.Rotated(-ownerRotation) * (offset * _ownerVisualScale);
         Rotation = -ownerRotation;
     }
 

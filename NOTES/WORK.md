@@ -1,3 +1,9 @@
+## VS1 — Unified Enemy Visual Scale — 2026-11-08
+
+Enemy definitions now author a 0.25–4× visual multiplier. Hull and gun transforms, muzzle positions, thrusters, shield and defense feedback, and F2 artwork use the same scale. Gameplay range and sight retain authored coordinates. Bulwark keeps its 0.8× hull through its definition. Source and scene review only; Godot build and live acceptance remain pending. See [visual authoring notes](../ENEMIES/Shared/Visuals/README.md).
+
+---
+
 ## Bulwark Drone visual shrink — 2026-11-08
 
 Changed only `ENEMIES/Types/Enemy004/Enemy004.tscn` Sprite2D scale to **0.8×** (effective display 51.2×38.4px from original SVG 64×48). Artwork itself, navigation clearance radius 22px, Standard class, hull HP and other gameplay remain unchanged; F2 art preview copies the authored Sprite scale. Per-enemy `.tres` currently has no visual scale setting; tweak `Sprite → Transform → Scale` in each enemy scene instead. Source-verified; Godot visual validation pending.

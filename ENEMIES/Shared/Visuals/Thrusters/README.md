@@ -1,3 +1,9 @@
+## VS1 — Visual Scale
+
+The engine first calculates dimensions and rear nozzle offsets in authored hull units, then scales its existing branch once, including visibility bounds. Resized ships use local-space exhaust so fleck size and travel follow the same multiplier. Ships at 1× keep the authored world-space trail. The emitter budget and movement-driven intensity are unchanged.
+
+---
+
 ## ET1 flame-length balance — 2026-11-04
 
 **Current rule:** flame **width** still depends only on displayed sprite height (`hullHeight × FlameWidthToHullHeight`). Flame **length** is now the independent sum of a base, a *hull-size contribution* and a *max-speed contribution*: `BaseFlameLengthPixels + sqrt(hullWidth × hullHeight) × LengthPerHullSize + MoveSpeed × LengthPerSpeed`, then clamped to `[5, MaxFlameLengthPixels]`. Defaults: **4 px + hullSize × 0.12 + speed × 0.10**, cap **55 px**. This avoids large, slow capital ships looking underpowered and preserves long narrow plumes on fast small ships.

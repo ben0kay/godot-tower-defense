@@ -114,14 +114,15 @@ public partial class EnemyWeaponMount : Node2D
         { Stop(); return; }
         if (!_host.GlobalPosition.IsFinite() || !_pivot.GlobalPosition.IsFinite() || !_muzzle.GlobalPosition.IsFinite())
         { Target = null; Aligned = false; ResetWeapon(); return; }
-        Vector2 sightOrigin = _muzzle.GlobalPosition;
+        Vector2 rangeOrigin = _host.AuthoredWeaponPoint(_pivot.GlobalPosition);
+        Vector2 sightOrigin = _host.AuthoredWeaponPoint(_muzzle.GlobalPosition);
         // A lost/occluded lock never waits out the longer hold interval; use this mount's muzzle, not hull center.
-        if (Target != null && !EnemyTowerTargeting.Valid(_registry, Target, _pivot.GlobalPosition, _settings.Range, sightOrigin))
+        if (Target != null && !EnemyTowerTargeting.Valid(_registry, Target, rangeOrigin, _settings.Range, sightOrigin))
         { Target = null; Aligned = false; ResetWeapon(); _search = System.Math.Min(_search, _settings.SearchSeconds); }
         _search -= delta;
         if (_search <= 0)
         {
-            Target = EnemyTowerTargeting.Closest(_registry, _pivot.GlobalPosition, _settings.Range, _scratch, sightOrigin);
+            Target = EnemyTowerTargeting.Closest(_registry, rangeOrigin, _settings.Range, _scratch, sightOrigin);
             TargetQueries++; LastCandidates = _registry.LastCandidates; _search = Target != null ? _settings.LockedSearchSeconds : _settings.SearchSeconds;
         }
         if (Target == null) { Aligned = false; ResetWeapon(); return; }
@@ -132,8 +133,9 @@ public partial class EnemyWeaponMount : Node2D
         _heading = _pivot.GlobalRotation;
         // Turning/countering hull rotation can move a long barrel around a corner in this same tick.
         // Recheck only if an aligned gun's actual muzzle moved since the acquisition/lock check.
-        if (Aligned && _muzzle.GlobalPosition != sightOrigin
-            && !EnemyTowerTargeting.Valid(_registry, Target, _pivot.GlobalPosition, _settings.Range, _muzzle.GlobalPosition))
+        Vector2 aimedSightOrigin = _host.AuthoredWeaponPoint(_muzzle.GlobalPosition);
+        if (Aligned && aimedSightOrigin != sightOrigin
+            && !EnemyTowerTargeting.Valid(_registry, Target, rangeOrigin, _settings.Range, aimedSightOrigin))
         { Target = null; Aligned = false; ResetWeapon(); _search = System.Math.Min(_search, _settings.SearchSeconds); return; }
         if (Aligned) OnAimReady(delta); else ResetWeapon();
     }

@@ -23,8 +23,11 @@ public partial class EnemySpritePreview : Control
             Node source = scene.Instantiate();
             try
             {
-                if (source is Node2D root && root.GetNodeOrNull<Node2D>("Sprite") is Node2D sprite)
+                if (source is Node2D root && root.GetNodeOrNull<Sprite2D>("Sprite") is Sprite2D sprite)
+                {
+                    if (root is Enemy enemy) enemy.ApplyHullVisualScale(sprite);
                     CopyArtwork(sprite, root.Transform, root.Modulate, root.Visible, root.ZIndex);
+                }
             }
             finally { source.Free(); }
         }

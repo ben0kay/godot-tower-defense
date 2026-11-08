@@ -7,7 +7,7 @@ public static class StatusEffectFeedback
     {
         if (id != StatusEffectId.Corruption) return;
         _corruption ??= GD.Load<ShockwaveStyle>("res://FEEDBACK/StatusEffects/CorruptionImpact.tres");
-        ShockwaveEffect.Spawn(enemy.GetNodeOrNull<Node2D>("../../Effects"), enemy.GlobalPosition, _corruption,
-            Mathf.Clamp(enemy.Definition.RadiusPixels * 1.2f, 8, 36));
+        ShockwaveEffect.Spawn(enemy.GetNodeOrNull<Node2D>("../../Effects"), enemy.VisualWorldCentre, _corruption,
+            Mathf.Clamp(enemy.Definition.RadiusPixels * 1.2f, 8, 36) * enemy.AppliedVisualScale);
     }
 }

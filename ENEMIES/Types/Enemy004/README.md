@@ -1,6 +1,6 @@
 ## Bulwark sprite display scale — 2026-11-08
 
-The Bulwark Drone hull now draws at **80%** of its previous size: `Sprite → Transform → Scale = (0.8, 0.8)` in `Enemy004.tscn`. The SVG source still imports at 64×48px, while its displayed hull is **51.2×38.4px**. Health/bar and thruster sizing follow the rendered sprite. `Enemy004.tres` does not currently expose a generic visual-scale property; adjust this particular enemy's `Sprite2D.Scale` in its scene. `RadiusPixels = 22` remains a separate navigation clearance value, and the Standard class, HP, movement, abilities, waves and IDs are unchanged. Validate at gameplay zoom.
+The Bulwark Drone hull displays at **80%** through `Enemy004.tres → Visual Presentation → Visual Scale`. Its inherited Sprite transform is at 1×, and the 64×48 SVG displays at **51.2×38.4 px**. The F2 preview uses the same value. Navigation clearance remains 22 px.
 
 ---
 

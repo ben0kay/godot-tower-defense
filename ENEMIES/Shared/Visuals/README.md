@@ -1,3 +1,11 @@
+## VS1 — Visual Scale
+
+Set **Visual Presentation → Visual Scale** on an enemy definition. Default is 1.0, finite values clamp to 0.25–4.0, and nonfinite values resolve to 1.0. The hull transform scales attached guns, recoil and flash renderers; live shots still use the marker's world position and their original projectile preset. Range and terrain-sight checks retain authored mount offsets. F2 applies the same hull transform to its off-tree sprite preview.
+
+The existing thruster, defense bar, shield aura, status feedback and death effects use the scaled framing. Damage stages replace the hull texture only; keep stages registered to the same canvas. Death effects still respect the shared effect's size cap. The enemy root and gameplay indicators such as the Shield Emitter's 192px ring remain in gameplay units.
+
+---
+
 ## ET1 flame size + speed contribution — 2026-11-04
 
 ET1's rear flame **width still follows displayed hull height**, but **length now combines overall displayed hull dimensions and the enemy's authored max speed**. A slow Heavy Transporter or Cruiser now receives a substantially longer (and still broad) ignition, while small fast ships remain narrow with longer speed-driven plumes. The optional GPU fleck speed is scaled to the resulting flame length, rather than solely to authored speed, without increasing emitter/particle count. Settings and formulas: [Thrusters README](Thrusters/README.md). Source-only; visually verify in Godot.

@@ -11,13 +11,15 @@ public partial class EnemyThrusterVisual : Node2D
     private GpuParticles2D _exhaust;
     private VisibleOnScreenNotifier2D _screen;
     private float _nominalSpeed, _baseFlameLength, _flameWidth, _rearX, _rearY;
+    private Transform2D _authoredTransform;
+    private bool _authoredLocalExhaust;
     private float _lastSpeedFraction = -1f;
     private bool _configured, _onScreen, _hasGpuSlot, _stealthed;
     private static int _activeGpuEmitters;
 
     public static int ActiveGpuEmitters => _activeGpuEmitters;
     public bool HasGpuSlot => _hasGpuSlot;
-    public Vector2 FlameDimensions => new(_baseFlameLength, _flameWidth);
+    public Vector2 FlameDimensions => new Vector2(_baseFlameLength, _flameWidth) * Scale.Abs();
     #endregion
 
     #region Setup
@@ -42,6 +44,8 @@ public partial class EnemyThrusterVisual : Node2D
         _flame = GetNode<Sprite2D>("Flame");
         _exhaust = GetNode<GpuParticles2D>("Exhaust");
         _screen = GetNode<VisibleOnScreenNotifier2D>("OnScreen");
+        _authoredTransform = Transform;
+        _authoredLocalExhaust = _exhaust.LocalCoords;
         _flame.Visible = false;
         _exhaust.Emitting = false;
         _screen.ScreenEntered += OnScreenEntered;
@@ -51,7 +55,7 @@ public partial class EnemyThrusterVisual : Node2D
 
     // =========================================================
     // Called once per enemy spawn; no per-frame measure or generated per-ship shader/material.
-    public void Configure(Sprite2D hull, EnemyDefinition definition)
+    public void Configure(Sprite2D hull, EnemyDefinition definition, float visualScale = 1f)
     {
         Stop();
         _configured = false;
@@ -59,7 +63,15 @@ public partial class EnemyThrusterVisual : Node2D
         if (Config?.Enabled != true || definition?.ThrusterEnabled != true ||
             hull?.Texture == null) return;
 
-        Vector2 bounds = hull.GetRect().Size * new Vector2(Mathf.Abs(hull.Scale.X), Mathf.Abs(hull.Scale.Y));
+        // All authored engine geometry lives in 1x hull space. Scale the existing branch once.
+        Transform = _authoredTransform.Scaled(Vector2.One * visualScale);
+        bool localExhaust = _authoredLocalExhaust || visualScale != 1f;
+        // Scaled exhaust uses local coordinates so Godot scales both the particle quads and their travel.
+        // Keep the authored world-space trail for ships using the original size.
+        if (_exhaust.LocalCoords != localExhaust) _exhaust.LocalCoords = localExhaust;
+        Vector2 hullScale = hull.Scale / visualScale;
+        Vector2 hullPosition = hull.Position / visualScale;
+        Vector2 bounds = hull.GetRect().Size * hullScale.Abs();
         if (bounds.X <= 0 || bounds.Y <= 0 || !float.IsFinite(definition.MoveSpeed)) return;
         Vector2 dimensions = ComputeFlameDimensions(bounds, definition.MoveSpeed, Config);
         _nominalSpeed = Mathf.Max(1f, definition.MoveSpeed);
@@ -68,15 +80,15 @@ public partial class EnemyThrusterVisual : Node2D
 
         // Right-facing (+X) sprites burn to the left (-X). A per-definition local mount offset
         // is available for artwork whose nozzle is not exactly rear-center.
-        _rearX = hull.Position.X + hull.GetRect().Position.X * hull.Scale.X +
+        _rearX = hullPosition.X + hull.GetRect().Position.X * hullScale.X +
             Config.RearNozzleInsetPixels + definition.ThrusterMountOffset.X;
-        _rearY = hull.Position.Y + definition.ThrusterMountOffset.Y;
+        _rearY = hullPosition.Y + definition.ThrusterMountOffset.Y;
         _exhaust.Position = new Vector2(_rearX - 1f, _rearY);
         _exhaust.Amount = Mathf.Clamp(Config.ParticlesPerShip, 1, 8);
 
         // The notification rectangle includes both the hull and its tail.
         float left = _rearX - _baseFlameLength - 12f;
-        float right = hull.Position.X + bounds.X * .5f + 8f;
+        float right = hullPosition.X + bounds.X * .5f + 8f;
         float halfHeight = Mathf.Max(bounds.Y, _flameWidth * 2f) * .5f + 12f;
         _screen.Rect = new Rect2(left, _rearY - halfHeight, Mathf.Max(1f, right - left), halfHeight * 2f);
         _onScreen = _screen.IsOnScreen();
