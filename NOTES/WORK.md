@@ -1,3 +1,9 @@
+## Tower rank emblem contrast pass — 2026-11-08
+
+Recoloured the five tiny shared `TOWERS/Shared/Ranks/Artwork/*.svg` emblems for better contrast against cyan/navy tower art. All now use a darker plum-toned face: Standard is warm copper/amber, Veteran pearl silver, Enhanced violet, Superior gold, and Legendary rose-gold with brighter crown details. No changes to geometry, 24px SVG size, sprite placement, rank thresholds/bonuses, scene wiring, saves or processing. Source review only; check visibility at regular battlefield zoom in Godot.
+
+---
+
 ## UI audio catalog startup fix — 2026-11-08
 
 Fixed broken `DefaultAudioCatalog.tres` loading caused by hard `AudioStream` external references to newly renamed/copied button WAVs before Godot had imported them. ButtonHover/Click/Back definitions now keep their Inspector-editable mix values but leave `Stream` unbound in the file. `AudioManager` binds these three optional WAVs once at startup (direct source loading in editor, imported resource fallback in export), so missing/unimported button clips cannot invalidate tower/ambience/voice audio. Original recorded sound bytes and audio IDs unchanged. Source-only review; owner should pull dev, restart Godot, verify all three buttons plus existing sound families.
