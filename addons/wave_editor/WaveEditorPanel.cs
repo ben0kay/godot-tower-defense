@@ -88,7 +88,7 @@ public partial class WaveEditorPanel : VBoxContainer
         _waveNumber.TooltipText = "Unique positive wave number. Waves play in the list order shown on the left; moving them does not renumber them.";
 
         _waveDelay = Number(_waveFields, "Next wave delay (seconds; -1 = default)", -1, 86400, .5,
-            v => Wave.NextWaveDelaySeconds = v);
+            v => { Wave.NextWaveDelaySeconds = v; RefreshTimeline(); });
         _waveDelay.TooltipText = "After this wave fully clears, auto-start the next wave after this many seconds. -1 uses the level default (30s). 0 starts on the next tick. The first wave remains manual; the final wave ignores this setting.";
 
         _schedule = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill };
