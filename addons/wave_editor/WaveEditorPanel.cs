@@ -100,6 +100,7 @@ public partial class WaveEditorPanel : VBoxContainer
             if (_refreshing || Wave == null) return;
             Wave.Schedule = (WaveScheduleMode)i; Dirty(); Refresh();
         };
+        BuildAnalysis(_waveFields);
         _timeline = Pane("Wave timeline · estimated", 0); _waveFields.AddChild(_timeline);
 
         _batchFields = Pane("Selected batch", 0); details.AddChild(_batchFields);
@@ -142,6 +143,7 @@ public partial class WaveEditorPanel : VBoxContainer
         };
         _enemyClassification = new Label { AutowrapMode = TextServer.AutowrapMode.WordSmart };
         _enemyFields.AddChild(_enemyClassification);
+        BuildEnemyPreview(_enemyFields);
         _weight = Number(_enemyFields, "Weight", 0, 10000, .01, v => { Entry.Weight = v; RefreshComposition(); });
         _weight.TooltipText = "Relative share of this batch, not a ship count or an independent spawn chance. Example 75 and 25 with Count 20 means exactly 15 and 5, shuffled.";
         _portal = Text(_enemyFields, "Required portal (blank = any)", v => { Entry.Portal = v; RefreshComposition(); });
@@ -256,22 +258,24 @@ public partial class WaveEditorPanel : VBoxContainer
         try
         {
             var catalog = ResourceLoader.Load<EnemyCatalog>("res://ENEMIES/DefaultEnemyCatalog.tres",
-                cacheMode: ResourceLoader.CacheMode.Replace);
+                cacheMode: ResourceLoader.CacheMode.IgnoreDeep);
             if (catalog == null) throw new InvalidOperationException("DefaultEnemyCatalog.tres could not be loaded.");
             catalog.Rebuild();
-            var choices = catalog.ToSceneMap().Keys.Select(id =>
+            var scenes = catalog.ToSceneMap();
+            var previews = scenes.ToDictionary(pair => pair.Key, pair => WaveEnemyPreview.Capture(pair.Value), StringComparer.Ordinal);
+            var choices = scenes.Keys.Select(id =>
             {
                 EnemyDefinition definition = catalog.DefinitionFor(id);
                 return (Id: id, Name: definition?.DisplayName ?? id, Class: definition?.Class ?? EnemyClass.Tiny);
             })
                 .OrderBy(e => EnemyNaming.ClassSortOrder(e.Class)).ThenBy(e => e.Name, StringComparer.OrdinalIgnoreCase)
                 .ThenBy(e => e.Id, StringComparer.Ordinal).ToList();
-            _enemyCatalog = catalog; _enemyChoices = choices;
+            _enemyCatalog = catalog; _enemyChoices = choices; _enemyPreviews = previews;
             Refresh(); Message("Enemy list refreshed: " + choices.Count + " registered types.");
         }
         catch (Exception ex)
         {
-            _enemyCatalog = null; _enemyChoices.Clear();
+            _enemyCatalog = null; _enemyChoices.Clear(); _enemyPreviews.Clear();
             Refresh(); Message("Enemy list unavailable: " + ex.Message);
         }
     }
@@ -397,7 +401,7 @@ public partial class WaveEditorPanel : VBoxContainer
         _fileLabel.Text = _path + "  * UNSAVED";
         _saveButton.Disabled = false;
         if (_source != null) _totals.Text = $"{_source.Waves.Count} waves  ·  " +
-            $"{_source.Waves.Sum(w => w?.Batches.Sum(b => b?.Count ?? 0) ?? 0)} enemies";
+            $"{_source.Waves.Sum(w => w?.Batches.Sum(b => (long)(b?.Count ?? 0)) ?? 0)} enemies";
     }
     private void Message(string text) { if (_status != null) _status.Text = text; }
 
@@ -521,6 +525,7 @@ public partial class WaveEditorPanel : VBoxContainer
     private void RefreshComposition()
     {
         RefreshTimeline();
+        RefreshEnemyPreview();
         if (_compositionPreview == null) return;
         foreach (Node child in _compositionPreview.GetChildren())
         { _compositionPreview.RemoveChild(child); child.QueueFree(); }
@@ -531,9 +536,7 @@ public partial class WaveEditorPanel : VBoxContainer
         { _compositionPreview.AddChild(new Label { Text = "Add an enemy entry to preview this batch." }); return; }
         try
         {
-            WaveEnemyEntry[] entries = batch.Enemies.Select(e => WaveBuilder.Enemy(
-                e?.EnemyId ?? "", e?.Weight ?? 0, e?.Portal ?? "", e?.Shield ?? false, e?.Stealth ?? false)).ToArray();
-            int[] counts = WaveCatalog.CompositionCounts(WaveBuilder.Batch(batch.Count, batch.Interval, batch.After, entries));
+            int[] counts = PreviewQuotas(batch);
             _compositionPreview.AddChild(new Label { Text = $"{batch.Count} total enemies · exact quotas · shuffled spawn order",
                 TooltipText = "The game determines exact numbers using largest remainders (earlier entries win ties), then shuffles their order." });
             for (int i = 0; i < counts.Length; i++)
@@ -561,14 +564,14 @@ public partial class WaveEditorPanel : VBoxContainer
             AutowrapMode = TextServer.AutowrapMode.WordSmart }); }
         // Keep list counts and flags current while editing numeric fields without rebuilding the whole selection UI.
         if (Wave != null && _waveIndex >= 0 && _waveIndex < _waves.ItemCount)
-            _waves.SetItemText(_waveIndex, $"Wave {Wave.Number}    ({Wave.Batches.Sum(b => b?.Count ?? 0)} ships)");
+            _waves.SetItemText(_waveIndex, $"Wave {Wave.Number}    ({Wave.Batches.Sum(b => (long)(b?.Count ?? 0))} ships)");
         if (_batchIndex >= 0 && _batchIndex < _batches.ItemCount)
             _batches.SetItemText(_batchIndex, $"Batch {_batchIndex + 1}    {batch.Count} ships   {batch.Interval:0.##}s");
         if (Entry != null && _enemyIndex >= 0 && _enemyIndex < _enemies.ItemCount)
             _enemies.SetItemText(_enemyIndex, $"{EnemyLabel(Entry.EnemyId)}   weight {Entry.Weight:0.##}" +
                 (Entry.Shield ? "  [shield]" : "") + (Entry.Stealth ? "  [stealth]" : ""));
         if (_source != null) _totals.Text = $"{_source.Waves.Count} waves  ·  " +
-            $"{_source.Waves.Sum(w => w?.Batches.Sum(b => b?.Count ?? 0) ?? 0)} enemies";
+            $"{_source.Waves.Sum(w => w?.Batches.Sum(b => (long)(b?.Count ?? 0)) ?? 0)} enemies";
     }
 
     // =========================================================
@@ -580,7 +583,7 @@ public partial class WaveEditorPanel : VBoxContainer
         {
             _waves.Clear(); _batches.Clear(); _enemies.Clear();
             if (_source != null) foreach (var w in _source.Waves)
-                _waves.AddItem(w == null ? "Missing wave" : $"Wave {w.Number}    ({w.Batches.Sum(b => b?.Count ?? 0)} ships)");
+                _waves.AddItem(w == null ? "Missing wave" : $"Wave {w.Number}    ({w.Batches.Sum(b => (long)(b?.Count ?? 0))} ships)");
             if (_waveIndex >= 0 && _waveIndex < _waves.ItemCount) _waves.Select(_waveIndex);
             var wave = Wave;
             if (wave != null) foreach (var batch in wave.Batches)
@@ -614,7 +617,7 @@ public partial class WaveEditorPanel : VBoxContainer
             _fileLabel.Text = _path + (_dirty ? "  * UNSAVED" : "");
             _saveButton.Disabled = !_dirty || _source == null;
             _totals.Text = _source == null ? "" : $"{_source.Waves.Count} waves  ·  " +
-                $"{_source.Waves.Sum(w => w?.Batches.Sum(b => b?.Count ?? 0) ?? 0)} enemies";
+                $"{_source.Waves.Sum(w => w?.Batches.Sum(b => (long)(b?.Count ?? 0)) ?? 0)} enemies";
         }
         finally { _refreshing = false; }
     }

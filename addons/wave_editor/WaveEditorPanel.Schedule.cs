@@ -19,7 +19,7 @@ public partial class WaveEditorPanel
         try
         {
             if (!Enum.IsDefined(Wave.Schedule)) throw new ArgumentException("Invalid schedule mode.");
-            var rows = new List<(double Start, double End, WaveBatchResource Batch)>();
+            var rows = new List<ScheduledBatch>();
             double cursor = 0, horizon = 0;
             foreach (var batch in Wave.Batches)
             {
@@ -29,23 +29,29 @@ public partial class WaveEditorPanel
                 double start = Wave.Schedule == WaveScheduleMode.Parallel ? batch.StartOffsetSeconds : cursor;
                 double end = start + (batch.Count - 1) * batch.Interval;
                 if (!double.IsFinite(end)) throw new ArgumentException("Spawn duration is too large.");
-                rows.Add((start, end, batch)); horizon = Math.Max(horizon, end);
+                int[] quotas = PreviewQuotas(batch);
+                rows.Add(new(start, end, batch, quotas, SourceDistribution(batch, quotas)));
+                horizon = Math.Max(horizon, end);
                 cursor = end + batch.After;
             }
+            RefreshWaveAnalysis(rows);
             for (int i = 0; i < rows.Count; i++)
             {
                 var row = rows[i];
                 _timeline.AddChild(new Label { Text = $"Group {i + 1}: {row.Start:0.##}–{row.End:0.##}s · {row.Batch.Count} ships",
                     AutowrapMode = TextServer.AutowrapMode.WordSmart });
                 _timeline.AddChild(TimelineBar(row.Start, row.End, Math.Max(1, horizon)));
-                _timeline.AddChild(new Label { Text = SourceDistribution(row.Batch),
+                _timeline.AddChild(new Label { Text = row.Sources,
                     AutowrapMode = TextServer.AutowrapMode.WordSmart });
             }
             _timeline.AddChild(new Label { Text = "Estimated first–last spawn times; blocked exits, opening portals and frame budgets can delay groups. Source selection also respects the loaded map.",
                 AutowrapMode = TextServer.AutowrapMode.WordSmart });
         }
         catch (ArgumentException error)
-        { _timeline.AddChild(new Label { Text = "Preview unavailable: " + error.Message, AutowrapMode = TextServer.AutowrapMode.WordSmart }); }
+        {
+            AnalysisUnavailable(error.Message);
+            _timeline.AddChild(new Label { Text = "Preview unavailable: " + error.Message, AutowrapMode = TextServer.AutowrapMode.WordSmart });
+        }
     }
 
     // =========================================================
@@ -67,19 +73,28 @@ public partial class WaveEditorPanel
 
     // =========================================================
     // Exact ship quotas per selector; random physical portal/side splits are expectations, not guarantees.
-    private string SourceDistribution(WaveBatchResource batch)
+    private readonly record struct ScheduledBatch(double Start, double End, WaveBatchResource Batch, int[] Quotas, string Sources);
+
+    private static int[] PreviewQuotas(WaveBatchResource batch)
     {
         var entries = batch.Enemies?.Select(e => e == null ? null :
             WaveBuilder.Enemy(e.EnemyId, e.Weight, e.Portal, e.Shield, e.Stealth)).ToArray();
-        int[] counts = WaveCatalog.CompositionCounts(WaveBuilder.Batch(batch.Count, batch.Interval, batch.After,
+        return WaveCatalog.CompositionCounts(WaveBuilder.Batch(batch.Count, batch.Interval, batch.After,
             entries ?? Array.Empty<WaveEnemyEntry>()));
+    }
+
+    private string SourceDistribution(WaveBatchResource batch, int[] counts)
+    {
         var totals = new Dictionary<string, int>();
         for (int i = 0; i < counts.Length; i++)
         {
             var entry = batch.Enemies[i];
             var source = entry.Source ?? batch.Source ?? Wave.Source;
             var options = source?.Capture() ?? SpawnSourceOptions.Legacy;
-            options.Validate(entry.Portal);
+            string portal = entry.Portal ?? "";
+            if (portal.StartsWith("/") || portal.Split('/').Contains(".."))
+                throw new ArgumentException("Invalid required portal path.");
+            options.Validate(portal);
             if (counts[i] == 0) continue;
             string label = !string.IsNullOrEmpty(entry.Portal) ? entry.Portal : options.Policy.ToString();
             if (options.Policy == SpawnSourcePolicy.EdgesOnly || options.Policy == SpawnSourcePolicy.AnyEligible)

@@ -1,3 +1,13 @@
+## Enemy previews and Wave Analysis — WP2 / WP4-A / WP4-B
+
+The selected entry shows its registered hull sprite, hull HP, maximum and starting shield, speed and Citadel damage. **Wave Analysis** shares the exact batch quotas and existing sequential/parallel timeline. It aggregates enemy types, starting shields, stealth, theoretical durability and maximum authored Citadel damage. **Refresh list** reloads source definitions, textures and configured capabilities.
+
+**Fleet Threat v1** uses the same scale across levels. Each ship contributes `5 × (0.45 × sqrt((hull + startingShield) / 60) + 0.25 × sqrt((1 + CitadelDamage) / 2) + 0.15 × clamp(sqrt(speed / 100), 0.5, 2) + 0.15 × (1 + min(3, nominalGunDPS / 15)))`. Enabled minigun mounts contribute damage × shots/sec × configured burst duty cycle. Starting stealth adds 10% to that ship’s points. A carrier contributes half its immediate children's base points separately. Child releases are conditional and excluded from authored totals. Armor is omitted because the runtime does not apply it.
+
+The fleet total is multiplied by cadence `clamp(sqrt(ships / max(1, last - first + 1)), 0.8, 1.45)` and parallel opening pressure `1 + min(0.25, 0.08 × (peak - 1))`, where peak counts starts within one second. Ten plain Standard Drones at one per second score **50.0**. Shield support, status immunities and unresolved capabilities are listed as **PARTIAL**. Invalid waves and unknown authored IDs show **UNAVAILABLE**. The score is an editor estimate.
+
+---
+
 ## Automatic next waves and upper-right countdown — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** The first authored wave remains manual. After any non-final wave fully clears (all scheduled ships, owned live ships and reserved death children resolved), the next wave starts automatically after 30 seconds by default. NEXT WAVE remains enabled throughout so the player can start early. Automatic/manual starts share StartWave and preserve once-only banners, portal activation, RNG/ownership and spawn budgets; zero delay starts on the next scheduler tick rather than recursively inside a death callback.
@@ -55,7 +65,7 @@ Hover over the relevant fields for explanatory **tooltips**: Wave Number; Count,
 
 Every **Delete** action (wave, batch, enemy entry) now asks for confirmation. **Cancel** leaves the current `.tres` unchanged; **Delete** alters only the editor's unsaved resource and does not write to disk until **Save**. The confirmation captures the selected resource so a changed selection cannot remove a different item.
 
-The existing Level003 wave file, the saved resource structure and the wave schedule have not changed. Remaining ideas are recorded in [PLAN.md](PLAN.md), including enemy art previews, controls-at-top, wave difficulty summaries, renumbering, Save As, search, and future Exact Counts mode.
+The existing Level003 wave file, the saved resource structure and the wave schedule have not changed. Remaining ideas are recorded in [PLAN.md](PLAN.md), including renumbering, Save As, search, and future Exact Counts mode.
 
 ---
 
@@ -126,6 +136,6 @@ The editor itself never spawns enemies or advances wave clocks. `WaveCatalog`, `
 
 ## Scope / follow-up
 
-This first editor provides functional authoring, not drag-and-drop wave timelines, a visual spawn preview, automatic wave-number renumbering, Undo/Redo, enemy thumbnails, live-hot-reload or port-existence validation against the map. Reordering *moves* numbered waves; edit the Number field to make their identifiers match the desired new order. The validation step checks registered enemy identities using the current EnemyCatalog. Keep wave numbers unique/positive and provide at least one batch with an enemy entry.
+This first editor provides functional authoring, not drag-and-drop wave timelines, a visual spawn preview, automatic wave-number renumbering, Undo/Redo, live-hot-reload or port-existence validation against the map. Reordering *moves* numbered waves; edit the Number field to make their identifiers match the desired new order. The validation step checks registered enemy identities using the current EnemyCatalog. Keep wave numbers unique/positive and provide at least one batch with an enemy entry.
 
 The plugin and resource classes have no `_Process` loops; lists refresh only on changes. It creates no additional gameplay managers or physics work. Static code/resource checks and a regression source comparison were added; **Godot 4.7.2 .NET build and UI run were not possible in this environment**. If Godot reports a C# assembly/plugin load issue, first ensure it is the .NET edition, rebuild the C# project and re-enable the plugin.

@@ -1,3 +1,9 @@
+## Wave Editor WP2 / WP4-A / WP4-B — 2026-11-08
+
+**Source Implemented / Awaiting Owner Validation.** Added catalog sprite/stat previews, exact selected-wave totals and an uncapped Fleet Threat Index with capability omissions identified. See the [Wave Editor notes](../addons/wave_editor/README.md) for the v1 formula. Source review only. Check Level003 Wave 4, then compare armed, support, carrier and parallel batches in Godot.
+
+---
+
 ## Wave Editor WP4 planning revision — 2026-11-08
 
 Updated `addons/wave_editor/PLAN.md` to split pending WP4 into WP4-A exact wave stats/schedule and WP4-B an **uncapped, one-decimal Fleet Threat Index** (e.g. 50.0 vs 78.0). The proposed calibrated, explainable model incorporates durability, shields, Citadel damage, speed, real hostile guns and supported abilities plus spawn cadence/parallel pressure, using authoritative catalog data and exact quotas. Explicit partial/unavailable handling prevents invented confidence. This is documentation only; nothing implemented in gameplay/editor and no build needed.

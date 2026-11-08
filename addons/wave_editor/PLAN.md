@@ -7,7 +7,7 @@ After further screenshot evidence showed the earlier nested anchored content cou
 ## Editor-layout acceptance fix (2026-11-01)
 
 - Fixed collapse of the plugin's **inner** layout with a full-rect anchored content margin, after the outer tab `ExpandFill` fix proved insufficient in a user screenshot.
-- Moved the completed WP1 live composition preview to the **top of the selected batch details**, and reset the details scrollbar when switching waves/batches. These changes are UI-only; WP2–WP7 backlog below remains deferred.
+- Moved the completed WP1 live composition preview to the **top of the selected batch details**, and reset the details scrollbar when switching waves/batches.
 - Needs local Godot editor verification: whole-height wave/batch lists, preview immediately after timings, footer at bottom, and no visible layout overlap/clipping at normal IDE dock sizes.
 
 ---
@@ -28,20 +28,21 @@ The main-screen `addons/wave_editor` Godot plugin edits `WaveSetResource` `.tres
 
 The resource schema and Level003 wave data remain unchanged; this is mostly editor-side UI behavior. A focused source regression check compares preview quotas with actual composition and stable ties. Godot.NET build and manual editor check pending.
 
-## Backlog — remaining earlier suggestions
+## WP2 — Enemy sprite and quick stats
+
+**Source Implemented / Awaiting Owner Validation.** The selected entry previews the registered hull sprite and catalog stats. Missing IDs remain visible and editable.
+
+## Backlog — remaining suggestions
 
 | Priority | Idea | Relative effort | Proposed outcome / acceptance |
 | --- | --- | --- | --- |
-| WP2 | **Enemy sprite & quick stats preview** | Small–medium | Display the selected registered enemy's **existing** visual sprite, display name, HP, max shield, move speed, and possibly Citadel damage; use real EnemyCatalog definitions/art without duplicating gameplay assets or per-frame spinning. Gracefully handle unregistered IDs. |
-| WP3 | **Move Add / Duplicate / Delete / Move controls to top** | Small | Place wave/batch action buttons above each list, with clear labels and disabled state where invalid; gain usable screen real estate and improve selection context. Keep existing confirmation dialogs. |
-| WP4-A / WP4-B | **Wave statistics + uncapped Fleet Threat Index** | Small–medium / medium | WP4-A: exact composition, totals, shields/stealth, Citadel-damage exposure and existing sequential/parallel schedule duration. WP4-B: an explainable **uncapped, one-decimal fleet threat number** (e.g. 50.0 vs 78.0) from real catalog stats, armed threats, abilities and spawning pressure; shared cross-level calibration, no 0–10 normalization, no fake class-to-strength mapping. See the WP4 contract below. |
 | WP5 | **Optional automatic wave renumbering** | Small | Offer a toggle / one-click renumber after move/insert/delete; default preserve authored numbers and document that list order—not number—governs wave sequence. Never silently renumber an existing level. |
 | WP6 | **Save As / Duplicate Wave Set** | Small | Clone the open `.tres` (including nested wave/batch/entry resources) to a new user-selected project path, validate it, avoid overwriting without confirmation, and leave original source untouched. New level still needs `LevelConfig.WaveSource` assigned manually. |
 | WP7 | **Enemy search/filter in chooser** | Small–medium | Search by display name or stable ID above/within the catalogue dropdown. Preserve the exact stored ID, show deprecated/missing IDs explicitly, and refresh choices only on demand or input changes. |
 
 ## WP4 — Wave summary and uncapped Fleet Threat Index (revised 2026-11-08)
 
-**Status: planned; documentation only.** Implement WP4-A first, then WP4-B as a separate focused pass (or a single WP4 job if explicitly requested). This is an **editor-only planning aid**, not an authoritative prediction of victory, campaign difficulty, score, rewards or scaling. Do not change waves, enemy stats, runtime spawning, saves or the research/progression systems.
+**Source Implemented / Awaiting Owner Validation.** See the [implemented v1 formula and exclusions](README.md). The proposal below records the original design and acceptance criteria. This is an **editor-only planning aid**, not an authoritative prediction of victory, campaign difficulty, score, rewards or scaling. Do not change waves, enemy stats, runtime spawning, saves or the research/progression systems.
 
 ### WP4-A — exact wave statistics and schedule
 
