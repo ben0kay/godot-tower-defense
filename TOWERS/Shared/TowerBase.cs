@@ -73,7 +73,7 @@ public abstract partial class TowerBase : Node2D
     // =========================================================
     // Fixed grid identity is independent of any rotating weapon artwork.
     public void SetPlacement(Vector2I cell, Vector2 center)
-    { GridCell = cell; GlobalPosition = center; }
+    { GridCell = cell; GlobalPosition = center; AttachRankEmblem(); }
 
     // =========================================================
     // Passive visuals can use root tint; weapon types may override their visual selection hook.
@@ -113,7 +113,7 @@ public abstract partial class TowerBase : Node2D
         bool promoted = RankProgress.Add(amount, AuthoredConfig.Ranks);
         if (promoted)
         {
-            FinalStats = ResolveLevel(UpgradeLevel); NotifyStatsChanged();
+            FinalStats = ResolveLevel(UpgradeLevel); RefreshRankEmblem(); NotifyStatsChanged();
             if (GodotObject.IsInstanceValid(this) && IsInsideTree() && !IsQueuedForDeletion())
                 ShowWorldCallout($"RANK UP  {CurrentRank.Rank}", RankCalloutColor, WorldCalloutSymbol.ThickUpArrow);
         }

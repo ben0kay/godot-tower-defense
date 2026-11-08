@@ -1,3 +1,9 @@
+## Battlefield rank insignia — 2026-11-08
+
+Every **placed tower with the complete five-rank combat table** displays a small fixed, top-right emblem within its footprint: a single cyan chevron for Standard, silver double chevrons for Veteran, blue diamond/chevrons for Enhanced, a gold winged star for Superior, and a crowned gold star for Legendary. These five `Artwork/*.svg` textures are cached globally and chosen from the **existing** rank state in `TowerRankEmblem.cs`; `TowerBase.RankEmblem.cs` attaches the visual once at placement, including checkpoint restores, and updates only on promotions. The sprite is independent of the rotating weapon pivot and captures no input. Standard-only passive structures and build ghosts have no badge. Rank XP thresholds, bonuses, profile saves and combat processing are unchanged. Godot visual acceptance pending.
+
+---
+
 ## Projectile handling update (PA1–PA3)
 
 Optional immutable handling now carries launch spread and explicit Straight/Homing guidance through level → selected rank → captured research → safety → final snapshots. Projectile towers default to straight physical shots; splash uses a fixed launch destination. See `TOWERS/Shared/Projectiles/PROJECTILE_GUIDANCE_ACCURACY_PLAN.md` for implementation decisions and retained pass history.

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+<path d="M12 1.5L21 5V15.8L12 22.5L3 15.8V5Z" fill="#0b1b29" stroke="#f4cb74" stroke-width="1.5"/><path d="M12 4L18.4 6.6V14.4L12 19.1L5.6 14.4V6.6Z" fill="#1c3241" stroke="#345467" stroke-width=".75"/>
+<!-- Superior: gold wings and one bright officer star. -->
+<path d="M5.6 8.2L2.9 10.8L7.4 12.5L9.3 10.3ZM18.4 8.2L21.1 10.8L16.6 12.5L14.7 10.3Z" fill="#c38d46" stroke="#ffe4a4" stroke-width=".65"/>
+<path d="M12 4L14 8.2L18.6 8.9L15.3 12.1L16.1 16.7L12 14.5L7.9 16.7L8.7 12.1L5.4 8.9L10 8.2Z" fill="#ffd57d" stroke="#fff0c5" stroke-width=".75"/>
+<path d="M8 17.6H16" stroke="#f1ac52" stroke-width="1.7" stroke-linecap="round"/>
+</svg>

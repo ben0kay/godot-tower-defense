@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+<path d="M12 1.5L21 5V15.8L12 22.5L3 15.8V5Z" fill="#0b1b29" stroke="#c2cbd1" stroke-width="1.5"/><path d="M12 4L18.4 6.6V14.4L12 19.1L5.6 14.4V6.6Z" fill="#1c3241" stroke="#345467" stroke-width=".75"/>
+<!-- Veteran: double silver chevrons. -->
+<path d="M6.2 7.4L12 11L17.8 7.4V10.4L12 14.1L6.2 10.4Z" fill="#ccd7dd" stroke="#f0fbfb" stroke-width=".5"/>
+<path d="M6.2 12.5L12 16.1L17.8 12.5V15.5L12 19.2L6.2 15.5Z" fill="#91b3c7" stroke="#e8fcff" stroke-width=".5"/>
+</svg>

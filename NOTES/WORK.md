@@ -1,3 +1,9 @@
+## World-space tower rank emblems — 2026-11-08
+
+Added five tiny military/sci-fi vector insignia (Standard → Legendary) and one shared non-processing `TowerRankEmblem` sprite for placed combat-ranked towers. Badge is anchored top-right **inside the full tower footprint**, not on the rotating gun, and uses cached shared SVG textures; the existing placement/restore path initializes it and only promotions swap its texture. Passive Standard-only structures, ghosts, XP economy, rank thresholds and save data are untouched. Review source paths/geometry only; owner should inspect legibility, overlaps and visual scale at gameplay zoom in Godot.
+
+---
+
 ## Shared UI button sounds — 2026-11-08
 
 Registered original GameMaker hover, click and back WAVs on the existing UI audio bus as `ui_button_hover`, `ui_button_click`, and `ui_button_back`; sound definitions and Inspector mix are `AUDIO/Button{Hover,Click,Back}.tres`. Renamed the imported `snd_btn_main_menu.wav` to `AUDIO/snd_click_success.wav` without changing the audio bytes. Shared `UIButtonFactory` plays a hover once on enabled mouse entry and a normal click on enabled press for menu screens and in-game tower build cards only; explicit Back buttons request back instead of click. `MenuNavigation` binds the existing `GameInput.BackAction` Escape for Main→Boot, Campaign→Main, Research/legacy Levels→Campaign, ignoring active modal dialogs; it unbinds on scene exit. No new audio manager or idle loop. Source review only; Godot WAV import and actual mix/keyboard behaviour await owner playtest.
