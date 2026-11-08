@@ -3,7 +3,7 @@ using Godot;
 
 public readonly record struct WeaponRecoilSnapshot(bool Enabled, float Distance, double KickSeconds, double ReturnSeconds, float Maximum);
 
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class WeaponRecoilStyle : Resource
 {
     #region Inspector

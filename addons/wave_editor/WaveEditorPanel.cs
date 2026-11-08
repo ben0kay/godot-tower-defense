@@ -53,11 +53,12 @@ public partial class WaveEditorPanel : VBoxContainer
 
         var title = new HBoxContainer();
         AddChild(title);
-        title.AddChild(new Label { Text = "WAVE EDITOR  ·  LAYOUT V2", ThemeTypeVariation = "HeaderSmall",
+        title.AddChild(new Label { Text = "WAVE EDITOR  ·  ANALYSIS", ThemeTypeVariation = "HeaderSmall",
             CustomMinimumSize = new Vector2(190, 0),
             TooltipText = "Full-height container layout. If this label is missing after pulling, rebuild C# and restart the Godot editor." });
         _fileLabel = new Label { SizeFlagsHorizontal = SizeFlags.ExpandFill, ClipText = true };
         title.AddChild(_fileLabel);
+        BuildThreatBadge(title);
         title.AddChild(Button("Open .tres", Open));
         title.AddChild(Button("New .tres", New));
         _saveButton = Button("Save", Save); title.AddChild(_saveButton);
@@ -284,6 +285,7 @@ public partial class WaveEditorPanel : VBoxContainer
     // Keep enemy list entries readable while preserving stable IDs in the underlying resource.
     private string EnemyLabel(string id)
     {
+        if (_enemyCatalog == null) return id;
         int index = _enemyChoices.FindIndex(e => e.Id == id);
         return index < 0 ? "[Unregistered] " + id : _enemyChoices[index].Name + " (" + id + ")";
     }
@@ -303,11 +305,13 @@ public partial class WaveEditorPanel : VBoxContainer
         int selected = _enemyChoices.FindIndex(e => e.Id == id);
         if (selected < 0)
         {
-            _enemyId.AddItem(string.IsNullOrEmpty(id) ? "[Missing enemy ID]" : "[Unregistered] " + id);
+            _enemyId.AddItem(string.IsNullOrEmpty(id) ? "[Missing enemy ID]" : EnemyLabel(id));
             selected = _enemyId.ItemCount - 1;
         }
         _enemyId.Select(selected);
-        _enemyClassification.Text = EnemyNaming.ClassificationLabel(_enemyCatalog?.DefinitionFor(id)) + "\nID: " + id;
+        string classification = _enemyCatalog == null ? "Enemy catalog unavailable"
+            : EnemyNaming.ClassificationLabel(_enemyCatalog.DefinitionFor(id));
+        _enemyClassification.Text = classification + "\nID: " + id;
         _enemyId.Disabled = _enemyChoices.Count == 0;
     }
     #endregion

@@ -2,6 +2,7 @@
 using Godot;
 using System;
 
+[Tool]
 public partial class EnemyMinigun : EnemyWeaponMount
 {
     #region Private Cadence

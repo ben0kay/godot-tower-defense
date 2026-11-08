@@ -15,6 +15,7 @@ public partial class WaveEditorPanel
         // Retain the pane heading.
         foreach (Node child in _timeline.GetChildren().Skip(1).ToArray())
         { _timeline.RemoveChild(child); child.QueueFree(); }
+        _fleetThreat.Visible = Wave != null;
         if (Wave == null) return;
         try
         {

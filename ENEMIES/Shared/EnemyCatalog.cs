@@ -2,7 +2,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class EnemyCatalog : Resource
 {
     [Export] public Godot.Collections.Array<PackedScene> Scenes { get; set; } = new();

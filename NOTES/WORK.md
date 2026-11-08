@@ -1,3 +1,9 @@
+## Wave Editor catalog loading and Fleet Threat visibility — 2026-11-08
+
+Enabled editor instantiation of the registered catalog, enemy scene metadata and authored capabilities. Gameplay mount and ability setup stays out of the editor. Fleet Threat is pinned in the toolbar and failed catalog loads preserve IDs without calling them unregistered. Godot .NET rebuild and editor acceptance pending.
+
+---
+
 ## LAVA1 — Molten surface, light spill and steam — 2026-11-08
 
 **Source Implemented / Awaiting Owner Validation.** Lava-only tile material adds world-space flow and sparse bubbles over the original SVG. The world lighting pool admits capped, shadowless lava spill at 0.63 energy / 160px, strengthens the cell glow and reuses regional anchors for a small GPU steam pool. Existing lava reveal geometry is preserved. Source and resource review only. Check isolated and connected lava, F6, camera movement and dense combat in Godot.

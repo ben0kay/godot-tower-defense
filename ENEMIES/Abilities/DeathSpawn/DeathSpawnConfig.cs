@@ -4,7 +4,7 @@ using System;
 
 public enum DeathSpawnPattern { RadialScatter }
 
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class DeathSpawnConfig : Resource
 {
     [ExportGroup("Children")]

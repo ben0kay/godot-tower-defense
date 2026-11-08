@@ -18,9 +18,15 @@ public partial class WaveEditorPanel
         var pane = Pane("Wave analysis · authored totals", 0);
         parent.AddChild(pane);
         _waveStats = AnalysisLabel(pane);
-        _fleetThreat = AnalysisLabel(pane);
-        _fleetThreat.TooltipText = "Relative ship-fleet threat only. Higher is harder. The index has no cap and does not predict wins. Terrain, allowed towers, upgrades, ammunition, economy, spawn blockage and player strategy are excluded.";
         _threatBreakdown = AnalysisLabel(pane);
+    }
+
+    // Keep the selected wave's rating visible while scrolling through batches and entries.
+    private void BuildThreatBadge(HBoxContainer title)
+    {
+        _fleetThreat = new Label();
+        title.AddChild(_fleetThreat);
+        _fleetThreat.TooltipText = "Relative ship-fleet threat only. Higher is harder. The index has no cap and does not predict wins. Terrain, allowed towers, upgrades, ammunition, economy, spawn blockage and player strategy are excluded.";
     }
 
     private static Label AnalysisLabel(Container parent)
@@ -50,7 +56,8 @@ public partial class WaveEditorPanel
         _enemyPreviews.TryGetValue(id, out var preview);
         _enemySprite.Texture = preview?.Texture;
         _enemySprite.Visible = _enemySprite.Texture != null;
-        _enemyStats.Text = definition == null ? "Preview unavailable · unregistered or missing enemy ID."
+        _enemyStats.Text = _enemyCatalog == null ? "Preview unavailable · enemy catalog failed to load."
+            : definition == null ? "Preview unavailable · unregistered or missing enemy ID."
             : $"{definition.DisplayName}\nHull {definition.MaxHealth:0.#} HP · Max shield {definition.MaxShield:0.#} HP " +
               $"({(Entry.Shield ? definition.MaxShield : 0):0.#} at spawn)\n" +
               $"Speed {definition.MoveSpeed:0.#} px/s · Citadel damage {definition.CitadelDamage}" +
@@ -71,6 +78,8 @@ public partial class WaveEditorPanel
         if (rows.Count == 0 || Wave.Number <= 0 || _source.Waves.Count(w => w?.Number == Wave.Number) != 1
             || !WaveCatalog.ValidNextWaveDelay(Wave.NextWaveDelaySeconds))
         { AnalysisUnavailable("A valid wave needs a unique positive number, a valid next-wave delay and at least one batch."); return; }
+
+        if (_enemyCatalog == null) { AnalysisUnavailable("Enemy catalog failed to load. Use Refresh list to retry."); return; }
 
         var types = new Dictionary<string, long>(StringComparer.Ordinal);
         var omissions = new SortedSet<string>(StringComparer.Ordinal);

@@ -1,7 +1,7 @@
 // Minigun continuous/optional-burst settings; source resources remain read-only while each mount captures private timing values.
 using Godot;
 
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class EnemyMinigunConfig : EnemyWeaponConfig
 {
     #region Bullet Presentation and Lifetime

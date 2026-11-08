@@ -2,6 +2,7 @@
 using Godot;
 using System.Collections.Generic;
 
+[Tool]
 public partial class EnemyWeaponMount : Node2D
 {
     #region Inspector and Runtime
@@ -38,6 +39,7 @@ public partial class EnemyWeaponMount : Node2D
     // Ordinary enemies never instantiate this component; locate the host once, without touching navigation.
     public override void _Ready()
     {
+        if (Engine.IsEditorHint()) { SetPhysicsProcess(false); return; }
         SetProcess(false); SetPhysicsProcess(false); _host = Host;
         for (Node ancestor = GetParent(); _host == null && ancestor != null; ancestor = ancestor.GetParent())
             if (ancestor is Enemy enemy) _host = enemy;

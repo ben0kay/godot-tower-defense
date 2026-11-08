@@ -1,7 +1,7 @@
 // Optional ordered Sprite2D textures for health-based enemy battle damage; index 0 is pristine.
 using Godot;
 
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class EnemyDamageAppearanceProfile : Resource
 {
     // =========================================================

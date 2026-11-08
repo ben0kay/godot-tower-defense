@@ -2,6 +2,7 @@
 using Godot;
 using System;
 
+[Tool]
 public partial class Enemy : Node2D
 {
     [Export] public EnemyDefinition Definition { get; set; }

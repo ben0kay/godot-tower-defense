@@ -1,7 +1,7 @@
 // Inspector-authored tracer appearance. Launch copies values, never a mutable per-shot Resource/material.
 using Godot;
 
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class ProjectileVisualStyle : Resource
 {
     [Export] public bool Enabled { get; set; } = true;

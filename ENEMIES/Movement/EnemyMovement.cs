@@ -2,6 +2,7 @@
 using Godot;
 using System.Collections.Generic;
 
+[Tool]
 public partial class EnemyMovement : Node
 {
     #region State

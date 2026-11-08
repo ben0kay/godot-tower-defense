@@ -2,6 +2,7 @@
 using Godot;
 using System;
 
+[Tool]
 public partial class DeathSpawn : Node
 {
     [Export] public Enemy Host { get; set; }
@@ -14,6 +15,7 @@ public partial class DeathSpawn : Node
     // No live ability timer or manager registration; cache the host/service and subscribe only to real hull kills.
     public override void _Ready()
     {
+        if (Engine.IsEditorHint()) { SetPhysicsProcess(false); return; }
         SetProcess(false); SetPhysicsProcess(false); _host = Host;
         for (Node node = GetParent(); _host == null && node != null; node = node.GetParent()) if (node is Enemy enemy) _host = enemy;
         if (_host == null) { GD.PushWarning("DeathSpawn requires an Enemy host."); return; }

@@ -1,7 +1,7 @@
 // Editable per-type identity, health and movement settings; plain types reuse shared gameplay scripts.
 using Godot;
 
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class EnemyDefinition : Resource
 {
     #region Identity

@@ -2,7 +2,7 @@
 using Godot;
 public enum MuzzleFlashShape { Cone, Starburst, Ring, Texture }
 
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class MuzzleFlashStyle : Resource
 {
     [Export] public bool Enabled { get; set; } = true;

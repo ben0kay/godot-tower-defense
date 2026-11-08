@@ -1,6 +1,7 @@
 // Optional friendly shield-restoration component; ordinary enemies pay no ability-node/tick cost.
 using Godot;
 using System;
+[Tool]
 public partial class ShieldEmitter : Node
 {
     #region Inspector and Instance State
@@ -40,6 +41,7 @@ public partial class ShieldEmitter : Node
     // Find an ancestor host or use an explicit Inspector reference; cache services only after spawn initialization.
     public override void _Ready()
     {
+        if (Engine.IsEditorHint()) { SetPhysicsProcess(false); return; }
         SetProcess(false); SetPhysicsProcess(false);
         _host = Host;
         for (Node parent = GetParent(); _host == null && parent != null; parent = parent.GetParent())

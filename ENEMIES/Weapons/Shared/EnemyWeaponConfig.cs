@@ -4,7 +4,7 @@ using Godot;
 public readonly record struct EnemyWeaponSettings(float Range, float TurnSpeed, float Tolerance, double SearchSeconds,
     float Damage, float BulletSpeed, float ShotsPerSecond, double LockedSearchSeconds = 1);
 
-[GlobalClass]
+[Tool, GlobalClass]
 public partial class EnemyWeaponConfig : Resource
 {
     #region Inspector Settings
