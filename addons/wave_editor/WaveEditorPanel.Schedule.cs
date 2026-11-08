@@ -39,11 +39,22 @@ public partial class WaveEditorPanel
             for (int i = 0; i < rows.Count; i++)
             {
                 var row = rows[i];
-                _timeline.AddChild(new Label { Text = $"Group {i + 1}: {row.Start:0.##}–{row.End:0.##}s · {row.Batch.Count} ships",
-                    AutowrapMode = TextServer.AutowrapMode.WordSmart });
-                _timeline.AddChild(TimelineBar(row.Start, row.End, Math.Max(1, horizon)));
-                _timeline.AddChild(new Label { Text = row.Sources,
-                    AutowrapMode = TextServer.AutowrapMode.WordSmart });
+                var group = new PanelContainer();
+                group.AddThemeStyleboxOverride("panel", Box(new Color("#19222d"), 6));
+                _timeline.AddChild(group);
+                var content = new VBoxContainer();
+                content.AddThemeConstantOverride("separation", 3);
+                group.AddChild(content);
+                var header = new HBoxContainer();
+                content.AddChild(header);
+                var name = StyledLabel($"Group {i + 1}", Accent);
+                name.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+                header.AddChild(name);
+                header.AddChild(StyledLabel($"{row.Start:0.##}–{row.End:0.##} s   ·   {row.Batch.Count} ships", Colors.White));
+                content.AddChild(TimelineBar(row.Start, row.End, Math.Max(1, horizon)));
+                var source = StyledLabel(row.Sources, Muted);
+                source.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+                content.AddChild(source);
             }
             _timeline.AddChild(new Label { Text = "Estimated first–last spawn times; blocked exits, opening portals and frame budgets can delay groups. Source selection also respects the loaded map.",
                 AutowrapMode = TextServer.AutowrapMode.WordSmart });
@@ -60,6 +71,9 @@ public partial class WaveEditorPanel
     private static Control TimelineBar(double start, double end, double horizon)
     {
         var track = new Control { CustomMinimumSize = new Vector2(0, 9), SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        var rail = new ColorRect { Color = new Color("#101823"), MouseFilter = MouseFilterEnum.Ignore };
+        track.AddChild(rail);
+        rail.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
         var bar = new ColorRect { Color = new Color(0.2f, 0.75f, 0.9f, 0.65f), MouseFilter = MouseFilterEnum.Ignore };
         track.AddChild(bar);
         track.Resized += () =>
@@ -97,7 +111,13 @@ public partial class WaveEditorPanel
                 throw new ArgumentException("Invalid required portal path.");
             options.Validate(portal);
             if (counts[i] == 0) continue;
-            string label = !string.IsNullOrEmpty(entry.Portal) ? entry.Portal : options.Policy.ToString();
+            string label = !string.IsNullOrEmpty(entry.Portal) ? entry.Portal : options.Policy switch
+            {
+                SpawnSourcePolicy.LegacyPortalPreferred => "Portal preferred",
+                SpawnSourcePolicy.EdgesOnly => "Map edges",
+                SpawnSourcePolicy.AnyEligible => "Any eligible source",
+                _ => options.Policy.ToString()
+            };
             if (options.Policy == SpawnSourcePolicy.EdgesOnly || options.Policy == SpawnSourcePolicy.AnyEligible)
                 label += (string.IsNullOrEmpty(options.EdgeSector) ? "" : " / " + options.EdgeSector) +
                     $" (T/B/L/R weights {options.TopWeight:0.#}/{options.BottomWeight:0.#}/{options.LeftWeight:0.#}/{options.RightWeight:0.#})";

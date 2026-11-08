@@ -1,3 +1,9 @@
+## Wave Editor readability polish — 2026-11-08
+
+Separated the editor sections into tinted panels. Wave Analysis uses labeled metric cards, the toolbar keeps the Fleet Threat value prominent, and timeline groups have aligned labels and tracks. Source review only. Check compact editor widths in Godot.
+
+---
+
 ## Lava glow continuity and bubble pops — 2026-11-08
 
 Replaced first-admitted lava point lights and stacking tile glows with a single chunked coverage field around the lava silhouette. The surface uses continuous self-lit color and the bubbles now swell, flash and throw warm flecks at varied intervals. Source review only. Inspect a long lava strip, chunk boundaries, F6 and bubble timing in Godot.
