@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="LightSourceConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://SYSTEMS/Lighting/Config/LightSourceConfig.cs" id="1_source"]
+
+[resource]
+script = ExtResource("1_source")
+Tint = Color(1, 0.48, 0.16, 1)
+Energy = 0.63
+RadiusPixels = 160.0

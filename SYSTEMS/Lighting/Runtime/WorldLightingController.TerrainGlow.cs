@@ -27,7 +27,7 @@ public partial class WorldLightingController
         if (HasOutput(Config.Lava) && Grid.InteractiveTiles is { } terrain)
         {
             Color lavaTint = Config.Lava.Tint;
-            lavaTint.A = .42f;
+            lavaTint.A = Mathf.Clamp(Config.LavaGlowOpacity, 0f, 1f);
             foreach (Vector2I cell in terrain.EnumerateLavaCells())
                 AddTileGlow(chunks, cell, size * .85f, lavaTint);
         }

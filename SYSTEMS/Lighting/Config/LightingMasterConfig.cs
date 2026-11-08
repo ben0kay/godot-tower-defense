@@ -19,6 +19,16 @@ public partial class LightingMasterConfig : Resource
     [Export(PropertyHint.Range, "0.1,1,0.05")] public float ConstructionEnergyFactor { get; set; } = 0.55f;
     [Export(PropertyHint.Range, "0,16,1")] public int MaxDroneLights { get; set; } = 8;
 
+    [ExportGroup("Lava Presentation")]
+    [Export] public LightSourceConfig LavaSpill { get; set; }
+    [Export(PropertyHint.Range, "0,8,1")] public int MaxLavaLights { get; set; } = 3;
+    [Export(PropertyHint.Range, "0,1,0.01")] public float LavaGlowOpacity { get; set; } = .52f;
+    [Export] public bool LavaSteamEnabled { get; set; } = true;
+    [Export(PropertyHint.Range, "0,8,1")] public int MaxLavaSteamEmitters { get; set; } = 4;
+    [Export(PropertyHint.Range, "1,12,1")] public int LavaSteamDensity { get; set; } = 3;
+    [Export(PropertyHint.Range, "0,0.5,0.01")] public float LavaSteamOpacity { get; set; } = .15f;
+    [Export(PropertyHint.Range, "1,32,1")] public float LavaSteamSpeed { get; set; } = 13f;
+
     [ExportGroup("Projectile Lighting")]
     [Export] public LightSourceConfig Projectile { get; set; }
     [Export(PropertyHint.Range, "0,8,1")] public int MaxProjectileLights { get; set; } = 4;

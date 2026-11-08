@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="56" viewBox="0 0 32 56">
+  <defs>
+    <radialGradient id="fade">
+      <stop stop-color="#f6dfcd"/>
+      <stop offset=".45" stop-color="#e9c7ae" stop-opacity=".6"/>
+      <stop offset="1" stop-color="#cfa48c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="16" cy="28" rx="11" ry="26" transform="rotate(-14 16 28)" fill="url(#fade)"/>
+  <ellipse cx="20" cy="20" rx="8" ry="17" transform="rotate(16 20 20)" fill="url(#fade)" opacity=".45"/>
+</svg>

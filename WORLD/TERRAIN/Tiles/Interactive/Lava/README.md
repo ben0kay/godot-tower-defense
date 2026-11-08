@@ -1,3 +1,5 @@
 # Lava artwork
 
-lava.svg is an editable64×64 vector tile: vivid orange liquid, soft amber heat variation, three tiny bright flecks and subtle curved highlights. Tile edges share the same orange base for coherent adjacent pools. No dark crust, cell borders, animated shaders, particles or damage logic are embedded in the art. InteractiveTerrain.tres source1 selects it; LavaTileConfig controls gameplay independently.
+`lava.svg` supplies the original 64px lava artwork. Only the lava entry in `InteractiveTerrain.tres` uses `LavaSurface.tres`. Its shader blends the original artwork with world-space flow and intermittent bubbles so neighbouring cells share the same motion field. Tune **Enabled**, **Flow Speed**, **Flow Strength**, **Brightness Variation** and **Bubble Density / Scale / Intensity** in that ShaderMaterial. Disabling it restores the original texture.
+
+Regional light and sparse GPU steam settings live in the [lighting configuration](../../../../../SYSTEMS/Lighting/README.md). Damage is configured separately through `LavaTileConfig`.
