@@ -1,11 +1,11 @@
-# Resource Storage — SALV1 planned building
+# Resource Storage — visual building implemented (SALV1 logistics pending)
 
-**Status: PLAN ONLY — not implemented.** Authoritative scope: [SALV1 implementation plan](../ScrapRefinery/SALV1_IMPLEMENTATION_PLAN.md).
+**Current source:** `ResourceStorage.tscn`, `ResourceStorage.cs`, `ResourceStorageConfig.cs`, `DefaultResourceStorageConfig.tres` and `ResourceStorageDefinition.tres`. Registered in the Economy build category with the stable ID `resource_storage`.
 
-The **Resource Storage** building is **separate from Ammunition Depot**. It is intended for physical **Refined Metal** rather than ammunition rounds; it has its own placeable scene/config, inventory, capacity, incoming and construction reservations, selected-building Inspector, SaveId and checkpoint data.
+The finished `Artwork/resource_storage.svg` is a distinct **128×128 top-down 2×2 design**: an armoured material vault containing two visibly stacked banks of silver Refined Metal ingots, heavy locking rails, a cargo hatch, small cyan indicators and steel/bronze details. Its art is intentionally different from the ammunition depot.
 
-Suggested initial values: Economy build category, **200 Credits**, **2×2**, **4-second build**, **1,000 HP**, and **100 Metal storage capacity**, starting empty. A refinery transport drone moves processed metal from the Scrap Refinery output buffer into Storage. The inventory stays local to that specific building and never automatically becomes a global wallet balance.
+**Provisional values:** 2×2 footprint, 200 Credits, 4s construction, 1,000 hull HP. Adjust Credits/time/HP in `DefaultResourceStorageConfig.tres`; the 2×2 footprint is on its `TowerDefinition`. Placement, shared construction drones/holograms, health, selection and ordinary Save/Continue reuse existing TowerBase contracts.
 
-For a future tower whose construction recipe requires Metal, a **Citadel-launched material/construction drone** retrieves reserved Metal from an operational Resource Storage, delivers it physically to the construction site, then joins a **second Citadel-launched engineering drone** in building that tower. Ordinary Credits-only buildings keep their existing construction path.
+**Not implemented in this artwork/building-shell pass:** physical Metal stock, production delivery, availability/reservations, material collection drones or two-drone material construction. The Inspector says SALV1 storage is pending; it does not fake stock or convert Metal into ammunition. The planned capacity of 100 Metal is a **future configuration**, not a live inventory.
 
-Existing `AmmunitionDepot/AmmoStorage` and `AmmunitionLogistics` demonstrate finite stock, reservations and drone transfer **but must not own Metal**. Do not share inventory instances or cargo jobs between the two building types. This feature does not implement other material categories, campaign-wide inventory, research, or new tower prices yet.
+**Future integration:** [SALV1 full implementation plan](../ScrapRefinery/SALV1_IMPLEMENTATION_PLAN.md). Implement the separate metal inventory and real shipment accounting on this existing building; do not attach it to Ammunition Depot or ammunition logistics.

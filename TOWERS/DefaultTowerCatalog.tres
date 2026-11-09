@@ -27,6 +27,9 @@
 [ext_resource type="Resource" path="res://TOWERS/Offensive/CorruptorTower/CorruptorTowerDefinition.tres" id="corruptor"]
 [ext_resource type="Resource" path="res://TOWERS/Utility/DroneStation/DroneStationDefinition.tres" id="drone_station"]
 
+[ext_resource type="Resource" path="res://TOWERS/Economy/ScrapRefinery/ScrapRefineryDefinition.tres" id="scrap_refinery"]
+[ext_resource type="Resource" path="res://TOWERS/Economy/ResourceStorage/ResourceStorageDefinition.tres" id="resource_storage"]
+
 [resource]
 script = ExtResource("1")
-Definitions = [ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10"), ExtResource("10_rocket"), ExtResource("stasis"), ExtResource("corruptor"), ExtResource("resource_income"), ExtResource("arg_income"), ExtResource("stealth_beacon"), ExtResource("industrial_power"), ExtResource("repair"), ExtResource("power_relay"), ExtResource("power_transmitter"), ExtResource("solar_power"), ExtResource("fusion_power"), ExtResource("drone_station")]
+Definitions = [ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10"), ExtResource("10_rocket"), ExtResource("stasis"), ExtResource("corruptor"), ExtResource("resource_income"), ExtResource("arg_income"), ExtResource("stealth_beacon"), ExtResource("industrial_power"), ExtResource("repair"), ExtResource("power_relay"), ExtResource("power_transmitter"), ExtResource("solar_power"), ExtResource("fusion_power"), ExtResource("drone_station"), ExtResource("scrap_refinery"), ExtResource("resource_storage")]

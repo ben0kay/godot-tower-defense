@@ -1,15 +1,11 @@
-# Scrap Refinery — planned SALV1
+# Scrap Refinery — visual building implemented (SALV1 logistics pending)
 
-**Status: PLAN ONLY, no gameplay implemented.**
+**Current source:** `ScrapRefinery.tscn`, `ScrapRefinery.cs`, `ScrapRefineryConfig.cs`, `DefaultScrapRefineryConfig.tres` and `ScrapRefineryDefinition.tres`. Registered in the Economy category with the stable ID `scrap_refinery`.
 
-Read the [SALV1 implementation plan](SALV1_IMPLEMENTATION_PLAN.md) for the complete physical-material economy:
+The finished `Artwork/refinery.svg` is a **128×128 top-down 2×2 design**: a slightly cylindrical rust-brown smelting drum, curved elliptical hatch, dark industrial footing, pipework, riveted bands and warm molten inspection window. This is a real scene and icon, not just concept art. Footprint, placement, ordinary paid Credits construction, shared construction drone/hologram, durability, pause and normal tower saving follow existing TowerBase mechanisms.
 
-1. 1% kill drop → physical Scrap → Citadel salvage drone → Scrap Refinery.
-2. Refinery processes 1 Scrap into 5 Refined Metal after 8s; **output remains stored at the refinery**.
-3. A distinct refinery cargo drone carries Metal to a separately placeable [Resource Storage](../ResourceStorage/README.md) building.
-4. Future metal-cost tower builds reserve Metal from Resource Storage; **two drones leave a Citadel**: an engineering drone flies to the site, and a material/construction drone visits Storage then joins construction.
-5. The first drone may advance real work to 25% while awaiting Metal; actual delivery unlocks the rest of the normal work clock.
+**Provisional values:** 2×2 footprint, 350 Credits, 5s construction, 1,000 hull HP. Adjust Credits/time/HP in `DefaultScrapRefineryConfig.tres`; the 2×2 footprint is authored on its `TowerDefinition`.
 
-This design **replaces** the previous proposal to grant Refined Metal directly to the session wallet on refinery completion. Metal is physically held by refinery buffers, material-flight cargo and storage. Future tower costs use existing `ResourceCost` identities with a physical-material affordability adapter; ammo depots and their jobs remain separate.
+**Not implemented in this artwork/building-shell pass:** Scrap intake, physical input/output buffers, refining clock, metal couriers, metal economy, SALV1 saving or dual-drone material construction. The selected-building Inspector explicitly identifies these as **pending**. No credits/resources appear from this building.
 
-All balance values are provisional. No existing tower gets a metal price in this plan. This document does not authorize gameplay implementation by itself.
+**Future integration:** follow the [SALV1 full implementation plan](SALV1_IMPLEMENTATION_PLAN.md), starting from this existing scene/config/artwork instead of recreating the building. Its future output must remain local physical Refined Metal, transferred to [Resource Storage](../ResourceStorage/README.md), never an automatic wallet grant.

@@ -1,3 +1,9 @@
+## Scrap Refinery and Resource Storage — visual building shells (2026-11-09)
+
+Added two authored 2×2 Economy buildings on dev: the rust-brown cylindrical `ScrapRefinery` and a separate silver-ingot `ResourceStorage`, each with original 128px SVG artwork, scene, Inspector config, catalogue entry, Credits-only construction, durability and ordinary TowerBase saving. SALV1 scrap recovery/refinement/metal stock and two-drone material supply are **not implemented**; both Inspectors show pending status. No build or in-editor visual verification was performed here; owner should build and place both, check sprite scale/preview, construction, and Save/Continue. See [SALV1](../TOWERS/Economy/ScrapRefinery/SALV1_IMPLEMENTATION_PLAN.md).
+
+---
+
 ## Results V2 visual-concept reference — 2026-11-09
 
 Documentation-only refinement: linked the owner's `UI/Menus/Results/Results_Concept_New.png` directly in the Results V2 plan and README. R2-B now explicitly targets its header, three KPI cards, 60/40 middle region, seven-row metrics, wide XP footer and four action buttons, while R3-B supplies the factual stacked wave chart. The image is a layout/style reference, **not a resource to rasterize as UI or a source of actual Credits/wave/XP values**. No runtime changes or build needed.

@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="-64 -64 128 128">
+<defs>
+<linearGradient id="base" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#67757a"/><stop offset=".48" stop-color="#273a40"/><stop offset="1" stop-color="#15252c"/></linearGradient>
+<linearGradient id="barrel" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#352524"/><stop offset=".17" stop-color="#96583b"/><stop offset=".43" stop-color="#bb8054"/><stop offset=".62" stop-color="#7a462e"/><stop offset=".86" stop-color="#56352e"/><stop offset="1" stop-color="#241f24"/></linearGradient>
+<linearGradient id="lid" x1="0" y1="0" x2=".9" y2="1"><stop stop-color="#e4ad70"/><stop offset=".35" stop-color="#a16c4c"/><stop offset=".8" stop-color="#503329"/><stop offset="1" stop-color="#2e2728"/></linearGradient>
+<linearGradient id="heat" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffefa6"/><stop offset=".3" stop-color="#ff9e37"/><stop offset=".8" stop-color="#be4922"/><stop offset="1" stop-color="#57291f"/></linearGradient>
+<linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a2b2b0"/><stop offset=".5" stop-color="#53666a"/><stop offset="1" stop-color="#273740"/></linearGradient>
+</defs>
+<!-- Two-cell world footprint, central almost-cylindrical rusted refinery vessel. -->
+<path d="M-47-59H47L59-47V47L47 59H-47L-59 47V-47Z" fill="#07151c" stroke="#99a8a7" stroke-width="2"/>
+<path d="M-45-55H45L55-45V45L45 55H-45L-55 45V-45Z" fill="url(#base)" stroke="#536d72" stroke-width="1.6"/>
+<path d="M-39-51H39L51-39V39L39 51H-39L-51 39V-39Z" fill="#152932" stroke="#547079" stroke-width="1.1"/>
+<!-- Service floor channels and wear. -->
+<path d="M-45-40H45M-45 42H45M-40-48V48M40-48V48" fill="none" stroke="#35494b" stroke-width="2"/>
+<g fill="#26363a" stroke="#779090" stroke-width="1.4"><rect x="-54" y="-21" width="19" height="42" rx="3"/><rect x="35" y="-21" width="19" height="42" rx="3"/></g>
+<g stroke="#aa7c50" stroke-width="2.5"><path d="M-50-15H-39M-50-6H-39M-50 3H-39M-50 12H-39"/><path d="M39-15H50M39-6H50M39 3H50M39 12H50"/></g>
+<!-- Warm side pipes feeding the chamber. -->
+<path d="M-47-33H-33V-24H-44V-12M47-33H33V-24H44V-12" fill="none" stroke="#191e25" stroke-width="8" stroke-linecap="round"/>
+<path d="M-47-33H-33V-24H-44V-12M47-33H33V-24H44V-12" fill="none" stroke="#a16c50" stroke-width="4" stroke-linecap="round"/>
+<path d="M-44 18V36H-23M44 18V36H23" fill="none" stroke="#191e25" stroke-width="8" stroke-linecap="round"/>
+<path d="M-44 18V36H-23M44 18V36H23" fill="none" stroke="#9c6d51" stroke-width="4" stroke-linecap="round"/>
+<!-- Huge vertical industrial vat with soft curved cylindrical sides. -->
+<path d="M-33-36C-33-45 33-45 33-36L37 33C37 49-37 49-37 33Z" fill="#161b20" stroke="#c08b64" stroke-width="2"/>
+<path d="M-31-34C-28-43 28-43 31-34L34 29C35 44-35 44-34 29Z" fill="url(#barrel)" stroke="#5b3027" stroke-width="1.5"/>
+<!-- Barrel length and perspective curved lower end. -->
+<ellipse cx="0" cy="31" rx="34" ry="13" fill="#3c2928" stroke="#bf8b5d" stroke-width="2.2"/>
+<ellipse cx="0" cy="30" rx="27" ry="8" fill="#593d32" stroke="#9f6a4a" stroke-width="1"/>
+<path d="M-31-34V27C-29 15-25-1-25-27 M31-34V27C29 15 25-1 25-27" fill="none" stroke="#e5a774" stroke-opacity=".38" stroke-width="2"/>
+<!-- Reinforced rib bands and regular rivets. -->
+<path d="M-34-15C-22-21 22-21 34-15L34-7C17-13-17-13-34-7Z" fill="#2a3133" stroke="#b59b7b" stroke-width="1.6"/>
+<path d="M-35 14C-20 6 20 6 35 14L35 21C15 14-15 14-35 21Z" fill="#354045" stroke="#a17d61" stroke-width="1.6"/>
+<g fill="#c9a47d" stroke="#382b2a" stroke-width="1"><circle cx="-27" cy="-12" r="2.3"/><circle cx="0" cy="-16" r="2.3"/><circle cx="27" cy="-12" r="2.3"/><circle cx="-28" cy="17" r="2.3"/><circle cx="0" cy="12" r="2.3"/><circle cx="28" cy="17" r="2.3"/></g>
+<!-- Orange viewing window / molten core; warm but not neon over the entire silhouette. -->
+<path d="M-15-3L-10-9H10L15-3V6L10 11H-10L-15 6Z" fill="#1e2023" stroke="#d2a479" stroke-width="2.2"/>
+<path d="M-11-2L-7-5H7L11-2V5L7 7H-7L-11 5Z" fill="url(#heat)"/>
+<path d="M-7 1C-3-2 1 4 5 0M-4 5C2 2 6 5 9 3" stroke="#fff1b7" stroke-width="1.5" opacity=".8" fill="none"/>
+<path d="M-17-2H-11M11-2H17M-17 7H-11M11 7H17" stroke="#a7ada3" stroke-width="2"/>
+<!-- Top circular lid is the primary cylindrical silhouette. -->
+<ellipse cx="0" cy="-36" rx="34" ry="17" fill="#101b21" stroke="#e0b17c" stroke-width="2.6"/>
+<ellipse cx="0" cy="-36" rx="29" ry="12" fill="url(#lid)" stroke="#4e3830" stroke-width="1.3"/>
+<ellipse cx="0" cy="-36" rx="21" ry="8" fill="#43302c" stroke="#e0a778" stroke-width="1.4"/>
+<ellipse cx="0" cy="-36" rx="13" ry="4.8" fill="#1e292c" stroke="#95674f" stroke-width="1.6"/>
+<path d="M-13-36H13M-8-40H8" stroke="#a17e64" stroke-width="1.4"/>
+<g fill="#d1b18f"><circle cx="-26" cy="-37" r="1.7"/><circle cx="26" cy="-37" r="1.7"/><circle cx="0" cy="-48" r="1.7"/><circle cx="0" cy="-24" r="1.7"/></g>
+<!-- Rust patina scratches and staining, placed away from the brightest lines. -->
+<g fill="none" stroke="#3d2423" stroke-width="2.2" opacity=".65"><path d="M-20-7L-16-9M17-1L22-4M-13 23L-4 25M19 25L25 21M-21-26L-13-23"/></g>
+<g fill="none" stroke="#de9a61" stroke-width="1" opacity=".65"><path d="M-24 4L-18 2M17-29L24-27M-9 28L1 29"/></g>
+<!-- Intake valves, outward amber exhaust and small command telemetry. -->
+<path d="M-54-42H-40M40-42H54M-53 46H-35M35 46H53" stroke="#b78d65" stroke-width="3"/>
+<g fill="#1c292d" stroke="#aeb5a9" stroke-width="1.2"><circle cx="-46" cy="-46" r="6"/><circle cx="46" cy="-46" r="6"/><circle cx="-46" cy="46" r="6"/><circle cx="46" cy="46" r="6"/></g>
+<g fill="#d9a378"><circle cx="-46" cy="-46" r="2.1"/><circle cx="46" cy="-46" r="2.1"/><circle cx="-46" cy="46" r="2.1"/><circle cx="46" cy="46" r="2.1"/></g>
+<path d="M-53 25H-41M41 25H53" stroke="#71c7c1" stroke-width="2.4"/>
+<path d="M-12 51H12" stroke="#cf9b68" stroke-width="2.2"/>
+<path d="M-7 55H7" stroke="#63c3be" stroke-width="1.5"/>
+</svg>
