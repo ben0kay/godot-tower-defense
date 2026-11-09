@@ -1,3 +1,9 @@
+## SALV1 updated — Resource Storage and two-drone construction (planning only, 2026-11-09)
+
+Revised [SALV1](../TOWERS/Economy/ScrapRefinery/SALV1_IMPLEMENTATION_PLAN.md) so Refinery output stays in its own buffer and is delivered by a material courier to a **separate Resource Storage** building (not an ammo depot, not a wallet grant). Metal-cost construction now plans two Citadel drones: one starts engineering work; the other visits Storage, physically carries Metal to the site, then helps build. Added a real pre-delivery 25% progress cap, material reservations and between-wave save rules. [Resource Storage note](../TOWERS/Economy/ResourceStorage/README.md). **No gameplay code changed.**
+
+---
+
 ## SALV1 salvage/refinery implementation plan — 2026-11-09
 
 Planned a physical scrap loop with 1% enemy drop chance, Citadel recovery drones, a placeable Scrap Refinery and Refined Metal as a future mixed-cost tower resource. Plan: [SALV1](../TOWERS/Economy/ScrapRefinery/SALV1_IMPLEMENTATION_PLAN.md). Planning only; no gameplay code or resources added.
