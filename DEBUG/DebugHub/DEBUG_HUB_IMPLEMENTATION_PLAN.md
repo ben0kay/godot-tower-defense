@@ -55,6 +55,18 @@ Suggested visual structure:
 
 The header, labels and separators are schematic, not pixel requirements. Reuse existing tactical dark menu/button styling; a restrained edge accent is fine. Do **not** turn DBG1 into the proposed game-wide UI redesign.
 
+### Direct performance shortcuts are independent of F1 (explicit owner clarification)
+
+**F2 / Shift+F2 / F3 must work immediately whenever an eligible debug battlefield is active, even when the F1 hub has never been opened or is currently closed.** They are standalone shortcuts, **not** a second-step key sequence inside the hub:
+
+- **F2** toggles the existing Performance Overlay directly.
+- **Shift+F2** starts/stops the detailed performance subsystem profiler directly, using the same retained sample policy and existing overlay/profile state.
+- **F3** immediately saves/prints the retained performance report to the existing `user://Debug/pf2-*.txt` path; if no report is available, provide a safe message.
+
+These three actions must **also appear as real clickable controls in the F1 hub**, not merely as passive labels: `Performance Overlay (F2)`, `Start/Stop Profiling (Shift+F2)`, `Save Performance Report (F3)`. The hub buttons call the **same shared actions and state** as the standalone keys; do not create a second profiling session or copy the overlay. The Performance Overlay is **not contained within or dependent on the hub UI**, and closing F1 must not automatically hide the overlay or stop a recording. Show live on/off status on the profiling action where easy.
+
+F4 notification samples likewise remain direct even with F1 closed, with an optional clickable hub entry. F1 is the *directory* for infrequently used panels, not a prerequisite for the frequent diagnostic shortcuts.
+
 **Navigation rules:**
 - Press **F1** in a debug-enabled battlefield to show the hub. Press F1 again from the hub to close it.
 - Choose **Enemy Spawner**, **Building Lookup** or **Route Preview** by mouse **or number keys 1/2/3 only while the hub has focus**. Hover/focus uses normal button states. Do not bind these number keys globally.
