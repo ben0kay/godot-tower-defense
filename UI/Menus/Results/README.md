@@ -1,3 +1,9 @@
+## Results V2 concept image adopted — 2026-11-09
+
+**Design target, not implemented yet.** The owner's [`Results_Concept_New.png`](Results_Concept_New.png) is now the **primary visual reference** in the [Results V2 Codex plan](RESULTS_ENHANCEMENT_IMPLEMENTATION_PLAN.md): R2-B will organize the header, 3 large stat cards, left analytics / right 7 compact stats, XP bar and four buttons to match it; R3-B will populate the left chart using real per-wave history. Image values are examples, **not** hardcoded gameplay stats. Preserve responsive layout and existing victory/defeat/reward behavior.
+
+---
+
 ## Results V2 planned Codex phases — 2026-11-08
 
 **Plan only; no source implementation yet.** The authoritative next-slice contract is [RESULTS_ENHANCEMENT_IMPLEMENTATION_PLAN.md](RESULTS_ENHANCEMENT_IMPLEMENTATION_PLAN.md). It splits remaining work into R3-A accurate Credits, R2-B compact overview layout, R3-B true per-wave history/chart, R3-C1 damage/tower statistics, R3-C2 active DETAILS subview, R4-A owner-approved scoring/replay policy and R4-B level-up/badges/personal bests; optional logistics and screenshots are later independent work. Existing R1/R2 progress and baseline saved XP stay intact. Older R2/R3/R4 historical checklist below is preserved for context, not permission to rebuild delivered foundations.
