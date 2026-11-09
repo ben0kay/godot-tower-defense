@@ -1,3 +1,9 @@
+## DBG1 — F1 Debug Hub / shortcut revamp (plan only, not implemented)
+
+The [DBG1 implementation plan](DebugHub/DEBUG_HUB_IMPLEMENTATION_PLAN.md) specifies an F1 Developer Hub with Enemy Spawner, a new read-only catalog-based Building Artwork Lookup (actual finished levels and optional stages) and Route Preview. Direct diagnostics will be F2 performance, Shift+F2 profiling, F3 profile report and F4 notification samples. The old F9 Audio Tester is to be unmounted. **These changes have not been implemented; current hotkeys described in historical sections below remain active until Codex completes DBG1.**
+
+---
+
 ## PW1 F4 power topology diagnostics — 2026-11-04
 
 F4 now includes two read-only rows showing cached island/cell totals, rebuild count/last topology milliseconds, and hovered cell/island/cell count. Island 0 means empty, nonconducting, decorative or outside terrain. Existing profiling rows keep their indices; these two rows remain visible without enabling subsystem profiling. Uses the existing throttled refresh, no terrain/tower/enemy scans or new polling loop; hiding F4 stops sampling. No capacity/powered status exists yet. See [power plan](../TOWERS/Economy/Power/IMPLEMENTATION_PLAN.md) and [owner checks](../TESTS/Power/README.md). Build/runtime/visual acceptance pending.

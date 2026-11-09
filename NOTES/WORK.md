@@ -1,3 +1,9 @@
+## DBG1 — F1 Debug Hub controls/Building Lookup plan (2026-11-09)
+
+Documentation only: added [DBG1](../DEBUG/DebugHub/DEBUG_HUB_IMPLEMENTATION_PLAN.md) under DEBUG. Defines an F1 master menu for Enemy Spawner, read-only tower/building L1–L3 artwork preview and Route Preview; direct F2 performance, Shift+F2 profiling, F3 sample export, F4 alert tests, retiring F9 Audio Tester, while retaining F11 and gameplay controls. Codex implementation still pending; no runtime bindings or scenes changed.
+
+---
+
 ## Radar contact sprites and viewport culling — 2026-11-09
 
 Replaced each dark contact’s two circle draws with one shared SVG quad. The overlay skips contacts outside the viewport, with padding for partially visible sprites. Reveal and targeting behavior are unchanged. Source checked. In-game FPS is unmeasured.
