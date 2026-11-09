@@ -1,6 +1,7 @@
 // Physical leg transitions. A job's cargo is owned by exactly one source, drone or destination.
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public partial class SalvageLogistics
 {
