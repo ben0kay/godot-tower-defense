@@ -2,6 +2,7 @@
 
 importer="wav"
 type="AudioStreamWAV"
+uid="uid://y8jg2pdb8urs"
 path="res://.godot/imported/snd_msg_tut.wav-6f1c4c6b43cfbc6dea68307bd799a3c6.sample"
 
 [deps]
