@@ -1,3 +1,9 @@
+## SALV1 salvage/refinery implementation plan — 2026-11-09
+
+Planned a physical scrap loop with 1% enemy drop chance, Citadel recovery drones, a placeable Scrap Refinery and Refined Metal as a future mixed-cost tower resource. Plan: [SALV1](../TOWERS/Economy/ScrapRefinery/SALV1_IMPLEMENTATION_PLAN.md). Planning only; no gameplay code or resources added.
+
+---
+
 ## Results V2 Codex roadmap update — 2026-11-08
 
 Documentation only: added `UI/Menus/Results/RESULTS_ENHANCEMENT_IMPLEMENTATION_PLAN.md` with focused R3-A/R2-B/R3-B/R3-C1/C2/R4-A/R4-B steps for real Credits, compact overview, wave history, tower attribution and DETAILS, then owner-approved XP rules and celebrations/records. Linked from Results README and unfinished backlog. Existing Results, economy, combat, mission XP, authored waves and saves unchanged; no build or gameplay QA applicable to this documentation edit.
