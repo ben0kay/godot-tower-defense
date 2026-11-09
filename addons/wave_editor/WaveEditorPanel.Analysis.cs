@@ -8,25 +8,50 @@ using System.Linq;
 public partial class WaveEditorPanel
 {
     private Dictionary<string, WaveEnemyPreview> _enemyPreviews = new(StringComparer.Ordinal);
-    private Label _waveStats, _fleetThreat, _threatBreakdown, _enemyStats;
+    private PanelContainer _fleetThreat;
+    private GridContainer _waveMetrics;
+    private Label _waveStats, _fleetThreatValue, _threatBreakdown, _breakdownHeading, _enemyStats;
+    private Label _shipMetric, _batchMetric, _spawnMetric, _hullMetric, _shieldMetric, _citadelMetric;
     private TextureRect _enemySprite;
 
     // =========================================================
     // Keep the analysis in the selected wave pane and reuse its labels across edits.
     private void BuildAnalysis(VBoxContainer parent)
     {
-        var pane = Pane("Wave analysis · authored totals", 0);
-        parent.AddChild(pane);
+        var pane = Pane(parent, "Wave analysis · authored totals");
+        _waveMetrics = new GridContainer { Columns = 3 };
+        _waveMetrics.AddThemeConstantOverride("h_separation", 6);
+        _waveMetrics.AddThemeConstantOverride("v_separation", 6);
+        pane.AddChild(_waveMetrics);
+        _shipMetric = AddMetric(_waveMetrics, "Ships");
+        _batchMetric = AddMetric(_waveMetrics, "Batches");
+        _spawnMetric = AddMetric(_waveMetrics, "Spawn window");
+        _hullMetric = AddMetric(_waveMetrics, "Hull HP");
+        _shieldMetric = AddMetric(_waveMetrics, "Starting shield HP");
+        _citadelMetric = AddMetric(_waveMetrics, "Citadel damage");
         _waveStats = AnalysisLabel(pane);
+        _breakdownHeading = StyledLabel("THREAT BREAKDOWN", Accent);
+        pane.AddChild(_breakdownHeading);
         _threatBreakdown = AnalysisLabel(pane);
     }
 
     // Keep the selected wave's rating visible while scrolling through batches and entries.
     private void BuildThreatBadge(HBoxContainer title)
     {
-        _fleetThreat = new Label();
+        _fleetThreat = new PanelContainer();
+        _fleetThreat.AddThemeStyleboxOverride("panel", Box(new Color("#203743"), 6));
         title.AddChild(_fleetThreat);
+        var badge = new HBoxContainer();
+        badge.AddThemeConstantOverride("separation", 9);
+        _fleetThreat.AddChild(badge);
+        var heading = StyledLabel("FLEET THREAT", Accent);
+        _fleetThreatValue = StyledLabel("—", Colors.White);
+        badge.AddChild(heading);
+        badge.AddChild(_fleetThreatValue);
+        _fleetThreatValue.AddThemeFontSizeOverride("font_size", _fleetThreatValue.GetThemeDefaultFontSize() + 5);
         _fleetThreat.TooltipText = "Relative ship-fleet threat only. Higher is harder. The index has no cap and does not predict wins. Terrain, allowed towers, upgrades, ammunition, economy, spawn blockage and player strategy are excluded.";
+        heading.TooltipText = _fleetThreat.TooltipText;
+        _fleetThreatValue.TooltipText = _fleetThreat.TooltipText;
     }
 
     private static Label AnalysisLabel(Container parent)
@@ -67,7 +92,9 @@ public partial class WaveEditorPanel
     private void AnalysisUnavailable(string message)
     {
         _waveStats.Text = "Analysis unavailable · " + message;
-        _fleetThreat.Text = "FLEET THREAT · UNAVAILABLE";
+        _waveMetrics.Hide();
+        _breakdownHeading.Hide();
+        _fleetThreatValue.Text = "Unavailable";
         _threatBreakdown.Text = "";
     }
 
@@ -130,12 +157,19 @@ public partial class WaveEditorPanel
         double overlap = OpeningPressure(rows);
         double index = Math.Round(threat.Total * pace * overlap, 1, MidpointRounding.AwayFromZero);
         string mix = string.Join(" · ", types.Select(pair => $"{pair.Value} × {EnemyLabel(pair.Key)}"));
-        _waveStats.Text = $"{ships} ships · {rows.Count} batches · spawn window {first:0.##}–{last:0.##}s ({last - first:0.##}s span)\n" +
-            $"Hull {hull:0.#} HP · Starting shield {shields:0.#} HP · Potential Citadel damage {breach}\n" +
-            $"Shield only {shieldOnly} · Stealth only {stealthOnly} · Both {both} · Neither {ships - shieldOnly - stealthOnly - both}\n" +
-            mix + (children > 0 ? $"\nUp to {children} death-spawn children outside these authored totals." : "");
+        _waveMetrics.Show();
+        _breakdownHeading.Show();
+        _shipMetric.Text = $"{ships:N0}";
+        _batchMetric.Text = $"{rows.Count:N0}";
+        _spawnMetric.Text = $"{first:0.##}–{last:0.##} s";
+        _spawnMetric.TooltipText = $"Estimated spawn span: {last - first:0.##} s.";
+        _hullMetric.Text = $"{hull:#,0.#}";
+        _shieldMetric.Text = $"{shields:#,0.#}";
+        _citadelMetric.Text = $"{breach:N0}";
+        _waveStats.Text = $"Enemy mix   {mix}\nShield only {shieldOnly}  ·  Stealth only {stealthOnly}  ·  Both {both}  ·  Neither {ships - shieldOnly - stealthOnly - both}" +
+            (children > 0 ? $"\nUp to {children} death-spawn children outside these authored totals." : "");
         _waveStats.TooltipText = "Theoretical authored totals. Blocked exits, portal opening and spawn budgets may delay spawns. Movement, combat and death-spawn children can extend the live wave.";
-        _fleetThreat.Text = $"FLEET THREAT · {index:0.0}" + (omissions.Count == 0 ? "" : " · PARTIAL");
+        _fleetThreatValue.Text = $"{index:0.0}" + (omissions.Count == 0 ? "" : " · PARTIAL");
         _threatBreakdown.Text = $"v1 points · Durability {threat.Durability:0.#} · Leak {threat.Leak:0.#} · Speed {threat.Speed:0.#} · " +
             $"Weapons {threat.Weapons:0.#} · Stealth {threat.Stealth:0.#} · Payload {threat.Payload:0.#}\n" +
             $"Cadence ×{pace:0.00} · Parallel openings ×{overlap:0.00}" +

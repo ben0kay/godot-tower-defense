@@ -66,13 +66,13 @@ public partial class WaveEditorPanel : VBoxContainer
 
         var split = new HSplitContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
         AddChild(split);
-        var wavePane = Pane("Waves", 205, expandHeight: true); split.AddChild(wavePane);
+        var wavePane = Pane(split, "Waves", 205, expandHeight: true);
         _waves = CreateItemList(wavePane, index => { _waveIndex = index; _batchIndex = _enemyIndex = 0; Refresh(); ResetDetailsScroll(); });
         Buttons(wavePane, ("+ Wave", AddWave), ("Duplicate", DuplicateWave), ("Delete", DeleteWave));
         Buttons(wavePane, ("Move ↑", () => MoveWave(-1)), ("Move ↓", () => MoveWave(1)));
         var second = new HSplitContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill, SizeFlagsVertical = SizeFlags.ExpandFill };
         split.AddChild(second);
-        var batchPane = Pane("Batches", 245, expandHeight: true); second.AddChild(batchPane);
+        var batchPane = Pane(second, "Batches", 245, expandHeight: true);
         _batches = CreateItemList(batchPane, index => { _batchIndex = index; _enemyIndex = 0; Refresh(); ResetDetailsScroll(); });
         Buttons(batchPane, ("+ Batch", AddBatch), ("Duplicate", DuplicateBatch), ("Delete", DeleteBatch));
         Buttons(batchPane, ("Move ↑", () => MoveBatch(-1)), ("Move ↓", () => MoveBatch(1)));
@@ -84,7 +84,7 @@ public partial class WaveEditorPanel : VBoxContainer
         details.AddThemeConstantOverride("separation", 10);
         _detailsScroll.AddChild(details);
 
-        _waveFields = Pane("Selected wave", 0); details.AddChild(_waveFields);
+        _waveFields = Pane(details, "Selected wave");
         _waveNumber = Number(_waveFields, "Wave number", 1, 10000, 1, v => { Wave.Number = (int)v; RefreshComposition(); });
         _waveNumber.TooltipText = "Unique positive wave number. Waves play in the list order shown on the left; moving them does not renumber them.";
 
@@ -102,9 +102,9 @@ public partial class WaveEditorPanel : VBoxContainer
             Wave.Schedule = (WaveScheduleMode)i; Dirty(); Refresh();
         };
         BuildAnalysis(_waveFields);
-        _timeline = Pane("Wave timeline · estimated", 0); _waveFields.AddChild(_timeline);
+        _timeline = Pane(_waveFields, "Wave timeline · estimated");
 
-        _batchFields = Pane("Selected batch", 0); details.AddChild(_batchFields);
+        _batchFields = Pane(details, "Selected batch");
         _count = Number(_batchFields, "Total enemies", 1, 100000, 1, v => { Batch.Count = (int)v; RefreshComposition(); });
         _count.TooltipText = "Total ships across all enemy entries in this batch; weights divide this count. Does not add ships per entry.";
         _interval = Number(_batchFields, "Seconds between spawns", 0, 3600, .01, v => { Batch.Interval = v; RefreshComposition(); });
@@ -115,8 +115,7 @@ public partial class WaveEditorPanel : VBoxContainer
             v => { Batch.StartOffsetSeconds = v; RefreshComposition(); });
         _startOffset.TooltipText = "Parallel only. Measured from the accepted wave start, including portal opening time. A late/blocked group waits independently; other groups keep running.";
         // Keep the composition summary immediately beneath count/timing so it is visible without scrolling.
-        var preview = Pane("Live composition · exact counts", 0);
-        _batchFields.AddChild(preview);
+        var preview = Pane(_batchFields, "Live composition · exact counts");
         _compositionPreview = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         _compositionPreview.AddThemeConstantOverride("separation", 3);
         preview.AddChild(_compositionPreview);
@@ -128,7 +127,7 @@ public partial class WaveEditorPanel : VBoxContainer
         _enemies.CustomMinimumSize = new Vector2(0, 135);
         Buttons(_batchFields, ("+ Enemy", AddEnemy), ("Duplicate", DuplicateEnemy), ("Delete", DeleteEnemy));
 
-        _enemyFields = Pane("Selected enemy entry", 0); details.AddChild(_enemyFields);
+        _enemyFields = Pane(details, "Selected enemy entry");
         var enemyPicker = new HBoxContainer();
         Field(_enemyFields, "Enemy type", enemyPicker);
         _enemyId = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill,
@@ -153,7 +152,7 @@ public partial class WaveEditorPanel : VBoxContainer
         _shield.TooltipText = "Start these ships with their configured shield full; this does not add shields to an enemy whose MaxShield is zero.";
         _stealth = Check(_enemyFields, "Spawn with stealth", v => { Entry.Stealth = v; RefreshComposition(); });
         _stealth.TooltipText = "Request starting stealth for this enemy entry. This flag is independent of the Shield flag.";
-        _presentationFields = Pane("Wave presentation (optional)", 0); details.AddChild(_presentationFields);
+        _presentationFields = Pane(details, "Wave presentation (optional)");
         _alert = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         foreach (WaveAlertKind alert in Enum.GetValues<WaveAlertKind>()) _alert.AddItem(alert.ToString());
         Field(_presentationFields, "Alert", _alert);
@@ -198,14 +197,6 @@ public partial class WaveEditorPanel : VBoxContainer
     // Small composable widgets keep the editor structure readable without a bulky .tscn tree.
     private static Button Button(string label, Action clicked)
     { var button = new Button { Text = label }; button.Pressed += clicked; return button; }
-    private static VBoxContainer Pane(string heading, float minWidth, bool expandHeight = false)
-    {
-        // Only the wave/batch list columns stretch vertically; field sections stay compact inside their scroll.
-        var pane = new VBoxContainer { CustomMinimumSize = new Vector2(minWidth, 0),
-            SizeFlagsVertical = expandHeight ? SizeFlags.ExpandFill : SizeFlags.Fill };
-        pane.AddThemeConstantOverride("separation", 7);
-        pane.AddChild(new Label { Text = heading.ToUpperInvariant() }); return pane;
-    }
     private static void Buttons(VBoxContainer parent, params (string label, Action clicked)[] items)
     { var row = new HBoxContainer(); parent.AddChild(row);
         foreach (var item in items) { Button b = Button(item.label, item.clicked); b.SizeFlagsHorizontal = SizeFlags.ExpandFill; row.AddChild(b); }
@@ -214,12 +205,14 @@ public partial class WaveEditorPanel : VBoxContainer
     {
         var list = new ItemList { SelectMode = ItemList.SelectModeEnum.Single, SizeFlagsHorizontal = SizeFlags.ExpandFill,
             SizeFlagsVertical = SizeFlags.ExpandFill };
+        list.AddThemeConstantOverride("v_separation", 7);
         parent.AddChild(list); list.ItemSelected += index => selected((int)index); return list;
     }
     private static void Field(VBoxContainer parent, string label, Control control)
     {
         var row = new HBoxContainer(); parent.AddChild(row);
-        row.AddChild(new Label { Text = label, CustomMinimumSize = new Vector2(175, 0) });
+        row.AddChild(new Label { Text = label, CustomMinimumSize = new Vector2(175, 0),
+            Modulate = new Color(0.78f, 0.83f, 0.89f) });
         control.SizeFlagsHorizontal = SizeFlags.ExpandFill; row.AddChild(control);
     }
     private SpawnSourceEditor AddSourceEditor(VBoxContainer parent, Func<WaveSpawnSourceResource> read, Action<WaveSpawnSourceResource> write)
@@ -559,8 +552,11 @@ public partial class WaveEditorPanel : VBoxContainer
                 row.AddChild(new Label { Text = label, SizeFlagsHorizontal = SizeFlags.ExpandFill,
                     ClipText = true, TooltipText = label });
                 row.AddChild(new Label { Text = $"{counts[i]} / {batch.Count}  ({100.0 * counts[i] / batch.Count:0.#}%)" });
-                _compositionPreview.AddChild(new ProgressBar { MinValue = 0, MaxValue = batch.Count, Value = counts[i],
-                    ShowPercentage = false, CustomMinimumSize = new Vector2(0, 9), SizeFlagsHorizontal = SizeFlags.ExpandFill });
+                var bar = new ProgressBar { MinValue = 0, MaxValue = batch.Count, Value = counts[i],
+                    ShowPercentage = false, CustomMinimumSize = new Vector2(0, 8), SizeFlagsHorizontal = SizeFlags.ExpandFill };
+                bar.AddThemeStyleboxOverride("background", Box(new Color("#171e28"), 0, 3));
+                bar.AddThemeStyleboxOverride("fill", Box(new Color("#399ab3"), 0, 3));
+                _compositionPreview.AddChild(bar);
             }
         }
         catch (ArgumentException error)
@@ -598,8 +594,10 @@ public partial class WaveEditorPanel : VBoxContainer
                 _enemies.AddItem(enemy == null ? "Missing enemy" : $"{EnemyLabel(enemy.EnemyId)}   weight {enemy.Weight:0.##}" +
                     (enemy.Shield ? "  [shield]" : "") + (enemy.Stealth ? "  [stealth]" : ""));
             if (_enemyIndex >= 0 && _enemyIndex < _enemies.ItemCount) _enemies.Select(_enemyIndex);
-            _waveFields.Visible = wave != null; _batchFields.Visible = batchSelected != null;
-            _enemyFields.Visible = Entry != null; _presentationFields.Visible = wave != null;
+            _waveFields.GetParent<PanelContainer>().Visible = wave != null;
+            _batchFields.GetParent<PanelContainer>().Visible = batchSelected != null;
+            _enemyFields.GetParent<PanelContainer>().Visible = Entry != null;
+            _presentationFields.GetParent<PanelContainer>().Visible = wave != null;
             if (wave != null)
             {
                 _schedule.Select((int)wave.Schedule);

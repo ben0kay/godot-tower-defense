@@ -9,6 +9,7 @@ Class = 2
 Rank = 0
 Role = 0
 DisplayName = "Bulwark Drone"
+VisualScale = 0.8
 MaxHealth = 160.0
 MoveSpeed = 75.0
 CitadelDamage = 2

@@ -26,6 +26,14 @@ public partial class EnemyDefinition : Resource
     [Export] public int Armor { get; set; }
     [ExportGroup("Rewards")]
     [Export(PropertyHint.Range, "0,1000000,1")] public int KillRewardCredits { get; set; } = 0;
+    [ExportGroup("Visual Presentation")]
+    private float _visualScale = 1f;
+    [Export(PropertyHint.Range, "0.25,4,0.01")]
+    public float VisualScale
+    {
+        get => _visualScale;
+        set => _visualScale = float.IsFinite(value) ? Mathf.Clamp(value, .25f, 4f) : 1f;
+    }
     [ExportGroup("Death Feedback")]
     [Export(PropertyHint.Range, "0,5,0.1")] public float DeathExplosionMultiplier { get; set; } = 1f;
     [ExportGroup("Damage Appearance")]

@@ -19,6 +19,27 @@ public partial class Enemy : Node2D
     public event Action<Enemy> Initialized;
     public EnemyRegistry Registry => _registry;
     public CitadelDestination AssignedCitadel { get; private set; }
+    private Transform2D? _authoredHullTransform;
+    private Vector2 _authoredHullSize, _visualCentre;
+    internal float AppliedVisualScale { get; private set; } = 1f;
+    internal Vector2 VisualWorldCentre => ToGlobal(_visualCentre);
+
+    // =========================================================
+    // Apply from the authored transform so reinitializing never compounds the multiplier.
+    // The debug preview uses this same entry point on its off-tree source.
+    internal void ApplyHullVisualScale(Sprite2D hull)
+    {
+        AppliedVisualScale = Definition?.VisualScale ?? 1f;
+        if (hull == null) return;
+        _authoredHullTransform ??= hull.Transform;
+        hull.Transform = _authoredHullTransform.Value.Scaled(Vector2.One * AppliedVisualScale);
+    }
+
+    // =========================================================
+    // Weapon range and terrain sight retain the authored mount geometry in gameplay space.
+    internal Vector2 AuthoredWeaponPoint(Vector2 worldPoint) => AppliedVisualScale == 1f ? worldPoint
+        : GlobalPosition + (worldPoint - GlobalPosition) / AppliedVisualScale;
+
     #region Status Effects
     private EnemyStatusEffects _statuses;
     private TimedStatusScheduler _statusClock;
@@ -116,16 +137,25 @@ public partial class Enemy : Node2D
         _defenseBar = GetNodeOrNull<DefenseBar>("DefenseBar");
         // Large hulls get extra bar clearance once, without per-type scene overrides.
         Sprite2D sprite = GetNodeOrNull<Sprite2D>("Sprite");
+        ApplyHullVisualScale(sprite);
         _damageAppearance = Definition.DamageAppearance;
         _damageAppearanceSprite = _damageAppearance != null && _damageAppearance.Stages != null
             && _damageAppearance.Stages.Count > 0 ? sprite : null;
         _damageAppearanceStage = -1;
         RefreshDamageAppearance();
-        // One ET1 visual on the shared enemy, sized from its displayed sprite and base speed.
+        Rect2 hullRect = sprite?.GetRect() ?? default;
+        _authoredHullSize = sprite?.Texture != null
+            ? hullRect.Size * sprite.Scale.Abs() / AppliedVisualScale
+            : Vector2.One * Mathf.Max(8f, Definition.RadiusPixels * 2f);
+        _visualCentre = sprite != null ? sprite.Transform * hullRect.GetCenter() : Vector2.Zero;
         _thruster = GetNodeOrNull<EnemyThrusterVisual>("Thruster");
-        _thruster?.Configure(sprite, Definition);
-        if (_defenseBar != null && sprite?.Texture != null)
-            _defenseBar.SetOwnerVisualHeight(sprite.GetRect().Size.Y * Mathf.Abs(sprite.Scale.Y));
+        _thruster?.Configure(sprite, Definition, AppliedVisualScale);
+        if (_defenseBar != null)
+        {
+            _defenseBar.Scale = Vector2.One * AppliedVisualScale;
+            _defenseBar.SetOwnerVisualHeight(sprite?.Texture != null ? _authoredHullSize.Y : 0f, AppliedVisualScale);
+        }
+        FitShieldVisual();
         _defenseBar?.SetHealth(Health, Definition.MaxHealth);
         SyncShieldVisual(0f, CurrentShield, false);
         _defenseBar?.AlignWithOwner(Rotation);
@@ -270,16 +300,21 @@ public partial class Enemy : Node2D
             _shieldVisual.Name = "ShieldVisual";
             AddChild(_shieldVisual);
 
-            Sprite2D sprite = GetNodeOrNull<Sprite2D>("Sprite");
-            Vector2 dimensions = sprite != null && sprite.Texture != null
-                ? sprite.GetRect().Size * new Vector2(Mathf.Abs(sprite.Scale.X), Mathf.Abs(sprite.Scale.Y))
-                : Vector2.One * Mathf.Max(8f, (Definition?.RadiusPixels ?? 16f) * 2f);
-            _shieldVisual.Position = sprite?.Position ?? Vector2.Zero;
-            _shieldVisual.SetVisualSize(dimensions);
+            FitShieldVisual();
         }
         if (GodotObject.IsInstanceValid(_shieldVisual))
             _shieldVisual.SetShield(before, after, animate);
         RefreshStealthVisual();
+    }
+
+    // =========================================================
+    // Use the pristine hull frame for stable placement across damage textures and reuse.
+    private void FitShieldVisual()
+    {
+        if (!GodotObject.IsInstanceValid(_shieldVisual)) return;
+        _shieldVisual.Position = _visualCentre;
+        _shieldVisual.Scale = Vector2.One * AppliedVisualScale;
+        _shieldVisual.SetVisualSize(_authoredHullSize);
     }
 
     // =========================================================
@@ -301,8 +336,8 @@ public partial class Enemy : Node2D
         {
             KilledBeforeRemoval?.Invoke(this);
             Sprite2D visual = GetNodeOrNull<Sprite2D>("Sprite");
-            float fallback = Mathf.Max(1f, Definition?.RadiusPixels * 2f ?? 32f);
-            DeathExplosion.Spawn(GetNodeOrNull<Node2D>("../../Effects"), GlobalPosition,
+            float fallback = Mathf.Max(1f, (Definition?.RadiusPixels * 2f ?? 32f) * AppliedVisualScale);
+            DeathExplosion.Spawn(GetNodeOrNull<Node2D>("../../Effects"), VisualWorldCentre,
                 DeathExplosion.MeasureVisualSize(visual, fallback), Definition?.DeathExplosionMultiplier ?? 1f);
         }
         _registry.Unregister(this); _registry.RecordOutcome(arrived, this);

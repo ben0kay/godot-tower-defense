@@ -1,3 +1,39 @@
+## SALV1 updated — Resource Storage and two-drone construction (planning only, 2026-11-09)
+
+Revised [SALV1](../TOWERS/Economy/ScrapRefinery/SALV1_IMPLEMENTATION_PLAN.md) so Refinery output stays in its own buffer and is delivered by a material courier to a **separate Resource Storage** building (not an ammo depot, not a wallet grant). Metal-cost construction now plans two Citadel drones: one starts engineering work; the other visits Storage, physically carries Metal to the site, then helps build. Added a real pre-delivery 25% progress cap, material reservations and between-wave save rules. [Resource Storage note](../TOWERS/Economy/ResourceStorage/README.md). **No gameplay code changed.**
+
+---
+
+## SALV1 salvage/refinery implementation plan — 2026-11-09
+
+Planned a physical scrap loop with 1% enemy drop chance, Citadel recovery drones, a placeable Scrap Refinery and Refined Metal as a future mixed-cost tower resource. Plan: [SALV1](../TOWERS/Economy/ScrapRefinery/SALV1_IMPLEMENTATION_PLAN.md). Planning only; no gameplay code or resources added.
+
+---
+
+## Results V2 Codex roadmap update — 2026-11-08
+
+Documentation only: added `UI/Menus/Results/RESULTS_ENHANCEMENT_IMPLEMENTATION_PLAN.md` with focused R3-A/R2-B/R3-B/R3-C1/C2/R4-A/R4-B steps for real Credits, compact overview, wave history, tower attribution and DETAILS, then owner-approved XP rules and celebrations/records. Linked from Results README and unfinished backlog. Existing Results, economy, combat, mission XP, authored waves and saves unchanged; no build or gameplay QA applicable to this documentation edit.
+
+---
+
+## VS1 — Unified Enemy Visual Scale — 2026-11-08
+
+Enemy definitions now author a 0.25–4× visual multiplier. Hull and gun transforms, muzzle positions, thrusters, shield and defense feedback, and F2 artwork use the same scale. Gameplay range and sight retain authored coordinates. Bulwark keeps its 0.8× hull through its definition. Source and scene review only; Godot build and live acceptance remain pending. See [visual authoring notes](../ENEMIES/Shared/Visuals/README.md).
+
+---
+
+## Bulwark Drone visual shrink — 2026-11-08
+
+Changed only `ENEMIES/Types/Enemy004/Enemy004.tscn` Sprite2D scale to **0.8×** (effective display 51.2×38.4px from original SVG 64×48). Artwork itself, navigation clearance radius 22px, Standard class, hull HP and other gameplay remain unchanged; F2 art preview copies the authored Sprite scale. Per-enemy `.tres` currently has no visual scale setting; tweak `Sprite → Transform → Scale` in each enemy scene instead. Source-verified; Godot visual validation pending.
+
+---
+
+## Wave Editor readability polish — 2026-11-08
+
+Separated the editor sections into tinted panels. Wave Analysis uses labeled metric cards, the toolbar keeps the Fleet Threat value prominent, and timeline groups have aligned labels and tracks. Source review only. Check compact editor widths in Godot.
+
+---
+
 ## Lava glow continuity and bubble pops — 2026-11-08
 
 Replaced first-admitted lava point lights and stacking tile glows with a single chunked coverage field around the lava silhouette. The surface uses continuous self-lit color and the bubbles now swell, flash and throw warm flecks at varied intervals. Source review only. Inspect a long lava strip, chunk boundaries, F6 and bubble timing in Godot.

@@ -1,3 +1,9 @@
+## Results V2 planned Codex phases — 2026-11-08
+
+**Plan only; no source implementation yet.** The authoritative next-slice contract is [RESULTS_ENHANCEMENT_IMPLEMENTATION_PLAN.md](RESULTS_ENHANCEMENT_IMPLEMENTATION_PLAN.md). It splits remaining work into R3-A accurate Credits, R2-B compact overview layout, R3-B true per-wave history/chart, R3-C1 damage/tower statistics, R3-C2 active DETAILS subview, R4-A owner-approved scoring/replay policy and R4-B level-up/badges/personal bests; optional logistics and screenshots are later independent work. Existing R1/R2 progress and baseline saved XP stay intact. Older R2/R3/R4 historical checklist below is preserved for context, not permission to rebuild delivered foundations.
+
+---
+
 ## Live battlefield before Results — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** Victory still captures and freezes the official outcome/stat snapshot immediately, but the map now keeps running during VictoryResultsDelaySeconds (default 4s). Drones, existing work, projectiles and effects can finish moving; builder dispatch explicitly permits this visual hold. An invisible mouse-input shield and existing result input bindings prevent new player transactions or Pause takeover, and WaveManager retires automatic/manual future starts. Results pauses the map only when its screen actually opens. Defeat retains its immediate pause/presentation path. Rewards still use the original captured snapshot and once-only ticket.
