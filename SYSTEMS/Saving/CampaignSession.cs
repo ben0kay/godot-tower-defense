@@ -52,6 +52,8 @@ public sealed class CampaignSession
         var sources = towers.ToDictionary(t => t.GetInstanceId(), t => "tower:" + t.SaveId);
         foreach (var objective in citadels.Objectives) sources[objective.Root.GetInstanceId()] = "citadel:" + objective.Id;
         var camera = _battle.GetNode<CameraController>("CameraRig");
+        var salvage = _battle.GetNode<SalvageLogistics>("World/Salvage");
+        salvage.SettleCheckpointOwnership();
         var snapshot = new LevelSaveData
         {
             LevelId = session.SavedLevelId, ContentHash = ContentHash(Mission(session.SavedLevelId)),
@@ -60,6 +62,7 @@ public sealed class CampaignSession
             Balances = _battle.GetNode<EconomyManager>("Economy").CaptureCheckpoint(), Research = citadels.Research.CaptureCheckpoint(),
             RewardTicket = session.SavedRewardTicket, Run = session.CaptureCheckpoint(), Citadels = citadels.CaptureCheckpoint(),
             Towers = towers.Select(t => t.CaptureCheckpoint(id => sources.GetValueOrDefault(id))).ToList(),
+            Salvage = salvage.CaptureCheckpoint(),
             Logistics = _battle.GetNode<AmmunitionLogistics>("World/AmmunitionLogistics").CaptureCheckpoint(),
             BuilderRetry = _battle.GetNode<ConstructionDroneManager>("World/ConstructionDrones").SavedRetry,
             Builders = _battle.GetNode<ConstructionDroneManager>("World/ConstructionDrones").CaptureCheckpoint(),
@@ -157,6 +160,7 @@ public sealed class CampaignSession
         foreach (var saved in data.Towers) towers[saved.Id].RestoreCheckpoint(saved, Source);
         _battle.GetNode<AmmunitionLogistics>("World/AmmunitionLogistics").RestoreCheckpoint(data.Logistics, towers);
         _battle.GetNode<ConstructionDroneManager>("World/ConstructionDrones").RestoreCheckpoint(data.Builders, towers, data.BuilderRetry);
+        _battle.GetNode<SalvageLogistics>("World/Salvage").RestoreCheckpoint(data.Salvage, towers);
         _battle.GetNode<EconomyManager>("Economy").RestoreCheckpoint(data.Balances);
         session.RestoreCheckpoint(data, towers.Values);
         _battle.GetNode<WaveManager>("Waves").RestoreCheckpoint(data.CompletedWaves, data.WaveRandomState, data.NextWaveAutoStartSeconds);

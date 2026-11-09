@@ -1,10 +1,13 @@
-// Inspector-authored visual-only Resource Storage building. SALV1 production/logistics will add physical stock later.
+// Shared tower lifecycle and SALV1 physical material settings.
 using Godot;
 using System;
 
 [GlobalClass]
 public partial class ResourceStorageConfig : TowerConfig
 {
+    [ExportGroup("Physical Stock")]
+    [Export(PropertyHint.Range, "1,1000,1")] public int MetalCapacity { get; set; } = 100;
+
     [ExportGroup("Construction")]
     [Export(PropertyHint.Range, "0,1000000,1,or_greater")]
     public int ConstructionCredits
@@ -23,10 +26,10 @@ public partial class ResourceStorageConfig : TowerConfig
     public ResourceStorageConfig()
     {
         DisplayName = "Resource Storage";
-        Description = "Armoured material vault. Future SALV1 deliveries store Refined Metal separately from ammunition.";
+        Description = "Armoured material vault. Stores Refined Metal separately from ammunition.";
         ConstructionCosts = new TowerLevel(1, 200, default).Costs;
         ConstructionSeconds = 4; MaxHealth = 1000;
     }
 
-    public override string DescribeStats(TowerFinalStats final) => "Planned: physical Refined Metal storage (SALV1)";
+    public override string DescribeStats(TowerFinalStats final) => "Physical Refined Metal storage";
 }

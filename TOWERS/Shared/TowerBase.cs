@@ -200,7 +200,7 @@ public abstract partial class TowerBase : Node2D
     public double ElapsedWorkSeconds { get; private set; }
     public double WorkSeconds { get; private set; }
     public double RemainingWorkSeconds => System.Math.Max(0, WorkSeconds - ElapsedWorkSeconds);
-    public double WorkProgress => WorkSeconds <= 0 ? 1 : System.Math.Clamp(ElapsedWorkSeconds / WorkSeconds, 0, 1);
+    public double WorkProgress => WorkSeconds <= 0 ? (WorkPhase == TowerWorkPhase.Constructing ? 0 : 1) : System.Math.Clamp(ElapsedWorkSeconds / WorkSeconds, 0, 1);
     public bool IsOperational => !IsDestroyed && WorkPhase != TowerWorkPhase.Constructing;
     public bool IsBusy => WorkPhase != TowerWorkPhase.Operational;
     public event Action UpgradePurchased;
@@ -215,6 +215,23 @@ public abstract partial class TowerBase : Node2D
     private double _lastWorkNotice;
     public TowerWorkState CaptureWorkState() => new(WorkPhase, ElapsedWorkSeconds, WorkSeconds, PendingUpgradeLevel);
 
+    internal int RequiredMetal { get; private set; }
+    internal bool MaterialsDelivered { get; private set; }
+    internal double MetalPreparationFraction { get; private set; }
+    internal bool WaitingAtMetalCap => WorkPhase == TowerWorkPhase.Constructing && RequiredMetal > 0 &&
+        !MaterialsDelivered && ElapsedWorkSeconds >= WorkSeconds * MetalPreparationFraction;
+
+    internal void RequireMetal(int amount, double fraction)
+    { RequiredMetal = amount; MetalPreparationFraction = fraction; }
+
+    internal void DeliverMetal()
+    {
+        if (MaterialsDelivered) return;
+        MaterialsDelivered = true;
+        if (!AwaitingConstructionDrone && GodotObject.IsInstanceValid(_construction)) _construction.Resume(this);
+        WorkProgressChanged?.Invoke();
+    }
+
     // =========================================================
     // Paid placement calls this before AddChild/Ready; direct scene instances remain operational by default.
     internal void StartConstruction(ConstructionWorkManager manager, ConstructionDroneManager builders = null)
@@ -222,10 +239,10 @@ public abstract partial class TowerBase : Node2D
         if (IsInsideTree() || IsBusy) throw new InvalidOperationException("Construction must start before placement.");
         double seconds = AuthoredConfig.BuildSeconds;
         TowerConfig.ValidateWorkSeconds(seconds);
-        if (seconds > 0 && (!GodotObject.IsInstanceValid(manager) || !manager.IsInsideTree() || manager.IsQueuedForDeletion()))
+        if ((seconds > 0 || RequiredMetal > 0) && (!GodotObject.IsInstanceValid(manager) || !manager.IsInsideTree() || manager.IsQueuedForDeletion()))
             throw new InvalidOperationException("Construction requires a live world manager.");
         WorkSeconds = seconds; ElapsedWorkSeconds = 0; _lastWorkNotice = 0;
-        if (seconds == 0) return; // Zero-duration compatibility has no inactive tick or job.
+        if (seconds == 0 && RequiredMetal == 0) return; // Zero-duration compatibility has no inactive tick or job.
         WorkPhase = TowerWorkPhase.Constructing; _construction = manager;
         _constructionDroneOwner = builders;
         ConstructionDroneReservation = builders?.Reserve() ?? 0;
@@ -241,7 +258,7 @@ public abstract partial class TowerBase : Node2D
     {
         if (!IsHeldBy(owner) || reservation != ConstructionDroneReservation || IsDestroyed || IsQueuedForDeletion()) return false;
         _constructionDroneOwner = null;
-        if (GodotObject.IsInstanceValid(_construction)) _construction.Resume(this);
+        if (GodotObject.IsInstanceValid(_construction) && !WaitingAtMetalCap) _construction.Resume(this);
         WorkProgressChanged?.Invoke(); return true;
     }
 
@@ -255,6 +272,17 @@ public abstract partial class TowerBase : Node2D
     internal void AdvanceWork(ConstructionWorkManager manager, double delta)
     {
         if (_construction != manager || !IsBusy || AwaitingConstructionDrone) return;
+        if (WorkPhase == TowerWorkPhase.Constructing && RequiredMetal > 0 && !MaterialsDelivered)
+        {
+            double limit = WorkSeconds * MetalPreparationFraction;
+            if (ElapsedWorkSeconds + delta >= limit)
+            {
+                ElapsedWorkSeconds = _lastWorkNotice = limit;
+                manager.Hold(this);
+                WorkProgressChanged?.Invoke();
+                return;
+            }
+        }
         double remaining = RemainingWorkSeconds;
         if (delta >= remaining || remaining - delta <= 1e-9)
         {
@@ -270,7 +298,11 @@ public abstract partial class TowerBase : Node2D
                 if (GodotObject.IsInstanceValid(this) && IsInsideTree() && !IsQueuedForDeletion())
                 { SetPhysicsProcess(_operationalPhysics); PublishDisableChanged(); }
             }
-            else { SetPhysicsProcess(_operationalPhysics); OnBecameOperational(); }
+            else
+            {
+                RequiredMetal = 0; MaterialsDelivered = false; MetalPreparationFraction = 0;
+                SetPhysicsProcess(_operationalPhysics); OnBecameOperational();
+            }
             // A stat/inventory observer may have removed this building during activation.
             if (GodotObject.IsInstanceValid(this) && IsInsideTree() && !IsQueuedForDeletion())
             {

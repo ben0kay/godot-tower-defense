@@ -1,11 +1,7 @@
-# Scrap Refinery — visual building implemented (SALV1 logistics pending)
+# Scrap Refinery
 
-**Current source:** `ScrapRefinery.tscn`, `ScrapRefinery.cs`, `ScrapRefineryConfig.cs`, `DefaultScrapRefineryConfig.tres` and `ScrapRefineryDefinition.tres`. Registered in the Economy category with the stable ID `scrap_refinery`.
+Place this 2×2 Economy building for 350 Credits. Its existing artwork, five-second construction and 1,000 HP use the normal tower lifecycle.
 
-The finished `Artwork/refinery.svg` is a **128×128 top-down 2×2 design**: a slightly cylindrical rust-brown smelting drum, curved elliptical hatch, dark industrial footing, pipework, riveted bands and warm molten inspection window. This is a real scene and icon, not just concept art. Footprint, placement, ordinary paid Credits construction, shared construction drone/hologram, durability, pause and normal tower saving follow existing TowerBase mechanisms.
+Citadel salvage drones collect physical Scrap drops and deliver them to an operational refinery. By default the refinery stores 20 raw Scrap and makes 5 Metal from 1 Scrap in 8 seconds. Output stays in the refinery's 50-Metal buffer until a shared-body courier delivers it to [Resource Storage](../ResourceStorage/README.md). Refining pauses when disabled or out of output room.
 
-**Provisional values:** 2×2 footprint, 350 Credits, 5s construction, 1,000 hull HP. Adjust Credits/time/HP in `DefaultScrapRefineryConfig.tres`; the 2×2 footprint is authored on its `TowerDefinition`.
-
-**Not implemented in this artwork/building-shell pass:** Scrap intake, physical input/output buffers, refining clock, metal couriers, metal economy, SALV1 saving or dual-drone material construction. The selected-building Inspector explicitly identifies these as **pending**. No credits/resources appear from this building.
-
-**Future integration:** follow the [SALV1 full implementation plan](SALV1_IMPLEMENTATION_PLAN.md), starting from this existing scene/config/artwork instead of recreating the building. Its future output must remain local physical Refined Metal, transferred to [Resource Storage](../ResourceStorage/README.md), never an automatic wallet grant.
+Tune building capacities and timing in `DefaultScrapRefineryConfig.tres`. Tune mission drop chance, dispatch limits, flight speed and construction preparation in `ECONOMY/Salvage/DefaultSalvageConfig.tres`. The selected inspector shows raw and inbound Scrap, batch progress, local output and outgoing cargo. See the [SALV1 plan](SALV1_IMPLEMENTATION_PLAN.md) for the test scenarios.

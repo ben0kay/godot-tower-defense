@@ -16,6 +16,7 @@ public sealed record LevelSaveData
     public RunSaveData Run { get; init; } = new();
     public List<CitadelSaveData> Citadels { get; init; } = new();
     public List<TowerSaveData> Towers { get; init; } = new();
+    public SalvageSaveData Salvage { get; init; }
     public LogisticsSaveData Logistics { get; init; } = new();
     public double BuilderRetry { get; init; }
     public List<BuilderSaveData> Builders { get; init; } = new();
@@ -51,6 +52,9 @@ public sealed record TowerSaveData
     public TowerTargeting.Priority? Priority { get; init; }
     public TowerWorkState Work { get; init; }
     public bool Held { get; init; }
+    public int RequiredMetal { get; init; }
+    public bool MaterialsDelivered { get; init; }
+    public double MetalPreparationFraction { get; init; }
     public float Heat { get; init; }
     public bool Overheated { get; init; }
     public List<DisableSaveData> Disables { get; init; } = new();

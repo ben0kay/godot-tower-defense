@@ -47,6 +47,7 @@ public partial class GameplayHUD : Control
     private ScrollContainer _buildScroll;
     private HBoxContainer _bottomArea;
     private Control _traySlot;
+    private Label _storedMetal;
     private Label _wave, _credits, _core, _towerName, _towerCategory, _towerStats, _towerNotes;
     private Button _startWave, _upgradeButton;
     private Label _upgradeInfo, _upgradeActionText, _upgradeCostText, _runtimeStats, _upgradeTitle, _targetValue;
@@ -117,6 +118,9 @@ public partial class GameplayHUD : Control
 
         _wave = GetNode<Label>("TopBar/Status/Wave");
         _credits = GetNode<Label>("TopBar/Status/Credits");
+        _storedMetal = new Label { MouseFilter = MouseFilterEnum.Ignore, ClipText = true,
+            TooltipText = "Physical Refined Metal in Resource Storage, including reserved stock." };
+        _credits.GetParent().AddChild(_storedMetal);
         SetProcess(false);
         _creditGain = GetNode<CreditGainIndicator>("TopBar/Status/CreditGain");
         _creditGain.Configure(Config);
@@ -468,7 +472,9 @@ public partial class GameplayHUD : Control
                 ? Config.EnergyLowColor.Lerp(Config.EnergyMidColor, (float)(fraction * 2))
                 : Config.EnergyMidColor.Lerp(Config.EnergyFullColor, (float)((fraction - .5d) * 2));
         }
-        string status = tower.DescribeRuntime();
+        string status = tower.RequiredMetal > 0 && tower.IsBusy
+            ? GetNodeOrNull<SalvageLogistics>("../../World/Salvage")?.DescribeConstruction(tower) ?? "Waiting for Refined Metal"
+            : tower.DescribeRuntime();
         int separator = status.LastIndexOf('\n');
         SetRuntimeDetails(tower is PowerDistributionBuilding ? status : separator >= 0 ? status[(separator + 1)..] : status);
     }
@@ -710,6 +716,8 @@ public partial class GameplayHUD : Control
 
     // =========================================================
     // The wallet supplies the true amount immediately; only the displayed counter eases toward it.
+    public void SetStoredMetal(long amount) { if (_storedMetal != null) _storedMetal.Text = $"Metal in storage: {amount:N0}"; }
+
     public void SetCredits(int amount, bool immediate = false)
     {
         _targetCredits = amount;
@@ -950,6 +958,7 @@ public partial class GameplayHUD : Control
         float centerWidth = Mathf.Min(_citadelRow == null ? Config.CitadelBlockWidth : Config.MultiCitadelBlockWidth, width * 0.46f);
         float sideWidth = Mathf.Max(0f, (width - centerWidth) * 0.5f - margin - Config.StatusGapPixels);
         _credits.Position = new Vector2(margin, 0); _credits.Size = new Vector2(sideWidth, height);
+        _storedMetal.Position = new Vector2(margin, height + 3); _storedMetal.Size = new Vector2(sideWidth, 22);
         _wave.Position = new Vector2(width - margin - sideWidth, 0); _wave.Size = new Vector2(sideWidth, height);
         LayoutCreditFeedback();
         Control center = status.GetNode<Control>("Citadel");

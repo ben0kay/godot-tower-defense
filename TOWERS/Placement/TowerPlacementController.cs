@@ -24,12 +24,14 @@ public partial class TowerPlacementController : Node2D
     private EconomyManager _economy;
     private bool _affordable, _previewDirty;
     private string _previewFailure;
+    private string _buildPriceFailure;
     private WorldGrid _grid;
     private GameplayHUD _hud;
     private SpawnManager _spawns;
     private Node2D _towers;
     private ConstructionWorkManager _construction;
     private ConstructionDroneManager _builders;
+    private SalvageLogistics _salvage;
     private TowerPlacementGhost _ghost;
     private readonly Dictionary<Vector2I, TowerBase> _placedTowers = new();
     private Vector2I _hoverCell = new(int.MinValue, int.MinValue);
@@ -66,6 +68,8 @@ public partial class TowerPlacementController : Node2D
         _construction = GetNode<ConstructionWorkManager>("../World/ConstructionWork");
         _builders = GetNodeOrNull<ConstructionDroneManager>("../World/ConstructionDrones"); _builders?.Bind(this);
         _hud = GetNode<GameplayHUD>("../UI/GameplayHUD");
+        _salvage = GetNodeOrNull<SalvageLogistics>("../World/Salvage");
+        if (_salvage != null) { _salvage.StockChanged += OnMetalStockChanged; OnMetalStockChanged(); }
         _selectionOverlay = new TowerSelectionOverlay { Name = "SelectedTowerOverlay" };
         AddChild(_selectionOverlay);
         _selectionOverlay.Configure(_grid, _hud);
@@ -105,6 +109,7 @@ public partial class TowerPlacementController : Node2D
     // Avoid subscriptions retaining scenes that are no longer alive.
     public override void _ExitTree()
     {
+        if (GodotObject.IsInstanceValid(_salvage)) _salvage.StockChanged -= OnMetalStockChanged;
         InvalidateSale();
         if (GodotObject.IsInstanceValid(_hud)) { _hud.TowerSellRequested -= OnSellRequested; _hud.TowerSellConfirmed -= OnSellConfirmed; }
         UnbindPowerLinkActions();
@@ -143,7 +148,7 @@ public partial class TowerPlacementController : Node2D
         if (GodotObject.IsInstanceValid(_buildDefinition?.DefaultConfig)) _buildDefinition.DefaultConfig.Changed -= OnPreviewConfigChanged;
         _buildDefinition = choice; choice.DefaultConfig.Changed += OnPreviewConfigChanged;
         _ghost.LoadFinishedLevelOne(choice); SelectTower(null); _browsingBuild = true;
-        _affordable = _economy.CanAfford(choice.DefaultConfig.ConstructionCosts);
+        RefreshBuildAffordability();
         RefreshBuildDetails(); return true;
     }
 
@@ -165,7 +170,7 @@ public partial class TowerPlacementController : Node2D
             if (final.ShotsPerSecond > 0) info += $"\nRate: {final.ShotsPerSecond:0.##} shots/s";
         }
         _hud.ShowTowerDetails(_buildDefinition.DisplayName, _buildDefinition.Category + " / Build Preview", info,
-            _affordable ? "CAN AFFORD — Click to place." : "INSUFFICIENT RESOURCES");
+            _affordable ? "CAN AFFORD — Click to place." : BuildPriceFailure());
     }
 
     // =========================================================
@@ -175,7 +180,7 @@ public partial class TowerPlacementController : Node2D
         if (GetTree().Paused || _placing) return;
         if (!PreviewBuild(id)) { CancelPlacement(); SelectTower(null); _hud.ClearInspection(); return; }
         if (!_affordable)
-        { EmitSignal(SignalName.BuildDenied, id, "Insufficient resources."); GetViewport().SetInputAsHandled(); return; }
+        { EmitSignal(SignalName.BuildDenied, id, BuildPriceFailure()); GetViewport().SetInputAsHandled(); return; }
         _browsingBuild = false; _placing = true; _previewDirty = true;
         _hud.ClearInspection(); _hud.SetPlacementPresentation(true);
         SetProcess(true); UpdatePreview(); GetViewport().SetInputAsHandled();
@@ -198,6 +203,7 @@ public partial class TowerPlacementController : Node2D
     private void RefreshPreview(Vector2I cell, bool visible)
     {
         string failure = _grid.PlacementFailure(cell, _buildDefinition.Footprint);
+        if (failure.Length == 0 && !_affordable) failure = _buildPriceFailure ?? "Insufficient resources.";
         bool valid = visible && _affordable && failure.Length == 0;
         if (!_previewDirty && _previewVisible == visible && _previewValid == valid && _previewFailure == failure && (!visible || cell == _hoverCell))
             return;
@@ -304,8 +310,8 @@ public partial class TowerPlacementController : Node2D
     private void TryPlace(Vector2I cell)
     {
         if (_buildDefinition == null || !_buildDefinition.Available) return;
-        if (!_economy.CanAfford(_buildDefinition.DefaultConfig.ConstructionCosts))
-        { ShowPlacementFailure("Insufficient resources."); return; }
+        string priceFailure = BuildPriceFailure();
+        if (priceFailure.Length != 0) { ShowPlacementFailure(priceFailure); return; }
         string failure = _spawns.PlacementFailure(cell, _buildDefinition.Footprint);
         if (failure.Length != 0)
         {
@@ -313,18 +319,20 @@ public partial class TowerPlacementController : Node2D
             return;
         }
         TowerBase tower = null;
-        if (!_economy.TryPurchase(_buildDefinition.DefaultConfig.ConstructionCosts, () => CommitTower(cell, out tower), paid => tower.RecordCreditsPaid(paid)))
+        var wallet = WalletRecipe(out int metal);
+        if (!_economy.TryPurchase(wallet, () => CommitTower(cell, metal, out tower), paid => tower.RecordCreditsPaid(paid)))
         {
-            ShowPlacementFailure(_economy.CanAfford(_buildDefinition.DefaultConfig.ConstructionCosts)
-                ? "Tower creation failed; no resources charged." : "Insufficient resources.");
+            ShowPlacementFailure(BuildPriceFailure().Length == 0
+                ? "Tower creation failed; no resources charged." : BuildPriceFailure());
             return;
         }
+        if (metal > 0) _salvage.PublishReservation(tower);
         TowerPlaced?.Invoke(tower);
         _placedInputFrame = Engine.GetProcessFrames();
         if (_rightShiftHeld)
         {
             // One committed tower per click; preserve the current catalog type and ghost.
-            _affordable = _economy.CanAfford(_buildDefinition.DefaultConfig.ConstructionCosts);
+            RefreshBuildAffordability();
             _previewDirty = true; UpdatePreview();
             return;
         }
@@ -342,7 +350,7 @@ public partial class TowerPlacementController : Node2D
 
     // =========================================================
     // Roll back occupancy and the scene on creation failure, before the wallet deducts payment.
-    private bool CommitTower(Vector2I cell, out TowerBase tower)
+    private bool CommitTower(Vector2I cell, int metal, out TowerBase tower)
     {
         tower = null;
         bool occupied = false;
@@ -360,6 +368,9 @@ public partial class TowerPlacementController : Node2D
             if (tower.Levels.Count > 0) tower.ResolveLevel(1); // Fail invalid inputs before occupancy/Ready/payment.
             if (!_grid.TryOccupy(cell, _buildDefinition.Footprint)) { tower.Free(); tower = null; return false; }
             occupied = true;
+            Vector2 worldCenter = _grid.FootprintCenter(cell, _buildDefinition.Footprint);
+            if (metal > 0 && !_salvage.ReserveConstruction(tower, metal, worldCenter))
+                throw new InvalidOperationException("Material reservation failed.");
             tower.StartConstruction(_construction, GodotObject.IsInstanceValid(_builders) && _builders.CanGate ? _builders : null);
             tower.Position = _towers.ToLocal(_grid.FootprintCenter(cell, _buildDefinition.Footprint));
             _towers.AddChild(tower);
@@ -375,7 +386,11 @@ public partial class TowerPlacementController : Node2D
         }
         catch (Exception exception)
         {
-            if (GodotObject.IsInstanceValid(tower)) tower.CancelConstruction();
+            if (GodotObject.IsInstanceValid(tower))
+            {
+                if (metal > 0) _salvage.RollbackConstruction(tower);
+                tower.CancelConstruction();
+            }
             if (tower != null) RemovePlacement(tower, cell, _buildDefinition.Footprint);
             if (GodotObject.IsInstanceValid(tower)) tower.Free();
             if (occupied) _grid.ReleaseOccupancy(cell, _buildDefinition.Footprint);
@@ -401,11 +416,50 @@ public partial class TowerPlacementController : Node2D
         _previewDirty = true;
     }
 
+    private Godot.Collections.Array<ResourceCost> WalletRecipe(out int metal)
+    {
+        var recipe = _buildDefinition.DefaultConfig.ConstructionCosts;
+        metal = 0;
+        Godot.Collections.Array<ResourceCost> wallet = null;
+        foreach (ResourceCost cost in recipe)
+        {
+            if (!SalvageLogistics.IsMetal(cost)) continue;
+            metal = (int)Math.Min(int.MaxValue, (long)metal + Math.Max(0, cost.Amount));
+            wallet ??= new Godot.Collections.Array<ResourceCost>();
+        }
+        if (wallet == null) return recipe;
+        foreach (ResourceCost cost in recipe) if (!SalvageLogistics.IsMetal(cost)) wallet.Add(cost);
+        return wallet;
+    }
+
+    private string BuildPriceFailure()
+    {
+        var wallet = WalletRecipe(out int metal);
+        if (metal > 0)
+        {
+            string shortage = _salvage?.PlacementFailure(metal) ?? "Material logistics unavailable.";
+            if (shortage.Length != 0) return shortage;
+        }
+        return _economy.CanAfford(wallet) ? "" : "Insufficient resources.";
+    }
+
+    private void RefreshBuildAffordability()
+    {
+        _buildPriceFailure = _buildDefinition == null ? "No building selected." : BuildPriceFailure();
+        _affordable = _buildPriceFailure.Length == 0;
+    }
+
+    private void OnMetalStockChanged()
+    {
+        _hud.SetStoredMetal(_salvage.StoredMetal);
+        if (_buildDefinition != null) OnBalanceChanged(SalvageLogistics.MetalId, 0);
+    }
+
     // =========================================================
     // Refresh affordability only when wallet state changes, not on every preview frame.
     private void OnBalanceChanged(string resourceId, int amount)
     {
-        _affordable = _buildDefinition != null && _economy.CanAfford(_buildDefinition.DefaultConfig.ConstructionCosts);
+        RefreshBuildAffordability();
         _previewDirty = true;
         if (_browsingBuild) RefreshBuildDetails();
         else if (_hud.IsInspectionVisible) RefreshUpgradePreview();
@@ -562,7 +616,7 @@ public partial class TowerPlacementController : Node2D
     private void OnPreviewConfigChanged()
     {
         _previewDirty = true;
-        _affordable = _buildDefinition != null && _economy.CanAfford(_buildDefinition.DefaultConfig.ConstructionCosts);
+        RefreshBuildAffordability();
         if (_browsingBuild) RefreshBuildDetails();
         else if (_placing && _selected == null) UpdatePreview();
     }

@@ -1,7 +1,7 @@
 # SALV1 — Scrap Recovery, Refining, Resource Storage and Two-Drone Construction
 
 **Repository:** `ben0kay/godot-tower-defense` · **Branch:** `dev` only  
-**Status:** **APPROVED DESIGN DIRECTION / IMPLEMENTATION PLAN — NOT YET IMPLEMENTED**  
+**Status:** **SOURCE IMPLEMENTED / AWAITING OWNER VALIDATION**
 **Purpose:** Replace the earlier SALV1 wallet-output concept with a complete, physically transported raw-material economy. This document is the **single authoritative SALV1 plan**; do not implement its superseded earlier wallet-grant variant.  
 **Implementation instruction:** Follow stages A–G sequentially, building on existing systems. Do not create unrelated advanced resources, research nodes, towers with mandatory metal costs, new economy singletons or global UI overhauls.
 
@@ -208,6 +208,6 @@ Plan stages are deliberately separable; complete integrated gameplay before mark
 
 **Minimal validation:** source/diff review, at most one practical basic build, no extended test runs unless necessary. Owner handles visual, balance and FPS acceptance. Keep updates brief in `NOTES/WORK.md` and owning feature READMEs.
 
-**When explicitly assigned to Codex:** implement only this SALV1 plan on `dev`, commit and push without touching `main`, and report code changes, settings, limitations, validations and owner testing guidance. Until then, **this document is planning only**.
+**When explicitly assigned to Codex:** implement only this SALV1 plan on `dev`, commit and push without touching `main`, and report code changes, settings, limitations, validations and owner testing guidance.
 
 **Future optional expansions:** Research increasing scrap chance, research increasing drone slots/refinery efficiency, authored metal-bearing tower tiers, material-based upgrades, cross-mission inventory, powered refining, rare alloys and additional storage resources.

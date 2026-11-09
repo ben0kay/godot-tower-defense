@@ -1,3 +1,9 @@
+## SALV1 — Physical scrap and metal logistics — 2026-11-09
+
+Genuine enemy kills roll for physical Scrap. Shared-body drones recover it, deliver refinery output to Resource Storage and supply material-bearing construction from a Citadel. The canonical build clock gates work until delivery. HUD/inspector and between-wave checkpoints track physical ownership. No existing tower recipe was changed. Source review only. Verify the full loop, failure cases and Save/Continue in Godot.
+
+---
+
 ## DBG1 — F1 Debug Hub controls/Building Lookup plan (2026-11-09)
 
 Documentation only: added [DBG1](../DEBUG/DebugHub/DEBUG_HUB_IMPLEMENTATION_PLAN.md) under DEBUG. Defines an F1 master menu for Enemy Spawner, read-only tower/building L1–L3 artwork preview and Route Preview; direct F2 performance, Shift+F2 profiling, F3 sample export, F4 alert tests, retiring F9 Audio Tester, while retaining F11 and gameplay controls. Codex implementation still pending; no runtime bindings or scenes changed.

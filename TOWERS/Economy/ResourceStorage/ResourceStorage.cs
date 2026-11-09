@@ -1,4 +1,4 @@
-// Placeable visual ResourceStorage; reuse normal construction/hull/Inspector/saving, no SALV1 inventory yet.
+// Placeable SALV1 building with mission-local physical stock.
 using Godot;
 using System.Collections.Generic;
 
@@ -15,9 +15,12 @@ public partial class ResourceStorage : TowerBase
     protected override void ApplyConfig(TowerConfig config) => Config = (ResourceStorageConfig)config;
     public override bool ValidateScene() => Config != null && GetNodeOrNull<Sprite2D>("Sprite")?.Texture != null;
 
-    // =========================================================
-    // Design-pass only: SALV1 will introduce physical stock and valid dispatch ownership.
+    internal int Metal, Reserved, Incoming;
+    internal int Capacity => Mathf.Clamp(Config.MetalCapacity, 1, 1000);
+    internal int Available => Metal - Reserved;
+    internal int Room => Capacity - Metal - Incoming;
     public override void _Ready() { SetProcess(false); SetPhysicsProcess(false); }
     public override string DescribeRuntime() =>
-        IsBusy ? "Construction in progress · Metal storage pending" : "Metal storage pending — SALV1 not connected";
+        $"Metal {Metal}/{Capacity} · Reserved {Reserved} · Incoming {Incoming} · Available {Available}" +
+        (CanOperate ? "" : " · Offline");
 }

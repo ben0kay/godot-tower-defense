@@ -20,6 +20,7 @@ public abstract partial class TowerBase
         {
             Id = SaveId, TypeId = TowerTypeId, X = GridCell.X, Y = GridCell.Y, Tier = UpgradeLevel,
             XP = RankProgress.TotalXp, Health = Health, CreditsInvested = CreditsInvested, Priority = TargetPriority, Work = CaptureWorkState(), Held = AwaitingConstructionDrone,
+            RequiredMetal = RequiredMetal, MaterialsDelivered = MaterialsDelivered, MetalPreparationFraction = MetalPreparationFraction,
             Heat = CurrentHeat, Overheated = IsOverheated, Disables = _conditions?.CaptureCheckpoint(sourceKey, Power?.NoPowerHandle ?? default) ?? new(),
             Ammo = inventory?.Amount, Consumed = Ammunition?.ConsumedRounds ?? 0, Discarded = Ammunition?.DiscardedRounds ?? 0,
             BeamCredit = Ammunition?.SavedBeamCredit ?? 0,
@@ -46,6 +47,13 @@ public abstract partial class TowerBase
             policy.TargetPriority = data.Priority.Value;
         }
         else if (TargetPriority.HasValue) throw new InvalidDataException("Missing targeting policy.");
+        long authoredMetal = 0;
+        foreach (var cost in AuthoredConfig.ConstructionCosts)
+            if (SalvageLogistics.IsMetal(cost)) authoredMetal += cost.Amount;
+        if (data.Work.Phase == TowerWorkPhase.Constructing && data.RequiredMetal != authoredMetal)
+            throw new InvalidDataException("Saved material recipe differs.");
+        RequireMetal(data.RequiredMetal, data.MetalPreparationFraction);
+        MaterialsDelivered = data.MaterialsDelivered;
         WorkPhase = data.Work.Phase; ElapsedWorkSeconds = _lastWorkNotice = data.Work.ElapsedSeconds;
         WorkSeconds = data.Work.TotalSeconds; PendingUpgradeLevel = data.Work.PendingUpgradeLevel;
         if (WorkPhase == TowerWorkPhase.Upgrading && (PendingUpgradeLevel != UpgradeLevel + 1 || PendingUpgradeLevel > Levels.Count))

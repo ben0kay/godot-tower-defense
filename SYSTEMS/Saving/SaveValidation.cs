@@ -32,6 +32,18 @@ public static class SaveValidation
                 throw new InvalidDataException("Invalid next-wave countdown.");
         }
         List(data.Towers); List(data.Citadels, 64); List(data.Builders); List(data.Balances, 64);
+        if (data.Salvage is { } salvage)
+        {
+            List(salvage.Drops, 64); List(salvage.Stocks); List(salvage.Jobs, 4160); List(salvage.Holding, 64);
+            Unique(salvage.Stocks.Select(s => s.Id));
+            foreach (var drop in salvage.Drops) { Point(drop.Position); Number(drop.Remaining); }
+            foreach (var job in salvage.Jobs)
+            {
+                Point(job.Position); Number(job.Hover); job.Motion?.ValidateFlight();
+                foreach (string id in new[] { job.Home, job.Refinery, job.Storage, job.Site })
+                    if (id != "") Text(id);
+            }
+        }
         if (data.Citadels.Count == 0 || data.Research == null || data.Run == null || data.Logistics == null || data.RewardTicket == null)
             throw new InvalidDataException("Incomplete checkpoint.");
         var ticket = data.RewardTicket;
@@ -43,7 +55,11 @@ public static class SaveValidation
         Number(data.Run.Killed); Number(data.Run.Breached); Number(data.Run.Placed); Number(data.Run.Constructed);
         Number(data.Run.Upgrades); Number(data.Run.Seconds);
         if (data.Run.Constructed > data.Run.Placed) throw new InvalidDataException("Invalid construction telemetry.");
-        foreach (var pair in data.Balances) Text(pair.Key);
+        foreach (var pair in data.Balances)
+        {
+            Text(pair.Key);
+            if (pair.Key == SalvageLogistics.MetalId) throw new InvalidDataException("Physical Metal cannot be stored in the wallet.");
+        }
         Unique(data.Towers.Select(t => t.Id)); Unique(data.Citadels.Select(c => c.Id));
         foreach (var citadel in data.Citadels)
         { if (citadel.Health < 1 || citadel.Credits < 0) throw new InvalidDataException("Invalid Citadel checkpoint."); Number(citadel.ProductionSeconds); }
@@ -73,10 +89,17 @@ public static class SaveValidation
             }
             Number(tower.XP); Number(tower.Heat); Number(tower.Work.ElapsedSeconds); Number(tower.Work.TotalSeconds);
             if (tower.Work.ElapsedSeconds > tower.Work.TotalSeconds ||
-                (tower.Work.Phase != TowerWorkPhase.Operational && tower.Work.ElapsedSeconds >= tower.Work.TotalSeconds) ||
+                (tower.Work.Phase != TowerWorkPhase.Operational && tower.Work.ElapsedSeconds >= tower.Work.TotalSeconds &&
+                    !(tower.Work.Phase == TowerWorkPhase.Constructing && tower.RequiredMetal > 0 && tower.Work.TotalSeconds == 0)) ||
                 (tower.Held && tower.Work.Phase != TowerWorkPhase.Constructing && tower.Work.Phase != TowerWorkPhase.Upgrading) ||
                 (tower.Work.Phase != TowerWorkPhase.Upgrading && tower.Work.PendingUpgradeLevel != 0))
                 throw new InvalidDataException("Invalid saved work state.");
+            if (tower.RequiredMetal < 0 || tower.RequiredMetal > 100 ||
+                !double.IsFinite(tower.MetalPreparationFraction) || tower.MetalPreparationFraction < 0 || tower.MetalPreparationFraction > .95 ||
+                (tower.RequiredMetal == 0 && (tower.MaterialsDelivered || tower.MetalPreparationFraction != 0)) ||
+                (tower.RequiredMetal > 0 && (tower.Work.Phase != TowerWorkPhase.Constructing ||
+                    (!tower.MaterialsDelivered && tower.Work.ElapsedSeconds > tower.Work.TotalSeconds * tower.MetalPreparationFraction))))
+                throw new InvalidDataException("Invalid saved material construction state.");
             if (tower.Ammo < 0 || tower.StoredCredits < 0) throw new InvalidDataException("Invalid saved stock.");
             Number(tower.Consumed); Number(tower.Discarded); Number(tower.BeamCredit); Number(tower.Produced);
             if (tower.BeamCredit >= 1) throw new InvalidDataException("Invalid prepaid beam fraction.");

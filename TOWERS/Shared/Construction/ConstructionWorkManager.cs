@@ -36,7 +36,7 @@ public partial class ConstructionWorkManager : Node
         if (_jobs.ContainsKey(tower)) throw new InvalidOperationException("Tower already has active work.");
         ulong version = ++_version;
         _jobs.Add(tower, version);
-        if (tower.AwaitingConstructionDrone) _held.Add(tower); else _waiting.Add(new(tower, version));
+        if (tower.AwaitingConstructionDrone || tower.WaitingAtMetalCap) _held.Add(tower); else _waiting.Add(new(tower, version));
         SetPhysicsProcess(WorkingCount > 0);
         PublishVisualEvent(JobRegistered, tower);
     }
@@ -48,6 +48,8 @@ public partial class ConstructionWorkManager : Node
         if (_shutdown || !_held.Remove(tower) || !_jobs.TryGetValue(tower, out ulong version)) return;
         _waiting.Add(new(tower, version)); SetPhysicsProcess(true);
     }
+
+    internal void Hold(TowerBase tower) { if (_jobs.ContainsKey(tower)) _held.Add(tower); }
 
     // =========================================================
     // In-flight entries become harmless tombstones; no mutation of an enumerated collection or per-frame copies.
@@ -91,7 +93,7 @@ public partial class ConstructionWorkManager : Node
                 { Unregister(job.Tower); continue; }
                 LastJobsVisited++;
                 job.Tower.AdvanceWork(this, delta);
-                if (_jobs.TryGetValue(job.Tower, out version) && version == job.Version) _waiting.Add(job);
+                if (_jobs.TryGetValue(job.Tower, out version) && version == job.Version && !_held.Contains(job.Tower)) _waiting.Add(job);
             }
         }
         finally { _batch.Clear(); _advancing = false; if (GodotObject.IsInstanceValid(this)) SetPhysicsProcess(!_shutdown && WorkingCount > 0); }

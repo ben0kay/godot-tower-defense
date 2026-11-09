@@ -153,7 +153,7 @@ public partial class ConstructionDroneManager : Node2D
         GodotObject.IsInstanceValid(home.Health) && !home.Health.IsDestroyed;
     // =========================================================
     // An optional authored marker wins; otherwise derive the actual footprint center, not a hardcoded single-Citadel path.
-    private Vector2 LaunchPoint(CitadelDestination home)
+    internal Vector2 LaunchPoint(CitadelDestination home)
     {
         Node2D marker = home.Root.GetNodeOrNull<Node2D>("DroneLaunch");
         if (marker != null) return marker.GlobalPosition;

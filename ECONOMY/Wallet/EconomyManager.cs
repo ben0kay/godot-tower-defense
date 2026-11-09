@@ -78,7 +78,7 @@ public partial class EconomyManager : Node
     // =========================================================
     // Resource IDs are stable identity; separate instances with the same ID share a balance.
     private static bool ValidResource(ResourceDefinition resource) =>
-        resource != null && !string.IsNullOrWhiteSpace(resource.ResourceId);
+        resource != null && resource.ResourceId != SalvageLogistics.MetalId && !string.IsNullOrWhiteSpace(resource.ResourceId);
 
     // =========================================================
     // Missing balances are zero, including future secondary materials.
