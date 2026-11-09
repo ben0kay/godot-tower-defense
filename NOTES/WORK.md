@@ -1,3 +1,9 @@
+## Radar contact sprites and viewport culling — 2026-11-09
+
+Replaced each dark contact’s two circle draws with one shared SVG quad. The overlay skips contacts outside the viewport, with padding for partially visible sprites. Reveal and targeting behavior are unchanged. Source checked. In-game FPS is unmeasured.
+
+---
+
 ## Scrap Refinery and Resource Storage — visual building shells (2026-11-09)
 
 Added two authored 2×2 Economy buildings on dev: the rust-brown cylindrical `ScrapRefinery` and a separate silver-ingot `ResourceStorage`, each with original 128px SVG artwork, scene, Inspector config, catalogue entry, Credits-only construction, durability and ordinary TowerBase saving. SALV1 scrap recovery/refinement/metal stock and two-drone material supply are **not implemented**; both Inspectors show pending status. No build or in-editor visual verification was performed here; owner should build and place both, check sprite scale/preview, construction, and Save/Continue. See [SALV1](../TOWERS/Economy/ScrapRefinery/SALV1_IMPLEMENTATION_PLAN.md).

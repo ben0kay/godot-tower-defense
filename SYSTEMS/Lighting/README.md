@@ -23,3 +23,5 @@ Use `RevealEnabled` to opt out. Reopen the level after editing this setting. F6 
 ## Removal
 
 Set the master config's `Enabled` to false and reopen the level for a configuration rollback. Revert A.3 independently to remove gameplay reveal and its shader bindings. Revert A.2 independently to remove projectile lights. Its integration points are labeled in the shared friendly projectile classes, hostile bullet system and splash tower configs. Revert A.1 to return to the original pilot. For selective removal, detach `Lighting` and its resources from `WORLD/World.tscn`, remove `FlightLight` and its script reference from `DRONES/Shared/DroneBody.tscn`, and remove the labeled lighting integrations in `DroneBody.cs`, `TowerDefinition.cs`, `InteractiveTileManager.cs` and `RoutePreviewOverlay.cs`. The latter keeps the F3 route colors independent. Lighting scripts and profiles live in this folder.
+
+Dark radar contacts share one SVG texture. The unlit overlay draws one quad per on-screen contact and preserves the light-edge opacity fade. Camera changes refresh culling even for stationary contacts.

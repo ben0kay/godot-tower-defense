@@ -23,8 +23,10 @@ public partial class WorldLightingController
     private readonly HashSet<EnemyReveal> _darkContacts = new();
     private ShaderMaterial _entityMask;
     private Node2D _contactOverlay;
-    private static readonly Color ContactCore = new("#be4b50");
-    private static readonly Color ContactHalo = new("#682c35");
+    private const float ContactHalfSize = 6f;
+    private Texture2D _contactTexture;
+    private Transform2D _contactCanvas;
+    private Rect2 _contactViewport;
     private Image _maskImage;
     private ImageTexture _maskTexture;
     private byte[] _maskPixels;
@@ -131,9 +133,10 @@ public partial class WorldLightingController
         _maskImage = Image.CreateFromData(_maskWidth, _maskHeight, false, Image.Format.R8, _maskPixels);
         _maskTexture = ImageTexture.CreateFromImage(_maskImage);
         _entityMask = NewRevealMaterial("res://SYSTEMS/Lighting/Shaders/RevealEntities.gdshader");
+        _contactTexture = GD.Load<Texture2D>("res://SYSTEMS/Lighting/Textures/RadarContact.svg");
         _contactOverlay = new Node2D
         {
-            Name = "DarkContacts", ZIndex = 5,
+            Name = "DarkContacts", ZIndex = 5, TextureFilter = CanvasItem.TextureFilterEnum.Linear,
             Material = new CanvasItemMaterial { LightMode = CanvasItemMaterial.LightModeEnum.Unshaded }
         };
         _contactOverlay.Draw += DrawDarkContacts;
@@ -222,27 +225,44 @@ public partial class WorldLightingController
             if (_darkContacts.Remove(state)) _contactOverlay.QueueRedraw();
             return;
         }
-        bool changed = _darkContacts.Add(state) || state.ContactPosition != position ||
+        bool added = _darkContacts.Add(state);
+        bool changed = added || state.ContactPosition != position ||
             !Mathf.IsEqualApprox(state.ContactOpacity, opacity);
         if (!changed) return;
         state.ContactPosition = position;
         state.ContactOpacity = opacity;
+        if (added && _darkContacts.Count == 1) SetProcess(true);
         _contactOverlay.QueueRedraw();
     }
 
     // =========================================================
-    // One unlit canvas draws only contacts that are currently fading or in darkness.
-    private void DrawDarkContacts()
+    // Camera movement also invalidates culling when the contacts themselves are stationary.
+    private void RefreshContactViewport()
     {
         if (_darkContacts.Count == 0) return;
-        _contactOverlay.DrawSetTransformMatrix(_contactOverlay.GlobalTransform.AffineInverse());
+        if (_contactCanvas != _contactOverlay.GetCanvasTransform() ||
+            _contactViewport != _contactOverlay.GetViewportRect())
+            _contactOverlay.QueueRedraw();
+    }
+
+    // =========================================================
+    // One shared SVG quad per visible contact. Keep the viewport margin large enough for the whole sprite.
+    private void DrawDarkContacts()
+    {
+        if (_darkContacts.Count == 0 || _contactTexture == null) return;
+        _contactCanvas = _contactOverlay.GetCanvasTransform();
+        _contactViewport = _contactOverlay.GetViewportRect();
+        Transform2D toLocal = _contactOverlay.GlobalTransform.AffineInverse();
+        Transform2D worldToScreen = _contactCanvas;
+        Vector2 margin = (worldToScreen.X.Abs() + worldToScreen.Y.Abs()) * ContactHalfSize;
+        Rect2 visible = new(_contactViewport.Position - margin, _contactViewport.Size + margin * 2);
+        Vector2 half = Vector2.One * ContactHalfSize;
+        _contactOverlay.DrawSetTransformMatrix(toLocal);
         foreach (EnemyReveal state in _darkContacts)
         {
-            Color halo = ContactHalo, core = ContactCore;
-            halo.A = state.ContactOpacity * .42f;
-            core.A = state.ContactOpacity * .85f;
-            _contactOverlay.DrawCircle(state.ContactPosition, 5, halo, true, -1, true);
-            _contactOverlay.DrawCircle(state.ContactPosition, 3, core, true, -1, true);
+            if (!visible.HasPoint(worldToScreen * state.ContactPosition)) continue;
+            _contactOverlay.DrawTextureRect(_contactTexture, new Rect2(state.ContactPosition - half, half * 2),
+                false, new Color(1f, 1f, 1f, state.ContactOpacity));
         }
         _contactOverlay.DrawSetTransformMatrix(Transform2D.Identity);
     }

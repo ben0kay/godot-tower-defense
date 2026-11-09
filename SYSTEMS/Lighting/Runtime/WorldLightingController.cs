@@ -84,6 +84,7 @@ public partial class WorldLightingController : Node2D
     public override void _Process(double delta)
     {
         TickMovingReveal(delta);
+        RefreshContactViewport();
         _refreshRemaining -= delta;
         if (_refreshRemaining <= 0) RefreshLights();
     }
@@ -250,7 +251,7 @@ public partial class WorldLightingController : Node2D
 
         UpdateRevealPresentation();
         bool watchSteam = RefreshLavaSteam();
-        SetProcess(watchSteam || (RevealActive && _movingReveal) || (cull && (hasCandidates || _projectileSources.Count > 0)));
+        SetProcess(_darkContacts.Count > 0 || watchSteam || (RevealActive && _movingReveal) || (cull && (hasCandidates || _projectileSources.Count > 0)));
     }
 
     // =========================================================
