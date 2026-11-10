@@ -39,6 +39,7 @@ public partial class DefenseBar : Node2D
     private Rect2 _hullRect, _hullInner, _shieldRect, _shieldInner;
     private bool _widthDirty, _layoutDirty = true, _fogConcealed, _redrawQueued;
     private bool _hullAlive;
+    private bool _presentationEnabled = true;
     private float _ownerHalfHeight;
     private float _ownerVisualScale = 1f;
     #endregion
@@ -88,6 +89,15 @@ public partial class DefenseBar : Node2D
     }
 
     // =========================================================
+    // Keep the latest durability fractions while an owner temporarily hides its meter.
+    internal void SetPresentationEnabled(bool enabled)
+    {
+        if (_presentationEnabled == enabled) return;
+        _presentationEnabled = enabled;
+        RefreshVisibility(true);
+    }
+
+    // =========================================================
     // A large sprite can exceed the default bar offset; cache its height once at spawn.
     // Small ships keep their existing Inspector-authored minimum vertical offset.
     public void SetOwnerVisualHeight(float height, float visualScale = 1f)
@@ -134,7 +144,7 @@ public partial class DefenseBar : Node2D
         HullVisible = _hullAlive && (HealthFraction < 1f || ShieldVisible);
         if (_fogConcealed) return;
         bool wasVisible = Visible;
-        bool show = Style != null && (MasterConfig == null || MasterConfig.DefenseBarsEnabled)
+        bool show = _presentationEnabled && Style != null && (MasterConfig == null || MasterConfig.DefenseBarsEnabled)
             && (HullVisible || ShieldVisible);
         if (wasVisible != show) Visible = show;
         if (!show)

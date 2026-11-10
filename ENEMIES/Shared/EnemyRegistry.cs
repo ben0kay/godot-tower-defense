@@ -19,6 +19,8 @@ public partial class EnemyRegistry : Node
     private readonly List<Enemy> _living = new();
     private readonly HashSet<Enemy> _members = new();
     public IReadOnlyList<Enemy> Living => _living;
+    internal bool ExplosionFxEnabled { get; set; } = true;
+    internal bool HealthBarsEnabled { get; private set; } = true;
     public int KilledCount { get; private set; }
     public int ArrivedCount { get; private set; }
     public event Action<Enemy> EnemyRegistered;
@@ -27,6 +29,14 @@ public partial class EnemyRegistry : Node
     public event Action<Enemy, DamageSource> AttributedKill;
     public event Action<Enemy> EnemyUnregistered;
     public event Action<Enemy> EnemyArrived;
+
+    // =========================================================
+    // Apply the visual override to living enemies only when the debug toggle changes.
+    internal void SetHealthBarsEnabled(bool enabled)
+    {
+        HealthBarsEnabled = enabled;
+        foreach (Enemy enemy in _living) enemy.SetHealthBarEnabled(enabled);
+    }
 
     // =========================================================
     // Register once; enemies unregister immediately on death or arrival.

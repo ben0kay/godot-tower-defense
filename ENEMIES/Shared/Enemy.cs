@@ -111,6 +111,7 @@ public partial class Enemy : Node2D
     private Vector2 _terrainPosition;
     private bool _terrainMovement;
     private DefenseBar _defenseBar;
+    internal const string ExplosionFxGroup = "enemy_explosion_fx";
     private EnemyDamageAppearanceProfile _damageAppearance;
     private Sprite2D _damageAppearanceSprite;
     private int _damageAppearanceStage = -1;
@@ -168,6 +169,7 @@ public partial class Enemy : Node2D
         _thruster?.Configure(sprite, Definition, AppliedVisualScale);
         if (_defenseBar != null)
         {
+            _defenseBar.SetPresentationEnabled(_registry.HealthBarsEnabled);
             _defenseBar.Scale = Vector2.One * AppliedVisualScale;
             _defenseBar.SetOwnerVisualHeight(sprite?.Texture != null ? _authoredHullSize.Y : 0f, AppliedVisualScale);
         }
@@ -337,6 +339,8 @@ public partial class Enemy : Node2D
 
     // =========================================================
     // Only visible health/shield meters counter-rotate; idle or absent meters do no work.
+    internal void SetHealthBarEnabled(bool enabled) => _defenseBar?.SetPresentationEnabled(enabled);
+
     public void UpdateDefenseBarTransform()
     {
         if (!_fogConcealed) _defenseBar?.AlignWithOwner(Rotation);
@@ -356,10 +360,14 @@ public partial class Enemy : Node2D
         if (!arrived)
         {
             KilledBeforeRemoval?.Invoke(this);
-            Sprite2D visual = GetNodeOrNull<Sprite2D>("Sprite");
-            float fallback = Mathf.Max(1f, (Definition?.RadiusPixels * 2f ?? 32f) * AppliedVisualScale);
-            DeathExplosion.Spawn(GetNodeOrNull<Node2D>("../../Effects"), VisualWorldCentre,
-                DeathExplosion.MeasureVisualSize(visual, fallback), Definition?.DeathExplosionMultiplier ?? 1f);
+            if (_registry.ExplosionFxEnabled)
+            {
+                Sprite2D visual = GetNodeOrNull<Sprite2D>("Sprite");
+                float fallback = Mathf.Max(1f, (Definition?.RadiusPixels * 2f ?? 32f) * AppliedVisualScale);
+                DeathExplosion effect = DeathExplosion.Spawn(GetNodeOrNull<Node2D>("../../Effects"), VisualWorldCentre,
+                    DeathExplosion.MeasureVisualSize(visual, fallback), Definition?.DeathExplosionMultiplier ?? 1f);
+                effect?.AddToGroup(ExplosionFxGroup);
+            }
         }
         _registry.Unregister(this); _registry.RecordOutcome(arrived, this);
         Removed?.Invoke(this); QueueFree();

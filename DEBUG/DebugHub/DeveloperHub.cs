@@ -3,7 +3,9 @@ using Godot;
 
 public partial class DeveloperHub : CanvasLayer
 {
-    private PanelContainer _panel;
+    private HBoxContainer _panel;
+    private EnemyRegistry _enemies;
+    private Node2D _effects;
     private Button _spawnButton, _lookupButton, _routeButton, _profileButton;
     private PerformanceOverlay _performance;
     private AlertPreview _alerts;
@@ -20,6 +22,8 @@ public partial class DeveloperHub : CanvasLayer
         ProcessMode = ProcessModeEnum.Always;
         Layer = 40;
         Node battle = GetParent();
+        _enemies = battle.GetNodeOrNull<EnemyRegistry>("World/EnemySystems/Registry");
+        _effects = battle.GetNodeOrNull<Node2D>("World/Effects");
         _performance = battle.GetNodeOrNull<PerformanceOverlay>("PerformanceOverlay");
         _alerts = battle.GetNodeOrNull<AlertPreview>("UI/GameplayHUD/AlertPreview");
         _tools = battle.GetNodeOrNull<WorldGrid>("World/Grid")?.Level?.GetNodeOrNull<LevelDebugController>("Debug");
@@ -32,12 +36,10 @@ public partial class DeveloperHub : CanvasLayer
 
     private void BuildPanel()
     {
-        _panel = new PanelContainer { Position = new Vector2(18, 76), CustomMinimumSize = new Vector2(360, 0) };
-        _panel.AddThemeStyleboxOverride("panel", UIButtonFactory.Box(_theme.PanelColor, _theme.AccentColor));
+        _panel = new HBoxContainer { Position = new Vector2(18, 76), MouseFilter = Control.MouseFilterEnum.Ignore };
+        _panel.AddThemeConstantOverride("separation", 10);
         AddChild(_panel);
-        var list = new VBoxContainer();
-        list.AddThemeConstantOverride("separation", 6);
-        _panel.AddChild(list);
+        var list = AddPanel(360);
         list.AddChild(UIButtonFactory.Label("DEVELOPER TOOLS · F1", 20, _theme));
         _spawnButton = AddButton(list, "1   Enemy Spawner", () => OpenTool(1));
         _lookupButton = AddButton(list, "2   Building Lookup", () => OpenTool(2));
@@ -48,7 +50,50 @@ public partial class DeveloperHub : CanvasLayer
         AddButton(list, "Save Performance Report (F3)", () => _performance?.DumpProfile());
         AddButton(list, "Notification Samples (F4)", () => _alerts?.CycleSample());
         AddButton(list, "Close · Esc", Dismiss);
+        if (_enemies != null)
+        {
+            var visuals = AddPanel(220);
+            visuals.AddChild(UIButtonFactory.Label("ENEMY VISUALS", 20, _theme));
+            AddToggle(visuals, "Enemy Explosion FX", _enemies.ExplosionFxEnabled, SetExplosionFxEnabled);
+            AddToggle(visuals, "Enemy Health Bars", _enemies.HealthBarsEnabled, _enemies.SetHealthBarsEnabled);
+        }
         _panel.Hide();
+    }
+
+    // =========================================================
+    // Panels share one row so F1, Escape and child tools hide both together.
+    private VBoxContainer AddPanel(float minWidth)
+    {
+        var panel = new PanelContainer
+        {
+            CustomMinimumSize = new Vector2(minWidth, 0),
+            SizeFlagsVertical = Control.SizeFlags.ShrinkBegin
+        };
+        panel.AddThemeStyleboxOverride("panel", UIButtonFactory.Box(_theme.PanelColor, _theme.AccentColor));
+        _panel.AddChild(panel);
+        var list = new VBoxContainer();
+        list.AddThemeConstantOverride("separation", 6);
+        panel.AddChild(list);
+        return list;
+    }
+
+    private static void AddToggle(VBoxContainer list, string text, bool enabled, System.Action<bool> apply)
+    {
+        var toggle = new CheckButton { Text = text, ButtonPressed = enabled };
+        toggle.Toggled += pressed => apply(pressed);
+        list.AddChild(toggle);
+    }
+
+    // =========================================================
+    // Clear active enemy explosions once when disabled. Future kills skip spawning them.
+    private void SetExplosionFxEnabled(bool enabled)
+    {
+        _enemies.ExplosionFxEnabled = enabled;
+        if (enabled || _effects == null) return;
+        foreach (Node effect in _effects.GetChildren())
+        {
+            if (effect.IsInGroup(Enemy.ExplosionFxGroup)) effect.QueueFree();
+        }
     }
 
     private Button AddButton(VBoxContainer list, string text, System.Action action)
