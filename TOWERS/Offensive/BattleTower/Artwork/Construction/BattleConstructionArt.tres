@@ -6,16 +6,14 @@
 [ext_resource type="Texture2D" uid="uid://cr2yc3t76ole6" path="res://TOWERS/Offensive/BattleTower/Artwork/Construction/stage0_foundation.svg" id="4_foundation"]
 [ext_resource type="Texture2D" uid="uid://conapg5cykva3" path="res://TOWERS/Offensive/BattleTower/Artwork/Construction/stage1_frame.svg" id="5_frame"]
 [ext_resource type="Texture2D" uid="uid://b5yttvsv0j4om" path="res://TOWERS/Offensive/BattleTower/Artwork/Construction/stage2_assembly.svg" id="6_assembly"]
-
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/battle_base_l2.svg" id="lvl2_base"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/battle_gun_l2.svg" id="lvl2_gun"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/battle_base_l3.svg" id="lvl3_base"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/battle_gun_l3.svg" id="lvl3_gun"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/battle_upgrade_l2.svg" id="lvl2_build"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/battle_upgrade_l3.svg" id="lvl3_build"]
-
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/battle_upgrade_l2_70.svg" id="lvl2_build70"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/battle_upgrade_l3_70.svg" id="lvl3_build70"]
+[ext_resource type="Texture2D" uid="uid://dn8ulfw5fs25e" path="res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/battle_base_l2.svg" id="lvl2_base"]
+[ext_resource type="Texture2D" uid="uid://byymnuqtjpkf5" path="res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/battle_upgrade_l2.svg" id="lvl2_build"]
+[ext_resource type="Texture2D" uid="uid://cv76qo16n4kug" path="res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/battle_upgrade_l2_70.svg" id="lvl2_build70"]
+[ext_resource type="Texture2D" uid="uid://db1qce3dupfls" path="res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/battle_gun_l2.svg" id="lvl2_gun"]
+[ext_resource type="Texture2D" uid="uid://skp7bj2gl8a4" path="res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/battle_base_l3.svg" id="lvl3_base"]
+[ext_resource type="Texture2D" uid="uid://dn47xv864w6bc" path="res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/battle_upgrade_l3.svg" id="lvl3_build"]
+[ext_resource type="Texture2D" uid="uid://ct78vtir1g67j" path="res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/battle_upgrade_l3_70.svg" id="lvl3_build70"]
+[ext_resource type="Texture2D" uid="uid://b6urfx11spxdo" path="res://TOWERS/Offensive/BattleTower/Artwork/Upgrades/battle_gun_l3.svg" id="lvl3_gun"]
 
 [sub_resource type="Resource" id="Stage0"]
 script = ExtResource("2_stage")
@@ -41,6 +39,14 @@ script = ExtResource("2_stage")
 Progress = 0.7
 Texture = ExtResource("lvl2_build70")
 
+[sub_resource type="Resource" id="Level2"]
+script = ExtResource("3_level")
+FinishedBaseTexture = ExtResource("lvl2_base")
+FinishedGunTexture = ExtResource("lvl2_gun")
+UpgradeTexture = ExtResource("lvl2_build")
+UpgradeStages = Array[ExtResource("2_stage")]([SubResource("Upgrade2_35"), SubResource("Upgrade2_70")])
+UpgradeProgress = 0.35
+
 [sub_resource type="Resource" id="Upgrade3_35"]
 script = ExtResource("2_stage")
 Progress = 0.35
@@ -51,22 +57,14 @@ script = ExtResource("2_stage")
 Progress = 0.7
 Texture = ExtResource("lvl3_build70")
 
-[sub_resource type="Resource" id="Level2"]
-script = ExtResource("3_level")
-FinishedBaseTexture = ExtResource("lvl2_base")
-FinishedGunTexture = ExtResource("lvl2_gun")
-UpgradeTexture = ExtResource("lvl2_build")
-UpgradeProgress = 0.35
-UpgradeStages = Array[ExtResource("2_stage")]([SubResource("Upgrade2_35"), SubResource("Upgrade2_70")])
-
 [sub_resource type="Resource" id="Level3"]
 script = ExtResource("3_level")
 Level = 3
 FinishedBaseTexture = ExtResource("lvl3_base")
 FinishedGunTexture = ExtResource("lvl3_gun")
 UpgradeTexture = ExtResource("lvl3_build")
-UpgradeProgress = 0.35
 UpgradeStages = Array[ExtResource("2_stage")]([SubResource("Upgrade3_35"), SubResource("Upgrade3_70")])
+UpgradeProgress = 0.35
 
 [resource]
 script = ExtResource("1_art")

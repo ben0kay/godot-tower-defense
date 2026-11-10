@@ -1,17 +1,17 @@
-[gd_resource type="Resource" script_class="TowerConstructionArt" load_steps=20 format=3]
+[gd_resource type="Resource" script_class="TowerConstructionArt" format=3 uid="uid://b78uy171vhp26"]
 
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="art"]
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="stage"]
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerLevelArtwork.cs" id="level"]
-[ext_resource type="Texture2D" path="res://TOWERS/Support/RepairTower/Artwork/Construction/foundation.svg" id="foundation"]
-[ext_resource type="Texture2D" path="res://TOWERS/Support/RepairTower/Artwork/Upgrades/repair_base_l2.svg" id="l2_base"]
-[ext_resource type="Texture2D" path="res://TOWERS/Support/RepairTower/Artwork/Upgrades/repair_head_l2.svg" id="l2_head"]
-[ext_resource type="Texture2D" path="res://TOWERS/Support/RepairTower/Artwork/Upgrades/repair_upgrade_l2_35.svg" id="l2_35"]
-[ext_resource type="Texture2D" path="res://TOWERS/Support/RepairTower/Artwork/Upgrades/repair_upgrade_l2_70.svg" id="l2_70"]
-[ext_resource type="Texture2D" path="res://TOWERS/Support/RepairTower/Artwork/Upgrades/repair_base_l3.svg" id="l3_base"]
-[ext_resource type="Texture2D" path="res://TOWERS/Support/RepairTower/Artwork/Upgrades/repair_head_l3.svg" id="l3_head"]
-[ext_resource type="Texture2D" path="res://TOWERS/Support/RepairTower/Artwork/Upgrades/repair_upgrade_l3_35.svg" id="l3_35"]
-[ext_resource type="Texture2D" path="res://TOWERS/Support/RepairTower/Artwork/Upgrades/repair_upgrade_l3_70.svg" id="l3_70"]
+[ext_resource type="Script" uid="uid://bt7vaabnpo1us" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="art"]
+[ext_resource type="Texture2D" uid="uid://bppemkh474bju" path="res://TOWERS/Support/RepairTower/Artwork/Construction/foundation.svg" id="foundation"]
+[ext_resource type="Texture2D" uid="uid://dqipgq6ukopy8" path="res://TOWERS/Support/RepairTower/Artwork/Upgrades/repair_upgrade_l2_35.svg" id="l2_35"]
+[ext_resource type="Texture2D" uid="uid://v86xec6c81np" path="res://TOWERS/Support/RepairTower/Artwork/Upgrades/repair_upgrade_l2_70.svg" id="l2_70"]
+[ext_resource type="Texture2D" uid="uid://dgf10cg4ffk6d" path="res://TOWERS/Support/RepairTower/Artwork/Upgrades/repair_base_l2.svg" id="l2_base"]
+[ext_resource type="Texture2D" uid="uid://cp33xeyugj6uo" path="res://TOWERS/Support/RepairTower/Artwork/Upgrades/repair_head_l2.svg" id="l2_head"]
+[ext_resource type="Texture2D" uid="uid://duvt10704r7sd" path="res://TOWERS/Support/RepairTower/Artwork/Upgrades/repair_upgrade_l3_35.svg" id="l3_35"]
+[ext_resource type="Texture2D" uid="uid://b73gkhbx3hjif" path="res://TOWERS/Support/RepairTower/Artwork/Upgrades/repair_upgrade_l3_70.svg" id="l3_70"]
+[ext_resource type="Texture2D" uid="uid://d0icxxc5cvewh" path="res://TOWERS/Support/RepairTower/Artwork/Upgrades/repair_base_l3.svg" id="l3_base"]
+[ext_resource type="Texture2D" uid="uid://dbax0hir7hmkp" path="res://TOWERS/Support/RepairTower/Artwork/Upgrades/repair_head_l3.svg" id="l3_head"]
+[ext_resource type="Script" uid="uid://iww0iyddykhp" path="res://TOWERS/Shared/Construction/TowerLevelArtwork.cs" id="level"]
+[ext_resource type="Script" uid="uid://phileg818m3o" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="stage"]
 
 [sub_resource type="Resource" id="Stage0"]
 script = ExtResource("stage")
@@ -27,6 +27,14 @@ script = ExtResource("stage")
 Progress = 0.7
 Texture = ExtResource("l2_70")
 
+[sub_resource type="Resource" id="Level2"]
+script = ExtResource("level")
+FinishedBaseTexture = ExtResource("l2_base")
+FinishedGunTexture = ExtResource("l2_head")
+UpgradeTexture = ExtResource("l2_35")
+UpgradeStages = Array[ExtResource("stage")]([SubResource("UpgradeL2_35"), SubResource("UpgradeL2_70")])
+UpgradeProgress = 0.35
+
 [sub_resource type="Resource" id="UpgradeL3_35"]
 script = ExtResource("stage")
 Progress = 0.35
@@ -37,23 +45,14 @@ script = ExtResource("stage")
 Progress = 0.7
 Texture = ExtResource("l3_70")
 
-[sub_resource type="Resource" id="Level2"]
-script = ExtResource("level")
-Level = 2
-FinishedBaseTexture = ExtResource("l2_base")
-FinishedGunTexture = ExtResource("l2_head")
-UpgradeTexture = ExtResource("l2_35")
-UpgradeProgress = 0.35
-UpgradeStages = Array[ExtResource("stage")]([SubResource("UpgradeL2_35"), SubResource("UpgradeL2_70")])
-
 [sub_resource type="Resource" id="Level3"]
 script = ExtResource("level")
 Level = 3
 FinishedBaseTexture = ExtResource("l3_base")
 FinishedGunTexture = ExtResource("l3_head")
 UpgradeTexture = ExtResource("l3_35")
-UpgradeProgress = 0.35
 UpgradeStages = Array[ExtResource("stage")]([SubResource("UpgradeL3_35"), SubResource("UpgradeL3_70")])
+UpgradeProgress = 0.35
 
 [resource]
 script = ExtResource("art")

@@ -1,10 +1,11 @@
-[gd_resource type="Resource" script_class="TowerConstructionArt" load_steps=9 format=3]
+[gd_resource type="Resource" script_class="TowerConstructionArt" format=3 uid="uid://da3ibs0d2wyoh"]
 
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="art"]
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="stage"]
-[ext_resource type="Texture2D" path="res://TOWERS/Economy/Power/IndustrialGenerator/Artwork/stage0_foundation.svg" id="s0"]
-[ext_resource type="Texture2D" path="res://TOWERS/Economy/Power/IndustrialGenerator/Artwork/stage1_frame.svg" id="s1"]
-[ext_resource type="Texture2D" path="res://TOWERS/Economy/Power/IndustrialGenerator/Artwork/stage2_assembly.svg" id="s2"]
+[ext_resource type="Script" uid="uid://iww0iyddykhp" path="res://TOWERS/Shared/Construction/TowerLevelArtwork.cs" id="5_ud2e1"]
+[ext_resource type="Script" uid="uid://bt7vaabnpo1us" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="art"]
+[ext_resource type="Texture2D" uid="uid://blxx1iqlas6wf" path="res://TOWERS/Economy/Power/IndustrialGenerator/Artwork/stage0_foundation.svg" id="s0"]
+[ext_resource type="Texture2D" uid="uid://gyxfdglyfoq5" path="res://TOWERS/Economy/Power/IndustrialGenerator/Artwork/stage1_frame.svg" id="s1"]
+[ext_resource type="Texture2D" uid="uid://gjc82e4davpt" path="res://TOWERS/Economy/Power/IndustrialGenerator/Artwork/stage2_assembly.svg" id="s2"]
+[ext_resource type="Script" uid="uid://phileg818m3o" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="stage"]
 
 [sub_resource type="Resource" id="Foundation"]
 script = ExtResource("stage")

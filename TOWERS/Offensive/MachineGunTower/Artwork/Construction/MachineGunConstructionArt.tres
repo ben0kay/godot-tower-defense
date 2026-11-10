@@ -1,20 +1,19 @@
-[gd_resource type="Resource" script_class="TowerConstructionArt" format=3]
+[gd_resource type="Resource" script_class="TowerConstructionArt" format=3 uid="uid://d2iltrnjxx1l6"]
 
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="1_art"]
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="2_stage"]
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerLevelArtwork.cs" id="3_level"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Construction/stage0_foundation.svg" id="4_foundation"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Construction/stage1_frame.svg" id="5_frame"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Construction/stage2_assembly.svg" id="6_assembly"]
-
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Upgrades/machine_gun_base_l2.svg" id="l2_base"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Upgrades/machine_gun_gun_l2.svg" id="l2_gun"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Upgrades/machine_gun_base_l3.svg" id="l3_base"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Upgrades/machine_gun_gun_l3.svg" id="l3_gun"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Upgrades/machine_gun_upgrade_l2_35.svg" id="l2_35"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Upgrades/machine_gun_upgrade_l2_70.svg" id="l2_70"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Upgrades/machine_gun_upgrade_l3_35.svg" id="l3_35"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Upgrades/machine_gun_upgrade_l3_70.svg" id="l3_70"]
+[ext_resource type="Script" uid="uid://bt7vaabnpo1us" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="1_art"]
+[ext_resource type="Script" uid="uid://phileg818m3o" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="2_stage"]
+[ext_resource type="Script" uid="uid://iww0iyddykhp" path="res://TOWERS/Shared/Construction/TowerLevelArtwork.cs" id="3_level"]
+[ext_resource type="Texture2D" uid="uid://b761qh6rk7ftt" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Construction/stage0_foundation.svg" id="4_foundation"]
+[ext_resource type="Texture2D" uid="uid://doe46f2kc1qu4" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Construction/stage1_frame.svg" id="5_frame"]
+[ext_resource type="Texture2D" uid="uid://bcqmfb2qiq107" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Construction/stage2_assembly.svg" id="6_assembly"]
+[ext_resource type="Texture2D" uid="uid://c0riyfdo7n3wp" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Upgrades/machine_gun_upgrade_l2_35.svg" id="l2_35"]
+[ext_resource type="Texture2D" uid="uid://cygr2w0pty8x3" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Upgrades/machine_gun_upgrade_l2_70.svg" id="l2_70"]
+[ext_resource type="Texture2D" uid="uid://b4ivqamto321n" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Upgrades/machine_gun_base_l2.svg" id="l2_base"]
+[ext_resource type="Texture2D" uid="uid://bxu2ook87ousq" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Upgrades/machine_gun_gun_l2.svg" id="l2_gun"]
+[ext_resource type="Texture2D" uid="uid://bubbgegivdbgf" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Upgrades/machine_gun_upgrade_l3_35.svg" id="l3_35"]
+[ext_resource type="Texture2D" uid="uid://ca35g2frte72h" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Upgrades/machine_gun_upgrade_l3_70.svg" id="l3_70"]
+[ext_resource type="Texture2D" uid="uid://cwq13w0f4nks6" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Upgrades/machine_gun_base_l3.svg" id="l3_base"]
+[ext_resource type="Texture2D" uid="uid://b27dpv0mbmwif" path="res://TOWERS/Offensive/MachineGunTower/Artwork/Upgrades/machine_gun_gun_l3.svg" id="l3_gun"]
 
 [sub_resource type="Resource" id="Stage0"]
 script = ExtResource("2_stage")
@@ -40,6 +39,14 @@ script = ExtResource("2_stage")
 Progress = 0.7
 Texture = ExtResource("l2_70")
 
+[sub_resource type="Resource" id="Level2"]
+script = ExtResource("3_level")
+FinishedBaseTexture = ExtResource("l2_base")
+FinishedGunTexture = ExtResource("l2_gun")
+UpgradeTexture = ExtResource("l2_35")
+UpgradeStages = Array[ExtResource("2_stage")]([SubResource("UpgradeL2_35"), SubResource("UpgradeL2_70")])
+UpgradeProgress = 0.35
+
 [sub_resource type="Resource" id="UpgradeL3_35"]
 script = ExtResource("2_stage")
 Progress = 0.35
@@ -50,23 +57,14 @@ script = ExtResource("2_stage")
 Progress = 0.7
 Texture = ExtResource("l3_70")
 
-[sub_resource type="Resource" id="Level2"]
-script = ExtResource("3_level")
-Level = 2
-FinishedBaseTexture = ExtResource("l2_base")
-FinishedGunTexture = ExtResource("l2_gun")
-UpgradeTexture = ExtResource("l2_35")
-UpgradeProgress = 0.35
-UpgradeStages = Array[ExtResource("2_stage")]([SubResource("UpgradeL2_35"), SubResource("UpgradeL2_70")])
-
 [sub_resource type="Resource" id="Level3"]
 script = ExtResource("3_level")
 Level = 3
 FinishedBaseTexture = ExtResource("l3_base")
 FinishedGunTexture = ExtResource("l3_gun")
 UpgradeTexture = ExtResource("l3_35")
-UpgradeProgress = 0.35
 UpgradeStages = Array[ExtResource("2_stage")]([SubResource("UpgradeL3_35"), SubResource("UpgradeL3_70")])
+UpgradeProgress = 0.35
 
 [resource]
 script = ExtResource("1_art")

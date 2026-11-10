@@ -1,17 +1,17 @@
-[gd_resource type="Resource" script_class="TowerConstructionArt" format=3]
+[gd_resource type="Resource" script_class="TowerConstructionArt" format=3 uid="uid://glxlyl35njsg"]
 
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="1_art"]
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="2_stage"]
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerLevelArtwork.cs" id="3_level"]
-[ext_resource type="Texture2D" path="res://TOWERS/Economy/ResourceTower/Artwork/Construction/stage0_foundation.svg" id="b0"]
-[ext_resource type="Texture2D" path="res://TOWERS/Economy/ResourceTower/Artwork/Construction/stage1_frame.svg" id="b1"]
-[ext_resource type="Texture2D" path="res://TOWERS/Economy/ResourceTower/Artwork/Construction/stage2_assembly.svg" id="b2"]
-[ext_resource type="Texture2D" path="res://TOWERS/Economy/ResourceTower/Artwork/Upgrades/resource_tower_l2.svg" id="l2f"]
-[ext_resource type="Texture2D" path="res://TOWERS/Economy/ResourceTower/Artwork/Upgrades/resource_upgrade_l2_35.svg" id="l2a"]
-[ext_resource type="Texture2D" path="res://TOWERS/Economy/ResourceTower/Artwork/Upgrades/resource_upgrade_l2_70.svg" id="l2b"]
-[ext_resource type="Texture2D" path="res://TOWERS/Economy/ResourceTower/Artwork/Upgrades/resource_tower_l3.svg" id="l3f"]
-[ext_resource type="Texture2D" path="res://TOWERS/Economy/ResourceTower/Artwork/Upgrades/resource_upgrade_l3_35.svg" id="l3a"]
-[ext_resource type="Texture2D" path="res://TOWERS/Economy/ResourceTower/Artwork/Upgrades/resource_upgrade_l3_70.svg" id="l3b"]
+[ext_resource type="Script" uid="uid://bt7vaabnpo1us" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="1_art"]
+[ext_resource type="Script" uid="uid://phileg818m3o" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="2_stage"]
+[ext_resource type="Script" uid="uid://iww0iyddykhp" path="res://TOWERS/Shared/Construction/TowerLevelArtwork.cs" id="3_level"]
+[ext_resource type="Texture2D" uid="uid://bhggxbieiucq3" path="res://TOWERS/Economy/ResourceTower/Artwork/Construction/stage0_foundation.svg" id="b0"]
+[ext_resource type="Texture2D" uid="uid://df32720jn021r" path="res://TOWERS/Economy/ResourceTower/Artwork/Construction/stage1_frame.svg" id="b1"]
+[ext_resource type="Texture2D" uid="uid://c6epn6isrl811" path="res://TOWERS/Economy/ResourceTower/Artwork/Construction/stage2_assembly.svg" id="b2"]
+[ext_resource type="Texture2D" uid="uid://dqldwqf1i26bl" path="res://TOWERS/Economy/ResourceTower/Artwork/Upgrades/resource_upgrade_l2_35.svg" id="l2a"]
+[ext_resource type="Texture2D" uid="uid://dqqag6423w0c4" path="res://TOWERS/Economy/ResourceTower/Artwork/Upgrades/resource_upgrade_l2_70.svg" id="l2b"]
+[ext_resource type="Texture2D" uid="uid://cejbnx6ah7quo" path="res://TOWERS/Economy/ResourceTower/Artwork/Upgrades/resource_tower_l2.svg" id="l2f"]
+[ext_resource type="Texture2D" uid="uid://c6swy2a7x7t1j" path="res://TOWERS/Economy/ResourceTower/Artwork/Upgrades/resource_upgrade_l3_35.svg" id="l3a"]
+[ext_resource type="Texture2D" uid="uid://cvku07hu05v4o" path="res://TOWERS/Economy/ResourceTower/Artwork/Upgrades/resource_upgrade_l3_70.svg" id="l3b"]
+[ext_resource type="Texture2D" uid="uid://c4wn30phki0wq" path="res://TOWERS/Economy/ResourceTower/Artwork/Upgrades/resource_tower_l3.svg" id="l3f"]
 
 [sub_resource type="Resource" id="Stage0"]
 script = ExtResource("2_stage")
@@ -37,6 +37,13 @@ script = ExtResource("2_stage")
 Progress = 0.7
 Texture = ExtResource("l2b")
 
+[sub_resource type="Resource" id="Level2"]
+script = ExtResource("3_level")
+FinishedTexture = ExtResource("l2f")
+UpgradeTexture = ExtResource("l2a")
+UpgradeStages = Array[ExtResource("2_stage")]([SubResource("UpgradeL2_35"), SubResource("UpgradeL2_70")])
+UpgradeProgress = 0.35
+
 [sub_resource type="Resource" id="UpgradeL3_35"]
 script = ExtResource("2_stage")
 Progress = 0.35
@@ -47,21 +54,13 @@ script = ExtResource("2_stage")
 Progress = 0.7
 Texture = ExtResource("l3b")
 
-[sub_resource type="Resource" id="Level2"]
-script = ExtResource("3_level")
-Level = 2
-FinishedTexture = ExtResource("l2f")
-UpgradeTexture = ExtResource("l2a")
-UpgradeProgress = 0.35
-UpgradeStages = Array[ExtResource("2_stage")]([SubResource("UpgradeL2_35"), SubResource("UpgradeL2_70")])
-
 [sub_resource type="Resource" id="Level3"]
 script = ExtResource("3_level")
 Level = 3
 FinishedTexture = ExtResource("l3f")
 UpgradeTexture = ExtResource("l3a")
-UpgradeProgress = 0.35
 UpgradeStages = Array[ExtResource("2_stage")]([SubResource("UpgradeL3_35"), SubResource("UpgradeL3_70")])
+UpgradeProgress = 0.35
 
 [resource]
 script = ExtResource("1_art")

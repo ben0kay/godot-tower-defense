@@ -1,20 +1,19 @@
-[gd_resource type="Resource" script_class="TowerConstructionArt" format=3]
+[gd_resource type="Resource" script_class="TowerConstructionArt" format=3 uid="uid://b3kxqckinkh4l"]
 
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="1_art"]
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="2_stage"]
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerLevelArtwork.cs" id="3_level"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/RocketTower/Artwork/Construction/stage0_foundation.svg" id="4_foundation"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/RocketTower/Artwork/Construction/stage1_frame.svg" id="5_frame"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/RocketTower/Artwork/Construction/stage2_assembly.svg" id="6_assembly"]
-
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/RocketTower/Artwork/Upgrades/rocket_base_l2.svg" id="l2_base"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/RocketTower/Artwork/Upgrades/rocket_gun_l2.svg" id="l2_gun"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/RocketTower/Artwork/Upgrades/rocket_upgrade_l2_35.svg" id="l2_35"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/RocketTower/Artwork/Upgrades/rocket_upgrade_l2_70.svg" id="l2_70"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/RocketTower/Artwork/Upgrades/rocket_base_l3.svg" id="l3_base"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/RocketTower/Artwork/Upgrades/rocket_gun_l3.svg" id="l3_gun"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/RocketTower/Artwork/Upgrades/rocket_upgrade_l3_35.svg" id="l3_35"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/RocketTower/Artwork/Upgrades/rocket_upgrade_l3_70.svg" id="l3_70"]
+[ext_resource type="Script" uid="uid://bt7vaabnpo1us" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="1_art"]
+[ext_resource type="Script" uid="uid://phileg818m3o" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="2_stage"]
+[ext_resource type="Script" uid="uid://iww0iyddykhp" path="res://TOWERS/Shared/Construction/TowerLevelArtwork.cs" id="3_level"]
+[ext_resource type="Texture2D" uid="uid://bsw8ic1xuhwtv" path="res://TOWERS/Offensive/RocketTower/Artwork/Construction/stage0_foundation.svg" id="4_foundation"]
+[ext_resource type="Texture2D" uid="uid://cyjknu5v8nndg" path="res://TOWERS/Offensive/RocketTower/Artwork/Construction/stage1_frame.svg" id="5_frame"]
+[ext_resource type="Texture2D" uid="uid://bvch44soq1wdu" path="res://TOWERS/Offensive/RocketTower/Artwork/Construction/stage2_assembly.svg" id="6_assembly"]
+[ext_resource type="Texture2D" uid="uid://4urmpbt5aaf5" path="res://TOWERS/Offensive/RocketTower/Artwork/Upgrades/rocket_upgrade_l2_35.svg" id="l2_35"]
+[ext_resource type="Texture2D" uid="uid://e0vmh7p0bgh1" path="res://TOWERS/Offensive/RocketTower/Artwork/Upgrades/rocket_upgrade_l2_70.svg" id="l2_70"]
+[ext_resource type="Texture2D" uid="uid://c0keo6npwcu6t" path="res://TOWERS/Offensive/RocketTower/Artwork/Upgrades/rocket_base_l2.svg" id="l2_base"]
+[ext_resource type="Texture2D" uid="uid://2r6ctw2uo5ql" path="res://TOWERS/Offensive/RocketTower/Artwork/Upgrades/rocket_gun_l2.svg" id="l2_gun"]
+[ext_resource type="Texture2D" uid="uid://drh0b6tpnoun6" path="res://TOWERS/Offensive/RocketTower/Artwork/Upgrades/rocket_upgrade_l3_35.svg" id="l3_35"]
+[ext_resource type="Texture2D" uid="uid://dldihmy02t7ok" path="res://TOWERS/Offensive/RocketTower/Artwork/Upgrades/rocket_upgrade_l3_70.svg" id="l3_70"]
+[ext_resource type="Texture2D" uid="uid://w7xw2iaqbphi" path="res://TOWERS/Offensive/RocketTower/Artwork/Upgrades/rocket_base_l3.svg" id="l3_base"]
+[ext_resource type="Texture2D" uid="uid://bnis60jlwnxi3" path="res://TOWERS/Offensive/RocketTower/Artwork/Upgrades/rocket_gun_l3.svg" id="l3_gun"]
 
 [sub_resource type="Resource" id="Stage0"]
 script = ExtResource("2_stage")
@@ -42,12 +41,11 @@ Texture = ExtResource("l2_70")
 
 [sub_resource type="Resource" id="Level2"]
 script = ExtResource("3_level")
-Level = 2
 FinishedBaseTexture = ExtResource("l2_base")
 FinishedGunTexture = ExtResource("l2_gun")
 UpgradeTexture = ExtResource("l2_35")
-UpgradeProgress = 0.35
 UpgradeStages = Array[ExtResource("2_stage")]([SubResource("UpgradeL2_35"), SubResource("UpgradeL2_70")])
+UpgradeProgress = 0.35
 
 [sub_resource type="Resource" id="UpgradeL3_35"]
 script = ExtResource("2_stage")
@@ -65,8 +63,8 @@ Level = 3
 FinishedBaseTexture = ExtResource("l3_base")
 FinishedGunTexture = ExtResource("l3_gun")
 UpgradeTexture = ExtResource("l3_35")
-UpgradeProgress = 0.35
 UpgradeStages = Array[ExtResource("2_stage")]([SubResource("UpgradeL3_35"), SubResource("UpgradeL3_70")])
+UpgradeProgress = 0.35
 
 [resource]
 script = ExtResource("1_art")

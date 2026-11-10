@@ -5,7 +5,6 @@
 
 [sub_resource type="Resource" id="default_tracer"]
 script = ExtResource("visual")
-EmitsWorldLight = true
 LengthPixels = 7.0
 CoreThicknessPixels = 1.3
 GlowWidthMultiplier = 2.0
@@ -13,6 +12,7 @@ CoreColor = Color(1, 0.702, 0.671, 1)
 BodyColor = Color(0.937, 0.4, 0.38, 1)
 GlowColor = Color(0.784, 0.196, 0.196, 0.18)
 BrightTip = false
+EmitsWorldLight = true
 
 [resource]
 script = ExtResource("config")

@@ -1,8 +1,7 @@
 [gd_resource type="TileSet" format=3 uid="uid://bwnwc1jg7xakk"]
 
 [ext_resource type="Texture2D" uid="uid://dkyx0lp88jisq" path="res://WORLD/TERRAIN/Tiles/Metal/prototype_atlas.svg" id="1"]
-
-[ext_resource type="Texture2D" path="res://WORLD/TERRAIN/Tiles/Decorative/IndustrialAccents.svg" id="2_accents"]
+[ext_resource type="Texture2D" uid="uid://qtv5engx3hf5" path="res://WORLD/TERRAIN/Tiles/Decorative/IndustrialAccents.svg" id="2_accents"]
 [ext_resource type="Material" path="res://WORLD/TERRAIN/Tiles/Decorative/IndustrialPulseCyan.tres" id="3_cyan"]
 [ext_resource type="Material" path="res://WORLD/TERRAIN/Tiles/Decorative/IndustrialPulseAmber.tres" id="4_amber"]
 

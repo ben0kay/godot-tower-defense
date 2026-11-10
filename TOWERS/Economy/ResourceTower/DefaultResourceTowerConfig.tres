@@ -1,42 +1,29 @@
-[gd_resource type="Resource" script_class="ResourceTowerConfig" load_steps=7 format=3]
-[ext_resource type="Script" path="res://TOWERS/Economy/ResourceTower/ResourceTowerConfig.cs" id="1"]
-[ext_resource type="Script" path="res://TOWERS/Economy/Shared/CreditProduction/CreditProducerLevel.cs" id="2"]
-[ext_resource type="Resource" path="res://TOWERS/Economy/ResourceTower/Artwork/Construction/ResourceConstructionArt.tres" id="construction"]
+[gd_resource type="Resource" script_class="ResourceTowerConfig" format=3 uid="uid://dy4lxoo237wfg"]
+
+[ext_resource type="Script" uid="uid://cc0pl6lkaoyrj" path="res://TOWERS/Economy/ResourceTower/ResourceTowerConfig.cs" id="1"]
+[ext_resource type="Script" uid="uid://bsv60l87iomjj" path="res://TOWERS/Economy/Shared/CreditProduction/CreditProducerLevel.cs" id="2"]
+[ext_resource type="Resource" uid="uid://glxlyl35njsg" path="res://TOWERS/Economy/ResourceTower/Artwork/Construction/ResourceConstructionArt.tres" id="construction"]
 
 [sub_resource type="Resource" id="Tier1"]
 script = ExtResource("2")
 Price = 350
-Capacity = 100
-CreditsPerKill = 0
 CreditsPerCycle = 10
-CycleSeconds = 5.0
-RangePixels = 0.0
-HullHealth = 1500.0
-WorkSeconds = 2.0
 
 [sub_resource type="Resource" id="Tier2"]
 script = ExtResource("2")
 Price = 250
 Capacity = 150
-CreditsPerKill = 0
 CreditsPerCycle = 15
-CycleSeconds = 5.0
-RangePixels = 0.0
 HullHealth = 1575.0
-WorkSeconds = 2.0
 
 [sub_resource type="Resource" id="Tier3"]
 script = ExtResource("2")
 Price = 350
 Capacity = 200
-CreditsPerKill = 0
 CreditsPerCycle = 20
-CycleSeconds = 5.0
-RangePixels = 0.0
 HullHealth = 1653.75
-WorkSeconds = 2.0
 
 [resource]
 script = ExtResource("1")
-ConstructionArt = ExtResource("construction")
 ProductionLevels = Array[ExtResource("2")]([SubResource("Tier1"), SubResource("Tier2"), SubResource("Tier3")])
+ConstructionArt = ExtResource("construction")

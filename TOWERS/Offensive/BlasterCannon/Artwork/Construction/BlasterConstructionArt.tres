@@ -1,16 +1,15 @@
-[gd_resource type="Resource" script_class="TowerConstructionArt" format=3]
+[gd_resource type="Resource" script_class="TowerConstructionArt" format=3 uid="uid://cxp2hfqqfflqt"]
 
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="1_art"]
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="2_stage"]
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerLevelArtwork.cs" id="3_level"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Construction/stage0_foundation.svg" id="4_foundation"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Construction/stage1_frame.svg" id="5_frame"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Construction/stage2_assembly.svg" id="6_assembly"]
-
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Upgrades/blaster_base_l2.svg" id="l2_base"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Upgrades/blaster_gun_l2.svg" id="l2_gun"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Upgrades/blaster_upgrade_l2_35.svg" id="l2_35"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Upgrades/blaster_upgrade_l2_70.svg" id="l2_70"]
+[ext_resource type="Script" uid="uid://bt7vaabnpo1us" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="1_art"]
+[ext_resource type="Script" uid="uid://phileg818m3o" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="2_stage"]
+[ext_resource type="Script" uid="uid://iww0iyddykhp" path="res://TOWERS/Shared/Construction/TowerLevelArtwork.cs" id="3_level"]
+[ext_resource type="Texture2D" uid="uid://b5kymj4d1qm5l" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Construction/stage0_foundation.svg" id="4_foundation"]
+[ext_resource type="Texture2D" uid="uid://1d2r52aqa4yl" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Construction/stage1_frame.svg" id="5_frame"]
+[ext_resource type="Texture2D" uid="uid://dbvlj6wl3mppg" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Construction/stage2_assembly.svg" id="6_assembly"]
+[ext_resource type="Texture2D" uid="uid://d223pqfckvm83" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Upgrades/blaster_upgrade_l2_35.svg" id="l2_35"]
+[ext_resource type="Texture2D" uid="uid://dqynccqxee42k" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Upgrades/blaster_upgrade_l2_70.svg" id="l2_70"]
+[ext_resource type="Texture2D" uid="uid://bnakvdmksqle7" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Upgrades/blaster_base_l2.svg" id="l2_base"]
+[ext_resource type="Texture2D" uid="uid://bpnemnus4gfg5" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Upgrades/blaster_gun_l2.svg" id="l2_gun"]
 
 [sub_resource type="Resource" id="Stage0"]
 script = ExtResource("2_stage")
@@ -38,12 +37,11 @@ Texture = ExtResource("l2_70")
 
 [sub_resource type="Resource" id="Level2"]
 script = ExtResource("3_level")
-Level = 2
 FinishedBaseTexture = ExtResource("l2_base")
 FinishedGunTexture = ExtResource("l2_gun")
 UpgradeTexture = ExtResource("l2_35")
-UpgradeProgress = 0.35
 UpgradeStages = Array[ExtResource("2_stage")]([SubResource("UpgradeL2_35"), SubResource("UpgradeL2_70")])
+UpgradeProgress = 0.35
 
 [resource]
 script = ExtResource("1_art")

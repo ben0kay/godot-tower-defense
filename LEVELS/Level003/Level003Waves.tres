@@ -77,7 +77,7 @@ Enemies = Array[ExtResource("enemy")]([SubResource("E3_2_1")])
 
 [sub_resource type="Resource" id="E3_3_1"]
 script = ExtResource("enemy")
-EnemyId = "medium_mk1"
+EnemyId = "big_mk1"
 
 [sub_resource type="Resource" id="B3_3"]
 script = ExtResource("batch")

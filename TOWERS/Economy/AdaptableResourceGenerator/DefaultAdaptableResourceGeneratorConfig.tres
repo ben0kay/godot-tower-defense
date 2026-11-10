@@ -1,39 +1,28 @@
-[gd_resource type="Resource" script_class="AdaptableResourceGeneratorConfig" load_steps=6 format=3]
-[ext_resource type="Script" path="res://TOWERS/Economy/AdaptableResourceGenerator/AdaptableResourceGeneratorConfig.cs" id="1"]
-[ext_resource type="Script" path="res://TOWERS/Economy/Shared/CreditProduction/CreditProducerLevel.cs" id="2"]
+[gd_resource type="Resource" script_class="AdaptableResourceGeneratorConfig" format=3 uid="uid://cyl1o4v2goufu"]
+
+[ext_resource type="Script" uid="uid://bfy5gyn6wqyuv" path="res://TOWERS/Economy/AdaptableResourceGenerator/AdaptableResourceGeneratorConfig.cs" id="1"]
+[ext_resource type="Script" uid="uid://bsv60l87iomjj" path="res://TOWERS/Economy/Shared/CreditProduction/CreditProducerLevel.cs" id="2"]
 
 [sub_resource type="Resource" id="Tier1"]
 script = ExtResource("2")
-Price = 300
-Capacity = 100
 CreditsPerKill = 1
-CreditsPerCycle = 0
-CycleSeconds = 5.0
 RangePixels = 256.0
-HullHealth = 1500.0
-WorkSeconds = 2.0
 
 [sub_resource type="Resource" id="Tier2"]
 script = ExtResource("2")
 Price = 250
 Capacity = 150
 CreditsPerKill = 2
-CreditsPerCycle = 0
-CycleSeconds = 5.0
 RangePixels = 288.0
 HullHealth = 1575.0
-WorkSeconds = 2.0
 
 [sub_resource type="Resource" id="Tier3"]
 script = ExtResource("2")
 Price = 350
 Capacity = 200
 CreditsPerKill = 3
-CreditsPerCycle = 0
-CycleSeconds = 5.0
 RangePixels = 320.0
 HullHealth = 1653.75
-WorkSeconds = 2.0
 
 [resource]
 script = ExtResource("1")

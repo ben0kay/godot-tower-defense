@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://d3rj1iimghlhl" path="res://LEVELS/LevelConfig.cs" id="1"]
 [ext_resource type="Script" uid="uid://dv76v7ybdvk74" path="res://ENEMIES/Spawning/MapEdges/SpawnEdgeSector.cs" id="1_vjpg2"]
-[ext_resource type="Resource" path="res://LEVELS/Level002/Level002Briefing.tres" id="mission_briefing"]
+[ext_resource type="Resource" uid="uid://bw105m7g70qlf" path="res://LEVELS/Level002/Level002Briefing.tres" id="mission_briefing"]
 [ext_resource type="Script" uid="uid://dmtgwp8f0o7mb" path="res://LEVELS/Level002/Level002Waves.cs" id="waves_script"]
 
 [sub_resource type="Resource" id="wave_source"]

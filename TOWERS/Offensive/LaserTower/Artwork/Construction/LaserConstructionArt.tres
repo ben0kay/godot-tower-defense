@@ -1,20 +1,19 @@
-[gd_resource type="Resource" script_class="TowerConstructionArt" format=3]
+[gd_resource type="Resource" script_class="TowerConstructionArt" format=3 uid="uid://dt2e788ap2pxo"]
 
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="1_art"]
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="2_stage"]
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerLevelArtwork.cs" id="3_level"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Construction/stage0_foundation.svg" id="build0"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Construction/stage1_frame.svg" id="build1"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Construction/stage2_assembly.svg" id="build2"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_base_l2.svg" id="l2_base"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_gun_l2.svg" id="l2_gun"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_upgrade_l2_35.svg" id="l2_35"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_upgrade_l2_70.svg" id="l2_70"]
-
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_base_l3.svg" id="l3_base"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_gun_l3.svg" id="l3_gun"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_upgrade_l3_35.svg" id="l3_35"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_upgrade_l3_70.svg" id="l3_70"]
+[ext_resource type="Script" uid="uid://bt7vaabnpo1us" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="1_art"]
+[ext_resource type="Script" uid="uid://phileg818m3o" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="2_stage"]
+[ext_resource type="Script" uid="uid://iww0iyddykhp" path="res://TOWERS/Shared/Construction/TowerLevelArtwork.cs" id="3_level"]
+[ext_resource type="Texture2D" uid="uid://cq8svrj7e0cuy" path="res://TOWERS/Offensive/LaserTower/Artwork/Construction/stage0_foundation.svg" id="build0"]
+[ext_resource type="Texture2D" uid="uid://depv1ct344hrw" path="res://TOWERS/Offensive/LaserTower/Artwork/Construction/stage1_frame.svg" id="build1"]
+[ext_resource type="Texture2D" uid="uid://cfntvvpe1rn6g" path="res://TOWERS/Offensive/LaserTower/Artwork/Construction/stage2_assembly.svg" id="build2"]
+[ext_resource type="Texture2D" uid="uid://dg778gd2gejqm" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_upgrade_l2_35.svg" id="l2_35"]
+[ext_resource type="Texture2D" uid="uid://n2e21fekpjso" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_upgrade_l2_70.svg" id="l2_70"]
+[ext_resource type="Texture2D" uid="uid://d16eihocpqof3" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_base_l2.svg" id="l2_base"]
+[ext_resource type="Texture2D" uid="uid://b00u2f3bii4fs" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_gun_l2.svg" id="l2_gun"]
+[ext_resource type="Texture2D" uid="uid://tb4tiqkmdxy0" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_upgrade_l3_35.svg" id="l3_35"]
+[ext_resource type="Texture2D" uid="uid://b6a1yi6irfuke" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_upgrade_l3_70.svg" id="l3_70"]
+[ext_resource type="Texture2D" uid="uid://bvjj8460nplxu" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_base_l3.svg" id="l3_base"]
+[ext_resource type="Texture2D" uid="uid://gf5o5x1i5ub5" path="res://TOWERS/Offensive/LaserTower/Artwork/Upgrades/laser_gun_l3.svg" id="l3_gun"]
 
 [sub_resource type="Resource" id="Stage0"]
 script = ExtResource("2_stage")
@@ -40,6 +39,14 @@ script = ExtResource("2_stage")
 Progress = 0.7
 Texture = ExtResource("l2_70")
 
+[sub_resource type="Resource" id="Level2"]
+script = ExtResource("3_level")
+FinishedBaseTexture = ExtResource("l2_base")
+FinishedGunTexture = ExtResource("l2_gun")
+UpgradeTexture = ExtResource("l2_35")
+UpgradeStages = Array[ExtResource("2_stage")]([SubResource("UpgradeL2_35"), SubResource("UpgradeL2_70")])
+UpgradeProgress = 0.35
+
 [sub_resource type="Resource" id="UpgradeL3_35"]
 script = ExtResource("2_stage")
 Progress = 0.35
@@ -50,23 +57,14 @@ script = ExtResource("2_stage")
 Progress = 0.7
 Texture = ExtResource("l3_70")
 
-[sub_resource type="Resource" id="Level2"]
-script = ExtResource("3_level")
-Level = 2
-FinishedBaseTexture = ExtResource("l2_base")
-FinishedGunTexture = ExtResource("l2_gun")
-UpgradeTexture = ExtResource("l2_35")
-UpgradeProgress = 0.35
-UpgradeStages = Array[ExtResource("2_stage")]([SubResource("UpgradeL2_35"), SubResource("UpgradeL2_70")])
-
 [sub_resource type="Resource" id="Level3"]
 script = ExtResource("3_level")
 Level = 3
 FinishedBaseTexture = ExtResource("l3_base")
 FinishedGunTexture = ExtResource("l3_gun")
 UpgradeTexture = ExtResource("l3_35")
-UpgradeProgress = 0.35
 UpgradeStages = Array[ExtResource("2_stage")]([SubResource("UpgradeL3_35"), SubResource("UpgradeL3_70")])
+UpgradeProgress = 0.35
 
 [resource]
 script = ExtResource("1_art")

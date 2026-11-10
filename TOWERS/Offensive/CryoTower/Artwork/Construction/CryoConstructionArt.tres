@@ -1,18 +1,19 @@
-[gd_resource type="Resource" script_class="TowerConstructionArt" format=3]
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="1_art"]
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="2_stage"]
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerLevelArtwork.cs" id="3_level"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/CryoTower/Artwork/Construction/stage0_foundation.svg" id="build0"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/CryoTower/Artwork/Construction/stage1_frame.svg" id="build1"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/CryoTower/Artwork/Construction/stage2_assembly.svg" id="build2"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/CryoTower/Artwork/Upgrades/cryo_base_l2.svg" id="l2_base"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/CryoTower/Artwork/Upgrades/cryo_gun_l2.svg" id="l2_gun"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/CryoTower/Artwork/Upgrades/cryo_upgrade_l2_35.svg" id="l2_35"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/CryoTower/Artwork/Upgrades/cryo_upgrade_l2_70.svg" id="l2_70"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/CryoTower/Artwork/Upgrades/cryo_base_l3.svg" id="l3_base"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/CryoTower/Artwork/Upgrades/cryo_gun_l3.svg" id="l3_gun"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/CryoTower/Artwork/Upgrades/cryo_upgrade_l3_35.svg" id="l3_35"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/CryoTower/Artwork/Upgrades/cryo_upgrade_l3_70.svg" id="l3_70"]
+[gd_resource type="Resource" script_class="TowerConstructionArt" format=3 uid="uid://do54o7c8voxus"]
+
+[ext_resource type="Script" uid="uid://bt7vaabnpo1us" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="1_art"]
+[ext_resource type="Script" uid="uid://phileg818m3o" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="2_stage"]
+[ext_resource type="Script" uid="uid://iww0iyddykhp" path="res://TOWERS/Shared/Construction/TowerLevelArtwork.cs" id="3_level"]
+[ext_resource type="Texture2D" uid="uid://pivr6r1en5t6" path="res://TOWERS/Offensive/CryoTower/Artwork/Construction/stage0_foundation.svg" id="build0"]
+[ext_resource type="Texture2D" uid="uid://c7i4tydhvkuef" path="res://TOWERS/Offensive/CryoTower/Artwork/Construction/stage1_frame.svg" id="build1"]
+[ext_resource type="Texture2D" uid="uid://drci7q7y8j0cn" path="res://TOWERS/Offensive/CryoTower/Artwork/Construction/stage2_assembly.svg" id="build2"]
+[ext_resource type="Texture2D" uid="uid://c3td3e5oc53w2" path="res://TOWERS/Offensive/CryoTower/Artwork/Upgrades/cryo_upgrade_l2_35.svg" id="l2_35"]
+[ext_resource type="Texture2D" uid="uid://d4bf3jrllopte" path="res://TOWERS/Offensive/CryoTower/Artwork/Upgrades/cryo_upgrade_l2_70.svg" id="l2_70"]
+[ext_resource type="Texture2D" uid="uid://dcvdgx52jipaw" path="res://TOWERS/Offensive/CryoTower/Artwork/Upgrades/cryo_base_l2.svg" id="l2_base"]
+[ext_resource type="Texture2D" uid="uid://daqq20wy8xvth" path="res://TOWERS/Offensive/CryoTower/Artwork/Upgrades/cryo_gun_l2.svg" id="l2_gun"]
+[ext_resource type="Texture2D" uid="uid://dg11f1n4tfugb" path="res://TOWERS/Offensive/CryoTower/Artwork/Upgrades/cryo_upgrade_l3_35.svg" id="l3_35"]
+[ext_resource type="Texture2D" uid="uid://dtuq6m81mv7a1" path="res://TOWERS/Offensive/CryoTower/Artwork/Upgrades/cryo_upgrade_l3_70.svg" id="l3_70"]
+[ext_resource type="Texture2D" uid="uid://dkhw2t3qtqs7k" path="res://TOWERS/Offensive/CryoTower/Artwork/Upgrades/cryo_base_l3.svg" id="l3_base"]
+[ext_resource type="Texture2D" uid="uid://cwedu2p12ppfe" path="res://TOWERS/Offensive/CryoTower/Artwork/Upgrades/cryo_gun_l3.svg" id="l3_gun"]
 
 [sub_resource type="Resource" id="Stage0"]
 script = ExtResource("2_stage")
@@ -40,12 +41,11 @@ Texture = ExtResource("l2_70")
 
 [sub_resource type="Resource" id="Level2"]
 script = ExtResource("3_level")
-Level = 2
 FinishedBaseTexture = ExtResource("l2_base")
 FinishedGunTexture = ExtResource("l2_gun")
 UpgradeTexture = ExtResource("l2_35")
-UpgradeProgress = 0.35
 UpgradeStages = Array[ExtResource("2_stage")]([SubResource("UpgradeL2_35"), SubResource("UpgradeL2_70")])
+UpgradeProgress = 0.35
 
 [sub_resource type="Resource" id="UpgradeL3_35"]
 script = ExtResource("2_stage")
@@ -63,9 +63,9 @@ Level = 3
 FinishedBaseTexture = ExtResource("l3_base")
 FinishedGunTexture = ExtResource("l3_gun")
 UpgradeTexture = ExtResource("l3_35")
-UpgradeProgress = 0.35
 UpgradeStages = Array[ExtResource("2_stage")]([SubResource("UpgradeL3_35"), SubResource("UpgradeL3_70")])
- 
+UpgradeProgress = 0.35
+
 [resource]
 script = ExtResource("1_art")
 BuildStages = Array[ExtResource("2_stage")]([SubResource("Stage0"), SubResource("Stage1"), SubResource("Stage2")])

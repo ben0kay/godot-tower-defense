@@ -1,20 +1,26 @@
-[gd_resource type="Resource" script_class="TowerConstructionArt" format=3]
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="art"]
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="stage"]
-[ext_resource type="Texture2D" path="res://TOWERS/Utility/PowerTransmitter/Artwork/power_transmitter_foundation.svg" id="a"]
-[ext_resource type="Texture2D" path="res://TOWERS/Utility/PowerTransmitter/Artwork/power_transmitter_frame.svg" id="b"]
-[ext_resource type="Texture2D" path="res://TOWERS/Utility/PowerTransmitter/Artwork/power_transmitter_assembly.svg" id="c"]
+[gd_resource type="Resource" script_class="TowerConstructionArt" format=3 uid="uid://l7fc5sftg6b2"]
+
+[ext_resource type="Script" uid="uid://iww0iyddykhp" path="res://TOWERS/Shared/Construction/TowerLevelArtwork.cs" id="5_ubcna"]
+[ext_resource type="Texture2D" uid="uid://cqt8knhee607x" path="res://TOWERS/Utility/PowerTransmitter/Artwork/power_transmitter_foundation.svg" id="a"]
+[ext_resource type="Script" uid="uid://bt7vaabnpo1us" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="art"]
+[ext_resource type="Texture2D" uid="uid://1gl3ywn0a2fg" path="res://TOWERS/Utility/PowerTransmitter/Artwork/power_transmitter_frame.svg" id="b"]
+[ext_resource type="Texture2D" uid="uid://b0vjm3chgtt44" path="res://TOWERS/Utility/PowerTransmitter/Artwork/power_transmitter_assembly.svg" id="c"]
+[ext_resource type="Script" uid="uid://phileg818m3o" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="stage"]
+
 [sub_resource type="Resource" id="Foundation"]
 script = ExtResource("stage")
 Texture = ExtResource("a")
+
 [sub_resource type="Resource" id="Frame"]
 script = ExtResource("stage")
 Progress = 0.35
 Texture = ExtResource("b")
+
 [sub_resource type="Resource" id="Assembly"]
 script = ExtResource("stage")
 Progress = 0.7
 Texture = ExtResource("c")
+
 [resource]
 script = ExtResource("art")
 BuildStages = Array[ExtResource("stage")]([SubResource("Foundation"), SubResource("Frame"), SubResource("Assembly")])

@@ -1,14 +1,14 @@
-[gd_resource type="Resource" script_class="TowerConstructionArt" format=3]
+[gd_resource type="Resource" script_class="TowerConstructionArt" format=3 uid="uid://ddlxwaxt7ys8k"]
 
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="1_art"]
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="2_stage"]
-[ext_resource type="Script" path="res://TOWERS/Shared/Construction/TowerLevelArtwork.cs" id="3_level"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/ShockwaveTower/Artwork/Construction/stage0_foundation.svg" id="build0"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/ShockwaveTower/Artwork/Construction/stage1_frame.svg" id="build1"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/ShockwaveTower/Artwork/Construction/stage2_assembly.svg" id="build2"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/ShockwaveTower/Artwork/Upgrades/shockwave_tower_l2.svg" id="l2_finished"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/ShockwaveTower/Artwork/Upgrades/shockwave_upgrade_l2_35.svg" id="l2_35"]
-[ext_resource type="Texture2D" path="res://TOWERS/Offensive/ShockwaveTower/Artwork/Upgrades/shockwave_upgrade_l2_70.svg" id="l2_70"]
+[ext_resource type="Script" uid="uid://bt7vaabnpo1us" path="res://TOWERS/Shared/Construction/TowerConstructionArt.cs" id="1_art"]
+[ext_resource type="Script" uid="uid://phileg818m3o" path="res://TOWERS/Shared/Construction/TowerConstructionStage.cs" id="2_stage"]
+[ext_resource type="Script" uid="uid://iww0iyddykhp" path="res://TOWERS/Shared/Construction/TowerLevelArtwork.cs" id="3_level"]
+[ext_resource type="Texture2D" uid="uid://8hs75jyyqous" path="res://TOWERS/Offensive/ShockwaveTower/Artwork/Construction/stage0_foundation.svg" id="build0"]
+[ext_resource type="Texture2D" uid="uid://bu3wvb05w0g8v" path="res://TOWERS/Offensive/ShockwaveTower/Artwork/Construction/stage1_frame.svg" id="build1"]
+[ext_resource type="Texture2D" uid="uid://0lvufmlif6l0" path="res://TOWERS/Offensive/ShockwaveTower/Artwork/Construction/stage2_assembly.svg" id="build2"]
+[ext_resource type="Texture2D" uid="uid://bnu8hk8t1l7ry" path="res://TOWERS/Offensive/ShockwaveTower/Artwork/Upgrades/shockwave_upgrade_l2_35.svg" id="l2_35"]
+[ext_resource type="Texture2D" uid="uid://ci7snopctiu4v" path="res://TOWERS/Offensive/ShockwaveTower/Artwork/Upgrades/shockwave_upgrade_l2_70.svg" id="l2_70"]
+[ext_resource type="Texture2D" uid="uid://bp2l6bh164al3" path="res://TOWERS/Offensive/ShockwaveTower/Artwork/Upgrades/shockwave_tower_l2.svg" id="l2_finished"]
 
 [sub_resource type="Resource" id="Stage0"]
 script = ExtResource("2_stage")
@@ -36,11 +36,10 @@ Texture = ExtResource("l2_70")
 
 [sub_resource type="Resource" id="Level2"]
 script = ExtResource("3_level")
-Level = 2
 FinishedTexture = ExtResource("l2_finished")
 UpgradeTexture = ExtResource("l2_35")
-UpgradeProgress = 0.35
 UpgradeStages = Array[ExtResource("2_stage")]([SubResource("UpgradeL2_35"), SubResource("UpgradeL2_70")])
+UpgradeProgress = 0.35
 
 [resource]
 script = ExtResource("1_art")
