@@ -8,7 +8,7 @@ public partial class EnemyBulletRenderer : Node2D
     private readonly Color[] _colors = new Color[EnemyEnergyStreakGeometry.VertexCount];
     #region Drawing Lifetime
     // =========================================================
-    // The world simulation explicitly binds this surface; drawing never owns damage, expiry or offscreen culling.
+    // The world simulation explicitly binds this surface; drawing never owns damage or expiry.
     public void Bind(EnemyBulletSystem system) { _system = system; QueueRedraw(); }
     // =========================================================
     // Render work is requested only by state changes; there is no idle animation callback.
@@ -21,11 +21,15 @@ public partial class EnemyBulletRenderer : Node2D
         Transform2D transform = GlobalTransform;
         if (!transform.X.IsFinite() || !transform.Y.IsFinite() || !transform.Origin.IsFinite() || transform.Determinant() == 0) return;
         Transform2D worldToLocal = transform.AffineInverse();
+        Transform2D worldToScreen = GetCanvasTransform();
+        Rect2 viewport = GetViewportRect();
         DrawSetTransformMatrix(worldToLocal);
         for (int i = 0; i < _system.ActiveCount; i++)
         {
             EnemyBulletData bullet = _system.Snapshot(i);
             var visual = bullet.Visual; if (!visual.Enabled) continue;
+            if (!ProjectileVisualBounds.OverlapsViewport(
+                ProjectileVisualBounds.ForTracer(bullet.Position, bullet.Direction, visual), worldToScreen, viewport)) continue;
             Vector2 head = bullet.Position, tail = head - bullet.Direction * visual.Length;
             if (GodotObject.IsInstanceValid(visual.Texture))
             {

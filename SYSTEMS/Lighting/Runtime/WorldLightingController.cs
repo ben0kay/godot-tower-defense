@@ -84,6 +84,7 @@ public partial class WorldLightingController : Node2D
     public override void _Process(double delta)
     {
         TickMovingReveal(delta);
+        RefreshProjectileLightVisibility();
         _refreshRemaining -= delta;
         if (_refreshRemaining <= 0) RefreshLights();
         TickEnemyReveal(delta);
@@ -252,7 +253,7 @@ public partial class WorldLightingController : Node2D
 
         UpdateRevealPresentation();
         bool watchSteam = RefreshLavaSteam();
-        SetProcess(_darkContacts.Count > 0 || _contactsDirty || HasPendingEnemyReveal || watchSteam || (RevealActive && _movingReveal) || (cull && (hasCandidates || _projectileSources.Count > 0)));
+        SetProcess(_projectileSources.Count > 0 || _darkContacts.Count > 0 || _contactsDirty || HasPendingEnemyReveal || watchSteam || (RevealActive && _movingReveal) || (cull && (hasCandidates || _projectileSources.Count > 0)));
     }
 
     // =========================================================
@@ -281,7 +282,7 @@ public partial class WorldLightingController : Node2D
         return viewport.Intersects(new Rect2(centre - extent, 2 * extent), true);
     }
 
-    private static Vector2 PositionFor(Source source) => source.Projectile?.Light?.GlobalPosition ?? source.Anchor?.ToGlobal(source.Offset) ?? source.Offset;
+    private static Vector2 PositionFor(Source source) => source.Projectile?.Position ?? source.Anchor?.ToGlobal(source.Offset) ?? source.Offset;
 
     private float RadiusFor(Source source) => source.Radius *
         (source.UnderConstruction?.Invoke() == true ? Mathf.Clamp(Config.ConstructionRadiusFactor, 0.1f, 1) : 1);
@@ -310,7 +311,8 @@ public partial class WorldLightingController : Node2D
         light.Color = source.Projectile?.Tint ?? source.Profile.Tint;
         if (source.Projectile is { } projectile) projectile.Light = light;
         source.Follower?.FollowWith(light);
-        light.Enabled = true;
+        light.Enabled = source.Projectile == null ||
+            ProjectileLightOverlapsReveal(source.Projectile.Position, source.Projectile.Radius);
     }
 
     private Slot AcquireSlot()

@@ -6,11 +6,17 @@ public partial class WorldLightingController
 {
     private static readonly NodePath LightingPath = new("../../Lighting");
     private readonly List<Source> _projectileSources = new();
+    private Transform2D _projectileCanvas;
+    private Rect2 _projectileViewport;
+    private uint _projectileRevealRevision;
+    private bool _projectileRevealVisible;
 
-    internal sealed class ProjectileLight(WorldLightingController owner, bool hostile, Color tint)
+    internal sealed class ProjectileLight(WorldLightingController owner, bool hostile, Color tint, float radius)
     {
         private WorldLightingController _owner = owner;
         internal PointLight2D Light;
+        internal Vector2 Position;
+        internal readonly float Radius = radius;
         internal readonly bool Hostile = hostile;
         internal readonly Color Tint = tint;
 
@@ -18,7 +24,8 @@ public partial class WorldLightingController
         // Called only by shots that obtained a lease, using the existing travel update.
         internal void Move(Vector2 position)
         {
-            if (Light != null) Light.GlobalPosition = position;
+            Position = position;
+            _owner?.UpdateProjectileLight(this);
         }
 
         internal void Release() => _owner?.ReleaseProjectile(this);
@@ -51,15 +58,60 @@ public partial class WorldLightingController
 
         float radius = Config.Projectile.RadiusPixels;
         if (Config.CullOffscreenLights &&
-            !OverlapsLight(position, radius, GetCanvasTransform(), GetViewportRect().Grow(Mathf.Max(0, Config.ScreenMarginPixels))))
+            !OverlapsLight(position, radius, GetCanvasTransform(), GetViewportRect()))
             return null;
 
-        ProjectileLight lease = new(this, hostile, WeaponVisualMath.Color(tint));
+        ProjectileLight lease = new(this, hostile, WeaponVisualMath.Color(tint), radius) { Position = position };
         Source candidate = new(null, Config.Projectile, position, radius, null, Projectile: lease);
         _projectileSources.Add(candidate);
         Apply(candidate);
-        if (Config.CullOffscreenLights && !IsProcessing()) SetProcess(true);
+        if (!IsProcessing()) SetProcess(true);
         return lease;
+    }
+
+    // =========================================================
+    // Movement already visits each leased shot. Whole-light culling releases the same pooled slot.
+    private void UpdateProjectileLight(ProjectileLight lease) =>
+        UpdateProjectileLight(lease, GetCanvasTransform(), GetViewportRect());
+
+    private void UpdateProjectileLight(ProjectileLight lease, Transform2D canvas, Rect2 viewport)
+    {
+        if (lease.Light == null) return;
+        if (Config.CullOffscreenLights && !OverlapsLight(lease.Position, lease.Radius, canvas, viewport))
+        {
+            ReleaseProjectile(lease);
+            return;
+        }
+        if (lease.Light.GlobalPosition != lease.Position) lease.Light.GlobalPosition = lease.Position;
+        bool enabled = ProjectileLightOverlapsReveal(lease.Position, lease.Radius);
+        if (lease.Light.Enabled != enabled) lease.Light.Enabled = enabled;
+    }
+
+    private bool ProjectileLightOverlapsReveal(Vector2 position, float radius)
+    {
+        if (!RevealVisible) return true;
+        EnsureRevealField();
+        // Keep light spill wherever bilinear mask filtering can leave visible projectile pixels.
+        Vector2 texel = _maskBounds.Size / new Vector2(Mathf.Max(1, _maskWidth), Mathf.Max(1, _maskHeight));
+        return _reveal.OverlapsDisk(position, radius + texel.Length());
+    }
+
+    // =========================================================
+    // Camera and reveal changes share the existing world loop, bounded by at most eight leases.
+    private void RefreshProjectileLightVisibility()
+    {
+        if (_projectileSources.Count == 0) return;
+        if (RevealVisible) EnsureRevealField();
+        Transform2D canvas = GetCanvasTransform();
+        Rect2 viewport = GetViewportRect();
+        if (_projectileCanvas == canvas && _projectileViewport == viewport &&
+            _projectileRevealRevision == _revealRevision && _projectileRevealVisible == RevealVisible) return;
+        _projectileCanvas = canvas;
+        _projectileViewport = viewport;
+        _projectileRevealRevision = _revealRevision;
+        _projectileRevealVisible = RevealVisible;
+        for (int i = _projectileSources.Count - 1; i >= 0; i--)
+            UpdateProjectileLight(_projectileSources[i].Projectile, canvas, viewport);
     }
 
     // =========================================================

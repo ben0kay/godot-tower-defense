@@ -25,6 +25,9 @@ public partial class BasicProjectile : Node2D
         _flight.ReleaseLight();
         _flight = new(target, speed, damage, effect, visual, handling, shieldRicochet, hullHitSparkCount);
         _launched = _finished = false;
+        ProjectileVisualBounds.SetCachedBounds(this,
+            ProjectileVisualBounds.ForTracer(Vector2.Zero, Vector2.Right, _flight.Visual), _flight.Visual.HasValue ? 20f : 0f);
+        QueueRedraw();
     }
 
     // =========================================================

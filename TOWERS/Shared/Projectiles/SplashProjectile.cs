@@ -25,6 +25,9 @@ public partial class SplashProjectile : Node2D
     public bool HasDetonated { get; private set; }
     public int AppliedHits { get; private set; }
 
+    public override void _Ready() =>
+        ProjectileVisualBounds.SetCachedBounds(this, ProjectileVisualBounds.Circle(Vector2.Zero, 5f));
+
     // =========================================================
     // Values are immutable copies; the projectile retains no tower or mutable config reference.
     public void Initialize(Enemy target, EnemyRegistry registry, Vector2 lastKnownImpact, float speed,

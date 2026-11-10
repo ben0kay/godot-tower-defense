@@ -47,6 +47,18 @@ internal sealed class LightRevealField
     internal bool Contains(Vector2 point) => point.IsFinite() &&
         (Contains(_wide, point) || (_buckets.TryGetValue(Bucket(point), out var bucket) && Contains(bucket, point)));
 
+    // =========================================================
+    // Only the bounded projectile light pool uses this conservative footprint test.
+    internal bool OverlapsDisk(Vector2 centre, float radius)
+    {
+        foreach (Disk disk in _disks)
+        {
+            float reach = radius + disk.Radius;
+            if (centre.DistanceSquaredTo(disk.Centre) <= reach * reach) return true;
+        }
+        return false;
+    }
+
     internal float AlphaAt(Vector2 point)
     {
         if (!point.IsFinite()) return 0;

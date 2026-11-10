@@ -1,3 +1,11 @@
+## P4-A visual viewport culling
+
+Friendly buffered and hostile shots share conservative tracer bounds including their tail, widest glow and bright tip. Shared renderers skip offscreen draw submissions. BasicProjectile and SplashProjectile retain cached draw commands and supply explicit native culling rectangles, so camera movement can bring them back without rebuilding geometry every frame. The shared lighting reveal shader still masks actual pixels at fog edges.
+
+Projectile lights use their full radius for viewport overlap and release pooled slots when offscreen. Completely concealed light footprints suspend illumination until they overlap reveal again. Simulation and impact feedback retain their existing lifecycle.
+
+---
+
 ## Buffered friendly tracers
 
 `World/Projectiles` now advances ordinary tower and fighter tracers in one retained buffer and draws them on one canvas item. `FriendlyProjectileFlight` shares straight and homing travel, swept hits, statuses, shield feedback and projectile light leases with the standalone `BasicProjectile` adapter. Splash rounds and wave emitters still use their existing child nodes.

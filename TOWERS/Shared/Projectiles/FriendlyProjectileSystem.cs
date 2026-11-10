@@ -96,27 +96,17 @@ public partial class FriendlyProjectileSystem : Node2D
         Transform2D transform = GlobalTransform;
         if (!transform.X.IsFinite() || !transform.Y.IsFinite() || !transform.Origin.IsFinite() || transform.Determinant() == 0) return;
         Transform2D worldToLocal = transform.AffineInverse();
-        Rect2 visibleWorld = VisibleWorldBounds();
+        Transform2D worldToScreen = GetCanvasTransform();
+        Rect2 viewport = GetViewportRect();
         DrawSetTransformMatrix(worldToLocal);
         for (int i = 0; i < _count; i++)
         {
             ref readonly FriendlyProjectileFlight shot = ref _shots[i];
-            if (visibleWorld.HasPoint(shot.Position))
+            if (ProjectileVisualBounds.OverlapsViewport(
+                ProjectileVisualBounds.ForTracer(shot.Position, shot.Direction, shot.Visual), worldToScreen, viewport))
                 _drawing.Draw(this, shot, shot.Position, shot.Direction, worldToLocal);
         }
         DrawSetTransformMatrix(Transform2D.Identity);
-    }
-
-    // =========================================================
-    // Pad by the maximum tracer extent so the tail remains visible when its head leaves the screen.
-    private Rect2 VisibleWorldBounds()
-    {
-        Transform2D screenToWorld = GetCanvasTransform().AffineInverse();
-        Rect2 viewport = GetViewportRect();
-        Vector2 halfSize = viewport.Size * .5f;
-        Vector2 centre = screenToWorld * (viewport.Position + halfSize);
-        Vector2 extent = screenToWorld.X.Abs() * halfSize.X + screenToWorld.Y.Abs() * halfSize.Y;
-        return new Rect2(centre - extent, 2 * extent).Grow(160);
     }
 
     // =========================================================

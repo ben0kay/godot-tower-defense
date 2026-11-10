@@ -14,6 +14,8 @@ Disabled towers release their cyan light and reveal until they recover. The cyan
 
 A.2 adds tiny lights for opt-in friendly and hostile rounds. The shared `Presets/ProjectileLight.tres` sets a 34px radius and 0.34 energy. Each round uses its tracer body or splash color. Enable `EmitsWorldLight` on a tracer style, or `ProjectileWorldLight` on Rocket/Blaster configs. `MaxProjectileLights` defaults to four spare slots within the world cap. With a cap above one, a single side can use up to the cap minus one. Already-flying rounds keep their normal visuals if they lose their slot. Set the category cap to zero to disable this pass.
 
+Projectile-light movement releases a lease when its full light footprint is outside the viewport. The existing world loop also checks camera and reveal changes, using at most eight leases. Fully concealed footprints disable their native lights, with conservative padding for the reveal texture's filtering. Partially revealed footprints retain their spill. The global and per-side budgets remain in effect. Projectile pixels continue using the shared fog shader.
+
 ## Light-based fog of war
 
 Towers retain their local cyan base lights. In darkness, a subtle red radar contact replaces the enemy hull and health bar. The two fade across lamp edges. Citadels, forming/open portals, flying drones and lava also reveal entities. Ground towers can fire and guide rounds at dark contacts with normal range, stealth and terrain rules. Fighters can also target dark contacts. Enemy direct targeting still requires light. Projectile lights illuminate the floor without granting reveal.

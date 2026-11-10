@@ -1,3 +1,9 @@
+## P4-A — Projectile viewport and fog visibility
+
+Shared friendly/hostile rendering now culls full tracer bounds. Basic/Splash retain cached commands with explicit native culling bounds. The capped light pool releases offscreen leases and suspends concealed light footprints. The reveal shader still handles bullet pixels. Source and geometry checks only, with no runtime FPS claim. Verify camera/fog boundaries, F6 and fallback shots using the optimization plan.
+
+---
+
 ## F1 enemy visual toggles
 
 The Developer Hub opens a companion Enemy Visuals panel for live enemy death explosion and health-bar toggles. Turning off bars hides both meter rows. Both switches default on for each battlefield and retain their values when the hub closes. Godot layout and live checks pending.
