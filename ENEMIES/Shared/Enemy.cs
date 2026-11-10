@@ -116,6 +116,20 @@ public partial class Enemy : Node2D
     private int _damageAppearanceStage = -1;
     private ShieldVisual _shieldVisual;
     private EnemyThrusterVisual _thruster;
+    private bool _fogConcealed;
+    internal bool HasHullMountedWeapon { get; set; }
+    internal bool SkipHiddenHullInterpolation =>
+        _fogConcealed && !HasHullMountedWeapon && Definition.MaxShield <= 0f;
+
+    // =========================================================
+    // Mounts and shield rims keep the normal hull transform for weapon and ricochet geometry.
+    internal void SetFogConcealed(bool concealed)
+    {
+        if (_fogConcealed == concealed) return;
+        _fogConcealed = concealed;
+        _thruster?.SetFogConcealed(concealed);
+        if (!concealed) UpdateDefenseBarTransform();
+    }
     private static PackedScene _shieldVisualScene;
     private double _initialDurability, _damageConsumed, _damageXpPool, _killXp;
     private int _xpCredits;
@@ -149,6 +163,7 @@ public partial class Enemy : Node2D
             : Vector2.One * Mathf.Max(8f, Definition.RadiusPixels * 2f);
         _visualCentre = sprite != null ? sprite.Transform * hullRect.GetCenter() : Vector2.Zero;
         _thruster = GetNodeOrNull<EnemyThrusterVisual>("Thruster");
+        _fogConcealed = false;
         _thruster?.Configure(sprite, Definition, AppliedVisualScale);
         if (_defenseBar != null)
         {
@@ -246,6 +261,7 @@ public partial class Enemy : Node2D
     {
         float oldHealth = Health;
         double actual = Math.Max(0, (double)Health - result.Health) + Math.Max(0, (double)CurrentShield - result.Shield);
+        if (actual > 0) _registry?.TerrainGrid?.Lighting?.RefreshEnemyRevealForCombat(this);
         double eligible = Math.Min(actual, Math.Max(0, _initialDurability - _damageConsumed));
         _damageConsumed += eligible; // Unattributed damage also consumes the finite budget; healing cannot refill it.
         double xp = 0;
@@ -319,7 +335,10 @@ public partial class Enemy : Node2D
 
     // =========================================================
     // Only visible health/shield meters counter-rotate; idle or absent meters do no work.
-    public void UpdateDefenseBarTransform() => _defenseBar?.AlignWithOwner(Rotation);
+    public void UpdateDefenseBarTransform()
+    {
+        if (!_fogConcealed) _defenseBar?.AlignWithOwner(Rotation);
+    }
 
     // =========================================================
     // Arrival is counted once; CitadelSession applies its configured damage.

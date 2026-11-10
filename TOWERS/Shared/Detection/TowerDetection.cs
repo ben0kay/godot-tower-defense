@@ -19,6 +19,6 @@ public static class TowerDetection
     private static bool IsLit(Enemy enemy)
     {
         WorldLightingController lighting = enemy.Registry?.TerrainGrid?.Lighting;
-        return lighting == null || lighting.IsRevealed(enemy.GlobalPosition);
+        return lighting == null || lighting.IsEnemyRevealed(enemy);
     }
 }

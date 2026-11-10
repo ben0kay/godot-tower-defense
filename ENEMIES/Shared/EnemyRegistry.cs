@@ -55,8 +55,7 @@ public partial class EnemyRegistry : Node
     public void UpdatePosition(Enemy enemy)
     {
         using var pf2 = SubsystemProfiler.Measure(this, ProfileCategory.Registry);
-        _spatial?.Move(enemy, enemy.GlobalPosition);
-        if (EnemyPositionChanged != null && _members.Contains(enemy)) EnemyPositionChanged.Invoke(enemy);
+        if (_spatial?.Move(enemy, enemy.GlobalPosition) == true) EnemyPositionChanged?.Invoke(enemy);
     }
     // =========================================================
     // Shared pooled buffers remain safe when a damage callback starts another query.

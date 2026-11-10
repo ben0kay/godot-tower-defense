@@ -18,6 +18,8 @@ A.2 adds tiny lights for opt-in friendly and hostile rounds. The shared `Presets
 
 Towers retain their local cyan base lights. In darkness, a subtle red radar contact replaces the enemy hull and health bar. The two fade across lamp edges. Citadels, forming/open portals, flying drones and lava also reveal entities. Ground towers can fire and guide rounds at dark contacts with normal range, stealth and terrain rules. Fighters can also target dark contacts. Enemy direct targeting still requires light. Projectile lights illuminate the floor without granting reveal.
 
+Routine enemy fade samples run on two staggered cohorts at about 30 Hz per moving ship. Spawn, source changes, and combat feedback can refresh presentation immediately. Radar positions stay current, with one shared redraw request per render frame when contacts or the viewport change. Fully concealed ships suspend thruster exhaust and hide their flame. Unarmed ships without shield capacity align to their travel heading while concealed and resume smooth turns when visible. Combat reveal queries still use current world positions and coverage.
+
 Use `RevealEnabled` to opt out. Reopen the level after editing this setting. F6 disables the visible mask and contacts for comparison. `SetSourceSuppressed(owner, suppressed)` controls a registered light's blackout state without changing damage, navigation or overlapping sources. Native portal lights have priority after Citadels. Gameplay coverage is independent of the cosmetic light cap.
 
 ## Removal

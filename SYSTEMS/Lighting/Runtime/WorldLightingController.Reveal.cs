@@ -9,10 +9,20 @@ public partial class WorldLightingController
     private readonly LightRevealField _reveal = new();
     private readonly List<Source> _portals = new();
     private readonly HashSet<Node2D> _suppressed = new();
-    private sealed class EnemyReveal(float original)
+    private const double EnemyRevealPhaseSeconds = 1.0 / 60.0;
+    private readonly HashSet<Enemy>[] _pendingEnemyReveal = { new(), new() };
+    private int _enemyRevealPhase, _nextEnemyPhase;
+    private double _enemyRevealElapsed;
+    private bool _contactsDirty, _contactRedrawQueued;
+    private bool HasPendingEnemyReveal => _pendingEnemyReveal[0].Count + _pendingEnemyReveal[1].Count > 0;
+
+    private sealed class EnemyReveal(float original, int phase)
     {
         internal readonly float Original = original;
+        internal readonly int Phase = phase;
         internal float Applied = original;
+        internal uint FieldRevision;
+        internal Vector2 SamplePosition;
         internal float ContactOpacity;
         internal Vector2 ContactPosition;
     }
@@ -34,6 +44,7 @@ public partial class WorldLightingController
     private int _maskWidth, _maskHeight;
     private bool _revealDirty = true, _maskDirty = true, _movingReveal;
     private double _revealRemaining;
+    private uint _revealRevision;
     private bool RevealActive => _ambient != null && Config.RevealEnabled;
     private bool RevealVisible => RevealActive && _lightingEnabled;
 
@@ -44,6 +55,15 @@ public partial class WorldLightingController
         if (!RevealActive) return true;
         EnsureRevealField();
         return _reveal.Contains(position);
+    }
+
+    internal bool IsEnemyRevealed(Enemy enemy)
+    {
+        bool revealed = IsRevealed(enemy.GlobalPosition);
+        if (revealed && RevealVisible && _enemyAlpha.TryGetValue(enemy, out EnemyReveal state) &&
+            state.ContactOpacity >= 1f)
+            RefreshEnemyRevealForCombat(enemy);
+        return revealed;
     }
 
     // =========================================================
@@ -94,6 +114,7 @@ public partial class WorldLightingController
     {
         if (!_revealDirty) return;
         _revealDirty = false;
+        _revealRevision++;
         _maskDirty = true;
         _reveal.Clear();
         _movingReveal = false;
@@ -147,7 +168,7 @@ public partial class WorldLightingController
         {
             _revealEnemies.EnemyRegistered += TrackEnemyReveal;
             _revealEnemies.EnemyUnregistered += UntrackEnemyReveal;
-            _revealEnemies.EnemyPositionChanged += UpdateEnemyReveal;
+            _revealEnemies.EnemyPositionChanged += OnEnemyRevealMoved;
             foreach (Enemy enemy in _revealEnemies.Living) TrackEnemyReveal(enemy);
         }
         BindExistingRevealVisuals(GetParent());
@@ -194,23 +215,86 @@ public partial class WorldLightingController
 
     private void TrackEnemyReveal(Enemy enemy)
     {
-        if (!_enemyAlpha.ContainsKey(enemy)) _enemyAlpha.Add(enemy, new EnemyReveal(enemy.Modulate.A));
-        UpdateEnemyReveal(enemy);
+        if (!_enemyAlpha.TryGetValue(enemy, out EnemyReveal state))
+        {
+            state = new EnemyReveal(enemy.Modulate.A, _nextEnemyPhase);
+            _nextEnemyPhase ^= 1;
+            _enemyAlpha.Add(enemy, state);
+        }
+        UpdateEnemyReveal(enemy, state, enemy.GlobalPosition);
     }
 
     private void UntrackEnemyReveal(Enemy enemy)
     {
         if (!_enemyAlpha.Remove(enemy, out EnemyReveal state)) return;
-        if (_darkContacts.Remove(state)) _contactOverlay.QueueRedraw();
-        if (GodotObject.IsInstanceValid(enemy)) SetEnemyAlpha(enemy, state.Original);
+        _pendingEnemyReveal[state.Phase].Remove(enemy);
+        if (_darkContacts.Remove(state)) InvalidateContacts();
+        if (!GodotObject.IsInstanceValid(enemy)) return;
+        SetEnemyAlpha(enemy, state.Original);
+        if (enemy.IsAlive) enemy.SetFogConcealed(false);
     }
 
-    private void UpdateEnemyReveal(Enemy enemy)
+    // =========================================================
+    // Movement records the latest contact position. Only the staggered pass samples opacity.
+    private void OnEnemyRevealMoved(Enemy enemy)
     {
-        if (!_enemyAlpha.TryGetValue(enemy, out EnemyReveal state)) return;
+        if (!RevealVisible || !_enemyAlpha.TryGetValue(enemy, out EnemyReveal state)) return;
         Vector2 position = enemy.GlobalPosition;
+        if (state.ContactOpacity > .001f && state.ContactPosition != position)
+        {
+            state.ContactPosition = position;
+            InvalidateContacts();
+        }
+        if (state.SamplePosition == position) return;
+        bool wasIdle = !HasPendingEnemyReveal;
+        _pendingEnemyReveal[state.Phase].Add(enemy);
+        if (wasIdle) SetProcess(true);
+    }
+
+    // =========================================================
+    // A shared 60 Hz phase clock visits each moving cohort at most 30 times per second.
+    private void TickEnemyReveal(double delta)
+    {
+        if (!HasPendingEnemyReveal) { _enemyRevealElapsed = 0; return; }
+        _enemyRevealElapsed += delta;
+        int phases = (int)(_enemyRevealElapsed / EnemyRevealPhaseSeconds);
+        if (phases == 0) return;
+        _enemyRevealElapsed -= phases * EnemyRevealPhaseSeconds;
+        phases = Math.Min(2, phases);
+        for (int i = 0; i < phases; i++)
+        {
+            var pending = _pendingEnemyReveal[_enemyRevealPhase];
+            _enemyRevealPhase ^= 1;
+            foreach (Enemy enemy in pending)
+            {
+                EnemyReveal state = _enemyAlpha[enemy];
+                Vector2 position = enemy.GlobalPosition;
+                if (state.SamplePosition != position) UpdateEnemyReveal(enemy, state, position);
+            }
+            pending.Clear();
+        }
+    }
+
+    // =========================================================
+    // Combat feedback can refresh presentation without changing or caching gameplay detection.
+    internal void RefreshEnemyRevealForCombat(Enemy enemy)
+    {
+        if (!RevealVisible || !_enemyAlpha.TryGetValue(enemy, out EnemyReveal state)) return;
+        Vector2 position = enemy.GlobalPosition;
+        if (!_revealDirty && state.FieldRevision == _revealRevision && state.SamplePosition == position) return;
+        _pendingEnemyReveal[state.Phase].Remove(enemy);
+        UpdateEnemyReveal(enemy, state, position);
+    }
+
+    private void UpdateEnemyReveal(Enemy enemy, EnemyReveal state, Vector2 position)
+    {
         if (RevealVisible) EnsureRevealField();
         float reveal = RevealVisible ? _reveal.AlphaAt(position) : 1;
+        state.SamplePosition = position;
+        state.FieldRevision = _revealRevision;
+        bool concealed = reveal <= 0f;
+        enemy.SetFogConcealed(concealed);
+
         float alpha = state.Original * reveal;
         if (!Mathf.IsEqualApprox(alpha, state.Applied))
         {
@@ -220,35 +304,40 @@ public partial class WorldLightingController
 
         // The contact cross-fades inversely to the whole enemy root, including its health bar.
         float opacity = 1 - reveal;
-        if (opacity <= .001f)
-        {
-            if (_darkContacts.Remove(state)) _contactOverlay.QueueRedraw();
-            return;
-        }
-        bool added = _darkContacts.Add(state);
-        bool changed = added || state.ContactPosition != position ||
+        bool changed = opacity <= .001f ? _darkContacts.Remove(state) :
+            _darkContacts.Add(state) || state.ContactPosition != position ||
             !Mathf.IsEqualApprox(state.ContactOpacity, opacity);
-        if (!changed) return;
         state.ContactPosition = position;
         state.ContactOpacity = opacity;
-        if (added && _darkContacts.Count == 1) SetProcess(true);
-        _contactOverlay.QueueRedraw();
+        if (changed) InvalidateContacts();
+    }
+
+    private void InvalidateContacts()
+    {
+        if (_contactsDirty) return;
+        _contactsDirty = true;
+        SetProcess(true);
     }
 
     // =========================================================
-    // Camera movement also invalidates culling when the contacts themselves are stationary.
-    private void RefreshContactViewport()
+    // Flush once from the render-frame loop after all movement and coverage updates.
+    private void FlushContactRedraw()
     {
-        if (_darkContacts.Count == 0) return;
-        if (_contactCanvas != _contactOverlay.GetCanvasTransform() ||
-            _contactViewport != _contactOverlay.GetViewportRect())
-            _contactOverlay.QueueRedraw();
+        if (_contactOverlay == null || _contactRedrawQueued) return;
+        if (!_contactsDirty && (_darkContacts.Count == 0 ||
+            (_contactCanvas == _contactOverlay.GetCanvasTransform() &&
+             _contactViewport == _contactOverlay.GetViewportRect()))) return;
+        _contactsDirty = false;
+        _contactRedrawQueued = true;
+        _contactOverlay.QueueRedraw();
     }
 
     // =========================================================
     // One shared SVG quad per visible contact. Keep the viewport margin large enough for the whole sprite.
     private void DrawDarkContacts()
     {
+        _contactRedrawQueued = false;
+        _contactsDirty = false;
         if (_darkContacts.Count == 0 || _contactTexture == null) return;
         _contactCanvas = _contactOverlay.GetCanvasTransform();
         _contactViewport = _contactOverlay.GetViewportRect();
@@ -286,7 +375,7 @@ public partial class WorldLightingController
         _reveal.Rasterize(_maskBounds, _maskWidth, _maskHeight, _maskPixels);
         _maskImage.SetData(_maskWidth, _maskHeight, false, Image.Format.R8, _maskPixels);
         _maskTexture.Update(_maskImage);
-        foreach (Enemy enemy in _enemyAlpha.Keys) UpdateEnemyReveal(enemy);
+        RefreshAllEnemyReveal();
     }
 
     private void ApplyRevealToggle()
@@ -295,7 +384,14 @@ public partial class WorldLightingController
         _entityMask.SetShaderParameter("reveal_enabled", RevealVisible);
         foreach (ShaderMaterial material in _smokeMaterials)
             material.SetShaderParameter("reveal_enabled", RevealVisible);
-        foreach (Enemy enemy in _enemyAlpha.Keys) UpdateEnemyReveal(enemy);
+        RefreshAllEnemyReveal();
+    }
+
+    private void RefreshAllEnemyReveal()
+    {
+        foreach (var pending in _pendingEnemyReveal) pending.Clear();
+        foreach (var entry in _enemyAlpha)
+            UpdateEnemyReveal(entry.Key, entry.Value, entry.Key.GlobalPosition);
     }
 
     private void TickMovingReveal(double delta)
@@ -318,9 +414,15 @@ public partial class WorldLightingController
         {
             _revealEnemies.EnemyRegistered -= TrackEnemyReveal;
             _revealEnemies.EnemyUnregistered -= UntrackEnemyReveal;
-            _revealEnemies.EnemyPositionChanged -= UpdateEnemyReveal;
+            _revealEnemies.EnemyPositionChanged -= OnEnemyRevealMoved;
         }
-        ApplyRevealToggle();
+        foreach (var entry in _enemyAlpha)
+        {
+            if (!GodotObject.IsInstanceValid(entry.Key)) continue;
+            SetEnemyAlpha(entry.Key, entry.Value.Original);
+            if (entry.Key.IsAlive) entry.Key.SetFogConcealed(false);
+        }
+        foreach (var pending in _pendingEnemyReveal) pending.Clear();
         _contactOverlay.Draw -= DrawDarkContacts;
         _darkContacts.Clear();
         _enemyAlpha.Clear();

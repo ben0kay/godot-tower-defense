@@ -311,14 +311,24 @@ public partial class EnemyMovement : Node
             if (reachesCheckpoint) nextPosition = Enemy.GlobalPosition.Lerp(nextPosition, entry);
             Vector2 direction = target - Enemy.GlobalPosition;
             _travelDirection = direction.Normalized();
-            Enemy.Rotation = Mathf.LerpAngle(Enemy.Rotation, direction.Angle(),
-                1f - Mathf.Exp(-Mathf.Max(0f, Enemy.Definition.TurnSpeed) * (float)delta));
+            float turnSpeed = Mathf.Max(0f, Enemy.Definition.TurnSpeed);
+            if (Enemy.SkipHiddenHullInterpolation)
+            {
+                // Keep the concealed hull aligned with travel so there is no catch-up turn on reveal.
+                float heading = direction.Angle();
+                if (turnSpeed > 0f && !Mathf.IsEqualApprox(Enemy.Rotation, heading)) Enemy.Rotation = heading;
+            }
+            else
+            {
+                Enemy.Rotation = Mathf.LerpAngle(Enemy.Rotation, direction.Angle(),
+                    1f - Mathf.Exp(-turnSpeed * (float)delta));
+            }
             Vector2 previous = Enemy.GlobalPosition;
             double segmentSeconds = speed > 0 ? previous.DistanceTo(nextPosition) / speed : 0;
             if (GodotObject.IsInstanceValid(Enemy.Terrain) && Enemy.Terrain.LavaCellCount > 0
                 && !Enemy.Terrain.Traverse(Enemy, previous, nextPosition, segmentSeconds, terrainElapsed)) return;
             terrainElapsed += segmentSeconds;
-            // SetMovementPosition publishes spatial/reveal updates through Enemy's transform notifications.
+            // SetMovementPosition publishes spatial movement and queues fog presentation updates through Enemy's transform notifications.
             Enemy.SetMovementPosition(nextPosition); Enemy.UpdateDefenseBarTransform(); travel -= distance;
             if (reachesCheckpoint) { CompleteCheckpoint(); return; }
             if (nextPosition == target) _next++; else break;

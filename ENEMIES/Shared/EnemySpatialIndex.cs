@@ -58,9 +58,9 @@ internal sealed class EnemySpatialIndex
 
     // =========================================================
     // Called by actual transform changes, not an all-enemies maintenance scan.
-    public void Move(Enemy enemy, Vector2 position)
+    public bool Move(Enemy enemy, Vector2 position)
     {
-        if (!_entries.TryGetValue(enemy, out Entry entry) || entry.Position == position) return;
+        if (!_entries.TryGetValue(enemy, out Entry entry) || entry.Position == position) return false;
         Vector2 before = entry.Position;
         if (_readers.Count > 0)
         {
@@ -71,6 +71,7 @@ internal sealed class EnemySpatialIndex
         if (position.IsFinite() && (!before.IsFinite() || Cell(before) != Cell(position))) Insert(_points, Cell(position), entry);
         entry.Position = position;
         if (_readers.Count > 0) UpdateSweep(entry);
+        return true;
     }
 
     // =========================================================

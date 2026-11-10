@@ -47,6 +47,7 @@ public partial class EnemyWeaponMount : Node2D
         _muzzle = MuzzlePath.IsEmpty ? null : GetNodeOrNull<Marker2D>(MuzzlePath);
         _ready = true;
         if (!GodotObject.IsInstanceValid(_host) || !_host.IsAncestorOf(this)) return;
+        _host.HasHullMountedWeapon = true;
         _host.Initialized += OnInitialized; _host.Removed += OnRemoved;
         if (_host.IsAlive) OnInitialized(_host);
     }

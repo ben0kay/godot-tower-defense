@@ -1,3 +1,9 @@
+## FOG-PERF1 — Enemy fog performance
+
+Staggered visual reveal samples, coalesced radar redraws, and suspended thrusters at full concealment. Hidden hull turning skips interpolation where mounts and shield rims do not depend on it. Source and scheduler checks only. In Godot, compare 200 moving contacts before and after at the same view and check fog-edge fade, exhaust, and F6.
+
+---
+
 ## STG0 impact-stagger proposal documented — 2026-11-10
 
 **Plan only; no code, resource or gameplay changes.** Added `FEEDBACK/ImpactStagger/IMPLEMENTATION_PLAN.md`, linked from `FEEDBACK/README.md` and `NOTES/Ideas.md` (M17). The plan scopes Blaster-only opt-in projectile impact mass, per-ship impact resistance mass, bounded tiny physical forward-speed reduction plus independent world-direction cosmetic hull shove, a single `DefaultFeedbackConfig.tres` enable/disable switch, and strict protection for enemy routes, Rocket Tower, AoE/XP, saves and 300–500 ship performance. Existing shockwave damage and enemy movement owners remain authoritative.

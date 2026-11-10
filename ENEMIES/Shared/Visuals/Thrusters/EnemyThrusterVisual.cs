@@ -14,7 +14,8 @@ public partial class EnemyThrusterVisual : Node2D
     private Transform2D _authoredTransform;
     private bool _authoredLocalExhaust;
     private float _lastSpeedFraction = -1f;
-    private bool _configured, _onScreen, _hasGpuSlot, _stealthed;
+    private bool _configured, _onScreen, _hasGpuSlot, _stealthed, _fogConcealed;
+    private bool _restartExhaust;
     private static int _activeGpuEmitters;
 
     public static int ActiveGpuEmitters => _activeGpuEmitters;
@@ -93,6 +94,8 @@ public partial class EnemyThrusterVisual : Node2D
         _screen.Rect = new Rect2(left, _rearY - halfHeight, Mathf.Max(1f, right - left), halfHeight * 2f);
         _onScreen = _screen.IsOnScreen();
         _configured = true;
+        _fogConcealed = false;
+        _exhaust.Visible = true;
         _lastSpeedFraction = -1f;
         _stealthed = false;
         SetEffectiveSpeed(_nominalSpeed);
@@ -109,6 +112,11 @@ public partial class EnemyThrusterVisual : Node2D
         float fraction = float.IsFinite(speed) ? Mathf.Clamp(speed / _nominalSpeed, 0f, 1.2f) : 0f;
         if (Mathf.Abs(_lastSpeedFraction - fraction) < .04f) return;
         _lastSpeedFraction = fraction;
+        if (!_fogConcealed) ApplySpeedVisuals(fraction);
+    }
+
+    private void ApplySpeedVisuals(float fraction)
+    {
         bool active = fraction > Mathf.Clamp(Config.MinimumSpeedFraction, 0f, .5f);
         _flame.Visible = active;
 
@@ -134,12 +142,31 @@ public partial class EnemyThrusterVisual : Node2D
     {
         if (_stealthed == stealthed) return;
         _stealthed = stealthed;
-        if (!_configured) return;
+        if (!_configured || _fogConcealed) return;
         float speed = Mathf.Max(0, _lastSpeedFraction);
         float alpha = Mathf.Clamp(.45f + speed * .55f, 0f, 1f) *
             (stealthed ? Config.StealthIntensity : 1f);
         _flame.Modulate = new Color(1f, 1f, 1f, alpha);
         _exhaust.Modulate = new Color(1f, 1f, 1f, stealthed ? Config.StealthIntensity : 1f);
+    }
+
+    // =========================================================
+    // Concealment is separate from viewport admission and stealth dimming.
+    internal void SetFogConcealed(bool concealed)
+    {
+        if (!_configured || _fogConcealed == concealed) return;
+        _fogConcealed = concealed;
+        if (concealed)
+        {
+            StopGpu();
+            _flame.Visible = false;
+            _exhaust.Visible = false;
+            _exhaust.SpeedScale = 0;
+            _restartExhaust = true;
+            return;
+        }
+        _exhaust.Visible = true;
+        ApplySpeedVisuals(_lastSpeedFraction);
     }
 
     // =========================================================
@@ -151,11 +178,16 @@ public partial class EnemyThrusterVisual : Node2D
     // Cap active GPU exhaust systems globally. At cap, the inexpensive static flame remains.
     private void TryStartGpu()
     {
-        if (_hasGpuSlot || !_configured || !_onScreen || !_flame.Visible ||
+        if (_hasGpuSlot || !_configured || _fogConcealed || !_onScreen || !_flame.Visible ||
             Config?.GpuParticlesEnabled != true ||
             _activeGpuEmitters >= Mathf.Clamp(Config.MaxActiveGpuEmitters, 1, 128)) return;
         _hasGpuSlot = true;
         _activeGpuEmitters++;
+        if (_restartExhaust)
+        {
+            _restartExhaust = false;
+            _exhaust.Restart();
+        }
         _exhaust.Emitting = true;
     }
 
