@@ -1,3 +1,9 @@
+## Purchased-level Roman badges — 2026-11-10
+
+Added a fixed top-left Roman-numeral emblem (I–XII) for placed buildings with more than one authored purchase tier, complementing the existing top-right earned-rank emblem. Each `TOWERS/Shared/Upgrades/Artwork/level_NN.svg` is a lightweight 24×24 imported Godot SVG with font-independent vector Roman strokes; `TowerUpgradeEmblem` caches each tier's Texture2D globally and switches textures only when the committed `UpgradeLevel` actually changes. Badge attaches at SetPlacement (including saved tier restoration); ongoing upgrades continue displaying the last *completed* tier until work finishes. No polling, modification to ranks, gameplay stats, save schema, targeting, or construction timing. Future level XIII+ requires new SVG entries. Source inspection only, awaiting owner visual/gameplay check.
+
+---
+
 ## SALV1 scrap marker
 
 Raw scrap uses a solid beveled shard silhouette with an amber highlight. Source review only. Check visibility at normal play zoom in Godot.

@@ -73,7 +73,7 @@ public abstract partial class TowerBase : Node2D
     // =========================================================
     // Fixed grid identity is independent of any rotating weapon artwork.
     public void SetPlacement(Vector2I cell, Vector2 center)
-    { GridCell = cell; GlobalPosition = center; AttachRankEmblem(); }
+    { GridCell = cell; GlobalPosition = center; AttachRankEmblem(); AttachUpgradeEmblem(); }
 
     // =========================================================
     // Passive visuals can use root tint; weapon types may override their visual selection hook.
@@ -87,7 +87,7 @@ public abstract partial class TowerBase : Node2D
     // Publish once after committed changes; wallet/controller retain payment ownership.
     internal void NotifyStatsChanged()
     {
-        SynchronizeHealth(); SynchronizeAmmunition(); SynchronizeConditions(); SynchronizePower(); StatsChanged?.Invoke();
+        SynchronizeHealth(); SynchronizeAmmunition(); SynchronizeConditions(); SynchronizePower(); RefreshUpgradeEmblem(); StatsChanged?.Invoke();
     }
 
     // =========================================================
