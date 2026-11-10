@@ -1,131 +1,166 @@
-# STG0 — Mass-Based Enemy Impact Stagger (Blaster Cannon pilot)
+# STG0 — Class-Based Directional Enemy Impact Stagger
 
-**Repository:** `ben0kay/godot-tower-defense` · **Branch:** `dev` only  
-**Date:** 2026-11-10  
-**Status:** **Approved concept / IMPLEMENTATION PLAN ONLY. No stagger code or balance changes have been implemented by this document.**  
-**Related brainstorm:** `NOTES/Ideas.md` → **M17 — Mass-based directional impact stagger**.
+**Repository:** `ben0kay/godot-tower-defense` · **Branch:** `dev`  
+**Updated:** 2026-11-10  
+**Status:** **Implementation plan ONLY — no stagger effects or gameplay code implemented.**  
+**Idea reference:** `NOTES/Ideas.md` → M17  
+**Supersedes:** the prior STG0 mass-ratio/per-enemy-impact-mass proposal in this same file.
 
-## 1. Player-facing behaviour and scope
+## Goal
 
-When an enemy ship is struck by a **projectile explicitly assigned a nonzero impact mass**, compare that projectile's impact mass with the struck ship's authored impact mass.
+Heavy-feeling weapon impacts should briefly jolt **eligible lighter enemies** while they continue **toward their Citadel**, never leaving their actual path. A qualifying splash hit causes:
 
-- A relatively light ship can **jolt a few pixels in the direction of the impact**, then its **visible hull eases back** into normal alignment. This is *only presentation*; do not move the enemy's authoritative `Node2D.GlobalPosition`, collision body, path waypoint, clearance footprint, spatial index or actual route sideways.
-- The enemy may temporarily **lose a small percentage of forward movement speed**, then smoothly/automatically resume normal Citadel-bound travel. This is the only gameplay effect; no actual world-space knockback, path deviation, stun/immobilization, wall collision, A* repath or long-duration slowing.
-- Bigger/heavier ships resist or entirely ignore light impacts. Strength and eligibility derive from **authored relative masses**, not visual size, class name, weapon damage or hull HP.
-- **Initial opt-in: Blaster Cannon's physical shell / splash impact only.** Every other tower/projectile—including Rocket Tower, which derives its config from Blaster—must continue with **zero impact mass** until separately authored. Laser, beams, shockwave rings, damage-over-time and enemy weapons do not accidentally inherit the feature.
-- Add a single user-requested Inspector master switch in `FEEDBACK/FeedbackMasterConfig.cs` and `FEEDBACK/DefaultFeedbackConfig.tres`: **`ImpactStaggerEnabled` (default true)**. Setting it **false disables the entire effect** (both momentary movement slowdown and visual shove), not just the animation. This is explicitly a gameplay-affecting exception to the ordinarily cosmetic FEEDBACK toggles. Do not add a Settings menu option or change other feedback flags in STG0.
+1. A very short **forward movement slowdown** (small genuine gameplay effect), then automatic recovery.
+2. A small **visual-only hull shove** away from the blast centre and smooth return to its normal local pose.
 
-**Important mental model:** The enemy's real position continues along its pre-existing path; only its *forward speed* dips briefly. The artwork appears to recoil away from the blast, then recovers. The Citadel is still its destination.
+**No physical sideways knockback, root displacement, collision change, path recalculation, sustained stun or new combat status category.** The difference between gameplay and visuals is essential: enemy root and path stay authoritative; only forward speed dips. Ships keep moving to their assigned Citadel.
 
-## 2. Existing code and integration seams checked on dev
+### Owner-selected initial weapon/class rules (exact scope)
 
-| Current owner | Why it matters |
+The live class enum is `ENEMIES/Shared/EnemyClass.cs`, not inferred from sprite scale:
+
+| Enemy class | Blaster Cannon | Rocket Tower | Other towers |
+| --- | --- | --- | --- |
+| **Tiny** | No — not specified yet | No — not specified yet | No |
+| **Light** | **Yes (strong)** | **Yes (mild)** | No |
+| **Standard** | **Yes (mild)** | No | No |
+| **Heavy** | No | No | No |
+| **Superheavy** | No | No | No |
+| **Capital** | No | No | No |
+| **Titan** | No | No | No |
+| **Colossal** | No | No | No |
+
+**Tiny note:** `Tiny` is an existing real class but the owner explicitly specified **Light and Standard** for Blaster and **Light** for Rocket. Do **not** opt Tiny in automatically: it needs a later owner decision. The last two classes have non-numeric display order in their enum: do not rely on `(int)EnemyClass` comparisons or assume sequential ordinals.
+
+All other towers, enemy weapons, drones, beams, projectile types and damage effects remain **not stagger-capable by default**. A tower dealing explosive damage does not automatically qualify; this is a specific **weapon-owned opt-in**.
+
+## 1. Simpler authoring model: class resistance and weapon impact power
+
+**Remove the old proposal for a mass field on each `EnemyDefinition.tres`.** No per-enemy masses, mass ratios, velocity/momentum physics, dynamic Rigidbody interaction, per-ship authored stagger values, or independent movement/path systems.
+
+Instead define a tiny central **class resistance table** with explicit enum entries plus a nonnegative **weapon impact power**.
+
+Proposed initial numeric tiers:
+
+| Weapon | `StaggerImpactPower` (proposed) |
+| --- | ---: |
+| **Blaster Cannon** | **2** |
+| **Rocket Tower** | **1** |
+| Every other weapon | **0 (disabled)** |
+
+| EnemyClass | `StaggerResistance` / class eligibility |
 | --- | --- |
-| `TOWERS/Offensive/BlasterCannon/BlasterCannon.cs` + `BlasterCannonConfig.cs` | A funded cannon shot creates `SplashProjectile`; its config/weapon owns opt-in mass. Don't attach impact to the generic `Explosive` damage type. |
-| `TOWERS/Offensive/RocketTower/RocketTowerConfig.cs` + `RocketTower.cs` | Rocket config inherits Blaster config and also launches `SplashProjectile`; default inherited impact mass **must remain zero** for Rocket. |
-| `TOWERS/Shared/Projectiles/SplashProjectile.cs` | Resolves one actual impact point and calls `AreaDamage.ApplyInstant` exactly once at detonation. Preserve straight/homing, spread, light, lifetime and shockwave presentation. |
-| `COMBAT/AreaDamage/AreaDamage.cs` | Already queries nearby enemies once, snapshots recipients and forwards their attenuated `DamageInfo` once. Reuse this recipient pass for mass impacts: **no second area query or per-enemy blast search**. |
-| `ENEMIES/Shared/EnemyDefinition.cs` | Add an Inspector-edited impact mass per enemy type. Do not compute it from sprites, RadiusPixels, EnemyClass, HP or Rank. |
-| `ENEMIES/Movement/EnemyMovement.cs` + `ENEMIES/Shared/Enemy.cs` | Already calculate `EffectiveMoveSpeed = MoveSpeed × status movement multiplier` and walk cached safe routes. Compose a bounded transient stagger multiplier here; never rewrite routes or set a displaced enemy root. |
-| `ENEMIES/Shared/GenericEnemy.tscn` + `Enemy.cs` | The hull Sprite, separate Thruster, Movement and DefenseBar are rooted on the Enemy. Visually offset only compatible presentation children; preserve root position, status tint, damage texture selection, shield center and weapon mounts. |
-| `FEEDBACK/FeedbackMasterConfig.cs` + `DefaultFeedbackConfig.tres` | Existing master toggles; cache/load the shared toggle once rather than accessing the resource per hit or per ship frame. |
+| Light | 1 |
+| Standard | 2 |
+| Tiny, Heavy, Superheavy, Capital, Titan, Colossal | **Immune / not eligible in STG0** |
 
-Nothing in the existing shared damage resolver (`DamageInfo` / `DamageResolver`) or existing Slow/Freeze status effects needs redefining. Do not add a generic stun ability system just for this one effect.
+Acceptance: valid target class, positive impact power, class resistance defined, and `power >= resistance`. **Use an explicit `switch` over EnemyClass** (or equivalent validated class-policy resource), not integer-enum ordering; `Tiny=0`, `Titan=6`, `Colossal=7` are already serialized. Missing/new future classes must default to immune.
 
-## 3. Authored settings (proposed initial tuning, not fixed balance)
-
-### Weapon impact mass — opt-in, default zero
-
-Add an exported nonnegative finite `ImpactMass` (or equivalent clearer name) under an **Impact Stagger** Inspector group on the appropriate Blaster projectile/config policy. Default **0 = no stagger capability**. Set the **Blaster Cannon default config resource** to approximately **2.0** for the first pilot; keep **Rocket Tower = 0** (including inherited defaults). Capture the mass at *launch* into the projectile's immutable firing context so live config edits/level upgrades never change a round in flight. Don't infer it from damage, projectile speed, projectile visual style, recoil, shield penetration or fire cadence.
-
-If STG0 wiring exposes mass on an inherited config shared with Rocket, explicitly verify that Rocket's effective authored value remains zero. Future projectile types can reuse this typed capability and delivery seam; they don't automatically opt in.
-
-### Enemy impact mass — each actual ship definition
-
-Add an exported finite `ImpactMass` field under **Impact Stagger / Mass Resistance** in `EnemyDefinition`. **0 = disabled/immune/unconfigured** for backwards-compatible definitions; positive values declare physical resistance. Author pilot data on only a few actual lightweight ship `.tres` definitions (for example Standard Drone/Swift Interceptor) and optionally one heavy ship for contrast. **Do not bulk-edit every enemy definition** in this first pass.
-
-Suggested demonstration values (purely relative game weights, not realistic kilograms):
-
-| Ship profile | Suggested impact mass | Blaster mass 2 result |
-| --- | ---: | --- |
-| Tiny / light drone | 1.0 | Noticeable but restrained jolt |
-| Tougher small ship | 1.8 | Milder jolt |
-| Medium / armoured ship | 4.0 | Usually no stagger |
-| Capital / superheavy | 12.0+ | No stagger |
-| Unconfigured / explicitly immune | 0 | Never stagger |
-
-Do not make enemy `ImpactMass` a proxy for class: a future special small but dense ship could legitimately be heavier than an ordinary large ship.
-
-### Shared effect strength and presentation
-
-Centralize finite, Inspector-tunable numeric settings in a small `FEEDBACK/ImpactStagger/` profile/resource, **not one hardcoded amount per weapon or ship**. Illustrative defaults:
-
-| Setting | Proposed starting value |
-| --- | --- |
-| Mass eligibility | `projectileMass / targetMass > 0.75` |
-| Full-strength ratio | `>= 2.0` |
-| Visual maximum push | **4–6 world pixels** on a normal-size small ship |
-| Visual return time | **0.18–0.25 seconds** |
-| Transient forward-speed multiplier | **0.75–1.0** (at strongest, at most 25% slower) |
-| Slow duration | **0.08–0.16 seconds** |
-| Per-enemy retrigger limit | approximately **0.15–0.25 seconds** |
-| Visual concurrency budget | bounded, e.g. **64 simultaneous visible reactions** |
-
-Compute a finite bounded strength from the relative mass, then attenuate it by actual distance from the Blaster's burst center. For example:
+A light ship is visibly affected more by Blaster (2 vs 1) than by Rocket (1 vs 1); Standard only reacts to Blaster. For optional intensity, use a bounded fixed step per tier, without division or simulated physics:
 
 ```text
-relative = projectileImpactMass / enemyImpactMass
-massStrength = clamp((relative - minRatio) / (fullRatio - minRatio), 0, 1)
-radialStrength = clamp(1 - distanceFromBlastCenter / blastRadius, 0, 1)
-strength = massStrength * radialStrength
-visualOffsetPixels = maxVisualPush * strength
-movementMultiplier = 1 - maxSlowFraction * strength
+if (!enabled || impactPower == 0 || classResistance == Immune || impactPower < classResistance)
+    return;                // zero work beyond inexpensive guards for ineligible hits
+
+tier = impactPower - classResistance + 1   // eligible: 1 (mild) or 2 (strong)
+strength = clamp(tier * 0.5, 0, 1)       // 0.5 mild, 1 strong
+strength *= blastProximity              // [0..1], using existing AoE recipient distance
 ```
 
-Handle zero blast radius and direct-center impacts explicitly; use a well-defined local/full impulse for a direct hit, and no negative/NaN values. The exact ratio curve is a **game-feel proposal** and should be tuned after owner playtesting. A faint hit near the outer radius should not impart a stronger shove than a direct impact.
+This is an explicit game-balance mechanic, **not physical mass**. If later towers need different curves, extend the shared effect policy deliberately rather than implementing separate status engines. A very modest static method or tiny configuration Resource is preferred.
 
-## 4. Directional impact and separation of responsibilities
+### Important config ownership and inheritance
 
-**Source-of-truth direction for Blaster splash:**
+- Put `StaggerImpactPower` on a suitable weapon-owned **Inspector-editable** resource/config, default `0` globally.
+- **Blaster Cannon** is `2` explicitly; **Rocket Tower** is `1` explicitly. Rocket's `RocketTowerConfig` **inherits** from `BlasterCannonConfig` today: explicitly set the correct value on **both separate weapon default resources** (or a typed per-constructor override with clear ownership), and verify the copied runtime config preserves the authored value. A single inherited shared default `2` would incorrectly make Rocket stagger Standard.
+- Add **no new `EnemyDefinition` mass or resistance field**. Read the existing `Enemy.Definition.Class` and map it to a resistance via one shared resolver. Per-class intensity is a central config/policy, not a per-enemy override.
+- Capture the impact power **once at projectile launch** as part of its immutable snapshot, not by asking the tower's config for every splash recipient. Runtime upgrades must not change shots already in flight.
 
-1. Snapshot the projectile's **last valid world-space travel direction** at the instant it detonates (away from the shooter toward its impact).
-2. For each eligible enemy in the existing splash-recipient pass, calculate **enemy world center − blast center**. If nonzero, normalize it: the enemy's artwork recoils **radially away from the explosion**.
-3. If an enemy sits exactly at the center (zero direction), fall back to the actual projectile travel direction; if also invalid, skip directional presentation gracefully.
-4. Convert that **world-space impulse direction into enemy-hull local coordinates** before offsetting the visual, because `Enemy` rotates toward its route. This must feel like the shot hits from the side, rear or front as appropriate.
+## 2. Existing implementation seams (read before coding)
 
-**Gameplay:** Keep `Enemy.GlobalPosition`, `EnemyMovement`'s cached route, `RemainingJourneyDistance`, spatial registry, AoE contacts, collision clearance, checkpoints and arrival checks authoritative and unchanged. Apply the limited, positive transient speed multiplier in the existing `EffectiveMoveSpeed` composition *after* Slow/Freeze so a frozen enemy remains frozen; independent of the Slow status ID/colour/immunity and without generating extra XP, damage, Credits or status notifications. Stagger should never turn a normal enemy backwards.
+| Source | Required reuse / constraint |
+| --- | --- |
+| `ENEMIES/Shared/EnemyClass.cs` | Canonical Class values. Do not change, reorder or renumber the enum. |
+| `ENEMIES/Shared/EnemyDefinition.cs` | Already declares `EnemyClass Class`. No new mass fields needed. |
+| `TOWERS/Offensive/BlasterCannon/BlasterCannon.cs` | Launches `SplashProjectile`; authored stagger power 2. |
+| `TOWERS/Offensive/RocketTower/RocketTower.cs` | Also launches `SplashProjectile`; authored stagger power 1. |
+| `TOWERS/Offensive/RocketTower/RocketTowerConfig.cs` | Inherits `BlasterCannonConfig`; avoid accidental copy/inheritance of power 2. |
+| `TOWERS/Shared/Projectiles/SplashProjectile.cs` | Has actual travelled direction and detonation position; on successful detonation, already calls instant area damage. Preserve weapon cadence, shot handling, TTL and hit-once rules. |
+| `COMBAT/AreaDamage/AreaDamage.cs` | Owns a **single spatial query and snapshotted recipient pass**; transport an optional impact context through the same pass. Do not re-query for stagger. |
+| `COMBAT/Damage/DamageInfo.cs` | Shared immutable damage payload; avoid putting general physics or class policy inside the damage resolver. |
+| `ENEMIES/Shared/Enemy.cs` + `ENEMIES/Movement/EnemyMovement.cs` | Compute `EffectiveMoveSpeed` once from authored speed and existing Slow/Freeze multiplier; compose a finite transient stagger multiplier into that value. Do not move the root sideways or rebuild routes. |
+| `ENEMIES/Shared/GenericEnemy.tscn` | Hull Sprite, Thruster, Movement and DefenseBar are separate children. Visual reaction must not break mount points, thruster attachment, shield aura, DefenseBar or existing `GetNode("Sprite")` lookups. |
+| `FEEDBACK/FeedbackMasterConfig.cs` + `FEEDBACK/DefaultFeedbackConfig.tres` | Add `ImpactStaggerEnabled` default **true**. Toggling off disables **both** speed dip and visual shove while preserving damage and all other feedback. |
 
-**Cosmetic:** Use a tiny local hull/recoil offset and optional subtle rocking tilt that restores its original authored pose. Do not touch root/global transform, turret/weapon firing origins, damage-art texture, shield bar, status tint, stealth reveal, targeting, collision or thruster gameplay. Existing `GenericEnemy.tscn` has **separate** hull Sprite/Thruster/DefenseBar siblings; prefer a small reusable presentation adapter that caches the baseline transform and only adjusts the appropriate visible hull components while active. Avoid a scene-wide hierarchy rewrite that breaks `GetNode("Sprite")` references; if mounted guns cannot be moved in unison, keep STG0 visual opt-in to the lightweight unarmed ships.
+## 3. Directional reaction, timing and defaults
 
-On re-hit, do **not** create stacking slow effects/tweens. Ignore weaker hits within the cooldown; stronger accepted hits may refresh once up to the same finite max duration/offset. Dead, arriving, unloading or re-initializing ships must restore/remove transient local offsets. Check shield-only **actual** damage as valid impact if the ship survives; empty/zero-damage hits, miss/expiry, dead or registry-excluded recipients must not stagger.
+Direction should be visually intuitive at a glance:
 
-## 5. Implementation boundaries and perf policy
+1. For each genuinely affected target, compute a direction **radially away from the explosion centre** using `enemy world centre - blast world centre`.
+2. If target position is exactly at the blast centre, use the projectile's last valid **world travel direction** captured before detonation.
+3. Convert the world impulse to the target's **local visual space** to account for the ship's current rotation, then move the appropriate artwork only.
+4. Return the visual offset smoothly and exactly to its authored baseline.
 
-- **STG0 only:** Blaster's launched shell opt-in, lightweight enemy mass profiles, one shared impact resolver, bounded cosmetic hull shove, short forward-speed dip and the `ImpactStaggerEnabled` master toggle. Rocket Tower stays unchanged.
-- **Don't** put persistent momentum into pathfinding; no pushed enemy roots, new A* queries, collision rechecks, no knockback into mountains/lava/towers, no change to real movement clearance. Do not conflate existing pathfinding *staggered route audits* with combat *impact stagger*.
-- **No new area queries.** `AreaDamage.ApplyInstant` already owns the one recipient pass. Pass optional impact context down that same delivery path. Keep direct hits and impact response separate from `DamageResolver` and from the decorative `ShockwaveEffect`; toggling off visuals cannot remove damage.
-- **Only active victims need updates.** Reuse the existing active enemy movement tick or a bounded shared transient scheduler for tiny expire/offset recovery state; no new permanent `_Process`, enemy-by-enemy idle scanning, per-hit Tween/Timer/Node allocation, per-enemy SVG duplication or every-frame config loading. Reuse one shared settings resource. Apply an optional **visible** cosmetic budget and skip just the animation when full, preserving deterministic gameplay eligibility.
-- **Heavy waves:** 300–500+ enemies may overlap within an area. No unlimited queue of deferred stagger animations; prefer per-enemy cooldown, capped active visual count and coalesced re-hits. Do not run heavy work for ineligible mass=0 shots.
-- **Saving/restore:** Existing checkpoints are only made between waves. Transient sub-second stagger/pose is **not persisted**; on mission unload, reuse or checkpoint restore enemies begin without stagger. No changes to saved enemy positions, profile XP, official wave ownership, enemy class/rank or research.
-- **Default feedback master:** `ImpactStaggerEnabled` is the user-requested single enable/disable for **both movement dip and visual animation**. When false, the regular hit, damage, AoE and XP still happen. Runtime live toggle behaviour can be scoped separately; switching it *before* deployment must work. Do not gate the main explosion/shockwave visual.
+**Illustrative starter tuning**, all clamped and shared (not per enemy) in a small Inspector configuration:
 
-## 6. Proposed implementation steps (Codex)
+| Parameter | Suggested value |
+| --- | --- |
+| Mild strength | 0.5 |
+| Strong strength | 1.0 |
+| Maximum visual shove (strong, centre hit) | 5 px |
+| Visual return time | 0.2 seconds |
+| Maximum forward-speed dip (strong, centre hit) | 20% |
+| Maximum speed dip duration | 0.12 seconds |
+| Per-enemy re-hit cooldown | 0.18 seconds |
+| Concurrent **visible** recovery animation cap | 64 |
+| Blast edge scaling | Use existing distance/radius; weaker at edge |
 
-1. **STG0-A — Data/seams:** introduce opt-in weapon impact mass (zero by default, nonzero only for Blaster), per-definition enemy mass, lightweight shared settings with safe validation, and the cached `DefaultFeedbackConfig` switch. Ensure Rocket and every other attack still have no stagger. Make the shared splash hit transport optionally carry an immutable mass + direction at launch/detonation without changing damage amounts.
-2. **STG0-B — Recipient response:** use the single existing `AreaDamage` recipient loop to determine actual valid surviving hits, relative mass, radius attenuation and outward world direction. Apply one bounded transient speed scalar through the existing `Enemy.EffectiveMoveSpeed`/movement owner; never alter real world X/Y. Integrate cleanly with existing Slow/Freeze and thruster presentation.
-3. **STG0-C — Cosmetic & tuning:** apply event-triggered child hull visual shove in world-consistent direction, return the local artwork to its baseline, cap visible concurrency, clear on death/restore and expose only legitimate tune points. Default screenshot/playtest should show small ships briefly flinch under Blaster shells without drifting off the physical route. Update the owning feature docs and short `NOTES/WORK.md` entry when coding is actually delivered.
+The slowdown is a *single positive multiplier* composed **after** existing Slow/Freeze; frozen ships remain frozen. No slow stacking, no permanent zero speed, no reverse travel and no status-colour takeover. A simultaneous stronger impact may refresh a reaction within a fixed cap, while weaker hits within cooldown are ignored.
 
-The three steps may be committed as one focused pass if uncomplicated; don't implement later weapon families under this task.
+**Damage eligibility:** Check actual valid live/registered hit recipients and real applied damage/shield absorption. An absorbed-by-shield hit can jolt the ship; a zero-damage hit cannot. If damage kills/removes a target, skip its later stagger animation. Do not grant extra XP, Credits or wave changes.
 
-## 7. Acceptance checklist (owner-led, lightweight developer validation)
+**Visual compatibility:** Keep the enemy root, collision and all route/terrain/registry coordinates unchanged. Small ships with only a hull sprite are the simplest first pilot. Preserve gun muzzle positions/rotating mounts, active thruster flames, glow, shield centre, damage textures, stealth and defense bars; if there is no straightforward reusable moving visual-group hook for more complex ships, do **not** rearrange every enemy scene in STG0.
 
-- A Blaster shell hits a standard small drone from above/side/rear: its hull nudges **away from the true hit center** and returns within about one quarter-second; its actual route stays intact.
-- The actual speed briefly dips then returns, without replaying route construction or adding a Slow-status entry. Combining with Cryo/Freeze behaves sensibly; Freeze remains zero speed.
-- A heavy ship and an authored zero-mass ship do not noticeably react to the same shell. A near-edge recipient reacts less than a near-center recipient.
-- A Rocket or Laser shot causes **no** stagger by default, even though Rocket uses the same `SplashProjectile` type. An expired/missed Blaster shell does not stagger anything.
-- `DefaultFeedbackConfig.tres` → `ImpactStaggerEnabled = false` prevents **both** the slow and hull animation while preserving ordinary blast damage, shield absorption, XP, rewards and visible explosion effect.
-- Multiple simultaneous Blaster hits do not permanently reduce speed, stack unbounded effects or leave sprites displaced. Killing a staggered enemy, pausing/unloading, and returning to the campaign reset correctly.
-- Source-level checks cover strength clamps, radial/fallback direction, mass zero, recipient filtering and no-impact default. Run only a short focused sanity/build if practical per `CodePreferences.md`; visual/gameplay and large-wave FPS acceptance belongs to the owner.
+## 4. Configuration switch: complete disable
 
-**Ready-to-paste Codex handoff:**  
-“Implement **STG0 ONLY — Mass-Based Enemy Impact Stagger** from `FEEDBACK/ImpactStagger/IMPLEMENTATION_PLAN.md` in `ben0kay/godot-tower-defense` on `dev`. Read `CodePreferences.md`, `project.md` and relevant feature docs first. Give the Blaster Cannon the only nonzero projectile impact mass; assign opt-in mass to lightweight enemy definitions. Use the existing splash recipient pass, a tiny temporary path-speed reduction, and a purely cosmetic directional hull recoil. Keep enemy root/path/collision unchanged, Rocket impact mass zero, and support `ImpactStaggerEnabled` in `DefaultFeedbackConfig.tres` to disable the whole mechanic. Avoid per-ship idle processing and stacking, preserve save/damage/XP, do lightweight checks, update notes, commit and push `dev`.”
+Add `ImpactStaggerEnabled` to **`FEEDBACK/FeedbackMasterConfig.cs`** (default `true`), reachable through **`FEEDBACK/DefaultFeedbackConfig.tres`**.
+
+- `true`: only the exact initial weapon/class matrix can trigger the effect.
+- `false`: **no brief movement dip and no artwork offset**. Ordinary shell hit, blast damage, defense layers, kill XP, wave progression and shockwave visuals must still work.
+- This particular toggle controls a small gameplay effect as well as feedback, unlike typical cosmetic-only master flags. A value set before deployment must be honored; optional live mid-wave retuning is not part of STG0.
+
+## 5. Performance and save requirements
+
+- **No second spatial query**: existing `AreaDamage.ApplyInstant` is the single hit-recipient owner. The `0` impact-power case does nearly nothing and never schedules stagger.
+- No physics impulses, Rigidbody2D nodes, extra colliders, per-enemy classes/fields, extra pathfinding, saved offsets, or event spam.
+- No per-hit Tween/Timer/node allocations. Reuse existing enemy movement physics updates or one bounded active-only scheduler for a few floats and a cosmetic return; keep all idle enemies asleep. Only visible victims receive animated shove, and the shared cosmetic budget is finite.
+- Avoid creating full-size visual nodes or per-ship material instances; cache the baseline local visual transforms and restore precisely after finishing, death, arrival, new spawn, pause/restore or unload.
+- Use **one clipped finite reaction per enemy**. Coalesce or ignore overlapping Blaster/Rocket explosions. Off-screen ships may get the same brief gameplay speed dip but should skip cosmetic offset work.
+- Check 300–500+ enemies during a congested splash wave for budget and correctness. Visual cap must never change gameplay eligibility. Keep movement, spatial indexing, fog and lighting performance the same when no stagger is active.
+- Between-wave checkpoint: transient stagger not persisted or reconstructed; normal saved transforms/HP/wave results unaffected. Do not modify campaign profiles.
+
+## 6. Suggested implementation sequence — STG0 only
+
+**STG0-A — Opt-in data & guard:** add one zero-default `StaggerImpactPower` to the shared splash weapon policy, author Blaster=2 and Rocket=1 in their respective default resources, leave other weapon families at 0; central enum-class resistance table and the master toggle.
+
+**STG0-B — Hit delivery & temporary gameplay dip:** snapshot power per launch, reuse `AreaDamage` recipient pass, compute allowed tier/proximity, apply very short temporary speed scalar using the enemy's existing movement path, keep full regular damage/XP semantics.
+
+**STG0-C — Visual-only recoil:** world-to-local hull offset, return and cooldown, bounded visuals, safe cleanup on all exits; add small focused test/sanity expectations for Tiny/nonordinal classes, Blaster Standard, Rocket Light and Rocket Standard rejection, shield hits, config-disabled mode and multiple hits.
+
+**Do not** implement masses, per-enemy physical data, support for Laser/other towers, directional enemy steering, shoving through walls, new status immunities, new XP mechanics or a multi-wave upgrade balance pass.
+
+## 7. Owner acceptance checklist
+
+- Blaster hits **Light** and **Standard**; Light takes the stronger reaction. Blaster does **not** stagger Heavy or above.
+- Rocket hits **Light only** (milder); **Standard** does not react to Rocket.
+- **Tiny** does not react in STG0 (explicitly not authorized yet); `Titan` and `Colossal` are not accidentally selected because of enum values.
+- All remaining towers and projectile families produce **no stagger**.
+- Each valid recipient keeps normal movement toward Citadel, briefly moves more slowly, shows a small outward visual jolt and recovers completely. Root position never jumps, route doesn't recalculate.
+- An explosion at a distance yields a weaker reaction than a centre hit. Shield impacts may count when they absorb positive damage; harmless or missed rounds do not.
+- `FEEDBACK/DefaultFeedbackConfig.tres` with `ImpactStaggerEnabled=false` disables **both** results while preserving damage, kill reward, sounds and shockwave presentation.
+- Numerous overlapping shots neither stack slowdowns nor cause lasting offsets. Save/reload and no-stagger waves work as before.
+- As usual per `CodePreferences.md`: focused source/diff inspection and at most one basic build if readily available; owner performs visual/gameplay/FPS acceptance.
+
+### Codex-ready handoff
+
+> Implement **STG0 only — Class-Based Directional Impact Stagger** from `FEEDBACK/ImpactStagger/IMPLEMENTATION_PLAN.md`, repo `ben0kay/godot-tower-defense`, branch `dev`. Read `CodePreferences.md`, `project.md` and the relevant combat/enemy/tower docs first. Replace the prior mass concept with **weapon impact power and shared EnemyClass resistance**: Blaster=2 (Light strong, Standard mild), Rocket=1 (Light mild), everything else zero; do not opt in Tiny. Use only existing splash recipients, never physics knockback or route rework. Add a short real speed dip plus a visual-only directional hull recoil and `ImpactStaggerEnabled` master switch to disable both. Keep performance bounded and save/damage behaviour intact. Do focused verification, update `NOTES/WORK.md`, commit/push to `dev`.

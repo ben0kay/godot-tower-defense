@@ -1,3 +1,9 @@
+## STG0 class-based stagger design revision — 2026-11-10
+
+**Documentation only; no stagger gameplay source changed.** Revised `FEEDBACK/ImpactStagger/IMPLEMENTATION_PLAN.md` to remove per-enemy physical mass and mass-ratio calculations in favour of canonical `EnemyClass` resistance and one weapon-owned `StaggerImpactPower`: Blaster 2 → Light/Standard; Rocket 1 → Light; all other weapons and classes disabled. The explicit `Tiny` exclusion awaits owner choice. Directional visual-only hull shove, tiny actual forward-speed dip, default Feedback disable switch, single area-hit pass, caching/perf limits and no route displacement remain. Updated M17/Feedback overview.
+
+---
+
 ## P2 — Enemy shield and defense-bar performance
 
 Full fog concealment hides enemy shield quads and bars and stops shield feedback tweens. Active shield rims remain available for ricochets. Individual bars cache width, layout and alignment. No batch prototype or runtime performance measurements. Check fog transitions and shield restoration with the 200–500 ship comparison in the optimization plan.

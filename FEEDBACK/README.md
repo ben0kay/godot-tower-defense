@@ -1,6 +1,6 @@
-## STG0 — Mass-based directional impact stagger (plan only, 2026-11-10)
+## STG0 — Class-based directional impact stagger (revised plan 2026-11-10)
 
-[Implementation specification](ImpactStagger/IMPLEMENTATION_PLAN.md) — optional Blaster Cannon projectile impact mass versus each enemy's authored mass, very brief real forward-speed dip and separate visual-only recoil away from the blast. **`ImpactStaggerEnabled`** will be added to the existing default Feedback config to disable both pieces. No physical knockback, route deviation, new projectile physics or Rocket Tower opt-in; source work not yet implemented.
+[Implementation specification](ImpactStagger/IMPLEMENTATION_PLAN.md) — replaces the old mass-ratio/per-enemy-mass proposal with a tiny **EnemyClass resistance / weapon impact-power** rule: Blaster affects Light + Standard, Rocket affects Light, nothing else by default. A qualifying splash briefly dips real forward speed and cosmetically nudges/recentres the visible ship without shifting its root or route. Proposed master `ImpactStaggerEnabled` in `DefaultFeedbackConfig.tres` disables both effects. **Plan only, not implemented.**
 
 ---
 
