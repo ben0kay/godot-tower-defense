@@ -1,3 +1,9 @@
+## Wave Editor voice-over
+
+In **Wave-start presentation**, enter a message for this typewriter display and optionally choose an imported audio clip. The wave presenter uses the shared Voice Assistant for playback. Older notes below describe earlier, text-only passes.
+
+---
+
 ## Original GameMaker typewriter sound — 2026-11-07
 
 The shared tactical narration card uses the original `snd_msg_tut.wav` from `ben0kay/SPACE-SHOOTER-TD-IDLE-CLICKER-HYBRID`, kept in `UI/Narration/Sounds/` and registered as `ui_narration_typewriter` through the existing `AudioManager` UI bus. The imported WAV loops while characters are revealed at the original game's approximate 30% volume (-10.5 dB); it stops immediately on typing completion, skip, replacement, pause, clear/results or unload, and resumes when typing is unpaused. No new per-character sound or polling loop.

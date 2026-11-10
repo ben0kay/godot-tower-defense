@@ -41,10 +41,10 @@ public partial class WaveSetResource : WaveSetSource
             }
             bool hasPresentation = wave.Alert != WaveAlertKind.Standard || !string.IsNullOrEmpty(wave.BannerTitle) ||
                 !string.IsNullOrEmpty(wave.BannerDescription) || !string.IsNullOrEmpty(wave.Speaker) ||
-                !string.IsNullOrEmpty(wave.NarrationText) || !string.IsNullOrEmpty(wave.VoiceCueId);
+                !string.IsNullOrEmpty(wave.NarrationText) || !string.IsNullOrEmpty(wave.VoiceCueId) || wave.VoiceClip != null;
             var definition = hasPresentation
                 ? Wave(wave.Number, Presentation(wave.Alert, wave.BannerTitle, wave.BannerDescription,
-                    wave.Speaker, wave.NarrationText, wave.VoiceCueId), batches.ToArray())
+                    wave.Speaker, wave.NarrationText, wave.VoiceCueId) with { VoiceClip = wave.VoiceClip }, batches.ToArray())
                 : Wave(wave.Number, batches.ToArray());
             result.Add(definition with { NextWaveDelaySeconds = wave.NextWaveDelaySeconds, Source = wave.Source?.Capture(), Schedule = wave.Schedule });
         }

@@ -18,6 +18,7 @@ public partial class WaveResource : Resource
     [Export(PropertyHint.MultilineText)] public string BannerDescription { get; set; } = "";
     [Export] public string Speaker { get; set; } = "";
     [Export(PropertyHint.MultilineText)] public string NarrationText { get; set; } = "";
+    [Export] public AudioStream VoiceClip { get; set; }
     [Export] public string VoiceCueId { get; set; } = "";
 
     // =========================================================
@@ -25,7 +26,7 @@ public partial class WaveResource : Resource
     public WaveResource Copy()
     {
         var copy = new WaveResource { Schedule = Schedule, Source = Source?.Copy(), Number = Number, NextWaveDelaySeconds = NextWaveDelaySeconds, Alert = Alert, BannerTitle = BannerTitle,
-            BannerDescription = BannerDescription, Speaker = Speaker, NarrationText = NarrationText, VoiceCueId = VoiceCueId };
+            BannerDescription = BannerDescription, Speaker = Speaker, NarrationText = NarrationText, VoiceCueId = VoiceCueId, VoiceClip = VoiceClip };
         foreach (WaveBatchResource batch in Batches) copy.Batches.Add(batch?.Copy());
         return copy;
     }

@@ -35,11 +35,13 @@ public partial class VoiceAssistant : Node
     #region Queue
     // =========================================================
     // One voice at a time; higher-priority emergency lines can interrupt lesser ones.
-    public bool Say(string cueId)
+    public bool Say(string cueId) => SayDefinition(_audio?.FindSound(cueId));
+
+    internal bool SayDefinition(AudioDefinition sound)
     {
-        AudioDefinition sound = _audio?.FindSound(cueId);
-        if (sound?.Stream == null || sound.Category != GameAudioCategory.Voice ||
+        if (_audio == null || sound?.Stream == null || string.IsNullOrWhiteSpace(sound.Id) || sound.Category != GameAudioCategory.Voice ||
             sound.Mode != GameAudioMode.OneShot || sound.Positional) return false;
+        string cueId = sound.Id;
         if (_currentId == cueId || _waiting.Exists(x => x.Id == cueId)) return false;
         if (_currentId.Length == 0) return Begin(sound);
         if (sound.Priority > _currentPriority)
@@ -51,7 +53,7 @@ public partial class VoiceAssistant : Node
             // subtitle listeners directly so they never wait indefinitely.
             CueEnded?.Invoke(interrupted);
             // A listener may have started another voice. Respect the new owner.
-            if (_currentId.Length > 0) return Say(cueId);
+            if (_currentId.Length > 0) return SayDefinition(sound);
             return Begin(sound);
         }
         int cap = Mathf.Max(0, _audio.Config.VoiceQueueLimit);
@@ -71,7 +73,7 @@ public partial class VoiceAssistant : Node
     // Advance only after the audio manager has successfully begun the voice line.
     private bool Begin(AudioDefinition sound)
     {
-        if (!_audio.Play(sound.Id)) return false;
+        if (!_audio.PlayFlat(sound)) return false;
         _currentId = sound.Id; _currentPriority = sound.Priority;
         CueStarted?.Invoke(sound.Id);
         return true;

@@ -26,11 +26,15 @@ public partial class WaveEditorPanel : VBoxContainer
     private SpinBox _startOffset;
     private SpinBox _waveDelay, _waveNumber, _count, _interval, _after, _weight;
     private OptionButton _alert, _enemyId;
-    private LineEdit _bannerTitle, _bannerDescription, _speaker, _narration, _voiceCue, _portal;
+    private LineEdit _bannerTitle, _bannerDescription, _speaker, _voiceCue, _portal;
+    private TextEdit _narration;
+    private Label _voiceClip;
+    private Button _clearVoiceClip;
+    private WaveResource _voiceClipTarget;
     private EnemyCatalog _enemyCatalog;
     private List<(string Id, string Name, EnemyClass Class)> _enemyChoices = new();
     private CheckBox _shield, _stealth;
-    private EditorFileDialog _openFile, _newFile;
+    private EditorFileDialog _openFile, _newFile, _voiceFile;
     private ConfirmationDialog _discard, _confirmDelete;
     private Action _pendingDelete;
     private WaveResource Wave => _source != null && _waveIndex >= 0 && _waveIndex < _source.Waves.Count ? _source.Waves[_waveIndex] : null;
@@ -104,6 +108,38 @@ public partial class WaveEditorPanel : VBoxContainer
         BuildAnalysis(_waveFields);
         _timeline = Pane(_waveFields, "Wave timeline · estimated");
 
+        _presentationFields = Pane(details, "Wave-start presentation (optional)");
+        _alert = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        foreach (WaveAlertKind alert in Enum.GetValues<WaveAlertKind>()) _alert.AddItem(alert.ToString());
+        Field(_presentationFields, "Alert", _alert);
+        _alert.TooltipText = "Wave announcement style only: Standard, Heavy, Final, Boss or None. It does not modify enemy strength or contents.";
+        _alert.ItemSelected += i => { if (!_refreshing && Wave != null) { Wave.Alert = (WaveAlertKind)i; Dirty(); } };
+        _bannerTitle = Text(_presentationFields, "Banner title", v => Wave.BannerTitle = v);
+        _bannerDescription = Text(_presentationFields, "Banner description", v => Wave.BannerDescription = v);
+        _speaker = Text(_presentationFields, "Speaker", v => Wave.Speaker = v);
+        _narration = new TextEdit { CustomMinimumSize = new Vector2(0, 88), SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            PlaceholderText = "Type the message shown when this wave starts.", WrapMode = TextEdit.LineWrappingMode.Boundary };
+        Field(_presentationFields, "Typewriter narration", _narration);
+        _narration.TextChanged += () =>
+        {
+            if (_refreshing || Wave is not { } wave || (wave.NarrationText ?? "") == _narration.Text) return;
+            wave.NarrationText = _narration.Text;
+            Dirty();
+        };
+        var voicePicker = new HBoxContainer();
+        Field(_presentationFields, "Voice-over clip", voicePicker);
+        _voiceClip = new Label { SizeFlagsHorizontal = SizeFlags.ExpandFill, TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis };
+        voicePicker.AddChild(_voiceClip);
+        voicePicker.AddChild(Button("Choose audio…", () => { _voiceClipTarget = Wave; _voiceFile.PopupCenteredRatio(.75f); }));
+        _clearVoiceClip = Button("Clear", () => SetVoiceClip(Wave, null));
+        voicePicker.AddChild(_clearVoiceClip);
+        _voiceCue = Text(_presentationFields, "Voice cue ID", v => Wave.VoiceCueId = v);
+        _bannerTitle.TooltipText = "Optional custom wave-start banner heading. Blank uses WAVE NN INCOMING.";
+        _bannerDescription.TooltipText = "Optional secondary text below the wave-start banner.";
+        _speaker.TooltipText = "Optional speaker name shown with the tactical narration.";
+        _narration.TooltipText = "Optional text displayed by the tactical narration panel when the wave starts.";
+        _voiceCue.TooltipText = "Optional registered voice cue used if no voice-over clip is assigned.";
+
         _batchFields = Pane(details, "Selected batch");
         _count = Number(_batchFields, "Total enemies", 1, 100000, 1, v => { Batch.Count = (int)v; RefreshComposition(); });
         _count.TooltipText = "Total ships across all enemy entries in this batch; weights divide this count. Does not add ships per entry.";
@@ -152,22 +188,6 @@ public partial class WaveEditorPanel : VBoxContainer
         _shield.TooltipText = "Start these ships with their configured shield full; this does not add shields to an enemy whose MaxShield is zero.";
         _stealth = Check(_enemyFields, "Spawn with stealth", v => { Entry.Stealth = v; RefreshComposition(); });
         _stealth.TooltipText = "Request starting stealth for this enemy entry. This flag is independent of the Shield flag.";
-        _presentationFields = Pane(details, "Wave presentation (optional)");
-        _alert = new OptionButton { SizeFlagsHorizontal = SizeFlags.ExpandFill };
-        foreach (WaveAlertKind alert in Enum.GetValues<WaveAlertKind>()) _alert.AddItem(alert.ToString());
-        Field(_presentationFields, "Alert", _alert);
-        _alert.TooltipText = "Wave announcement style only: Standard, Heavy, Final, Boss or None. It does not modify enemy strength or contents.";
-        _alert.ItemSelected += i => { if (!_refreshing && Wave != null) { Wave.Alert = (WaveAlertKind)i; Dirty(); } };
-        _bannerTitle = Text(_presentationFields, "Banner title", v => Wave.BannerTitle = v);
-        _bannerDescription = Text(_presentationFields, "Banner description", v => Wave.BannerDescription = v);
-        _speaker = Text(_presentationFields, "Speaker", v => Wave.Speaker = v);
-        _narration = Text(_presentationFields, "Narration", v => Wave.NarrationText = v);
-        _voiceCue = Text(_presentationFields, "Voice cue ID", v => Wave.VoiceCueId = v);
-        _bannerTitle.TooltipText = "Optional custom wave-start banner heading. Blank uses WAVE NN INCOMING.";
-        _bannerDescription.TooltipText = "Optional secondary text below the wave-start banner.";
-        _speaker.TooltipText = "Optional speaker name shown with the tactical narration.";
-        _narration.TooltipText = "Optional text displayed by the tactical narration panel when the wave starts.";
-        _voiceCue.TooltipText = "Optional registered voice cue ID for the wave-start alert. Does not create or record audio.";
         details.AddChild(new Label { Text = "Enemy names and IDs are read from DefaultEnemyCatalog.tres.\n" +
             "Wave order = list order; counts are per batch, not per enemy entry.", AutowrapMode = TextServer.AutowrapMode.WordSmart });
 
@@ -322,6 +342,10 @@ public partial class WaveEditorPanel : VBoxContainer
             FileMode = EditorFileDialog.FileModeEnum.SaveFile, Title = "Create wave set" };
         _newFile.AddFilter("*.tres", "Godot Resources");
         AddChild(_newFile); _newFile.FileSelected += CreatePath;
+        _voiceFile = new EditorFileDialog { Access = EditorFileDialog.AccessEnum.Resources,
+            FileMode = EditorFileDialog.FileModeEnum.OpenFile, Title = "Choose wave voice-over" };
+        _voiceFile.AddFilter("*.wav, *.ogg, *.mp3", "Audio clips");
+        AddChild(_voiceFile); _voiceFile.FileSelected += ChooseVoiceClip;
         _discard = new ConfirmationDialog { Title = "Discard wave edits", DialogText = "Discard unsaved changes and reload this wave set?" };
         AddChild(_discard); _discard.Confirmed += () => { _dirty = false; LoadPath(_path); };
         _confirmDelete = new ConfirmationDialog { Title = "Confirm deletion" };
@@ -329,6 +353,30 @@ public partial class WaveEditorPanel : VBoxContainer
         _confirmDelete.GetOkButton().Text = "Delete";
         _confirmDelete.Confirmed += () => { Action action = _pendingDelete; _pendingDelete = null; action?.Invoke(); };
     }
+    private void ChooseVoiceClip(string path)
+    {
+        if (_voiceClipTarget == null || _voiceClipTarget != Wave) return;
+        if (ResourceLoader.Load(path) is not AudioStream clip) { Message("Choose an imported WAV, OGG or MP3 audio clip."); return; }
+        SetVoiceClip(_voiceClipTarget, clip);
+        _voiceClipTarget = null;
+    }
+
+    private void SetVoiceClip(WaveResource wave, AudioStream clip)
+    {
+        if (wave == null || wave.VoiceClip == clip) return;
+        wave.VoiceClip = clip;
+        Dirty(); RefreshVoiceClip(wave);
+    }
+
+    private void RefreshVoiceClip(WaveResource wave)
+    {
+        string path = wave.VoiceClip?.ResourcePath ?? "";
+        _voiceClip.Text = wave.VoiceClip == null ? "No clip assigned" :
+            string.IsNullOrEmpty(path) ? "Embedded audio clip" : System.IO.Path.GetFileName(path);
+        _voiceClip.TooltipText = path;
+        _clearVoiceClip.Disabled = wave.VoiceClip == null;
+    }
+
     private void Open()
     {
         if (_dirty) { Message("Save or Reload unsaved changes before opening another file."); return; }
@@ -605,6 +653,7 @@ public partial class WaveEditorPanel : VBoxContainer
                 _bannerTitle.Text = wave.BannerTitle ?? ""; _bannerDescription.Text = wave.BannerDescription ?? "";
                 _speaker.Text = wave.Speaker ?? ""; _narration.Text = wave.NarrationText ?? "";
                 _voiceCue.Text = wave.VoiceCueId ?? "";
+                RefreshVoiceClip(wave);
             }
             if (batchSelected != null) { _startOffset.Value = batchSelected.StartOffsetSeconds; _count.Value = batchSelected.Count; _interval.Value = batchSelected.Interval; _after.Value = batchSelected.After; }
             if (Entry != null)

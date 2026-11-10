@@ -1,3 +1,9 @@
+## Wave-start narration and voice-over
+
+Under **Wave-start presentation**, write the typewriter message and optionally choose an imported WAV, OGG or MP3. Save the wave set to keep the assignment. Text and audio are optional independently. A selected clip takes precedence over a registered Voice cue ID. The estimated timeline labels match the batch list.
+
+---
+
 ## Enemy previews and Wave Analysis — WP2 / WP4-A / WP4-B
 
 The selected entry shows its registered hull sprite, hull HP, maximum and starting shield, speed and Citadel damage. The selected wave’s **Fleet Threat** number stays in the top toolbar. **Wave Analysis**, below the wave fields, shares the exact batch quotas and existing sequential/parallel timeline. It aggregates enemy types, starting shields, stealth, theoretical durability and maximum authored Citadel damage. **Refresh list** reloads source definitions, textures and configured capabilities.

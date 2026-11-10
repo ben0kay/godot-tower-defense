@@ -47,7 +47,7 @@ public partial class WaveEditorPanel
                 group.AddChild(content);
                 var header = new HBoxContainer();
                 content.AddChild(header);
-                var name = StyledLabel($"Group {i + 1}", Accent);
+                var name = StyledLabel($"Batch {i + 1}", Accent);
                 name.SizeFlagsHorizontal = SizeFlags.ExpandFill;
                 header.AddChild(name);
                 header.AddChild(StyledLabel($"{row.Start:0.##}–{row.End:0.##} s   ·   {row.Batch.Count} ships", Colors.White));
@@ -56,7 +56,7 @@ public partial class WaveEditorPanel
                 source.AutowrapMode = TextServer.AutowrapMode.WordSmart;
                 content.AddChild(source);
             }
-            _timeline.AddChild(new Label { Text = "Estimated first–last spawn times; blocked exits, opening portals and frame budgets can delay groups. Source selection also respects the loaded map.",
+            _timeline.AddChild(new Label { Text = "Estimated first–last spawn times; blocked exits, opening portals and frame budgets can delay batches. Source selection also respects the loaded map.",
                 AutowrapMode = TextServer.AutowrapMode.WordSmart });
         }
         catch (ArgumentException error)

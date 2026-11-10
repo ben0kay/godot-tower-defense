@@ -26,7 +26,7 @@ AUDIO/VoiceAssistant/
 
 **One clip and one `.tres` definition per line**, kept in the same subfolder once assets are moved. IDs should be meaningful, stable and independent of file location, e.g. `voice_profile_welcome`, `voice_wave_heavy`, `voice_citadel_critical`. `AUDIO/DefaultAudioCatalog.tres` holds references, not duplicated audio. No sound event-specific logic goes into `VoiceAssistant.cs`; the menu, wave presenter or combat event sends the ID. Voice cue priority controls interruption (profile welcome medium/50; critical emergency future 90+), with existing voice queue and optional music ducking.
 
-Wave narrator `WavePresentation.VoiceCueId` already exists as a reserved field, but **no automatic audio on wave start yet**. Adding clips in `Cues/Waves/` and routing events later is a separate task. Maintain separate UI/Narration text, optional subtitle synchronization, and central voice audio.
+The wave presenter queues a wave's assigned clip or its registered `VoiceCueId` on accepted wave start. Wave narration still uses the separate typewriter. An active mission briefing keeps its existing subtitle flow and the latest wave presentation can follow it.
  
 ---
 

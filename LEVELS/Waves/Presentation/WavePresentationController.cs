@@ -9,7 +9,9 @@ public partial class WavePresentationController : Node
     private NarrationDisplay _narration;
     private MissionBriefingDefinition _missionBriefing;
     private VoiceAssistant _voice;
+    private const string WaveClipId = "runtime:wave_voice_over";
     private string _introVoiceId = "";
+    private string _waveVoiceId = "";
     private WavePresentation _pendingWaveNarration;
 
     // =========================================================
@@ -70,14 +72,13 @@ public partial class WavePresentationController : Node
     // Audio playback, not a guessed fixed timer, releases the on-screen transmission.
     private void OnVoiceCueEnded(string id)
     {
+        if (id == _waveVoiceId) _waveVoiceId = "";
         if (id != _introVoiceId) return;
         _introVoiceId = "";
-        if (!GodotObject.IsInstanceValid(_narration)) return;
-        if (_pendingWaveNarration != null)
-            _narration.ShowMessage(_pendingWaveNarration.Text, _pendingWaveNarration.Speaker);
-        else
-            _narration.ReleaseVoiceHold();
+        WavePresentation pending = _pendingWaveNarration;
         _pendingWaveNarration = null;
+        if (pending != null) PresentWaveNarration(pending);
+        else if (GodotObject.IsInstanceValid(_narration)) _narration.ReleaseVoiceHold();
     }
 
     // =========================================================
@@ -102,16 +103,11 @@ public partial class WavePresentationController : Node
     {
         if (wave == null) return;
         WavePresentation presentation = wave.Presentation;
-        if (GodotObject.IsInstanceValid(_narration))
-        {
-            // A wave can start during the briefing, but must not erase its subtitles
-            // while the AI is still speaking. Authored wave text follows after it.
-            if (_introVoiceId.Length > 0)
-            {
-                if (!string.IsNullOrWhiteSpace(presentation?.Text)) _pendingWaveNarration = presentation;
-            }
-            else _narration.ShowMessage(presentation?.Text, presentation?.Speaker);
-        }
+        // Keep briefing subtitles intact while its clip plays. Only the latest wave can follow it.
+        if (_introVoiceId.Length > 0)
+            _pendingWaveNarration = presentation;
+        else
+            PresentWaveNarration(presentation);
         if (!GodotObject.IsInstanceValid(_alerts)) return;
         WaveAlertKind kind = presentation?.Alert ?? WaveAlertKind.Standard;
         if (kind == WaveAlertKind.None) return;
@@ -132,10 +128,47 @@ public partial class WavePresentationController : Node
             Priority = kind == WaveAlertKind.Boss ? 95 : kind == WaveAlertKind.Final ? 85 : 50,
             DurationSeconds = 3f,
             CooldownSeconds = 0f,
-            OncePerSession = false,
-            VoiceCueId = presentation?.VoiceCueId ?? ""
+            OncePerSession = false
         };
         _alerts.ShowMajor(banner);
+    }
+
+    // =========================================================
+    // Keep the typewriter useful even when voice playback is unavailable or queued.
+    private void PresentWaveNarration(WavePresentation presentation)
+    {
+        CancelVoice(ref _waveVoiceId);
+        if (GodotObject.IsInstanceValid(_narration)) _narration.ShowMessage(presentation?.Text, presentation?.Speaker);
+        if (!GodotObject.IsInstanceValid(_voice) || presentation == null) return;
+
+        if (presentation.VoiceClip != null)
+        {
+            var sound = new AudioDefinition
+            {
+                Id = WaveClipId, Stream = presentation.VoiceClip, Category = GameAudioCategory.Voice,
+                Mode = GameAudioMode.OneShot, Positional = false, MaximumInstances = 1
+            };
+            if (_voice.SayDefinition(sound)) _waveVoiceId = WaveClipId;
+            return;
+        }
+
+        string cueId = presentation.VoiceCueId?.Trim() ?? "";
+        if (cueId.Length > 0 && _voice.Say(cueId)) _waveVoiceId = cueId;
+    }
+
+    private void CancelVoice(ref string id)
+    {
+        string owned = id;
+        id = "";
+        if (owned.Length > 0 && GodotObject.IsInstanceValid(_voice)) _voice.Cancel(owned);
+    }
+
+    internal void StopNarration()
+    {
+        _pendingWaveNarration = null;
+        CancelVoice(ref _waveVoiceId);
+        CancelVoice(ref _introVoiceId);
+        if (GodotObject.IsInstanceValid(_narration)) _narration.Clear();
     }
 
     // =========================================================
@@ -149,7 +182,8 @@ public partial class WavePresentationController : Node
         {
             _voice.CueStarted -= OnVoiceCueStarted;
             _voice.CueEnded -= OnVoiceCueEnded;
-            if (_introVoiceId.Length > 0) _voice.Cancel(_introVoiceId);
+            CancelVoice(ref _waveVoiceId);
+            CancelVoice(ref _introVoiceId);
         }
         _waves = null; _alerts = null; _narration = null; _missionBriefing = null;
         _voice = null; _introVoiceId = ""; _pendingWaveNarration = null;

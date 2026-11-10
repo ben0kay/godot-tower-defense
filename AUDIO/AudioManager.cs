@@ -158,8 +158,11 @@ public partial class AudioManager : Node2D
     public bool Play(string id)
     {
         AudioDefinition sound = FindSound(id);
-        return sound != null && !sound.Positional && PlayOneShot(sound, Vector2.Zero, false, 0UL);
+        return PlayFlat(sound);
     }
+
+    internal bool PlayFlat(AudioDefinition sound) =>
+        sound != null && !sound.Positional && PlayOneShot(sound, Vector2.Zero, false, 0UL);
 
     // =========================================================
     // Static impact, explosion or other point in world coordinates.

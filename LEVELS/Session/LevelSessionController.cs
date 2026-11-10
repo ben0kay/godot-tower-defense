@@ -144,7 +144,9 @@ public partial class LevelSessionController : Node
         GetNodeOrNull<DeveloperHub>("../DeveloperHub")?.StopForOutcome();
         _waves.StopForOutcome();
         RunStats.Freeze();
-        _hud.GetNodeOrNull<NarrationDisplay>("NarrationDisplay")?.Clear();
+        if (GetNodeOrNull<WavePresentationController>("../WavePresentation") is { } presentation)
+            presentation.StopNarration();
+        else _hud.GetNodeOrNull<NarrationDisplay>("NarrationDisplay")?.Clear();
         _pause.LockForResults(); _hud.SetTowerBarOpen(false, true);
         _input.Bind(this, GameInput.BackAction, ConsumeBack, 200);
         _input.Bind(this, GameInput.BuildAction, () => true, 200);

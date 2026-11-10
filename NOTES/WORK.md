@@ -1,3 +1,9 @@
+## Wave Editor batch labels and voice-over
+
+The estimated timeline uses Batch labels. Wave-start presentation exposes multiline typewriter narration and an optional imported voice clip routed through the shared voice queue. Source review only. Verify save/reload and playback in Godot.
+
+---
+
 ## Purchased-level Roman badges — 2026-11-10
 
 Added a fixed top-left Roman-numeral emblem (I–XII) for placed buildings with more than one authored purchase tier, complementing the existing top-right earned-rank emblem. Each `TOWERS/Shared/Upgrades/Artwork/level_NN.svg` is a lightweight 24×24 imported Godot SVG with font-independent vector Roman strokes; `TowerUpgradeEmblem` caches each tier's Texture2D globally and switches textures only when the committed `UpgradeLevel` actually changes. Badge attaches at SetPlacement (including saved tier restoration); ongoing upgrades continue displaying the last *completed* tier until work finishes. No polling, modification to ranks, gameplay stats, save schema, targeting, or construction timing. Future level XIII+ requires new SVG entries. Source inspection only, awaiting owner visual/gameplay check.
