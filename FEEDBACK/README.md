@@ -1,3 +1,9 @@
+## STG0 — Mass-based directional impact stagger (plan only, 2026-11-10)
+
+[Implementation specification](ImpactStagger/IMPLEMENTATION_PLAN.md) — optional Blaster Cannon projectile impact mass versus each enemy's authored mass, very brief real forward-speed dip and separate visual-only recoil away from the blast. **`ImpactStaggerEnabled`** will be added to the existing default Feedback config to disable both pieces. No physical knockback, route deviation, new projectile physics or Rocket Tower opt-in; source work not yet implemented.
+
+---
+
 ## CW1 — weapon-neutral recoil (planned 2026-11-06)
 
 **Plan only.** Extract the existing tower recoil's visual motion into shared `FEEDBACK/Weapons/Recoil/` ownership with backwards-compatible tower wiring, then opt in Gunner/Heavy Gunner and four Capital gun mounts on accepted shots only. Active-only, bounded and visually cosmetic; no recoil code moved yet. [Codex handoff](../COMBAT/SHARED_WEAPON_CAPABILITIES_PLAN.md).

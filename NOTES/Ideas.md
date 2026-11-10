@@ -47,6 +47,7 @@ Ideas for tactical depth, replayability, tower variety and enemy behaviour. Some
 | M14 | Tower active abilities | Selected towers can overcharge, focus fire or enter a defensive mode for a limited time. |
 | M15 | Enemy formations | Squadrons enter with leaders and supporting craft; formations create tactical targeting choices. |
 | M16 | Endless survival mode | Optional escalating waves, rewards and score records. |
+| M17 | Mass-based directional enemy impact stagger | **Planned, not implemented.** Only projectiles with authored impact mass can briefly reduce a light ship's forward speed and visually shove its sprite away from the blast before it eases back; never move the physical enemy off-route. First opt-in Blaster Cannon only (Rocket remains zero), per-enemy impact mass and `DefaultFeedbackConfig.tres` on/off switch for the whole effect. [STG0 implementation plan](../FEEDBACK/ImpactStagger/IMPLEMENTATION_PLAN.md). |
 
 ## Implementation guidance
 

@@ -1,3 +1,9 @@
+## STG0 impact-stagger proposal documented — 2026-11-10
+
+**Plan only; no code, resource or gameplay changes.** Added `FEEDBACK/ImpactStagger/IMPLEMENTATION_PLAN.md`, linked from `FEEDBACK/README.md` and `NOTES/Ideas.md` (M17). The plan scopes Blaster-only opt-in projectile impact mass, per-ship impact resistance mass, bounded tiny physical forward-speed reduction plus independent world-direction cosmetic hull shove, a single `DefaultFeedbackConfig.tres` enable/disable switch, and strict protection for enemy routes, Rocket Tower, AoE/XP, saves and 300–500 ship performance. Existing shockwave damage and enemy movement owners remain authoritative.
+
+---
+
 ## Drone Transporter and Warship class/balance update — 2026-11-10
 
 Set `Transporter.tres` (stable `transporter_mk1`) to **Heavy** class; cargo ability, native 112×72 art and stats unchanged. Set `Enemy005.tres` (stable `big_mk1`) to **Heavy**, rename display to **Warship**, reduce hull **1000→750**, and set VS1 `VisualScale=0.75` (112×120 native SVG displays at 84×90). Shield (200 capacity), speed (80), navigation clearance (24), waves and save identity unchanged. Updated roster/type notes plus focused catalog/fleet assertions. Source-checked; Godot runtime and in-game visual review pending.
