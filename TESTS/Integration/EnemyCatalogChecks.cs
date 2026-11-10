@@ -32,8 +32,9 @@ public static class EnemyCatalogChecks
             "Short picker names and separate classification details match authored metadata");
         EnemyCatalog catalog = spawns.Catalog;
         Require(catalog.DefinitionFor("racer_mk1").DisplayName == "Racer Interceptor" &&
-            catalog.DefinitionFor("transporter_mk1").DisplayName == "Drone Transporter",
-            "Ambiguous placeholder ship names are replaced without changing their IDs");
+            catalog.DefinitionFor("transporter_mk1").DisplayName == "Drone Transporter" &&
+            catalog.DefinitionFor("transporter_mk1").Class == EnemyClass.Heavy,
+            "Cargo classification and readable display names update without changing stable enemy IDs");
         var scenes = WaveCatalog.LoadScenes();
         Require(catalog.Find("basic_mk1") == scenes["basic_mk1"] && catalog.Find("scout_mk1") == scenes["scout_mk1"] && catalog.Find("medium_mk1") == scenes["medium_mk1"] && catalog.Find("unknown") == null,
             "Wave adapter reads actual enemy registration");
@@ -100,45 +101,48 @@ public static class EnemyCatalogChecks
             "Medium ship's existing kill pipeline pays exactly seven Credits");
         // Big mk.1 is a separate plain heavy type: catalog/F2, clearance, credits and optional shields.
         EnemyDefinition bigData = GD.Load<EnemyDefinition>("res://ENEMIES/Types/Enemy005/Enemy005.tres");
-        Require(bigData.EnemyId == "big_mk1" && bigData.DisplayName == "Heavy Warship"
-            && bigData.MaxHealth == 1000 && bigData.MaxShield == 200 && bigData.MoveSpeed == 80
+        Require(bigData.EnemyId == "big_mk1" && bigData.DisplayName == "Warship"
+            && bigData.Class == EnemyClass.Heavy && bigData.Rank == EnemyRank.Veteran
+            && Mathf.IsEqualApprox(bigData.VisualScale, 0.75f)
+            && bigData.MaxHealth == 750 && bigData.MaxShield == 200 && bigData.MoveSpeed == 80
             && bigData.CitadelDamage == 5 && bigData.KillRewardCredits == 10
             && bigData.RadiusPixels == 24 && catalog.Find("big_mk1") == scenes["big_mk1"],
-            "Big mk.1 retains original heavy-role balance, canonical ID and catalog registration");
+            "Warship retains its stable ID, shield/collision properties and catalog registration with new Heavy balance");
         Enemy big = spawns.Spawn("big_mk1", true);
-        Require(big != null && big.Health == 1000 && big.CurrentShield == 0
+        Require(big != null && big.Health == 750 && big.CurrentShield == 0
             && spawns.Paths.Navigation.HasClearance(big.GlobalPosition, big.Definition.RadiusPixels),
-            "Normal/F2 Big mk.1 spawn has no active shield and respects existing clearance");
+            "Normal/F2 Warship spawn has 750 hull, no active shield and unchanged clearance");
         big.Movement.SetPhysicsProcess(false);
         Texture2D bigTexture = big.GetNode<Sprite2D>("Sprite").Texture;
         Require(bigTexture != null && bigTexture.GetWidth() == 112 && bigTexture.GetHeight() == 120
+            && big.GetNode<Sprite2D>("Sprite").Scale.IsEqualApprox(Vector2.One * 0.75f)
             && big.GetNode<DefenseBar>("DefenseBar").GetChildCount() == 0
             && big.GetNodeOrNull<Node>("Abilities") == null,
-            "Big mk.1 has oversized 112x120 SVG with no added ability nodes or runtime bar children");
+            "Warship displays its original 112x120 SVG at 75% through VS1 without new nodes");
         big.TakeDamage(100);
         DefenseBar hullBar = big.GetNode<DefenseBar>("DefenseBar");
-        Require(big.Health == 900 && big.CurrentShield == 0 && hullBar.Visible
-            && hullBar.Position.Y < -bigTexture.GetHeight() * 0.5f,
-            "Large enemy hull survives hits and health bar clears oversized sprite without polling");
+        Require(big.Health == 650 && big.CurrentShield == 0 && hullBar.Visible
+            && hullBar.Position.Y < -bigTexture.GetHeight() * big.Definition.VisualScale * 0.5f,
+            "Warship hull survives hits and health bar clears scaled sprite without polling");
         int bigCredits = wallet.GetBalance(wallet.CreditsResource);
         big.TakeDamage(1500);
         Require(!big.IsAlive && wallet.GetBalance(wallet.CreditsResource) == bigCredits + 10,
             "Big mk.1 pays exactly 10 Credits through the existing kill pipeline");
 
         Enemy shieldedBig = spawns.SpawnWave("big_mk1", new RandomNumberGenerator { Seed = 17 }, spawnWithShield: true);
-        Require(shieldedBig != null && shieldedBig.CurrentShield == 200 && shieldedBig.Health == 1000,
-            "Opt-in shielded Big mk.1 starts with full 200 shield points");
+        Require(shieldedBig != null && shieldedBig.CurrentShield == 200 && shieldedBig.Health == 750,
+            "Opt-in shielded Warship starts with 200 shield points and 750 HP");
         shieldedBig.Movement.SetPhysicsProcess(false);
         DefenseBar stacked = shieldedBig.GetNode<DefenseBar>("DefenseBar");
         Require(stacked.ShieldVisible && stacked.HullVisible && stacked.Visible
             && shieldedBig.GetNodeOrNull<ShieldVisual>("ShieldVisual") != null,
             "Big mk.1 shares existing stacked shield/hull meters and glowing shield art");
         shieldedBig.TakeDamage(50);
-        Require(shieldedBig.CurrentShield == 150 && shieldedBig.Health == 1000
+        Require(shieldedBig.CurrentShield == 150 && shieldedBig.Health == 750
             && Mathf.IsEqualApprox(stacked.ShieldFraction, 0.75f),
             "Shield-only hits shrink the shared meter without harming Big mk.1 hull");
         shieldedBig.TakeDamage(150);
-        Require(shieldedBig.CurrentShield == 0 && shieldedBig.Health == 1000 && !stacked.ShieldVisible,
+        Require(shieldedBig.CurrentShield == 0 && shieldedBig.Health == 750 && !stacked.ShieldVisible,
             "Shield depletion retains full hull and removes only the shield meter");
         shieldedBig.TakeDamage(1500);
         // =========================================================

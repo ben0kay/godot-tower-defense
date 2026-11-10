@@ -1,3 +1,9 @@
+## Warship balance / visual regroup — 2026-11-10
+
+The existing **Heavy Warship** is now named **Warship**, classified **Heavy / Veteran / Fighter** (`Class = 3`; previously Superheavy). Hull HP is **750** (was 1,000). `Enemy005.tres` now sets **`VisualScale = 0.75`**, giving the original 112×120 SVG an effective displayed hull of **84×90px**, 25% smaller in each dimension. The shared VS1 system scales its attached cosmetics while keeping the original native SVG, 24px navigation clearance, 200 optional shields, 80px/s speed, damage, rewards, wave/save ID `big_mk1` and combat behaviour unchanged. F2 and the Wave Editor pick up the new class/display name from the definition. The name, HP and unscaled art dimensions in older sections below describe the original configuration; current values are above.
+
+---
+
 ## Dark/red Heavy Warship artwork repolish — 2026-11-05
 
 `Artwork/enemy005.svg` now matches the flat charcoal/black/scarlet fleet style, retaining four independent lance wings, reinforced spine, compact red sensor and two aft drive ports. Native size **112×120**, original `0 0 112 120` viewBox, right-facing orientation and gameplay remain unchanged. No gradients, filters, reflective shading or glow. Source implemented; owner Godot native-zoom review pending.

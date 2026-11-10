@@ -21,9 +21,9 @@ Guideline: **Capital 256–511px, Colossal 512–1023px, Titan 1024px+**, by the
 | Heavy Gunner Drone | Standard | Veteran | Fighter | `heavy_gunner_drone_mk1` | `Types/HeavyGunnerDrone/` | 62×42 |
 | Shield Emitter | Standard | Common | Support | `shield_emitter_mk1` | `Types/Enemy003/` | 60×48 |
 | Shield Frigate | Standard | Veteran | Support | `shield_frigate_mk1` | `Types/ShieldFrigate/` | 72×48 |
-| Drone Transporter | Superheavy | Common | Cargo | `transporter_mk1` | `Types/Transporter/` | 112×72 |
+| Drone Transporter | Heavy | Common | Cargo | `transporter_mk1` | `Types/Transporter/` | 112×72 |
 | Heavy Transporter | Superheavy | Veteran | Cargo | `heavy_transporter_mk1` | `Types/HeavyTransporter/` | 160×112 |
-| Heavy Warship | Superheavy | Veteran | Fighter | `big_mk1` | `Types/Enemy005/` | 112×120 |
+| Warship | Heavy | Veteran | Fighter | `big_mk1` | `Types/Enemy005/` | 112×120 (0.75× = 84×90 displayed) |
 | Elite Assault Ship | Standard | Elite | Fighter | `elite_mk1` | `Types/Enemy006/` | 80×60 |
 | Cruiser | Superheavy | Elite | Fighter | `cruiser_mk1` | `Types/Cruiser/` | 168×96 |
 | Obsidian Dreadnought | Capital | Champion | Fighter | `obsidian_dreadnought_mk1` | `Types/ObsidianDreadnought/` | 352×208 |

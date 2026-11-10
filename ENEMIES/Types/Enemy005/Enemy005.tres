@@ -5,12 +5,13 @@
 [resource]
 script = ExtResource("1")
 EnemyId = "big_mk1"
-Class = 4
+Class = 3
 Rank = 1
 Role = 0
-DisplayName = "Heavy Warship"
-MaxHealth = 1000.0
+DisplayName = "Warship"
+MaxHealth = 750.0
 MaxShield = 200.0
+VisualScale = 0.75
 MoveSpeed = 80.0
 RadiusPixels = 24.0
 TurnSpeed = 4.5

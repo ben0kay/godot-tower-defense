@@ -82,8 +82,8 @@ public partial class FleetExpansionChecks : Node
         Require(unusual.MaxHealth == 60f && unusual.MoveSpeed == 100f && unusual.MaxShield == 0,
             "Changing class/rank/role never derives gameplay values"); unusual.Dispose();
         EnemyDefinition carrier = f.Spawns.Catalog.DefinitionFor("transporter_mk1");
-        Require(carrier.Class == EnemyClass.Superheavy && carrier.Rank == EnemyRank.Common && carrier.Role == EnemyRole.Cargo,
-            "Drone Transporter is large Cargo, not automatically high combat rank");
+        Require(carrier.Class == EnemyClass.Heavy && carrier.Rank == EnemyRank.Common && carrier.Role == EnemyRole.Cargo,
+            "Drone Transporter is Heavy-class Cargo without changing its stable ID or payload");
         var cases = new[] {
             ("reinforced_drone_mk1", EnemyClass.Light, EnemyRank.Veteran, EnemyRole.Fighter, 110f, 100f, new Vector2(40, 30)),
             ("racer_mk1", EnemyClass.Tiny, EnemyRank.Veteran, EnemyRole.Fighter, 20f, 230f, new Vector2(34, 18)),

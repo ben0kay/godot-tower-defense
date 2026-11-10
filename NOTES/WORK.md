@@ -1,3 +1,9 @@
+## Drone Transporter and Warship class/balance update — 2026-11-10
+
+Set `Transporter.tres` (stable `transporter_mk1`) to **Heavy** class; cargo ability, native 112×72 art and stats unchanged. Set `Enemy005.tres` (stable `big_mk1`) to **Heavy**, rename display to **Warship**, reduce hull **1000→750**, and set VS1 `VisualScale=0.75` (112×120 native SVG displays at 84×90). Shield (200 capacity), speed (80), navigation clearance (24), waves and save identity unchanged. Updated roster/type notes plus focused catalog/fleet assertions. Source-checked; Godot runtime and in-game visual review pending.
+
+---
+
 ## Wave Editor batch labels and voice-over
 
 The estimated timeline uses Batch labels. Wave-start presentation exposes multiline typewriter narration and an optional imported voice clip routed through the shared voice queue. Source review only. Verify save/reload and playback in Godot.

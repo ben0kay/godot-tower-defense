@@ -1,3 +1,9 @@
+## Heavy class regroup — 2026-11-10
+
+Drone Transporter is now **Heavy / Common / Cargo** (`Class = 3`, previously Superheavy), so it appears under HEAVY in F2 and class-grouped wave authoring. Its original **112×72** artwork, 500 HP, 45px/s, 24px route clearance, DeathSpawn payload of six drones, wave ID `transporter_mk1`, credits and other mechanics are unchanged. Class is descriptive metadata, not an automatic sprite resize.
+
+---
+
 ## Dark/red Drone Transporter artwork repolish — 2026-11-05
 
 `Artwork/transporter.svg` now uses the same flat charcoal/scarlet faction palette, but keeps a distinctive **112×72** bulbous cargo body, segmented holding cells and recessed mechanically gated central launch slot. The centred `-56 -36 112 72` viewBox and +X orientation remain unchanged. No gradients, glow or reflective shading. Stats, 24px clearance, six-drone DeathSpawn, scene and waves are untouched. Owner Godot visual acceptance pending.
