@@ -1,3 +1,9 @@
+## SALV1 scrap marker
+
+Raw scrap uses a solid beveled shard silhouette with an amber highlight. Source review only. Check visibility at normal play zoom in Godot.
+
+---
+
 ## Laser reference-inspired SVG refinement — 2026-11-09
 
 Refined the complete `TOWERS/Offensive/LaserTower/Artwork/` family (16 existing SVGs): Level 1–3 fixed silver circular armour bases and thin long yellow laser barrels, matching combined icons, initial 0/35/70% construction, and L2/L3 35/70% upgrade previews. Artwork keeps 64×64 canvases, split stationary-base/rotating-gun layers, identical texture paths, and the existing `Muzzle` at (0,-29). No tower behavior/stats/scene/audio/beam changes; no heavy runtime effects. Source consistency review only; owner to inspect Godot's SVG rendering and beam alignment.

@@ -37,6 +37,13 @@ public partial class SalvageLogistics : Node2D
         public Action Completed;
     }
 
+    private static readonly Vector2[] ScrapOutline =
+        { new(-9, -4), new(-4, -8), new(6, -6), new(9, 0), new(4, 7), new(-6, 5) };
+    private static readonly Vector2[] ScrapFace =
+        { new(-7, -3), new(-3, -6), new(5, -4), new(7, 0), new(3, 5), new(-5, 3) };
+    private static readonly Vector2[] ScrapBevel =
+        { new(-7, -3), new(-3, -6), new(5, -4), new(2, -1), new(-4, 0) };
+
     private readonly List<Drop> _drops = new();
     private readonly List<Job> _jobs = new();
     private readonly List<ScrapRefinery> _refineries = new();
@@ -114,10 +121,13 @@ public partial class SalvageLogistics : Node2D
     {
         foreach (Drop drop in _drops)
         {
-            Vector2 p = ToLocal(drop.Position);
-            DrawCircle(p, 8, new Color(1, .64f, .24f, .18f));
-            DrawLine(p - new Vector2(3, 2), p + new Vector2(3, 2), new Color("#ffce7e"), 3, true);
+            DrawSetTransform(ToLocal(drop.Position));
+            DrawCircle(Vector2.Zero, 11, new Color(1, .64f, .24f, .14f));
+            DrawColoredPolygon(ScrapOutline, new Color("#352719"));
+            DrawColoredPolygon(ScrapFace, new Color("#a1794d"));
+            DrawColoredPolygon(ScrapBevel, new Color("#ffd28a"));
         }
+        DrawSetTransform(Vector2.Zero);
     }
 
     // =========================================================
