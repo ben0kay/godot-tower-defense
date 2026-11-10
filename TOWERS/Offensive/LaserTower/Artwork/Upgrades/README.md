@@ -1,3 +1,9 @@
+## Reference-inspired precision laser artwork — 2026-11-09
+
+The L1/L2/L3 base and rotating gun SVGs plus their combined illustrations and L2/L3 35/70% upgrade textures now share a consistent top-down, silver-and-amber precision laser design. The circular ring grows reinforced anchors and focus nodes with each level while the weapon keeps a long, **thin** forward barrel. All remain 64×64 and retain the existing fixed-base/rotating-gun presentation and local muzzle position `(0,-29)`. Gameplay stats, prices, upgrade work, scene paths and import metadata are unchanged; in-editor visual acceptance remains for the owner.
+
+---
+
 # Laser Tower — split finished artwork, purchased Levels 1–3
 
 The Laser Tower has a **stationary base** and **separate rotating emitter sprite** at each level. The earlier monolithic 64×64 artwork remains as combined catalog art and the temporary full assembly basis, but is no longer rotated as a complete finished tower.

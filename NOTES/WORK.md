@@ -1,3 +1,9 @@
+## Laser reference-inspired SVG refinement — 2026-11-09
+
+Refined the complete `TOWERS/Offensive/LaserTower/Artwork/` family (16 existing SVGs): Level 1–3 fixed silver circular armour bases and thin long yellow laser barrels, matching combined icons, initial 0/35/70% construction, and L2/L3 35/70% upgrade previews. Artwork keeps 64×64 canvases, split stationary-base/rotating-gun layers, identical texture paths, and the existing `Muzzle` at (0,-29). No tower behavior/stats/scene/audio/beam changes; no heavy runtime effects. Source consistency review only; owner to inspect Godot's SVG rendering and beam alignment.
+
+---
+
 ## SALV1 — Physical scrap and metal logistics — 2026-11-09
 
 Genuine enemy kills roll for physical Scrap. Shared-body drones recover it, deliver refinery output to Resource Storage and supply material-bearing construction from a Citadel. The canonical build clock gates work until delivery. HUD/inspector and between-wave checkpoints track physical ownership. No existing tower recipe was changed. Source review only. Verify the full loop, failure cases and Save/Continue in Godot.
