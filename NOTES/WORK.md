@@ -1,3 +1,9 @@
+## P2 — Enemy shield and defense-bar performance
+
+Full fog concealment hides enemy shield quads and bars and stops shield feedback tweens. Active shield rims remain available for ricochets. Individual bars cache width, layout and alignment. No batch prototype or runtime performance measurements. Check fog transitions and shield restoration with the 200–500 ship comparison in the optimization plan.
+
+---
+
 ## FOG-PERF1 — Enemy fog performance
 
 Staggered visual reveal samples, coalesced radar redraws, and suspended thrusters at full concealment. Hidden hull turning skips interpolation where mounts and shield rims do not depend on it. Source and scheduler checks only. In Godot, compare 200 moving contacts before and after at the same view and check fog-edge fade, exhaust, and F6.

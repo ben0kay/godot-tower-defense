@@ -1,3 +1,9 @@
+## Fog concealment
+
+Full enemy fog concealment hides the aura quad and cancels hit and break tweens. Shield changes keep the live rim query available, and reveal restores the current idle aura if shield points remain. Partially revealed ships still fade with their owner.
+
+---
+
 ## Read-only ricochet geometry — 2026-10-21
 
 ShieldVisual.TryGetRim returns an affine unit-circle transform at the current shader bright rim (UV radius.875), using the actual ColorRect global transform, pivot and dimensions. It contains no hit decision/damage logic. Ricochet captures this before damage and uses the confirmed absorption result. If shader rim geometry changes later, update this shared presentation constant too. See ../Ricochet/README.md.

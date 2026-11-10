@@ -1,3 +1,9 @@
+## Fog concealment and cached layout
+
+Enemy bars retain their latest hull and shield fractions in complete darkness while skipping draw and alignment work. On reveal, they restore the current rows and align immediately, including under Stasis. Partial reveal still uses the ship's normal fog fade. The existing individual bars cache width, meter rectangles and owner clearance, and skip unchanged alignment and redraw requests. Towers use the same layout cache without the enemy fog gate.
+
+---
+
 ## Frozen-enemy bar orientation fix (2026-10-18)
 
 A previously hidden DefenseBar now counter-rotates itself **when damage or restored shields first make it visible**, using its owning Node2D's current angle. Stasis/Freeze stops `EnemyMovement`, so the normal movement callback could not align a newly revealed HP bar until the enemy resumed walking. The bar therefore appeared turned sideways/on top of upward-facing enemies. Aligning on the hidden→visible transition keeps it horizontal and positioned above the hull, with no polling, new nodes, separate Stasis code or change to gameplay; moving enemies still align through their existing movement callback. This shared correction covers every damageable enemy/tower that reuses DefenseBar.

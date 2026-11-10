@@ -128,7 +128,8 @@ public partial class Enemy : Node2D
         if (_fogConcealed == concealed) return;
         _fogConcealed = concealed;
         _thruster?.SetFogConcealed(concealed);
-        if (!concealed) UpdateDefenseBarTransform();
+        _defenseBar?.SetFogConcealed(concealed);
+        if (GodotObject.IsInstanceValid(_shieldVisual)) _shieldVisual.SetFogConcealed(concealed);
     }
     private static PackedScene _shieldVisualScene;
     private double _initialDurability, _damageConsumed, _damageXpPool, _killXp;
@@ -163,7 +164,7 @@ public partial class Enemy : Node2D
             : Vector2.One * Mathf.Max(8f, Definition.RadiusPixels * 2f);
         _visualCentre = sprite != null ? sprite.Transform * hullRect.GetCenter() : Vector2.Zero;
         _thruster = GetNodeOrNull<EnemyThrusterVisual>("Thruster");
-        _fogConcealed = false;
+        SetFogConcealed(false);
         _thruster?.Configure(sprite, Definition, AppliedVisualScale);
         if (_defenseBar != null)
         {
@@ -317,10 +318,11 @@ public partial class Enemy : Node2D
             AddChild(_shieldVisual);
 
             FitShieldVisual();
+            _shieldVisual.SetFogConcealed(_fogConcealed);
+            RefreshStealthVisual();
         }
         if (GodotObject.IsInstanceValid(_shieldVisual))
             _shieldVisual.SetShield(before, after, animate);
-        RefreshStealthVisual();
     }
 
     // =========================================================

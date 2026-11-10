@@ -9,6 +9,7 @@ public partial class ShieldVisual : Node2D
     public bool HasShieldVisual { get; private set; }
     private ColorRect _aura;
     private Tween _feedbackTween;
+    private bool _fogConcealed;
     #endregion
 
     #region Lifecycle
@@ -52,6 +53,16 @@ public partial class ShieldVisual : Node2D
     public void SetShield(float previous, float current, bool animate = true)
     {
         if (_aura == null) return;
+        if (_fogConcealed)
+        {
+            bool hasShield = current > 0f;
+            if (HasShieldVisual != hasShield)
+            {
+                HasShieldVisual = hasShield;
+                Visible = hasShield;
+            }
+            return;
+        }
         // Sustained beams may damage the same shield at 60+Hz: do not restart the same flash each tick.
         if (animate && current > 0f && current < previous && HasShieldVisual &&
             _feedbackTween != null && _feedbackTween.IsValid() && _feedbackTween.IsRunning()) return;
@@ -80,6 +91,22 @@ public partial class ShieldVisual : Node2D
             _feedbackTween.TweenCallback(Callable.From(() => { if (!HasShieldVisual) ResetVisual(); }));
         }
         else ResetVisual();
+    }
+
+    // =========================================================
+    // Hide only the quad for live shields, keeping the root and rim transform available.
+    internal void SetFogConcealed(bool concealed)
+    {
+        if (_fogConcealed == concealed) return;
+        _fogConcealed = concealed;
+        if (!concealed)
+        {
+            SetShield(0f, HasShieldVisual ? 1f : 0f, false);
+            return;
+        }
+        StopFeedback();
+        _aura.Visible = false;
+        if (!HasShieldVisual) Visible = false;
     }
 
     // =========================================================
