@@ -26,6 +26,8 @@
 [ext_resource type="Script" path="res://FEEDBACK/CameraEffects/CameraShakeManager.cs" id="camera_shake"]
 [ext_resource type="Resource" path="res://FEEDBACK/CameraEffects/DefaultCameraShakeSettings.tres" id="camera_shake_settings"]
 
+[ext_resource type="Script" path="res://DEBUG/DebugHub/DeveloperHub.cs" id="debug_hub"]
+
 [node name="Battlefield" type="Node2D" unique_id=1543557823]
 script = ExtResource("launcher")
 
@@ -73,3 +75,6 @@ script = ExtResource("17_session")
 
 [node name="PerformanceOverlay" type="CanvasLayer" parent="."]
 script = ExtResource("perf_overlay")
+
+[node name="DeveloperHub" type="CanvasLayer" parent="."]
+script = ExtResource("debug_hub")

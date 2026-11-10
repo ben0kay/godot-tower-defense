@@ -89,7 +89,7 @@ public partial class MultiCitadelHudChecks : Node
     private static void Preview(MultiCitadelChecks.Fixture f)
     {
         var debug=f.Grid.Level.GetNode<LevelDebugController>("Debug"); var overlay=debug.RoutePreview;
-        debug._UnhandledKeyInput(new InputEventKey { Keycode=Key.F3, Pressed=true });
+        overlay.Toggle();
         Node panel=overlay.GetNode("PreviewUI/Panel"); var portals=Find<OptionButton>(panel,"Portal");
         Find<SpinBox>(panel,"Samples").Value=2; portals.Select(portals.ItemCount-1);
         int living=f.Spawns.Registry.Living.Count, pending=f.Paths.PendingCount, pools=f.Paths.Navigation.TotalSharedProfileCount;
@@ -109,7 +109,7 @@ public partial class MultiCitadelHudChecks : Node
             && f.Spawns.CitadelAssignments.SelectionQueries==selections && f.Paths.Navigation.TotalSharedProfileCount==pools,"F3 neither spawns nor alters live routing/assignments/pools");
         var target=f.Session.Objectives[1]; target.Goals.Add(new Vector2I(26,16)); overlay._PhysicsProcess(.016);
         Require(overlay.Job==null,"Secondary objective goal edits invalidate cached previews too"); target.Goals.RemoveAt(target.Goals.Count-1);
-        debug._UnhandledKeyInput(new InputEventKey { Keycode=Key.F3, Pressed=true }); Require(!overlay.IsOpen,"F3 closes preview");
+        overlay.Close(); Require(!overlay.IsOpen,"Close hides the preview");
     }
     // =========================================================
     // Locate production panel controls without coupling the check to container nesting.

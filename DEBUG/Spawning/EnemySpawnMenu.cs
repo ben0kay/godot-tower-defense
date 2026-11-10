@@ -1,4 +1,4 @@
-// F2-only batch spawner: catalog choices and bounded portal delivery, isolated from authored wave ownership.
+// Developer Hub batch spawner: catalog choices and bounded portal delivery, isolated from authored wave ownership.
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -62,7 +62,7 @@ public partial class EnemySpawnMenu : CanvasLayer
         _panel.AddThemeStyleboxOverride("panel", UIButtonFactory.Box(theme.PanelColor, theme.AccentColor));
         HBoxContainer columns = new(); columns.AddThemeConstantOverride("separation", 24); _panel.AddChild(columns);
         VBoxContainer box = new() { CustomMinimumSize = new(Mathf.Clamp(PickerMinimumWidth, 420, 800), 0), SizeFlagsHorizontal = Control.SizeFlags.ExpandFill }; columns.AddChild(box);
-        box.AddChild(UIButtonFactory.Label("ENEMY SPAWNER · F2", 20));
+        box.AddChild(UIButtonFactory.Label("ENEMY SPAWNER", 20));
         box.AddChild(UIButtonFactory.Label("Random valid portal per ship", 14));
         _enemy = new() { Name = "Enemy", CustomMinimumSize = new(0, 40), SizeFlagsHorizontal = Control.SizeFlags.ExpandFill }; box.AddChild(_enemy);
         _enemy.AddThemeFontSizeOverride("font_size", 17);
@@ -105,7 +105,7 @@ public partial class EnemySpawnMenu : CanvasLayer
         ScrollContainer active = new() { CustomMinimumSize = new(0, 110), HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
         box.AddChild(active); _batchRows = new() { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill }; active.AddChild(_batchRows);
         box.AddChild(UIButtonFactory.Create("Cancel all remaining spawns", CancelBatch, UIButtonStyle.Compact, 32));
-        box.AddChild(UIButtonFactory.Create("Close · F2 / Escape", Close, UIButtonStyle.Compact, 32));
+        box.AddChild(UIButtonFactory.Create("Close · Esc", Close, UIButtonStyle.Compact, 32));
         _status = UIButtonFactory.Label("Choose an enemy and batch settings.", 14); _status.AutowrapMode = TextServer.AutowrapMode.WordSmart; box.AddChild(_status);
         VBoxContainer preview = new() { CustomMinimumSize = new(360, 0), SizeFlagsHorizontal = Control.SizeFlags.ExpandFill }; columns.AddChild(preview);
         preview.AddChild(UIButtonFactory.Label("SPRITE PREVIEW · ACTUAL SIZE", 17));
@@ -165,7 +165,7 @@ public partial class EnemySpawnMenu : CanvasLayer
     public void Toggle() { if (IsOpen) Close(); else { _panel.Show(); _enemy.GrabFocus(); } }
     // =========================================================
     // Closing leaves an accepted batch running; cancellation is explicit.
-    public void Close() { _panel?.Hide(); SetProcess(false); if (_enemy != null) RefreshPreview(_enemy.Selected); }
+    public void Close() { if (_enemyPopup?.Visible == true) _enemyPopup.Hide(); _panel?.Hide(); SetProcess(false); if (_enemy != null) RefreshPreview(_enemy.Selected); }
     // =========================================================
     // Capture controls once so editing inputs cannot mutate an in-flight batch.
     private void StartSelected() => StartBatch(_enemy.Selected, (int)_amount.Value, _gap.Value, _shielded.ButtonPressed, _stealthed.ButtonPressed);

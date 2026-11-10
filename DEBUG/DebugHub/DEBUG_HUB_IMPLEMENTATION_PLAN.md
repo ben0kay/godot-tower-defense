@@ -2,7 +2,7 @@
 
 **Repository:** `ben0kay/godot-tower-defense`  
 **Branch:** `dev` only  
-**Status:** Codex-ready implementation plan — **NOT IMPLEMENTED**  
+**Status:** Source implemented — awaiting owner validation
 **Scope:** Quick, targeted controls/debug-tool UX pass. Preserve production combat, authored assets, building costs, saving and normal gameplay controls.
 
 ## 1. Goal

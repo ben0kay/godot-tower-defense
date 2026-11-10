@@ -1,4 +1,4 @@
-// Real battlefield overlay checks: layout coexistence, read-only counters, scoped F4 and pause behavior.
+// Real battlefield overlay checks: layout coexistence, read-only counters, scoped F2 and pause behavior.
 using Godot;
 using System;
 using System.Linq;
@@ -21,12 +21,15 @@ public partial class PerformanceOverlayChecks : Node
                 PerformanceOverlay overlay = f.Main.GetNode<PerformanceOverlay>("PerformanceOverlay");
                 Require(overlay.Visible && overlay.IsProcessing(), "Debug overlay starts visible");
                 LevelDebugController debug = f.Main.GetNode<LevelDebugController>("World/Level/Debug");
-                Require(debug.RoutePreview != null, "F3 service initializes alongside F2");
-                debug._UnhandledKeyInput(new InputEventKey { Keycode = Key.F2, Pressed = true });
+                Require(debug.RoutePreview != null, "Route Preview initializes alongside Enemy Spawner");
+                DeveloperHub hub = f.Main.GetNode<DeveloperHub>("DeveloperHub");
+                hub._Input(new InputEventKey { Keycode = Key.F1, Pressed = true });
+                hub._UnhandledKeyInput(new InputEventKey { Keycode = Key.Key1, Pressed = true });
+                Require(debug.SpawnMenu.IsOpen, "F1 then 1 opens Enemy Spawner");
+                hub._Input(new InputEventKey { Keycode = Key.Escape, Pressed = true });
+                Require(!debug.SpawnMenu.IsOpen && !GetTree().Paused, "Escape dismisses the tool without pausing");
                 debug.SpawnMenu.StartBatch(0, 1, 0); debug.SpawnMenu._PhysicsProcess(1.0 / 60);
-                Require(f.Spawns.Registry.Living.Count == 1, "F2 menu batch creates a ship on this real battlefield");
-                debug._UnhandledKeyInput(new InputEventKey { Keycode = Key.F2, Pressed = true, Echo = true });
-                Require(f.Spawns.Registry.Living.Count == 1, "F2 ignores key repeat");
+                Require(f.Spawns.Registry.Living.Count == 1, "Enemy Spawner batch creates a ship on this real battlefield");
                 Enemy enemy = f.Spawns.Registry.Living.Single();
                 AmmoLoopFixture.Disable(enemy);
                 long queries = f.Spawns.Paths.TotalCalculations;
@@ -48,8 +51,8 @@ public partial class PerformanceOverlayChecks : Node
                 Control legacy = f.Main.GetNodeOrNull<Control>("World/Level/Debug/HUD/Info");
                 Require(legacy == null, "Retired map debug readout is removed");
                 Require(!overlay.Profiler.Running, "Subsystem profiling defaults off");
-                overlay._Input(new InputEventKey { Keycode = Key.F4, Pressed = true, ShiftPressed = true });
-                Require(overlay.Visible && overlay.Profiler.Running, "Shift+F4 enables profiling without hiding the panel");
+                hub._Input(new InputEventKey { Keycode = Key.F2, Pressed = true, ShiftPressed = true });
+                Require(overlay.Visible && overlay.Profiler.Running, "Shift+F2 enables profiling without hiding the panel");
                 await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
                 await ToSignal(GetTree(), SceneTree.SignalName.PhysicsFrame);
                 Require(overlay.Profiler.Samples > 0, "Early/late physics callbacks close real samples");
@@ -64,15 +67,15 @@ public partial class PerformanceOverlayChecks : Node
                             "Scaled panel avoids the lower HUD on small viewports");
                 }
                 Require(rows[19].Visible && rows[20].Text.Contains("overlap"), "Expanded profiling rows remain readable and explain overlap");
-                if (scene == MenuNavigation.Level001Scene) overlay._Input(new InputEventKey { Keycode = Key.F5, Pressed = true });
+                if (scene == MenuNavigation.Level001Scene) hub._Input(new InputEventKey { Keycode = Key.F3, Pressed = true });
                 int bindings = GetNode<GameInput>("/root/GameInput").BindingCount;
-                overlay._Input(new InputEventKey { Keycode = Key.F4, Pressed = true, Echo = true });
+                hub._Input(new InputEventKey { Keycode = Key.F2, Pressed = true, Echo = true });
                 Require(overlay.Visible, "OS repeat does not toggle");
                 GetTree().Paused = true;
-                overlay._Input(new InputEventKey { Keycode = Key.F4, Pressed = true });
-                Require(!overlay.Visible && !overlay.IsProcessing() && !overlay.IsPhysicsProcessing() && !overlay.Profiler.Running, "F4 hides/stops sampling while paused");
-                overlay._Input(new InputEventKey { Keycode = Key.F4, Pressed = true });
-                Require(overlay.Visible && GetTree().Paused && overlay.Profiler.Running && overlay.Profiler.Samples == 0, "F4 reopens fresh capture without resuming gameplay");
+                hub._Input(new InputEventKey { Keycode = Key.F2, Pressed = true });
+                Require(!overlay.Visible && !overlay.IsProcessing() && !overlay.IsPhysicsProcessing() && !overlay.Profiler.Running, "F2 hides/stops sampling while paused");
+                hub._Input(new InputEventKey { Keycode = Key.F2, Pressed = true });
+                Require(overlay.Visible && GetTree().Paused && overlay.Profiler.Running && overlay.Profiler.Samples == 0, "F2 reopens fresh capture without resuming gameplay");
                 await ToSignal(GetTree().CreateTimer(.3), SceneTreeTimer.SignalName.Timeout);
                 Require(rows[0].Text.Contains("PAUSED") && f.Spawns.Registry.Living.Count == 1
                     && GetNode<GameInput>("/root/GameInput").BindingCount == bindings, "Paused sampling remains read-only without new input bindings");
@@ -80,7 +83,7 @@ public partial class PerformanceOverlayChecks : Node
                 GetViewport().GetWindow().ContentScaleSize = new(1920, 1080);
             }
             await SubsystemBattlefield.DrainFreedFixtures(this);
-            GD.Print("PASS: performance overlay on all three battlefields, cached counts, mouse pass-through, HUD/debug coexistence, resize, F4/echo, pause and hidden sampling");
+            GD.Print("PASS: performance overlay on all three battlefields, cached counts, mouse pass-through, HUD/debug coexistence, resize, F2/echo, pause and hidden sampling");
             GetTree().Quit();
         }
         catch (Exception error) { GD.PushError(error.ToString()); GetTree().Paused = false; GetTree().Quit(1); }

@@ -10,9 +10,9 @@ Genuine enemy kills roll for physical Scrap. Shared-body drones recover it, deli
 
 ---
 
-## DBG1 — F1 Debug Hub controls/Building Lookup plan (2026-11-09)
+## DBG1 — F1 Developer Hub
 
-Documentation only: added [DBG1](../DEBUG/DebugHub/DEBUG_HUB_IMPLEMENTATION_PLAN.md) under DEBUG. Defines an F1 master menu for Enemy Spawner, read-only tower/building L1–L3 artwork preview and Route Preview; direct F2 performance, Shift+F2 profiling, F3 sample export, F4 alert tests, retiring F9 Audio Tester, while retaining F11 and gameplay controls. Codex implementation still pending; no runtime bindings or scenes changed.
+Added the battlefield debug hub for Enemy Spawner, Building Lookup and Route Preview. Building Lookup resolves authored finished tiers off-tree and offers native-size and fit views. F2/Shift+F2/F3 now control the performance overlay, profiler and report. F4 cycles notification samples. The F9 audio tester was unmounted. Source review only. Verify shortcuts, pause and finished artwork in Godot.
 
 ---
 

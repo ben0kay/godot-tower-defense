@@ -80,11 +80,8 @@ public partial class EnemyIntegrationChecks : Node
             CitadelHealthChecks.Run(_battle, _spawns);
             int arrivedBefore = _spawns.Registry.ArrivedCount;
             LevelDebugController debug = _grid.Level.GetNode<LevelDebugController>("Debug");
-            debug._UnhandledKeyInput(new InputEventKey { Keycode = Key.F2, Pressed = true });
-                debug.SpawnMenu.StartBatch(0, 1, 0); debug.SpawnMenu._PhysicsProcess(1.0 / 60);
-            Check(_spawns.Registry.Living.Count == 1, "F2 creates one Enemy001");
-            debug._UnhandledKeyInput(new InputEventKey { Keycode = Key.F2, Pressed = true, Echo = true });
-            Check(_spawns.Registry.Living.Count == 1, "F2 ignores OS key repeat");
+            debug.SpawnMenu.StartBatch(0, 1, 0); debug.SpawnMenu._PhysicsProcess(1.0 / 60);
+            Check(_spawns.Registry.Living.Count == 1, "Enemy Spawner creates one Enemy001");
             Enemy first = _spawns.Registry.Living[0]; first.Movement.SetPhysicsProcess(false);
             Check(first.Definition.EnemyId == "basic_mk1" && first.Health == 60, "Enemy001 resource identity and health");
             DefenseBar bar = first.GetNode<DefenseBar>("DefenseBar");

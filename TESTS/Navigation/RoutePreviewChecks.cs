@@ -39,8 +39,7 @@ public partial class RoutePreviewChecks : Node
         LevelDebugController debug = grid.Level.GetNode<LevelDebugController>("Debug");
         RoutePreviewOverlay overlay = debug.RoutePreview;
         Require(overlay != null && !overlay.IsOpen, "Overlay starts hidden");
-        var key = new InputEventKey { Keycode = Key.F3, Pressed = true };
-        debug._UnhandledKeyInput(key); Require(overlay.IsOpen, "F3 opens panel");
+        overlay.Toggle(); Require(overlay.IsOpen, "Route Preview opens");
         Node panel = overlay.GetNode("PreviewUI/Panel");
         Button simulate = Find<Button>(panel, "Simulate"), clear = Find<Button>(panel, "Clear");
         OptionButton portal = Find<OptionButton>(panel, "Portal"), enemies = Find<OptionButton>(panel, "Enemy"), mode = Find<OptionButton>(panel, "Mode");
@@ -94,10 +93,8 @@ public partial class RoutePreviewChecks : Node
         simulate.EmitSignal(Button.SignalName.Pressed); Run(overlay); Require(overlay.Job.Results.Count + overlay.Job.Failed == 2, "New input replaces old run");
         clear.EmitSignal(Button.SignalName.Pressed); Require(overlay.Job == null, "Clear removes results");
         simulate.EmitSignal(Button.SignalName.Pressed);
-        debug._UnhandledKeyInput(new InputEventKey { Keycode = Key.F3, Pressed = true, Echo = true });
-        Require(overlay.IsOpen, "Key repeat ignored");
-        debug._UnhandledKeyInput(key); Require(!overlay.IsOpen && overlay.Job == null && !overlay.IsPhysicsProcessing(), "F3 closes, hides and cancels work");
-        debug._UnhandledKeyInput(key); debug.Enabled = false;
+        overlay.Close(); Require(!overlay.IsOpen && overlay.Job == null && !overlay.IsPhysicsProcessing(), "Closing the preview hides it and cancels work");
+        overlay.Toggle(); debug.Enabled = false;
         Require(!overlay.IsOpen && !overlay.IsPhysicsProcessing(), "Disabling level Debug closes overlay without polling");
         debug.Enabled = true;
         EnemyDefinition fixture = new() { RadiusPixels = 12, AllowPathDiversity = false, AllowPathOffsets = false, AllowCorridorVariation = false };

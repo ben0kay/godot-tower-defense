@@ -1,4 +1,4 @@
-// Debug-only F7 samples for the gameplay alert foundation; no gameplay events are emitted.
+// Debug-only F4 samples for the gameplay alert foundation; no gameplay events are emitted.
 // Release builds do not register input handlers or show preview notifications.
 using Godot;
 
@@ -6,17 +6,17 @@ public partial class AlertPreview : Node
 {
     [ExportGroup("Development Preview")]
     [Export] public bool Enabled { get; set; } = true;
-    [Export] public Key PreviewKey { get; set; } = Key.F7;
 
 #if DEBUG
     private int _step;
+#endif
 
     // =========================================================
     // Manually cycle toast, merge, queued alerts and priority interruption while playing.
-    public override void _UnhandledKeyInput(InputEvent input)
+    public void CycleSample()
     {
-        if (!Enabled || input is not InputEventKey key || !key.Pressed || key.Echo ||
-            key.Keycode != PreviewKey) return;
+#if DEBUG
+        if (!Enabled || !OS.IsDebugBuild() || GetTree().Paused) return;
 
         NotificationManager manager = NotificationManager.Find(this);
         if (manager == null) { GD.PushWarning("Alert preview: manager missing."); return; }
@@ -45,7 +45,6 @@ public partial class AlertPreview : Node
                     manager.ShowItem("sample_" + (i % 5), "Sample Resource " + (i % 5), 1);
                 break;
         }
-        GetViewport().SetInputAsHandled();
-    }
 #endif
+    }
 }

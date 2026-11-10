@@ -1,6 +1,8 @@
-## DBG1 — F1 Debug Hub / shortcut revamp (plan only, not implemented)
+## DBG1 — Developer Hub
 
-The [DBG1 implementation plan](DebugHub/DEBUG_HUB_IMPLEMENTATION_PLAN.md) specifies an F1 Developer Hub with Enemy Spawner, a new read-only catalog-based Building Artwork Lookup (actual finished levels and optional stages) and Route Preview. Direct diagnostics will be F2 performance, Shift+F2 profiling, F3 profile report and F4 notification samples. The old F9 Audio Tester is to be unmounted. **These changes have not been implemented; current hotkeys described in historical sections below remain active until Codex completes DBG1.**
+In a running debug battlefield, press **F1** and choose **1 Enemy Spawner**, **2 Building Lookup**, or **3 Route Preview**. F1 returns from a child to the hub. Escape closes the active panel. Building Lookup browses all catalog entries, with authored finished tiers, native artwork bounds, and Actual Size and Fit views.
+
+**F2** toggles Performance, **Shift+F2** toggles profiling, **F3** saves retained samples, and **F4** cycles notification samples. These keys work with the hub closed. F9 Audio Tester is retired. Shortcut references in older entries below are historical.
 
 ---
 

@@ -86,7 +86,7 @@ public partial class GunnerDroneChecks : Node
     private static void CatalogCycle(AmmoLoopFixture f)
     {
         var debug = f.Main.GetNode<LevelDebugController>("World/Level/Debug");
-        Require(debug.RoutePreview != null, "Deferred F2/F3 service connected");
+        Require(debug.RoutePreview != null, "Deferred Route Preview service connected");
         int gunners = 0, heavies = 0; LegacyCatalogSpawner legacy = new();
         foreach (PackedScene scene in f.Spawns.Catalog.Scenes)
         {
@@ -95,11 +95,9 @@ public partial class GunnerDroneChecks : Node
             Enemy ship = f.Spawns.Registry.Living.Single(); Disable(ship);
             if (ship.Definition.EnemyId == "gunner_drone_mk1") gunners++;
             if (ship.Definition.EnemyId == "heavy_gunner_drone_mk1") heavies++;
-            debug._UnhandledKeyInput(new InputEventKey { Keycode = Key.F2, Pressed = true, Echo = true });
-            Require(f.Spawns.Registry.Living.Count == 1, "Key repeat does not emit extra armed ships");
             ship.Free();
         }
-        Require(gunners == 1 && heavies == 1, "F2 catalogs starter and heavy Gunner Drones exactly once");
+        Require(gunners == 1 && heavies == 1, "Enemy catalog contains starter and heavy Gunner Drones exactly once");
     }
     #endregion
 

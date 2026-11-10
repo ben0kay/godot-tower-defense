@@ -24,12 +24,10 @@ public partial class EnemySpawnMenuChecks : Node
                 HoverPreview(f, menu);
                 int basicIndex = FindEnemyIndex(menu, "basic_mk1");
                 int before = f.Spawns.Registry.Living.Count;
-                debug._UnhandledKeyInput(new InputEventKey { Keycode = Key.F2, Pressed = true });
-                Require(menu.IsOpen && f.Spawns.Registry.Living.Count == before, "F2 opens without spawning");
-                debug._UnhandledKeyInput(new InputEventKey { Keycode = Key.F2, Pressed = true, Echo = true });
-                Require(menu.IsOpen, "F2 ignores repeat");
-                debug._Input(new InputEventKey { Keycode = Key.Escape, Pressed = true });
-                Require(!menu.IsOpen, "Escape closes");
+                menu.Toggle();
+                Require(menu.IsOpen && f.Spawns.Registry.Living.Count == before, "Opening the menu does not spawn");
+                menu.Close();
+                Require(!menu.IsOpen, "Close hides the menu");
                 int waveCreated = 0; f.Spawns.WaveEnemyCreated += _ => waveCreated++;
                 Require(!menu.StartBatch(-1, 2, 0) && !menu.StartBatch(0, 2, 0) &&
                     !menu.StartBatch(basicIndex, 0, 0) && !menu.StartBatch(basicIndex, 1, double.NaN),
@@ -56,7 +54,7 @@ public partial class EnemySpawnMenuChecks : Node
                 Require(!menu.IsSpawning && !menu.IsOpen, "Disabled level tool cancels batch");
             }
             await SubsystemBattlefield.DrainFreedFixtures(this);
-            GD.Print("PASS: F2 menu, bounded exact batches, gaps, pause, close, cancel, validation and wave isolation"); GetTree().Quit();
+            GD.Print("PASS: Enemy Spawner, bounded exact batches, gaps, pause, close, cancel, validation and wave isolation"); GetTree().Quit();
         }
         catch (Exception error) { GetTree().Paused = false; GD.PushError(error.ToString()); GetTree().Quit(1); }
     }

@@ -8,7 +8,6 @@ public partial class AudioTester : Node
 {
     [ExportGroup("Preview")]
     [Export] public bool Enabled { get; set; } = true;
-    [Export] public Key PreviewKey { get; set; } = Key.F9;
     [Export] public AudioTestScenario Scenario { get; set; } = AudioTestScenario.CycleExamples;
 
 #if DEBUG
@@ -60,13 +59,12 @@ public partial class AudioTester : Node
     }
     #endregion
 
-    #region Input
+    #region Manual Samples
     // =========================================================
-    // F9 checks UI tone, left/right spatial panning and a repeating positional hum.
-    public override void _UnhandledKeyInput(InputEvent input)
+    // Run a synthetic playback sample from a dedicated debug fixture.
+    public void RunSample()
     {
-        if (!Enabled || _audio == null || input is not InputEventKey key ||
-            !key.Pressed || key.Echo || key.Keycode != PreviewKey) return;
+        if (!Enabled || _audio == null) return;
         Camera2D camera = GetViewport().GetCamera2D();
         Vector2 center = camera?.GetScreenCenterPosition() ?? Vector2.Zero;
         switch (Scenario)
@@ -101,8 +99,7 @@ public partial class AudioTester : Node
                 }
                 break;
         }
-        GD.Print("AudioTester: ", Scenario, " / key step ", _step);
-        GetViewport().SetInputAsHandled();
+        GD.Print("AudioTester: ", Scenario, " / step ", _step);
     }
     #endregion
 

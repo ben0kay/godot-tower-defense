@@ -1,4 +1,4 @@
-// Level-debug-owned F3 panel and cached world polylines; never creates gameplay enemies or modifies their routes.
+// Level-debug-owned route panel and cached world polylines; never creates gameplay enemies or modifies their routes.
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -49,7 +49,8 @@ public partial class RoutePreviewOverlay : Node2D
         ScrollContainer scroll = new() { HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
         panel.AddChild(scroll);
         VBoxContainer box = new() { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill }; scroll.AddChild(box);
-        box.AddChild(UIButtonFactory.Label("ROUTE PREVIEW · F3", 18));
+        box.AddChild(UIButtonFactory.Label("ROUTE PREVIEW", 18));
+        box.AddChild(UIButtonFactory.Create("Close · Esc", Close, UIButtonStyle.Compact, 28));
         _portals = Choice(box, "Portal", "Portal");
         _enemies = Choice(box, "Enemy type", "Enemy");
         HBoxContainer samples = new(); box.AddChild(samples); samples.AddChild(UIButtonFactory.Label("Paths per portal", 14));
@@ -118,12 +119,15 @@ public partial class RoutePreviewOverlay : Node2D
     { Clear(""); _previewSettings?.Dispose(); _previewSettings = null; }
 
     // =========================================================
-    // F3 hides both panel and paths; reopen starts clean and reflects current registered sources.
+    // Closing hides both panel and paths; reopen starts clean and reflects current registered sources.
+    public void Close() { if (IsOpen) Toggle(); }
+
     public void Toggle()
     {
         bool open = !IsOpen; _designOverlay?.SetRuntimeVisible(open); _canvas.Visible = open; Visible = open; SetPhysicsProcess(open);
         Clear("Choose inputs and click Simulate Paths. No enemies spawn.");
-        if (open) RefreshChoices();
+        if (open) { RefreshChoices(); _portals.GrabFocus(); }
+        else { _portals.GetPopup().Hide(); _enemies.GetPopup().Hide(); _mode.GetPopup().Hide(); }
     }
 
     // =========================================================
@@ -168,11 +172,11 @@ public partial class RoutePreviewOverlay : Node2D
         foreach (int index in selected)
         {
             Marker2D exit = _exits[index];
-            if (!GodotObject.IsInstanceValid(exit)) { Clear("Portal removed. Close/reopen F3 to refresh choices."); return; }
+            if (!GodotObject.IsInstanceValid(exit)) { Clear("Portal removed. Close and reopen Route Preview to refresh choices."); return; }
             string pathName = _portals.GetItemMetadata(index).AsString();
             bool active = level.Settings.SpawnMode != LevelConfig.SpawnSourceMode.MapEdges && level.Settings.ActivePortals.Any(path =>
                 path.ToString() == pathName && level.GetNodeOrNull<Node2D>(path)?.GetNodeOrNull<Marker2D>("SpawnExit") == exit);
-            if (!active) { Clear("Active portals changed. Close/reopen F3 to refresh choices."); return; }
+            if (!active) { Clear("Active portals changed. Close and reopen Route Preview to refresh choices."); return; }
         }
         _previewNav = NavigationGrid.CreatePreview(_nav, _previewSettings);
         foreach (int index in selected)

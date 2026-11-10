@@ -1,12 +1,6 @@
-## DBG1 future shortcut plan (not implemented)
+## Debug battlefield shortcuts
 
-See [DBG1](../DEBUG/DebugHub/DEBUG_HUB_IMPLEMENTATION_PLAN.md) for the proposed F1 debug hub, Building Lookup and F2 / Shift+F2 / F3 / F4 remap. **Current live keys documented below have not changed yet.** F11 fullscreen, Ctrl build, Escape and camera controls will remain unchanged.
-
----
-
-## Performance overlay — F4
-
-All playable launchers now mount the isolated `DEBUG/PerformanceOverlay.cs`. Its own pause-aware F4 handler ignores OS repeat, consumes only its configured key, and creates no GameInput scoped binding. F2/F3 remain LevelDebugController responsibilities. See DEBUG/README.md from the repository root.
+**F1** opens the Developer Hub. With hub focus, **1** opens Enemy Spawner, **2** opens Building Lookup, and **3** opens Route Preview. **F2**, **Shift+F2**, **F3** and **F4** directly toggle Performance, toggle profiling, export a retained report and cycle notification samples, respectively. Escape closes the open debug panel first. See [DEBUG](../DEBUG/README.md).
 
 ---
 

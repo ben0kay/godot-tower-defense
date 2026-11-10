@@ -7,7 +7,7 @@ public partial class EnemySpritePreview : Control
     public Rect2 ArtworkBounds { get; private set; }
     public int SpriteCount => _art?.GetChildCount() ?? 0;
     private Node2D _art;
-    private bool _hasBounds;
+    private bool _hasBounds, _fit;
     // =========================================================
     // Geometry only recenters on resize; there is no per-frame preview logic.
     public override void _Ready()
@@ -16,8 +16,7 @@ public partial class EnemySpritePreview : Control
     // Inspect the actual scene without entering the tree, then immediately release its gameplay wrappers.
     public void ShowScene(PackedScene scene)
     {
-        if (_art != null) { RemoveChild(_art); _art.Free(); }
-        _art = new() { Name = "Artwork" }; AddChild(_art); _hasBounds = false; ArtworkBounds = default;
+        ResetArtwork();
         if (scene != null)
         {
             Node source = scene.Instantiate();
@@ -31,7 +30,30 @@ public partial class EnemySpritePreview : Control
             }
             finally { source.Free(); }
         }
-        CustomMinimumSize = new(Mathf.Max(340, ArtworkBounds.Size.X + 32), Mathf.Max(300, ArtworkBounds.Size.Y + 32));
+        SetFit(false);
+    }
+
+    // =========================================================
+    // Building Lookup passes a detached, already resolved scene. No runtime node is retained.
+    internal void ShowArtwork(Node2D root, bool fit)
+    {
+        ResetArtwork();
+        if (root != null) CopyArtwork(root, Transform2D.Identity, Colors.White, true, 0);
+        SetFit(fit);
+    }
+
+    private void ResetArtwork()
+    {
+        if (_art != null) { RemoveChild(_art); _art.Free(); }
+        _art = new() { Name = "Artwork" };
+        AddChild(_art); _hasBounds = false; ArtworkBounds = default;
+    }
+
+    internal void SetFit(bool fit)
+    {
+        _fit = fit;
+        CustomMinimumSize = fit ? Vector2.Zero :
+            new Vector2(Mathf.Max(340, ArtworkBounds.Size.X + 32), Mathf.Max(300, ArtworkBounds.Size.Y + 32));
         CenterArtwork();
     }
     // =========================================================
@@ -61,12 +83,16 @@ public partial class EnemySpritePreview : Control
         foreach (Node child in source.GetChildren()) CopyArtwork(child, transform, tint, visible, z);
     }
     // =========================================================
-    // Only translation changes; artwork retains its authored scale even in the scrollable preview area.
+    // Enemy previews stay 1:1. Building Lookup can opt into view-only scaling.
     private void CenterArtwork()
     {
         if (_art == null) return;
         Vector2 area = new(Mathf.Max(Size.X, CustomMinimumSize.X), Mathf.Max(Size.Y, CustomMinimumSize.Y));
-        _art.Position = (area - ArtworkBounds.Size) * .5f - ArtworkBounds.Position;
+        float scale = 1f;
+        if (_fit && _hasBounds && ArtworkBounds.Size.X > 0 && ArtworkBounds.Size.Y > 0)
+            scale = Mathf.Clamp(Mathf.Min((area.X - 24) / ArtworkBounds.Size.X, (area.Y - 24) / ArtworkBounds.Size.Y), .01f, 4);
+        _art.Scale = Vector2.One * scale;
+        _art.Position = (area - ArtworkBounds.Size * scale) * .5f - ArtworkBounds.Position * scale;
     }
     #endregion
 }

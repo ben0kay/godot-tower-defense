@@ -1,5 +1,5 @@
 // Self-contained, debug-build performance readout; reads existing counters without changing gameplay.
-// Cached services, allocation-free frame sampling and throttled text updates; F4 remains available while paused.
+// Cached services, allocation-free frame sampling and throttled text updates; F2 remains available while paused.
 using Godot;
 
 public partial class PerformanceOverlay : CanvasLayer
@@ -8,7 +8,6 @@ public partial class PerformanceOverlay : CanvasLayer
     [ExportGroup("Visibility")]
     [Export] public bool DebugBuildsOnly { get; set; } = true;
     [Export] public bool ShowOnStart { get; set; } = true;
-    [Export] public Key ToggleKey { get; set; } = Key.F4;
     [ExportGroup("Display")]
     [Export(PropertyHint.Range, "0.1,2,0.05")] public double RefreshSeconds { get; set; } = .25;
     [Export(PropertyHint.Range, "1,10,0.5")] public double PeakWindowSeconds { get; set; } = 2;
@@ -49,7 +48,7 @@ public partial class PerformanceOverlay : CanvasLayer
     {
         ProcessMode = ProcessModeEnum.Always; Layer = 20; ProcessPhysicsPriority = int.MaxValue;
         _allowed = !DebugBuildsOnly || OS.IsDebugBuild();
-        SetProcess(false); SetPhysicsProcess(false); SetProcessInput(_allowed);
+        SetProcess(false); SetPhysicsProcess(false);
         if (!_allowed) { Hide(); return; }
         _headless = DisplayServer.GetName() == "headless";
         BuildPanel();
@@ -76,17 +75,9 @@ public partial class PerformanceOverlay : CanvasLayer
         SetOverlayVisible(ShowOnStart);
     }
 
-    // =========================================================
-    // F4 is independent of focused controls and pause/results; repeat events cannot flicker visibility.
-    public override void _Input(InputEvent input)
-    {
-        if (!_allowed || input is not InputEventKey key || !key.Pressed || key.Echo) return;
-        if (key.Keycode == ToggleKey && key.ShiftPressed) SetProfiling(!(_profiler?.Running ?? false));
-        else if (key.Keycode == ToggleKey) SetOverlayVisible(!Visible);
-        else if (key.Keycode == Key.F5) DumpProfile();
-        else return;
-        GetViewport().SetInputAsHandled();
-    }
+    public bool Profiling => _profiler?.Running == true;
+    public void ToggleOverlay() => SetOverlayVisible(!Visible);
+    public void ToggleProfiling() => SetProfiling(!Profiling);
 
     // =========================================================
     // Hidden panels stop all sampling and formatting; reopening starts a fresh observation window.
@@ -104,7 +95,7 @@ public partial class PerformanceOverlay : CanvasLayer
 
     #region Profiling Controls
     // =========================================================
-    // Explicit profiling is independent of ordinary F4 visibility; hidden captures always stop.
+    // Explicit profiling is independent of ordinary F2 visibility; hidden captures always stop.
     public void SetProfiling(bool enabled)
     {
         if (!_allowed || _profiler == null) return;
@@ -117,7 +108,7 @@ public partial class PerformanceOverlay : CanvasLayer
     // Capture only on demand; report workload and hardware alongside CPU observations, never infer GPU utilization.
     public void DumpProfile()
     {
-        if (_profiler == null) return;
+        if (_profiler?.Samples is not > 0) { GD.Print("No retained performance samples. Start profiling with Shift+F2."); return; }
         var camera = GetParent().GetNodeOrNull<CameraController>("CameraRig");
         string context = $"build={BuildLabel}; battlefield={GetParent().SceneFilePath}; level={_paths?.Navigation.Grid.Level.SceneFilePath}; enemies={_enemies?.Living.Count ?? 0}; towers={_towers?.GetChildCount() ?? 0}; projectileNodes={_projectiles?.GetChildCount() ?? 0}; friendlyBullets={(_projectiles as FriendlyProjectileSystem)?.ActiveCount ?? 0}; hostileBullets={_hostile?.ActiveCount ?? 0}; zoom={camera?.ZoomLevel}; viewport={GetViewport().GetVisibleRect().Size}; maxFps={Engine.MaxFps}; fps={Engine.GetFramesPerSecond()}; processMs={Performance.GetMonitor(Performance.Monitor.TimeProcess) * 1000:0.000}; physicsMs={Performance.GetMonitor(Performance.Monitor.TimePhysicsProcess) * 1000:0.000}; headless={_headless}; CPU={OS.GetProcessorName()}; threads={OS.GetProcessorCount()}; OS={OS.GetName()}; pathQueue={_paths?.PendingCount}; sharedRawHits={_paths?.Navigation.RoutePool.RawHits}; sharedRefinedHits={_paths?.Navigation.RoutePool.RefinedHits}; sharedTemplateBuilds={_paths?.Navigation.RoutePool.RefinedBuilds}; segmentSafetyHits={_paths?.Navigation.SegmentSafety.Hits}; segmentSafetyBuilds={_paths?.Navigation.SegmentSafety.Builds}; segmentSafetyEvictions={_paths?.Navigation.SegmentSafety.Evictions}; segmentSafetyEntries={_paths?.Navigation.SegmentSafety.Count}; GPU timing=unmeasured";
         string report = _profiler.Report(context); GD.Print(report);
@@ -173,7 +164,7 @@ public partial class PerformanceOverlay : CanvasLayer
     {
         bool paths = GodotObject.IsInstanceValid(_paths), paused = GetTree().Paused;
         double average = _frames > 0 ? _frameTotal / _frames : 0;
-        Write(0, "PERFORMANCE · F4" + (paused ? " · PAUSED" : ""), new Color("#d9efff"));
+        Write(0, "PERFORMANCE · F2" + (paused ? " · PAUSED" : ""), new Color("#d9efff"));
         Write(1, $"FPS {Engine.GetFramesPerSecond()} · frame {average:0.0}ms · peak {_framePeak:0.0}", Pressure(average, FrameWarningMs, FrameCriticalMs));
         Write(2, $"Engine process {Performance.GetMonitor(Performance.Monitor.TimeProcess) * 1000:0.00}ms · physics {Performance.GetMonitor(Performance.Monitor.TimePhysicsProcess) * 1000:0.00}ms", Normal);
         string enemies = GodotObject.IsInstanceValid(_enemies) ? _enemies.Living.Count.ToString() : "N/A";
@@ -184,7 +175,7 @@ public partial class PerformanceOverlay : CanvasLayer
         int pending = paths ? _paths.PendingCount : 0;
         Write(5, paths ? $"Path queue {pending} · audit queue {_paths.PendingValidationCount} · audit peak {_validationPeak:0.00}ms" : "Route validation N/A", Pressure(pending, QueueWarning, QueueCritical));
         Write(6, _headless ? "Rendering N/A (headless)" : $"Draw calls {Performance.GetMonitor(Performance.Monitor.RenderTotalDrawCallsInFrame):0} · render objects {Performance.GetMonitor(Performance.Monitor.RenderTotalObjectsInFrame):0}", Normal);
-        Write(7, "Shift+F4: profile " + (_profiler?.Running == true ? "ON" : "OFF") + " · F5: save report", new Color("#9aafbd"));
+        Write(7, "Shift+F2: profile " + (_profiler?.Running == true ? "ON" : "OFF") + " · F3: save report", new Color("#9aafbd"));
         for (int i = 8; i <= 20; i++) _rows[i].Visible = _profileRequested;
         if (_profileRequested && _profiler != null)
         {
@@ -243,7 +234,7 @@ public partial class PerformanceOverlay : CanvasLayer
             bottom = Mathf.Min(bottom, _bottomArea.GetGlobalRect().Position.Y - margin);
         Vector2 natural = _panel.GetCombinedMinimumSize();
         float scale = Mathf.Min(1, Mathf.Min((viewport.X - margin * 2) / Mathf.Max(1, natural.X), (bottom - top) / Mathf.Max(1, natural.Y)));
-        // Extremely short windows have no usable slot; suppress drawing until space returns, keep F4 active.
+        // Extremely short windows have no usable slot; suppress drawing until space returns, keep F2 active.
         _panel.Visible = scale > .25f;
         _panel.Scale = Vector2.One * Mathf.Max(.25f, scale); _panel.Position = new(margin, top); _panel.Size = natural;
     }

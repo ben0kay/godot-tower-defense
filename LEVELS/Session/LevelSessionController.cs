@@ -141,6 +141,7 @@ public partial class LevelSessionController : Node
     {
         if (_cameraShake != null) _cameraShake.ProcessMode = ProcessModeEnum.Disabled;
         GetNodeOrNull<SalvageLogistics>("../World/Salvage")?.StopForOutcome();
+        GetNodeOrNull<DeveloperHub>("../DeveloperHub")?.StopForOutcome();
         _waves.StopForOutcome();
         RunStats.Freeze();
         _hud.GetNodeOrNull<NarrationDisplay>("NarrationDisplay")?.Clear();
