@@ -1,3 +1,9 @@
+## Construction site lighting
+
+Initial builds use a pooled cyan light centred on the footprint, with a one-tile fade on all sides. Masks are shared by footprint size. Construction reveal keeps its existing radius setting. Source review only. Godot build and visual verification are pending.
+
+---
+
 ## CV-PERF1 — Cached construction rings and footprint lines
 
 Telemetry and footprint scanner arcs use shared atlases and draw transforms. The outer telemetry region includes the dots. Footprint line buffers, progress vertices and number measurements are reused on the existing animation clock. Godot .NET build, visual comparison and 1/5/10-site profiling are pending.

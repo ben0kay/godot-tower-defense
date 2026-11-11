@@ -4,12 +4,11 @@ using System.Collections.Generic;
 
 public partial class WorldLightingController
 {
-    private sealed class TowerGlowGroup(Source representative, Vector2 seed, float radius, bool building)
+    private sealed class TowerGlowGroup(Source representative, Vector2 seed, float radius)
     {
         public readonly Source Representative = representative;
         public readonly Vector2 Seed = seed;
         public readonly float Radius = radius;
-        public readonly bool Building = building;
         public Vector2 Sum = seed;
         public int Count = 1;
         public float Furthest;
@@ -17,9 +16,12 @@ public partial class WorldLightingController
 
     private readonly List<TowerGlowGroup> _glowGroups = new();
     private readonly List<Source> _towerGlows = new();
+    private readonly List<Source> _constructionGlows = new();
+    private readonly Dictionary<Vector2I, Texture2D> _constructionFalloffs = new();
     private bool _towerGlowsDirty = true;
 
-    private static Vector2 VisualPositionFor(Source source) => source.GroupCentre ?? PositionFor(source);
+    private static Vector2 VisualPositionFor(Source source) =>
+        source.ConstructionFootprint != Vector2I.Zero ? source.Anchor.GlobalPosition : source.GroupCentre ?? PositionFor(source);
     private float VisualRadiusFor(Source source) => source.GroupCentre.HasValue ? source.GroupRadius : RadiusFor(source);
 
     // =========================================================
@@ -31,7 +33,10 @@ public partial class WorldLightingController
         Vector2 centre = viewport.GetCenter();
         foreach (Source source in _towerGlows)
             source.CameraDistance = (canvas * VisualPositionFor(source)).DistanceSquaredTo(centre);
+        foreach (Source source in _constructionGlows)
+            source.CameraDistance = (canvas * VisualPositionFor(source)).DistanceSquaredTo(centre);
         _towerGlows.Sort(CompareTowerGlowDistance);
+        _constructionGlows.Sort(CompareTowerGlowDistance);
     }
 
     private static int CompareTowerGlowDistance(Source a, Source b)
@@ -47,24 +52,32 @@ public partial class WorldLightingController
         _towerGlowsDirty = false;
         _glowGroups.Clear();
         _towerGlows.Clear();
+        _constructionGlows.Clear();
         foreach (Source source in _towers)
         {
             source.GroupCentre = null;
             source.GroupEnergy = 1;
+            source.ConstructionFootprint = Vector2I.Zero;
             if (!IsAvailable(source)) continue;
+            if (source.UnderConstruction?.Invoke() == true && source.Anchor is TowerBase tower)
+            {
+                source.ConstructionFootprint = tower.Footprint;
+                _constructionGlows.Add(source);
+                continue;
+            }
+
             Vector2 position = PositionFor(source);
             float radius = RadiusFor(source);
-            bool building = source.UnderConstruction?.Invoke() == true;
             TowerGlowGroup match = null;
             float best = float.PositiveInfinity;
             foreach (TowerGlowGroup group in _glowGroups)
             {
-                if (building != group.Building || Mathf.Abs(radius - group.Radius) > group.Radius * .15f) continue;
+                if (Mathf.Abs(radius - group.Radius) > group.Radius * .15f) continue;
                 float reach = Mathf.Min(radius, group.Radius) * .55f;
                 float distance = position.DistanceSquaredTo(group.Seed);
                 if (distance <= reach * reach && distance < best) { match = group; best = distance; }
             }
-            if (match == null) _glowGroups.Add(new TowerGlowGroup(source, position, radius, building));
+            if (match == null) _glowGroups.Add(new TowerGlowGroup(source, position, radius));
             else
             {
                 match.Count++;
@@ -95,5 +108,35 @@ public partial class WorldLightingController
             }
             source.GroupEnergy = 1 / (1 + overlap);
         }
+    }
+
+    // =========================================================
+    // Bake one rectangular mask per footprint, with a one-cell fade measured from the building edge.
+    private Texture2D GetConstructionFalloff(Vector2I footprint)
+    {
+        if (_constructionFalloffs.TryGetValue(footprint, out Texture2D texture)) return texture;
+
+        Vector2I cells = footprint + new Vector2I(2, 2);
+        int samplesPerCell = Mathf.Clamp(512 / Mathf.Max(cells.X, cells.Y), 1, 16);
+        int width = cells.X * samplesPerCell;
+        int height = cells.Y * samplesPerCell;
+        byte[] pixels = new byte[width * height * 4];
+        for (int y = 0; y < height; y++)
+        {
+            int edgeY = Mathf.Min(y, height - 1 - y);
+            for (int x = 0; x < width; x++)
+            {
+                int edge = Mathf.Min(edgeY, Mathf.Min(x, width - 1 - x));
+                float weight = Mathf.SmoothStep(0, 1, (edge + .5f) / samplesPerCell);
+                int index = (y * width + x) * 4;
+                pixels[index] = pixels[index + 1] = pixels[index + 2] = 255;
+                pixels[index + 3] = (byte)Mathf.RoundToInt(weight * 255);
+            }
+        }
+
+        using Image image = Image.CreateFromData(width, height, false, Image.Format.Rgba8, pixels);
+        texture = ImageTexture.CreateFromImage(image);
+        _constructionFalloffs.Add(footprint, texture);
+        return texture;
     }
 }
