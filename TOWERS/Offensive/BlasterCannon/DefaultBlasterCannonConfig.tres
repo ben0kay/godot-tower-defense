@@ -1,20 +1,15 @@
-[gd_resource type="Resource" script_class="BlasterCannonConfig" format=3]
+[gd_resource type="Resource" script_class="BlasterCannonConfig" format=3 uid="uid://cofb41caiekag"]
 
-[ext_resource type="Script" path="res://TOWERS/Offensive/BlasterCannon/BlasterCannonConfig.cs" id="1"]
-
+[ext_resource type="Script" uid="uid://cscv2s5ul8ug2" path="res://TOWERS/Offensive/BlasterCannon/BlasterCannonConfig.cs" id="1"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/BlasterCannon/Effects/BlasterShockwaveStyle.tres" id="2"]
-
+[ext_resource type="Resource" uid="uid://cxp2hfqqfflqt" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Construction/BlasterConstructionArt.tres" id="construction"]
 [ext_resource type="Resource" path="res://TOWERS/Offensive/BlasterCannon/Visuals/BlasterMuzzleFlashStyle.tres" id="flash"]
-
-[ext_resource type="Resource" path="res://TOWERS/Offensive/BlasterCannon/Artwork/Construction/BlasterConstructionArt.tres" id="construction"]
-
 [ext_resource type="Resource" path="res://TOWERS/Offensive/BlasterCannon/BlasterCannonPower.tres" id="power"]
 
 [resource]
 script = ExtResource("1")
-Power = ExtResource("power")
 HeatEnabled = true
-ConstructionArt = ExtResource("construction")
-ImpactStyle = ExtResource("2")
 MuzzleFlash = ExtResource("flash")
-StaggerImpactPower = 2
+ImpactStyle = ExtResource("2")
+Power = ExtResource("power")
+ConstructionArt = ExtResource("construction")

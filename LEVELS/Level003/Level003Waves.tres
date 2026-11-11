@@ -10,8 +10,8 @@ script = ExtResource("enemy")
 
 [sub_resource type="Resource" id="B1_1"]
 script = ExtResource("batch")
-Count = 12
-Interval = 0.85
+Count = 14
+Interval = 0.6
 After = 3.0
 Enemies = Array[ExtResource("enemy")]([SubResource("E1_1_1")])
 
