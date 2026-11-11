@@ -29,6 +29,11 @@ public partial class MountainSightChecks : Node
                 Require(!grid.HasTowerLineOfSight(Point(10, 8), Point(10, 12)), "Mountain blocks vertical sight");
                 Require(!grid.HasTowerLineOfSight(Point(9, 10), Point(10, 9)), "Corner grazing cannot leak through");
                 Require(grid.HasTowerLineOfSight(source, side), "Exposed side remains visible");
+                float size = grid.Config.CellSize;
+                Vector2 cornerStart = grid.ToGlobal(new Vector2(5.5f, 6.5f) * size);
+                Vector2 cornerEnd = grid.ToGlobal(new Vector2(6f, 6f) * size);
+                Require(!grid.HasWeaponLineOfSight(cornerStart, cornerEnd),
+                    "An empty corridor preserves the existing mixed-direction endpoint corner rule");
                 Enemy blocked = f.Target(behind), visible = f.Target(side);
                 Require(TowerTargeting.Find(f.Spawns.Registry, source, 500, TowerTargeting.Priority.Closest) == visible,
                     "Blocked closest candidate does not suppress visible fallback");

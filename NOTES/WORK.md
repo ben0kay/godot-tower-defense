@@ -1,3 +1,9 @@
+## LOS-PERF1 — Weapon sight on maps with blockers
+
+Terrain rebuilds now cache blocker counts for padded corridor queries. Clear corridors bypass cell traversal, with endpoint boundary cases retaining the old traversal. Added a corner regression assertion to MountainSightChecks. Source and diff checks only. Godot build and profiling pending.
+
+---
+
 ## Root optimization plan consolidation — 2026-11-10
 
 Consolidated the informal PERF-A–E proposals into the canonical [root optimization register](../Optimization%20plan.md). Marked P4-A, FOG-PERF1/P2, existing shared projectile buffers, route caches and profiler as source-implemented; linked still-planned LOS-PERF1 and the conditional tower-idle, splash-buffer, hull batching and future fog proposals without duplicating implementation ownership. Preserved the original 300+ enemy baseline and P2/P4 verification details. Documentation-only; no gameplay code, runtime benchmarks or settings changed.

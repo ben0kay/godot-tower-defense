@@ -17,7 +17,7 @@
 | **P2** — concealed shields and bars | **Source implemented; desktop validation pending** | Hidden shield quads/bars and cached defense-bar layout. **Do not implement PERF-D a second time for these visuals.** | [Defense bars](FEEDBACK/DefenseBars/README.md); `1de88b122d` |
 | **P4-A (formerly PERF-A)** — projectile viewport culling | **Source implemented; desktop validation pending** | **Both friendly and hostile shared tracers already cull** complete viewport bounds; native standalone Basic/Splash culling and offscreen/concealed projectile light leases also exist. The prior recommendation to add hostile culling was outdated. | [Friendly projectiles](TOWERS/Shared/Projectiles/README.md), `ENEMIES/Projectiles/EnemyBulletRenderer.cs`; `6f5509d05d` |
 | **P4-B** — textured-tracer comparison | **Source implemented, optional; desktop comparison pending** | Bounded 64-style cached textured-tracer path, original style remains default, permanent right-side visual toggle. **Do not separately create a new tracer-mode system.** | [Weapon visuals](TOWERS/Shared/Weapons/Visuals/README.md); `14ed3357ed` |
-| **LOS-PERF1 (formerly PERF-C)** — cached terrain sight fast path | **Planned; not implemented** | Already has **automatic zero-sight-blocker map bypass**. Add a conservative per-terrain-rebuild blocker-region prefix table so sight lines that cannot intersect mountains skip exact DDA. **Preserve LOS correctness every lock tick, including beams.** | [Detailed Codex plan](WORLD/GRID/LOS_PERF1_IMPLEMENTATION_PLAN.md) |
+| **LOS-PERF1 (formerly PERF-C)** — cached terrain sight fast path | **Implemented in source** | The terrain rebuild caches blocker counts for padded corridor checks. Empty corridors skip exact DDA and endpoints near boundaries retain it. **Preserve LOS correctness every lock tick, including beams.** | [Detailed Codex plan](WORLD/GRID/LOS_PERF1_IMPLEMENTATION_PLAN.md) |
 | **TOWER-IDLE (formerly PERF-B)** — sleep idle weapons | **Proposed; not implemented** | Consider event-driven no-enemy idle sleep and safe wake for Battle/shared projectile turrets and other compatible towers. Existing disable gating is **not** the same as no-enemy sleep. Requires lifecycle/cooldown checks and desktop profiling. | Section 2B below |
 | **FOG-FOLLOWUP (formerly residual PERF-D)** | **Conditional; do not redo FOG-PERF1/P2** | Only pursue additional hidden VFX / GPU rendering dormancy after matched diagnostics show work still persists. | Section 2C below |
 | **SPLASH-BUFFER (formerly PERF-E)** | **Deferred / profile first** | SplashProjectile still has independent flight nodes; consider shared-state adaptation only if node count or callback time is measured high. Shockwave gameplay stays separate. | Section 2E below |
@@ -32,7 +32,7 @@
 
 ### 2A. LOS-PERF1 — safe terrain sight broadphase (next small self-contained pass)
 
-**Status:** Planned. **Source owner:** `WORLD/GRID/WorldGrid.cs` + `WorldGridSight.cs`; existing detailed [LOS-PERF1 plan](WORLD/GRID/LOS_PERF1_IMPLEMENTATION_PLAN.md).
+**Status:** Implemented in source. Godot profiling pending. **Source owner:** `WORLD/GRID/WorldGrid.cs` + `WorldGridSight.cs`; existing detailed [LOS-PERF1 plan](WORLD/GRID/LOS_PERF1_IMPLEMENTATION_PLAN.md).
 
 - `WorldGrid.RebuildTerrain()` **already** caches `TowerSightBlockerCount` from Boolean `blocks_tower_sight`. `HasWeaponLineOfSight` already returns true without tile traversal when this count is zero. No new "no mountains" map-scan toggle should be added.
 - For maps with sight blockers, precompute a conservative *summed-area table* of `_towerSightBlocked` once at explicit terrain rebuild. If a padded segment bounding rectangle contains no blockers, skip DDA; if it contains any, keep the current exact supercover traversal.
@@ -145,7 +145,7 @@ The path warning now shows its soft budget and over-budget tick count beside a s
 ## 6. References and backlog ownership
 
 - **This root file:** current canonical IDs, implemented/planned status, duplicates, priorities and next measurement.
-- **[LOS-PERF1 detailed plan](WORLD/GRID/LOS_PERF1_IMPLEMENTATION_PLAN.md):** ready-to-implement shared WorldGrid change, **not** already in gameplay code.
+- **[LOS-PERF1 detailed plan](WORLD/GRID/LOS_PERF1_IMPLEMENTATION_PLAN.md):** shared WorldGrid implementation and validation checklist.
 - **[World Grid](WORLD/GRID/README.md):** authoritative terrain facts and current no-blocker sight fast path.
 - **[Tower targeting](TOWERS/Shared/Targeting/README.md) / [Enemy projectiles](ENEMIES/Projectiles/README.md) / [Friendly projectiles](TOWERS/Shared/Projectiles/README.md):** implemented combat ownership.
 - **[Lighting](SYSTEMS/Lighting/README.md) / [Defense bars](FEEDBACK/DefenseBars/README.md):** implemented fog/VFX behaviours.

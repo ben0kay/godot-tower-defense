@@ -78,6 +78,7 @@ public partial class WorldGrid : Node2D
         ReadLayer(Level.Passable, false);
         if (Level.Interactive != null) ReadLayer(Level.Interactive, null);
         ReadLayer(Level.Impassable, true); // Impassable overrides Passable, including build permission.
+        RebuildSightBlockerPrefix();
         Level.CaptureCitadels();
         ReadFootprints(Level);
         List<Vector2I> approaches = new();

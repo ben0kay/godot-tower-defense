@@ -1,3 +1,7 @@
+## LOS-PERF1
+
+Terrain rebuilds cache a summed-area table of weapon sight blockers when any exist. On those maps, a clear padded corridor skips cell traversal. Corridors with blockers and endpoints near cell boundaries use the existing traversal. Blocker-free maps return before coordinate transforms. Godot validation and profiling are pending.
+
 ## LOS-PERF1 — planned safe weapon-LOS fast paths (documentation only)
 
 [LOS-PERF1 implementation plan](LOS_PERF1_IMPLEMENTATION_PLAN.md) records the **existing** automatic no-blocker early return in `WorldGridSight` and proposes a map-rebuild-time summed-area blocker table to skip exact segment traversal when no blockers can lie in a shot's corridor. It preserves all mountain/corner/hostile-muzzle and continuous-beam sight semantics. **Not yet implemented; old LOS code remains live.**

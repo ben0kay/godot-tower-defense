@@ -1,7 +1,7 @@
 # LOS-PERF1 — Safe Map-Aware Weapon LOS Fast Paths
 
 **Repo:** `ben0kay/godot-tower-defense` · **Branch:** `dev` only  
-**Status:** Planned — Codex-ready **small performance pass**, not implemented  
+**Status:** Implemented in source. Godot validation and profiling pending
 **Main owner:** `WORLD/GRID/`. No new LOS service, terrain index, world singleton or extra weapon semantics.
 
 ## 1. Why this is a narrow optimization
@@ -83,4 +83,4 @@ Read `CodePreferences.md`, `project.md`, `WORLD/GRID/WorldGrid.cs`, `WorldGridSi
 
 Update the existing `WORLD/GRID/README.md` briefly, append a short `NOTES/WORK.md` entry, commit and push one focused change, report commit SHA plus what was and was not validated. Leave target-lock scheduling changes as a separate later, explicitly approved performance experiment.
 
-**This plan is documentation only; no runtime optimization has been implemented by writing this file.**
+The implementation uses the existing traversal for endpoints near cell boundaries to preserve its corner rules.
