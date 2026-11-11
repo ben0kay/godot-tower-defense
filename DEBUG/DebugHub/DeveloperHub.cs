@@ -4,6 +4,8 @@ using Godot;
 public partial class DeveloperHub : CanvasLayer
 {
     private HBoxContainer _panel;
+    private Control _visualRoot;
+    private ProjectileRenderSettings _projectileSettings;
     private EnemyRegistry _enemies;
     private Node2D _effects;
     private Button _spawnButton, _lookupButton, _routeButton, _profileButton;
@@ -30,7 +32,9 @@ public partial class DeveloperHub : CanvasLayer
         _session = battle.GetNodeOrNull<LevelSessionController>("LevelSession");
         _catalog = GD.Load<TowerCatalog>("res://TOWERS/DefaultTowerCatalog.tres");
         _theme = GD.Load<UIMasterConfig>("res://UI/DefaultUIConfig.tres") ?? new UIMasterConfig();
+        _projectileSettings = battle.GetNodeOrNull<FriendlyProjectileSystem>("World/Projectiles")?.RenderSettings;
         BuildPanel();
+        BuildVisualPanel();
         SetProcessInput(true); SetProcessUnhandledKeyInput(true);
     }
 
@@ -39,7 +43,7 @@ public partial class DeveloperHub : CanvasLayer
         _panel = new HBoxContainer { Position = new Vector2(18, 76), MouseFilter = Control.MouseFilterEnum.Ignore };
         _panel.AddThemeConstantOverride("separation", 10);
         AddChild(_panel);
-        var list = AddPanel(360);
+        var list = AddPanel(_panel, 360);
         list.AddChild(UIButtonFactory.Label("DEVELOPER TOOLS · F1", 20, _theme));
         _spawnButton = AddButton(list, "1   Enemy Spawner", () => OpenTool(1));
         _lookupButton = AddButton(list, "2   Building Lookup", () => OpenTool(2));
@@ -50,19 +54,12 @@ public partial class DeveloperHub : CanvasLayer
         AddButton(list, "Save Performance Report (F3)", () => _performance?.DumpProfile());
         AddButton(list, "Notification Samples (F4)", () => _alerts?.CycleSample());
         AddButton(list, "Close · Esc", Dismiss);
-        if (_enemies != null)
-        {
-            var visuals = AddPanel(220);
-            visuals.AddChild(UIButtonFactory.Label("ENEMY VISUALS", 20, _theme));
-            AddToggle(visuals, "Enemy Explosion FX", _enemies.ExplosionFxEnabled, SetExplosionFxEnabled);
-            AddToggle(visuals, "Enemy Health Bars", _enemies.HealthBarsEnabled, _enemies.SetHealthBarsEnabled);
-        }
         _panel.Hide();
     }
 
     // =========================================================
-    // Panels share one row so F1, Escape and child tools hide both together.
-    private VBoxContainer AddPanel(float minWidth)
+    // Shared styling for the F1 directory and the independent persistent visual controls.
+    private VBoxContainer AddPanel(Node parent, float minWidth)
     {
         var panel = new PanelContainer
         {
@@ -70,11 +67,35 @@ public partial class DeveloperHub : CanvasLayer
             SizeFlagsVertical = Control.SizeFlags.ShrinkBegin
         };
         panel.AddThemeStyleboxOverride("panel", UIButtonFactory.Box(_theme.PanelColor, _theme.AccentColor));
-        _panel.AddChild(panel);
+        parent.AddChild(panel);
         var list = new VBoxContainer();
         list.AddThemeConstantOverride("separation", 6);
         panel.AddChild(list);
         return list;
+    }
+
+    // =========================================================
+    // Anchors follow viewport resizing without a process loop. Empty screen space stays click-through.
+    private void BuildVisualPanel()
+    {
+        _visualRoot = new Control { MouseFilter = Control.MouseFilterEnum.Ignore };
+        AddChild(_visualRoot);
+        _visualRoot.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
+        var list = AddPanel(_visualRoot, 260);
+        var panel = (PanelContainer)list.GetParent();
+        panel.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.CenterRight);
+        panel.OffsetLeft = -274;
+        panel.OffsetRight = -14;
+        panel.GrowHorizontal = Control.GrowDirection.Begin;
+        panel.GrowVertical = Control.GrowDirection.Both;
+        list.AddChild(UIButtonFactory.Label("VISUAL DEBUG", 20, _theme));
+        if (_enemies != null)
+        {
+            AddToggle(list, "Enemy Explosion FX", _enemies.ExplosionFxEnabled, SetExplosionFxEnabled);
+            AddToggle(list, "Enemy Health Bars", _enemies.HealthBarsEnabled, _enemies.SetHealthBarsEnabled);
+        }
+        if (_projectileSettings != null)
+            AddToggle(list, "Textured Tracers", _projectileSettings.TexturedTracers, _projectileSettings.SetTexturedTracers);
     }
 
     private static void AddToggle(VBoxContainer list, string text, bool enabled, System.Action<bool> apply)
@@ -173,6 +194,7 @@ public partial class DeveloperHub : CanvasLayer
     internal void StopForOutcome()
     {
         Dismiss();
+        _visualRoot?.Hide();
         _tools?.SpawnMenu?.CancelBatch();
     }
 

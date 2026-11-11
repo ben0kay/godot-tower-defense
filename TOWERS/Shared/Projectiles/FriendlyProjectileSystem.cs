@@ -7,6 +7,7 @@ public partial class FriendlyProjectileSystem : Node2D
     [Export] public bool UseBufferedTracers { get; set; } = true;
     [Export(PropertyHint.Range, "1,16384,1")] public int MaximumBufferedRounds { get; set; } = 4096;
     public int ActiveCount => _count;
+    internal ProjectileRenderSettings RenderSettings { get; } = new();
 
     private FriendlyProjectileFlight[] _shots = Array.Empty<FriendlyProjectileFlight>();
     private readonly FriendlyProjectileDrawing _drawing = new();
@@ -19,6 +20,7 @@ public partial class FriendlyProjectileSystem : Node2D
     public override void _Ready()
     {
         SetPhysicsProcess(false);
+        RenderSettings.Changed += QueueRedraw;
         _ricochets = GetNodeOrNull<RicochetController>("../Effects/Ricochets");
         _hullSparks = GetNodeOrNull<HullHitSparkController>("../Effects/HullHitSparks");
         _lighting = GetNodeOrNull<WorldLightingController>("../Lighting");
@@ -104,7 +106,7 @@ public partial class FriendlyProjectileSystem : Node2D
             ref readonly FriendlyProjectileFlight shot = ref _shots[i];
             if (ProjectileVisualBounds.OverlapsViewport(
                 ProjectileVisualBounds.ForTracer(shot.Position, shot.Direction, shot.Visual), worldToScreen, viewport))
-                _drawing.Draw(this, shot, shot.Position, shot.Direction, worldToLocal);
+                _drawing.Draw(this, shot, shot.Position, shot.Direction, worldToLocal, RenderSettings.TexturedTracers);
         }
         DrawSetTransformMatrix(Transform2D.Identity);
     }
@@ -123,6 +125,7 @@ public partial class FriendlyProjectileSystem : Node2D
 
     public override void _ExitTree()
     {
+        RenderSettings.Changed -= QueueRedraw;
         Clear();
         _ricochets = null;
         _hullSparks = null;

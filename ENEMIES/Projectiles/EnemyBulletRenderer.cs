@@ -4,12 +4,20 @@ using Godot;
 public partial class EnemyBulletRenderer : Node2D
 {
     private EnemyBulletSystem _system;
+    private ProjectileRenderSettings _renderSettings;
     private readonly Vector2[] _streak = new Vector2[EnemyEnergyStreakGeometry.VertexCount];
     private readonly Color[] _colors = new Color[EnemyEnergyStreakGeometry.VertexCount];
     #region Drawing Lifetime
     // =========================================================
     // The world simulation explicitly binds this surface; drawing never owns damage or expiry.
-    public void Bind(EnemyBulletSystem system) { _system = system; QueueRedraw(); }
+    public void Bind(EnemyBulletSystem system)
+    {
+        if (_renderSettings != null) _renderSettings.Changed -= QueueRedraw;
+        _system = system;
+        _renderSettings = system?.GetNodeOrNull<FriendlyProjectileSystem>("../Projectiles")?.RenderSettings;
+        if (_renderSettings != null) _renderSettings.Changed += QueueRedraw;
+        QueueRedraw();
+    }
     // =========================================================
     // Render work is requested only by state changes; there is no idle animation callback.
     public override void _Ready() { SetProcess(false); SetPhysicsProcess(false); }
@@ -31,6 +39,8 @@ public partial class EnemyBulletRenderer : Node2D
             if (!ProjectileVisualBounds.OverlapsViewport(
                 ProjectileVisualBounds.ForTracer(bullet.Position, bullet.Direction, visual), worldToScreen, viewport)) continue;
             Vector2 head = bullet.Position, tail = head - bullet.Direction * visual.Length;
+            if (_renderSettings?.TexturedTracers == true &&
+                TexturedProjectileDrawing.TryDraw(this, visual, head, bullet.Direction, worldToLocal)) continue;
             if (GodotObject.IsInstanceValid(visual.Texture))
             {
                 DrawSetTransformMatrix(worldToLocal * new Transform2D(bullet.Direction.Angle(), head));
@@ -62,6 +72,11 @@ public partial class EnemyBulletRenderer : Node2D
     }
     // =========================================================
     // Surface teardown releases the world simulation wrapper regardless of sibling exit order.
-    public override void _ExitTree() => _system = null;
+    public override void _ExitTree()
+    {
+        if (_renderSettings != null) _renderSettings.Changed -= QueueRedraw;
+        _renderSettings = null;
+        _system = null;
+    }
     #endregion
 }

@@ -1,3 +1,9 @@
+## P4-B — Optional textured tracers and persistent visual controls
+
+Visual Debug now stays at middle-right in debug battlefields, with the existing enemy explosion/bar switches and a live Textured Tracers switch. Original rendering defaults on. Friendly, hostile and Basic fallback tracers share a bounded cache of baked style textures. Source review only. Verify live switching, fog, viewport edges, panel resizing and steady-state FPS after cache warmup.
+
+---
+
 ## P4-A — Projectile viewport and fog visibility
 
 Shared friendly/hostile rendering now culls full tracer bounds. Basic/Splash retain cached commands with explicit native culling bounds. The capped light pool releases offscreen leases and suspends concealed light footprints. The reveal shader still handles bullet pixels. Source and geometry checks only, with no runtime FPS claim. Verify camera/fog boundaries, F6 and fallback shots using the optimization plan.

@@ -8,7 +8,7 @@ internal sealed class FriendlyProjectileDrawing
 
     // =========================================================
     // Geometry is in the caller's current draw space. Only textured shots need a per-shot draw transform.
-    internal void Draw(CanvasItem canvas, in FriendlyProjectileFlight shot, Vector2 head, Vector2 forward, Transform2D drawTransform)
+    internal void Draw(CanvasItem canvas, in FriendlyProjectileFlight shot, Vector2 head, Vector2 forward, Transform2D drawTransform, bool texturedTracers = false)
     {
         if (!shot.Visual.HasValue)
         {
@@ -17,6 +17,7 @@ internal sealed class FriendlyProjectileDrawing
         }
         var style = shot.Visual.Value;
         if (!style.Enabled) return;
+        if (texturedTracers && TexturedProjectileDrawing.TryDraw(canvas, style, head, forward, drawTransform)) return;
         Vector2 tail = head - forward * style.Length;
         if (GodotObject.IsInstanceValid(style.Texture))
         {

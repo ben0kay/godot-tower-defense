@@ -1,3 +1,13 @@
+## P4-B — Optional textured tracers
+
+Tick **Textured Tracers** in the persistent middle-right Visual Debug panel to combine each procedural tracer's layers into one cached textured quad. Untick it to restore the original drawing immediately, including rounds already in flight. Each battlefield starts with the original renderer selected.
+
+The bounded process-wide cache holds up to 64 immutable styles, baked lazily at two texture pixels per world pixel using the existing layer colors, dimensions and tapered vertices. Texture sampling can slightly change the edges. The first use of a style incurs baking/upload work. Further styles fall back to the original renderer once the cache is full. Authored texture presets and missing-style circles retain their existing drawing. Shared renderers and BasicProjectile fallback use the same selection, P4-A bounds and fog material. No per-round texture or material is created. Splash circles and reflected cosmetic streaks keep their existing drawing.
+
+Source implemented. The .NET build, live switching, image comparison and matched FPS/GPU comparison remain pending. The new mode is experimental until measured against the current one.
+
+---
+
 ## Cosmetic reflected tracers — 2026-10-21
 
 FEEDBACK/Ricochet reuses the bullet's existing immutable visual snapshot (core/body colors, length, thickness); no impact-time resource capture/load. Its bounded renderer simplifies artwork to two streak lines. Original projectile and muzzle presentation remain unchanged. See FEEDBACK/Ricochet/README.md.

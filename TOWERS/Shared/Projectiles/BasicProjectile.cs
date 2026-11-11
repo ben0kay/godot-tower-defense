@@ -8,6 +8,13 @@ public partial class BasicProjectile : Node2D
     private FriendlyProjectileFlight _flight;
     private readonly FriendlyProjectileDrawing _drawing = new();
     private bool _launched, _finished, _advancing;
+    private ProjectileRenderSettings _renderSettings;
+
+    public override void _Ready()
+    {
+        _renderSettings = (GetParent() as FriendlyProjectileSystem)?.RenderSettings;
+        if (_renderSettings != null) _renderSettings.Changed += QueueRedraw;
+    }
 
     public ProjectileVisualSnapshot? VisualSnapshot => _flight.Visual;
     public Vector2 TravelDirection => _flight.Direction;
@@ -78,6 +85,8 @@ public partial class BasicProjectile : Node2D
 
     public override void _ExitTree()
     {
+        if (_renderSettings != null) _renderSettings.Changed -= QueueRedraw;
+        _renderSettings = null;
         _flight.ReleaseLight();
         _flight = default;
         _finished = true;
@@ -85,5 +94,5 @@ public partial class BasicProjectile : Node2D
         _hullSparks = null;
     }
 
-    public override void _Draw() => _drawing.Draw(this, _flight, Vector2.Zero, Vector2.Right, Transform2D.Identity);
+    public override void _Draw() => _drawing.Draw(this, _flight, Vector2.Zero, Vector2.Right, Transform2D.Identity, _renderSettings?.TexturedTracers == true);
 }
