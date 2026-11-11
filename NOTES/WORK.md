@@ -1,3 +1,9 @@
+## Root optimization plan consolidation — 2026-11-10
+
+Consolidated the informal PERF-A–E proposals into the canonical [root optimization register](../Optimization%20plan.md). Marked P4-A, FOG-PERF1/P2, existing shared projectile buffers, route caches and profiler as source-implemented; linked still-planned LOS-PERF1 and the conditional tower-idle, splash-buffer, hull batching and future fog proposals without duplicating implementation ownership. Preserved the original 300+ enemy baseline and P2/P4 verification details. Documentation-only; no gameplay code, runtime benchmarks or settings changed.
+
+---
+
 ## STG0 — Directional splash stagger
 
 Blaster staggers Light and Standard ships. Rocket staggers Light ships. Eligible surviving hits briefly reduce forward speed, with an outward hull and thruster shove for visible ships without hull-mounted weapons. The right-side Impact Stagger switch clears active reactions when off. Settings live in DefaultFeedbackConfig.tres. Godot build and visual checks pending.
