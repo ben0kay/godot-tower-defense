@@ -1,3 +1,11 @@
+## CV-PERF1 — Cached hologram artwork
+
+The shared 24 Hz canvas rotates three telemetry atlas regions and two footprint scanner regions. The 20 telemetry dots share the outer arc. Atlases are generated once for each active ring size, then reused by sites of the same size. Footprint brackets and cross-lines use cached point buffers. The moving perimeter dot and acquisition cues still animate on the shared clock. The readout caches progress vertices by displayed progress and radius, and font metrics by displayed integer, font and size.
+
+For visual and performance comparison in Godot, use the same camera and zoom with 1, 5 and 10 sites. Allow the first artwork bake to finish before comparing steady-state FPS, CPU process time, draw calls and render objects. Check 1×1, 2×2 and 3×2 footprints, pause, upgrade, cancel, completion fade and restored work.
+
+---
+
 ## Smaller approach-fading widget — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** Build/upgrade telemetry scales from 0.80 to 0.72 (another 10% smaller) and moves closer to the upper-right footprint corner (offset -8,-4). It stays hidden while queued/distant, then fades over 0.25s when its assigned builder is within 140px of the final hover arrival point. Visibility stays latched during work/orbit and composes with the existing 100% completion fade. Work without a held builder also fades in. Reveal distance/fade/scale/offset are editable in DefaultConstructionSiteVisualConfig.tres. The existing shared active-only clock reads an O(1) assignment query; no new scan, timer or process per building. Source review only; owner visual acceptance pending.

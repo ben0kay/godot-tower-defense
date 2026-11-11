@@ -1,3 +1,9 @@
+## CV-PERF1 — Cached construction rings and footprint lines
+
+Telemetry and footprint scanner arcs use shared atlases and draw transforms. The outer telemetry region includes the dots. Footprint line buffers, progress vertices and number measurements are reused on the existing animation clock. Godot .NET build, visual comparison and 1/5/10-site profiling are pending.
+
+---
+
 ## Compact FPS counter
 
 Closing F2 leaves a click-through FPS label below the top-left HUD. It reads engine FPS twice a second, independently of detailed profiling. Godot layout verification pending.

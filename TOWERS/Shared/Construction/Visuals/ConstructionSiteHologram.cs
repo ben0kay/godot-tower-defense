@@ -94,12 +94,25 @@ public partial class ConstructionSiteHologram : Node2D
         if (c?.Enabled != true) return;
         _readoutCount = 0;
         float inset = Mathf.Clamp(c.InsetPixels, 0, 12);
+        float corner = Mathf.Clamp(c.CornerLength, 2, 20);
+        if (_artInset != inset)
+        {
+            _artInset = inset;
+            _scannerArtwork.Clear();
+            _footprintLines.Clear();
+        }
+        if (_artCorner != corner)
+        {
+            _artCorner = corner;
+            _footprintLines.Clear();
+        }
         // Camera-space culling prevents offscreen sites from issuing canvas draw calls.
         Transform2D toWorldCanvas = GetGlobalTransformWithCanvas().AffineInverse();
         Vector2 viewA = toWorldCanvas * Vector2.Zero;
         Vector2 viewB = toWorldCanvas * GetViewportRect().Size;
         Rect2 visible = new(new Vector2(Mathf.Min(viewA.X, viewB.X), Mathf.Min(viewA.Y, viewB.Y)),
             new Vector2(Mathf.Abs(viewB.X - viewA.X), Mathf.Abs(viewB.Y - viewA.Y)));
+        float pulse = 1f + Mathf.Clamp(c.PulseDepth, 0, .5f) * Mathf.Sin(_clock * Mathf.Tau * Mathf.Clamp(c.PulseHz, 0, 5));
         foreach (TowerBase tower in _sites)
         {
             if (!GodotObject.IsInstanceValid(tower) || !tower.IsInsideTree() ||
@@ -111,13 +124,15 @@ public partial class ConstructionSiteHologram : Node2D
             Vector2 center = ToLocal(tower.GlobalPosition);
             Rect2 bounds = new(center - size * .5f + Vector2.One * inset, size - Vector2.One * (inset * 2));
             if (bounds.Size.X <= 2 || bounds.Size.Y <= 2 || !visible.Intersects(bounds.Grow(c.TelemetryEnabled ? 240 : 8))) continue;
-            float locked = GodotObject.IsInstanceValid(_builders) ? _builders.AcquisitionProgressFor(tower) : -1;
-            DrawSite(bounds, tower.AwaitingConstructionDrone, c, locked);
+            if (visible.Intersects(bounds.Grow(12)))
+            {
+                float locked = GodotObject.IsInstanceValid(_builders) ? _builders.AcquisitionProgressFor(tower) : -1;
+                DrawSite(bounds, tower.AwaitingConstructionDrone, c, pulse, locked);
+            }
             if (_telemetry.TryGetValue(tower, out var site))
             {
-                UpdateReadout(site); // Cached strings also recover when visual toggles change while a site is held.
-                bool acquired = locked >= 0 || (GodotObject.IsInstanceValid(_builders) && _builders.PhaseFor(tower) == ConstructionDronePhase.Deploying);
-                DrawTelemetry(bounds, site, acquired, 1, c);
+                UpdateReadout(site); // Recover authoritative progress if telemetry is enabled while a job is held.
+                DrawTelemetry(bounds, site, 1, c);
             }
         }
         DrawCompletions(visible, c);
@@ -125,10 +140,9 @@ public partial class ConstructionSiteHologram : Node2D
 
     // =========================================================
     // A faint full-footprint blueprint, fixed perimeter, travelling indicator and rotating engineering HUD.
-    private void DrawSite(Rect2 r, bool waiting, ConstructionSiteVisualConfig c, float locked = -1)
+    private void DrawSite(Rect2 r, bool waiting, ConstructionSiteVisualConfig c, float pulse, float locked)
     {
         float baseAlpha = Mathf.Clamp(waiting ? c.WaitingOpacity : c.BuildingOpacity, 0, 1);
-        float pulse = 1f + Mathf.Clamp(c.PulseDepth, 0, .5f) * Mathf.Sin(_clock * Mathf.Tau * Mathf.Clamp(c.PulseHz, 0, 5));
         float alpha = Mathf.Min(1, baseAlpha * pulse);
         bool acquiring = locked >= 0 && c.AcquisitionCueEnabled;
         if (acquiring) alpha = Mathf.Clamp(alpha + .45f * Mathf.Sin(Mathf.Pi * Mathf.Clamp(locked, 0, 1)), 0, 1);
@@ -142,50 +156,37 @@ public partial class ConstructionSiteHologram : Node2D
         DrawRect(r, new Color(tint.R, tint.G, tint.B, alpha * Mathf.Clamp(c.BlueprintOpacity, 0, 1) * .4f));
         DrawRect(r, fade, false, 4, true);
         DrawRect(r, line, false, 1.25f, true);
-        DrawLine(new Vector2(r.Position.X, mid.Y), new Vector2(r.End.X, mid.Y), fade, 1, true);
-        DrawLine(new Vector2(mid.X, r.Position.Y), new Vector2(mid.X, r.End.Y), fade, 1, true);
-
-        float bracket = Mathf.Min(Mathf.Clamp(c.CornerLength, 2, 20), Mathf.Min(r.Size.X, r.Size.Y) * .3f);
-        DrawCorner(r.Position, Vector2.Right, Vector2.Down, bracket, bright);
-        DrawCorner(new Vector2(r.End.X, r.Position.Y), Vector2.Left, Vector2.Down, bracket, bright);
-        DrawCorner(r.End, Vector2.Left, Vector2.Up, bracket, bright);
-        DrawCorner(new Vector2(r.Position.X, r.End.Y), Vector2.Right, Vector2.Up, bracket, bright);
+        float radius = Mathf.Clamp(Mathf.Min(r.Size.X, r.Size.Y) * .27f, 9, 42);
+        FootprintLines lines = GetFootprintLines(r.Size, radius);
+        DrawSetTransform(mid);
+        DrawMultiline(lines.Cross, fade, 1, true);
+        DrawMultiline(lines.Brackets, bright, 2, true);
+        DrawSetTransform(Vector2.Zero);
 
         float perimeter = 2 * (r.Size.X + r.Size.Y);
         float progress = Mathf.PosMod(_clock * Mathf.Clamp(c.PerimeterCyclesPerSecond, 0, 3) * perimeter, perimeter);
-        DrawCircle(PerimeterPoint(r, progress), 2.5f, bright);
-        DrawCircle(PerimeterPoint(r, progress), 5f, fade);
+        Vector2 indicator = PerimeterPoint(r, progress);
+        DrawCircle(indicator, 2.5f, bright);
+        DrawCircle(indicator, 5f, fade);
 
-        // Central HUD remains circular even for large rectangular footprints.
-        float radius = Mathf.Clamp(Mathf.Min(r.Size.X, r.Size.Y) * .27f, 9, 42);
         float angle = Mathf.DegToRad(_clock * Mathf.Clamp(c.RotationDegreesPerSecond, 0, 40));
-        for (int i = 0; i < 10; i++)
-        {
-            float a = angle + i * Mathf.Tau / 10;
-            DrawArc(mid, radius, a, a + .40f, 5, line, 1.25f, true);
-            DrawArc(mid, radius * .7f, -a, -a + .24f, 4, fade, 1, true);
-        }
+        ScannerArtwork scanner = GetScannerArtwork(radius);
+        DrawRotatingRing(scanner.Outer, mid, angle, Vector2.One, line);
+        DrawRotatingRing(scanner.Inner, mid, -angle, Vector2.One, fade);
+        DrawSetTransform(mid);
         if (acquiring)
         {
             float converge = (1 - Mathf.Clamp(locked, 0, 1)) * Mathf.Min(r.Size.X, r.Size.Y) * .6f;
-            for (int i = 0; i < 4; i++)
+            foreach (Vector2 direction in AcquisitionDirections)
             {
-                Vector2 direction = Vector2.FromAngle(i * Mathf.Pi / 2), side = direction.Orthogonal() * 4;
-                Vector2 point = mid + direction * converge;
+                Vector2 side = direction.Orthogonal() * 4;
+                Vector2 point = direction * converge;
                 DrawLine(point - side, point + side, bright, 1, true);
             }
         }
-        DrawCircle(mid, 2, new Color(.72f, .96f, 1, alpha * .7f));
-        DrawLine(mid + Vector2.Left * radius * .4f, mid + Vector2.Right * radius * .4f, fade, 1, true);
-        DrawLine(mid + Vector2.Up * radius * .4f, mid + Vector2.Down * radius * .4f, fade, 1, true);
-    }
-
-    // =========================================================
-    // Precomputed axis signs keep brackets crisp for both 1x1 towers and 3x2 factories.
-    private void DrawCorner(Vector2 anchor, Vector2 x, Vector2 y, float length, Color tint)
-    {
-        DrawLine(anchor, anchor + x * length, tint, 2, true);
-        DrawLine(anchor, anchor + y * length, tint, 2, true);
+        DrawCircle(Vector2.Zero, 2, new Color(.72f, .96f, 1, alpha * .7f));
+        DrawMultiline(lines.ScannerCross, fade, 1, true);
+        DrawSetTransform(Vector2.Zero);
     }
 
     // =========================================================

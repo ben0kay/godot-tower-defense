@@ -7,13 +7,17 @@ public partial class ConstructionSiteHologram
     private sealed class Readout
     {
         public TowerBase Tower;
-        public string Text;
         public int Percent = -1;
         public float DisplayedPercent;
         public bool DisplayInitialized;
         public int LastDrawnPercent = -1;
         public string PercentLabel;
-        public bool Waiting, Upgrading;
+        public Font MeasuredFont;
+        public int MeasuredFontSize;
+        public Vector2 LabelPosition;
+        public Vector2[] ProgressPoints;
+        public float CachedProgress = -1, CachedRadius = -1;
+        public bool Waiting;
         public float Age, Opacity;
         public Action Progress, Completed, Removed;
     }
@@ -24,7 +28,7 @@ public partial class ConstructionSiteHologram
     private int _readoutCount;
     public int CompletionReadouts => _completions.Count;
     // =========================================================
-    // Registration/restore use the real work source; progress strings change only on an authoritative event.
+    // Registration and work events update the authoritative target for the cosmetic count-up.
     private void TrackTelemetry(TowerBase tower)
     {
         if (_telemetry.TryGetValue(tower, out var old)) RemoveTelemetry(old);
@@ -40,12 +44,11 @@ public partial class ConstructionSiteHologram
         var tower = site.Tower;
         if (!GodotObject.IsInstanceValid(tower) || Config?.Enabled != true || !Config.TelemetryEnabled) return;
         int percent = Mathf.Clamp(Mathf.FloorToInt((float)(tower.WorkProgress * 100)), 0, 100);
-        bool waiting = tower.AwaitingConstructionDrone, upgrading = tower.WorkPhase == TowerWorkPhase.Upgrading;
-        if (site.Text != null && site.Percent == percent && site.Waiting == waiting && site.Upgrading == upgrading) return;
-        site.Percent = percent; site.Waiting = waiting; site.Upgrading = upgrading;
+        bool waiting = tower.AwaitingConstructionDrone;
+        if (site.DisplayInitialized && site.Percent == percent && site.Waiting == waiting) return;
+        site.Percent = percent; site.Waiting = waiting;
         // New or restored work starts with its authoritative progress; future changes count upward.
         if (!site.DisplayInitialized) { site.DisplayInitialized = true; site.DisplayedPercent = percent; }
-        site.Text = percent + "%";
     }
     private void RetireTelemetry(TowerBase tower)
     {
@@ -63,7 +66,8 @@ public partial class ConstructionSiteHologram
         int cap = Mathf.Clamp(Config.MaxCompletionReadouts, 1, 64);
         while (_completions.Count >= cap) RemoveTelemetry(_completions[0]);
         site.Percent = 100; site.Waiting = false;
-        site.Text = "100%"; site.Age = 0;
+        if (!site.DisplayInitialized) { site.DisplayInitialized = true; site.DisplayedPercent = 100; }
+        site.Age = 0;
         _completions.Add(site); RefreshProcessing();
     }
     private void AdvanceTelemetry(float dt)
@@ -110,10 +114,10 @@ public partial class ConstructionSiteHologram
     // =========================================================
     // Draw only the circular percentage, including a brief 100% completion fade.
     // Keep the old bounded eight-lane placement to prevent overlap on crowded sites.
-    private void DrawTelemetry(Rect2 bounds, Readout site, bool acquiring, float opacity, ConstructionSiteVisualConfig c)
+    private void DrawTelemetry(Rect2 bounds, Readout site, float opacity, ConstructionSiteVisualConfig c)
     {
         opacity *= site.Opacity;
-        if (!c.TelemetryEnabled || site.Text == null || opacity <= 0) return;
+        if (!c.TelemetryEnabled || !site.DisplayInitialized || opacity <= 0) return;
         float scale = ConstructionDroneMasterConfig.Safe(c.TelemetryScale, .72f, .4f, 1.5f);
         float radius = ConstructionDroneMasterConfig.Safe(c.TelemetryRingRadius, 40, 26, 56);
         float diameter = (radius + 9) * 2;
@@ -134,17 +138,17 @@ public partial class ConstructionSiteHologram
         if (!placed || _readoutCount >= _readoutBounds.Length) return;
         _readoutBounds[_readoutCount++] = panel;
         Font font = c.TelemetryFont ?? ThemeDB.FallbackFont;
-        DrawSetTransform(panel.Position, 0, Vector2.One * scale);
-        DrawCircularProgress(new Rect2(Vector2.Zero, new Vector2(diameter, diameter)), radius, site, opacity, font, c);
-        DrawSetTransform(Vector2.Zero, 0, Vector2.One);
+        Vector2 center = panel.GetCenter();
+        DrawCircularProgress(center, Vector2.One * scale, radius, site, opacity, font, c);
+        DrawSetTransform(Vector2.Zero);
     }
 
     // =========================================================
-    // Outer arc and dotted ion dust turn anti-clockwise; both inner arcs turn clockwise.
-    // The percent climbs with the existing authoritative work progress, not a new fake timer.
-    private void DrawCircularProgress(Rect2 panel, float radius, Readout site, float opacity, Font font, ConstructionSiteVisualConfig c)
+    // Outer artwork turns anticlockwise. Both inner arcs turn clockwise.
+    private void DrawCircularProgress(Vector2 center, Vector2 scale, float radius, Readout site,
+        float opacity, Font font, ConstructionSiteVisualConfig c)
     {
-        Vector2 center = panel.Position + new Vector2(panel.Size.X * .5f, radius + 9);
+        EnsureTelemetryArtwork(radius);
         float outer = -Mathf.DegToRad(_clock * ConstructionDroneMasterConfig.Safe(c.TelemetryOuterDegreesPerSecond, 30, 0, 180));
         float middle = Mathf.DegToRad(_clock * ConstructionDroneMasterConfig.Safe(c.TelemetryMiddleDegreesPerSecond, 48, 0, 180));
         float inner = Mathf.DegToRad(_clock * ConstructionDroneMasterConfig.Safe(c.TelemetryInnerDegreesPerSecond, 72, 0, 180));
@@ -153,40 +157,45 @@ public partial class ConstructionSiteHologram
         Color cyan = new(.12f, .92f, .96f, opacity * .85f);
         Color pale = new(.77f, 1f, 1f, opacity * .93f);
         Color fill = c.TelemetryBackground; fill.A *= opacity * .4f;
-        DrawCircle(center, radius * .81f, fill); // Circular tint, not the old rectangular panel.
-        DrawArc(center, radius * .82f, 0, Mathf.Tau, 56, dim, 1.15f, true);
+        DrawSetTransform(center, 0, scale);
+        DrawCircle(Vector2.Zero, radius * .81f, fill);
+        DrawPolyline(_telemetryTrack, dim, 1.15f, true);
         float done = Mathf.Clamp(site.DisplayedPercent / 100f, 0, 1);
         if (done > .001f)
-            DrawArc(center, radius * .88f, -Mathf.Pi * .5f,
-                -Mathf.Pi * .5f + Mathf.Tau * done, 56, new Color(.14f, .94f, 1f, opacity * .55f), 1.5f, true);
-
-        DrawArc(center, radius + 1, outer, outer + 2.25f, 32, pale, 1.6f, true);
-        DrawArc(center, radius * .75f, middle, middle + 4.4f, 44, cyan, 1.55f, true);
-        DrawArc(center, radius * .59f, inner, inner + 2.85f, 30, pale, 1.25f, true);
-        for (int i = 0; i < 20; i++)
         {
-            float fraction = i / 19f;
-            float angle = outer + fraction * 2.4f - .25f;
-            float distance = radius + 3 + (i % 4) * 2.1f;
-            float alpha = opacity * (.16f + .54f * (1 - fraction));
-            DrawCircle(center + Vector2.FromAngle(angle) * distance, i % 6 == 0 ? 1.05f : .6f,
-                new Color(.35f, .97f, 1, alpha));
+            site.ProgressPoints ??= new Vector2[56];
+            if (site.CachedProgress != done || site.CachedRadius != radius)
+            {
+                FillArcPoints(site.ProgressPoints, radius * .88f, -Mathf.Pi * .5f, Mathf.Tau * done);
+                site.CachedProgress = done;
+                site.CachedRadius = radius;
+            }
+            DrawPolyline(site.ProgressPoints, new Color(.14f, .94f, 1f, opacity * .55f), 1.5f, true);
         }
 
-        // Format the number only when the displayed integer changes.
+        DrawRotatingRing(_telemetryOuter, center, outer, scale, new Color(1, 1, 1, opacity));
+        DrawRotatingRing(_telemetryMiddle, center, middle, scale, cyan);
+        DrawRotatingRing(_telemetryInner, center, inner, scale, pale);
+
         int shown = Mathf.Clamp(Mathf.RoundToInt(site.DisplayedPercent), 0, 100);
-        if (shown != site.LastDrawnPercent)
+        bool numberChanged = shown != site.LastDrawnPercent;
+        if (numberChanged)
         {
             site.LastDrawnPercent = shown;
             site.PercentLabel = shown.ToString() + "%";
         }
         int numberSize = Mathf.Clamp(c.TelemetryFontSize + 8, 16, 28);
-        Vector2 size = font.GetStringSize(site.PercentLabel, HorizontalAlignment.Left, -1, numberSize);
-        float baseline = center.Y + (font.GetAscent(numberSize) - font.GetDescent(numberSize)) * .5f;
-        DrawString(font, new Vector2(center.X - size.X * .5f, baseline), site.PercentLabel,
-            HorizontalAlignment.Left, -1, numberSize, pale);
-
+        if (numberChanged || site.MeasuredFont != font || site.MeasuredFontSize != numberSize)
+        {
+            site.MeasuredFont = font;
+            site.MeasuredFontSize = numberSize;
+            Vector2 size = font.GetStringSize(site.PercentLabel, HorizontalAlignment.Left, -1, numberSize);
+            site.LabelPosition = new Vector2(-size.X * .5f, (font.GetAscent(numberSize) - font.GetDescent(numberSize)) * .5f);
+        }
+        DrawSetTransform(center, 0, scale);
+        DrawString(font, site.LabelPosition, site.PercentLabel, HorizontalAlignment.Left, -1, numberSize, pale);
     }
+
     private void DrawCompletions(Rect2 visible, ConstructionSiteVisualConfig c)
     {
         float duration = ConstructionDroneMasterConfig.Safe(c.CompletionReadoutSeconds, 1, .8f, 1.2f);
@@ -195,7 +204,7 @@ public partial class ConstructionSiteHologram
             var tower = site.Tower; if (!GodotObject.IsInstanceValid(tower) || !tower.IsInsideTree() || tower.IsQueuedForDeletion()) continue;
             Vector2 size = (Vector2)tower.Footprint * _cellSize;
             Rect2 bounds = new(ToLocal(tower.GlobalPosition) - size * .5f, size);
-            if (visible.Intersects(bounds.Grow(240))) DrawTelemetry(bounds, site, false, Mathf.Clamp((duration - site.Age) / (duration * .4f), 0, 1), c);
+            if (visible.Intersects(bounds.Grow(240))) DrawTelemetry(bounds, site, Mathf.Clamp((duration - site.Age) / (duration * .4f), 0, 1), c);
         }
     }
 }
