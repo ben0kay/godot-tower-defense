@@ -1,5 +1,7 @@
 ## Rendering and frame diagnostics
 
+Closing F2 leaves a compact FPS counter below the top-left HUD in debug battlefields. It reads the engine FPS twice a second while the detailed overlay, profiler, and viewport measurements are off.
+
 F2 now adds p95/p99 wall-clock frame spacing over the latest 600 observed frames, latest viewport rendering CPU/GPU time and global CPU setup time. Native rendering measurement runs while the overlay is visible and MeasureRendering is enabled on PerformanceOverlay. Set it false in the Inspector to compare measurement overhead. Unsupported, uninitialized or zero native readings display N/A. These timings have different scopes from engine process/physics and should not be added together. Frame history includes paused frames while the overlay is visible.
 
 Additional rows show managed heap size, process-wide GC collection totals by generation, registered fog contacts (including offscreen and partially revealed contacts), enabled/allocated pooled lights, projectile-light leases, global exhaust/explosion counts, tracer-cache entries and the three visual toggle states. F3 saves these even without retained physics-profile samples. Counts and toggles in the report are snapshots at export, rather than averages over the physics capture. Heap values cover managed memory, not total process or GPU memory.

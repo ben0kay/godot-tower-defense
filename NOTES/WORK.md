@@ -1,3 +1,9 @@
+## Compact FPS counter
+
+Closing F2 leaves a click-through FPS label below the top-left HUD. It reads engine FPS twice a second, independently of detailed profiling. Godot layout verification pending.
+
+---
+
 ## LOS-PERF1 — Weapon sight on maps with blockers
 
 Terrain rebuilds now cache blocker counts for padded corridor queries. Clear corridors bypass cell traversal, with endpoint boundary cases retaining the old traversal. Added a corner regression assertion to MountainSightChecks. Source and diff checks only. Godot build and profiling pending.

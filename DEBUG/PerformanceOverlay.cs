@@ -18,6 +18,9 @@ public partial class PerformanceOverlay : CanvasLayer
     [Export] public int QueueWarning { get; set; } = 32;
     [Export] public int QueueCritical { get; set; } = 128;
     private PanelContainer _panel;
+    private CanvasLayer _fpsLayer;
+    private Label _fpsLabel;
+    private Timer _fpsTimer;
     [ExportGroup("Rendering Diagnostics")]
     [Export] public bool MeasureRendering { get; set; } = true;
     private readonly Label[] _rows = new Label[33];
@@ -76,6 +79,7 @@ public partial class PerformanceOverlay : CanvasLayer
         _profiler = new SubsystemProfiler { Name = "SubsystemProfiler" }; AddChild(_profiler);
         _profiler.Initialize(battle.GetNodeOrNull<Node>("World"), ProfileWindowTicks);
         _profiler.SampleEveryTicks = ProfileEveryTicks; _profileRequested = ProfileOnStart;
+        BuildCompactFps(battle);
         SetOverlayVisible(ShowOnStart);
     }
 
@@ -93,6 +97,7 @@ public partial class PerformanceOverlay : CanvasLayer
         ResetPeaks();
         ResetDiagnostics();
         SetRenderingMeasurement(visible);
+        SetCompactFpsVisible(_allowed && !visible);
         if (!visible) _profiler?.Stop();
         else if (_profileRequested) _profiler?.Start();
         if (visible && _panel != null) RefreshDisplay();
@@ -132,6 +137,12 @@ public partial class PerformanceOverlay : CanvasLayer
     {
         SetRenderingMeasurement(false);
         _profiler?.Stop();
+        if (GodotObject.IsInstanceValid(_fpsLayer))
+        {
+            _fpsTimer.Stop();
+            _fpsLayer.Hide();
+            _fpsLayer.QueueFree();
+        }
     }
 
     #endregion
@@ -241,11 +252,52 @@ public partial class PerformanceOverlay : CanvasLayer
     }
 
     // =========================================================
-    // Stack below existing top-left diagnostics; fit remaining space above the build HUD on small windows.
+    // The compact counter has its own canvas so closing F2 can fully stop the detailed overlay.
+    private void BuildCompactFps(Node battle)
+    {
+        if (_headless) return;
+        _fpsLayer = new CanvasLayer { Name = "CompactFps", Layer = Layer, ProcessMode = ProcessModeEnum.Always };
+        _fpsLayer.Hide();
+        battle.AddChild(_fpsLayer);
+        _fpsLabel = new Label { MouseFilter = Control.MouseFilterEnum.Ignore };
+        _fpsLabel.AddThemeFontSizeOverride("font_size", 14);
+        _fpsLabel.AddThemeColorOverride("font_color", new Color("#d9efff"));
+        _fpsLabel.AddThemeColorOverride("font_outline_color", Colors.Black);
+        _fpsLabel.AddThemeConstantOverride("outline_size", 4);
+        _fpsLayer.AddChild(_fpsLabel);
+        _fpsTimer = new Timer { WaitTime = .5 };
+        _fpsTimer.Timeout += RefreshCompactFps;
+        _fpsLayer.AddChild(_fpsTimer);
+    }
+
+    private void SetCompactFpsVisible(bool visible)
+    {
+        if (_fpsLayer == null) return;
+        _fpsLayer.Visible = visible;
+        if (visible)
+        {
+            RefreshCompactFps();
+            _fpsTimer.Start();
+        }
+        else _fpsTimer.Stop();
+    }
+
+    private void RefreshCompactFps()
+    {
+        float margin = Mathf.Max(4, EdgeMargin);
+        _fpsLabel.Position = new Vector2(margin, TopHudOffset(margin));
+        _fpsLabel.Text = $"FPS {Engine.GetFramesPerSecond()}";
+    }
+
+    private float TopHudOffset(float margin) =>
+        GodotObject.IsInstanceValid(_topBar) && _topBar.IsVisibleInTree()
+            ? Mathf.Max(margin, _topBar.GetGlobalRect().End.Y + margin) : margin;
+
+    // =========================================================
+    // Fit the detailed overlay between the top and bottom HUD.
     private void LayoutPanel()
     {
-        float margin = Mathf.Max(4, EdgeMargin), top = margin;
-        if (GodotObject.IsInstanceValid(_topBar) && _topBar.IsVisibleInTree()) top = Mathf.Max(top, _topBar.GetGlobalRect().End.Y + margin);
+        float margin = Mathf.Max(4, EdgeMargin), top = TopHudOffset(margin);
         Vector2 viewport = GetViewport().GetVisibleRect().Size;
         float bottom = viewport.Y - margin;
         if (GodotObject.IsInstanceValid(_bottomArea) && _bottomArea.IsVisibleInTree() && _bottomArea.Size.Y > 0)
