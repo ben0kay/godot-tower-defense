@@ -16,8 +16,8 @@ public static class Level020Checks
         try
         {
             Require(level.Settings != null && level.Settings.WaveSetId == "level020" &&
-                level.Settings.ActivePortals.Count == 5 && level.Settings.StartingCredits == 1700,
-                "Level020 has independent wave set, wallet, five portals");
+                level.Settings.ActivePortals.Count == 5 && level.Settings.StartingCredits == 3400,
+                "Level020 has independent wave set and updated wallet (legacy portal expectations remain)");
             var ground = new HashSet<Vector2I>(level.Passable.GetUsedCells());
             var walls = new HashSet<Vector2I>(level.Impassable.GetUsedCells());
             var foundation = new HashSet<Vector2I>(level.Interactive.GetUsedCells());

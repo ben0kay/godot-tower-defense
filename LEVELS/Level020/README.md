@@ -1,3 +1,21 @@
+## Level020 balance relief — lighter fleet and double starting Credits (2026-11-11)
+
+**Source implemented; awaiting owner gameplay validation.** Starting Credits increase from **1,700 → 3,400** in `Level020Config.tres`. `Level020Waves.cs` retains **seven waves / 462 scheduled enemies** and the original batch sizes, intervals, pauses, narrator messages and finale's **two shielded Cruisers**; global enemy stats and other levels are unchanged.
+
+**Wave composition adjustments:**
+- Waves **1–2:** unchanged (all light ships). The larger starting wallet makes their opening pressure easier.
+- Wave **3:** replace some Bulwarks and shield generators with Standard and Swift drones.
+- Wave **4:** reduce escort Bulwarks, shield frigates and the late-batch Transporter weight **33% → 17%** (approximately four → two scheduled transporters), replacing them with Standards/Scouts.
+- Wave **5:** reduce the mid-wave Transporter and Frigate weights, and heavy-convoy Heavy Transporter share **25% → 8%** (approximately three → one), filling those slots with light drones.
+- Wave **6:** cut back Big/Elite/Heavy Bulwark/Frigate shares across the armoured push; light and reinforced drones carry more of the pressure.
+- Wave **7:** keep two shielded Cruisers as the boss encounter, but replace many heavyweight escorts and carrier slots with basic/scout drones.
+
+The authored weights use existing deterministic largest-remainder/shuffle composition. All new batch weights total 100; all totals and boss counts remain invariant. Transporter death-spawn children may still increase actual ship totals beyond 462. Starting Credits apply to **newly started/retried missions**; restoring a previously saved checkpoint may retain the wallet balance recorded in that save.
+
+**Scope:** Local level data only. No global tower/enemy tuning, terrain/map changes, new mechanics or altered wave scheduler. Old sections below describe the original level design and are historical when they conflict with this update. Test source `Level020Checks.cs` now expects the new credit value, but its older five-portal/map-layout assertions require separate review against the currently authored four-portal scene. Owner should play all seven waves from a fresh mission and tune again based on the first wave where defences fail.
+
+---
+
 ## Portal registration repair — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** ActivePortals now names the four portals actually present (01–04). Removed stale `EnemyPortal05`, which the new SPAWN1 registration validator would otherwise turn into SETUP ERROR. No portal, terrain, placement or authored wave was added/changed; legacy Five Gates names/narration remain authored content. Owner: launch Level020 and start its first wave.

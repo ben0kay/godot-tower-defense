@@ -1,3 +1,9 @@
+## Level020 — double starting Credits and lighten seven-wave fleet (2026-11-11)
+
+In `LEVELS/Level020`, starting Credits go **1,700→3,400**. Kept all seven waves, their batch sizes/cadence, narration and **two shielded final Cruisers**; shifted many Medium/Heavy Bulwarks, Elites, Frigates and carrier slots toward Standard/Swift/Reinforced drones, especially waves 4–7. Adjusted the existing Level020 Credits assertion and documented the balance change in the Level020 README. No shared combat/enemy stats or other level resources changed. Source and authored-weight checks only; owner gameplay QA pending. The legacy `Level020Checks` map/portal checks are already out of sync with the four-portal scene.
+
+---
+
 ## Unlit construction telemetry
 
 Reverted the one-tile construction lighting pass. The percentage, rings and completion fade use one shared unshaded canvas item, with the existing redraw cadence. Source review only. Godot build and in-game verification are pending.
