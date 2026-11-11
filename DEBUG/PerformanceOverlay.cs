@@ -18,7 +18,9 @@ public partial class PerformanceOverlay : CanvasLayer
     [Export] public int QueueWarning { get; set; } = 32;
     [Export] public int QueueCritical { get; set; } = 128;
     private PanelContainer _panel;
-    private readonly Label[] _rows = new Label[25];
+    [ExportGroup("Rendering Diagnostics")]
+    [Export] public bool MeasureRendering { get; set; } = true;
+    private readonly Label[] _rows = new Label[33];
     private PathRequestManager _paths;
     private PowerGridManager _power;
     private EnemyRegistry _enemies;
@@ -61,6 +63,8 @@ public partial class PerformanceOverlay : CanvasLayer
     {
         if (!IsInsideTree()) return;
         Node battle = GetParent();
+        _lighting = battle.GetNodeOrNull<WorldLightingController>("World/Lighting");
+        _renderingMethod = _headless ? "headless" : RenderingServer.GetCurrentRenderingMethod();
         _power = battle.GetNodeOrNull<PowerGridManager>("World/PowerNetworks");
         _paths = battle.GetNodeOrNull<PathRequestManager>("World/EnemySystems/Paths");
         _enemies = battle.GetNodeOrNull<EnemyRegistry>("World/EnemySystems/Registry");
@@ -87,6 +91,8 @@ public partial class PerformanceOverlay : CanvasLayer
         Visible = visible; SetProcess(visible); SetPhysicsProcess(visible);
         _lastFrameUsec = 0; _refresh = _peakAge = _frameTotal = 0; _frames = 0;
         ResetPeaks();
+        ResetDiagnostics();
+        SetRenderingMeasurement(visible);
         if (!visible) _profiler?.Stop();
         else if (_profileRequested) _profiler?.Start();
         if (visible && _panel != null) RefreshDisplay();
@@ -108,10 +114,12 @@ public partial class PerformanceOverlay : CanvasLayer
     // Capture only on demand; report workload and hardware alongside CPU observations, never infer GPU utilization.
     public void DumpProfile()
     {
-        if (_profiler?.Samples is not > 0) { GD.Print("No retained performance samples. Start profiling with Shift+F2."); return; }
+        if (_profiler == null) return;
         var camera = GetParent().GetNodeOrNull<CameraController>("CameraRig");
-        string context = $"build={BuildLabel}; battlefield={GetParent().SceneFilePath}; level={_paths?.Navigation.Grid.Level.SceneFilePath}; enemies={_enemies?.Living.Count ?? 0}; towers={_towers?.GetChildCount() ?? 0}; projectileNodes={_projectiles?.GetChildCount() ?? 0}; friendlyBullets={(_projectiles as FriendlyProjectileSystem)?.ActiveCount ?? 0}; hostileBullets={_hostile?.ActiveCount ?? 0}; zoom={camera?.ZoomLevel}; viewport={GetViewport().GetVisibleRect().Size}; maxFps={Engine.MaxFps}; fps={Engine.GetFramesPerSecond()}; processMs={Performance.GetMonitor(Performance.Monitor.TimeProcess) * 1000:0.000}; physicsMs={Performance.GetMonitor(Performance.Monitor.TimePhysicsProcess) * 1000:0.000}; headless={_headless}; CPU={OS.GetProcessorName()}; threads={OS.GetProcessorCount()}; OS={OS.GetName()}; pathQueue={_paths?.PendingCount}; sharedRawHits={_paths?.Navigation.RoutePool.RawHits}; sharedRefinedHits={_paths?.Navigation.RoutePool.RefinedHits}; sharedTemplateBuilds={_paths?.Navigation.RoutePool.RefinedBuilds}; segmentSafetyHits={_paths?.Navigation.SegmentSafety.Hits}; segmentSafetyBuilds={_paths?.Navigation.SegmentSafety.Builds}; segmentSafetyEvictions={_paths?.Navigation.SegmentSafety.Evictions}; segmentSafetyEntries={_paths?.Navigation.SegmentSafety.Count}; GPU timing=unmeasured";
-        string report = _profiler.Report(context); GD.Print(report);
+        string context = $"build={BuildLabel}; battlefield={GetParent().SceneFilePath}; level={_paths?.Navigation.Grid.Level.SceneFilePath}; enemies={_enemies?.Living.Count ?? 0}; towers={_towers?.GetChildCount() ?? 0}; projectileNodes={_projectiles?.GetChildCount() ?? 0}; friendlyBullets={(_projectiles as FriendlyProjectileSystem)?.ActiveCount ?? 0}; hostileBullets={_hostile?.ActiveCount ?? 0}; zoom={camera?.ZoomLevel}; viewport={GetViewport().GetVisibleRect().Size}; maxFps={Engine.MaxFps}; fps={Engine.GetFramesPerSecond()}; processMs={Performance.GetMonitor(Performance.Monitor.TimeProcess) * 1000:0.000}; physicsMs={Performance.GetMonitor(Performance.Monitor.TimePhysicsProcess) * 1000:0.000}; headless={_headless}; CPU={OS.GetProcessorName()}; threads={OS.GetProcessorCount()}; OS={OS.GetName()}; pathQueue={_paths?.PendingCount}; sharedRawHits={_paths?.Navigation.RoutePool.RawHits}; sharedRefinedHits={_paths?.Navigation.RoutePool.RefinedHits}; sharedTemplateBuilds={_paths?.Navigation.RoutePool.RefinedBuilds}; segmentSafetyHits={_paths?.Navigation.SegmentSafety.Hits}; segmentSafetyBuilds={_paths?.Navigation.SegmentSafety.Builds}; segmentSafetyEvictions={_paths?.Navigation.SegmentSafety.Evictions}; segmentSafetyEntries={_paths?.Navigation.SegmentSafety.Count}; {DiagnosticReport()}";
+        string report = _profiler.Samples > 0 ? _profiler.Report(context) :
+            $"Performance snapshot {System.DateTime.UtcNow:O}\n{context}\nNo retained subsystem samples. Shift+F2 starts physics profiling.";
+        GD.Print(report);
         DirAccess.MakeDirRecursiveAbsolute("user://Debug");
         string path = $"user://Debug/pf2-{System.DateTime.UtcNow:yyyyMMdd-HHmmss-fff}.txt";
         using var file = FileAccess.Open(path, FileAccess.ModeFlags.Write);
@@ -120,7 +128,11 @@ public partial class PerformanceOverlay : CanvasLayer
     }
     // =========================================================
     // Clear the active capture before the scene-owned UI disappears.
-    public override void _ExitTree() => _profiler?.Stop();
+    public override void _ExitTree()
+    {
+        SetRenderingMeasurement(false);
+        _profiler?.Stop();
+    }
 
     #endregion
 
@@ -135,6 +147,7 @@ public partial class PerformanceOverlay : CanvasLayer
         _peakAge += seconds;
         if (_peakAge >= Mathf.Max(1, PeakWindowSeconds)) { ResetPeaks(); _peakAge = 0; }
         double ms = seconds * 1000;
+        RecordDiagnosticFrame(ms);
         _frameTotal += ms; _frames++; _framePeak = System.Math.Max(_framePeak, ms);
         _refresh += seconds;
         if (_refresh < Mathf.Max(.1, RefreshSeconds)) return;
@@ -147,6 +160,9 @@ public partial class PerformanceOverlay : CanvasLayer
     {
         _profiler?.EndTick();
         if (GetTree().Paused || !GodotObject.IsInstanceValid(_paths)) return;
+        _observedPathTicks++;
+        double budget = _paths.Config?.MaxPathfindingMillisecondsPerFrame ?? 0;
+        if (budget > 0 && _paths.LastPathfindingMilliseconds >= budget) _pathBudgetTicks++;
         _queryPeak = System.Math.Max(_queryPeak, _paths.LastFrameCalculations);
         _pathPeak = System.Math.Max(_pathPeak, _paths.LastPathfindingMilliseconds);
         _astarPeak = System.Math.Max(_astarPeak, _paths.LastFrameAStarMilliseconds);
@@ -156,7 +172,7 @@ public partial class PerformanceOverlay : CanvasLayer
     // =========================================================
     // Fixed observation windows avoid permanent session peaks dominating the live readout.
     private void ResetPeaks()
-    { _framePeak = _pathPeak = _astarPeak = _validationPeak = 0; _queryPeak = 0; }
+    { _framePeak = _pathPeak = _astarPeak = _validationPeak = 0; _queryPeak = 0; _pathBudgetTicks = _observedPathTicks = 0; }
 
     // =========================================================
     // Navigation totals include A*; those numbers must never be added together as separate costs.
@@ -171,7 +187,8 @@ public partial class PerformanceOverlay : CanvasLayer
         string projectiles = GodotObject.IsInstanceValid(_projectiles) ? _projectiles.GetChildCount().ToString() : "N/A";
         Write(3, $"Enemies {enemies} · projectile nodes {projectiles} · towers {_towers?.GetChildCount() ?? 0} · buffered F/H {(_projectiles as FriendlyProjectileSystem)?.ActiveCount ?? 0}/{_hostile?.ActiveCount ?? 0}", Normal);
         double budget = paths ? _paths.Config?.MaxPathfindingMillisecondsPerFrame ?? 0 : 0;
-        Write(4, paths ? $"Path peak {_pathPeak:0.00}ms · A* {_astarPeak:0.00}ms · queries {_queryPeak}" : "Navigation N/A", budget > 0 ? Pressure(_pathPeak, budget, budget * 2) : Normal);
+        string budgetText = budget > 0 ? $"{budget:0.##}ms" : "off";
+        Write(4, paths ? $"Path work peak {_pathPeak:0.00}ms · soft budget {budgetText} · jobs {_queryPeak}" : "Navigation N/A", budget > 0 ? Pressure(_pathPeak, budget, budget * 2) : Normal);
         int pending = paths ? _paths.PendingCount : 0;
         Write(5, paths ? $"Path queue {pending} · audit queue {_paths.PendingValidationCount} · audit peak {_validationPeak:0.00}ms" : "Route validation N/A", Pressure(pending, QueueWarning, QueueCritical));
         Write(6, _headless ? "Rendering N/A (headless)" : $"Draw calls {Performance.GetMonitor(Performance.Monitor.RenderTotalDrawCallsInFrame):0} · render objects {Performance.GetMonitor(Performance.Monitor.RenderTotalObjectsInFrame):0}", Normal);
@@ -199,6 +216,7 @@ public partial class PerformanceOverlay : CanvasLayer
         }
         else { Write(21, "Power topology N/A", Normal); Write(22, "Power hover N/A", Normal);
             Write(23, "Power accounting N/A", Normal); Write(24, "Power island totals N/A", Normal); }
+        WriteDiagnostics();
         LayoutPanel();
     }
     #endregion

@@ -1,3 +1,15 @@
+## Rendering and frame diagnostics
+
+F2 now adds p95/p99 wall-clock frame spacing over the latest 600 observed frames, latest viewport rendering CPU/GPU time and global CPU setup time. Native rendering measurement runs while the overlay is visible and MeasureRendering is enabled on PerformanceOverlay. Set it false in the Inspector to compare measurement overhead. Unsupported, uninitialized or zero native readings display N/A. These timings have different scopes from engine process/physics and should not be added together. Frame history includes paused frames while the overlay is visible.
+
+Additional rows show managed heap size, process-wide GC collection totals by generation, registered fog contacts (including offscreen and partially revealed contacts), enabled/allocated pooled lights, projectile-light leases, global exhaust/explosion counts, tracer-cache entries and the three visual toggle states. F3 saves these even without retained physics-profile samples. Counts and toggles in the report are snapshots at export, rather than averages over the physics capture. Heap values cover managed memory, not total process or GPU memory.
+
+The path row highlights its whole scheduled request/journey-work slice, including refinement, against the authored soft budget. A* has its own nested peak row with the number of physics ticks that exceeded that path budget during the peak window. The default 2 ms budget turns the path row yellow at 2 ms and red at 4 ms. A single operation can overrun the soft budget before the scheduler yields. Peaks persist for the configured observation window, default two seconds. These warnings describe budget pressure. Frame percentiles and CPU/GPU readings provide the accompanying context.
+
+No new enemy/projectile timing hooks, node scans or per-instance callbacks were added. Visual count reads use existing owner state, with a bounded scan of the light pool only. Rendering CPU/GPU numbers still need verification on the owner's renderer/hardware. Godot APIs are documented under [viewport rendering measurements](https://docs.godotengine.org/en/stable/classes/class_renderingserver.html#class-renderingserver-method-viewport-get-measured-render-time-gpu).
+
+---
+
 ## DBG1 — Developer Hub
 
 In a running debug battlefield, press **F1** and choose **1 Enemy Spawner**, **2 Building Lookup**, or **3 Route Preview**. F1 returns from a child to the hub. Escape closes the active panel. Building Lookup browses all catalog entries, with authored finished tiers, native artwork bounds, and Actual Size and Fit views.

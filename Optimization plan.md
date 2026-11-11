@@ -40,3 +40,9 @@ No crowded-battle FPS or GPU comparison was practical without the Godot .NET run
 The permanent debug panel at middle-right switches tracer rendering live. Original rendering remains the default. Compare both modes at the same camera/zoom with dense friendly and hostile volleys, then disable UseBufferedTracers to exercise BasicProjectile fallback. Check switching with rounds in flight and while paused, texture colors and dimensions, tapered shots, fog edges, F6, and viewport clipping. Account for the first bake/upload of each style before recording steady-state results. Resize the window and open/close F1 to check the independent panel.
 
 No matched runtime FPS or GPU measurements are available in the current environment. The 64-style cache is bounded and preserves original-renderer fallback for additional styles. The textured mode remains optional pending owner comparison.
+
+### Overlay diagnostics
+
+Use F2 for the 600-frame p95/p99 distribution, latest native viewport CPU/GPU rendering time, managed heap/GC totals and existing visual count/toggle snapshots. F3 now saves the diagnostic context with or without retained Shift+F2 samples. Native GPU availability depends on the renderer; missing readings are N/A. MeasureRendering on PerformanceOverlay controls timestamp instrumentation while the overlay is open. Compare measurement enabled/disabled if investigating small differences. No matched hardware FPS measurements have been recorded for this diagnostic update.
+
+The path warning now shows its soft budget and over-budget tick count beside a separate nested A* peak. With the default 2 ms budget, a 5–8 ms path-work peak turns red. Use the frequency and frame distribution to distinguish occasional work spikes from sustained pressure.

@@ -9,6 +9,8 @@ internal static class TexturedProjectileDrawing
     private sealed record TracerTexture(Texture2D Texture, Rect2 Bounds);
     private static readonly Dictionary<ProjectileVisualSnapshot, TracerTexture> Cache = new();
 
+    internal static int CachedStyleCount => Cache.Count;
+
     // =========================================================
     // Authored textures and disabled styles continue through their original drawing path.
     internal static bool TryDraw(CanvasItem canvas, ProjectileVisualSnapshot style,
