@@ -47,7 +47,7 @@ Ideas for tactical depth, replayability, tower variety and enemy behaviour. Some
 | M14 | Tower active abilities | Selected towers can overcharge, focus fire or enter a defensive mode for a limited time. |
 | M15 | Enemy formations | Squadrons enter with leaders and supporting craft; formations create tactical targeting choices. |
 | M16 | Endless survival mode | Optional escalating waves, rewards and score records. |
-| M17 | Class-based directional enemy impact stagger | **Planned, not implemented.** Reuse existing `EnemyClass` as shared stagger resistance; Blaster Cannon affects Light (strong) and Standard (mild), Rocket Tower affects Light (mild), and other weapons/classes remain ineligible initially, including currently unspecified Tiny. A short real forward-speed dip plus visual-only blast-direction hull shove; no physical knockback or per-enemy masses. Add `ImpactStaggerEnabled` to the default Feedback config to disable both. [STG0 implementation plan](../FEEDBACK/ImpactStagger/IMPLEMENTATION_PLAN.md). |
+| M17 | Class-based directional enemy impact stagger | **Implemented in source.** Reuse existing `EnemyClass` as shared stagger resistance; Blaster Cannon affects Light (strong) and Standard (mild), Rocket Tower affects Light (mild), and other weapons/classes remain ineligible initially, including currently unspecified Tiny. A short real forward-speed dip plus visual-only blast-direction hull shove; no physical knockback or per-enemy masses. Add `ImpactStaggerEnabled` to the default Feedback config to disable both. [STG0 implementation plan](../FEEDBACK/ImpactStagger/IMPLEMENTATION_PLAN.md). |
 
 ## Implementation guidance
 

@@ -16,6 +16,7 @@ public partial class SplashProjectile : Node2D
     private double _life;
     private ProjectileHandlingStats _handling;
     private bool _launched;
+    private int _staggerImpactPower;
     public Vector2 ImpactPoint => _impact;
     public ProjectileHandlingStats Handling => _handling;
     private bool _initialized, _finished, _trackTarget = true;
@@ -31,7 +32,7 @@ public partial class SplashProjectile : Node2D
     // =========================================================
     // Values are immutable copies; the projectile retains no tower or mutable config reference.
     public void Initialize(Enemy target, EnemyRegistry registry, Vector2 lastKnownImpact, float speed,
-        DamageInfo hit, AreaBlastStats blast, Node2D effects = null, float lifetime = 5f, ShockwaveStyle style = null, bool trackTarget = false, ProjectileHandlingStats? handling = null)
+        DamageInfo hit, AreaBlastStats blast, Node2D effects = null, float lifetime = 5f, ShockwaveStyle style = null, bool trackTarget = false, ProjectileHandlingStats? handling = null, int staggerImpactPower = 0)
     {
         if (_initialized) throw new InvalidOperationException("Projectile is already initialized.");
         AreaDamage.Validate(blast.RadiusPixels, blast.EdgeDamageFraction);
@@ -42,6 +43,7 @@ public partial class SplashProjectile : Node2D
         _registry = registry; _effects = effects; _impact = lastKnownImpact; _speed = speed; _life = lifetime;
         _hit = hit; _blast = blast; _style = style == null ? null : (ShockwaveStyle)style.Duplicate(true); _initialized = true;
         _handling = ProjectileHandlingStats.Sanitize(handling ?? new(0, trackTarget ? ProjectileGuidance.Homing : ProjectileGuidance.Straight));
+        _staggerImpactPower = Math.Clamp(staggerImpactPower, 0, 2);
         _trackTarget = _handling.Guidance == ProjectileGuidance.Homing;
         if (_trackTarget && GodotObject.IsInstanceValid(target) && target.IsAlive && target.IsInsideTree() && !target.IsQueuedForDeletion())
         { _target = target; _target.Removed += OnTargetRemoved; _target.TreeExiting += OnTargetExiting; }
@@ -76,10 +78,18 @@ public partial class SplashProjectile : Node2D
         float step = (float)Math.Min(float.MaxValue, _speed * seconds);
         if (GlobalPosition.DistanceTo(_impact) <= step)
         {
+            Vector2 travelDirection = Vector2.Zero;
+            if (_staggerImpactPower > 0)
+            {
+                Vector2 finalStep = _impact - GlobalPosition;
+                travelDirection = finalStep.LengthSquared() > .0001f
+                    ? finalStep.Normalized() : Vector2.Right.Rotated(GlobalRotation);
+            }
             GlobalPosition = _impact; _finished = true; HasDetonated = true; DetachTarget();
             try
             {
-                AppliedHits = AreaDamage.ApplyInstant(_impact, _blast.RadiusPixels, _hit, _blast.EdgeDamageFraction, _registry);
+                AppliedHits = AreaDamage.ApplyInstant(_impact, _blast.RadiusPixels, _hit, _blast.EdgeDamageFraction, _registry,
+                    _staggerImpactPower, travelDirection);
                 ShockwaveEffect.Spawn(_effects, _impact, _style, _blast.RadiusPixels);
             }
             finally { QueueFree(); }

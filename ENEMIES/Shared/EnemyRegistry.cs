@@ -21,6 +21,25 @@ public partial class EnemyRegistry : Node
     public IReadOnlyList<Enemy> Living => _living;
     internal bool ExplosionFxEnabled { get; set; } = true;
     internal bool HealthBarsEnabled { get; private set; } = true;
+    private bool? _impactStaggerOverride;
+    private int _staggerVisuals;
+    internal bool ImpactStaggerEnabled => _impactStaggerOverride ?? ImpactStagger.Settings.ImpactStaggerEnabled;
+
+    internal void SetImpactStaggerEnabled(bool enabled)
+    {
+        _impactStaggerOverride = enabled;
+        if (!enabled)
+            foreach (Enemy enemy in _living) enemy.ClearImpactStagger();
+    }
+
+    internal bool TryReserveStaggerVisual()
+    {
+        if (_staggerVisuals >= ImpactStagger.VisualLimit) return false;
+        _staggerVisuals++;
+        return true;
+    }
+
+    internal void ReleaseStaggerVisual() => _staggerVisuals--;
     public int KilledCount { get; private set; }
     public int ArrivedCount { get; private set; }
     public event Action<Enemy> EnemyRegistered;

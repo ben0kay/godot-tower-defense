@@ -2,7 +2,7 @@
 
 **Repository:** `ben0kay/godot-tower-defense` · **Branch:** `dev`  
 **Updated:** 2026-11-10  
-**Status:** **Implementation plan ONLY — no stagger effects or gameplay code implemented.**  
+**Status:** **Implemented in source. Godot build and in-game acceptance pending.**
 **Idea reference:** `NOTES/Ideas.md` → M17  
 **Supersedes:** the prior STG0 mass-ratio/per-enemy-impact-mass proposal in this same file.
 
@@ -127,7 +127,7 @@ Add `ImpactStaggerEnabled` to **`FEEDBACK/FeedbackMasterConfig.cs`** (default `t
 
 - `true`: only the exact initial weapon/class matrix can trigger the effect.
 - `false`: **no brief movement dip and no artwork offset**. Ordinary shell hit, blast damage, defense layers, kill XP, wave progression and shockwave visuals must still work.
-- This particular toggle controls a small gameplay effect as well as feedback, unlike typical cosmetic-only master flags. A value set before deployment must be honored; optional live mid-wave retuning is not part of STG0.
+- This particular toggle controls a small gameplay effect as well as feedback, unlike typical cosmetic-only master flags. The right-side **Impact Stagger** switch overrides the starting value for the current battlefield and clears active reactions when switched off.
 
 ## 5. Performance and save requirements
 

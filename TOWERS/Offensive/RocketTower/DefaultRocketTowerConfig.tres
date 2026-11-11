@@ -13,3 +13,4 @@ HeatEnabled = true
 ConstructionArt = ExtResource("construction")
 ImpactStyle = ExtResource("2")
 MuzzleFlash = ExtResource("3")
+StaggerImpactPower = 1

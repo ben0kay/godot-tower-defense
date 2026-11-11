@@ -1,3 +1,9 @@
+## STG0 — Directional splash stagger
+
+Blaster staggers Light and Standard ships. Rocket staggers Light ships. Eligible surviving hits briefly reduce forward speed, with an outward hull and thruster shove for visible ships without hull-mounted weapons. The right-side Impact Stagger switch clears active reactions when off. Settings live in DefaultFeedbackConfig.tres. Godot build and visual checks pending.
+
+---
+
 ## LOS-PERF1 — scoped world-grid LOS optimization plan (planning only, 2026-11-10)
 
 Authored [LOS-PERF1](../WORLD/GRID/LOS_PERF1_IMPLEMENTATION_PLAN.md): no-blocker map fast return was already implemented; proposed a cached authoritative sight-blocker integral image for additional empty-corridor returns on mountain-containing maps, without relaxing exact acquisition/locked-target/beam sight. Future Codex job only; **no runtime code changed**.

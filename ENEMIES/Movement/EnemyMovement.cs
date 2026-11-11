@@ -265,7 +265,9 @@ public partial class EnemyMovement : Node
     public override void _PhysicsProcess(double delta)
     {
         using var pf2 = SubsystemProfiler.Measure(this, ProfileCategory.Movement);
-        if (!Enemy.IsAlive || Enemy.AssignedCitadel?.Available != true) return;
+        if (!Enemy.IsAlive) return;
+        float staggerSpeed = Enemy.AdvanceImpactStagger(delta);
+        if (Enemy.AssignedCitadel?.Available != true) return;
         if (HeadingToCheckpoint)
         {
             if (_checkpointError.Length == 0 && GodotObject.IsInstanceValid(Checkpoint) && Checkpoint.Contains(Enemy.GlobalPosition)
@@ -292,7 +294,7 @@ public partial class EnemyMovement : Node
             if (_retry <= 0f) RequestRoute(float.PositiveInfinity);
             return;
         }
-        float speed = Enemy.EffectiveMoveSpeed;
+        float speed = Enemy.EffectiveMoveSpeed * staggerSpeed;
         float travel = speed * (float)delta;
         double terrainElapsed = 0;
         while (_next < _route.Points.Length)

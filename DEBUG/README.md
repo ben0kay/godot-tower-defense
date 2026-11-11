@@ -17,7 +17,7 @@ In a running debug battlefield, press **F1** and choose **1 Enemy Spawner**, **2
 **F2** toggles Performance, **Shift+F2** toggles profiling, **F3** saves retained samples, and **F4** cycles notification samples. These keys work with the hub closed. F9 Audio Tester is retired. Shortcut references in older entries below are historical.
 
 
-The **Visual Debug** panel stays at the middle-right during debug battlefields, independently of F1 and Escape. It contains Enemy Explosion FX, Enemy Health Bars (both hull and shield meter rows), and Textured Tracers. The tracer switch applies live to friendly, hostile and standalone fallback tracers. Unchecked selects the existing rendering. Switches reset for each battlefield. The panel follows viewport resizing and hides with the mission outcome.
+The **Visual Debug** panel stays at the middle-right during debug battlefields, independently of F1 and Escape. It contains Enemy Explosion FX, Enemy Health Bars (both hull and shield meter rows), Impact Stagger, and Textured Tracers. Impact Stagger controls the speed dip and cosmetic shove and clears active reactions when switched off. The tracer switch applies live to friendly, hostile and standalone fallback tracers. Unchecked selects the existing rendering. Switches reset for each battlefield. The panel follows viewport resizing and hides with the mission outcome.
 ---
 
 ## PW1 F4 power topology diagnostics — 2026-11-04

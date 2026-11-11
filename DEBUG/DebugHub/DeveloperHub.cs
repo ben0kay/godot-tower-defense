@@ -93,6 +93,7 @@ public partial class DeveloperHub : CanvasLayer
         {
             AddToggle(list, "Enemy Explosion FX", _enemies.ExplosionFxEnabled, SetExplosionFxEnabled);
             AddToggle(list, "Enemy Health Bars", _enemies.HealthBarsEnabled, _enemies.SetHealthBarsEnabled);
+            AddToggle(list, "Impact Stagger", _enemies.ImpactStaggerEnabled, _enemies.SetImpactStaggerEnabled);
         }
         if (_projectileSettings != null)
             AddToggle(list, "Textured Tracers", _projectileSettings.TexturedTracers, _projectileSettings.SetTexturedTracers);

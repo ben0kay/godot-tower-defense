@@ -128,6 +128,7 @@ public partial class Enemy : Node2D
     {
         if (_fogConcealed == concealed) return;
         _fogConcealed = concealed;
+        if (concealed) ClearStaggerVisual();
         _thruster?.SetFogConcealed(concealed);
         _defenseBar?.SetFogConcealed(concealed);
         if (GodotObject.IsInstanceValid(_shieldVisual)) _shieldVisual.SetFogConcealed(concealed);
@@ -141,6 +142,7 @@ public partial class Enemy : Node2D
     // Called by SpawnManager after adding the scene, using world-scoped services.
     public void Initialize(EnemyRegistry registry, PathRequestManager paths, bool spawnWithShield = false, RouteCheckpoint checkpoint = null, bool requiresCheckpoint = false, EnemyRouteHandoff routeHandoff = null, int generation = 0, CitadelDestination assignedCitadel = null, bool spawnWithStealth = false)
     {
+        ClearImpactStagger();
         if (GodotObject.IsInstanceValid(_registry) && _registry.Contains(this)) _registry.Unregister(this);
         AssignedCitadel = routeHandoff?.Destination ?? assignedCitadel ?? paths.Navigation.SingleDestination;
         ClearStatuses();
@@ -153,6 +155,7 @@ public partial class Enemy : Node2D
         _defenseBar = GetNodeOrNull<DefenseBar>("DefenseBar");
         // Large hulls get extra bar clearance once, without per-type scene overrides.
         Sprite2D sprite = GetNodeOrNull<Sprite2D>("Sprite");
+        _staggerHull = sprite;
         ApplyHullVisualScale(sprite);
         _damageAppearance = Definition.DamageAppearance;
         _damageAppearanceSprite = _damageAppearance != null && _damageAppearance.Stages != null
@@ -204,6 +207,7 @@ public partial class Enemy : Node2D
     // Keep proximity buckets current for movement and direct position assignments, with no polling scan.
     public override void _Notification(int what)
     {
+        if (what == NotificationPaused) ClearImpactStagger();
         if ((what == NotificationLocalTransformChanged || what == NotificationTransformChanged) && IsAlive
             && GodotObject.IsInstanceValid(_registry))
         {
@@ -355,6 +359,7 @@ public partial class Enemy : Node2D
     private void Finish(bool arrived)
     {
         if (!IsAlive) return;
+        ClearImpactStagger();
         IsAlive = false; ClearStatuses(); Movement.SetPhysicsProcess(false);
         _thruster?.Stop();
         if (!arrived)
@@ -377,6 +382,8 @@ public partial class Enemy : Node2D
     // Also clean up when the whole level is unloaded.
     public override void _ExitTree()
     {
+        ClearImpactStagger();
+        _staggerHull = null;
         ClearStatuses(); ClearStealth();
         _damageAppearance = null; _damageAppearanceSprite = null; _damageAppearanceStage = -1;
         if (GodotObject.IsInstanceValid(_shieldVisual)) _shieldVisual.ResetVisual();

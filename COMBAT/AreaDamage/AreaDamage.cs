@@ -6,7 +6,7 @@ using System.Collections.Generic;
 public static class AreaDamage
 {
     // Main-thread scratch only; lists are cleared before pooling, retaining no world/enemy references.
-    private static readonly Stack<List<(Enemy Enemy, DamageInfo Hit)>> HitBuffers = new();
+    private static readonly Stack<List<(Enemy Enemy, DamageInfo Hit, Vector2 Position, float Strength)>> HitBuffers = new();
     // =========================================================
     // Validate every supplied area value before any recipient can be mutated.
     public static void Validate(float radius, float edgeFraction)
@@ -31,14 +31,16 @@ public static class AreaDamage
     // =========================================================
     // One nearby query per impact, then dispatch each snapshotted hit once despite kill/removal callbacks.
     // EnemyRegistry guarantees uniqueness. The return value counts eligible dispatched hits, including zero damage.
-    public static int ApplyInstant(Vector2 impact, float radius, DamageInfo source, float edgeFraction, EnemyRegistry registry)
+    public static int ApplyInstant(Vector2 impact, float radius, DamageInfo source, float edgeFraction, EnemyRegistry registry,
+        int staggerImpactPower = 0, Vector2 travelDirection = default)
     {
         using var pf2 = SubsystemProfiler.Measure(registry, ProfileCategory.AreaDamage);
         Validate(radius, edgeFraction);
         if (!float.IsFinite(impact.X) || !float.IsFinite(impact.Y)) throw new ArgumentOutOfRangeException(nameof(impact));
         if (!GodotObject.IsInstanceValid(registry)) throw new ArgumentNullException(nameof(registry));
+        bool stagger = staggerImpactPower > 0 && registry.ImpactStaggerEnabled;
         var candidates = registry.RentQueryBuffer();
-        var recipients = HitBuffers.Count > 0 ? HitBuffers.Pop() : new List<(Enemy Enemy, DamageInfo Hit)>();
+        var recipients = HitBuffers.Count > 0 ? HitBuffers.Pop() : new List<(Enemy Enemy, DamageInfo Hit, Vector2 Position, float Strength)>();
         try
         {
             registry.GetNeighborsInRadius(impact, radius, candidates);
@@ -53,13 +55,32 @@ public static class AreaDamage
                 double dx = (double)position.X - impact.X, dy = (double)position.Y - impact.Y;
                 double squared = dx * dx + dy * dy;
                 if (!double.IsFinite(squared) || squared > radiusSquared) continue;
-                recipients.Add((enemy, AtDistance(source, (float)Math.Sqrt(squared), radius, edgeFraction)));
+                float distance = (float)Math.Sqrt(squared);
+                float strength = stagger ? ImpactStagger.Strength(enemy.Definition.Class, staggerImpactPower,
+                    radius > 0 ? Mathf.Clamp(1f - distance / radius, 0, 1) : 1f) : 0f;
+                recipients.Add((enemy, AtDistance(source, distance, radius, edgeFraction), position, strength));
             }
             int applied = 0;
             foreach (var recipient in recipients)
             {
                 if (!Eligible(recipient.Enemy, registry)) continue;
-                recipient.Enemy.ApplyDamage(recipient.Hit); applied++;
+                Enemy enemy = recipient.Enemy;
+                if (recipient.Strength <= 0)
+                {
+                    enemy.ApplyDamage(recipient.Hit);
+                }
+                else
+                {
+                    float hullBefore = enemy.Health, shieldBefore = enemy.CurrentShield;
+                    enemy.ApplyDamage(recipient.Hit);
+                    if (Eligible(enemy, registry) && (enemy.Health < hullBefore || enemy.CurrentShield < shieldBefore))
+                    {
+                        Vector2 away = recipient.Position - impact;
+                        Vector2 direction = away.LengthSquared() > .0001f ? away.Normalized() : travelDirection.Normalized();
+                        enemy.ApplyImpactStagger(recipient.Strength, direction);
+                    }
+                }
+                applied++;
             }
             return applied;
         }

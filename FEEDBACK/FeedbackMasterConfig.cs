@@ -12,4 +12,11 @@ public partial class FeedbackMasterConfig : Resource
 	[Export] public bool DamageNumbersEnabled { get; set; } = true;
 	[Export] public bool CameraEffectsEnabled { get; set; } = true;
 	[Export] public bool WorldCalloutsEnabled { get; set; } = true;
+	[ExportGroup("Impact Stagger")]
+	[Export] public bool ImpactStaggerEnabled { get; set; } = true;
+	[Export(PropertyHint.Range, "0,12,0.1")] public float StaggerShovePixels { get; set; } = 5f;
+	[Export(PropertyHint.Range, "0,0.5,0.01")] public float StaggerReturnSeconds { get; set; } = .2f;
+	[Export(PropertyHint.Range, "0,0.5,0.01")] public float StaggerMaximumSlow { get; set; } = .2f;
+	[Export(PropertyHint.Range, "0,0.3,0.01")] public float StaggerSlowSeconds { get; set; } = .12f;
+	[Export(PropertyHint.Range, "0,0.5,0.01")] public float StaggerCooldownSeconds { get; set; } = .18f;
 }

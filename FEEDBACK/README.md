@@ -1,6 +1,6 @@
 ## STG0 — Class-based directional impact stagger (revised plan 2026-11-10)
 
-[Implementation specification](ImpactStagger/IMPLEMENTATION_PLAN.md) — replaces the old mass-ratio/per-enemy-mass proposal with a tiny **EnemyClass resistance / weapon impact-power** rule: Blaster affects Light + Standard, Rocket affects Light, nothing else by default. A qualifying splash briefly dips real forward speed and cosmetically nudges/recentres the visible ship without shifting its root or route. Proposed master `ImpactStaggerEnabled` in `DefaultFeedbackConfig.tres` disables both effects. **Plan only, not implemented.**
+[Implementation specification](ImpactStagger/IMPLEMENTATION_PLAN.md). Blaster staggers Light and Standard ships. Rocket staggers Light ships. Surviving hits that reduce hull or shield briefly slow eligible ships. Visible ships without hull-mounted weapons also get an outward hull and thruster shove. The right-side **Impact Stagger** switch controls both effects and starts from `DefaultFeedbackConfig.tres`.
 
 ---
 

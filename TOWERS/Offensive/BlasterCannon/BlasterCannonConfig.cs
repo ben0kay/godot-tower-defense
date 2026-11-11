@@ -36,6 +36,7 @@ public partial class BlasterCannonConfig : TowerConfig, ITowerTargetingPolicy
     [Export] public MuzzleFlashStyle MuzzleFlash { get; set; }
 
     [ExportGroup("Effects")]
+    [Export(PropertyHint.Range, "0,2,1")] public int StaggerImpactPower { get; set; }
     [Export] public ShockwaveStyle ImpactStyle { get; set; }
 
     [ExportGroup("Aiming")]
