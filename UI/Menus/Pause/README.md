@@ -1,3 +1,9 @@
+## Restart from Pause — 2026-11-11
+
+**RESTART** appears immediately below RESUME, using the existing Action button styling. It launches a **fresh instance of the current mission** through `MenuNavigation.Open`: the active waves, towers, credits and run state start over, rather than restoring the saved checkpoint. Campaign deployments resolve their mission `.tres` resource (not the generic `Battlefield.tscn`), while direct scene play retains a scene-file fallback. Navigation is deferred outside the button signal; a failed restart keeps the paused battlefield and shows an error. Existing Resume, Save/Load, Options and exit controls are unchanged. Owner in-editor validation pending.
+
+---
+
 ## Between-wave checkpoint integration — 2026-10-26
 
 S2/S3 now provide source-owned capture/restore seams for this feature through

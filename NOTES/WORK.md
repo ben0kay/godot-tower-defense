@@ -1,3 +1,9 @@
+## Pause menu — Restart action (2026-11-11)
+
+Added an Action-styled RESTART button directly beneath RESUME in `UI/Menus/Pause/PauseMenu.cs`. Clicking it defers a fresh current-mission launch via `MenuNavigation.Open` (mission `.tres` preferred over generic battlefield scene), not `CampaignSession.LoadCurrent`; existing scene and pause are retained if launch fails. No save format or unrelated gameplay changes. Source sanity review only; Godot .NET runtime and visual acceptance pending.
+
+---
+
 ## Construction site lighting
 
 Initial builds use a pooled cyan light centred on the footprint, with a one-tile fade on all sides. Masks are shared by footprint size. Construction reveal keeps its existing radius setting. Source review only. Godot build and visual verification are pending.

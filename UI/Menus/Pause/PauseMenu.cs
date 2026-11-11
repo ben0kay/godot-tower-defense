@@ -11,7 +11,7 @@ public partial class PauseMenu : CanvasLayer
     private GameInput _input;
     private Control _previousFocus;
     private AcceptDialog _error;
-    private bool _resultsLocked;
+    private bool _resultsLocked, _restartQueued;
 
     // =========================================================
     // Always-process UI remains interactive while the entire battlefield is paused.
@@ -23,6 +23,7 @@ public partial class PauseMenu : CanvasLayer
         VBoxContainer content = MenuLayout.Create(_screen, "PAUSED", "BATTLEFIELD ON HOLD", 560f);
         _screen.GetChild<ColorRect>(0).Color = new Color(0.02f, 0.05f, 0.09f, 0.88f);
         _resume = UIButtonFactory.Create("RESUME", Resume); content.AddChild(_resume);
+        content.AddChild(UIButtonFactory.Create("RESTART", RestartMission, UIButtonStyle.Action));
         _save = UIButtonFactory.Create("SAVE", SaveCheckpoint, UIButtonStyle.Action); content.AddChild(_save);
         _saveReason = UIButtonFactory.Label("", 14); _saveReason.AutowrapMode = TextServer.AutowrapMode.WordSmart; content.AddChild(_saveReason);
         _load = UIButtonFactory.Create("LOAD", LoadCheckpoint, UIButtonStyle.Action); content.AddChild(_load);
@@ -69,6 +70,38 @@ public partial class PauseMenu : CanvasLayer
         if (GodotObject.IsInstanceValid(_previousFocus) && _previousFocus.IsVisibleInTree()) _previousFocus.GrabFocus();
         else _resume.ReleaseFocus();
         _previousFocus = null;
+    }
+
+    // =========================================================
+    // A fresh mission launch discards this run rather than loading a checkpoint. Defer scene changes
+    // until after the pressed signal, and keep the paused battlefield if navigation fails.
+    public void RestartMission()
+    {
+        if (_resultsLocked || !IsOpen || _restartQueued) return;
+        _restartQueued = true;
+        Callable.From(() =>
+        {
+            if (!IsInsideTree() || _resultsLocked || !IsOpen) { _restartQueued = false; return; }
+            try
+            {
+                if (GetParent() is not BattlefieldLauncher battle)
+                    throw new InvalidOperationException("The current battlefield is unavailable.");
+                // Runtime campaign deployments have the generic Battlefield.tscn scene path;
+                // the Mission resource identifies the actual level that must be restarted.
+                string destination = battle.Mission?.ResourcePath;
+                if (string.IsNullOrEmpty(destination)) destination = battle.SceneFilePath;
+                if (string.IsNullOrEmpty(destination))
+                    throw new InvalidOperationException("This mission has no restart destination.");
+                MenuNavigation.Open(this, destination);
+            }
+            catch (Exception error)
+            {
+                _restartQueued = false;
+                _error.Title = "Restart failed";
+                _error.DialogText = error.Message;
+                _error.PopupCentered(new Vector2I(460, 180));
+            }
+        }).CallDeferred();
     }
 
     // =========================================================
