@@ -1,3 +1,9 @@
+## Unlit construction telemetry
+
+Reverted the one-tile construction lighting pass. The percentage, rings and completion fade use one shared unshaded canvas item, with the existing redraw cadence. Source review only. Godot build and in-game verification are pending.
+
+---
+
 ## Tower light transitions and splash stagger
 
 Pooled tower lights expand in 0.6 seconds and retract in 0.25 seconds. Restored the Blaster and Rocket stagger powers and enabled Tiny reactions for Blaster-strength hits, including the Standard Drone. Increased the shared visual shove to 8 px and the return to 0.28 seconds. Source review only. Godot build and visual checks are pending.

@@ -126,11 +126,12 @@ public partial class ConstructionSiteHologram
         return rings;
     }
 
-    private void DrawRotatingRing(RingArtwork ring, Vector2 center, float angle, Vector2 scale, Color tint)
+    private void DrawRotatingRing(RingArtwork ring, Vector2 center, float angle, Vector2 scale, Color tint, CanvasItem target = null)
     {
         if (ring.Texture == null) return;
-        DrawSetTransform(center, angle, scale);
-        DrawTextureRectRegion(ring.Texture, ring.Bounds, ring.Region, tint);
+        target ??= this;
+        target.DrawSetTransform(center, angle, scale);
+        target.DrawTextureRectRegion(ring.Texture, ring.Bounds, ring.Region, tint);
     }
 
     // =========================================================

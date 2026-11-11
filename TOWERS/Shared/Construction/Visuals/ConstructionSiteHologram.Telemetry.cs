@@ -1,9 +1,11 @@
-// One cached readout per tracked site, drawn by the existing bounded hologram canvas; no site GUI nodes/timers.
+// One cached readout per tracked site, drawn by a shared unlit canvas; no site GUI nodes/timers.
 using Godot;
 using System;
 using System.Collections.Generic;
 public partial class ConstructionSiteHologram
 {
+    private Node2D _readoutCanvas;
+
     private sealed class Readout
     {
         public TowerBase Tower;
@@ -140,7 +142,7 @@ public partial class ConstructionSiteHologram
         Font font = c.TelemetryFont ?? ThemeDB.FallbackFont;
         Vector2 center = panel.GetCenter();
         DrawCircularProgress(center, Vector2.One * scale, radius, site, opacity, font, c);
-        DrawSetTransform(Vector2.Zero);
+        _readoutCanvas.DrawSetTransform(Vector2.Zero);
     }
 
     // =========================================================
@@ -157,9 +159,9 @@ public partial class ConstructionSiteHologram
         Color cyan = new(.12f, .92f, .96f, opacity * .85f);
         Color pale = new(.77f, 1f, 1f, opacity * .93f);
         Color fill = c.TelemetryBackground; fill.A *= opacity * .4f;
-        DrawSetTransform(center, 0, scale);
-        DrawCircle(Vector2.Zero, radius * .81f, fill);
-        DrawPolyline(_telemetryTrack, dim, 1.15f, true);
+        _readoutCanvas.DrawSetTransform(center, 0, scale);
+        _readoutCanvas.DrawCircle(Vector2.Zero, radius * .81f, fill);
+        _readoutCanvas.DrawPolyline(_telemetryTrack, dim, 1.15f, true);
         float done = Mathf.Clamp(site.DisplayedPercent / 100f, 0, 1);
         if (done > .001f)
         {
@@ -170,12 +172,12 @@ public partial class ConstructionSiteHologram
                 site.CachedProgress = done;
                 site.CachedRadius = radius;
             }
-            DrawPolyline(site.ProgressPoints, new Color(.14f, .94f, 1f, opacity * .55f), 1.5f, true);
+            _readoutCanvas.DrawPolyline(site.ProgressPoints, new Color(.14f, .94f, 1f, opacity * .55f), 1.5f, true);
         }
 
-        DrawRotatingRing(_telemetryOuter, center, outer, scale, new Color(1, 1, 1, opacity));
-        DrawRotatingRing(_telemetryMiddle, center, middle, scale, cyan);
-        DrawRotatingRing(_telemetryInner, center, inner, scale, pale);
+        DrawRotatingRing(_telemetryOuter, center, outer, scale, new Color(1, 1, 1, opacity), _readoutCanvas);
+        DrawRotatingRing(_telemetryMiddle, center, middle, scale, cyan, _readoutCanvas);
+        DrawRotatingRing(_telemetryInner, center, inner, scale, pale, _readoutCanvas);
 
         int shown = Mathf.Clamp(Mathf.RoundToInt(site.DisplayedPercent), 0, 100);
         bool numberChanged = shown != site.LastDrawnPercent;
@@ -192,8 +194,8 @@ public partial class ConstructionSiteHologram
             Vector2 size = font.GetStringSize(site.PercentLabel, HorizontalAlignment.Left, -1, numberSize);
             site.LabelPosition = new Vector2(-size.X * .5f, (font.GetAscent(numberSize) - font.GetDescent(numberSize)) * .5f);
         }
-        DrawSetTransform(center, 0, scale);
-        DrawString(font, site.LabelPosition, site.PercentLabel, HorizontalAlignment.Left, -1, numberSize, pale);
+        _readoutCanvas.DrawSetTransform(center, 0, scale);
+        _readoutCanvas.DrawString(font, site.LabelPosition, site.PercentLabel, HorizontalAlignment.Left, -1, numberSize, pale);
     }
 
     private void DrawCompletions(Rect2 visible, ConstructionSiteVisualConfig c)

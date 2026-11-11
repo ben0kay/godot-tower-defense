@@ -23,6 +23,13 @@ public partial class ConstructionSiteHologram : Node2D
     public override void _Ready()
     {
         SetProcess(false); SetPhysicsProcess(false);
+        _readoutCanvas = new Node2D
+        {
+            Name = "UnlitTelemetry",
+            Material = new CanvasItemMaterial { LightMode = CanvasItemMaterial.LightModeEnum.Unshaded }
+        };
+        _readoutCanvas.Draw += DrawReadouts;
+        AddChild(_readoutCanvas);
         _work = GetNodeOrNull<ConstructionWorkManager>("../../ConstructionWork");
         _builders = GetNodeOrNull<ConstructionDroneManager>("../../ConstructionDrones");
         _cellSize = GetNodeOrNull<WorldGrid>("../../Grid")?.Config?.CellSize ?? 64;
@@ -64,7 +71,7 @@ public partial class ConstructionSiteHologram : Node2D
         bool active = IsInsideTree() && Config?.Enabled == true && (_sites.Count > 0 || _completions.Count > 0);
         if (active) _tick = 0;
         SetProcess(active);
-        QueueRedraw();
+        QueueVisualRedraw();
     }
     #endregion
 
@@ -74,7 +81,7 @@ public partial class ConstructionSiteHologram : Node2D
     public override void _Process(double delta)
     {
         if ((_sites.Count == 0 && _completions.Count == 0) || Config?.Enabled != true)
-        { SetProcess(false); QueueRedraw(); return; }
+        { SetProcess(false); QueueVisualRedraw(); return; }
         if (GetTree().Paused) return;
         if (!double.IsFinite(delta) || delta <= 0) return;
         AdvanceTelemetry((float)System.Math.Min(delta, 3600));
@@ -83,25 +90,35 @@ public partial class ConstructionSiteHologram : Node2D
         float interval = 1f / Mathf.Clamp(Config.RefreshHz, 8f, 48f);
         if (_tick < interval) return;
         _tick %= interval;
-        QueueRedraw();
+        QueueVisualRedraw();
     }
 
     // =========================================================
     // Draw from live fixed tower footprints; a site has no visual work once its job unregisters.
-    public override void _Draw()
+    public override void _Draw() => DrawSites(telemetry: false);
+
+    private void DrawReadouts() => DrawSites(telemetry: true);
+
+    private void QueueVisualRedraw()
+    {
+        QueueRedraw();
+        _readoutCanvas?.QueueRedraw();
+    }
+
+    private void DrawSites(bool telemetry)
     {
         ConstructionSiteVisualConfig c = Config;
-        if (c?.Enabled != true) return;
-        _readoutCount = 0;
+        if (c?.Enabled != true || (telemetry && !c.TelemetryEnabled)) return;
+        if (telemetry) _readoutCount = 0;
         float inset = Mathf.Clamp(c.InsetPixels, 0, 12);
         float corner = Mathf.Clamp(c.CornerLength, 2, 20);
-        if (_artInset != inset)
+        if (!telemetry && _artInset != inset)
         {
             _artInset = inset;
             _scannerArtwork.Clear();
             _footprintLines.Clear();
         }
-        if (_artCorner != corner)
+        if (!telemetry && _artCorner != corner)
         {
             _artCorner = corner;
             _footprintLines.Clear();
@@ -112,7 +129,7 @@ public partial class ConstructionSiteHologram : Node2D
         Vector2 viewB = toWorldCanvas * GetViewportRect().Size;
         Rect2 visible = new(new Vector2(Mathf.Min(viewA.X, viewB.X), Mathf.Min(viewA.Y, viewB.Y)),
             new Vector2(Mathf.Abs(viewB.X - viewA.X), Mathf.Abs(viewB.Y - viewA.Y)));
-        float pulse = 1f + Mathf.Clamp(c.PulseDepth, 0, .5f) * Mathf.Sin(_clock * Mathf.Tau * Mathf.Clamp(c.PulseHz, 0, 5));
+        float pulse = telemetry ? 1f : 1f + Mathf.Clamp(c.PulseDepth, 0, .5f) * Mathf.Sin(_clock * Mathf.Tau * Mathf.Clamp(c.PulseHz, 0, 5));
         foreach (TowerBase tower in _sites)
         {
             if (!GodotObject.IsInstanceValid(tower) || !tower.IsInsideTree() ||
@@ -123,19 +140,19 @@ public partial class ConstructionSiteHologram : Node2D
             Vector2 size = cells * _cellSize;
             Vector2 center = ToLocal(tower.GlobalPosition);
             Rect2 bounds = new(center - size * .5f + Vector2.One * inset, size - Vector2.One * (inset * 2));
-            if (bounds.Size.X <= 2 || bounds.Size.Y <= 2 || !visible.Intersects(bounds.Grow(c.TelemetryEnabled ? 240 : 8))) continue;
-            if (visible.Intersects(bounds.Grow(12)))
+            if (bounds.Size.X <= 2 || bounds.Size.Y <= 2 || !visible.Intersects(bounds.Grow(telemetry ? 240 : 12))) continue;
+            if (!telemetry)
             {
                 float locked = GodotObject.IsInstanceValid(_builders) ? _builders.AcquisitionProgressFor(tower) : -1;
                 DrawSite(bounds, tower.AwaitingConstructionDrone, c, pulse, locked);
             }
-            if (_telemetry.TryGetValue(tower, out var site))
+            else if (_telemetry.TryGetValue(tower, out var site))
             {
                 UpdateReadout(site); // Recover authoritative progress if telemetry is enabled while a job is held.
                 DrawTelemetry(bounds, site, 1, c);
             }
         }
-        DrawCompletions(visible, c);
+        if (telemetry) DrawCompletions(visible, c);
     }
 
     // =========================================================

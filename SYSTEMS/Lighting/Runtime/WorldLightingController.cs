@@ -19,7 +19,6 @@ public partial class WorldLightingController : Node2D
         public float GroupRadius;
         public float GroupEnergy = 1;
         public float CameraDistance;
-        public Vector2I ConstructionFootprint;
     }
     private const float CollapsedTowerLightScale = .001f;
 
@@ -246,9 +245,7 @@ public partial class WorldLightingController : Node2D
         bool hasCandidates = Select(_citadels, cap, cull, canvas, viewport);
         hasCandidates |= Select(_portals, cap, cull, canvas, viewport);
         if (_selected.Count < cap) hasCandidates |= Select(_towerGlows, _selected.Count + 1, cull, canvas, viewport);
-        if (_selected.Count < cap) hasCandidates |= Select(_constructionGlows, _selected.Count + 1, cull, canvas, viewport);
         hasCandidates |= Select(_drones, Mathf.Min(cap, _selected.Count + Mathf.Clamp(Config.MaxDroneLights, 0, 16)), cull, canvas, viewport);
-        hasCandidates |= Select(_constructionGlows, cap, cull, canvas, viewport);
         hasCandidates |= Select(_towerGlows, cap, cull, canvas, viewport);
 
         Select(_projectileSources, Mathf.Min(cap, _selected.Count + Mathf.Clamp(Config.MaxProjectileLights, 0, 8)), cull, canvas, viewport);
@@ -281,16 +278,8 @@ public partial class WorldLightingController : Node2D
         return hasCandidates;
     }
 
-    private bool Overlaps(Source source, Transform2D canvas, Rect2 viewport)
-    {
-        if (source.ConstructionFootprint == Vector2I.Zero)
-            return OverlapsLight(VisualPositionFor(source), VisualRadiusFor(source), canvas, viewport);
-
-        Vector2 halfSize = (Vector2)(source.ConstructionFootprint + new Vector2I(2, 2)) * (Grid.Config.CellSize * .5f);
-        Vector2 centre = canvas * VisualPositionFor(source);
-        Vector2 extent = canvas.X.Abs() * halfSize.X + canvas.Y.Abs() * halfSize.Y;
-        return viewport.Intersects(new Rect2(centre - extent, extent * 2), true);
-    }
+    private bool Overlaps(Source source, Transform2D canvas, Rect2 viewport) =>
+        OverlapsLight(VisualPositionFor(source), VisualRadiusFor(source), canvas, viewport);
 
     private static bool OverlapsLight(Vector2 position, float radius, Transform2D canvas, Rect2 viewport)
     {
@@ -324,25 +313,13 @@ public partial class WorldLightingController : Node2D
             Vector2 position = VisualPositionFor(source);
             if (light.GlobalPosition != position) light.GlobalPosition = position;
         }
-        bool constructing = source.ConstructionFootprint != Vector2I.Zero;
-        Texture2D texture = constructing ? GetConstructionFalloff(source.ConstructionFootprint) : Falloff;
-        float scale = constructing
-            ? (source.ConstructionFootprint.X + 2) * (float)Grid.Config.CellSize / texture.GetWidth()
-            : 2 * VisualRadiusFor(source) / texture.GetWidth();
-        bool textureChanged = light.Texture != texture;
-        if (textureChanged)
-        {
-            float oldWidth = light.Texture?.GetWidth() ?? texture.GetWidth();
-            light.Texture = texture;
-            if (towerLight && (!acquired || reversing))
-                light.TextureScale *= oldWidth / texture.GetWidth();
-        }
+        float scale = 2 * VisualRadiusFor(source) / Falloff.GetWidth();
         float energy = source.Profile.Energy * source.GroupEnergy *
-            (constructing ? Mathf.Clamp(Config.ConstructionEnergyFactor, 0.1f, 1) : 1);
+            (source.UnderConstruction?.Invoke() == true ? Mathf.Clamp(Config.ConstructionEnergyFactor, 0.1f, 1) : 1);
         if (towerLight)
         {
             if (acquired && !reversing) light.TextureScale = Mathf.Min(scale, CollapsedTowerLightScale);
-            if (acquired || textureChanged || slot.TargetScale != scale)
+            if (acquired || slot.TargetScale != scale)
                 AnimateTowerScale(slot, scale, Config.TowerLightExpandSeconds);
         }
         else if (light.TextureScale != scale) light.TextureScale = scale;
