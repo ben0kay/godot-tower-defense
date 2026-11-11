@@ -19,6 +19,10 @@ public partial class LightingMasterConfig : Resource
     [Export(PropertyHint.Range, "0.1,1,0.05")] public float ConstructionEnergyFactor { get; set; } = 0.55f;
     [Export(PropertyHint.Range, "0,16,1")] public int MaxDroneLights { get; set; } = 8;
 
+    [ExportGroup("Tower Light Transitions")]
+    [Export(PropertyHint.Range, "0,2,0.01")] public float TowerLightExpandSeconds { get; set; } = .6f;
+    [Export(PropertyHint.Range, "0,2,0.01")] public float TowerLightRetractSeconds { get; set; } = .25f;
+
     [ExportGroup("Lava Presentation")]
     [Export] public LightSourceConfig LavaSpill { get; set; }
     [Export(PropertyHint.Range, "0,1,0.01")] public float LavaGlowOpacity { get; set; } = .52f;

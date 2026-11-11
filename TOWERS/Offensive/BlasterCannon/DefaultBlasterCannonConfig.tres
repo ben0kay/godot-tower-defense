@@ -9,6 +9,7 @@
 [resource]
 script = ExtResource("1")
 HeatEnabled = true
+StaggerImpactPower = 2
 MuzzleFlash = ExtResource("flash")
 ImpactStyle = ExtResource("2")
 Power = ExtResource("power")

@@ -13,6 +13,7 @@ internal static class ImpactStagger
     {
         int resistance = enemyClass switch
         {
+            EnemyClass.Tiny when power >= 2 => 1,
             EnemyClass.Light => 1,
             EnemyClass.Standard => 2,
             _ => 0

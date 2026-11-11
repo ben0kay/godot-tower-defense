@@ -1,3 +1,9 @@
+## Tower light transitions and splash stagger
+
+Pooled tower lights expand in 0.6 seconds and retract in 0.25 seconds. Restored the Blaster and Rocket stagger powers and enabled Tiny reactions for Blaster-strength hits, including the Standard Drone. Increased the shared visual shove to 8 px and the return to 0.28 seconds. Source review only. Godot build and visual checks are pending.
+
+---
+
 ## Pause menu — Restart action (2026-11-11)
 
 Added an Action-styled RESTART button directly beneath RESUME in `UI/Menus/Pause/PauseMenu.cs`. Clicking it defers a fresh current-mission launch via `MenuNavigation.Open` (mission `.tres` preferred over generic battlefield scene), not `CampaignSession.LoadCurrent`; existing scene and pause are retained if launch fails. No save format or unrelated gameplay changes. Source sanity review only; Godot .NET runtime and visual acceptance pending.

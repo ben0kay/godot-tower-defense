@@ -21,10 +21,15 @@ public partial class WorldLightingController : Node2D
         public float CameraDistance;
         public Vector2I ConstructionFootprint;
     }
+    private const float CollapsedTowerLightScale = .001f;
+
     private sealed class Slot(PointLight2D light)
     {
         public readonly PointLight2D Light = light;
         public Source Source;
+        public Tween ScaleTween;
+        public Node2D RetractingTower;
+        public float TargetScale;
     }
 
     private readonly List<Source> _citadels = new(), _towers = new(), _drones = new(), _lava = new();
@@ -194,7 +199,7 @@ public partial class WorldLightingController : Node2D
         key.VisibilityChanged += QueueRefresh;
         _disconnect.Add(key, () =>
         {
-            ReleaseSlot(source);
+            ReleaseSlot(source, retract: _lightingEnabled);
             sources.Remove(source);
             key.VisibilityChanged -= QueueRefresh;
         });
@@ -251,7 +256,8 @@ public partial class WorldLightingController : Node2D
             if (!_selected.Contains(_projectileSources[i])) RemoveProjectile(i);
 
         foreach (Slot slot in _slots)
-            if (slot.Source != null && !_selected.Contains(slot.Source)) Release(slot);
+            if (slot.Source != null && !_selected.Contains(slot.Source))
+                Release(slot, retract: !_lightingEnabled || !IsAvailable(slot.Source));
         foreach (Source source in _selected) Apply(source);
 
         UpdateRevealPresentation();
@@ -304,8 +310,15 @@ public partial class WorldLightingController : Node2D
     {
         Slot slot = source.Slot;
         bool acquired = slot == null;
-        if (acquired) slot = AcquireSlot();
+        if (acquired) slot = AcquireSlot(source);
         PointLight2D light = slot.Light;
+        bool towerLight = source.UnderConstruction != null;
+        bool reversing = acquired && ReferenceEquals(slot.RetractingTower, source.Anchor) && towerLight;
+        if (acquired)
+        {
+            StopScaleTween(slot);
+            slot.RetractingTower = null;
+        }
         if (acquired || source.Follower == null)
         {
             Vector2 position = VisualPositionFor(source);
@@ -316,10 +329,23 @@ public partial class WorldLightingController : Node2D
         float scale = constructing
             ? (source.ConstructionFootprint.X + 2) * (float)Grid.Config.CellSize / texture.GetWidth()
             : 2 * VisualRadiusFor(source) / texture.GetWidth();
-        if (light.Texture != texture) light.Texture = texture;
+        bool textureChanged = light.Texture != texture;
+        if (textureChanged)
+        {
+            float oldWidth = light.Texture?.GetWidth() ?? texture.GetWidth();
+            light.Texture = texture;
+            if (towerLight && (!acquired || reversing))
+                light.TextureScale *= oldWidth / texture.GetWidth();
+        }
         float energy = source.Profile.Energy * source.GroupEnergy *
             (constructing ? Mathf.Clamp(Config.ConstructionEnergyFactor, 0.1f, 1) : 1);
-        if (light.TextureScale != scale) light.TextureScale = scale;
+        if (towerLight)
+        {
+            if (acquired && !reversing) light.TextureScale = Mathf.Min(scale, CollapsedTowerLightScale);
+            if (acquired || textureChanged || slot.TargetScale != scale)
+                AnimateTowerScale(slot, scale, Config.TowerLightExpandSeconds);
+        }
+        else if (light.TextureScale != scale) light.TextureScale = scale;
         if (light.Energy != energy) light.Energy = energy;
         if (!acquired) return;
         slot.Source = source;
@@ -331,10 +357,19 @@ public partial class WorldLightingController : Node2D
             ProjectileLightOverlapsReveal(source.Projectile.Position, source.Projectile.Radius);
     }
 
-    private Slot AcquireSlot()
+    private Slot AcquireSlot(Source source)
     {
+        Slot idle = null, retracting = null;
         foreach (Slot slot in _slots)
-            if (slot.Source == null) return slot;
+        {
+            if (slot.Source != null) continue;
+            if (slot.RetractingTower == null) idle ??= slot;
+            else if (ReferenceEquals(slot.RetractingTower, source.Anchor)) return slot;
+            else retracting ??= slot;
+        }
+        if (idle != null) return idle;
+        if (retracting != null && _slots.Count >= Mathf.Clamp(Config.MaxActiveLights, 0, 64)) return retracting;
+
         PointLight2D light = new() { Enabled = false, Texture = Falloff, ShadowEnabled = false };
         AddChild(light);
         Slot created = new(light);
@@ -342,17 +377,58 @@ public partial class WorldLightingController : Node2D
         return created;
     }
 
-    private void ReleaseSlot(Source source)
+    private void ReleaseSlot(Source source, bool retract = false)
     {
-        if (source.Slot is { } slot) Release(slot);
+        if (source.Slot is { } slot) Release(slot, retract);
     }
 
-    private static void Release(Slot slot)
+    // =========================================================
+    // A retracting tower releases its lease immediately. The pool can reclaim its lamp under load.
+    private void Release(Slot slot, bool retract = false)
     {
-        slot.Light.Enabled = false;
-        slot.Source.Follower?.StopFollowing();
-        slot.Source.Slot = null;
+        Source source = slot.Source;
+        source.Follower?.StopFollowing();
+        source.Slot = null;
         slot.Source = null;
+        if (retract && source.UnderConstruction != null && slot.Light.Enabled &&
+            float.IsFinite(Config.TowerLightRetractSeconds) && Config.TowerLightRetractSeconds > 0 && slot.Light.TextureScale > CollapsedTowerLightScale)
+        {
+            slot.RetractingTower = source.Anchor;
+            AnimateTowerScale(slot, CollapsedTowerLightScale, Config.TowerLightRetractSeconds);
+            slot.ScaleTween.TweenCallback(Callable.From(() =>
+            {
+                slot.Light.Enabled = false;
+                slot.RetractingTower = null;
+                slot.ScaleTween = null;
+            }));
+            return;
+        }
+
+        StopScaleTween(slot);
+        slot.Light.Enabled = false;
+    }
+
+    // =========================================================
+    // Tweens run only on transitions. An interrupted transition starts from the current light size.
+    private void AnimateTowerScale(Slot slot, float scale, float seconds)
+    {
+        StopScaleTween(slot);
+        slot.TargetScale = scale;
+        if (!float.IsFinite(seconds) || seconds <= 0)
+        {
+            slot.Light.TextureScale = scale;
+            return;
+        }
+
+        slot.ScaleTween = CreateTween();
+        slot.ScaleTween.TweenProperty(slot.Light, "texture_scale", scale, seconds)
+            .SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.InOut);
+    }
+
+    private static void StopScaleTween(Slot slot)
+    {
+        if (slot.ScaleTween?.IsValid() == true) slot.ScaleTween.Kill();
+        slot.ScaleTween = null;
     }
     #endregion
 
@@ -369,7 +445,10 @@ public partial class WorldLightingController : Node2D
         foreach (Action disconnect in _disconnect.Values) disconnect();
         _disconnect.Clear();
         foreach (Slot slot in _slots)
+        {
             if (slot.Source != null) Release(slot);
+            else StopScaleTween(slot);
+        }
         for (int i = _projectileSources.Count - 1; i >= 0; i--) RemoveProjectile(i);
         _selected.Clear();
         _lava.Clear();
