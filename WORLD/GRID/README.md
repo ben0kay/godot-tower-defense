@@ -1,3 +1,9 @@
+## LOS-PERF1 — planned safe weapon-LOS fast paths (documentation only)
+
+[LOS-PERF1 implementation plan](LOS_PERF1_IMPLEMENTATION_PLAN.md) records the **existing** automatic no-blocker early return in `WorldGridSight` and proposes a map-rebuild-time summed-area blocker table to skip exact segment traversal when no blockers can lie in a shot's corridor. It preserves all mountain/corner/hostile-muzzle and continuous-beam sight semantics. **Not yet implemented; old LOS code remains live.**
+
+---
+
 ## Shared weapon terrain vision — 2026-11-06
 
 **Source Implemented / Awaiting Owner Validation.** Mountains now block enemy weapon acquisition, aiming and firing as well as friendly tower targeting. `WorldGrid.HasWeaponLineOfSight(from, to)` is the neutral shared API, using the existing allocation-free cached terrain traversal. `HasTowerLineOfSight` remains a compatibility wrapper; the existing `blocks_tower_sight` tile metadata, blocker count/cache, corner rules and no-blocker fast path are preserved. Friendly target queries and the selected red/visible range overlay call the neutral API; no second visibility cache, terrain scan, physics ray system or global fog system.

@@ -1,3 +1,9 @@
+## LOS-PERF1 — scoped world-grid LOS optimization plan (planning only, 2026-11-10)
+
+Authored [LOS-PERF1](../WORLD/GRID/LOS_PERF1_IMPLEMENTATION_PLAN.md): no-blocker map fast return was already implemented; proposed a cached authoritative sight-blocker integral image for additional empty-corridor returns on mountain-containing maps, without relaxing exact acquisition/locked-target/beam sight. Future Codex job only; **no runtime code changed**.
+
+---
+
 ## Overlay frame and rendering diagnostics
 
 F2 adds a fixed 600-frame p95/p99 history, latest viewport CPU/GPU rendering timings, managed heap/GC totals and existing visual counters/toggle states. F3 can save a snapshot without physics profiling. Path warnings now expose the soft budget and over-budget tick frequency separately from A*. Source review only. MeasureRendering can disable native timing for comparison. Godot .NET build and hardware timing checks remain pending.
